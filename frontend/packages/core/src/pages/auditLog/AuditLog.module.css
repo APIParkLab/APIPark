@@ -1,0 +1,8 @@
+.audit-log-table{
+    :global .ant-pro-table-search {
+            margin-block-end: 0px;
+        }
+    :global .ant-pro-query-filter.ant-pro-query-filter {
+            padding: 10px;
+        }
+}

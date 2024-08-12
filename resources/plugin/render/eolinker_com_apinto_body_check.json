@@ -1,0 +1,1 @@
+{"group":"eolinker.com","project":"apinto","name":"body_check","version":"innert","render":{"type":"object","eo:type":"object","properties":{"allowed_payload_size":{"type":"integer","eo:type":"integer","format":"int32","label":"允许的最大请求体大小"},"is_empty":{"type":"boolean","eo:type":"boolean","label":"是否允许为空"}},"ui:sort":["is_empty","allowed_payload_size"]}}

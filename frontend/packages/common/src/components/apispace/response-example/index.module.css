@@ -1,0 +1,22 @@
+.tab-container{
+  position: relative;
+  padding: 10px;
+  line-height: 20px;
+  font-size: 12px;
+  border: 1px solid var(--border-default-color);
+  border-radius: var(--DEFAULT_BORDER_RADIUS);
+}
+.code-span {
+  padding: 5px 10px;
+  color: #5f7d8b;
+  border-radius: var(--DEFAULT_BORDER_RADIUS);
+  border: 1px solid #EDEDED;
+  background-color: #f7f8fa;
+}
+.pre {
+  padding-top: 35px;
+  min-height: 130px;
+  max-height: 500px;
+  word-break: break-all;
+  overflow: auto;
+}

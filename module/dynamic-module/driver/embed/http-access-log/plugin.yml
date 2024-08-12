@@ -1,0 +1,203 @@
+id: "http-access-log.apinto.com"
+name: "http-access-log"
+cname: "HTTP日志"
+resume: "将请求和响应日志发送到HTTP服务器"
+version: "v1.0.0"
+icon: "HTTP日志.png"
+driver: "dynamic.apinto.com"
+front: template/http-access-log
+navigation: "navigation.system"
+group_id: "log"
+frontend:
+  - name: http-access-log
+    driver: apinto.intelligent.normal
+    router:
+      - path: template/http-access-log
+        type: normal
+define:  # 动态模块定义
+  profession: output
+  drivers:
+    - name: http_output
+      title: http请求
+  skill: Access-Output
+  fields:
+    - name: title           # 定义从响应中对应字段中获取显示值
+      title: 名称
+    - name: id
+      title: ID
+    - name: driver
+      title: 驱动名称
+    - name: description
+      title: 描述
+  render:
+    http_output: |
+      {
+          "type": "object",
+          "properties": {
+              "scopes": {
+                  "type": "array",
+                  "title": "作用范围",
+                  "x-decorator": "FormItem",
+                  "x-component": "ArrayItems",
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "name": "scopes",
+                  "x-index": 0,
+                  "required": true,
+                  "items": {
+                      "type": "void",
+                      "x-component": "Space",
+                      "properties": {
+                          "sort": {
+                              "type": "void",
+                              "x-decorator": "FormItem",
+                              "x-component": "ArrayItems.SortHandle",
+                              "name": "sort",
+                              "x-index": 0
+                          },
+                          "select": {
+                              "type": "string",
+                              "x-decorator": "FormItem",
+                              "x-component": "Select",
+                              "enum": [
+                                  {
+                                      "label": "Access日志",
+                                      "value": "access_log"
+                                  }
+                              ],
+                              "name": "select",
+                              "x-index": 1
+                          },
+                          "remove": {
+                              "type": "void",
+                              "x-decorator": "FormItem",
+                              "x-component": "ArrayItems.Remove",
+                              "name": "remove",
+                              "x-index": 2
+                          }
+                      }
+                  },
+                  "properties": {
+                      "add": {
+                          "type": "void",
+                          "title": "添加条目",
+                          "x-component": "ArrayItems.Addition",
+                          "x-component-props": {
+                              "defaultValue": "access_log"
+                          },
+                          "name": "add",
+                          "x-index": 0
+                      }
+                  }
+              },
+              "method": {
+                  "type": "string",
+                  "title": "请求方式",
+                  "x-decorator": "FormItem",
+                  "x-component": "Select",
+                  "x-validator": [],
+                  "x-component-props": {},
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "enum": [
+                      {
+                          "label": "POST",
+                          "value": "POST"
+                      },
+                      {
+                          "label": "PUT",
+                          "value": "PUT"
+                      },
+                      {
+                          "label": "PATCH",
+                          "value": "PATCH"
+                      }
+                  ],
+                  "default": "POST",
+                  "name": "method",
+                  "x-index": 1,
+                  "required": true
+              },
+              "url": {
+                  "type": "string",
+                  "title": "URL",
+                  "x-decorator": "FormItem",
+                  "x-component": "Input",
+                  "x-validator": [
+                      {
+                          "triggerType": "onBlur",
+                          "pattern": "^[a-zA-z]+://[^\\s]*$"
+                      }
+                  ],
+                  "x-component-props": {},
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "name": "url",
+                  "x-index": 2,
+                  "required": true
+              },
+              "headers": {
+                  "type": "object",
+                  "title": "请求头部",
+                  "x-decorator": "FormItem",
+                  "x-component": "CustomCodeboxComponent",
+                  "x-component-props": {
+                      "mode": "json"
+                  },
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "name": "headers",
+                  "x-index": 3
+              },
+              "type": {
+                  "title": "输出格式",
+                  "x-decorator": "FormItem",
+                  "x-component": "Select",
+                  "x-validator": [],
+                  "x-component-props": {},
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "enum": [
+                      {
+                          "children": [],
+                          "label": "单行",
+                          "value": "line"
+                      },
+                      {
+                          "children": [],
+                          "label": "Json",
+                          "value": "json"
+                      }
+                  ],
+                  "default": "line",
+                  "name": "type",
+                  "x-index": 4,
+                  "required": true
+              },
+              "formatter": {
+                  "type": "object",
+                  "title": "格式化配置",
+                  "x-decorator": "FormItem",
+                  "x-component": "CustomCodeboxComponent",
+                  "x-component-props": {
+                      "mode": "json"
+                  },
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "name": "formatter",
+                  "x-index": 5
+              }
+          }
+      }

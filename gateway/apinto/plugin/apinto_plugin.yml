@@ -1,0 +1,66 @@
+-
+  id: eolinker.com:apinto:access_log
+  name: access_log
+  status: global
+-
+  id: eolinker.com:apinto:monitor
+  name: monitor
+  status: global
+-
+  id: eolinker.com:apinto:proxy_rewrite_v2
+  name: proxy_rewrite
+  status: enable
+-
+  id: eolinker.com:apinto:extra_params
+  name: extra_params
+  status: enable
+-
+  id: eolinker.com:apinto:plugin_app
+  name: app
+  status: global
+-
+  id: eolinker.com:apinto:access_relational
+  name: access_relational
+  status: global
+  config:
+    rules:
+      - a: "service_of_api:#{api}"
+        b: "subscription_service:#{application}"
+    response:
+      status_code: 403
+      content_typ: "text/plan"
+      charset: "utf-8"
+      body: "Forbidden"
+-
+  id: eolinker.com:apinto:strategy-plugin-visit
+  name: strategy_visit
+  status: global
+  rely: eolinker.com:apinto:plugin_app
+-
+  id: eolinker.com:apinto:strategy-plugin-grey
+  name: strategy_grey
+  status: global
+  rely: eolinker.com:apinto:plugin_app
+-
+  id: eolinker.com:apinto:strategy-plugin-limiting
+  name: strategy_limiting
+  status: global
+  rely: eolinker.com:apinto:plugin_app
+  config:
+    cache: redis@output
+-
+  id: eolinker.com:apinto:strategy-plugin-fuse
+  name: strategy_fuse
+  status: global
+  rely: eolinker.com:apinto:plugin_app
+  config:
+    cache: redis@output
+-
+  id: eolinker.com:apinto:strategy-plugin-cache
+  name: strategy_cache
+  status: global
+  rely: eolinker.com:apinto:plugin_app
+  config:
+    cache: redis@output
+
+

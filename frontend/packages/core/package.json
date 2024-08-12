@@ -1,0 +1,24 @@
+{
+  "name": "core",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": " vite  --mode open --port 5000 --strictPort",
+    "dev:pro": " vite  --config ./vite.pro.config.ts  --mode pro --port 5000 --strictPort ",
+    "build": "vite build  --mode open",
+    "build:pro": "vite --config ./vite.pro.config.ts build --mode pro",
+    "postinstall": "node scripts/moveTinymce.js",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview --port 5000 --strictPort",
+    "serve": "vite preview --port 5000 --strictPort"
+  },
+  "dependencies": {
+    "@tinymce/tinymce-react": "^4.3.2",
+    "tinymce": "^6.8.1",
+    "highlight.js": "^11.9.0",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+  }
+}

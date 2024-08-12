@@ -1,0 +1,32 @@
+{
+  "name": "common",
+  "version": "1.0.0",
+  "description": "Common library for AO Platform",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "node ./__tests__/common.test.js"
+  },
+  "dependencies": {
+    "@formkit/auto-animate": "^0.8.1",
+    "@mui/icons-material": "^5.15.6",
+    "@mui/lab": "5.0.0-alpha.150",
+    "@mui/material": "5.14.14",
+    "@mui/x-data-grid-pro": "6.18.1",
+    "allotment": "^1.20.0",
+    "echarts": "^5.5.0",
+    "mockjs": "^1.1.0",
+    "rc-picker": "^4.1.1",
+    "react-dropzone": "^14.2.3",
+    "react-hook-form": "^7.49.3"
+  },
+  "devDependencies": {
+    "@formily/antd-v5": "^1.2.1",
+    "@formily/core": "^2.2.13",
+    "@formily/react": "^2.2.13",
+    "@formily/reactive": "^2.2.13",
+    "@monaco-editor/react": "^4.6.0",
+    "exceljs": "^4.4.0",
+    "monaco-editor": "^0.45.0"
+  }
+}

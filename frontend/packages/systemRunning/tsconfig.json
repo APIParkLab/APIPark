@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@common/*": ["../common/src/*"],
+      "@core/*": ["../core/src/*"],
+    },
+  },
+  "include": ["src", "public/iconpark_eolink.js", "public/iconpark_apinto.js", "../common/src/component/aoplatform/EditableTableWithModal.tsx", "../common/src/components/aoplatform/TransferTable.tsx", "../common/src/components/aoplatform/TreeWithMore.tsx", "../common/src/components/aoplatform/DatePicker.tsx", "../common/src/components/aoplatform/TimeRangeSelector.tsx", "../common/src/components/aoplatform/TimePicker.tsx", "../common/src/components/aoplatform/MemberTransfer.tsx", "../common/src/components/aoplatform/Navigation.tsx", "../common/src/components/aoplatform/PageList.tsx", "../common/src/components/aoplatform/GroupTree.tsx", "../common/src/components/aoplatform/ErrorBoundary.tsx", "../core/src/pages/serviceCategory/ServiceHubCategoryConfig.tsx"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

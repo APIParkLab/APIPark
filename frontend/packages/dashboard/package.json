@@ -1,0 +1,11 @@
+{
+  "name": "dashboard",
+  "version": "0.0.0",
+  "description": "dashboard for AO Platform",
+  "author": "maggieyyy ",
+  "homepage": "",
+  "license": "ISC",
+  "dependencies": {
+    "echarts-for-react": "^3.0.2"
+  }
+}

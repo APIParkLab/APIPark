@@ -1,0 +1,94 @@
+system:
+team:
+  project_manager:
+    - "team_master"
+    - "team_member"
+
+  project_view:
+    - "team_member"
+    - "team_master"
+
+  team_permission_setting:
+    - "team_master"
+
+  team_setting:
+    - "team_master"
+
+  member_setting:
+    - "team_master"
+
+project:
+  project_setting:
+    - "team_master"
+    - "project_master"
+  member_setting:
+    - "team_master"
+    - "project_master"
+
+  api_manager:
+    - "team_master"
+    - "project_master"
+    - "project_member"
+  api_view:
+    - "team_master"
+    - "project_master"
+    - "project_member"
+
+  upstream_manager:
+    - "team_master"
+    - "project_master"
+    - "project_member"
+
+  upstream_view:
+    - "team_master"
+    - "project_master"
+    - "project_member"
+
+  service_manager:
+    - "team_master"
+    - "project_master"
+
+  service_view:
+    - "team_master"
+    - "project_master"
+
+  subscribe_view:
+    - "team_master"
+    - "project_master"
+    - "project_member"
+
+  subscribe_apply:
+    - "team_master"
+    - "project_master"
+    - "project_member"
+
+  subscribers_manager:
+    - "team_master"
+    - "project_master"
+    - "project_member"
+
+  subscribe_approval:
+    - "team_master"
+    - "project_master"
+
+  authentication_view:
+    - "team_master"
+    - "project_master"
+    - "project_member"
+
+  authentication_manager:
+    - "team_master"
+    - "project_master"
+
+  publish_manager:
+    - "team_master"
+    - "project_master"
+    - "project_member"
+
+  publish_approve:
+    - "team_master"
+    - "project_master"
+
+  permission_manager:
+    - "team_master"
+    - "project_master"

@@ -1,0 +1,12 @@
+.collapse-without-padding{
+    :global .ant-collapse-header{
+        background:#f7f8fa;
+        border-radius: 4px;
+    }
+    :global .ant-collapse-content-box{
+        padding:0px !important;
+    }
+    :global .ant-list-footer{
+        padding:4px 0;
+    }
+}

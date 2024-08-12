@@ -1,0 +1,527 @@
+id: "kafka-access-log.apinto.com"
+name: "kafka-access-log"
+cname: "Kafka日志"
+resume: "将请求和响应日志发布到Apache Kafka topic中"
+version: "v1.0.0"
+icon: "Kafka日志.png"
+driver: "dynamic.apinto.com"
+front: template/kafka-access-log
+navigation: "navigation.system"
+group_id: "log"
+frontend:
+  - name: kafka-access-log
+    driver: apinto.intelligent.normal
+    router:
+      - path: template/kafka-access-log
+        type: normal
+define:  # 动态模块定义
+  profession: output
+  drivers:
+    - name: kafka_output
+      title: Kafka
+  skill: Access-Output
+  fields:
+    - name: title           # 定义从响应中对应字段中获取显示值
+      title: 名称
+    - name: id
+      title: ID
+    - name: driver
+      title: 驱动名称
+    - name: description
+      title: 描述
+  render:
+    kafka_output: |
+      {
+          "type": "object",
+          "properties": {
+              "scopes": {
+                  "type": "array",
+                  "title": "作用范围",
+                  "x-decorator": "FormItem",
+                  "x-component": "ArrayItems",
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "name": "scopes",
+                  "x-index": 0,
+                  "required": true,
+                  "x-designable-id": "14ambdfgkyl",
+                  "items": {
+                      "type": "void",
+                      "x-component": "Space",
+                      "x-designable-id": "5dwv836plg8",
+                      "properties": {
+                          "sort": {
+                              "type": "void",
+                              "x-decorator": "FormItem",
+                              "x-component": "ArrayItems.SortHandle",
+                              "name": "sort",
+                              "x-index": 0,
+                              "x-designable-id": "vj263v9oh37"
+                          },
+                          "select": {
+                              "type": "string",
+                              "x-decorator": "FormItem",
+                              "x-component": "Select",
+                              "enum": [
+                                  {
+                                      "label": "Access日志",
+                                      "value": "access_log"
+                                  }
+                              ],
+                              "name": "select",
+                              "x-index": 1,
+                              "x-designable-id": "j2vu3wd3cu8"
+                          },
+                          "remove": {
+                              "type": "void",
+                              "x-decorator": "FormItem",
+                              "x-component": "ArrayItems.Remove",
+                              "name": "remove",
+                              "x-index": 2,
+                              "x-designable-id": "p4ieu9yteew"
+                          }
+                      }
+                  },
+                  "properties": {
+                      "add": {
+                          "type": "void",
+                          "title": "添加条目",
+                          "x-component": "ArrayItems.Addition",
+                          "x-component-props": {
+                              "defaultValue": "access_log"
+                          },
+                          "name": "add",
+                          "x-index": 0,
+                          "x-designable-id": "mfvpuzu4ma3"
+                      }
+                  }
+              },
+              "kafka_version": {
+                  "title": "版本",
+                  "x-decorator": "FormItem",
+                  "x-component": "Select",
+                  "x-validator": [],
+                  "x-component-props": {},
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "name": "kafka_version",
+                  "default": "3.1.0",
+                  "required": true,
+                  "enum": [
+                      {
+                          "children": [],
+                          "label": "3.1.0",
+                          "value": "3.1.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "3.0.0",
+                          "value": "3.0.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.8.1",
+                          "value": "2.8.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.8.0",
+                          "value": "2.8.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.7.1",
+                          "value": "2.7.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.7.0",
+                          "value": "2.7.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.6.2",
+                          "value": "2.6.2"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.6.1",
+                          "value": "2.6.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.6.0",
+                          "value": "2.6.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.5.1",
+                          "value": "2.5.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.5.0",
+                          "value": "2.5.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.4.1",
+                          "value": "2.4.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.4.0",
+                          "value": "2.4.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.3.1",
+                          "value": "2.3.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.3.0",
+                          "value": "2.3.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.2.2",
+                          "value": "2.2.2"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.2.1",
+                          "value": "2.2.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.2.0",
+                          "value": "2.2.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.1.1",
+                          "value": "2.1.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.1.0",
+                          "value": "2.1.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.0.1",
+                          "value": "2.0.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "2.0.0",
+                          "value": "2.0.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "1.1.1",
+                          "value": "1.1.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "1.1.0",
+                          "value": "1.1.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "1.0.2",
+                          "value": "1.0.2"
+                      },
+                      {
+                          "children": [],
+                          "label": "1.0.1",
+                          "value": "1.0.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "1.0.0",
+                          "value": "1.0.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.11.0.2",
+                          "value": "0.11.0.2"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.11.0.1",
+                          "value": "0.11.0.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.11.0.0",
+                          "value": "0.11.0.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.10.2.2",
+                          "value": "0.10.2.2"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.10.2.1",
+                          "value": "0.10.2.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.10.2.0",
+                          "value": "0.10.2.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.10.1.1",
+                          "value": "0.10.1.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.10.1.0",
+                          "value": "0.10.1.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.10.0.1",
+                          "value": "0.10.0.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.10.0.0",
+                          "value": "0.10.0.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.9.0.1",
+                          "value": "0.9.0.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.9.0.0",
+                          "value": "0.9.0.0"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.8.2.2",
+                          "value": "0.8.2.2"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.8.2.1",
+                          "value": "0.8.2.1"
+                      },
+                      {
+                          "children": [],
+                          "label": "0.8.2.0",
+                          "value": "0.8.2.0"
+                      }
+                  ],
+                  "x-index": 1,
+                  "x-designable-id": "uga7qtv47da"
+              },
+              "topic": {
+                  "type": "string",
+                  "title": "Topic",
+                  "x-decorator": "FormItem",
+                  "x-component": "Input",
+                  "x-validator": [],
+                  "x-component-props": {},
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "name": "topic",
+                  "required": true,
+                  "x-designable-id": "27le3kmhbca",
+                  "x-index": 2
+              },
+              "address": {
+                  "type": "string",
+                  "title": "服务器地址",
+                  "x-decorator": "FormItem",
+                  "x-component": "Input",
+                  "x-validator": [],
+                  "x-component-props": {},
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "name": "address",
+                  "x-index": 3,
+                  "required": true,
+                  "x-designable-id": "gz77bhn4f9d"
+              },
+              "partition_type": {
+                  "title": "Partition Type",
+                  "x-decorator": "FormItem",
+                  "x-component": "Select",
+                  "x-validator": [],
+                  "x-component-props": {},
+                  "required": true,
+                  "name": "partition_type",
+                  "enum": [
+                      {
+                          "children": [],
+                          "label": "robin",
+                          "value": "robin"
+                      },
+                      {
+                          "children": [],
+                          "label": "hash",
+                          "value": "warn"
+                      },
+                      {
+                          "children": [],
+                          "label": "manual",
+                          "value": "manual"
+                      },
+                      {
+                          "children": [],
+                          "label": "random",
+                          "value": "random"
+                      }
+                  ],
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "x-index": 4,
+                  "x-designable-id": "u939zlo1suv",
+                  "default": "robin"
+              },
+              "partition": {
+                  "type": "number",
+                  "title": "Partition",
+                  "x-decorator": "FormItem",
+                  "x-component": "NumberPicker",
+                  "x-validator": [],
+                  "x-component-props": {},
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "name": "partition",
+                  "required": false,
+                  "x-index": 5,
+                  "x-reactions": {
+                      "dependencies": [
+                          "partition_type"
+                      ],
+                      "when": "{{$deps[0] === 'manual'}}",
+                      "fulfill": {
+                          "state": {
+                              "visible": true
+                          }
+                      },
+                      "otherwise": {
+                          "state": {
+                              "visible": false
+                          }
+                      }
+                  }
+              },
+              "partition_key": {
+                  "type": "string",
+                  "title": "Partition Key",
+                  "x-decorator": "FormItem",
+                  "x-component": "Input",
+                  "x-validator": [],
+                  "x-component-props": {},
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "name": "partition_key",
+                  "required": false,
+                  "x-designable-id": "w3y6n0ali8z",
+                  "x-index": 6,
+                  "x-reactions": {
+                      "dependencies": [
+                          "partition_type"
+                      ],
+                      "when": "{{$deps[0] === 'hash'}}",
+                      "fulfill": {
+                          "state": {
+                              "visible": true
+                          }
+                      },
+                      "otherwise": {
+                          "state": {
+                              "visible": false
+                          }
+                      }
+                  }
+              },
+              "timeout": {
+                  "type": "number",
+                  "title": "请求超时时间",
+                  "x-decorator": "FormItem",
+                  "x-component": "NumberPicker",
+                  "x-validator": [
+                      {
+                          "triggerType": "onInput",
+                          "min": 0
+                      }
+                  ],
+                  "x-component-props": {},
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "required": true,
+                  "default": 10,
+                  "name": "timeout",
+                  "description": "单位：s，最小值：1",
+                  "x-index": 7
+              },
+              "type": {
+                  "title": "输出格式",
+                  "x-decorator": "FormItem",
+                  "x-component": "Select",
+                  "x-validator": [],
+                  "x-component-props": {},
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "enum": [
+                      {
+                          "children": [],
+                          "label": "单行",
+                          "value": "line"
+                      },
+                      {
+                          "children": [],
+                          "label": "Json",
+                          "value": "json"
+                      }
+                  ],
+                  "default": "line",
+                  "name": "type",
+                  "x-index": 8,
+                  "required": true
+              },
+              "formatter": {
+                  "type": "object",
+                  "title": "格式化配置",
+                  "x-decorator": "FormItem",
+                  "x-component": "CustomCodeboxComponent",
+                  "x-component-props": {
+                      "mode": "json"
+                  },
+                  "x-decorator-props": {
+                      "labelCol": 6,
+                      "wrapperCol": 10
+                  },
+                  "name": "formatter",
+                  "x-index": 9
+              }
+          }
+      }

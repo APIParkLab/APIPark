@@ -1,0 +1,120 @@
+id: "redis.apinto.com"
+name: "redis"
+cname: "Redis配置"
+resume: "配置Redis Cluster信息，帮助Apinto节点接入Redis资源。"
+version: "v1.0.0"
+icon: "Redis配置.png"
+driver: "dynamic.apinto.com"
+front: template/redis
+navigation: "navigation.system"
+group_id: "resource"
+frontend:
+  - name: redis
+    driver: apinto.intelligent.normal
+    router:
+      - path: template/redis
+        type: normal
+define:  # 动态模块定义
+  profession: output
+  drivers:
+    - name: redis
+      title: Redis
+  skill: Cache
+  fields:
+    - name: title           # 定义从响应中对应字段中获取显示值
+      title: 名称
+    - name: id
+      title: ID
+    - name: driver
+      title: 驱动名称
+    - name: description
+      title: 描述
+  render:
+    redis: |
+      {
+          "type":"object",
+          "properties":{
+              "addrs":{
+                  "type":"array",
+                  "title":"Redis节点列表",
+                  "x-decorator":"FormItem",
+                  "x-component":"ArrayItems",
+                  "x-decorator-props":{
+                      "labelCol":6,
+                      "wrapperCol":10
+                  },
+                  "items":{
+                      "type":"void",
+                      "x-component":"Space",
+                      "properties":{
+                          "sort":{
+                              "type":"void",
+                              "x-decorator":"FormItem",
+                              "x-component":"ArrayItems.SortHandle",
+                              "x-index":0
+                          },
+                          "select":{
+                              "type":"string",
+                              "x-decorator":"FormItem",
+                              "x-component":"Input",
+                                    "x-index":1
+                          },
+                          "remove":{
+                              "type":"void",
+                              "x-decorator":"FormItem",
+                              "x-component":"ArrayItems.Remove",
+                                    "x-index":2
+                          }
+                      }
+                  },
+                  "properties":{
+                      "add":{
+                          "type":"void",
+                          "title":"添加节点",
+                          "x-component":"ArrayItems.Addition"
+                      }
+                  },
+                  "name":"addrs",
+                  "x-index":0,
+                  "required":true
+              },
+              "username":{
+                  "type":"string",
+                  "title":"用户名",
+                  "x-decorator":"FormItem",
+                  "x-component":"Input",
+                  "x-validator":[
+
+                  ],
+                  "x-component-props":{
+
+                  },
+                  "x-decorator-props":{
+                      "labelCol":6,
+                      "wrapperCol":10
+                  },
+                  "name":"username",
+                  "x-index":1,
+                  "required":false
+              },
+              "password":{
+                  "type":"string",
+                  "title":"密码",
+                  "x-decorator":"FormItem",
+                  "x-component":"Password",
+                  "x-component-props":{
+                      "checkStrength":true
+                  },
+                  "x-validator":[
+
+                  ],
+                  "x-decorator-props":{
+                      "labelCol":6,
+                      "wrapperCol":10
+                  },
+                  "name":"password",
+                  "x-index":2,
+                  "required":false
+              }
+          }
+      }
