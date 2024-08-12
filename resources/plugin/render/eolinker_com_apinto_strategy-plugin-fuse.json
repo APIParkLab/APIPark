@@ -1,0 +1,1 @@
+{"group":"eolinker.com","project":"apinto","name":"strategy-plugin-fuse","version":"innert","render":{"type":"object","eo:type":"object","properties":{"cache":{"type":"string","eo:type":"require","skill":"github.com/eolinker/apinto/resources.resources.ICache","label":"缓存位置"}},"ui:sort":["cache"]}}

@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+#root {
+  width: 100vw;
+  height:100vh;
+}
+
+:global.ant-tree-node-content-wrapper{
+  overflow: hidden;
+}
+.tree-title-hover{
+  display: flex;
+  justify-content: space-between;
+  align-items:center;
+  .tree-title-span{
+    text-overflow: ellipsis;
+  }
+  .tree-title-more{
+    display: none;
+  }
+
+  &:hover .tree-title-more{
+    display: flex;
+    height:22px;
+    width:22px;
+  }
+}
+
+

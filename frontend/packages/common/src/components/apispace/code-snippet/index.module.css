@@ -1,0 +1,12 @@
+
+
+.code-snippet {
+  margin-bottom: 30px;
+ :global {
+  .ant-select-single.ant-select-sm .ant-select-selector {
+    font-size: 12px !important;
+  }
+ }
+}
+
+  

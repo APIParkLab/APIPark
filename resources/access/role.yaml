@@ -1,0 +1,116 @@
+system:
+  - name: supper_admin
+    cname: 超级管理员
+    permits:
+      - system.api_market.service_classification.manager
+      - system.api_market.service_classification.view
+      - system.devops.cluster.manager
+      - system.devops.cluster.view
+      - system.devops.log_configuration.manager
+      - system.devops.log_configuration.view
+      - system.devops.ssl_certificate.manager
+      - system.devops.ssl_certificate.view
+      - system.organization.member.manager
+      - system.organization.member.view
+      - system.organization.role.view_system_role
+      - system.organization.role.view_team_role
+      - system.organization.team.manager
+      - system.organization.team.view
+      - system.workspace.api_market.view
+      - system.workspace.application.view_all
+      - system.workspace.service.view_all
+      - system.workspace.team.view_all
+    supper: true
+  - name: team_admin
+    cname: 团队管理员
+    permits:
+      - system.organization.role.view_team_role
+      - system.organization.team.manager
+      - system.organization.team.view
+      - system.workspace.api_market.view
+      - system.workspace.application.view_all
+      - system.workspace.service.view_all
+      - system.workspace.team.view_all
+  - name: devops_admin
+    cname: 运维管理员
+    permits:
+      - system.api_market.service_classification.manager
+      - system.api_market.service_classification.view
+      - system.devops.cluster.manager
+      - system.devops.cluster.view
+      - system.devops.log_configuration.manager
+      - system.devops.log_configuration.view
+      - system.devops.ssl_certificate.manager
+      - system.devops.ssl_certificate.view
+      - system.workspace.api_market.view
+      - system.workspace.application.view_all
+      - system.workspace.service.view_all
+      - system.workspace.team.view_all
+  - name: member
+    cname: 普通成员
+    permits:
+    - system.workspace.api_market.view
+    default: true
+team:
+  - name: team_admin
+    cname: 团队管理员
+    permits:
+      - team.application.application.manager
+      - team.application.authorization.manager
+      - team.application.authorization.view
+      - team.application.subscription.manager
+      - team.application.subscription.view
+      - team.service.api.manager
+      - team.service.api.view
+      - team.service.release.manager
+      - team.service.release.view
+      - team.service.service.manager
+      - team.service.subscription.manager
+      - team.service.subscription.view
+      - team.service.upstream.manager
+      - team.service.upstream.view
+      - team.team.member.manager
+      - team.team.member.view
+      - team.team.team.manager
+      - team.team.team.view
+    supper: true
+  - name: service_admin
+    cname: 服务管理员
+    permits:
+      - team.service.service.manager
+      - team.service.upstream.manager
+      - team.service.upstream.view
+      - team.service.api.manager
+      - team.service.api.view
+      - team.service.subscription.manager
+      - team.service.subscription.view
+      - team.service.release.manager
+      - team.service.release.view
+      - team.team.member.view
+  - name: service_developer
+    cname: 服务开发者
+    permits:
+      - team.service.upstream.manager
+      - team.service.upstream.view
+      - team.service.api.manager
+      - team.service.api.view
+      - team.service.release.manager
+      - team.service.release.view
+      - team.team.member.view
+  - name: application_admin
+    cname: 应用管理员
+    permits:
+      - team.application.application.manager
+      - team.application.authorization.manager
+      - team.application.authorization.view
+      - team.application.subscription.manager
+      - team.application.subscription.view
+      - team.team.member.view
+  - name: application_developer
+    cname: 应用开发者
+    permits:
+      - team.application.authorization.view
+      - team.application.subscription.manager
+      - team.application.subscription.view
+      - team.team.member.view
+    default: true

@@ -1,0 +1,15 @@
+{
+  "name": "market",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "service market project",
+  "scripts": {
+    "dev": " vite --port 5000 --strictPort",
+    "build": "vite build",
+    "test": "node ./__tests__/market.test.js"
+  },
+  "dependencies": {
+    "react-virtuoso": "^4.7.11"
+  }
+}

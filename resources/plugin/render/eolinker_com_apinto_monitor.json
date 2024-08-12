@@ -1,0 +1,1 @@
+{"group":"eolinker.com","project":"apinto","name":"monitor","version":"innert","render":{"type":"object","eo:type":"object","properties":{"output":{"type":"array","eo:type":"array","items":{"type":"string","eo:type":"require"},"skill":"github.com/eolinker/apinto/monitor-entry.monitor-entry.IOutput","label":"输出器列表"}},"ui:sort":["output"]}}
