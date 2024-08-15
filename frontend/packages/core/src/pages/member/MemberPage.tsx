@@ -17,6 +17,7 @@ import { checkAccess } from "@common/utils/permission.ts";
 import { RenameDepModal } from "./Modal/RenameDepModal.tsx";
 import { AddDepModal } from "./Modal/AddDepModal.tsx";
 import { EditMemberModal } from "./Modal/EditMember.tsx";
+import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 
 const MemberPage = ()=>{
         const [searchWord, setSearchWord] = useState<string>('')
@@ -244,56 +245,41 @@ const MemberPage = ()=>{
         },[memberGroupId])
 
         return (
-            
-            <div className="flex flex-1  h-full flex-col ">
-                <div className="pb-[30px] border-0 border-b-[1px] border-solid border-BORDER">
-                        <p className="text-theme text-[26px] mb-[20px]">成员</p>
-                        <p>设置成员和对应的角色，成员只能够看到权限范围内的功能和数据。</p>
-                </div>
-                
-            <div className="flex flex-1">
-                  <div className="w-[200px] border-0 border-solid border-r-[1px] border-r-BORDER">
-                <div className="px-btnbase pb-[0px]">
-                    <Input className=" my-btnybase" onChange={(e) => debounce(onSearchWordChange, 100)(e.target.value)}
-                           allowClear placeholder="搜索部门"
-                           prefix={<SearchOutlined className="cursor-pointer"/>}/>
-                           </div>
-                <div className="h-[calc(100%-52px)] overflow-auto">
-                    <div  className="h-[calc(100%-30px)] overflow-y-auto pl-[5px] pr-[10px]">
-                    <Tree
-                    showLine
-                    switcherIcon={<DownOutlined />}
-                    blockNode={true}
-                    treeData={treeData}
-                    selectedKeys={[selectedDepartmentId]}
-                    expandedKeys={expandedKeys}
-                    onExpand={(expandedKeys:Key[])=>{setExpandedKeys(expandedKeys)}}
-                    onSelect={(selectedKeys,selectedRow) => {
-                        if(selectedKeys.length > 0 ){
-                        setSelectedDepartmentIds((selectedRow.node as unknown).departmentIds || [])
-                        navigate(`/member/list${selectedKeys[0] === '-1'? '' : `/${selectedKeys[0]}`}`)
-                        }
-                    }}
-                    />
-                    {/* <DirectoryTree
-                        icon={<></>}
+            <InsidePage 
+                pageTitle='成员' 
+                description="设置成员和对应的角色，成员只能够看到权限范围内的功能和数据。"
+                >
+                <div className="flex flex-1 h-full">
+                    <div className="w-[200px] border-0 border-solid border-r-[1px] border-r-BORDER">
+                    <div className="px-btnbase pb-[0px]">
+                        <Input className=" my-btnybase" onChange={(e) => debounce(onSearchWordChange, 100)(e.target.value)}
+                            allowClear placeholder="搜索部门"
+                            prefix={<SearchOutlined className="cursor-pointer"/>}/>
+                            </div>
+                    <div className="h-[calc(100%-52px)] overflow-auto">
+                        <div  className="h-[calc(100%-30px)] overflow-y-auto pl-[5px] pr-[10px]">
+                        <Tree
+                        showLine
+                        switcherIcon={<DownOutlined />}
                         blockNode={true}
                         treeData={treeData}
                         selectedKeys={[selectedDepartmentId]}
                         expandedKeys={expandedKeys}
-                        onExpand={(expandedKeys:string[])=>{setExpandedKeys(expandedKeys)}}
+                        onExpand={(expandedKeys:Key[])=>{setExpandedKeys(expandedKeys)}}
                         onSelect={(selectedKeys,selectedRow) => {
+                            if(selectedKeys.length > 0 ){
                             setSelectedDepartmentIds((selectedRow.node as unknown).departmentIds || [])
-                            navigate(`/member/list${selectedKeys[0] === '-1' ? '' : `/${selectedKeys[0]}`}`)
+                            navigate(`/member/list${selectedKeys[0] === '-1'? '' : `/${selectedKeys[0]}`}`)
+                            }
                         }}
-                    /> */}
+                        />
+                            </div>
                         </div>
                     </div>
+                    <div className="flex-1 p-btnbase pr-0">
+                        <Outlet context={{refreshMemberCount, selectedDepartmentIds,refreshGroup:()=>getDepartmentList()}}/>
+                    </div>
                 </div>
-                <div className="w-[calc(100%-200px)] pl-btnbase pt-btnbase">
-                    <Outlet context={{refreshMemberCount, selectedDepartmentIds,refreshGroup:()=>getDepartmentList()}}/>
-                </div>
-            </div>
-            </div>);
+            </InsidePage>);
 }
 export default MemberPage;

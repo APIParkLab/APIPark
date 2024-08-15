@@ -76,7 +76,6 @@ const SystemInsidePage:FC = ()=> {
     };
     
     useEffect(() => {
-        console.log(apiId, serviceId, currentUrl)
         if(apiId !== undefined){
             setActiveMenu('api')
         }else if(serviceId !== currentUrl.split('/')[currentUrl.split('/').length - 1]){ 
@@ -84,7 +83,6 @@ const SystemInsidePage:FC = ()=> {
         }else{
             setActiveMenu('api')
         }
-        console.log(activeMenu)
     }, [currentUrl]);
 
     useEffect(()=>{
@@ -119,7 +117,7 @@ const SystemInsidePage:FC = ()=> {
                         mode="inline"
                         items={menuData as unknown as ItemType<MenuItemType>[] } 
                     />
-                    <div  className={` ${['setting', 'upstream'].indexOf(activeMenu!) !== -1   ? 'pr-btnrbase' :''} w-full h-full flex flex-1 flex-col overflow-auto bg-MAIN_BG  pt-[20px] pl-[20px] pb-[20px] ` }>
+                    <div  className={` ${['setting', 'upstream'].indexOf(activeMenu!) !== -1   ? 'pr-btnrbase' :''} w-full h-full flex flex-1 flex-col overflow-auto bg-MAIN_BG  pt-[20px] pl-[20px] pb-PAGE_INSIDE_B ` }>
                             <Outlet/>
                     </div>
                 </div>

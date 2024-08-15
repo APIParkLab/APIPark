@@ -5,7 +5,7 @@ import { PERMISSION_DEFINITION } from "@common/const/permissions";
 import { useFetch } from "@common/hooks/http";
 import { checkAccess } from "@common/utils/permission";
 import { CategorizesType, ServiceHubCategoryConfigHandle } from "@market/const/serviceHub/type";
-import { App, Button, Spin, TagType, Tree, TreeDataNode, TreeProps } from "antd";
+import { App, Button, Spin, Tree, TreeDataNode, TreeProps } from "antd";
 import { DataNode } from "antd/es/tree";
 import { Key, useEffect, useMemo, useRef, useState } from "react";
 import { ServiceHubCategoryConfig } from "./ServiceHubCategoryConfig";
@@ -14,6 +14,8 @@ import { useBreadcrumb } from "@common/contexts/BreadcrumbContext";
 import { LoadingOutlined } from "@ant-design/icons";
 import { cloneDeep } from "lodash-es";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import InsidePage from "@common/components/aoplatform/InsidePage";
+import { EntityItem } from "@common/const/type";
 
 export default function ServiceCategory(){
    const [gData, setGData] = useState<CategorizesType[]>([]);
@@ -227,7 +229,7 @@ export default function ServiceCategory(){
 
     const getCategoryList = ()=>{
         setLoading(true)
-        fetchData<BasicResponse<{ catalogues:CategorizesType[],tags:TagType[]}>>('catalogues',{method:'GET'}).then(response=>{
+        fetchData<BasicResponse<{ catalogues:CategorizesType[],tags:EntityItem[]}>>('catalogues',{method:'GET'}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setGData(data.catalogues)
@@ -246,11 +248,11 @@ export default function ServiceCategory(){
     },[])
 
     return (
-        <div className=" mx-auto h-full">
-            <div className="pb-[30px] pt-0">
-                <p className="text-theme text-[26px] mb-[20px]">服务分类管理</p>
-                <p>设置服务可选择的分类，方便团队成员快速找到API。</p>
-            </div>
+        <InsidePage 
+                pageTitle='服务分类管理' 
+                description="设置服务可选择的分类，方便团队成员快速找到API。"
+                showBorder={false}
+                >
             <div className="max-h-[calc(100%-75px)] border border-solid border-BORDER p-[20px] rounded-[10px]">
                 <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} className=''>
                     <Tree
@@ -267,6 +269,6 @@ export default function ServiceCategory(){
                         </WithPermission>
                     </Spin>
                 </div>
-        </div>
+        </InsidePage>
     )
 }

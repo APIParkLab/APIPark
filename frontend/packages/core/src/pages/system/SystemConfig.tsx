@@ -1,6 +1,6 @@
 
 import  {forwardRef, useEffect, useImperativeHandle, useState} from "react";
-import {App, Button, Divider, Form, Input, Radio, Row, Select, TagType, TreeSelect, Upload} from "antd";
+import {App, Button, Form, Input, Radio, Row, Select, TreeSelect, Upload} from "antd";
 import { Link, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
@@ -93,11 +93,11 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
     const getTagAndServiceClassifyList = ()=>{
         setTagOptionList([])
         setServiceClassifyOptionList([])
-        fetchData<BasicResponse<{ catalogues:CategorizesType[],tags:TagType[]}>>('catalogues',{method:'GET'}).then(response=>{
+        fetchData<BasicResponse<{ catalogues:CategorizesType[],tags:EntityItem[]}>>('catalogues',{method:'GET'}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                setTagOptionList(data.tags?.map((x:TagType)=>{return {
-                    label:x.name, value:x.name
+                setTagOptionList(data.tags?.map((x:EntityItem)=>{return {
+                    label:x.name, value:x.id
                 }})||[])
                 setServiceClassifyOptionList(data.catalogues)
 
@@ -118,19 +118,6 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         team:data.service.team.id,
                         catalogue:data.service.catalogue?.id,
                         tags:data.service.tags?.map((x:EntityItem)=>x.id),
-                         logoFile:[
-                            {
-                                uid: '-1', // 文件唯一标识
-                                name: 'image.png', // 文件名
-                                status: 'done', // 状态有：uploading, done, error, removed
-                                url: data.service?.logo || '', // 图片 Base64 数据
-                            }
-                        ]
-                    })
-                    console.log({
-                        ...data.service,
-                        team:data.service.team.id,
-                        catalogue:data.service.catalogue?.id,
                          logoFile:[
                             {
                                 uid: '-1', // 文件唯一标识
@@ -202,7 +189,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
             getSystemInfo();
             setBreadcrumb([
                 {
-                    title: <Link to={`/service/list`}>内部数据服务</Link>
+                    title: <Link to={`/service/list`}>服务</Link>
                 },
                 {
                     title: '设置'
@@ -245,7 +232,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                     labelAlign='left'
                     scrollToFirstError
                     form={form}
-                    className="mx-auto pb-[20px] "
+                    className="mx-auto pb-PAGE_INSIDE_B "
                     name="systemConfig"
                     onFinish={onFinish}
                     autoComplete="off"

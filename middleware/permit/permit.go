@@ -51,6 +51,7 @@ func (p *PermitMiddleware) Check(method string, path string) (bool, []gin.Handle
 		func(ginCtx *gin.Context) {
 			userId := utils.UserId(ginCtx)
 			if userId == "" {
+				// 未开启游客模式
 				ginCtx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"code": http.StatusForbidden, "msg": "not login", "success": "fail"})
 				ginCtx.Abort()
 				return
@@ -67,6 +68,7 @@ func (p *PermitMiddleware) Check(method string, path string) (bool, []gin.Handle
 					// 当前分组没有配置权限
 					continue
 				}
+				
 				domainHandler, has := permit.SelectDomain(group)
 				if !has {
 					// 当前分组没有配置身份handler

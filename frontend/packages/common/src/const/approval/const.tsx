@@ -19,25 +19,21 @@ export const SUBSCRIBE_APPROVAL_TABLE_COLUMN : ProColumns<ApprovalTableListItem>
     {
         title: '申请方-应用',
         dataIndex: ['application','name'],
-        copyable: true,
         ellipsis:true
     },
     {
         title: '申请服务',
         dataIndex: ['service','name'],
-        copyable: true,
         ellipsis:true
     },
     {
         title: '服务所属系统',
         dataIndex: ['service','name'],
-        copyable: true,
         ellipsis:true
     },
     {
         title: '服务所属团队',
         dataIndex: ['team','name'],
-        copyable: true,
         ellipsis:true
     },
     {
@@ -74,7 +70,6 @@ export const SUBSCRIBE_APPROVAL_INNER_TODO_TABLE_COLUMN : ProColumns<SubscribeAp
         title: '申请时间',
         dataIndex: 'applyTime',
         // sorter: true,
-        copyable: true,
         ellipsis:true,
         width:182,
         fixed:'left',
@@ -85,7 +80,6 @@ export const SUBSCRIBE_APPROVAL_INNER_TODO_TABLE_COLUMN : ProColumns<SubscribeAp
     {
         title: '申请方-应用',
         dataIndex: ['application','name'],
-        copyable: true,
         ellipsis:true
     },
     {
@@ -101,7 +95,6 @@ export const SUBSCRIBE_APPROVAL_INNER_TODO_TABLE_COLUMN : ProColumns<SubscribeAp
     {
         title: '申请服务',
         dataIndex: ['service','name'],
-        copyable: true,
         ellipsis:true
     },
 ];
@@ -112,7 +105,6 @@ export const SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN : ProColumns<SubscribeAp
         title: '申请时间',
         dataIndex: 'applyTime',
         // sorter: true,
-        copyable: true,
         ellipsis:true,
         width:182,
         fixed:'left',
@@ -123,7 +115,6 @@ export const SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN : ProColumns<SubscribeAp
     {
         title: '申请方-应用',
         dataIndex: ['application','name'],
-        copyable: true,
         ellipsis:true
     },
     {
@@ -139,7 +130,6 @@ export const SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN : ProColumns<SubscribeAp
     {
         title: '申请服务',
         dataIndex: ['service','name'],
-        copyable: true,
         ellipsis:true
     },
     {
@@ -235,7 +225,6 @@ export const PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN : ProColumns<PublishTab
     {
         title: '发布版本',
         dataIndex: 'version',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left'
@@ -243,7 +232,6 @@ export const PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN : ProColumns<PublishTab
     {
         title: '版本说明',
         dataIndex: 'remark',
-        copyable: true,
         ellipsis:true
     },
     {
@@ -287,7 +275,6 @@ export const PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN : ProColumns<PublishTabl
     {
         title: '申请时间',
         dataIndex: 'applyTime',
-        copyable: true,
         ellipsis:true,
         width:182,
         fixed:'left',
@@ -295,20 +282,17 @@ export const PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN : ProColumns<PublishTabl
     {
         title: '审核时间',
         dataIndex: 'approveTime',
-        copyable: true,
         ellipsis:true,
         width:182,
     },
     {
         title: '版本号',
         dataIndex: 'version',
-        copyable: true,
         ellipsis:true
     },
     {
         title: '版本说明',
         dataIndex: 'remark',
-        copyable: true,
         ellipsis:true
     },
     {
@@ -357,7 +341,6 @@ export const PUBLISH_APPROVAL_TABLE_COLUMN : ProColumns<ApprovalTableListItem>[]
     {
         title: '申请时间',
         dataIndex: 'applyTime',
-        copyable: true,
         ellipsis:true,
         width:182,
         fixed:'left',
@@ -368,13 +351,11 @@ export const PUBLISH_APPROVAL_TABLE_COLUMN : ProColumns<ApprovalTableListItem>[]
     {
         title: '申请系统',
         dataIndex: ['service','name'],
-        copyable: true,
         ellipsis:true
     },
     {
         title: '所属团队',
         dataIndex: ['team','name'],
-        copyable: true,
         ellipsis:true
     },
     {

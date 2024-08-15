@@ -6,11 +6,11 @@ import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
 import {useFetch} from "@common/hooks/http.ts";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
-import {  CategorizesType, ServiceHubTableListItem, TagType } from "../../const/serviceHub/type.ts";
+import {  CategorizesType, ServiceHubTableListItem } from "../../const/serviceHub/type.ts";
 import { VirtuosoGrid } from 'react-virtuoso';
 import { ApiOutlined,LoadingOutlined } from "@ant-design/icons";
 import ServiceHubGroup from "./ServiceHubGroup.tsx";
-import { unset } from "lodash-es";
+import { EntityItem } from "@common/const/type.ts";
 
 export enum SERVICE_HUB_LIST_ACTIONS {
     GET_CATEGORIES = 'GET_CATEGORIES',
@@ -26,7 +26,7 @@ export enum SERVICE_HUB_LIST_ACTIONS {
 
 export type ServiceHubListActionType = 
 | { type: SERVICE_HUB_LIST_ACTIONS.GET_CATEGORIES, payload: CategorizesType[] }
-| { type: SERVICE_HUB_LIST_ACTIONS.GET_TAGS, payload: TagType[] }
+| { type: SERVICE_HUB_LIST_ACTIONS.GET_TAGS, payload: EntityItem[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.GET_SERVICES, payload: ServiceHubTableListItem[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_SERVICES, payload: ServiceHubTableListItem[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_CATE, payload: string[] }
@@ -37,7 +37,7 @@ export type ServiceHubListActionType =
 
 export const initialServiceHubListState = {
     categoriesList: [] as CategorizesType[],
-    tagsList: [] as TagType[],
+    tagsList: [] as EntityItem[],
     servicesList: [] as ServiceHubTableListItem[],
     showServicesList: [] as ServiceHubTableListItem[],
     selectedCate: [] as string[],

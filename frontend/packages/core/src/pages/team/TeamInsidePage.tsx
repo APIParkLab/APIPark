@@ -94,7 +94,8 @@ const TeamInsidePage:FC = ()=> {
                 tagList={[{label:
                     <Paragraph className="mb-0" copyable={teamId ? { text: teamId } : false}>团队 ID：{teamId || '-'}</Paragraph>
             }]}
-                backUrl="/team/list">
+                backUrl="/team/list"
+                >
                 <div className="flex h-full">
                     <Menu
                         style={{ width: 220 }}
@@ -103,7 +104,7 @@ const TeamInsidePage:FC = ()=> {
                         onClick={onMenuClick}
                         selectedKeys={[activeMenu || '']}
                     />
-                    <div className={`flex flex-1 flex-col h-full overflow-auto bg-MAIN_BG pb-[20px] pt-[20px] pl-[10px]  ${activeMenu === 'setting' ? ' pr-btnrbase ':''}`}>
+                    <div className={`flex flex-1 flex-col h-full overflow-auto bg-MAIN_BG pb-PAGE_INSIDE_B pt-[20px] pl-[10px]  ${activeMenu === 'setting' ? ' pr-btnrbase ':''}`}>
                         <Outlet  />
                     </div>
                 </div>

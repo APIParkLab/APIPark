@@ -152,9 +152,7 @@ const RoleConfig = ()=>{
                 const newPermits = generateNewPermit(data.permits)
                 generateDependenciesMap(newPermits)
                 setPermissionTemplate(newPermits)
-                console.log(newPermits)
             }else{
-                console.log(message)
                 message.error(msg || '获取权限模板失败')
             }
         })

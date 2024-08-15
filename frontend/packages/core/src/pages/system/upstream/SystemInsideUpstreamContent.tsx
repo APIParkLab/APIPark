@@ -20,7 +20,7 @@ const DEFAULT_FORM_VALUE = {
     balance:'round-robin',
     limitPeerSecond:10000,
     retry:3,
-    timeout:3,
+    timeout:10000,
 }
 
 const SystemInsideUpstreamContent= forwardRef<SystemInsideUpstreamContentHandle>((props,ref) => {
@@ -107,7 +107,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
     useEffect(() => {
         setBreadcrumb([
             {
-                title: <Link to={`/service/list`}>内部数据服务</Link>
+                title: <Link to={`/service/list`}>服务</Link>
             },
             {
                 title: '上游'
