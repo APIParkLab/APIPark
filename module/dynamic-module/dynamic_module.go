@@ -21,8 +21,8 @@ type IDynamicModuleModule interface {
 	Render(ctx context.Context, module string) (map[string]interface{}, error)
 	ModuleDrivers(ctx context.Context, group string) ([]*dynamic_module_dto.ModuleDriver, error)
 	
-	Online(ctx context.Context, module string, id string, clusterInput *dynamic_module_dto.ClusterInput) error
-	Offline(ctx context.Context, module string, id string, clusterInput *dynamic_module_dto.ClusterInput) error
+	Online(ctx context.Context, module string, id string) error
+	Offline(ctx context.Context, module string, id string) error
 	//PartitionStatuses(ctx context.Context, module string, keyword string, page int, pageSize int) (map[string]map[string]string, error)
 	//PartitionStatus(ctx context.Context, module string, id string) (*dynamic_module_dto.OnlineInfo, error)
 }

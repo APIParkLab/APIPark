@@ -16,8 +16,8 @@ type IDynamicModuleController interface {
 	List(ctx *gin.Context, module string, keyword string, cluster string, page string, pageSize string) ([]map[string]interface{}, *dynamic_module_dto.PluginInfo, int64, error)
 	Render(ctx *gin.Context, module string) (*dynamic_module_dto.PluginBasic, map[string]interface{}, error)
 	ModuleDrivers(ctx *gin.Context, group string) ([]*dynamic_module_dto.ModuleDriver, error)
-	Online(ctx *gin.Context, module string, id string, partitionInput *dynamic_module_dto.ClusterInput) error
-	Offline(ctx *gin.Context, module string, id string, partitionInput *dynamic_module_dto.ClusterInput) error
+	Online(ctx *gin.Context, module string, id string) error
+	Offline(ctx *gin.Context, module string, id string) error
 	//PartitionStatuses(ctx *gin.Context, module string, keyword string, page string, pageSize string) (map[string]map[string]string, error)
 	//PartitionStatus(ctx *gin.Context, module string, id string) (*dynamic_module_dto.OnlineInfo, error)
 }

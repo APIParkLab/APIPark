@@ -64,6 +64,7 @@ type Member struct {
 	User       auto.Label     `json:"user" aolabel:"user"`
 	Roles      []auto.Label   `json:"roles" aolabel:"role"`
 	AttachTime auto.TimeLabel `json:"attach_time"`
+	IsDelete   bool           `json:"is_delete"`
 }
 
 func ToMember(model *team_member.Member, roles ...string) *Member {

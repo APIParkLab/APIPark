@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: APIPark Discussion Forum
+    url: https://github.com/APIParkLab/APIPark/discussions
+    about: Please ask and answer questions here.
