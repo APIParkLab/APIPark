@@ -15,12 +15,12 @@ type imlDynamicModuleController struct {
 	module dynamic_module.IDynamicModuleModule `autowired:""`
 }
 
-func (i *imlDynamicModuleController) Online(ctx *gin.Context, module string, id string, partitionInput *dynamic_module_dto.ClusterInput) error {
-	return i.module.Online(ctx, module, id, partitionInput)
+func (i *imlDynamicModuleController) Online(ctx *gin.Context, module string, id string) error {
+	return i.module.Online(ctx, module, id)
 }
 
-func (i *imlDynamicModuleController) Offline(ctx *gin.Context, module string, id string, partitionInput *dynamic_module_dto.ClusterInput) error {
-	return i.module.Offline(ctx, module, id, partitionInput)
+func (i *imlDynamicModuleController) Offline(ctx *gin.Context, module string, id string) error {
+	return i.module.Offline(ctx, module, id)
 }
 
 //func (i *imlDynamicModuleController) PartitionStatuses(ctx *gin.Context, module string, keyword string, page string, pageSize string) (map[string]map[string]string, error) {
