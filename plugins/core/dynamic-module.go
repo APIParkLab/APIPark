@@ -2,7 +2,7 @@ package core
 
 import (
 	"net/http"
-
+	
 	"github.com/eolinker/go-common/pm3"
 )
 
@@ -15,7 +15,7 @@ func (p *plugin) DynamicModuleApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/dynamic/:name/batch", []string{"context", "rest:name", "query:ids"}, nil, p.dynamicModuleController.Delete),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/dynamic/:name/render", []string{"context", "rest:name"}, []string{"basic", "render"}, p.dynamicModuleController.Render),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/dynamics/:group", []string{"context", "rest:group"}, []string{"dynamics"}, p.dynamicModuleController.ModuleDrivers),
-		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/dynamic/:name/online", []string{"context", "rest:name", "query:id", "body"}, nil, p.dynamicModuleController.Online),
-		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/dynamic/:name/offline", []string{"context", "rest:name", "query:id", "body"}, nil, p.dynamicModuleController.Offline),
+		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/dynamic/:name/online", []string{"context", "rest:name", "query:id"}, nil, p.dynamicModuleController.Online),
+		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/dynamic/:name/offline", []string{"context", "rest:name", "query:id"}, nil, p.dynamicModuleController.Offline),
 	}
 }
