@@ -42,7 +42,7 @@ func (i *imlDynamicModule) initGateway(ctx context.Context, clusterId string, cl
 	return nil
 }
 
-func (i *imlDynamicModule) Online(ctx context.Context, module string, id string, clusterInput *dynamic_module_dto.ClusterInput) error {
+func (i *imlDynamicModule) Online(ctx context.Context, module string, id string) error {
 	_, has := driver.Get(module)
 	if !has {
 		return fmt.Errorf("模块【%s】不存在", module)
@@ -56,7 +56,7 @@ func (i *imlDynamicModule) Online(ctx context.Context, module string, id string,
 	if err != nil {
 		return fmt.Errorf("上线失败，配置不存在")
 	}
-	clusters, err := i.clusterService.List(ctx, clusterInput.Clusters...)
+	clusters, err := i.clusterService.List(ctx)
 	if err != nil || len(clusters) == 0 {
 		return fmt.Errorf("上线失败，集群不存在")
 	}
@@ -102,28 +102,21 @@ func (i *imlDynamicModule) Online(ctx context.Context, module string, id string,
 	})
 }
 
-func (i *imlDynamicModule) Offline(ctx context.Context, module string, id string, clusterInput *dynamic_module_dto.ClusterInput) error {
+func (i *imlDynamicModule) Offline(ctx context.Context, module string, id string) error {
 	_, has := driver.Get(module)
 	if !has {
 		return fmt.Errorf("模块【%s】不存在", module)
 	}
-	//if len(clusterInput.Clusters) == 0 {
-	//	return fmt.Errorf("下线分区失败，分区为空")
-	//}
-	
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		id = strings.ToLower(fmt.Sprintf("%s_%s", id, module))
-		if len(clusterInput.Clusters) == 0 {
-			clusters, err := i.clusterService.List(ctx)
-			if err != nil {
-				return err
-			}
-			clusterInput.Clusters = make([]string, 0)
-			for _, c := range clusters {
-				clusterInput.Clusters = append(clusterInput.Clusters, c.Uuid)
-			}
+		clusters, err := i.clusterService.List(ctx)
+		if err != nil {
+			return err
 		}
-		for _, clusterId := range clusterInput.Clusters {
+		clusterIds := utils.SliceToSlice(clusters, func(s *cluster.Cluster) string {
+			return s.Uuid
+		})
+		for _, clusterId := range clusterIds {
 			err := i.dynamicClient(ctx, clusterId, module, func(dynamicClient gateway.IDynamicClient) error {
 				return dynamicClient.Offline(ctx, &gateway.DynamicRelease{
 					BasicItem: &gateway.BasicItem{
