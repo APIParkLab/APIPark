@@ -4,7 +4,6 @@
 }
 
 :global .eo_page_list  .ant-pro-table-list-toolbar-container{
-    padding:10px 20px 10px 10px !important;
 
     .ant-pro-table-list-toolbar-right{
         justify-content: flex-start;

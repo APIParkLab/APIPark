@@ -754,12 +754,22 @@ p{
   height:10px  !important;
 }
 
-/* 生产环境无法获取到下列样式，先写在这里 */
+.eo_page_list .ant-pro-card{
+  margin-top: -1px;
+  margin-bottom: -1px;
+}
+
 .eo_page_list .ant-pro-card .ant-pro-card-body{
   padding:0 !important;
 }
  .eo_page_list  .ant-pro-table-list-toolbar-container{
-  padding:12px 20px 12px 12px !important;
+  /* padding:12px 20px 12px 12px !important; */
+  padding-block:0px !important;
+  flex-direction: row-reverse;
+
+  .ant-pro-table-list-toolbar-left{
+    justify-content: flex-end !important;
+  }
 
   .ant-pro-table-list-toolbar-right{
       flex:unset !important;
@@ -1160,11 +1170,6 @@ p{
 .padding-top-40 .virtuoso-grid-list{
   padding-bottom:60px !important;
 }
-
-/* .padding-top-20 .virtuoso-grid-list{
-  padding-bottom:60px !important;
-  padding:20px 40px 40px !important;
-} */
 
 .ant-form-item-control-input-content{
   .ant-pro-card-body{

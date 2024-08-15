@@ -232,7 +232,7 @@ const MemberList = ()=>{
         return !checkAccess(permission, accessData);
     };
 
-    const openModal = (type:'addMember'|'editMember'|'removeFromDep'|'addToDep'|'blocked'|'activate'|'delete',entity?:MemberTableListItem)=>{
+    const openModal = (type:'addMember'|'editMember'|'addToDep'|'delete',entity?:MemberTableListItem)=>{
         let title:string = ''
         let content:string|React.ReactNode = ''
         switch (type){
@@ -244,10 +244,6 @@ const MemberList = ()=>{
                 title='编辑成员信息'
                 content=<MemberDropdownModal topGroupId={topGroupId} ref={EditMemberRef} type={type} entity={entity} />
                 break;
-            case 'removeFromDep':
-                title='移出当前部门'
-                content=<span>确定将成员<span className="text-status_fail"></span>从当前部门中移除？此操作无法恢复，确认操作？</span>
-                break;
             case 'addToDep':
                 title='加入部门'
                 content=<AddToDepartment ref={AddToDepRef}  selectedUserIds={selectedRowKeys as string[]} />
@@ -255,14 +251,6 @@ const MemberList = ()=>{
             case 'delete':
                 title='删除'
                 content=<span>确定删除成员<span className="text-status_fail"></span>？此操作无法恢复，确认操作？</span>
-                break;
-            case 'blocked':
-                title='禁用成员'
-                content=<span>确定禁用成员<span className="text-status_fail"></span>？此操作无法恢复，确认操作？</span>
-                break;
-            case 'activate':
-                title='启用成员'
-                content=<span>确定启用成员<span className="text-status_fail"></span>？此操作无法恢复，确认操作？</span>
                 break;
         }
 
@@ -274,18 +262,9 @@ const MemberList = ()=>{
                     case 'addMember':
                         return AddMemberRef.current?.save().then((res)=>{if(res === true) {refreshGroup && refreshGroup();manualReloadTable()}})
                     case 'editMember':
-                        //console.log('addChild')
                         return EditMemberRef.current?.save().then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})
-                    case 'removeFromDep':
-                        //console.log('addChild')
-                        return handleMemberAction('removeFromDep').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})
                     case 'addToDep':
-                        //console.log('addToDep')
                         return AddToDepRef.current?.save().then((res)=>{if(res === true) {refreshGroup && refreshGroup();manualReloadTable()}})
-                    case 'activate':
-                        return handleMemberAction('activate').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})
-                    case 'blocked':
-                        return handleMemberAction('blocked').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})
                     case 'delete':
                         return handleMemberAction('delete').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})
                 }
@@ -400,11 +379,11 @@ const MemberList = ()=>{
             onRowClick={handleRowClick}
             tableClickAccess="system.organization.member.edit"
             afterNewBtn={[
-                memberGroupId &&<WithPermission key="removeFromDepPermission" access="system.organization.member.edit"><Button className="mr-btnbase" disabled={selectedRowKeys.length === 0} key="removeFromDep" onClick={()=>openModal('removeFromDep')}>移出当前部门</Button></WithPermission>,
-                memberGroupId &&<WithPermission key="addToDepPermission" access="system.organization.member.edit"><Button className="mr-btnbase" disabled={selectedRowKeys.length === 0} key="addToDep" onClick={()=>openModal('addToDep')}>加入部门</Button></WithPermission>,
-                memberGroupId !== 'disable' &&<WithPermission key="blockedPermission" access="system.organization.member.block"><Button className="mr-btnbase" disabled={selectedRowKeys.length === 0 || memberGroupId === 'unknown'} key="blocked" onClick={()=>openModal('blocked')}>禁用成员</Button></WithPermission>,
-                <WithPermission key="activatePermission" access="system.organization.member.block"><Button className="mr-btnbase" disabled={selectedRowKeys.length === 0} key="activate" onClick={()=>openModal('activate')}>启用成员</Button></WithPermission>,
-            <WithPermission key="deletePermission" access="system.organization.member.delete"><Button className="mr-btnbase" disabled={selectedRowKeys.length === 0} key="delete" onClick={()=>openModal('delete')}>删除成员</Button></WithPermission>,
+                selectedRowKeys.length > 0 && memberGroupId &&<WithPermission key="removeFromDepPermission" access="system.organization.member.edit"><Button className="mr-btnbase"  key="removeFromDep" onClick={()=>handleMemberAction('removeFromDep').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})}>移出当前部门</Button></WithPermission>,
+                selectedRowKeys.length > 0 &&  memberGroupId &&<WithPermission key="addToDepPermission" access="system.organization.member.edit"><Button className="mr-btnbase" key="addToDep" onClick={()=>openModal('addToDep')}>加入部门</Button></WithPermission>,
+                selectedRowKeys.length > 0 && memberGroupId !== 'disable' &&<WithPermission key="blockedPermission" access="system.organization.member.block"><Button className="mr-btnbase"  key="blocked" onClick={()=>handleMemberAction('blocked').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})}>禁用成员</Button></WithPermission>,
+                selectedRowKeys.length > 0 && <WithPermission key="activatePermission" access="system.organization.member.block"><Button className="mr-btnbase"  key="activate" onClick={()=>handleMemberAction('activate').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})}>启用成员</Button></WithPermission>,
+                selectedRowKeys.length > 0 &&<WithPermission key="deletePermission" access="system.organization.member.delete"><Button className="mr-btnbase"  key="delete" onClick={()=>openModal('delete')}>删除成员</Button></WithPermission>,
             ]}
             onSearchWordChange={(e) => {
                 setSearchWord(e.target.value)

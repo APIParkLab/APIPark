@@ -125,7 +125,7 @@ const themeToken = {
         {
             key: '3',
             label: (
-                <a className="block px-btnbase leading-[32px]" target="_blank" rel="noopener noreferrer" onClick={logOut}>
+                <a className="block leading-[32px]" target="_blank" rel="noopener noreferrer" onClick={logOut}>
                    退出登录
                 </a>
             ),
@@ -259,7 +259,7 @@ const themeToken = {
                 collapsed={false}
                 collapsedButtonRender={false}
                 >
-                  <div className={`w-full h-calc-100vh-minus-navbar px-[40px] pt-[30px] ${currentUrl.startsWith('/role/list') ? 'overflow-auto' : 'overflow-hidden' }`}>
+                  <div className={`w-full h-calc-100vh-minus-navbar px-PAGE_INSIDE_X pt-PAGE_INSIDE_T ${currentUrl.startsWith('/role/list') ? 'overflow-auto' : 'overflow-hidden' }`}>
                     <Outlet />
                   </div>
                 </ProLayout>

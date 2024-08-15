@@ -148,7 +148,7 @@ const SystemInsideApprovalList:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>内部数据服务</Link>
+                title:<Link to={`/service/list`}>服务</Link>
             },
             {
                 title:'订阅审批'

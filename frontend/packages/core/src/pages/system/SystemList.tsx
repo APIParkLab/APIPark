@@ -94,7 +94,7 @@ const SystemList:FC = ()=>{
             getMemberList()
             setBreadcrumb([
                 {
-                    title: '内部数据服务'
+                    title: '服务'
                 }])
     }, []);
 

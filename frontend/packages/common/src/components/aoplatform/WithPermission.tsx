@@ -27,13 +27,13 @@ const WithPermission = ({access, tooltip, children,disabled}:WithPermissionProps
       disabled && setEditAccess(false)
     },[lastAccess,disabled])
 
+
     return (
       <>
-        {editAccess ? cloneElement(children): 
-        <Tooltip  title={tooltip ?? "暂无操作权限，请联系管理员分配。"}> 
-          { cloneElement(children, {disabled:true})}
-           </Tooltip>
-        }
+        {editAccess ? cloneElement(children): children?.type?.displayName !== 'Button' && <Tooltip  title={tooltip ?? "暂无操作权限，请联系管理员分配。"}> 
+            { cloneElement(children, {disabled:true})}
+             </Tooltip>
+          }
       </>
     );
     }

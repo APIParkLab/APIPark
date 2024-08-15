@@ -9,6 +9,7 @@ import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import  { ClusterNodeModal } from "./PartitionInsideClusterNode.tsx";
 import { DownOutlined, LoadingOutlined, UpOutlined } from "@ant-design/icons";
 import { checkAccess } from "@common/utils/permission.ts";
+import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 
 const PartitionInsideCluster:FC = ()=> {
     const {setBreadcrumb} = useBreadcrumb()
@@ -79,37 +80,38 @@ const PartitionInsideCluster:FC = ()=> {
 
     return (
         <>
-            <div className=" overflow-auto h-full">
-                
-                <div className="pb-[30px] pt-0">
-                        <p className="text-theme text-[26px] mb-[20px]">集群</p>
-                        <p>设置访问 API 的集群，让 API 在分布式环境中稳定运行，并且能够根据业务需求进行灵活扩展和优化。</p>
+            <InsidePage 
+                pageTitle='集群' 
+                description="设置访问 API 的集群，让 API 在分布式环境中稳定运行，并且能够根据业务需求进行灵活扩展和优化。"
+                showBorder={false}
+                scrollPage={true}
+                >
+                <div className="flex flex-col h-full overflow-auto pb-PAGE_INSIDE_B">
+                    <div className="pb-btnbase"> <WithPermission access="system.devops.cluster.edit" key="changeClusterConfig"><Button type="primary" onClick={() => openModal('editNode')}>修改集群配置</Button></WithPermission></div>
+                    <Spin wrapperClassName=" flex-1" indicator={<LoadingOutlined style={{ fontSize: 24 }} spin/>} spinning={loading}>
+                        <div className="h-full  overflow-auto">
+                        {nodesList && nodesList.length > 0  ? 
+                        <Collapse className={``} 
+                                            expandIcon={({isActive})=>(isActive?  <UpOutlined className="w-[23px] text-MAIN_TEXT hover:text-MAIN_HOVER_TEXT"/>:<DownOutlined className="w-[23px] text-MAIN_TEXT hover:text-MAIN_HOVER_TEXT"/> )}
+                                            items={nodesList?.map(x=>{
+                                                return {
+                                                    label:<div ><Tag color={x.status === 1 ? '#87d068' : '#f50'}>{x.status === 1 ? '正常' : '异常'}</Tag><span className="text-MAIN_TEXT my-btnybase mr-btnbase" id={`${x.id}`}>{x.managerAddress.join(',')}</span></div>,
+                                                    key:x.id,
+                                                    children:<div className="p-btnbase">
+                                                        <Row className="mb-[4px]"><Col className="font-bold text-right pr-[4px]" span="3">管理地址：</Col><Col>{x.managerAddress.map(m=>(<p className="leading-[22px]">{m}</p>))}</Col></Row>
+                                                        <Row className="mb-[4px]"><Col className="font-bold text-right pr-[4px]" span="3">服务地址：</Col><Col>{x.serviceAddress.map(m=>(<p className="leading-[22px]">{m}</p>))}</Col></Row>
+                                                        <Row className="mb-[4px]"><Col className="font-bold text-right pr-[4px]" span="3">同步地址：</Col><Col><p className="leading-[22px]">{x.peerAddress}</p></Col></Row>
+                                                    </div>
+                                                }
+                                            })}
+                                            activeKey={activeKey}
+                                            onChange={(val)=>{setActiveKey(val as string[])}}
+                                />:<Empty className="mt-[10%]" image={Empty.PRESENTED_IMAGE_SIMPLE}/>
+                                        }
+                    </div>
+                    </Spin>
                 </div>
-
-                <div className="pb-btnbase"> <WithPermission access="system.devops.cluster.edit" key="changeClusterConfig"><Button type="primary" onClick={() => openModal('editNode')}>修改集群配置</Button></WithPermission></div>
-                <Spin wrapperClassName=" h-[calc(100%-44px)] flex-1 overflow-auto" indicator={<LoadingOutlined style={{ fontSize: 24 }} spin/>} spinning={loading}>
-                    <div className="h-full overflow-auto ">
-                    {nodesList && nodesList.length > 0  ? 
-                    <Collapse className={` p-[0px] mb-btnybase`} 
-                                        expandIcon={({isActive})=>(isActive?  <UpOutlined className="w-[23px] text-MAIN_TEXT hover:text-MAIN_HOVER_TEXT"/>:<DownOutlined className="w-[23px] text-MAIN_TEXT hover:text-MAIN_HOVER_TEXT"/> )}
-                                        items={nodesList?.map(x=>{
-                                            return {
-                                                label:<div ><Tag color={x.status === 1 ? '#87d068' : '#f50'}>{x.status === 1 ? '正常' : '异常'}</Tag><span className="text-MAIN_TEXT my-btnybase mr-btnbase" id={`${x.id}`}>{x.managerAddress.join(',')}</span></div>,
-                                                key:x.id,
-                                                children:<div className="p-btnbase">
-                                                    <Row className="mb-[4px]"><Col className="font-bold text-right pr-[4px]" span="3">管理地址：</Col><Col>{x.managerAddress.map(m=>(<p className="leading-[22px]">{m}</p>))}</Col></Row>
-                                                    <Row className="mb-[4px]"><Col className="font-bold text-right pr-[4px]" span="3">服务地址：</Col><Col>{x.serviceAddress.map(m=>(<p className="leading-[22px]">{m}</p>))}</Col></Row>
-                                                    <Row className="mb-[4px]"><Col className="font-bold text-right pr-[4px]" span="3">同步地址：</Col><Col><p className="leading-[22px]">{x.peerAddress}</p></Col></Row>
-                                                </div>
-                                            }
-                                        })}
-                                        activeKey={activeKey}
-                                        onChange={(val)=>{setActiveKey(val as string[])}}
-                            />:<Empty className="mt-[10%]" image={Empty.PRESENTED_IMAGE_SIMPLE}/>
-                                    }
-                </div>
-                </Spin>
-            </div>
+            </InsidePage>
             </>
     )
 }
