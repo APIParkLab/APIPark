@@ -149,7 +149,7 @@ APIPark 使用 Apache 2.0 许可证。更多详情请查看 LICENSE 文件。
 对于企业级功能和专业技术支持，请联系售前专家进行个性化演示、定制方案和获取报价。
 
 - 网站: https://apipark.com
-- 电子邮件: sales@apipark.com
+- 电子邮件: dev@apipark.com
 
 <br>
 
