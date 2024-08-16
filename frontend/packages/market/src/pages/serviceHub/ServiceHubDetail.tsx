@@ -11,12 +11,10 @@ import { EntityItem } from "@common/const/type.ts";
 import { ApplyServiceModal } from "./ApplyServiceModal.tsx";
 import ServiceHubApiDocument from "./ServiceHubApiDocument.tsx";
 import { ApiFilled, ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons";
-import { Typography } from 'antd';
 import { SimpleSystemItem } from "@core/const/system/type.ts";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import DOMPurify from 'dompurify';
 
-const { Title, Text } = Typography;
 
 const ServiceHubDetail = ()=>{
     const {serviceId} = useParams<RouterParams>();

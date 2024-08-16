@@ -51,7 +51,7 @@ const getServiceList = ()=>{
   
   const getTeamsList = ()=>{
     setPageLoading(true)
-    fetchData<BasicResponse<{teams:SimpleTeamItem[]}>>('simple/teams/mine',{method:'GET',eoTransformKeys:['app_num','subscribe_num']}).then(response=>{
+    fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(!checkPermission('system.workspace.team.view_all') ?'simple/teams/mine' :'simple/teams',{method:'GET',eoTransformKeys:['app_num','subscribe_num']}).then(response=>{
         const {code,data,msg} = response
         if(code === STATUS_CODE.SUCCESS){
             setTeamList(data.teams.map((x:SimpleTeamItem)=>({label:<div className="flex items-center justify-between "><span  className="w-[calc(100%-42px)] truncate" title={x.name}>{x.name}</span><span className="bg-[#fff] rounded-[5px] h-[20px] w-[30px] flex items-center justify-center">{x.appNum || 0}</span></div>, key:x.id})))

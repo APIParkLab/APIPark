@@ -20,6 +20,7 @@ import { getImgBase64 } from "@common/utils/dataTransfer.ts";
 import { CategorizesType } from "@market/const/serviceHub/type.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 
 const MAX_SIZE = 2 * 1024; // 1KB
 
@@ -38,6 +39,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
     const [tagOptionList, setTagOptionList] = useState<DefaultOptionType[]>([])
     const [serviceClassifyOptionList, setServiceClassifyOptionList] = useState<DefaultOptionType[]>()
     const [uploadLoading, setUploadLoading] = useState<boolean>(false)
+    const {checkPermission} = useGlobalContext()
 
     useImperativeHandle(ref, () => ({
         save:onFinish
@@ -157,7 +159,8 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
 
     const getTeamOptionList = ()=>{
         setTeamOptionList([])
-        fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>('simple/teams/mine',{method:'GET',eoTransformKeys:['available_partitions']}).then(response=>{
+
+        fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(!checkPermission('system.workspace.team.view_all') ?'simple/teams/mine' :'simple/teams',{method:'GET',eoTransformKeys:[]}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setTeamOptionList(data.teams?.map((x:MemberItem)=>{return {...x,

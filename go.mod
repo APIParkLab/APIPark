@@ -7,7 +7,7 @@ go 1.21
 require (
 	github.com/eolinker/ap-account v1.0.9
 	github.com/eolinker/eosc v0.17.3
-	github.com/eolinker/go-common v1.0.2
+	github.com/eolinker/go-common v1.0.4
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
@@ -67,3 +67,4 @@ require (
 )
 
 //replace github.com/eolinker/ap-account => ../../eolinker/ap-account
+//replace github.com/eolinker/go-common => ../../eolinker/go-common

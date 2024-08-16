@@ -290,7 +290,6 @@ team:
             cname: 管理
             value: 'manager'
             apis:
-              - "GET:/api/v1/service/info"
               - "PUT:/api/v1/service/info"
               - "POST:/api/v1/team/service"
               - "DELETE:/api/v1/team/service"
@@ -342,7 +341,6 @@ team:
             cname: 管理
             value: 'manager'
             apis:
-              - "GET:/api/v1/app/info"
               - "PUT:/api/v1/app/info"
               - "POST:/api/v1/team/app"
               - "DELETE:/api/v1/app"

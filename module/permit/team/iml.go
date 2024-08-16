@@ -24,31 +24,32 @@ type imlTeamPermitModule struct {
 
 func (m *imlTeamPermitModule) Permissions(ctx context.Context, teamId string) ([]string, error) {
 
-	uid := utils.UserId(ctx)
-	roleMembers, err := m.roleMemberService.List(ctx, role.TeamTarget(teamId), uid)
-	if err != nil {
-		return nil, err
-	}
-	roleIds := utils.SliceToSlice(roleMembers, func(rm *role.Member) string {
-		return rm.Role
-	})
-	if len(roleMembers) == 0 {
-		return []string{}, nil
-	}
-	roles, err := m.roleService.List(ctx, roleIds...)
-	if err != nil {
-		return nil, err
-	}
-	permits := make(map[string]struct{})
-	for _, r := range roles {
-		for _, p := range r.Permit {
-			permits[p] = struct{}{}
-		}
-	}
-
-	return utils.MapToSlice(permits, func(k string, v struct{}) string {
-		return k
-	}), nil
+	//uid := utils.UserId(ctx)
+	//roleMembers, err := m.roleMemberService.List(ctx, role.TeamTarget(teamId), uid)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//roleIds := utils.SliceToSlice(roleMembers, func(rm *role.Member) string {
+	//	return rm.Role
+	//})
+	//if len(roleMembers) == 0 {
+	//	return []string{}, nil
+	//}
+	//roles, err := m.roleService.List(ctx, roleIds...)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//permits := make(map[string]struct{})
+	//for _, r := range roles {
+	//	for _, p := range r.Permit {
+	//		permits[p] = struct{}{}
+	//	}
+	//}
+	//
+	//return utils.MapToSlice(permits, func(k string, v struct{}) string {
+	//	return k
+	//}), nil
+	return m.accesses(ctx, teamId)
 }
 
 func (m *imlTeamPermitModule) OnComplete() {
@@ -59,7 +60,7 @@ func (m *imlTeamPermitModule) accesses(ctx context.Context, teamId string) ([]st
 
 	// 判断是否是访客，如果是，直接返回访客权限
 	if utils.GuestAllow() && utils.IsGuest(ctx) {
-		return access.GuestAccess(role.SystemTarget()), nil
+		return access.GuestAccess(role.GroupTeam), nil
 	}
 	uid := utils.UserId(ctx)
 	roleMembers, err := m.roleMemberService.List(ctx, role.TeamTarget(teamId), uid)
