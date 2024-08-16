@@ -49,10 +49,6 @@ export type CategorizesType = {
     children:CategorizesType[]
 }
 
-export type TagType = {
-    id:string
-    name:string
-}
 
 
 export type ServiceHubTableListItem = {

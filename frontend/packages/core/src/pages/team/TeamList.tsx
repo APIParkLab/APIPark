@@ -14,6 +14,7 @@ import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPe
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { checkAccess } from "@common/utils/permission.ts";
 import TeamConfig from "./TeamConfig.tsx";
+import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 
 const TeamList:FC = ()=>{
     const [searchWord, setSearchWord] = useState<string>('')
@@ -32,7 +33,7 @@ const TeamList:FC = ()=>{
     const [modalType, setModalType] = useState<'add'|'edit'>('add')
 
     const getTeamList = ()=>{
-        return fetchData<BasicResponse<{teams:TeamTableListItem}>>(!checkPermission('system.organization.team.view') ? 'teams':'manager/teams',{method:'GET',eoParams:{keyword:searchWord},eoTransformKeys:['create_time','service_num','can_delete']}).then(response=>{
+        return fetchData<BasicResponse<{teams:TeamTableListItem}>>(!checkPermission('system.workspace.team.view_all') ? 'teams':'manager/teams',{method:'GET',eoParams:{keyword:searchWord},eoTransformKeys:['create_time','service_num','can_delete']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 return  {data:data.teams, success: true}
@@ -158,11 +159,12 @@ const TeamList:FC = ()=>{
 
 
     return (
-        <div className="flex flex-col flex-1 h-full">
-            <div className="pb-[30px] pt-0">
-                <p className="text-theme text-[26px] mb-[20px]">团队</p>
-                <p>设置团队和成员，然后你可以在团队内创建服务和应用、订阅API，成员只能看到所属团队内的服务和应用。</p>
-            </div>
+            <InsidePage 
+                pageTitle='团队' 
+                description="设置团队和成员，然后你可以在团队内创建服务和应用、订阅API，成员只能看到所属团队内的服务和应用。"
+                showBorder={false}
+                contentClassName=" pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B"
+                >
             <PageList
                 id="global_team"
                 className="pl-btnbase"
@@ -203,7 +205,7 @@ const TeamList:FC = ()=>{
             >
                 <TeamConfig ref={teamConfigRef} inModal entity={modalType === 'add' ? undefined : curTeam} />
             </Modal>
-        </div>
+        </InsidePage>
     )
 
 }

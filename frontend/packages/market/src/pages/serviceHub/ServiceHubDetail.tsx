@@ -11,11 +11,10 @@ import { EntityItem } from "@common/const/type.ts";
 import { ApplyServiceModal } from "./ApplyServiceModal.tsx";
 import ServiceHubApiDocument from "./ServiceHubApiDocument.tsx";
 import { ApiFilled, ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons";
-import { Typography } from 'antd';
 import { SimpleSystemItem } from "@core/const/system/type.ts";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import DOMPurify from 'dompurify';
 
-const { Title, Text } = Typography;
 
 const ServiceHubDetail = ()=>{
     const {serviceId} = useParams<RouterParams>();
@@ -42,7 +41,7 @@ const ServiceHubDetail = ()=>{
                 setServiceName(data.service.name)
                 setServiceDesc(data.service.description)
                 setApplied(data.service.applied)
-                setServiceDoc(data.service.document)
+                setServiceDoc(DOMPurify.sanitize(data.service.document))
                 setActiveKey(data.service.apis.map((x)=>x.id))
             }else{
                 message.error(msg || '操作失败')
@@ -106,7 +105,7 @@ const ServiceHubDetail = ()=>{
         {
             key: 'introduction',
             label: '介绍',
-            children: <><pre className="p-btnbase" dangerouslySetInnerHTML={{__html: serviceDoc || ''}}></pre></>,
+            children: <><div className="p-btnbase preview-document" dangerouslySetInnerHTML={{__html: serviceDoc || ''}}></div></>,
             icon: <Icon icon="ic:baseline-space-dashboard" width="14" height="14"/>,
         },
         {
@@ -118,7 +117,7 @@ const ServiceHubDetail = ()=>{
     ]
 
     return (
-        <section className=" grid grid-cols-5 h-full ">
+        <section className=" grid grid-cols-5 h-full mr-PAGE_INSIDE_X">
             <section className="col-span-4 border-0 border-r-[1px] border-solid border-BORDER flex flex-col overflow-hidden">
                 <section className="flex flex-col gap-btnbase p-btnbase ">
                     
@@ -128,7 +127,7 @@ const ServiceHubDetail = ()=>{
                     <div className="flex">
                         {/* <Avatar shape="square" size={50} className=" bg-[linear-gradient(135deg,white,#f0f0f0)] text-[#333] rounded-[12px]" > {service?.name?.substring(0,1)}</Avatar> */}
                         <Avatar shape="square" size={50} 
-                            className={ `rounded-[12px] border-none rounded-[12px] ${ serviceBasicInfo?.logo ? 'bg-[linear-gradient(135deg,white,#f0f0f0)]' : 'bg-[linear-gradient(135deg,#7F83F7,#4E54FF)]'}`} 
+                            className={ `rounded-[12px] border-none rounded-[12px] ${ serviceBasicInfo?.logo ? 'bg-[linear-gradient(135deg,white,#f0f0f0)]' : 'bg-theme'}`} 
                             src={ serviceBasicInfo?.logo ?  <img src={serviceBasicInfo?.logo} alt="Logo" style={{  maxWidth: '200px', width:'45px',height:'45px',objectFit:'unset'}} 
                             /> : undefined}
                             icon={serviceBasicInfo?.logo ? '' :<iconpark-icon   name="auto-generate-api"></iconpark-icon>}> </Avatar>

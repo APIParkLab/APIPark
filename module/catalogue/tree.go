@@ -55,6 +55,7 @@ func NewRoot(list []*catalogue.Catalogue) *Root {
 			Name:     i.Name,
 			Depth:    0,
 			children: nil,
+			sort:     i.Sort,
 		}
 		l = append(l, g)
 		m[g.Uuid] = g
@@ -137,7 +138,7 @@ func (g Groups) Less(i, j int) bool {
 			}
 			return g[i].sort < g[j].sort
 		}
-		return g[i].Parent < g[i].Parent
+		return g[i].Parent < g[j].Parent
 	}
 	return g[i].Depth < g[j].Depth
 }

@@ -4,21 +4,21 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	
+
 	"github.com/eolinker/ap-account/service/role"
-	
+
 	"gorm.io/gorm"
-	
+
 	department_member "github.com/eolinker/ap-account/service/department-member"
 	"github.com/eolinker/go-common/auto"
-	
+
 	"github.com/eolinker/ap-account/service/user"
-	
+
 	"github.com/eolinker/go-common/store"
-	
+
 	"github.com/APIParkLab/APIPark/service/service"
 	team_member "github.com/APIParkLab/APIPark/service/team-member"
-	
+
 	team_dto "github.com/APIParkLab/APIPark/module/my-team/dto"
 	"github.com/APIParkLab/APIPark/service/team"
 	"github.com/eolinker/go-common/utils"
@@ -39,8 +39,46 @@ type imlTeamModule struct {
 	transaction             store.ITransaction               `autowired:""`
 }
 
+func (m *imlTeamModule) SimpleTeams(ctx context.Context, keyword string) ([]*team_dto.SimpleTeam, error) {
+	teams, err := m.teamService.Search(ctx, keyword, nil)
+	if err != nil {
+		return nil, err
+	}
+	projects, err := m.serviceService.Search(ctx, "", nil)
+	projectCount := make(map[string]int64)
+	appCount := make(map[string]int64)
+	for _, p := range projects {
+		if p.AsServer {
+			if _, ok := projectCount[p.Team]; !ok {
+				projectCount[p.Team] = 0
+			}
+			projectCount[p.Team]++
+		}
+		if p.AsApp {
+			if _, ok := appCount[p.Team]; !ok {
+				appCount[p.Team] = 0
+			}
+			appCount[p.Team]++
+		}
+	}
+
+	return utils.SliceToSlice(teams, func(s *team.Team) *team_dto.SimpleTeam {
+		return &team_dto.SimpleTeam{
+			Id:          s.Id,
+			Name:        s.Name,
+			Description: s.Description,
+			ServiceNum:  projectCount[s.Id],
+			AppNum:      appCount[s.Id],
+		}
+	}), nil
+}
+
 func (m *imlTeamModule) UpdateMemberRole(ctx context.Context, id string, input *team_dto.UpdateMemberRole) error {
 	_, err := m.teamService.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+	supperRole, err := m.roleService.GetSupperRole(ctx, role.GroupTeam)
 	if err != nil {
 		return err
 	}
@@ -48,6 +86,7 @@ func (m *imlTeamModule) UpdateMemberRole(ctx context.Context, id string, input *
 		if len(input.Roles) < 1 {
 			return errors.New("at least one role")
 		}
+
 		err = m.roleMemberService.RemoveUserRole(ctx, role.TeamTarget(id), input.Users...)
 		if err != nil {
 			return err
@@ -64,6 +103,14 @@ func (m *imlTeamModule) UpdateMemberRole(ctx context.Context, id string, input *
 				}
 			}
 		}
+
+		count, err := m.roleMemberService.CountByRole(ctx, role.TeamTarget(id), supperRole.Id)
+		if err != nil {
+			return err
+		}
+		if count < 1 {
+			return fmt.Errorf("role(%s) must have at least one member", supperRole.Name)
+		}
 		return nil
 	})
 }
@@ -73,7 +120,7 @@ func (m *imlTeamModule) GetTeam(ctx context.Context, id string) (*team_dto.Team,
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &team_dto.Team{
 		Id:          tv.Id,
 		Name:        tv.Name,
@@ -109,7 +156,7 @@ func (m *imlTeamModule) Search(ctx context.Context, keyword string) ([]*team_dto
 	if err != nil {
 		return nil, err
 	}
-	
+
 	outList := make([]*team_dto.Item, 0, len(list))
 	for _, v := range list {
 		outList = append(outList, team_dto.ToItem(v, serviceNumMap[v.Id], appNumMap[v.Id]))
@@ -137,14 +184,14 @@ func (m *imlTeamModule) Edit(ctx context.Context, id string, input *team_dto.Edi
 			Description: input.Description,
 		})
 	})
-	
+
 	if err != nil {
 		return nil, err
 	}
 	return m.GetTeam(ctx, id)
 }
 
-func (m *imlTeamModule) SimpleTeams(ctx context.Context, keyword string) ([]*team_dto.SimpleTeam, error) {
+func (m *imlTeamModule) MySimpleTeams(ctx context.Context, keyword string) ([]*team_dto.SimpleTeam, error) {
 	userID := utils.UserId(ctx)
 	memberMap, err := m.teamMemberService.FilterMembersForUser(ctx, userID)
 	if err != nil {
@@ -160,7 +207,7 @@ func (m *imlTeamModule) SimpleTeams(ctx context.Context, keyword string) ([]*tea
 	if err != nil {
 		return nil, err
 	}
-	
+
 	projects, err := m.serviceService.Search(ctx, "", map[string]interface{}{
 		"team": teamIDs,
 	})
@@ -180,7 +227,7 @@ func (m *imlTeamModule) SimpleTeams(ctx context.Context, keyword string) ([]*tea
 			appCount[p.Team]++
 		}
 	}
-	
+
 	outList := utils.SliceToSlice(list, func(s *team.Team) *team_dto.SimpleTeam {
 		return &team_dto.SimpleTeam{
 			Id:          s.Id,
@@ -215,7 +262,7 @@ func (m *imlTeamModule) AddMember(ctx context.Context, id string, uuids ...strin
 		}
 		return nil
 	})
-	
+
 }
 
 func (m *imlTeamModule) RemoveMember(ctx context.Context, id string, uuids ...string) error {
@@ -223,7 +270,7 @@ func (m *imlTeamModule) RemoveMember(ctx context.Context, id string, uuids ...st
 	if err != nil {
 		return err
 	}
-	
+
 	supperRole, err := m.roleService.GetSupperRole(ctx, role.GroupTeam)
 	if err != nil {
 		return err
@@ -243,12 +290,12 @@ func (m *imlTeamModule) RemoveMember(ctx context.Context, id string, uuids ...st
 				supperRoleCount++
 			}
 		}
-		
+
 		if supperRoleCount == int(count) {
 			return errors.New("can not delete all team admin")
 		}
 	}
-	
+
 	return m.transaction.Transaction(ctx, func(ctx context.Context) error {
 		err = m.roleMemberService.RemoveUserRole(ctx, role.TeamTarget(id), uuids...)
 		if err != nil {
@@ -256,7 +303,7 @@ func (m *imlTeamModule) RemoveMember(ctx context.Context, id string, uuids ...st
 		}
 		return m.teamMemberService.RemoveMemberFrom(ctx, id, uuids...)
 	})
-	
+
 }
 
 func (m *imlTeamModule) Members(ctx context.Context, id string, keyword string) ([]*team_dto.Member, error) {
@@ -285,12 +332,12 @@ func (m *imlTeamModule) Members(ctx context.Context, id string, keyword string) 
 	roleMemberMap := utils.SliceToMapArrayO(roleMembers, func(r *role.Member) (string, string) {
 		return r.User, r.Role
 	})
-	
+	uId := utils.UserId(ctx)
 	out := make([]*team_dto.Member, 0, len(members))
 	for _, member := range members {
-		out = append(out, team_dto.ToMember(member, roleMemberMap[member.UID]...))
+		out = append(out, team_dto.ToMember(member, uId, roleMemberMap[member.UID]...))
 	}
-	
+
 	return out, nil
 }
 
@@ -330,20 +377,20 @@ func (m *imlTeamModule) SimpleMembers(ctx context.Context, id string, keyword st
 		}
 		departmentMemberMap[member.UID] = append(departmentMemberMap[member.UID], member.Come)
 	}
-	
+
 	out := make([]*team_dto.SimpleMember, 0, len(teamMembers))
 	for _, member := range teamMembers {
 		u, ok := userMap[member.UID]
 		if !ok {
 			continue
 		}
-		
+
 		out = append(out, &team_dto.SimpleMember{
 			User:       auto.UUID(u.UID),
 			Mail:       u.Email,
 			Department: auto.List(departmentMemberMap[member.UID]),
 		})
 	}
-	
+
 	return out, nil
 }

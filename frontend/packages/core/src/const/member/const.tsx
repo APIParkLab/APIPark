@@ -7,7 +7,6 @@ export const MEMBER_TABLE_COLUMNS: ProColumns<MemberTableListItem>[] = [
     {
         title: '用户名',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -18,13 +17,11 @@ export const MEMBER_TABLE_COLUMNS: ProColumns<MemberTableListItem>[] = [
     {
         title: '邮箱',
         dataIndex: 'email',
-        copyable: true,
         ellipsis:true,
     },
     {
         title: '部门',
         dataIndex: 'department',
-        copyable: true,
         ellipsis:true,
         filterMode:'tree',
         renderText:(_,entity:MemberTableListItem)=>(entity.department?.map(x=>x.name).join('，') || '-'),
@@ -36,7 +33,6 @@ export const MEMBER_TABLE_COLUMNS: ProColumns<MemberTableListItem>[] = [
     {
         title: '角色',
         dataIndex: 'roles',
-        copyable: true,
         ellipsis:true,
         width:200
     },

@@ -19,9 +19,9 @@ export default function SystemRunningInstruction() {
                     </p> */}
                 <div className="flex mt-[28px]">
                     <div className="h-[208px] w-[384px] flex flex-col items-center py-[32px] px-[24px] gap-[16px] rounded-DEFAULT bg-MENU_BG mr-[24px]">
-                        <p className="text-[20px] font-medium leading-[32px] text-MAIN_TEXT">内部数据服务设置</p>
+                        <p className="text-[20px] font-medium leading-[32px] text-MAIN_TEXT">服务设置</p>
                         <p className="text-[12px] font-normal leading-[20px] text-DESC_TEXT">支持根据权限，拆分人员对 API 添加 、上游设置、鉴权设置等信息发布及管理；同时支持管理 API 调用服务（包含第三方调用）及订阅；</p>
-                        <p><Link to="/service/list">添加内部数据服务信息</Link></p>
+                        <p><Link to="/service/list">添加服务信息</Link></p>
                     </div>
                 </div>
             </div></div>

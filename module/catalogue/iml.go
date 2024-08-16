@@ -347,9 +347,10 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 
 func (i *imlCatalogueModule) recurseUpdateSort(ctx context.Context, parent string, sorts []*catalogue_dto.SortItem) error {
 	for index, item := range sorts {
+		s := index
 		err := i.catalogueService.Save(ctx, item.Id, &catalogue.EditCatalogue{
 			Parent: &parent,
-			Sort:   &index,
+			Sort:   &s,
 		})
 		if err != nil {
 			return err
@@ -488,8 +489,12 @@ func treeItems(parentId string, parentMap map[string][]*catalogue.Catalogue) []*
 				Id:       v.Id,
 				Name:     v.Name,
 				Children: childItems,
+				Sort:     v.Sort,
 			})
 		}
 	}
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Sort < items[j].Sort
+	})
 	return items
 }

@@ -75,6 +75,10 @@ module.exports = {
           DEFAULT_BORDER_RADIUS: 'var(--border-radius)',
           TREE_TITLE:'var(--small-padding) var(--LAYOUT_PADDING);',
           'navbar-height': 'var(--layout-header-height)',
+          TAG_LEFT:'10px',
+          PAGE_INSIDE_X:'40px',
+          PAGE_INSIDE_T:'30px',
+          PAGE_INSIDE_B:'20px',
         },
         borderColor: {
           'color-base': 'var(--border-color)'

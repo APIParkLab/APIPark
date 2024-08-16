@@ -6,11 +6,11 @@ import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
 import {useFetch} from "@common/hooks/http.ts";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
-import {  CategorizesType, ServiceHubTableListItem, TagType } from "../../const/serviceHub/type.ts";
+import {  CategorizesType, ServiceHubTableListItem } from "../../const/serviceHub/type.ts";
 import { VirtuosoGrid } from 'react-virtuoso';
 import { ApiOutlined,LoadingOutlined } from "@ant-design/icons";
 import ServiceHubGroup from "./ServiceHubGroup.tsx";
-import { unset } from "lodash-es";
+import { EntityItem } from "@common/const/type.ts";
 
 export enum SERVICE_HUB_LIST_ACTIONS {
     GET_CATEGORIES = 'GET_CATEGORIES',
@@ -19,33 +19,29 @@ export enum SERVICE_HUB_LIST_ACTIONS {
     SET_SERVICES='SET_SERVICES',
     SET_SELECTED_CATE = 'SET_SELECTED_CATE',
     SET_SELECTED_TAG = 'SET_SELECTED_TAG',
-    SET_SELECTED_PARTITION = 'SET_SELECTED_PARTITION',
     SET_KEYWORD = 'SET_KEYWORD',
     LIST_LOADING = 'LIST_LOADING'
   }
 
 export type ServiceHubListActionType = 
 | { type: SERVICE_HUB_LIST_ACTIONS.GET_CATEGORIES, payload: CategorizesType[] }
-| { type: SERVICE_HUB_LIST_ACTIONS.GET_TAGS, payload: TagType[] }
+| { type: SERVICE_HUB_LIST_ACTIONS.GET_TAGS, payload: EntityItem[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.GET_SERVICES, payload: ServiceHubTableListItem[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_SERVICES, payload: ServiceHubTableListItem[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_CATE, payload: string[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_TAG, payload: string[] }
-| { type: SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_PARTITION, payload: string[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_KEYWORD, payload: string }
 | { type: SERVICE_HUB_LIST_ACTIONS.LIST_LOADING, payload: boolean }
 
 export const initialServiceHubListState = {
     categoriesList: [] as CategorizesType[],
-    tagsList: [] as TagType[],
+    tagsList: [] as EntityItem[],
     servicesList: [] as ServiceHubTableListItem[],
     showServicesList: [] as ServiceHubTableListItem[],
     selectedCate: [] as string[],
     selectedTag: [] as string[],
-    selectedPartition: [] as string[],
     keyword: '',
     getCateAndTagData:false,
-    getPartitionData:false,
     listLoading:false,
   };
   
@@ -63,8 +59,6 @@ export const initialServiceHubListState = {
             return { ...state, selectedCate: action.payload };
         case SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_TAG: 
             return { ...state, selectedTag: action.payload };
-        case SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_PARTITION: 
-            return { ...state, selectedPartition: action.payload };
         case SERVICE_HUB_LIST_ACTIONS.SET_KEYWORD: 
             return { ...state, keyword: action.payload };
         case SERVICE_HUB_LIST_ACTIONS.LIST_LOADING: 
@@ -75,7 +69,7 @@ export const initialServiceHubListState = {
   }
 
   export const filterServiceList = (dataSet: typeof initialServiceHubListState)=>{
-    if(!dataSet.getCateAndTagData || !dataSet.getPartitionData){
+    if(!dataSet.getCateAndTagData ){
         return dataSet.servicesList
     }else{
         return dataSet.servicesList.filter((x)=>{
@@ -83,7 +77,6 @@ export const initialServiceHubListState = {
             if(!dataSet.selectedTag || dataSet.selectedTag.length === 0) return false
             if((!x.tags || !x.tags.length )&& dataSet.selectedTag.indexOf('empty') === -1) return false
             if(x.tags && x.tags.length && !x.tags.some(tag => dataSet.selectedTag.includes(tag.id))) return false;
-            if(!dataSet.selectedPartition || dataSet.selectedPartition.length === 0) return false
             if( dataSet.keyword && !x.name.includes(dataSet.keyword)) return false
             return true
         })
@@ -143,7 +136,8 @@ const ServiceHubList:FC = ()=>{
             return (
                 <div className="pt-[20px]">
                 <Card title={CardTitle(item)} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px] m-0 transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]"  classNames={{header:'border-b-[0px] p-[20px] ', body:"pt-0"}} onClick={()=>showDocumentDetail(item)}>
-                   <span className="line-clamp-3 break-all">{item.description || '暂无服务描述'}</span> 
+                   <span className="line-clamp-3  text-[12px] text-[#666] " 
+                    style={{'word-break':'auto-phrase'}}>{item.description || '暂无服务描述'}</span> 
                 </Card>
                 </div>
             );
@@ -186,7 +180,7 @@ const CardTitle = (service:ServiceHubTableListItem)=>{
             <div className="pl-[20px] w-[calc(100%-50px)]">
                 <p className="text-[14px] h-[20px] leading-[20px] truncate w-full">{service.name}</p>
                 <div className="mt-[10px] h-[20px] flex items-center font-normal">
-                    <Tag color="#7371fc1b" className="text-theme font-normal border-0 mr-[12px] max-w-[70px] truncate" key={service.id} bordered={false} title={service.catalogue?.name || '-'}>{service.catalogue?.name || '-'}</Tag>
+                    <Tag color="#7371fc1b" className="text-theme font-normal border-0 mr-[12px] max-w-[150px] truncate" key={service.id} bordered={false} title={service.catalogue?.name || '-'}>{service.catalogue?.name || '-'}</Tag>
                    
                     <Tooltip  title='API 数量'>
                         <span className="mr-[12px]"><ApiOutlined className="mr-[1px] text-[14px] h-[14px] w-[14px]"/><span className="font-normal text-[14px]">{service.apiNum ?? '-'}</span></span>

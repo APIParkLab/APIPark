@@ -148,7 +148,7 @@ const SystemInsideApprovalList:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>内部数据服务</Link>
+                title:<Link to={`/service/list`}>服务</Link>
             },
             {
                 title:'订阅审批'
@@ -182,6 +182,7 @@ const SystemInsideApprovalList:FC = ()=>{
                 }}
                 onRowClick={(row:SubscribeApprovalTableListItem)=>openModal(pageStatus === 0 ? 'approval': 'view',row)}
                 tableClickAccess={pageStatus === 0 ?'team.service.subscription.approval':'team.service.subscription.view'}
+                tableClass="pr-PAGE_INSIDE_X"
             />
         </div>
     )
