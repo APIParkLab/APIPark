@@ -55,7 +55,7 @@ const SystemList:FC = ()=>{
     }
 
     const getTeamsList = ()=>{
-        fetchData<BasicResponse<{teams:SimpleTeamItem[]}>>('simple/teams/mine',{method:'GET'}).then(response=>{
+        fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(!checkPermission('system.workspace.team.view_all') ?'simple/teams/mine' :'simple/teams',{method:'GET',eoTransformKeys:[]}).then(response=>{
             const {code,data,msg} = response
             setTeamList(data.teams)
             if(code === STATUS_CODE.SUCCESS){

@@ -10,7 +10,8 @@ func (p *plugin) MyTeamApi() []pm3.Api {
 	return []pm3.Api{
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/team", []string{"context", "query:team"}, []string{"team"}, p.myTeamController.GetTeam),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/teams", []string{"context", "query:keyword"}, []string{"teams"}, p.myTeamController.Search),
-		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/teams/mine", []string{"context", "query:keyword"}, []string{"teams"}, p.myTeamController.SimpleTeams),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/teams/mine", []string{"context", "query:keyword"}, []string{"teams"}, p.myTeamController.MySimpleTeams),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/teams", []string{"context", "query:keyword"}, []string{"teams"}, p.myTeamController.SimpleTeams),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/team/members/simple", []string{"context", "query:team", "query:keyword"}, []string{"teams"}, p.myTeamController.SimpleMembers),
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/team", []string{"context", "query:team", "body"}, []string{"team"}, p.myTeamController.EditTeam),
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/team/member", []string{"context", "query:team", "body"}, nil, p.myTeamController.AddMember),
