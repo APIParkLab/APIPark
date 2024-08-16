@@ -38,7 +38,7 @@ const ChangePsw= () => {
                                 labelAlign='left'
                                 name="changePsw"
                                 scrollToFirstError
-                                className="mx-auto  "
+                                className="mx-auto pl-[10px]  "
                                 autoComplete="off"
                                 form={form}
                                 onFinish={savePsw}
@@ -92,7 +92,7 @@ const ChangePsw= () => {
                                 </Form.Item>
 
                                 <Form.Item
-                                    className="border-none bg-transparent pt-btnrbase mb-0 pb-0"
+                                    className="border-none bg-transparent pt-btnrbase mb-0 pb-0 pl-0"
                                 >
                                     <WithPermission access=''><Button type="primary" htmlType="submit" >
                                         修改密码

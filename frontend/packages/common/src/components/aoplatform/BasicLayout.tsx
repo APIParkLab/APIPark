@@ -2,7 +2,8 @@ import {
     ConfigProvider,
     Dropdown, 
     MenuProps,
-    App} from 'antd';
+    App,
+    Button} from 'antd';
 import Logo from '@common/assets/layout-logo.png';
 import AvatarPic from '@common/assets/default-avatar.png'
 import { routerKeyMap, TOTAL_MENU_ITEMS } from "./Navigation";
@@ -19,6 +20,8 @@ import { ResetPsw, ResetPswHandle } from './ResetPsw.tsx';
 import { BasicResponse, STATUS_CODE } from '@common/const/const.ts';
 import { UserInfoType, UserProfileHandle } from '@common/const/type.ts';
 import { useFetch } from '@common/hooks/http.ts';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Icon } from '@iconify/react/dist/iconify.js';
   
 const themeToken = {
     bgLayout:'#17163E;',
@@ -125,18 +128,16 @@ const themeToken = {
         {
             key: '2',
             label: (
-                <a target="_blank" rel="noopener noreferrer" onClick={()=>navigator('/userProfile/changepsw')}>
-                   账号设置
-                </a>
-            ),
+                <Button key="changePsw" type="text" className="border-none p-0 flex items-center bg-transparent " onClick={()=>navigator('/userProfile/changepsw')}>
+                账号设置
+                </Button>)
         },
         {
             key: '3',
             label: (
-                <a className="block leading-[32px]" target="_blank" rel="noopener noreferrer" onClick={logOut}>
-                   退出登录
-                </a>
-            ),
+                <Button key="logout" type="text" className="border-none p-0 flex items-center bg-transparent " onClick={logOut}>
+                退出登录
+                </Button>)
         },
     ];
 
@@ -218,19 +219,19 @@ const themeToken = {
                     );
                     },
                 }}
-                // actionsRender={(props) => {
-                //   if (props.isMobile) return [];
-                //   if (typeof window === 'undefined') return [];
-                //   return [
-                //     <Button  className="mr-[20px]">
-                //       <span className='flex items-center'><QuestionCircleOutlined className="mr-[4px]" />帮助文档</span>
-                //     </Button> 
-                //   ];
-                // }}
+                actionsRender={(props) => {
+                  if (props.isMobile) return [];
+                  if (typeof window === 'undefined') return [];
+                  return [
+                    <Button  className=" text-[#ffffffb3] hover:text-[#fff] border-none" type="default" ghost onClick={()=>{window.open('https://docs.apipark.com','_blank')}}>
+                      <span className='flex items-center gap-[8px]'> <Icon icon="ic:baseline-help" width="14" height="14"/>文档</span>
+                    </Button> 
+                  ];
+                }}
                 headerTitleRender={() => (
                 <div className="w-[192px]  flex items-center">
                   <img
-                    className="h-[20px] cursor-pointer"
+                    className="h-[20px] cursor-pointer "
                     src={Logo}
                     onClick={()=> navigator(mainPage)}
                   />

@@ -19,7 +19,6 @@ export enum SERVICE_HUB_LIST_ACTIONS {
     SET_SERVICES='SET_SERVICES',
     SET_SELECTED_CATE = 'SET_SELECTED_CATE',
     SET_SELECTED_TAG = 'SET_SELECTED_TAG',
-    SET_SELECTED_PARTITION = 'SET_SELECTED_PARTITION',
     SET_KEYWORD = 'SET_KEYWORD',
     LIST_LOADING = 'LIST_LOADING'
   }
@@ -31,7 +30,6 @@ export type ServiceHubListActionType =
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_SERVICES, payload: ServiceHubTableListItem[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_CATE, payload: string[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_TAG, payload: string[] }
-| { type: SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_PARTITION, payload: string[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_KEYWORD, payload: string }
 | { type: SERVICE_HUB_LIST_ACTIONS.LIST_LOADING, payload: boolean }
 
@@ -42,10 +40,8 @@ export const initialServiceHubListState = {
     showServicesList: [] as ServiceHubTableListItem[],
     selectedCate: [] as string[],
     selectedTag: [] as string[],
-    selectedPartition: [] as string[],
     keyword: '',
     getCateAndTagData:false,
-    getPartitionData:false,
     listLoading:false,
   };
   
@@ -63,8 +59,6 @@ export const initialServiceHubListState = {
             return { ...state, selectedCate: action.payload };
         case SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_TAG: 
             return { ...state, selectedTag: action.payload };
-        case SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_PARTITION: 
-            return { ...state, selectedPartition: action.payload };
         case SERVICE_HUB_LIST_ACTIONS.SET_KEYWORD: 
             return { ...state, keyword: action.payload };
         case SERVICE_HUB_LIST_ACTIONS.LIST_LOADING: 
@@ -75,7 +69,7 @@ export const initialServiceHubListState = {
   }
 
   export const filterServiceList = (dataSet: typeof initialServiceHubListState)=>{
-    if(!dataSet.getCateAndTagData || !dataSet.getPartitionData){
+    if(!dataSet.getCateAndTagData ){
         return dataSet.servicesList
     }else{
         return dataSet.servicesList.filter((x)=>{
@@ -83,7 +77,6 @@ export const initialServiceHubListState = {
             if(!dataSet.selectedTag || dataSet.selectedTag.length === 0) return false
             if((!x.tags || !x.tags.length )&& dataSet.selectedTag.indexOf('empty') === -1) return false
             if(x.tags && x.tags.length && !x.tags.some(tag => dataSet.selectedTag.includes(tag.id))) return false;
-            if(!dataSet.selectedPartition || dataSet.selectedPartition.length === 0) return false
             if( dataSet.keyword && !x.name.includes(dataSet.keyword)) return false
             return true
         })
