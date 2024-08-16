@@ -70,7 +70,7 @@ const UserAvatar: FC = () => {
         {
             key: '3',
             label: (
-                <a className="block px-btnbase leading-[32px]" target="_blank" rel="noopener noreferrer" onClick={logOut}>
+                <a className="block  leading-[32px]" target="_blank" rel="noopener noreferrer" onClick={logOut}>
                    退出登录
                 </a>
             ),

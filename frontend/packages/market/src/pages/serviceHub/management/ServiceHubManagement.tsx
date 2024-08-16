@@ -25,14 +25,14 @@ export default function ServiceHubManagement() {
     const [teamList, setTeamList] = useState<MenuItem[]>([])
     const {setAppName} = useTenantManagementContext()
     const navigateTo = useNavigate()
-    const {getTeamAccessData,cleanTeamAccessData} = useGlobalContext()
+    const {getTeamAccessData,cleanTeamAccessData,checkPermission} = useGlobalContext()
     type MenuItem = Required<MenuProps>['items'][number];
 
 
 const getServiceList = ()=>{
     //console.log(pagination,sorter,categoryId,tagId)
     setServiceLoading(true)
-     fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>('my_apps',{method:'GET', eoParams:{ team:teamId,keyword:''},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num']}).then(response=>{
+        return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team:teamId,keyword:''},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num']}).then(response=>{
         const {code,data,msg} = response
         if(code === STATUS_CODE.SUCCESS){
             setServiceList([...data.apps,{type:'addNewItem'}])
@@ -51,7 +51,7 @@ const getServiceList = ()=>{
   
   const getTeamsList = ()=>{
     setPageLoading(true)
-    fetchData<BasicResponse<{teams:SimpleTeamItem[]}>>('simple/teams/mine',{method:'GET',eoTransformKeys:['app_num','subscribe_num']}).then(response=>{
+    fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(!checkPermission('system.workspace.team.view_all') ?'simple/teams/mine' :'simple/teams',{method:'GET',eoTransformKeys:['app_num','subscribe_num']}).then(response=>{
         const {code,data,msg} = response
         if(code === STATUS_CODE.SUCCESS){
             setTeamList(data.teams.map((x:SimpleTeamItem)=>({label:<div className="flex items-center justify-between "><span  className="w-[calc(100%-42px)] truncate" title={x.name}>{x.name}</span><span className="bg-[#fff] rounded-[5px] h-[20px] w-[30px] flex items-center justify-center">{x.appNum || 0}</span></div>, key:x.id})))
@@ -200,7 +200,7 @@ useEffect(() => {
 const CardTitle = (service:ServiceHubAppListItem)=>{
     return(
         <div className="flex">
-            <Avatar shape="square" size={50}  className=" bg-[linear-gradient(135deg,#7F83F7,#4E54FF)] rounded-[12px]" icon={<iconpark-icon  className="" name="auto-generate-api"></iconpark-icon>} />
+            <Avatar shape="square" size={50}  className=" bg-theme rounded-[12px]" icon={<iconpark-icon  className="" name="auto-generate-api"></iconpark-icon>} />
             <div className="pl-[20px] w-[calc(100%-50px)]">
                 <p className="text-[14px] h-[20px] leading-[20px] truncate">{service.name}</p>
                 <div className="mt-[10px] h-[20px] flex items-center font-normal">

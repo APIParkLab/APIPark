@@ -109,17 +109,22 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
     const [pluginAccessDictionary, setPluginAccessDictionary] = useState<{[k:string]:string}>({})
     const [teamDataFlushed, setTeamDataFlushed] = useState<boolean>(false)
     const [accessInit, setAccessInit] = useState<boolean>(false)
+    let getGlobalAccessPromise: Promise<BasicResponse<{ access:string[] }>> | null = null
 
     const getGlobalAccessData = ()=>{
-        fetchData<BasicResponse<{ access:string[]}>>('profile/permission/system',{method:'GET'},).then(response=>{
+        getGlobalAccessPromise = new Promise((resolve, reject) => fetchData<BasicResponse<{ access:string[]}>>('profile/permission/system',{method:'GET'},).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setAccessInit(true)
                 setAccessData(prevData => new Map(prevData).set('system', data.access))
+                resolve(data.response)
             }else{
                 message.error(msg || '操作失败')
+                reject(data.msg || '操作失败')
             }
         })
+        )
+        return getGlobalAccessData
     }
 
     const getTeamAccessData = (teamId:string)=>{
@@ -149,7 +154,13 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
         setPluginAccessDictionary({})
     }
 
-    const checkPermission = (access:keyof typeof PERMISSION_DEFINITION[0] | Array<keyof typeof PERMISSION_DEFINITION[0]>)=>{
+    const checkPermission = async (access:keyof typeof PERMISSION_DEFINITION[0] | Array<keyof typeof PERMISSION_DEFINITION[0]>)=>{
+        if( !accessInit && getGlobalAccessPromise){
+            await getGlobalAccessPromise
+        }
+        if( !accessInit && !getGlobalAccessPromise){
+           await getGlobalAccessData()
+        }
         let revs = false;
         if (Array.isArray(access)) {
             revs = access.some(item => checkAccess(item, accessData));

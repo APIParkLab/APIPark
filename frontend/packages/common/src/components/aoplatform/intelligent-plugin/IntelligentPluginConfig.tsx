@@ -46,6 +46,7 @@ import {createSchemaField, FormProvider, RecursionField, useField, useForm} from
 import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
 import {useFetch} from "@common/hooks/http.ts";
 import {App} from "antd";
+import { config } from "process";
 
 
 
@@ -218,8 +219,8 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                         placeholder: '请输入描述',
                     }
                 },
-                container: {
-                    type: 'void',
+                config: {
+                    type: 'object',
                     'x-component': 'DynamicRender',
                     'x-component-props': {
                         schema: JSON.stringify(renderSchema),

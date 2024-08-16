@@ -727,11 +727,20 @@ p{
       padding-left:0 !important;
       padding-top:0 !important;
     }
+    .pr-PAGE_INSIDE_X{
+      padding-right: 0  !important;
+    }
   }
+
 
   .ant-drawer-footer{
     padding:16px 20px  !important
   }
+}
+
+
+.ant-modal-body .pr-PAGE_INSIDE_X{
+  padding-right: 0  !important;
 }
 
 .g6-tooltip {
@@ -754,12 +763,22 @@ p{
   height:10px  !important;
 }
 
-/* 生产环境无法获取到下列样式，先写在这里 */
+.eo_page_list .ant-pro-card{
+  margin-top: -1px;
+  margin-bottom: -1px;
+}
+
 .eo_page_list .ant-pro-card .ant-pro-card-body{
   padding:0 !important;
 }
  .eo_page_list  .ant-pro-table-list-toolbar-container{
-  padding:12px 20px 12px 12px !important;
+  /* padding:12px 20px 12px 12px !important; */
+  padding-block:0px !important;
+  flex-direction: row-reverse;
+
+  .ant-pro-table-list-toolbar-left{
+    justify-content: flex-end !important;
+  }
 
   .ant-pro-table-list-toolbar-right{
       flex:unset !important;
@@ -836,9 +855,10 @@ p{
   }
 }
 
-/* .ant-dropdown .ant-dropdown-menu{
-  border-radius: 10px;
-  padding: 10px;
+
+.ant-dropdown .ant-dropdown-menu{
+  /* border-radius: 10px;
+  padding: 10px; */
   li.ant-dropdown-menu-item{
     padding:0 !important;
     >button.ant-btn{
@@ -848,13 +868,14 @@ p{
     }
     >span.ant-dropdown-menu-title-content{
       padding:0px !important;
-      min-width: 80px;
-      /* padding:0px 12px !important; 
+      /* min-width: 80px; */
+       /* padding:0px 12px !important;  */
       height:32px !important;
       line-height: 32px !important;
       .ant-btn{
         width:100%;
         padding:0px 12px !important;
+        justify-content:flex-start;
       }
       .ant-btn-default:not(:disabled):not(.ant-btn-disabled):hover{
         color:var(--text-color) !important;
@@ -862,7 +883,7 @@ p{
     }
   }
 
-} */
+} 
 .ant-dropdown-button{
   .ant-btn-link{
     color:var(--text-color)  !important;
@@ -1161,11 +1182,6 @@ p{
   padding-bottom:60px !important;
 }
 
-/* .padding-top-20 .virtuoso-grid-list{
-  padding-bottom:60px !important;
-  padding:20px 40px 40px !important;
-} */
-
 .ant-form-item-control-input-content{
   .ant-pro-card-body{
     padding-bottom: 0px !important;
@@ -1199,3 +1215,13 @@ p{
   padding-left:0 !important;
   padding-right:0 !important;
 } */
+
+
+div.preview-document{
+  p{
+    margin-block-start: 1em;
+    margin-block-end: 1em;}
+}
+.ant-table-wrapper .ant-table-thead th.ant-table-column-has-sorters{
+  transition:none !important;
+}

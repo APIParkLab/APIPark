@@ -142,7 +142,6 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
             <Form.Item<ManagementConfigFieldType>
                 label="应用 ID"
                 name="id"
-                extra="应用ID（app_id）可用于检索服务或日志"
                 rules={[{ required: true, message: '必填项' ,whitespace:true }]}
             >
                 <Input className="w-INPUT_NORMAL" placeholder="请输入" disabled={type === 'edit'}/>
@@ -168,14 +167,16 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
             
             { type === 'edit' && <>
             
-            <div className="bg-[rgb(255_120_117_/_5%)] rounded-[10px] mt-[50px] p-btnrbase pb-0">
-                    <p className="text-left"><span className="font-bold">删除应用：</span>删除操作不可恢复，请谨慎操作！</p>
-                        <div className="text-left">
-                <WithPermission access="team.application.application.delete">
-                    <Button className="m-auto mt-[16px] mb-[20px]" type="default" danger={true} onClick={deleteApplicationModal} loading={delBtnLoading}>删除应用</Button>
+                <WithPermission access="team.application.application.delete" showDisabled={false}>
+                    <div className="bg-[rgb(255_120_117_/_5%)] rounded-[10px] mt-[50px] p-btnrbase pb-0">
+                            <p className="text-left"><span className="font-bold">删除应用：</span>删除操作不可恢复，请谨慎操作！</p>
+                                <div className="text-left">
+                                    <WithPermission access="team.application.application.delete">
+                                        <Button className="m-auto mt-[16px] mb-[20px]" type="default" danger={true} onClick={deleteApplicationModal} loading={delBtnLoading}>删除应用</Button>
+                                        </WithPermission>
+                                </div>
+                            </div>
                     </WithPermission>
-                        </div>
-                    </div>
     </>}
             </Form>
     </WithPermission></>

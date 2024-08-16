@@ -72,7 +72,7 @@ const LogSettings = ()=>{
                             mode="inline"
                             items={menuItems}
                         />
-                        <div className={`w-full flex flex-1 flex-col h-full overflow-auto bg-MAIN_BG pt-btnbase pl-btnbase`}>
+                        <div className={`w-full flex flex-1 flex-col h-full overflow-auto bg-MAIN_BG pt-btnbase pl-btnbase pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B overflow-x-hidden`}>
                             <Outlet  context={{accessPrefix:'system.devops.log_configuration'}}/>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 import  { forwardRef, useEffect, useImperativeHandle, useState} from "react";
-import {App, Button, Divider, Form, Input, Row, Select} from "antd";
+import {App, Button, Form, Input, Row, Select} from "antd";
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import { v4 as uuidv4 } from 'uuid'
@@ -125,13 +125,12 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
             setOnEdit(false);
             form.setFieldsValue({id:uuidv4()}); // 清空 initialValues
         }
-        // setPageType(currentUrl.split('/')[1] === 'myteam'? 'myteam':'manage')
         return (form.setFieldsValue({}))
     }, [teamId]);
 
     return (
         <>
-            <div className='overflow-auto h-full w-full'>
+            <div className='overflow-auto h-full w-full pr-PAGE_INSIDE_X'>
                 <WithPermission access={onEdit ?(currentUrl.split('/')[1] === 'myteam'? 'team.team.team.edit':'system.organization.team.edit') : 'system.organization.team.add'}>
                     <Form
                         layout='vertical'
@@ -191,16 +190,16 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
                     </Row>
                 }
                   {onEdit &&
-                    <>
+                    <WithPermission access="system.organization.team.delete" showDisabled={false}>
                         <div className="bg-[rgb(255_120_117_/_5%)] rounded-[10px] mt-[50px] p-btnrbase pb-0">
                         <p className="text-left"><span className="font-bold">删除团队：</span>删除操作不可恢复，请谨慎操作！</p>
                             <div className="text-left">
                             <WithPermission access="system.organization.team.delete" disabled={!canDelete}  tooltip={canDelete ? '':'服务数据清除后，方可删除'}>
-                                <Button className="m-auto mt-[16px] mb-[20px]" type="default" danger onClick={()=>deleteTeam(entity!)}>删除</Button></WithPermission>
-
+                                <Button className="m-auto mt-[16px] mb-[20px]" type="default" danger onClick={()=>deleteTeam(entity!)}>删除</Button>
+                                </WithPermission>
                             </div>
                         </div>
-                    </>
+                    </WithPermission>
                     }
                     </Form>
                 </WithPermission>
