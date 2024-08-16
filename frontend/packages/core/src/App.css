@@ -80,7 +80,7 @@
 .apipark-layout-layout{
 
   .apipark-layout-layout-bg-list{
-    background:#17163E;
+    background-image:  radial-gradient(circle farthest-corner at 450px 350px, #050eb7, #17163e 500px);
   }
   .ant-layout-header.apipark-layout-layout-header{
     backdrop-filter: unset !important;

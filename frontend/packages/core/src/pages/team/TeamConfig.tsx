@@ -1,5 +1,5 @@
 import  { forwardRef, useEffect, useImperativeHandle, useState} from "react";
-import {App, Button, Divider, Form, Input, Row, Select} from "antd";
+import {App, Button, Form, Input, Row, Select} from "antd";
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import { v4 as uuidv4 } from 'uuid'
@@ -125,7 +125,6 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
             setOnEdit(false);
             form.setFieldsValue({id:uuidv4()}); // 清空 initialValues
         }
-        // setPageType(currentUrl.split('/')[1] === 'myteam'? 'myteam':'manage')
         return (form.setFieldsValue({}))
     }, [teamId]);
 

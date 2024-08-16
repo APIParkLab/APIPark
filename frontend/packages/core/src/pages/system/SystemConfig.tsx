@@ -231,7 +231,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                     labelAlign='left'
                     scrollToFirstError
                     form={form}
-                    className="mx-auto  pr-PAGE_INSIDE_X "
+                    className="w-full pr-PAGE_INSIDE_X "
                     name="systemConfig"
                     onFinish={onFinish}
                     autoComplete="off"
@@ -256,7 +256,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         <Form.Item<SystemConfigFieldType>
                             label="API 调用前缀"
                             name="prefix"
-                            extra="选填，作为服务内所有服务的API的前缀，比如host/{sys_name}/{service_name}/{api_path}，一旦保存无法修改"
+                            extra="选填，作为服务内所有API的前缀，比如host/{service_name}/{api_path}，一旦保存无法修改"
                             rules={[
                             {
                             validator: validateUrlSlash,
