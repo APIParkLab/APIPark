@@ -67,12 +67,13 @@ type Member struct {
 	IsDelete   bool           `json:"is_delete"`
 }
 
-func ToMember(model *team_member.Member, roles ...string) *Member {
-	
+func ToMember(model *team_member.Member, userId string, roles ...string) *Member {
+
 	return &Member{
 		User:       auto.UUID(model.UID),
 		Roles:      auto.List(roles),
 		AttachTime: auto.TimeLabel(model.CreateTime),
+		IsDelete:   userId != model.UID,
 	}
 }
 
