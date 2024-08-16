@@ -287,6 +287,7 @@ const PartitionInsideCert:FC = ()=>{
             pageTitle='证书' 
             description="通过为 API 服务配置和管理 SSL 证书，企业可以加密数据传输，防止敏感信息被窃取或篡改。"
             showBorder={false}
+            contentClassName="pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B"
             >
             <PageList
                 id="global_partition_cert"

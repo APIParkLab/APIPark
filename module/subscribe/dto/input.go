@@ -2,7 +2,7 @@ package subscribe_dto
 
 type AddSubscriber struct {
 	Application string `json:"application" aocheck:"service"`
-	Applier     string `json:"applier" aocheck:"user"`
+	//Applier     string `json:"applier" aocheck:"user"`
 	//Cluster []string `json:"partition" aocheck:"partition"`
 }
 

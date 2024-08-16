@@ -33,7 +33,7 @@ const TeamList:FC = ()=>{
     const [modalType, setModalType] = useState<'add'|'edit'>('add')
 
     const getTeamList = ()=>{
-        return fetchData<BasicResponse<{teams:TeamTableListItem}>>(!checkPermission('system.organization.team.view') ? 'teams':'manager/teams',{method:'GET',eoParams:{keyword:searchWord},eoTransformKeys:['create_time','service_num','can_delete']}).then(response=>{
+        return fetchData<BasicResponse<{teams:TeamTableListItem}>>(!checkPermission('system.workspace.team.view_all') ? 'teams':'manager/teams',{method:'GET',eoParams:{keyword:searchWord},eoTransformKeys:['create_time','service_num','can_delete']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 return  {data:data.teams, success: true}
@@ -163,6 +163,7 @@ const TeamList:FC = ()=>{
                 pageTitle='团队' 
                 description="设置团队和成员，然后你可以在团队内创建服务和应用、订阅API，成员只能看到所属团队内的服务和应用。"
                 showBorder={false}
+                contentClassName=" pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B"
                 >
             <PageList
                 id="global_team"

@@ -446,6 +446,7 @@ const SystemInsidePublicList:FC = ()=>{
                 }}
                 onRowClick={(row:PublishTableListItem|PublishVersionTableListItem)=>openDrawer('view',row)}
                 tableClickAccess="team.service.release.view"
+                tableClass="pr-PAGE_INSIDE_X"
             />
             <DrawerWithFooter 
               destroyOnClose={true} 

@@ -3,25 +3,25 @@ package subscribe
 import (
 	"context"
 	"fmt"
-	
+
 	"github.com/google/uuid"
-	
+
 	"github.com/eolinker/eosc/log"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
-	
+
 	"github.com/APIParkLab/APIPark/service/cluster"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/APIParkLab/APIPark/service/service"
-	
+
 	"github.com/eolinker/go-common/store"
-	
+
 	"github.com/eolinker/go-common/auto"
-	
+
 	"github.com/APIParkLab/APIPark/service/subscribe"
-	
+
 	subscribe_dto "github.com/APIParkLab/APIPark/module/subscribe/dto"
 )
 
@@ -52,7 +52,7 @@ func (i *imlSubscribeModule) getSubscribers(ctx context.Context, serviceIds []st
 }
 
 func (i *imlSubscribeModule) initGateway(ctx context.Context, clientDriver gateway.IClientDriver) error {
-	
+
 	projects, err := i.serviceService.List(ctx)
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func (i *imlSubscribeModule) initGateway(ctx context.Context, clientDriver gatew
 	if err != nil {
 		return err
 	}
-	
+
 	return clientDriver.Subscribe().Online(ctx, releases...)
 }
 
@@ -76,7 +76,7 @@ func (i *imlSubscribeModule) SearchSubscriptions(ctx context.Context, appId stri
 	if !info.AsApp {
 		return nil, fmt.Errorf("service %s is not an application", appId)
 	}
-	
+
 	// 获取当前订阅服务列表
 	subscriptions, err := i.subscribeService.MySubscribeServices(ctx, appId, nil)
 	if err != nil {
@@ -92,7 +92,7 @@ func (i *imlSubscribeModule) SearchSubscriptions(ctx context.Context, appId stri
 	serviceMap := utils.SliceToMapArray(services, func(s *service.Service) string {
 		return s.Id
 	})
-	
+
 	return utils.SliceToSlice(subscriptions, func(s *subscribe.Subscribe) *subscribe_dto.SubscriptionItem {
 		return &subscribe_dto.SubscriptionItem{
 			Id:          s.Id,
@@ -126,7 +126,7 @@ func (i *imlSubscribeModule) RevokeSubscription(ctx context.Context, pid string,
 	if subscription.ApplyStatus != subscribe.ApplyStatusSubscribe {
 		return fmt.Errorf("subscription can not be revoked")
 	}
-	
+
 	clusters, err := i.clusterService.List(ctx)
 	if err != nil {
 		return err
@@ -148,10 +148,10 @@ func (i *imlSubscribeModule) RevokeSubscription(ctx context.Context, pid string,
 				return err
 			}
 		}
-		
+
 		return nil
 	})
-	
+
 }
 
 func (i *imlSubscribeModule) DeleteSubscription(ctx context.Context, pid string, uuid string) error {
@@ -192,7 +192,12 @@ func (i *imlSubscribeModule) AddSubscriber(ctx context.Context, serviceId string
 	if err != nil {
 		return err
 	}
-	
+	_, err = i.subscribeService.GetByServiceAndApplication(ctx, serviceId, input.Application)
+	if err == nil {
+		// 订阅方已存在
+		return fmt.Errorf("subscriber is already exists")
+	}
+
 	sub := &gateway.SubscribeRelease{
 		Service:     serviceId,
 		Application: input.Application,
@@ -202,7 +207,7 @@ func (i *imlSubscribeModule) AddSubscriber(ctx context.Context, serviceId string
 	if err != nil {
 		return err
 	}
-	
+
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		err = i.subscribeService.Create(ctx, &subscribe.CreateSubscribe{
 			Uuid:        uuid.New().String(),
@@ -210,7 +215,6 @@ func (i *imlSubscribeModule) AddSubscriber(ctx context.Context, serviceId string
 			Application: input.Application,
 			ApplyStatus: subscribe.ApplyStatusSubscribe,
 			From:        subscribe.FromUser,
-			Applier:     input.Applier,
 		})
 		if err != nil {
 			return err
@@ -221,14 +225,14 @@ func (i *imlSubscribeModule) AddSubscriber(ctx context.Context, serviceId string
 				return fmt.Errorf("add subscriber for cluster[%s] %v", c.Uuid, err)
 			}
 		}
-		
+
 		return nil
 	})
-	
+
 }
 
 func (i *imlSubscribeModule) onlineSubscriber(ctx context.Context, clusterId string, subscriber *gateway.SubscribeRelease) error {
-	
+
 	client, err := i.clusterService.GatewayClient(ctx, clusterId)
 	if err != nil {
 		return err
@@ -237,7 +241,7 @@ func (i *imlSubscribeModule) onlineSubscriber(ctx context.Context, clusterId str
 		_ = client.Close(ctx)
 	}()
 	return client.Subscribe().Online(ctx, subscriber)
-	
+
 }
 
 func (i *imlSubscribeModule) DeleteSubscriber(ctx context.Context, service string, serviceId string, applicationId string) error {
@@ -249,7 +253,7 @@ func (i *imlSubscribeModule) DeleteSubscriber(ctx context.Context, service strin
 	if err != nil {
 		return err
 	}
-	
+
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		list, err := i.subscribeService.ListByApplication(ctx, serviceId, applicationId)
 		if err != nil {
@@ -275,7 +279,7 @@ func (i *imlSubscribeModule) DeleteSubscriber(ctx context.Context, service strin
 	})
 }
 func (i *imlSubscribeModule) offlineForCluster(ctx context.Context, clusterId string, config *gateway.SubscribeRelease) error {
-	
+
 	client, err := i.clusterService.GatewayClient(ctx, clusterId)
 	if err != nil {
 		return err
@@ -291,13 +295,13 @@ func (i *imlSubscribeModule) SearchSubscribers(ctx context.Context, serviceId st
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// 获取当前项目所有订阅方
 	list, err := i.subscribeService.ListBySubscribeStatus(ctx, serviceId, subscribe.ApplyStatusSubscribe)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if keyword == "" {
 		items := make([]*subscribe_dto.Subscriber, 0, len(list))
 		for _, subscriber := range list {
@@ -324,7 +328,7 @@ func (i *imlSubscribeModule) SearchSubscribers(ctx context.Context, serviceId st
 	})
 	items := make([]*subscribe_dto.Subscriber, 0, len(list))
 	for _, subscriber := range list {
-		
+
 		if _, ok := serviceMap[subscriber.Service]; ok {
 			items = append(items, &subscribe_dto.Subscriber{
 				Id:         subscriber.Id,
@@ -354,7 +358,7 @@ func (i *imlSubscribeApprovalModule) Pass(ctx context.Context, pid string, id st
 	if err != nil {
 		return err
 	}
-	
+
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		userID := utils.UserId(ctx)
 		status := subscribe.ApplyStatusSubscribe
@@ -375,16 +379,16 @@ func (i *imlSubscribeApprovalModule) Pass(ctx context.Context, pid string, id st
 			return err
 		}
 		for _, c := range cs {
-			
+
 			err := i.onlineSubscriber(ctx, c.Uuid, &gateway.SubscribeRelease{
 				Service:     applyInfo.Service,
 				Application: applyInfo.Application,
 				Expired:     "0",
 			})
-			
+
 			if err != nil {
 				log.Warnf("online subscriber for cluster[%s] %v", c.Uuid, err)
-				
+
 			}
 		}
 		return nil
@@ -405,7 +409,7 @@ func (i *imlSubscribeApprovalModule) Reject(ctx context.Context, pid string, id 
 	if err != nil {
 		return err
 	}
-	
+
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		userID := utils.UserId(ctx)
 		status := subscribe.ApplyStatusRefuse
@@ -460,7 +464,7 @@ func (i *imlSubscribeApprovalModule) GetApprovalDetail(ctx context.Context, pid 
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &subscribe_dto.Approval{
 		Id:           item.Id,
 		Service:      auto.UUID(item.Service),

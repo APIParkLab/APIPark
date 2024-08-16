@@ -249,7 +249,7 @@ const MemberPage = ()=>{
                 pageTitle='成员' 
                 description="设置成员和对应的角色，成员只能够看到权限范围内的功能和数据。"
                 >
-                <div className="flex flex-1 h-full">
+                <div className="flex flex-1 h-full w-full">
                     <div className="w-[200px] border-0 border-solid border-r-[1px] border-r-BORDER">
                     <div className="px-btnbase pb-[0px]">
                         <Input className=" my-btnybase" onChange={(e) => debounce(onSearchWordChange, 100)(e.target.value)}
@@ -276,7 +276,7 @@ const MemberPage = ()=>{
                             </div>
                         </div>
                     </div>
-                    <div className="flex-1 p-btnbase pr-0">
+                    <div className="flex-1 p-btnbase pr-PAGE_INSIDE_X overflow-x-hidden">
                         <Outlet context={{refreshMemberCount, selectedDepartmentIds,refreshGroup:()=>getDepartmentList()}}/>
                     </div>
                 </div>

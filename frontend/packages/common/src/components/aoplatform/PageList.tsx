@@ -78,7 +78,8 @@ const PageList = <T extends Record<string, unknown>>(props: React.PropsWithChild
       if (parentRef.current && !noScroll) {
         const res = parentRef.current.getBoundingClientRect();
         const height = res.height - ((noTop ? 0 : 59) + 54  + (showPagination && !dragSortKey ? 52 : 0) +( besidesTableHeight ?? 0) + 1); // 减去顶部按钮、底部分页、表头高度
-        setTableWidth(minTableWidth > res.width ? minTableWidth : undefined);
+        setTableWidth(minTableWidth - 5> res.width ? minTableWidth : undefined);
+        console.log(minTableWidth,res.width )
         height && setTableHeight(minVirtualHeight === undefined ? height : (height > minVirtualHeight ? height : minVirtualHeight));
       }
     };

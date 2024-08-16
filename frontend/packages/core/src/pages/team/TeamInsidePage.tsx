@@ -104,7 +104,7 @@ const TeamInsidePage:FC = ()=> {
                         onClick={onMenuClick}
                         selectedKeys={[activeMenu || '']}
                     />
-                    <div className={`flex flex-1 flex-col h-full overflow-auto bg-MAIN_BG pb-PAGE_INSIDE_B pt-[20px] pl-[10px]  ${activeMenu === 'setting' ? ' pr-btnrbase ':''}`}>
+                    <div className={`flex flex-1 flex-col h-full overflow-auto bg-MAIN_BG pb-PAGE_INSIDE_B pt-[20px] pl-[10px]  ${activeMenu === 'setting' ? '  ':'pr-PAGE_INSIDE_X'}`}>
                         <Outlet  />
                     </div>
                 </div>

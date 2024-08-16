@@ -58,7 +58,7 @@ const TeamInsideMember:FC = ()=>{
         {
             title: '操作',
             key: 'option',
-            width: 76,
+            width: 88,
             fixed:'right',
             valueType: 'option',
             render: (_: React.ReactNode, entity: TeamMemberTableListItem) => [
@@ -288,7 +288,7 @@ const TeamInsideMember:FC = ()=>{
             request={()=>getMemberList()}
             primaryKey="user.id"
             addNewBtnTitle="添加成员"
-            className="ml-[20px] mt-[20px]"
+            className="ml-[20px] mt-[20px] "
             searchPlaceholder="输入姓名查找"
             onAddNewBtnClick={()=>{openModal('add')}}
             addNewBtnAccess="team.team.member.add"

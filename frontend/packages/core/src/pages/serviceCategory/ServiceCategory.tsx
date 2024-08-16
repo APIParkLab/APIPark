@@ -252,8 +252,10 @@ export default function ServiceCategory(){
                 pageTitle='服务分类管理' 
                 description="设置服务可选择的分类，方便团队成员快速找到API。"
                 showBorder={false}
+                contentClassName="pr-PAGE_INSIDE_X"
+                scrollPage={false}
                 >
-            <div className="max-h-[calc(100%-75px)] border border-solid border-BORDER p-[20px] rounded-[10px]">
+            <div className="border border-solid border-BORDER p-[20px] rounded-[10px] ">
                 <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} className=''>
                     <Tree
                         showIcon

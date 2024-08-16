@@ -4,7 +4,7 @@ import {
     MenuProps,
     App} from 'antd';
 import Logo from '@common/assets/layout-logo.png';
-import AvatarPic from '@common/assets/avatar_default.svg'
+import AvatarPic from '@common/assets/default-avatar.png'
 import { routerKeyMap, TOTAL_MENU_ITEMS } from "./Navigation";
 import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import {useEffect, useMemo, useRef, useState} from "react";
@@ -122,6 +122,14 @@ const themeToken = {
     }
 
     const items: MenuProps['items'] = [
+        {
+            key: '2',
+            label: (
+                <a target="_blank" rel="noopener noreferrer" onClick={()=>navigator('/userProfile/changepsw')}>
+                   账号设置
+                </a>
+            ),
+        },
         {
             key: '3',
             label: (
@@ -259,7 +267,7 @@ const themeToken = {
                 collapsed={false}
                 collapsedButtonRender={false}
                 >
-                  <div className={`w-full h-calc-100vh-minus-navbar px-PAGE_INSIDE_X pt-PAGE_INSIDE_T ${currentUrl.startsWith('/role/list') ? 'overflow-auto' : 'overflow-hidden' }`}>
+                  <div className={`w-full h-calc-100vh-minus-navbar pl-PAGE_INSIDE_X pt-PAGE_INSIDE_T ${currentUrl.startsWith('/role/list') ? 'overflow-auto' : 'overflow-hidden' }`}>
                     <Outlet />
                   </div>
                 </ProLayout>
