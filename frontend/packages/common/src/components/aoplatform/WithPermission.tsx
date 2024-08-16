@@ -9,9 +9,10 @@ type WithPermissionProps = {
     tooltip?:string
     children:ReactElement
     disabled?:boolean
+    showDisabled?:boolean
 }
 // 权限控制的高阶组件
-const WithPermission = ({access, tooltip, children,disabled}:WithPermissionProps) => {
+const WithPermission = ({access, tooltip, children,disabled, showDisabled = true}:WithPermissionProps) => {
   
     const [editAccess, setEditAccess] = useState<boolean>(access ? false:true)
     const {accessData,checkPermission} = useGlobalContext()
@@ -24,16 +25,21 @@ const WithPermission = ({access, tooltip, children,disabled}:WithPermissionProps
     useEffect(()=>{
       // 先判断权限，无论权限是否为true，如果disabled为true时则必须为ture
       access && setEditAccess(lastAccess) 
-      disabled && setEditAccess(false)
+      console.log('editAccess',editAccess, children,children?.type?.displayName,showDisabled, children?.type?.displayName !== 'Button' && showDisabled)
     },[lastAccess,disabled])
+
 
 
     return (
       <>
-        {editAccess ? cloneElement(children): children?.type?.displayName !== 'Button' && <Tooltip  title={tooltip ?? "暂无操作权限，请联系管理员分配。"}> 
+        {editAccess && !disabled && cloneElement(children)}
+        {editAccess && disabled  && <Tooltip  title={tooltip}> 
             { cloneElement(children, {disabled:true})}
-             </Tooltip>
-          }
+             </Tooltip>}
+        {!editAccess && (children?.type?.displayName !== 'Button' && showDisabled ) && <Tooltip  title={tooltip ?? "暂无操作权限，请联系管理员分配。"}> 
+            { cloneElement(children, {disabled:true})}
+             </Tooltip>}
+        
       </>
     );
     }

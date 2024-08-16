@@ -355,7 +355,7 @@ const MemberList = ()=>{
 
     return (
         <>
-            <PageList
+        <PageList
             id="global_member"
             ref={pageListRef}
             columns={[...columns, ...operation]}

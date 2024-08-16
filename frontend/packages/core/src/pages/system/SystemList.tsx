@@ -11,6 +11,7 @@ import { SystemConfigHandle, SystemTableListItem } from "../../const/system/type
 import { SYSTEM_TABLE_COLUMNS } from "../../const/system/const.tsx";
 import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter.tsx";
 import SystemConfig from "./SystemConfig.tsx";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 
 const SystemList:FC = ()=>{
     const navigate = useNavigate();
@@ -27,6 +28,7 @@ const SystemList:FC = ()=>{
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
     const [open, setOpen] = useState(false);
     const drawerFormRef = useRef<SystemConfigHandle>(null)
+    const {checkPermission} = useGlobalContext()
 
     const getSystemList = ()=>{
         if(!tableHttpReload){
@@ -36,7 +38,7 @@ const SystemList:FC = ()=>{
                 success: true,
             });
         }
-        return fetchData<BasicResponse<{services:SystemTableListItem[]}>>('my_services',{method:'GET',eoParams:{keyword:tableSearchWord},eoTransformKeys:['api_num','service_num','create_time']}).then(response=>{
+        return fetchData<BasicResponse<{services:SystemTableListItem[]}>>(!checkPermission('system.workspace.service.view_all') ? 'my_services':'services',{method:'GET',eoParams:{keyword:tableSearchWord},eoTransformKeys:['api_num','service_num','create_time']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setTableListDataSource(data.services)
@@ -123,7 +125,7 @@ const SystemList:FC = ()=>{
 
     return (
         // <Skeleton  className='m-btnbase w-[calc(100%-20px)]' loading={loading} active>
-          <div className="h-full w-full">
+          <div className="h-full w-full pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B">
             
             <PageList
                 id="global_system"

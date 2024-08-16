@@ -194,7 +194,7 @@ const RoleConfig = ()=>{
             }).catch((errInfo)=>Promise.reject(errInfo))
     };
 
-    return  (<div className="h-full flex flex-col overflow-hidden">
+    return  (<div className="h-full flex flex-col overflow-hidden ">
                 <div className="text-[18px] leading-[25px] pb-[12px]">
                         <Button className="flex items-center" type="text" onClick={()=>navigateTo(-1)}><ArrowLeftOutlined className="max-h-[14px]" /><span>返回</span></Button>
                 </div>
@@ -212,7 +212,7 @@ const RoleConfig = ()=>{
                 >
                     <div className="flex flex-col h-full">
                     <Form.Item
-                        className=" m-btnbase"
+                        className=" m-btnbase  mr-PAGE_INSIDE_X"
                         name="name"
                         rules={[{ required: true, message: '必填项',whitespace:true  }]}
                     >
@@ -220,7 +220,7 @@ const RoleConfig = ()=>{
                     </Form.Item>
                     <Form.Item
                         name="permits"
-                        className="m-btnbase flex-1 overflow-auto"
+                        className="m-btnbase mr-0 flex-1 overflow-auto pr-PAGE_INSIDE_X"
                     >
                         <PermissionCollapse permissionTemplate={permissionTemplate!} dependenciesMap={dependenciesMap} />
                     </Form.Item>

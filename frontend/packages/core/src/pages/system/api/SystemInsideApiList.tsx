@@ -226,6 +226,7 @@ const SystemInsideApiList:FC = ()=>{
                     setTableHttpReload(false)
                 }}
                 onRowClick={(row:SystemApiTableListItem)=>openDrawer('view',row)}
+                tableClass="mr-PAGE_INSIDE_X "
                 />
                 <DrawerWithFooter 
                     title={drawerType === 'add' ? "添加 API":"API 详情"} 

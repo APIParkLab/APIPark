@@ -117,7 +117,7 @@ const SystemInsidePage:FC = ()=> {
                         mode="inline"
                         items={menuData as unknown as ItemType<MenuItemType>[] } 
                     />
-                    <div  className={` ${['setting', 'upstream'].indexOf(activeMenu!) !== -1   ? 'pr-btnrbase' :''} w-full h-full flex flex-1 flex-col overflow-auto bg-MAIN_BG  pt-[20px] pl-[20px] pb-PAGE_INSIDE_B ` }>
+                    <div  className={` ${['setting', 'upstream'].indexOf(activeMenu!) !== -1   ? '' :''} w-full h-full flex flex-1 flex-col overflow-auto bg-MAIN_BG  pt-[20px] pl-[20px] pb-PAGE_INSIDE_B ` }>
                             <Outlet/>
                     </div>
                 </div>

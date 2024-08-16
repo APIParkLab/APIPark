@@ -151,6 +151,7 @@ const SystemInsideSubscriber:FC = ()=>{
             addNewBtnTitle="新增订阅方"
             onAddNewBtnClick={()=>{openModal('add')}}
             addNewBtnAccess="team.service.subscription.add"
+            tableClass="pr-PAGE_INSIDE_X"
         />
     )
 }
@@ -160,13 +161,10 @@ export default SystemInsideSubscriber
 
 export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,SystemSubscriberConfigProps>((props, ref) => {
     const { message } = App.useApp()
-    const { serviceId, teamId,appId} = props
+    const { serviceId, teamId} = props
     const [form] = Form.useForm();
     const {fetchData} = useFetch()
     const [systemOptionList, setSystemOptionList] = useState<DefaultOptionType[]>()
-    const [memberOptionList, setMemberOptionList] = useState<DefaultOptionType[]>()
-    const [subscriberTeamId, setSubscriberTeamId] = useState<string>()
-    const [appsList, setAppsList] = useState<SimpleSystemItem[]>()
     const save:()=>Promise<boolean | string> =  ()=>{
         return new Promise((resolve, reject)=>{
             form.validateFields().then((value)=>{
@@ -196,7 +194,6 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 const teamMap = new Map<string, unknown>();
-                setAppsList(data.apps)
                 data.apps
                     .filter((x:SimpleSystemItem)=>x.id !== serviceId)
                     .forEach((item:SimpleSystemItem) => {
@@ -226,24 +223,6 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
         })
     }
 
-    useEffect(()=>{
-        subscriberTeamId && getMemberList()
-        form.setFieldValue('applier',null)
-    },[subscriberTeamId])
-
-    const getMemberList = ()=>{
-        setMemberOptionList([])
-        fetchData<BasicResponse<{ teams: NewSimpleMemberItem[] }>>('team/members/simple',{method:'GET',eoParams:{team:subscriberTeamId}}).then(response=>{
-            const {code,data,msg} = response
-            if(code === STATUS_CODE.SUCCESS){
-                setMemberOptionList(data.teams?.map((x:NewSimpleMemberItem)=>{return {
-                    label:x.user.name, value:x.user.id
-                }}))
-            }else{
-                message.error(msg || '操作失败')
-            }
-        })
-    }
 
     useEffect(() => {
         getSystemList()
@@ -272,16 +251,7 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
                     treeData={systemOptionList}
                     placeholder="请选择"
                     treeDefaultExpandAll
-                    onSelect={(_:unknown)=>{ setSubscriberTeamId(appsList?.filter(x=>x.id === _)?.[0]?.team.id)}}
                 />
-            </Form.Item>
-
-            <Form.Item
-                label="申请人"
-                name="applier"
-                rules={[{ required: true, message: '必填项' }]}
-            >
-                <Select className="w-INPUT_NORMAL"  options={memberOptionList}  placeholder="请选择"/>
             </Form.Item>
 
         </Form>

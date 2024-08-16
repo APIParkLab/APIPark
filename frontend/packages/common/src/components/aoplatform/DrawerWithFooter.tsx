@@ -38,7 +38,7 @@ export function DrawerWithFooter(props:DrawerWithFooterProps){
             {footer:'text-right'}
           }
           footer={
-            <Space className="flex flex-end" style={{justifyContent:'flex-end'}}> 
+            <Space className="flex flex-row-reverse" style={{}}> 
                 {showOkBtn && <WithPermission access={submitAccess}>
                     <Button onClick={handlerSubmit} type="primary" loading={submitLoading} disabled={submitDisabled}>
                   {okBtnTitle}

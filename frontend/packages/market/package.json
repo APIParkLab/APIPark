@@ -10,6 +10,8 @@
     "test": "node ./__tests__/market.test.js"
   },
   "dependencies": {
+    "@types/dompurify": "^3.0.5",
+    "dompurify": "^3.1.6",
     "react-virtuoso": "^4.7.11"
   }
 }

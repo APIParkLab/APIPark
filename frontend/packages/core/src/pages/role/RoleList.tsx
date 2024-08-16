@@ -1,4 +1,4 @@
-import { App, Divider} from "antd";
+import { App} from "antd";
 import PageList from "@common/components/aoplatform/PageList.tsx";
 import  { useEffect, useRef,} from "react";
 import {ActionType, ProColumns} from "@ant-design/pro-components";
@@ -122,9 +122,10 @@ const RoleList = ()=>{
             pageTitle='角色' 
             description="设置角色的权限范围。"
             showBorder={false}
+            scrollPage={false}
             >
-            <div className="overflow-auto h-full">
-                <h3 className="p ">系统级别角色</h3>
+            <div className="pr-PAGE_INSIDE_X">
+                <h3 className="mt-0">系统级别角色</h3>
                     <PageList
                         id="global_role"
                         tableClass="role_table  mb-btnrbase"

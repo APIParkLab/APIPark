@@ -727,6 +727,9 @@ p{
       padding-left:0 !important;
       padding-top:0 !important;
     }
+    .pr-PAGE_INSIDE_X{
+      padding-right: 0  !important;
+    }
   }
 
   .ant-drawer-footer{
@@ -1204,3 +1207,13 @@ p{
   padding-left:0 !important;
   padding-right:0 !important;
 } */
+
+
+div.preview-document{
+  p{
+    margin-block-start: 1em;
+    margin-block-end: 1em;}
+}
+.ant-table-wrapper .ant-table-thead th.ant-table-column-has-sorters{
+  transition:none !important;
+}
