@@ -2,8 +2,7 @@ package team
 
 import (
 	"context"
-	"errors"
-
+	"github.com/eolinker/go-common/access"
 	"github.com/eolinker/go-common/permit"
 
 	"github.com/gin-gonic/gin"
@@ -57,10 +56,12 @@ func (m *imlTeamPermitModule) OnComplete() {
 }
 
 func (m *imlTeamPermitModule) accesses(ctx context.Context, teamId string) ([]string, error) {
-	uid := utils.UserId(ctx)
-	if uid == "" {
-		return nil, errors.New("not login")
+
+	// 判断是否是访客，如果是，直接返回访客权限
+	if utils.GuestAllow() && utils.IsGuest(ctx) {
+		return access.GuestAccess(role.SystemTarget()), nil
 	}
+	uid := utils.UserId(ctx)
 	roleMembers, err := m.roleMemberService.List(ctx, role.TeamTarget(teamId), uid)
 	if err != nil {
 		return nil, err

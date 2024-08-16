@@ -130,10 +130,9 @@ export default function IntelligentPluginList(){
                 message.destroy(); 
                 if(res.code === STATUS_CODE.SUCCESS){
                     getConfig(res.data) 
-                    setColumns(res.data.basic.fields.map((field:DynamicTableField)=>({
+                    setColumns(res.data.basic.fields.map((field:DynamicTableField, index:number)=>({
                             title:field.title,
                             dataIndex:field.name,
-                            copyable: true,
                             fixed:field.name === 'title' ? 'left' : undefined,
                             ellipsis:true,
                             width:field.name === 'title' ? 150 : undefined, 
@@ -227,7 +226,7 @@ export default function IntelligentPluginList(){
     const openDrawer = async (type:'add'|'edit', entity?:DynamicTableItem)=>{
         switch (type){
             case 'add':
-                setCurDetail({driver:driverOptions[0].value || '',config:{'c3ebd745-f7d5-45cd-8d3e-e0e43099d20e':{scopes:[]},'550e2537-8436-48e4-ab84-f9f58faf1b18':{scopes:[]}}})
+                setCurDetail({driver:driverOptions[0].value || '',config:{}})
                 break;
             case 'edit':{
                 setDrawerLoading(true)
@@ -237,9 +236,6 @@ export default function IntelligentPluginList(){
                         const {code, data, msg } = res
                         if(code === STATUS_CODE.SUCCESS){
                             if(data.info.config){
-                                for (const tab in data.info.config) {
-                                    data.info.config[tab]._apinto_show = true
-                                }
                             }
                             setCurDetail(data.info)
                         }else{
@@ -276,7 +272,7 @@ export default function IntelligentPluginList(){
                 return;}
             case 'delete':
                 title='删除'
-                content=<span>确定删除成员<span className="text-status_fail"></span>？此操作无法恢复，确认操作？</span>
+                content=<span>确定删除<span className="text-status_fail"></span>？此操作无法恢复，确认操作？</span>
                 break;
         }
 

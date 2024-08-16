@@ -5,9 +5,8 @@ import (
 )
 
 const (
-	SystemGroup  = "system"
-	TeamGroup    = "team"
-	ProjectGroup = "project"
+	SystemGroup = "system"
+	TeamGroup   = "team"
 )
 
 type IdentityTeamService interface {

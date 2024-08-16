@@ -8,7 +8,6 @@ export const PARTITION_CERT_TABLE_COLUMNS: ProColumns<PartitionCertTableListItem
     {
         title: '证书',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -22,17 +21,16 @@ export const PARTITION_CERT_TABLE_COLUMNS: ProColumns<PartitionCertTableListItem
         renderText:(_,entity) =>(
             entity.domains.join(',')
         ),
-        copyable: true,
         ellipsis:true
     },
     {
-        title: '证书有效期',
+        title: '过期日期',
         ellipsis: true,
         dataIndex: 'notAfter',
-        copyable: true,
-        width:320,
-        renderText: (value:string,entity:PartitionCertTableListItem) => {
-            return `${entity.notBefore} - ${entity.notAfter}`
+        width:100,
+        renderText: (value: string) => value ? value.split(' ')?.[0] : '-',
+        sorter: (a,b)=> {
+            return a.notAfter.localeCompare(b.notAfter)
         },
     },
     {
@@ -60,7 +58,6 @@ export const PARTITION_CLUSTER_TABLE_COLUMNS : ProColumns<PartitionClusterTableL
     {
         title: '集群名称',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -72,7 +69,6 @@ export const PARTITION_CLUSTER_TABLE_COLUMNS : ProColumns<PartitionClusterTableL
         title: '集群 ID',
         dataIndex: 'id',
         width: 140,
-        copyable: true,
         ellipsis:true
     },
     {
@@ -90,7 +86,6 @@ export const PARTITION_CLUSTER_TABLE_COLUMNS : ProColumns<PartitionClusterTableL
     {
         title: '描述',
         dataIndex: 'description',
-        copyable: true,
         ellipsis:true
     }
 ];
@@ -100,7 +95,6 @@ export const PARTITION_CLUSTER_NODE_COLUMNS: ProColumns<PartitionClusterNodeTabl
     {
         title: '节点名称',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         fixed:'left',
         sorter: (a,b)=> {
@@ -159,7 +153,6 @@ export const PARTITION_LIST_COLUMNS: ProColumns<PartitionTableListItem>[] = [
     {
         title: '环境名称',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         fixed:'left',
         sorter: (a,b)=> {
@@ -169,7 +162,6 @@ export const PARTITION_LIST_COLUMNS: ProColumns<PartitionTableListItem>[] = [
     {
         title: 'ID',
         dataIndex: 'id',
-        copyable: true,
         ellipsis:true,
         width:140,
     },

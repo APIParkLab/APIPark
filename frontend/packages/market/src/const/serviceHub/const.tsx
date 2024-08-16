@@ -8,7 +8,6 @@ export const SERVICE_HUB_TABLE_COLUMNS: ProColumns<ServiceHubTableListItem>[] = 
     {
         title: '服务名称',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -20,7 +19,6 @@ export const SERVICE_HUB_TABLE_COLUMNS: ProColumns<ServiceHubTableListItem>[] = 
         title: '服务ID',
         dataIndex: 'id',
         width: 140,
-        copyable: true,
         ellipsis:true
     },
     {
@@ -32,19 +30,16 @@ export const SERVICE_HUB_TABLE_COLUMNS: ProColumns<ServiceHubTableListItem>[] = 
     {
         title: '所属系统',
         dataIndex: ['app','name'],
-        copyable: true,
         ellipsis:true
     },
     {
         title: '所属团队',
         dataIndex: ['team','name'],
-        copyable: true,
         ellipsis:true
     },
     {
         title: '服务分类',
         dataIndex: ['catalogue','name'],
-        copyable: true,
         ellipsis:true
     }
 ];

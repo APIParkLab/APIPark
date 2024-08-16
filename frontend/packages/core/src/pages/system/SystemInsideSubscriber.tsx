@@ -126,7 +126,7 @@ const SystemInsideSubscriber:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>内部数据服务</Link>
+                title:<Link to={`/service/list`}>服务</Link>
             },
             {
                 title:'订阅方管理'
@@ -151,6 +151,7 @@ const SystemInsideSubscriber:FC = ()=>{
             addNewBtnTitle="新增订阅方"
             onAddNewBtnClick={()=>{openModal('add')}}
             addNewBtnAccess="team.service.subscription.add"
+            tableClass="pr-PAGE_INSIDE_X"
         />
     )
 }
@@ -164,12 +165,10 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
     const [form] = Form.useForm();
     const {fetchData} = useFetch()
     const [systemOptionList, setSystemOptionList] = useState<DefaultOptionType[]>()
-    const [memberOptionList, setMemberOptionList] = useState<DefaultOptionType[]>()
-    const [subscriberTeamId, setSubscriberTeamId] = useState<string>()
     const save:()=>Promise<boolean | string> =  ()=>{
         return new Promise((resolve, reject)=>{
             form.validateFields().then((value)=>{
-                fetchData<BasicResponse<null>>('service/subscriber',{method:'POST',eoBody:({...value,service:serviceId}), eoParams:{service:serviceId,team:teamId}}).then(response=>{
+                fetchData<BasicResponse<null>>('service/subscriber',{method:'POST',eoBody:({...value}), eoParams:{service:serviceId,team:teamId}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
                         message.success(msg || '操作成功！')
@@ -195,7 +194,6 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 const teamMap = new Map<string, unknown>();
-
                 data.apps
                     .filter((x:SimpleSystemItem)=>x.id !== serviceId)
                     .forEach((item:SimpleSystemItem) => {
@@ -225,24 +223,6 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
         })
     }
 
-    useEffect(()=>{
-        subscriberTeamId && getMemberList()
-        form.setFieldValue('applier',null)
-    },[subscriberTeamId])
-
-    const getMemberList = ()=>{
-        setMemberOptionList([])
-        fetchData<BasicResponse<{ members: NewSimpleMemberItem[] }>>('team/members/simple',{method:'GET',eoParams:{team:subscriberTeamId}}).then(response=>{
-            const {code,data,msg} = response
-            if(code === STATUS_CODE.SUCCESS){
-                setMemberOptionList(data.members?.map((x:NewSimpleMemberItem)=>{return {
-                    label:x.user.name, value:x.user.id
-                }}))
-            }else{
-                message.error(msg || '操作失败')
-            }
-        })
-    }
 
     useEffect(() => {
         getSystemList()
@@ -262,7 +242,7 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
         >
             <Form.Item<SystemSubscriberConfigFieldType>
                 label="订阅方"
-                name="subscriber"
+                name="application"
                 rules={[{ required: true, message: '必填项' }]}
             >
                 <TreeSelect
@@ -271,16 +251,7 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
                     treeData={systemOptionList}
                     placeholder="请选择"
                     treeDefaultExpandAll
-                    onSelect={(_:unknown)=>{setSubscriberTeamId(_)}}
                 />
-            </Form.Item>
-
-            <Form.Item
-                label="申请人"
-                name="applier"
-                rules={[{ required: true, message: '必填项' }]}
-            >
-                <Select className="w-INPUT_NORMAL"  options={memberOptionList}  placeholder="请选择"/>
             </Form.Item>
 
         </Form>

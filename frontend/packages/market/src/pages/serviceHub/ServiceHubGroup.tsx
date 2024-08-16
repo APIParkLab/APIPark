@@ -5,8 +5,9 @@ import  {useCallback, useEffect, useState} from "react";
 import Tree, {DataNode} from "antd/es/tree";
 import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
 import {useFetch} from "@common/hooks/http.ts";
-import { CategorizesType, TagType } from "../../const/serviceHub/type.ts";
+import { CategorizesType } from "../../const/serviceHub/type.ts";
 import { filterServiceList, initialServiceHubListState, SERVICE_HUB_LIST_ACTIONS, ServiceHubListActionType } from "./ServiceHubList.tsx";
+import { EntityItem } from "@common/const/type.ts";
 
 type ServiceHubGroup = {
     children:JSX.Element
@@ -30,21 +31,21 @@ export const ServiceHubGroup = ({children,filterOption,dispatch}:ServiceHubGroup
     }
 
     const getTagAndServiceClassifyList = ()=>{
-        fetchData<BasicResponse<{ catalogues:CategorizesType[],tags:TagType[]}>>('catalogues',{method:'GET'}).then(response=>{
+        fetchData<BasicResponse<{ catalogues:CategorizesType[],tags:EntityItem[]}>>('catalogues',{method:'GET'}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 dispatch({type:SERVICE_HUB_LIST_ACTIONS.GET_CATEGORIES,payload:data.catalogues})
                 dispatch({type:SERVICE_HUB_LIST_ACTIONS.GET_TAGS,payload:[...data.tags,{id:'empty',name:'无标签'}]})
                 dispatch({type:SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_CATE,payload:[...data.catalogues.map((x:CategorizesType)=>x.id)]})
-                dispatch({type:SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_TAG,payload:[...data.tags.map((x:TagType)=>x.id),'empty']})
+                dispatch({type:SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_TAG,payload:[...data.tags.map((x:EntityItem)=>x.id),'empty']})
             }else{
                 message.error(msg || '操作失败')
             }
         })
     }
     
-    const transferToTreeData = useCallback((data:CategorizesType[] | TagType[] ):TreeDataNode[]=>{
-        const loop = (data: CategorizesType[] | TagType[] ): DataNode[] =>
+    const transferToTreeData = useCallback((data:CategorizesType[] | EntityItem[] ):TreeDataNode[]=>{
+        const loop = (data: CategorizesType[] | EntityItem[] ): DataNode[] =>
             data?.map((item) => {
                 if ((item as CategorizesType).children) {
                     return {

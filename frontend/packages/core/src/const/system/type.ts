@@ -56,8 +56,7 @@ export type SystemSubscriberTableListItem = {
 };
 
 export type SystemSubscriberConfigFieldType = {
-    service:string
-    subscriber:string
+    application:string
     applier:string
 };
 

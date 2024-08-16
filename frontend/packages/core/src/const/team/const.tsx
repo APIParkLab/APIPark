@@ -12,7 +12,6 @@ export const TEAM_TABLE_COLUMNS: ProColumns<TeamTableListItem>[] = [
     {
         title: '名称',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -24,13 +23,11 @@ export const TEAM_TABLE_COLUMNS: ProColumns<TeamTableListItem>[] = [
         title: 'ID',
         dataIndex: 'id',
         width: 140,
-        copyable: true,
         ellipsis:true
     },
     {
         title: '描述',
         dataIndex: 'description',
-        copyable: true,
         ellipsis:true
     },
     {
@@ -67,7 +64,6 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: ProColumns<SystemTableListItem>[] = [
     {
         title: '服务名称',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -79,13 +75,11 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: ProColumns<SystemTableListItem>[] = [
         title: '服务 ID',
         dataIndex: 'id',
         width: 140,
-        copyable: true,
         ellipsis:true
     },
     {
         title: '所属团队',
         dataIndex: ['team','name'],
-        copyable: true,
         ellipsis:true
     },
     {
@@ -128,7 +122,6 @@ export const TEAM_MEMBER_TABLE_COLUMNS: ProColumns<TeamMemberTableListItem>[] = 
     {
         title: '姓名',
         dataIndex: ['user','name'],
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -139,7 +132,6 @@ export const TEAM_MEMBER_TABLE_COLUMNS: ProColumns<TeamMemberTableListItem>[] = 
     {
         title: '团队角色',
         dataIndex: 'roles',
-        copyable: true,
         ellipsis:true,
     },
     {

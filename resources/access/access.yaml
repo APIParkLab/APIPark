@@ -10,6 +10,7 @@ system:
           - name: view
             cname: '查看'
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/user/accounts"
               - "GET:/api/v1/user/departments"
@@ -38,6 +39,7 @@ system:
           - name: view
             cname: '查看'
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/manager/teams"
               - "GET:/api/v1/manager/team"
@@ -56,12 +58,14 @@ system:
         children:
           - name: view system role
             cname: '查看系统角色'
+            guest_allow: true
             value: 'view_system_role'
             apis:
               - "GET:/api/v1/system/roles"
               - "GET:/api/v1/system/role"
           - name: view team role
             cname: '查看团队角色'
+            guest_allow: true
             value: 'view_team_role'
             apis:
               - "GET:/api/v1/team/roles"
@@ -77,6 +81,7 @@ system:
           - name: view
             cname: '查看'
             value: 'view'
+            guest_allow: true
 #            apis:
 #              - "GET:/api/v1/catalogues"
           - name: manager
@@ -100,6 +105,7 @@ system:
           - name: view
             cname: 查看
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/cluster/nodes"
           - name: manager
@@ -115,6 +121,7 @@ system:
           - name: view
             cname: 查看
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/certificates"
               - "GET:/api/v1/certificate"
@@ -133,6 +140,7 @@ system:
           - name: view
             cname: 查看
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/dynamic/{name}/info"
               - "GET:/api/v1/dynamic/{name}/list"
@@ -157,6 +165,7 @@ system:
           - name: view all
             cname: 查看所有应用
             value: 'view_all'
+            guest_allow: true
             apis:
               - "GET:/api/v1/apps"
       - name: service
@@ -166,6 +175,7 @@ system:
           - name: view all
             cname: 查看所有服务
             value: 'view_all'
+            guest_allow: true
             apis:
               - "GET:/api/v1/services"
       - name: team
@@ -175,6 +185,7 @@ system:
           - name: view all
             cname: 查看所有团队
             value: 'view_all'
+            guest_allow: true
             apis:
               - "GET:/api/v1/manager/teams"
       - name: api market
@@ -184,6 +195,7 @@ system:
           - name: view
             cname: 查看
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/catalogue/services"
               - "GET:/api/v1/catalogue/service"
@@ -199,6 +211,7 @@ team:
           - name: view
             cname: 查看
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/service/apis"
               - "GET:/api/v1/service/api/detail"
@@ -220,6 +233,7 @@ team:
           - name: view
             cname: 查看
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/service/upstream"
           - name: manager
@@ -234,6 +248,7 @@ team:
           - name: view
             cname: 查看
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/service/releases"
               - "GET:/api/v1/service/release"
@@ -255,6 +270,7 @@ team:
           - name: view
             cname: 查看
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/service/approval/subscribes"
               - "GET:/api/v1/service/approval/subscribe"
@@ -289,6 +305,7 @@ team:
           - name: view
             cname: 查看
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/application/subscriptions"
           - name: manager
@@ -305,6 +322,7 @@ team:
           - name: view
             cname: 查看
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/app/authorization"
               - "GET:/api/v1/app/authorizations"
@@ -339,6 +357,7 @@ team:
           - name: view
             cname: 查看
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/team/members"
               - "GET:/api/v1/team/members/toadd"
@@ -356,6 +375,7 @@ team:
           - name: view
             cname: '查看'
             value: 'view'
+            guest_allow: true
             apis:
               - "GET:/api/v1/manager/teams"
               - "GET:/api/v1/manager/team"

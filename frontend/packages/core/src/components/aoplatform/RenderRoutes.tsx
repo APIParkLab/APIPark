@@ -379,6 +379,16 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                     key:uuidv4()
                 }]
                 
+            },
+            {
+                path:'userProfile/*',
+                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/userProfile/UserProfile.tsx')),
+                key:uuidv4(),
+                children:[{
+                    path:'changepsw',
+                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/userProfile/ChangePsw.tsx')),
+                    key:uuidv4()
+                }]
             }
         ]
     },

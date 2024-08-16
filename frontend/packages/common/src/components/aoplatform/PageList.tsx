@@ -77,8 +77,9 @@ const PageList = <T extends Record<string, unknown>>(props: React.PropsWithChild
     const handleResize = () => {
       if (parentRef.current && !noScroll) {
         const res = parentRef.current.getBoundingClientRect();
-        const height = res.height - ((noTop ? 0 : 52) + 40 + (showPagination && !dragSortKey ? 52 : 0) +( besidesTableHeight ?? 0)); // 减去顶部按钮、底部分页、表头高度
-        setTableWidth(minTableWidth > res.width ? minTableWidth : undefined);
+        const height = res.height - ((noTop ? 0 : 59) + 54  + (showPagination && !dragSortKey ? 52 : 0) +( besidesTableHeight ?? 0) + 1); // 减去顶部按钮、底部分页、表头高度
+        setTableWidth(minTableWidth - 5> res.width ? minTableWidth : undefined);
+        console.log(minTableWidth,res.width )
         height && setTableHeight(minVirtualHeight === undefined ? height : (height > minVirtualHeight ? height : minVirtualHeight));
       }
     };
@@ -112,11 +113,11 @@ const PageList = <T extends Record<string, unknown>>(props: React.PropsWithChild
   const newColumns = useMemo(()=>{
     let width:number = 0
     const res = columns?.map(
-      (x)=>{
+      (x, index)=>{
         width += Number(x.width ?? ((x.filters || x.sorter) ? 120 : 100))
-        x.copyable = x.copyable === false? false: true
         const sorter = localStorage.getItem(`${id}_sorter`)
         const filters = localStorage.getItem(`${id}_filters`)
+        x.copyable = x.copyable ?? (index === 0 || x.dataIndex === 'id' || x.dataIndex === 'email')
         if(sorter && x.sorter){
           const sorterObj =  JSON.parse(sorter)
           const xName = Array.isArray(x.dataIndex) ? x.dataIndex.join(','):x.dataIndex
@@ -137,7 +138,7 @@ const PageList = <T extends Record<string, unknown>>(props: React.PropsWithChild
     return (
         <>{
           tableTitle ? <span className={`text-[30px] leading-[42px] my-mbase pl-[20px] ${tableTitleClass}`}>{tableTitle}</span> : (
-           addNewBtnTitle ?  <WithPermission access={addNewBtnAccess} ><Button type="primary"  className={`mr-btnbase ${addNewBtnWrapperClass}`} onClick={onAddNewBtnClick}>{addNewBtnTitle}</Button></WithPermission> : undefined
+           addNewBtnTitle ?  <WithPermission access={addNewBtnAccess} ><Button type="primary"  className={`mr-btnrbase my-btnbase ${addNewBtnWrapperClass}`} onClick={onAddNewBtnClick}>{addNewBtnTitle}</Button></WithPermission> : undefined
           )
 
         }
@@ -191,7 +192,7 @@ const PageList = <T extends Record<string, unknown>>(props: React.PropsWithChild
             </Dropdown>):null,
           ]}
           toolbar={{
-            actions:[...[beforeSearchNode],...[searchPlaceholder?<Input className="" onChange={ onSearchWordChange ?  (e) => debounce(onSearchWordChange, 100)(e) : undefined  } onPressEnter={()=>manualReloadTable ? manualReloadTable():actionRef.current?.reload?.()} allowClear placeholder={searchPlaceholder}  prefix={<SearchOutlined className="cursor-pointer" onClick={()=>{actionRef.current?.reload?.()}}/>}/>:null]],
+            actions:[...[beforeSearchNode],...[searchPlaceholder?<Input className="my-btnbase ml-btnbase" onChange={ onSearchWordChange ?  (e) => debounce(onSearchWordChange, 100)(e) : undefined  } onPressEnter={()=>manualReloadTable ? manualReloadTable():actionRef.current?.reload?.()} allowClear placeholder={searchPlaceholder}  prefix={<SearchOutlined className="cursor-pointer" onClick={()=>{actionRef.current?.reload?.()}}/>}/>:null]],
           }}
           options={{
             reload: false,

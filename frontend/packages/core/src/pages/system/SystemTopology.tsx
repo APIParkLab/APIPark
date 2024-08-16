@@ -109,7 +109,7 @@ export default function SystemTopology() {
       getNodeData()
       setBreadcrumb([
         {
-            title: <Link to={`/service/list`}>内部数据服务</Link>
+            title: <Link to={`/service/list`}>服务</Link>
         },
         {
             title: '调用拓扑图'

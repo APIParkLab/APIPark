@@ -1,4 +1,4 @@
-import { App, Divider} from "antd";
+import { App} from "antd";
 import PageList from "@common/components/aoplatform/PageList.tsx";
 import  { useEffect, useRef,} from "react";
 import {ActionType, ProColumns} from "@ant-design/pro-components";
@@ -12,6 +12,7 @@ import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { checkAccess } from "@common/utils/permission.ts";
 import { useNavigate } from "react-router-dom";
 import { RoleTableListItem } from "@core/const/role/type.ts";
+import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 
 
 const RoleList = ()=>{
@@ -116,46 +117,50 @@ const RoleList = ()=>{
     }, []);
 
     return (<>
-        <div className="flex flex-col pb-[20px]">
-            <div className="pb-[30px] ">
-                <p className="text-theme text-[26px] mb-[20px]">角色</p>
-                <p>设置角色的权限范围。</p>
-            </div>
-        <h3 className="p ">系统级别角色</h3>
-            <PageList
-                id="global_role"
-                tableClass="role_table  mb-btnrbase"
-                ref={pageListRef}
-                columns={[...ROLE_TABLE_COLUMNS as ProColumns<RoleTableListItem, "text">[], ...operation('system')]}
-                request={()=>getRoleList('system')}
-                addNewBtnTitle="添加角色"
-                showPagination={false}
-                onAddNewBtnClick={() => {
-                    navigateTo(`/role/system/config`)
-                }}
-                noScroll={true}
-                addNewBtnAccess="system.organization.role.system.add"
-                onRowClick={(row:RoleTableListItem)=>  navigateTo(`/role/system/config/${row.id}`)}
-                tableClickAccess="system.organization.role.system.edit"
-            />
-        <h3 className=" pt-btnbase ">团队级别角色</h3>
-        <PageList
-            id="global_role"
-            ref={pageListRef}
-            tableClass="role_table "
-            columns={[...ROLE_TABLE_COLUMNS as ProColumns<RoleTableListItem, "text">[], ...operation('team')]}
-            request={()=>getRoleList('team')}
-            showPagination={false}
-            addNewBtnTitle="添加角色"
-            onAddNewBtnClick={() => {
-                navigateTo(`/role/team/config`)
-            }}
-            noScroll={true}
-            addNewBtnAccess="system.organization.role.team.add"
-            onRowClick={(row:RoleTableListItem)=>  navigateTo(`/role/team/config/${row.id}`)}
-            tableClickAccess="system.organization.role.team.edit"
-        />
-        </div>
+        <InsidePage 
+            className="pb-PAGE_INSIDE_B overflow-y-auto"
+            pageTitle='角色' 
+            description="设置角色的权限范围。"
+            showBorder={false}
+            scrollPage={false}
+            >
+            <div className="pr-PAGE_INSIDE_X">
+                <h3 className="mt-0">系统级别角色</h3>
+                    <PageList
+                        id="global_role"
+                        tableClass="role_table  mb-btnrbase"
+                        ref={pageListRef}
+                        columns={[...ROLE_TABLE_COLUMNS as ProColumns<RoleTableListItem, "text">[], ...operation('system')]}
+                        request={()=>getRoleList('system')}
+                        addNewBtnTitle="添加角色"
+                        showPagination={false}
+                        onAddNewBtnClick={() => {
+                            navigateTo(`/role/system/config`)
+                        }}
+                        noScroll={true}
+                        addNewBtnAccess="system.organization.role.system.add"
+                        onRowClick={(row:RoleTableListItem)=>  navigateTo(`/role/system/config/${row.id}`)}
+                        tableClickAccess="system.organization.role.system.edit"
+                    />
+                <h3 className=" pt-btnbase ">团队级别角色</h3>
+                <PageList
+                    id="global_role"
+                    ref={pageListRef}
+                    tableClass="role_table "
+                    columns={[...ROLE_TABLE_COLUMNS as ProColumns<RoleTableListItem, "text">[], ...operation('team')]}
+                    request={()=>getRoleList('team')}
+                    showPagination={false}
+                    addNewBtnTitle="添加角色"
+                    onAddNewBtnClick={() => {
+                        navigateTo(`/role/team/config`)
+                    }}
+                    noScroll={true}
+                    addNewBtnAccess="system.organization.role.team.add"
+                    onRowClick={(row:RoleTableListItem)=>  navigateTo(`/role/team/config/${row.id}`)}
+                    tableClickAccess="system.organization.role.team.edit"
+                />
+                </div>
+        </InsidePage>
     </>)
 }
 export default RoleList;

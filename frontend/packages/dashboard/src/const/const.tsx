@@ -22,7 +22,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         dataIndex: 'requestSuccess',
         width: 106,
         ellipsis:true,
-        copyable: true,
         sorter: (a,b)=> {
             return a.requestSuccess - b.requestSuccess
         },
@@ -33,7 +32,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         eoTitle:'请求成功率',
         dataIndex: 'requestRate',
         valueType:'percent',
-        copyable: true,
         ellipsis:true,
         sorter: (a,b)=> {
             return a.requestRate - b.requestRate
@@ -45,7 +43,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         eoTitle:'转发总数',
         width: 96,
       dataIndex: 'proxyTotal',
-      copyable: true,
       ellipsis:true,
       sorter: (a,b)=> {
             return a.proxyTotal - b.proxyTotal
@@ -57,7 +54,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         eoTitle:'转发成功数',
         width: 106,
       dataIndex: 'proxySuccess',
-      copyable: true,
       ellipsis:true,
       sorter: (a,b)=> {
           return a.proxySuccess - b.proxySuccess
@@ -70,7 +66,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         width: 106,
       dataIndex: 'proxyRate',
       valueType:'percent',
-      copyable: true,
       ellipsis:true,
       sorter: (a,b)=> {
           return a.proxyRate - b.proxyRate
@@ -82,7 +77,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         eoTitle:'失败状态码数',
         width: 120,
       dataIndex: 'statusFail',
-      copyable: true,
       ellipsis:true,
       sorter: (a,b)=> {
           return a.statusFail - b.statusFail
@@ -95,7 +89,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         width: 148,
       dataIndex: 'avgResp',
       valueType:'digit',
-      copyable: true,
       ellipsis:true,
       sorter: (a,b)=> {
           return a.avgResp - b.avgResp
@@ -108,7 +101,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         width: 148,
       dataIndex: 'maxResp',
       valueType:'digit',
-      copyable: true,
       ellipsis:true,
       sorter: (a,b)=> {
           return a.maxResp - b.maxResp
@@ -121,7 +113,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         width: 148,
       dataIndex: 'minResp',
       valueType:'digit',
-      copyable: true,
       ellipsis:true,
       sorter: (a,b)=> {
           return a.minResp - b.minResp
@@ -134,7 +125,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         width: 148,
       dataIndex: 'avgTraffic',
       valueType:'digit',
-      copyable: true,
       ellipsis:true,
       sorter: (a,b)=> {
           return a.avgTraffic - b.avgTraffic
@@ -147,7 +137,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         width: 148,
       dataIndex: 'maxTraffic',
       valueType:'digit',
-      copyable: true,
       ellipsis:true,
       sorter: (a,b)=> {
           return a.maxTraffic - b.maxTraffic
@@ -160,7 +149,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         width: 148,
       dataIndex: 'minTraffic',
       valueType:'digit',
-      copyable: true,
       ellipsis:true,
       sorter: (a,b)=> {
           return a.minTraffic - b.minTraffic
@@ -176,7 +164,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         dataIndex: 'name',
       width:120,
       ellipsis:true,
-      copyable:true,
       fixed: 'left',
       disable:true
     },
@@ -185,7 +172,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         eoTitle:'请求路径',
         dataIndex: 'path',
       ellipsis:true,
-      copyable:true,
       width: 80
     },
     {
@@ -208,7 +194,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
         dataIndex: 'name',
       width:160,
       ellipsis:true,
-      copyable:true,
       fixed: 'left',
       disable:true
     },
@@ -218,7 +203,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
       dataIndex: 'id',
       width: 140,
       ellipsis:true,
-      copyable:true,
       fixed: 'left'
     },
     ...DASHBOARD_BASE_COLUMNS_CONFIG as (ProColumns<MonitorApiData>&{eoTitle:string})[]
@@ -232,7 +216,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
       dataIndex: 'name',
       width:160,
       ellipsis:true,
-      copyable:true,
       fixed: 'left',
       disable:true
     },
@@ -242,7 +225,6 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(ProColumns<MonitorData>&{eoTitle:str
       dataIndex: 'id',
       width: 140,
       ellipsis:true,
-      copyable:true,
       fixed: 'left'
     },
     ...DASHBOARD_BASE_COLUMNS_CONFIG as (ProColumns<MonitorApiData>&{eoTitle:string})[]

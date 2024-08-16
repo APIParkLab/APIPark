@@ -27,7 +27,6 @@ const AUDIT_LOG_COLUMNS_CONFIG: ProColumns<AuditLogTableListItem, 'multipleSelec
         dataIndex: 'operateTime',
         valueType: 'dateTimeRange',
         order:1,
-        copyable: true,
         ellipsis:true,
         fixed:'left',
         width:182
