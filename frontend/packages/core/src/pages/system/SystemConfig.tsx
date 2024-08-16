@@ -1,6 +1,6 @@
 
 import  {forwardRef, useEffect, useImperativeHandle, useState} from "react";
-import {App, Button, Divider, Form, Input, Radio, Row, Select, TagType, TreeSelect, Upload} from "antd";
+import {App, Button, Form, Input, Radio, Row, Select, TreeSelect, Upload} from "antd";
 import { Link, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
@@ -93,11 +93,11 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
     const getTagAndServiceClassifyList = ()=>{
         setTagOptionList([])
         setServiceClassifyOptionList([])
-        fetchData<BasicResponse<{ catalogues:CategorizesType[],tags:TagType[]}>>('catalogues',{method:'GET'}).then(response=>{
+        fetchData<BasicResponse<{ catalogues:CategorizesType[],tags:EntityItem[]}>>('catalogues',{method:'GET'}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                setTagOptionList(data.tags?.map((x:TagType)=>{return {
-                    label:x.name, value:x.name
+                setTagOptionList(data.tags?.map((x:EntityItem)=>{return {
+                    label:x.name, value:x.id
                 }})||[])
                 setServiceClassifyOptionList(data.catalogues)
 
@@ -118,19 +118,6 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         team:data.service.team.id,
                         catalogue:data.service.catalogue?.id,
                         tags:data.service.tags?.map((x:EntityItem)=>x.id),
-                         logoFile:[
-                            {
-                                uid: '-1', // 文件唯一标识
-                                name: 'image.png', // 文件名
-                                status: 'done', // 状态有：uploading, done, error, removed
-                                url: data.service?.logo || '', // 图片 Base64 数据
-                            }
-                        ]
-                    })
-                    console.log({
-                        ...data.service,
-                        team:data.service.team.id,
-                        catalogue:data.service.catalogue?.id,
                          logoFile:[
                             {
                                 uid: '-1', // 文件唯一标识
@@ -202,7 +189,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
             getSystemInfo();
             setBreadcrumb([
                 {
-                    title: <Link to={`/service/list`}>内部数据服务</Link>
+                    title: <Link to={`/service/list`}>服务</Link>
                 },
                 {
                     title: '设置'
@@ -238,14 +225,13 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
 
     return (
         <>
-            <div className={`h-full min-w-[570px]`}>
                 <WithPermission access={onEdit ? 'team.service.service.edit' :''}>
                 <Form
                     layout='vertical'
                     labelAlign='left'
                     scrollToFirstError
                     form={form}
-                    className="mx-auto pb-[20px] "
+                    className="mx-auto  pr-PAGE_INSIDE_X "
                     name="systemConfig"
                     onFinish={onFinish}
                     autoComplete="off"
@@ -262,7 +248,6 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         <Form.Item<SystemConfigFieldType>
                             label="服务ID"
                             name="id"
-                            extra="服务ID（sys_id）可用于检索服务或日志"
                             rules={[{ required: true, message: '必填项' ,whitespace:true }]}
                         >
                             <Input className="w-INPUT_NORMAL" disabled={onEdit} placeholder="请输入服务ID"/>
@@ -376,18 +361,19 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         </Row></>}
                     </div>
                     {onEdit && <>
-                        <div className="bg-[rgb(255_120_117_/_5%)] rounded-[10px] mt-[50px] p-btnrbase pb-0">
-                        <p className="text-left"><span className="font-bold">删除服务：</span>删除操作不可恢复，请谨慎操作！</p>
-                            <div className="text-left">
-                                <WithPermission access="team.service.service.delete">
-                                    <Button className="m-auto mt-[16px] mb-[20px]" type="default"  danger={true} onClick={deleteSystemModal}>删除服务</Button>
-                                    </WithPermission>
+                        <WithPermission access="team.service.service.delete" showDisabled={false}>
+                            <div className="bg-[rgb(255_120_117_/_5%)] rounded-[10px] mt-[50px] p-btnrbase pb-0">
+                            <p className="text-left"><span className="font-bold">删除服务：</span>删除操作不可恢复，请谨慎操作！</p>
+                                <div className="text-left">
+                                    <WithPermission access="team.service.service.delete">
+                                        <Button className="m-auto mt-[16px] mb-[20px]" type="default"  danger={true} onClick={deleteSystemModal}>删除服务</Button>
+                                        </WithPermission>
+                                </div>
                             </div>
-                        </div>
+                        </WithPermission>
                     </>}
                 </Form>
                 </WithPermission>
-                </div>
         </>
     )
 })

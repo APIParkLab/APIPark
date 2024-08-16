@@ -86,9 +86,15 @@ export type NodeModalFieldType = {
 
 
 export type NodeModalHandle = {
-    save:()=>Promise<boolean|string>
+    save:()=>void
+}
+export type NodeModalPropsType = {
+    changeStatus:(status:ClusterPageShowStatus)=>void
+    getClusterInfo:()=>void
+    status:ClusterPageShowStatus
 }
 
+export type ClusterPageShowStatus = 'view'|'preview'|'edit'
 export type PartitionTableListItem = {
     id:string;
     name: string;

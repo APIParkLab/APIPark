@@ -6,11 +6,11 @@ import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
 import {useFetch} from "@common/hooks/http.ts";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
-import {  CategorizesType, ServiceHubTableListItem, TagType } from "../../const/serviceHub/type.ts";
+import {  CategorizesType, ServiceHubTableListItem } from "../../const/serviceHub/type.ts";
 import { VirtuosoGrid } from 'react-virtuoso';
 import { ApiOutlined,LoadingOutlined } from "@ant-design/icons";
 import ServiceHubGroup from "./ServiceHubGroup.tsx";
-import { unset } from "lodash-es";
+import { EntityItem } from "@common/const/type.ts";
 
 export enum SERVICE_HUB_LIST_ACTIONS {
     GET_CATEGORIES = 'GET_CATEGORIES',
@@ -26,7 +26,7 @@ export enum SERVICE_HUB_LIST_ACTIONS {
 
 export type ServiceHubListActionType = 
 | { type: SERVICE_HUB_LIST_ACTIONS.GET_CATEGORIES, payload: CategorizesType[] }
-| { type: SERVICE_HUB_LIST_ACTIONS.GET_TAGS, payload: TagType[] }
+| { type: SERVICE_HUB_LIST_ACTIONS.GET_TAGS, payload: EntityItem[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.GET_SERVICES, payload: ServiceHubTableListItem[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_SERVICES, payload: ServiceHubTableListItem[] }
 | { type: SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_CATE, payload: string[] }
@@ -37,7 +37,7 @@ export type ServiceHubListActionType =
 
 export const initialServiceHubListState = {
     categoriesList: [] as CategorizesType[],
-    tagsList: [] as TagType[],
+    tagsList: [] as EntityItem[],
     servicesList: [] as ServiceHubTableListItem[],
     showServicesList: [] as ServiceHubTableListItem[],
     selectedCate: [] as string[],
@@ -143,7 +143,8 @@ const ServiceHubList:FC = ()=>{
             return (
                 <div className="pt-[20px]">
                 <Card title={CardTitle(item)} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px] m-0 transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]"  classNames={{header:'border-b-[0px] p-[20px] ', body:"pt-0"}} onClick={()=>showDocumentDetail(item)}>
-                   <span className="line-clamp-3 break-all">{item.description || '暂无服务描述'}</span> 
+                   <span className="line-clamp-3  text-[12px] text-[#666] " 
+                    style={{'word-break':'auto-phrase'}}>{item.description || '暂无服务描述'}</span> 
                 </Card>
                 </div>
             );
@@ -186,7 +187,7 @@ const CardTitle = (service:ServiceHubTableListItem)=>{
             <div className="pl-[20px] w-[calc(100%-50px)]">
                 <p className="text-[14px] h-[20px] leading-[20px] truncate w-full">{service.name}</p>
                 <div className="mt-[10px] h-[20px] flex items-center font-normal">
-                    <Tag color="#7371fc1b" className="text-theme font-normal border-0 mr-[12px] max-w-[70px] truncate" key={service.id} bordered={false} title={service.catalogue?.name || '-'}>{service.catalogue?.name || '-'}</Tag>
+                    <Tag color="#7371fc1b" className="text-theme font-normal border-0 mr-[12px] max-w-[150px] truncate" key={service.id} bordered={false} title={service.catalogue?.name || '-'}>{service.catalogue?.name || '-'}</Tag>
                    
                     <Tooltip  title='API 数量'>
                         <span className="mr-[12px]"><ApiOutlined className="mr-[1px] text-[14px] h-[14px] w-[14px]"/><span className="font-normal text-[14px]">{service.apiNum ?? '-'}</span></span>

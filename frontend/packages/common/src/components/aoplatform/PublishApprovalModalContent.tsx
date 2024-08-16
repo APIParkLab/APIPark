@@ -26,19 +26,16 @@ const apiColumns = [
     {
         title:'API 名称',
         dataIndex:'name',
-        copyable: true,
         ellipsis:true
     },
     {
         title:'请求方式',
         dataIndex:'method',
-        copyable: true,
         ellipsis:true
     },
     {
         title:'路径',
         dataIndex:'path',
-        copyable: true,
         ellipsis:true
     },
     {
@@ -77,7 +74,6 @@ const upstreamColumns = [
         title:'地址',
         dataIndex:'addr',
         render:(text:string[])=>(<>{text.join(',')}</>),
-        copyable: true,
         ellipsis:true
     },
     {
@@ -265,7 +261,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                 >
                     <Input.TextArea className="w-INPUT_NORMAL" disabled={type !== 'add' && type !== 'publish'} placeholder="请输入" />
                 </Form.Item>
-
+{/* 
                 {type !== 'add' && type !== 'publish' && <Form.Item
                     label="审批意见"
                     name="opinion"
@@ -277,7 +273,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                             errors: [], // 设置为空数组来移除错误信息
                         },
                     ]);}}/>
-                </Form.Item>}
+                </Form.Item>} */}
                 
                 {['error','done'].indexOf(data.status) !== -1 && data.clusterPublishStatus &&data.clusterPublishStatus.length > 0 && <>                    <Row className="text-left h-[32px] mb-8px]" span={3}><span>上线情况：</span></Row>
                     <Row span={24} className="mb-mbase">

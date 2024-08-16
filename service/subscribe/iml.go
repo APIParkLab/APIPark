@@ -3,9 +3,9 @@ package subscribe
 import (
 	"context"
 	"time"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/APIParkLab/APIPark/service/universally"
 	"github.com/APIParkLab/APIPark/stores/subscribe"
 )
@@ -42,12 +42,20 @@ type imlSubscribeService struct {
 	universally.IServiceEdit[UpdateSubscribe]
 }
 
+func (i *imlSubscribeService) GetByServiceAndApplication(ctx context.Context, serviceId string, applicationId string) (*Subscribe, error) {
+	info, err := i.store.First(ctx, map[string]interface{}{"service": serviceId, "application": applicationId})
+	if err != nil {
+		return nil, err
+	}
+	return FromEntity(info), nil
+}
+
 func (i *imlSubscribeService) CountMapByService(ctx context.Context, status int, service ...string) (map[string]int64, error) {
 	w := make(map[string]interface{})
 	if len(service) > 0 {
 		w["service"] = service
 	}
-	
+
 	w["apply_status"] = status
 	return i.store.CountByGroup(ctx, "", w, "service")
 }
@@ -69,7 +77,7 @@ func (i *imlSubscribeService) SubscriptionsByApplication(ctx context.Context, ap
 	if len(applicationIds) > 0 {
 		w["application"] = applicationIds
 	}
-	
+
 	//w["apply_status"] = ApplyStatusSubscribe
 	list, err := i.store.List(ctx, w, "create_at desc")
 	if err != nil {
@@ -88,7 +96,7 @@ func (i *imlSubscribeService) SubscribersByProject(ctx context.Context, serviceI
 	if len(serviceIds) > 0 {
 		w["service"] = serviceIds
 	}
-	
+
 	w["apply_status"] = ApplyStatusSubscribe
 	list, err := i.store.List(ctx, w, "create_at desc")
 	if err != nil {
@@ -131,7 +139,7 @@ func (i *imlSubscribeService) UpdateSubscribeStatus(ctx context.Context, applica
 
 func (i *imlSubscribeService) MySubscribeServices(ctx context.Context, application string, serviceIDs []string) ([]*Subscribe, error) {
 	w := make(map[string]interface{})
-	
+
 	if len(serviceIDs) > 0 {
 		w["service"] = serviceIDs
 	}
@@ -194,7 +202,7 @@ func (i *imlSubscribeService) updateHandler(e *subscribe.Subscribe, t *UpdateSub
 	if t.ApplyStatus != nil {
 		e.ApplyStatus = *t.ApplyStatus
 	}
-	
+
 	//if t.ApplyID != nil {
 	//	e.ApplyID = *t.ApplyID
 	//}
@@ -295,5 +303,5 @@ func (i *imlSubscribeApplyService) updateHandler(e *subscribe.Apply, t *EditAppl
 		e.Applier = *t.Applier
 		e.ApplyAt = time.Now()
 	}
-	
+
 }

@@ -20,7 +20,7 @@ const DEFAULT_FORM_VALUE = {
     balance:'round-robin',
     limitPeerSecond:10000,
     retry:3,
-    timeout:3,
+    timeout:10000,
 }
 
 const SystemInsideUpstreamContent= forwardRef<SystemInsideUpstreamContentHandle>((props,ref) => {
@@ -107,7 +107,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
     useEffect(() => {
         setBreadcrumb([
             {
-                title: <Link to={`/service/list`}>内部数据服务</Link>
+                title: <Link to={`/service/list`}>服务</Link>
             },
             {
                 title: '上游'
@@ -118,14 +118,14 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
 
     return (
         <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading}>
-            <div className={`flex-1 h-full overflow-auto`} >
+            <div className={`flex-1 h-full overflow-auto pr-PAGE_INSIDE_X`} >
                         <WithPermission access={'team.service.upstream.edit'}>
                             <Form
                                 layout='vertical'
                                 labelAlign='left'
                                 name="systemInsideUpstreamContent"
                                 scrollToFirstError
-                                className="mx-auto mb-[20px]  overflow-hidden"
+                                className="mx-auto  "
                                 autoComplete="off"
                                 form={form}
                                 onFinish={saveUpstream}
@@ -224,7 +224,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
                                 </Form.Item>
 
                                 <Form.Item
-                                    className="border-none bg-transparent pt-btnrbase"
+                                    className="border-none bg-transparent pt-btnrbase mb-0 pb-0"
                                 >
                                     <WithPermission access='team.service.upstream.edit'><Button type="primary" htmlType="submit" >
                                         保存

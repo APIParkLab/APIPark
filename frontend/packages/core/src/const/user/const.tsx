@@ -8,7 +8,6 @@ export const USER_LIST_COLUMNS: ProColumns<MemberItem>[]= [
     {
         title: '用户名',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -19,7 +18,6 @@ export const USER_LIST_COLUMNS: ProColumns<MemberItem>[]= [
     {
         title: '邮箱',
         dataIndex: 'email',
-        copyable: true,
         ellipsis:true,
     },
     {

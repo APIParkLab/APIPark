@@ -25,14 +25,14 @@ export default function ServiceHubManagement() {
     const [teamList, setTeamList] = useState<MenuItem[]>([])
     const {setAppName} = useTenantManagementContext()
     const navigateTo = useNavigate()
-    const {getTeamAccessData,cleanTeamAccessData} = useGlobalContext()
+    const {getTeamAccessData,cleanTeamAccessData,checkPermission} = useGlobalContext()
     type MenuItem = Required<MenuProps>['items'][number];
 
 
 const getServiceList = ()=>{
     //console.log(pagination,sorter,categoryId,tagId)
     setServiceLoading(true)
-     fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>('my_apps',{method:'GET', eoParams:{ team:teamId,keyword:''},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num']}).then(response=>{
+        return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team:teamId,keyword:''},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num']}).then(response=>{
         const {code,data,msg} = response
         if(code === STATUS_CODE.SUCCESS){
             setServiceList([...data.apps,{type:'addNewItem'}])
@@ -200,7 +200,7 @@ useEffect(() => {
 const CardTitle = (service:ServiceHubAppListItem)=>{
     return(
         <div className="flex">
-            <Avatar shape="square" size={50}  className=" bg-[linear-gradient(135deg,#7F83F7,#4E54FF)] rounded-[12px]" icon={<iconpark-icon  className="" name="auto-generate-api"></iconpark-icon>} />
+            <Avatar shape="square" size={50}  className=" bg-theme rounded-[12px]" icon={<iconpark-icon  className="" name="auto-generate-api"></iconpark-icon>} />
             <div className="pl-[20px] w-[calc(100%-50px)]">
                 <p className="text-[14px] h-[20px] leading-[20px] truncate">{service.name}</p>
                 <div className="mt-[10px] h-[20px] flex items-center font-normal">

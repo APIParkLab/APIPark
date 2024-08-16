@@ -74,7 +74,6 @@ export const SYSTEM_TABLE_COLUMNS: ProColumns<SystemTableListItem>[] = [
     {
         title: '服务名称',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -86,13 +85,11 @@ export const SYSTEM_TABLE_COLUMNS: ProColumns<SystemTableListItem>[] = [
         title: '服务 ID',
         dataIndex: 'id',
         width: 140,
-        copyable: true,
         ellipsis:true,
     },
     {
         title: '所属团队',
         dataIndex: ['team','name'],
-        copyable: true,
         ellipsis:true,
         // filters: true,
         // onFilter: true,
@@ -134,7 +131,6 @@ export const SYSTEM_SUBSERVICE_TABLE_COLUMNS: ProColumns<SystemSubServiceTableLi
     {
         title: '服务名称',
         dataIndex: ['service','name'],
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -146,7 +142,6 @@ export const SYSTEM_SUBSERVICE_TABLE_COLUMNS: ProColumns<SystemSubServiceTableLi
         title: '服务 ID',
         dataIndex: ['service','name'],
         width: 140,
-        copyable: true,
         ellipsis:true
     },
     {
@@ -170,13 +165,11 @@ export const SYSTEM_SUBSERVICE_TABLE_COLUMNS: ProColumns<SystemSubServiceTableLi
     {
         title: '所属服务',
         dataIndex: ['project','name'],
-        copyable: true,
         ellipsis:true
     },
     {
         title: '所属团队',
         dataIndex: ['team','name'],
-        copyable: true,
         ellipsis:true
     },
     {
@@ -217,7 +210,6 @@ export const SYSTEM_SUBSCRIBER_TABLE_COLUMNS: ProColumns<SystemSubscriberTableLi
     {
         title: '服务名称',
         dataIndex: ['service','name'],
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -229,19 +221,16 @@ export const SYSTEM_SUBSCRIBER_TABLE_COLUMNS: ProColumns<SystemSubscriberTableLi
         title: '服务 ID',
         dataIndex: 'id',
         width: 140,
-        copyable: true,
         ellipsis:true
     },
     {
         title: '订阅方',
         dataIndex: ['subscriber','name'],
-        copyable: true,
         ellipsis:true
     },
     {
         title: '所属团队',
         dataIndex: ['team','name'],
-        copyable: true,
         ellipsis:true
     },
     // {
@@ -307,7 +296,6 @@ export const SYSTEM_MEMBER_TABLE_COLUMN: ProColumns<SystemMemberTableListItem>[]
     {
         title: '用户名',
         dataIndex: ['user','name'],
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -318,13 +306,11 @@ export const SYSTEM_MEMBER_TABLE_COLUMN: ProColumns<SystemMemberTableListItem>[]
     {
         title: '邮箱',
         dataIndex: 'email',
-        copyable: true,
         ellipsis:true
     },
     {
         title: '角色',
         dataIndex: ['roles','name'],
-        copyable: true,
         ellipsis:true
 
     }
@@ -374,7 +360,6 @@ export const SYSTEM_API_TABLE_COLUMNS: ProColumns<SystemApiTableListItem>[] = [
     {
         title: '名称',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -401,7 +386,6 @@ export const SYSTEM_API_TABLE_COLUMNS: ProColumns<SystemApiTableListItem>[] = [
     {
         title: 'URL',
         dataIndex: 'requestPath',
-        copyable: true,
         ellipsis:true
     },
     {
@@ -429,7 +413,6 @@ export const SYSTEM_UPSTREAM_TABLE_COLUMNS: ProColumns<SystemUpstreamTableListIt
     {
         title: '名称',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -441,7 +424,6 @@ export const SYSTEM_UPSTREAM_TABLE_COLUMNS: ProColumns<SystemUpstreamTableListIt
         title: '上游 ID',
         dataIndex: 'id',
         width: 140,
-        copyable: true,
         ellipsis:true
     },
     {
@@ -583,7 +565,6 @@ export const SYSTEM_MYSERVICE_API_TABLE_COLUMNS: ProColumns<ServiceApiTableListI
     {
         title: '名称',
         dataIndex: 'name',
-        copyable: true,
         width:160,
         fixed:'left',
         ellipsis:true
@@ -596,13 +577,11 @@ export const SYSTEM_MYSERVICE_API_TABLE_COLUMNS: ProColumns<ServiceApiTableListI
     {
         title: '请求路径',
         dataIndex: 'path',
-        copyable: true,
         ellipsis:true
     },
     {
         title: '描述',
         dataIndex: 'description',
-        copyable: true,
         ellipsis:true
     }
 ];
@@ -625,7 +604,6 @@ export const SYSTEM_AUTHORITY_TABLE_COLUMNS: ProColumns<SystemAuthorityTableList
     {
         title: '名称',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -702,7 +680,6 @@ export const SYSTEM_MYSERVICE_TABLE_COLUMNS: ProColumns<MyServiceTableListItem>[
     {
         title: '服务名称',
         dataIndex: 'name',
-        copyable: true,
         ellipsis:true,
         width:160,
         fixed:'left',
@@ -714,7 +691,6 @@ export const SYSTEM_MYSERVICE_TABLE_COLUMNS: ProColumns<MyServiceTableListItem>[
         title: '服务ID',
         dataIndex: 'id',
         width: 140,
-        copyable: true,
         ellipsis:true
     },
     {
@@ -796,7 +772,6 @@ export const SYSTEM_UPSTREAM_GLOBAL_CONFIG_TABLE_COLUMNS: ProColumns<GlobalNodeI
           },
         ],
       },
-      copyable: true,
       ellipsis:true
     },
     {
@@ -928,7 +903,7 @@ const APP_MODE = import.meta.env.VITE_APP_MODE;
 
 
   export const SYSTEM_PAGE_MENU_ITEMS: MenuProps['items'] = [
-    getItem('内部数据服务', 'assets', null,
+    getItem('服务', 'assets', null,
         [
             getItem(<Link to="./api">API</Link>, 'api',undefined,undefined,undefined,'team.service.api.view'),
             getItem(<Link to="./upstream">上游</Link>, 'upstream',undefined,undefined,undefined,'team.service.upstream.view'),
@@ -936,7 +911,7 @@ const APP_MODE = import.meta.env.VITE_APP_MODE;
             getItem(<Link to="./publish">发布</Link>, 'publish',undefined,undefined,undefined,'team.service.release.view'),
             ],
         'group'),
-    getItem('提供服务', 'provideSer', null,
+    getItem('订阅管理', 'provideSer', null,
         [
             getItem(<Link to="./approval">订阅审批</Link>, 'approval',undefined,undefined,undefined,'team.service.subscription.view'),
             getItem(<Link to="./subscriber">订阅方管理</Link>, 'subscriber',undefined,undefined,undefined,'team.service.subscription.view'),
