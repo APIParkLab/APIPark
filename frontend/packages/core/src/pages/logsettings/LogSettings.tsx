@@ -3,11 +3,12 @@ import { Menu, MenuProps, Skeleton, message } from "antd";
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import InsidePage from "@common/components/aoplatform/InsidePage";
 import { useEffect, useState } from "react";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { DynamicMenuItem,  } from "@common/const/type";
 import { useFetch } from "@common/hooks/http";
 import { getItem } from "@common/utils/navigation";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
+import { $t } from "@common/locales";
 
 const LogSettings = ()=>{
     const {moduleId} = useParams<RouterParams>();
@@ -36,8 +37,8 @@ const LogSettings = ()=>{
                     }
                     return Promise.resolve(newMenu)
             }else{
-                message.error(msg || '操作失败')
-                return Promise.reject(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
+                return Promise.reject(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -60,8 +61,8 @@ const LogSettings = ()=>{
         <>
           <Skeleton className='m-btnbase w-[calc(100%-20px)]' active loading={loading}>
                 <InsidePage 
-                    pageTitle='日志配置'
-                    description="APIPark 提供详尽的 API 调用日志，帮助企业监控、分析和审计 API 的运行状况。"
+                    pageTitle={$t('日志配置')}
+                    description={$t("APIPark 提供详尽的 API 调用日志，帮助企业监控、分析和审计 API 的运行状况。")}
                     >
                     <div className="flex h-full">
                         <Menu

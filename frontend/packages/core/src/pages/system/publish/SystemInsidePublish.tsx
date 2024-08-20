@@ -5,6 +5,7 @@ import { Link, Outlet, useLocation, useNavigate, useParams } from "react-router-
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext"
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes"
 import { SYSTEM_PUBLISH_TAB_ITEMS } from "../../../const/system/const"
+import { $t } from "@common/locales"
 
 const SystemInsidePublic:FC = ()=>{
     const { setBreadcrumb } = useBreadcrumb()
@@ -27,10 +28,10 @@ const SystemInsidePublic:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>服务</Link>
+                title:<Link to={`/service/list`}>{$t('服务')}</Link>
             },
             {
-                title:'发布'
+                title:$t('发布')
             }
         ])
     }, []);

@@ -2,16 +2,16 @@ import { Editor } from '@tinymce/tinymce-react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/default.css';
 import {useEffect, useState} from "react";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {App, Button} from "antd";
 import { EntityItem } from '@common/const/type.ts';
 import WithPermission from '@common/components/aoplatform/WithPermission.tsx';
 import { RouterParams } from '@core/components/aoplatform/RenderRoutes';
 import { useParams } from 'react-router-dom';
+import { $t } from '@common/locales';
 const ServiceInsideDocument = ()=>{
     const { message } = App.useApp()
-    const [serviceName,setServiceName] = useState<string>()
     const [updater,setUpdater] = useState<string>()
     const [updateTime,setUpdateTime]=useState<string>()
     const [initDoc, setInitDoc] = useState<string>()
@@ -23,10 +23,10 @@ const ServiceInsideDocument = ()=>{
         fetchData<BasicResponse<{service:{ id:string,name:string,updater:string,updateTime:string, doc:string} }>>('service/doc',{method:'PUT',eoBody:({doc:doc}) ,eoParams:{service:serviceId,team:teamId},eoTransformKeys:['update_time']}).then(response=>{
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                message.success(msg || '操作成功！')
+                message.success(msg || RESPONSE_TIPS.success)
                 getServiceDoc()
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -52,12 +52,11 @@ const ServiceInsideDocument = ()=>{
         fetchData<BasicResponse<{doc:{ id:string,name:string,updater:EntityItem,updateTime:string,creater:EntityItem, doc:string} }>>('service/doc',{method:'GET',eoParams:{service:serviceId,team:teamId},eoTransformKeys:['update_time']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                setServiceName(data.doc.name)
                 setUpdater(data.doc.updater.id === '' ? '-' : data.doc.updater.name)
                 setUpdateTime(data.doc.updater.id === '' ? '-' : data.doc.updateTime)
                 setInitDoc(data.doc.doc)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -137,8 +136,8 @@ const ServiceInsideDocument = ()=>{
             
             <div className=" pl-[8px] py-btnbase ">
                     <div className="flex justify-between items-center">
-                        <p className="text-[14px] leading-[20px] text-[#999999]"><span className="mr-[20px]">最近一次更新者：{updater || '-'}</span><span>最近一次更新时间：{updateTime || '-'}</span></p>
-                        <WithPermission access="team.service.service.edit"><Button type="primary" className="mr-btnbase" onClick={save}>保存</Button></WithPermission>
+                        <p className="text-[14px] leading-[20px] text-[#999999]"><span className="mr-[20px]">{$t('最近一次更新者')}：{updater || '-'}</span><span>{$t('最近一次更新时间')}：{updateTime || '-'}</span></p>
+                        <WithPermission access="team.service.service.edit"><Button type="primary" className="mr-btnbase" onClick={save}>{$t('保存')}</Button></WithPermission>
                     </div>
                 </div>
         </div>)

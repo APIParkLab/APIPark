@@ -2,11 +2,26 @@
 import { GetProp, TransferProps, TreeDataNode, theme, Transfer, Tree, Spin } from "antd";
 import { DataNode, TreeProps } from "antd/es/tree";
 import {  Ref, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { TransferTableHandle, TransferTableProps } from "./TransferTable";
 import { ApartmentOutlined, LoadingOutlined, UserOutlined } from "@ant-design/icons";
 import { debounce } from "lodash-es";
+import { ColumnsType } from "antd/es/table";
 
 type TransferItem = GetProp<TransferProps, 'dataSource'>[number];
+
+export type TransferTableProps<T> = {
+  request?:(k?:string)=>Promise<{data:T[],success:boolean}>
+  columns: ColumnsType<T>
+  primaryKey:string
+  onSelect:(selectedData:T[])=>void
+  tableType?:'member'|'api'
+  disabledData:string[]
+  searchPlaceholder?:string
+}
+
+export type TransferTableHandle<T> = {
+  selectedData: () => T[];
+  selectedRowKeys: () => React.Key[];
+}
 
 interface TreeTransferProps {
   dataSource: TreeDataNode[];

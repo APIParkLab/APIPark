@@ -4,6 +4,7 @@ import { Radio, DatePicker, GetProps, RadioChangeEvent } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import "../../index.css"
+import { $t } from '@common/locales';
 
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>;
 export type RangeValue = [Dayjs | null, Dayjs | null] | null;
@@ -94,12 +95,12 @@ const disabledDate: RangePickerProps['disabledDate'] = (current) => {
 
   return (
     <div className="flex flex-nowrap items-center  pt-btnybase mr-btnybase">
-    {!hideTitle && <label className={`whitespace-nowrap `}>时间：</label>}
+    {!hideTitle && <label className={`whitespace-nowrap `}>{$t('时间')}：</label>}
      <Radio.Group className="whitespace-nowrap" value={timeButton} onChange={handleRadioChange} buttonStyle="solid">
-                    <Radio.Button value="hour">近1小时</Radio.Button>
-                    <Radio.Button value="day">近24小时</Radio.Button>
-                    <Radio.Button value="threeDays">近3天</Radio.Button>
-                    <Radio.Button className="rounded-e-none" value="sevenDays">近7天</Radio.Button>
+                    <Radio.Button value="hour">{$t('近1小时')}</Radio.Button>
+                    <Radio.Button value="day">{$t('近24小时')}</Radio.Button>
+                    <Radio.Button value="threeDays">{$t('近3天')}</Radio.Button>
+                    <Radio.Button className="rounded-e-none" value="sevenDays">{$t('近7天')}</Radio.Button>
                 </Radio.Group>
       <DatePicker.RangePicker
         value={datePickerValue}

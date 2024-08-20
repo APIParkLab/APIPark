@@ -1,13 +1,12 @@
 
 import  {forwardRef, useImperativeHandle, useState} from "react";
-import {App, Button, Form, Input, Table} from "antd";
+import {App, Button, Form, Input} from "antd";
 import {useFetch} from "@common/hooks/http.ts";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
-import { NODE_MODAL_COLUMNS } from "../../const/partitions/const.tsx";
+import {BasicResponse, FORM_ERROR_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import { NodeModalHandle, PartitionClusterNodeModalTableListItem, PartitionClusterNodeTableListItem, NodeModalFieldType, NodeModalPropsType } from "../../const/partitions/types.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { ClusterConfigPreview } from "./PartitionInsideCluster.tsx";
-import { set, values } from "lodash-es";
+import { $t } from "@common/locales/index.ts";
 
 export const ClusterNodeModal = forwardRef<NodeModalHandle, NodeModalPropsType>((props,ref)=>{
     const { message } = App.useApp()
@@ -27,11 +26,11 @@ export const ClusterNodeModal = forwardRef<NodeModalHandle, NodeModalPropsType>(
                 fetchData<BasicResponse<{ nodes: PartitionClusterNodeTableListItem[] }>>('cluster/check', {method: 'POST', eoBody: (value),eoTransformKeys:['manager_address','service_address','peer_address']}).then(response => {
                     const {code,data, msg} = response
                     if (code === STATUS_CODE.SUCCESS) {
-                        message.success(msg || '操作成功')
+                        message.success(msg || RESPONSE_TIPS.success)
                         setDataSource(data.nodes)
                         changeStatus('preview')
                     } else {
-                        message.error(msg || '无法连接集群，请检查集群地址是否正确或防火墙配置')
+                        message.error(msg ||FORM_ERROR_TIPS.clusterTest)
                         setAddressError('error')
                         
                     }
@@ -45,10 +44,10 @@ export const ClusterNodeModal = forwardRef<NodeModalHandle, NodeModalPropsType>(
             fetchData<BasicResponse<null>>('cluster/reset',{method:'PUT' ,eoBody:({managerAddress:form.getFieldValue('address')}), eoTransformKeys:['managerAddress']}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     getClusterInfo()
                 }else{
-                    message.error(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=>
                 console.warn(errorInfo))
@@ -75,19 +74,19 @@ export const ClusterNodeModal = forwardRef<NodeModalHandle, NodeModalPropsType>(
         {status === 'edit' ? 
 
                 <Form.Item<NodeModalFieldType>
-                    label="集群地址"
+                    label={$t("集群地址")}
                     name="address"
                     className="mb-0"
                     validateStatus={addressError}
-                    help={addressError ? form.getFieldValue('address')? '无法连接集群，请检查集群地址是否正确或防火墙配置' : '必填项' : ''}
+                    help={addressError ? form.getFieldValue('address')? FORM_ERROR_TIPS.clusterTest : VALIDATE_MESSAGE.required : ''}
                 >  
-                        <Input placeholder="请输入" onPressEnter={()=>test()} onChange={(e)=>setAddressError(e.target?.value ? '' : 'error')}/>
+                        <Input placeholder={PLACEHOLDER.input} onPressEnter={()=>test()} onChange={(e)=>setAddressError(e.target?.value ? '' : 'error')}/>
                 </Form.Item> :  dataSource && ClusterConfigPreview(dataSource?.[0] as unknown as PartitionClusterNodeTableListItem)}
 
                 <div className="flex gap-btnbase mt-[20px]">
-                    { status === 'edit' && <WithPermission access="system.devops.cluster.edit"><Button type="primary" onClick={test}>下一步</Button></WithPermission>}
-                    { status === 'preview' && <WithPermission access="system.devops.cluster.edit"><Button type="primary" onClick={save}>确定</Button></WithPermission>}
-                    <Button type="default" onClick={()=>{changeStatus(status === 'edit' ? 'view' :'edit'); form.resetFields()}}>取消</Button>
+                    { status === 'edit' && <WithPermission access="system.devops.cluster.edit"><Button type="primary" onClick={test}>{$t('下一步')}</Button></WithPermission>}
+                    { status === 'preview' && <WithPermission access="system.devops.cluster.edit"><Button type="primary" onClick={save}>{$t('确定')}</Button></WithPermission>}
+                    <Button type="default" onClick={()=>{changeStatus(status === 'edit' ? 'view' :'edit'); form.resetFields()}}>{$t('取消')}</Button>
                 </div>
         </Form>
         </WithPermission>

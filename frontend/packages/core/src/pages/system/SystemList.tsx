@@ -4,7 +4,7 @@ import  {FC, useEffect, useMemo, useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import { App} from "antd";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { SimpleTeamItem ,SimpleMemberItem} from "@common/const/type.ts";
 import { SystemConfigHandle, SystemTableListItem } from "../../const/system/type.ts";
@@ -12,6 +12,7 @@ import { SYSTEM_TABLE_COLUMNS } from "../../const/system/const.tsx";
 import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter.tsx";
 import SystemConfig from "./SystemConfig.tsx";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
+import { $t } from "@common/locales/index.ts";
 
 const SystemList:FC = ()=>{
     const navigate = useNavigate();
@@ -19,12 +20,10 @@ const SystemList:FC = ()=>{
     const { setBreadcrumb } = useBreadcrumb()
     const [teamList, setTeamList] = useState<{ [k: string]: { text: string; }; }>()
     const {fetchData} = useFetch()
-    const [init, setInit] = useState<boolean>(true)
     const [tableListDataSource, setTableListDataSource] = useState<SystemTableListItem[]>([]);
     const [tableHttpReload, setTableHttpReload] = useState(true);
     const { message } = App.useApp()
     const pageListRef = useRef<ActionType>(null);
-    const [loading, setLoading] = useState<boolean>(true)
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
     const [open, setOpen] = useState(false);
     const drawerFormRef = useRef<SystemConfigHandle>(null)
@@ -42,11 +41,10 @@ const SystemList:FC = ()=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setTableListDataSource(data.services)
-                setInit((prev)=>prev ? false : prev)
                 setTableHttpReload(false)
                 return  {data:data.services, success: true}
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -59,14 +57,13 @@ const SystemList:FC = ()=>{
             const {code,data,msg} = response
             setTeamList(data.teams)
             if(code === STATUS_CODE.SUCCESS){
-                    setLoading(false)
                     const tmpValueEnum:{[k:string]:{text:string}} = {}
                     data.teams?.forEach((x:SimpleMemberItem)=>{
                         tmpValueEnum[x.name] = {text:x.name}
                     })
                     setTeamList(tmpValueEnum)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
             }
         })
@@ -87,7 +84,7 @@ const SystemList:FC = ()=>{
             })
             setMemberValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || '操作失败')
+            message.error(msg || RESPONSE_TIPS.error)
         }
     }
 
@@ -96,15 +93,9 @@ const SystemList:FC = ()=>{
             getMemberList()
             setBreadcrumb([
                 {
-                    title: '服务'
+                    title: $t('服务')
                 }])
     }, []);
-
-    // useEffect(() => {
-    //     if(!init){
-    //         manualReloadTable()
-    //     }
-    // }, []);
 
     const onClose = () => {
         setOpen(false);
@@ -124,7 +115,6 @@ const SystemList:FC = ()=>{
     },[memberValueEnum,teamList])
 
     return (
-        // <Skeleton  className='m-btnbase w-[calc(100%-20px)]' loading={loading} active>
           <div className="h-full w-full pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B">
             
             <PageList
@@ -132,8 +122,8 @@ const SystemList:FC = ()=>{
                 ref={pageListRef}
                 columns={[...columns]}
                 request={()=>getSystemList()}
-                addNewBtnTitle="添加服务"
-                searchPlaceholder="输入名称、ID、所属团队、负责人查找服务"
+                addNewBtnTitle={$t("添加服务")}
+                searchPlaceholder={$t("输入名称、ID、所属团队、负责人查找服务")}
                 onAddNewBtnClick={() => {
                     setOpen(true) 
                 }}
@@ -146,7 +136,7 @@ const SystemList:FC = ()=>{
                 }}
                 onRowClick={(row:SystemTableListItem)=>navigate(`/service/${row.team.id}/inside/${row.id}`)}
                 />
-                    <DrawerWithFooter title="添加服务" open={open} onClose={onClose} onSubmit={()=>drawerFormRef.current?.save()?.then((res)=>{res && manualReloadTable();return res})} >
+                    <DrawerWithFooter title={$t("添加服务")} open={open} onClose={onClose} onSubmit={()=>drawerFormRef.current?.save()?.then((res)=>{res && manualReloadTable();return res})} >
                         <SystemConfig ref={drawerFormRef} />
                     </DrawerWithFooter>
                 </div>

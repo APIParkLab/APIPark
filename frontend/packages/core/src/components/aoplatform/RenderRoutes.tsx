@@ -339,16 +339,6 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                 ]
             },
             {
-                path:'logretrieval',
-                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/logRetrieval/LogRetrieval.tsx')),
-                key:uuidv4(),
-            },
-            {
-                path:'auditlog',
-                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/auditLog/AuditLog.tsx')),
-                key:uuidv4(),
-            },
-            {
                 path:'assets',
                 component:<p>设计中</p>,
                 key:uuidv4()

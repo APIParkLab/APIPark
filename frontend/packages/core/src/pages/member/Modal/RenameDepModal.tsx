@@ -2,9 +2,10 @@
 import { App, Form, Input } from "antd";
 import { forwardRef, useImperativeHandle, useEffect } from "react";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
-import { BasicResponse, STATUS_CODE } from "@common/const/const.ts";
+import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE } from "@common/const/const.tsx";
 import { MemberDropdownModalHandle, MemberDropdownModalProps, MemberDropdownModalFieldType } from "../../../const/member/type";
 import { useFetch } from "@common/hooks/http.ts";
+import { $t } from "@common/locales";
 
 export const RenameDepModal = forwardRef<MemberDropdownModalHandle,MemberDropdownModalProps>((props,ref)=>{
     const { message} = App.useApp()
@@ -22,11 +23,11 @@ export const RenameDepModal = forwardRef<MemberDropdownModalHandle,MemberDropdow
                     }),eoParams: {id:entity!.id}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -45,28 +46,25 @@ export const RenameDepModal = forwardRef<MemberDropdownModalHandle,MemberDropdow
 
     return (<WithPermission access="">
         <Form
-            // labelAlign='left'
             form={form}
             className="mx-auto "
             name="renameDepModal"
-            // labelCol={{ span: 4 }}
-            // wrapperCol={{ span: 20}}
             autoComplete="off"
         >
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="ID"
+                    label={$t("ID")}
                     name="id"
                     hidden
-                    rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                 >
                     <Input className="w-INPUT_NORMAL" placeholder="ID"/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="部门名称"
+                    label={$t("部门名称")}
                     name="name"
-                    rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder="请输入部门名称"/>
+                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                 </Form.Item>
         </Form>
     </WithPermission>)

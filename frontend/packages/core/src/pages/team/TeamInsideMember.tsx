@@ -1,11 +1,10 @@
-import PageList from "@common/components/aoplatform/PageList.tsx"
-import {ActionType, ProColumns} from "@ant-design/pro-components";
+import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx"
+import {ActionType} from "@ant-design/pro-components";
 import  {FC, useEffect, useMemo, useRef, useState} from "react";
 import {Link, useParams} from "react-router-dom";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {App, Button, Modal, Select} from "antd";
-import {TransferTableHandle} from "@common/components/aoplatform/TransferTable.tsx";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, COLUMNS_TITLE, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import {EntityItem, MemberItem} from "@common/const/type.ts";
@@ -14,10 +13,11 @@ import {  TEAM_MEMBER_TABLE_COLUMNS } from "../../const/team/const.tsx";
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission.tsx";
 import { checkAccess } from "@common/utils/permission.ts";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
-import MemberTransfer from "@common/components/aoplatform/MemberTransfer.tsx";
+import MemberTransfer, { TransferTableHandle } from "@common/components/aoplatform/MemberTransfer.tsx";
 import { DepartmentListItem } from "../../const/member/type.ts";
 import {v4 as uuidv4} from 'uuid'
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
+import { $t } from "@common/locales/index.ts";
 
 export const getDepartmentWithMember = (department:(DepartmentListItem & {type?:'department'|'member'})[],departmentMap:Map<string, (MemberItem & {type:'department'|'member'})[]>) : (DepartmentWithMemberItem | undefined)[] =>{
     return department.map((x:DepartmentListItem & {type?:'department'|'member'})=>{
@@ -52,17 +52,17 @@ const TeamInsideMember:FC = ()=>{
     const [modalVisible, setModalVisible] = useState<boolean>(false)
     const [addMemberBtnDisabled, setAddMemberBtnDisabled] = useState<boolean>(true)
     const [allMemberSelectedDepartIds, setAllMemberSelectedDepartIds] = useState<string[]>([])
-    const [columns,setColumns] = useState<ProColumns<TeamMemberTableListItem>[]>([])
+    const [columns,setColumns] = useState<PageProColumns<TeamMemberTableListItem>[]>([])
 
-    const operation:ProColumns<TeamMemberTableListItem>[] =[
+    const operation:PageProColumns<TeamMemberTableListItem>[] =[
         {
-            title: '操作',
+            title: COLUMNS_TITLE.operate,
             key: 'option',
-            width: 88,
+            btnNums:1,
             fixed:'right',
             valueType: 'option',
             render: (_: React.ReactNode, entity: TeamMemberTableListItem) => [
-                <TableBtnWithPermission disabled={!entity.isDelete} tooltip="暂无权限" access="team.team.member.edit" key="removeMember" onClick={()=>{openModal('remove',entity)}} btnTitle="移出团队"/>]
+                <TableBtnWithPermission disabled={!entity.isDelete} tooltip="暂无权限" access="team.team.member.edit" key="delete" btnType="delete" onClick={()=>{openModal('remove',entity)}} btnTitle="移出团队"/>]
         }
     ]
 
@@ -127,7 +127,7 @@ const TeamInsideMember:FC = ()=>{
                 }
                 return  {data:data.members, success: true}
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -143,13 +143,13 @@ const TeamInsideMember:FC = ()=>{
             fetchData<BasicResponse<null>>('team/member',{method:'POST' ,eoBody:({users:memberKeyFromModal}),eoParams:{team:teamId}}).then(response=>{
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                message.success(msg || '操作成功！')
+                message.success(msg || RESPONSE_TIPS.success)
                 manualReloadTable()
                 cleanModalData()
                 resolve(true)
             }else{
-                message.error(msg || '操作失败')
-                reject(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
+                reject(msg || RESPONSE_TIPS.error)
             }
         }).catch((errorInfo)=> reject(errorInfo)).finally(()=>setAddMemberBtnLoading(false))
     })
@@ -161,11 +161,11 @@ const TeamInsideMember:FC = ()=>{
             fetchData<BasicResponse<null>>(`team/member`,{method:'DELETE',eoParams:{team:teamId,user:entity.user.id}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -185,8 +185,8 @@ const TeamInsideMember:FC = ()=>{
                 setAddMemberBtnLoading(false)
                 return
             case 'remove':
-                title='移除成员'
-                content=<span>确定删除成员<span className="text-status_fail"></span>？此操作无法恢复，确认操作？</span>
+                title=$t('移除成员')
+                content=<span>{$t('确定删除成员？此操作无法恢复，确认操作？')}</span>
                break
         }
         
@@ -197,11 +197,11 @@ const TeamInsideMember:FC = ()=>{
                     return  removeMember(entity!).then((res)=>{if(res === true) manualReloadTable()})
             },
             width:600,
-            okText:'确认',
+            okText:$t('确认'),
             okButtonProps:{
                 disabled: !checkAccess(`team.team.member.edit`,accessData)
             },
-            cancelText:'取消',
+            cancelText:$t('取消'),
             closable:true,
             icon:<></>
         })
@@ -219,11 +219,11 @@ const TeamInsideMember:FC = ()=>{
             fetchData<BasicResponse<null>>(`team/member/role`, {method: 'PUT',eoBody:({roles:value, users:[entity.user.id]}), eoParams: {team:teamId}}).then(response => {
                 const {code, msg} = response
                 if (code === STATUS_CODE.SUCCESS) {
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     resolve(true)
                 } else {
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -262,7 +262,7 @@ const TeamInsideMember:FC = ()=>{
                 setColumns(newCol)
                 return
             } else {
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -271,8 +271,8 @@ const TeamInsideMember:FC = ()=>{
     useEffect(() => {
         getRoleList()
         setBreadcrumb([
-            {title:<Link to="/team/list">团队</Link>},
-            {title:'成员'}
+            {title:<Link to="/team/list">{$t('团队')}</Link>},
+            {title:$t('成员')}
         ])
         manualReloadTable()
     }, [teamId]);
@@ -287,16 +287,16 @@ const TeamInsideMember:FC = ()=>{
             columns = {[...columns,...operation]}
             request={()=>getMemberList()}
             primaryKey="user.id"
-            addNewBtnTitle="添加成员"
+            addNewBtnTitle={$t('添加成员')}
             className="ml-[20px] mt-[20px] "
-            searchPlaceholder="输入姓名查找"
+            searchPlaceholder={$t("输入姓名查找")}
             onAddNewBtnClick={()=>{openModal('add')}}
             addNewBtnAccess="team.team.member.add"
             tableClickAccess="team.team.member.edit"
             onSearchWordChange={(e)=>{setSearchWord(e.target.value)}}
         />
-        <Modal
-                   title="添加成员"
+            <Modal
+                   title={$t("添加成员")}
                    open={modalVisible}
                    destroyOnClose={true}
                    width={900}
@@ -304,7 +304,7 @@ const TeamInsideMember:FC = ()=>{
                    maskClosable={false}
                    footer={[
                        <Button key="back" onClick={() => cleanModalData()}>
-                           取消
+                           {$t('取消')}
                        </Button>,
                        <WithPermission access="team.team.member.add"><Button
                            key="submit"
@@ -313,7 +313,7 @@ const TeamInsideMember:FC = ()=>{
                            loading={addMemberBtnLoading}
                            onClick={()=>addMember(selectableMemberIds as Set<string>)}
                        >
-                           确认
+                           {$t('确认')}
                        </Button></WithPermission>,
                    ]}
                >
@@ -326,7 +326,7 @@ const TeamInsideMember:FC = ()=>{
                         const memberKeyFromModal = Array.from(selectedData)?.filter(x => allMemberIds.indexOf(x) === -1 &&selectableMemberIds.has(x)) || [];
                         setAddMemberBtnDisabled((memberKeyFromModal.length === 0));
                     }}
-                    searchPlaceholder="搜索用户名、邮箱"
+                    searchPlaceholder={$t("搜索用户名、邮箱")}
                  />
                </Modal>
         </>

@@ -1,3 +1,5 @@
+import { $t } from "@common/locales"
+
 const CODE_LANG =  [
   {
     label: 'Java(OK HTTP)',
@@ -68,7 +70,7 @@ const CODE_LANG =  [
     ]
   },
   {
-    label: '微信小程序',
+    label: $t('微信小程序'),
     value: 21
   },
   // {

@@ -2,6 +2,7 @@
 import { Box, Chip, Stack, Typography, Skeleton } from '@mui/material'
 import {HTTPMethod, Protocol,RequestMethod} from "../../../RequestMethod";
 import {Clipboard} from "../../../Clipboard"
+import { $t } from '@common/locales';
 
 interface ApiBasicInfoDisplayProps {
   apiName: string
@@ -38,7 +39,7 @@ export default function ApiBasicInfoDisplay(props: Partial<ApiBasicInfoDisplayPr
       <Box display="flex">
         <Stack direction="row" spacing={1} alignItems="center">
           <Chip
-            label="HTTP"
+            label={$t("HTTP")}
             sx={{
               height:'22px',
               borderRadius: '4px',

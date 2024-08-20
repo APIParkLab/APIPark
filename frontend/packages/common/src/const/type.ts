@@ -63,8 +63,8 @@ export type SimpleTeamItem = {
 }
 
 export type MatchItem = {
-    position:MatchPositionEnum
-    matchType:MatchTypeEnum
+    position:typeof MatchPositionEnum
+    matchType:typeof MatchTypeEnum
     key:string
     pattern:string
     id?:string

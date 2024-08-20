@@ -3,6 +3,8 @@ import { Button, Modal, Form, Table, FormInstance, TableProps, Divider } from 'a
 import { v4 as uuidv4 } from 'uuid';
 import { ColumnsType } from 'antd/es/table';
 import WithPermission from './WithPermission';
+import { $t } from '@common/locales';
+import { COLUMNS_TITLE, VALIDATE_MESSAGE } from '@common/const/const';
 
 export interface ConfigField<T> {
     title: string;
@@ -90,9 +92,9 @@ const EditableTableWithModal = <T extends { _id?: string }>({
     }));
 
     !disabled && columns.push({
-        title: '操作',
+        title: COLUMNS_TITLE.operate,
         key: 'action',
-        width:117,
+        btnNums:2,
         render: (_: unknown, record: T) => (
             <>
             <div className="flex items-center">
@@ -109,7 +111,7 @@ const EditableTableWithModal = <T extends { _id?: string }>({
                 <Form.Item
                     label={title as string}
                     name={key as string}
-                    rules={[{ required, message: `必填项`}]}
+                    rules={[{ required, message: VALIDATE_MESSAGE.required}]}
                 >
                     {component}
                 </Form.Item>
@@ -119,12 +121,12 @@ const EditableTableWithModal = <T extends { _id?: string }>({
 
     return (
         <>
-            {!disabled && <Button className="" disabled={disabled} onClick={() => showModal()}>添加配置</Button>}
+            {!disabled && <Button className="" disabled={disabled} onClick={() => showModal()}>{$t('添加配置')}</Button>}
             {configurations.length > 0 &&
                 <Table
                     className={`mt-btnybase border-solid border-[1px] border-BORDER border-b-0 rounded ${className}`} {...tableProps} dataSource={configurations} size="small" columns={columns} rowKey="_id" pagination={false}/>}
             <Modal
-                title={editingConfig ? '编辑配置' : '添加配置'}
+                title={editingConfig ? $t('编辑配置') : $t('添加配置')}
                 open={isModalVisible}
                 onOk={handleOk}
                 onCancel={handleCancel}

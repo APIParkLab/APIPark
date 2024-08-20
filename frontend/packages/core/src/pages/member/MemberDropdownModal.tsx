@@ -1,9 +1,10 @@
 import {App, Form, Input, TreeSelect} from "antd";
 import {forwardRef, useEffect, useImperativeHandle, useState} from "react";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { MemberDropdownModalHandle, MemberDropdownModalProps, DepartmentListItem, MemberDropdownModalFieldType, MemberTableListItem } from "../../const/member/type.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
+import { $t } from "@common/locales/index.ts";
 
 export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDropdownModalProps>((props,ref)=>{
     const { message} = App.useApp()
@@ -36,7 +37,7 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
         }
         return new Promise((resolve, reject)=>{
             if(!url || !method){
-                reject('类型错误')
+                reject(RESPONSE_TIPS.error)
                 return
             }
             form.validateFields().then((value)=>{
@@ -49,11 +50,11 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                     }),eoTransformKeys:['departmentIds']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -71,7 +72,7 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
             if(code === STATUS_CODE.SUCCESS){
                 setDepartmentList([{...data.departments,disabled:true}])
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
             }
         })
@@ -105,67 +106,65 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
             form={form}
             className="mx-auto "
             name="MemberDropdownModal"
-            // labelCol={{ offset:1, span: 3 }}
-            // wrapperCol={{ span: 20}}
             autoComplete="off"
         >
 
             {type === 'rename' &&
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="ID"
+                    label={$t("ID")}
                     name="id"
                     hidden
-                    rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder="ID"/>
+                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                 </Form.Item>
             }
             {(type === 'addDep' || type === 'rename') &&
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="部门名称"
+                    label={$t("部门名称")}
                     name="name"
-                    rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder="请输入部门名称"/>
+                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                 </Form.Item>}
 
             {type === 'addChild' &&<>
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="父部门 ID"
+                    label={$t("父部门 ID")}
                     name="parent"
                     hidden
-                    rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder="父部门 ID"/>
+                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                 </Form.Item>
 
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="子部门名称"
+                    label={$t("子部门名称")}
                     name="name"
-                    rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder="请输入子部门名称"/>
+                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                 </Form.Item>
             </>
             }
 
             {(type === 'addMember'|| type ==='editMember') && <>
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="用户名"
+                    label={$t("用户名")}
                     name="name"
-                    rules={[{required: true, message: '必填项',whitespace:true }]}
+                    rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder="请输入用户名"/>
+                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="邮箱"
+                    label={$t("邮箱")}
                     name="email"
-                    rules={[{required: true, message: '必填项',whitespace:true },{type:"email",message: '不是有效邮箱地址'}]}
+                    rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true },{type:"email",message: VALIDATE_MESSAGE.email}]}
                 >
-                    <Input className="w-INPUT_NORMAL" disabled={type ==='editMember'} placeholder="请输入"/>
+                    <Input className="w-INPUT_NORMAL" disabled={type ==='editMember'} placeholder={PLACEHOLDER.input}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="部门"
+                    label={$t("部门")}
                     name="departmentIds"
                 >
                     <TreeSelect
@@ -174,7 +173,7 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                             fieldNames={{label:'name',value:'id',children:'children'}}
                             showSearch
                             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                            placeholder="请选择"
+                            placeholder={PLACEHOLDER.select}
                             allowClear
                             treeDefaultExpandAll
                             treeData={departmentList}

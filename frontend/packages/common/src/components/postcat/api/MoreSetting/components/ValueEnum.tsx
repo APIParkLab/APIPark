@@ -13,6 +13,7 @@ import {IconButton} from "../../IconButton";
 import {flattenTree, generateId, getActionColWidth} from "@common/utils/postcat.tsx";
 import {EditableDataGridSx} from "../../ApiManager/components/EditableDataGrid";
 import { commonTableSx } from '@common/const/api-detail/index.ts';
+import { $t } from '@common/locales';
 
 export interface ValueEnum {
   value: string
@@ -97,7 +98,7 @@ export function ValueEnum({ data, apiRef,readOnly = false }: ValueEnumProps) {
   const columns: GridColDef<Row>[] = [
     {
       field: 'value',
-      headerName: '值枚举',
+      headerName: $t('值枚举'),
       type: 'string',
       sortable: false,
       flex: 1,
@@ -109,7 +110,7 @@ export function ValueEnum({ data, apiRef,readOnly = false }: ValueEnumProps) {
           <TextField
             fullWidth
             value={params.value}
-            placeholder='枚举'
+            placeholder={$t('枚举')}
             sx={{
               input: {
                 paddingLeft: `${theme.spacing(1)} !important`,
@@ -132,7 +133,7 @@ export function ValueEnum({ data, apiRef,readOnly = false }: ValueEnumProps) {
     },
     {
       field: 'description',
-      headerName: '描述',
+      headerName: $t('描述'),
       type: 'string',
       sortable: false,
       flex: 1,
@@ -154,7 +155,7 @@ export function ValueEnum({ data, apiRef,readOnly = false }: ValueEnumProps) {
                 paddingRight: `${theme.spacing(1)} !important`
               }
             }}
-            placeholder='示例'
+            placeholder={$t('示例')}
           />
         )
       }
@@ -170,7 +171,7 @@ export function ValueEnum({ data, apiRef,readOnly = false }: ValueEnumProps) {
         if (renderRows.length <= 1) return []
         return [
           <IconButton
-            title='删除'
+            title={$t('删除')}
             name="delete"
             onClick={() => {
               handleRowDelete(params)

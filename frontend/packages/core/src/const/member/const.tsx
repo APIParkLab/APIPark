@@ -1,11 +1,12 @@
 
-import { ProColumns } from "@ant-design/pro-components";
+import { PageProColumns } from "@common/components/aoplatform/PageList";
 import { MemberTableListItem } from "./type";
+import { $t } from "@common/locales";
 
 
-export const MEMBER_TABLE_COLUMNS: ProColumns<MemberTableListItem>[] = [
+export const MEMBER_TABLE_COLUMNS: PageProColumns<MemberTableListItem>[] = [
     {
-        title: '用户名',
+        title:$t('用户名'),
         dataIndex: 'name',
         ellipsis:true,
         width:160,
@@ -15,12 +16,12 @@ export const MEMBER_TABLE_COLUMNS: ProColumns<MemberTableListItem>[] = [
         },
     },
     {
-        title: '邮箱',
+        title:$t('邮箱'),
         dataIndex: 'email',
         ellipsis:true,
     },
     {
-        title: '部门',
+        title:$t('部门'),
         dataIndex: 'department',
         ellipsis:true,
         filterMode:'tree',
@@ -31,20 +32,20 @@ export const MEMBER_TABLE_COLUMNS: ProColumns<MemberTableListItem>[] = [
         filterSearch: true,
     },
     {
-        title: '角色',
+        title:$t('角色'),
         dataIndex: 'roles',
         ellipsis:true,
         width:200
     },
     {
-        title:'状态',
+        title:$t('状态'),
         dataIndex:'enable',
         valueType: 'select',
         filters: true,
         onFilter: true,
         valueEnum:new Map([
-            [true,<span className="text-status_success">启用</span>],
-            [false,<span className="text-status_fail">禁用</span>],
+            [true,<span className="text-status_success">{$t('启用')}</span>],
+            [false,<span className="text-status_fail">{$t('禁用')}</span>],
         ])
     }
 ];

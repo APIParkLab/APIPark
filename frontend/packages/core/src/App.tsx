@@ -1,11 +1,22 @@
 
 import './App.css'
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, ConfigProviderProps, Radio, RadioChangeEvent } from 'antd';
 import RenderRoutes from '@core/components/aoplatform/RenderRoutes';
 import {BreadcrumbProvider} from "@common/contexts/BreadcrumbContext.tsx";
 import { StyleProvider } from '@ant-design/cssinjs';
 import zhCN from 'antd/locale/zh_CN';
+import enUS from 'antd/locale/en_US';
 import useInitializeMonaco from "@common/hooks/useInitializeMonaco";
+import { useEffect, useState } from 'react';
+import 'dayjs/locale/zh-cn';
+import dayjs from 'dayjs';
+import { useTranslation } from "react-i18next";
+import { useGlobalContext } from '@common/contexts/GlobalStateContext';
+
+type Locale = ConfigProviderProps['locale'];
+
+dayjs.locale('en');
+
 
 const antdComponentThemeToken = {
   token: {
@@ -129,12 +140,21 @@ const antdComponentThemeToken = {
 }
 
 function App() {
+  const [locale, setLocal] = useState<Locale>(enUS);
   useInitializeMonaco()
+  const { state} = useGlobalContext()
 
+  useEffect(() => {
+      console.log(state.language)
+      dayjs.locale(state.language);
+      setLocal(state.language === 'cn' ? zhCN : enUS);
+  },[state.language])
+  
+  
   return (
       <StyleProvider hashPriority={"high"}>
         <ConfigProvider 
-          locale={zhCN}
+          locale={locale}
           wave={{disabled:true}}
           theme={antdComponentThemeToken}>
                 <BreadcrumbProvider>

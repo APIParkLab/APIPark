@@ -3,7 +3,7 @@ import { App, Table } from "antd";
 import { SYSTEM_PUBLISH_ONLINE_COLUMNS } from "../../../const/system/const";
 import { useEffect, useState } from "react";
 import { useFetch } from "@common/hooks/http";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { EntityItem } from "@common/const/type";
 
 type SystemInsidePublishOnlineProps = {
@@ -33,7 +33,7 @@ export default function SystemInsidePublishOnline(props:SystemInsidePublishOnlin
                     setIsStopped(true)
                 }
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         }).catch((errorInfo)=> message.error(errorInfo))
     }

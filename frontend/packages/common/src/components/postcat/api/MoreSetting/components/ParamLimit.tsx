@@ -1,6 +1,7 @@
 
 import { ChangeEvent, useEffect, useState } from 'react'
 import { FormControl, TextField, Box } from '@mui/material'
+import { $t } from '@common/locales';
 
 interface ParamLimitProps {
   min: number | null
@@ -17,15 +18,15 @@ export function ParamLimit({ min, max, onChange, minLabel = 'Minimum', maxLabel 
 
   const validate = (minVal: number, maxVal: number) => {
     if (isNaN(minVal) || minVal < 0) {
-      return `The ${minLabel} must not be negative.`
+      return $t('The (0) must not be negative.', [minLabel])
     }
 
     if (isNaN(maxVal) || maxVal < 0) {
-      return `The ${maxLabel} must not be negative.`
+      return $t('The (0) must not be negative.',[maxLabel])
     }
 
     if (minVal > maxVal) {
-      return `The ${maxLabel} must be greater than or equal to the ${minLabel}.`
+      return $t('The (0) must be greater than or equal to the (1).',[maxLabel, minLabel])
     }
 
     return null

@@ -1,4 +1,4 @@
-import * as Mock from 'mockjs'
+import {Random} from 'mockjs'
 import { PARAM_KEY_REF_TYPE, PARAM_LIST_TYPE, PARAM_LIS_ITEM_TYPE, PARAM_TYPE, PARAM_TYPE_REF_TYPE } from "./code-snippets.type"
 const DEFAULT_PARAM_KEY_REF: PARAM_KEY_REF_TYPE = {
   key: 'key',
@@ -127,5 +127,5 @@ export function tranformJson(
   return result.join('\n') //分隔符会换行
 }
 export function getRandomDataByType(type: PARAM_TYPE) {
-  return Mock.Random[Object.keys(Mock.Random).includes(type) ? type : 'string'](0, 5)
+  return Random[Object.keys(Random).includes(type) ? type : 'string'](0, 5)
 }

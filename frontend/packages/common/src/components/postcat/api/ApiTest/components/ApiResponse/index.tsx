@@ -6,6 +6,7 @@ import { HeaderPreview } from './components/HeaderPreview'
 import { ResponseIndicator } from './components/ResponseIndicator'
 import {TestResponse} from "@common/hooks/useTest.ts";
 import {downloadFile} from "@common/utils/download.ts";
+import { $t } from '@common/locales'
 
 type TabType = 'Response' | 'Response Headers' | 'Body' | 'Request Headers'
 
@@ -16,12 +17,12 @@ interface ApiResponseProps {
 export function ApiResponse({ data }: ApiResponseProps) {
   const tabHeight = 30
   const theme = useTheme()
-
   const [tabValue, setTabValue] = useState<TabType>('Response')
 
-  const handleTabValueChange = (_evt: SyntheticEvent, value: TabType): void => {
+  const handleTabValueChange = useCallback((_evt: SyntheticEvent, value: TabType): void => {
     setTabValue(value)
-  }
+  },[])
+  
   const response = data?.report.response
 
   const handleDownload = useCallback(() => {
@@ -42,7 +43,7 @@ export function ApiResponse({ data }: ApiResponseProps) {
     const response = data?.report.response
     return [
       {
-        title: '响应',
+        title: $t('响应'),
         name: 'Response',
         hidden: false,
         element: (
@@ -57,19 +58,19 @@ export function ApiResponse({ data }: ApiResponseProps) {
         )
       },
       {
-        title: '响应头',
+        title: $t('响应头'),
         name: 'Response Headers',
         hidden: !response?.headers.length,
         element: <HeaderPreview data={response?.headers || []} />
       },
       {
-        title:'正文',
+        title:$t('正文'),
         name: 'Body',
         hidden: !request?.body.length,
         element: <Body data={request?.body} />
       },
       {
-        title: '请求头',
+        title: $t('请求头'),
         name: 'Request Headers',
         hidden: !request?.headers.length,
         element: <HeaderPreview data={request?.headers || []} />

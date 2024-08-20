@@ -10,6 +10,7 @@ import {
 import {MessageDataGrid, MessageDataGridApi} from "../MessageDataGrid";
 import {Indicator} from "../../../../Indicator";
 import { ApiMessageBody, ApiMessageBodyApi } from '../ApiMessageBody';
+import { $t } from '@common/locales';
 
 export interface ApiRequestEditorApi {
   getData: () => {
@@ -62,7 +63,7 @@ export function ApiRequestEditor({ editorRef ,apiInfo=null,loaded}: { editorRef?
 
   const tabs: ApiRequestEditorTab[] = [
     {
-      label: '请求头部',
+      label: $t('请求头部'),
       element: (
         <MessageDataGrid
           apiRef={headersRef}
@@ -76,12 +77,12 @@ export function ApiRequestEditor({ editorRef ,apiInfo=null,loaded}: { editorRef?
       dirty: false
     },
     {
-      label:'请求体',
+      label:$t('请求体'),
       element: <ApiMessageBody bodyApiRef={bodyRef} mode="request" apiInfo={apiInfo} loaded={innerLoaded}/>,
       dirty: false
     },
     {
-      label: 'Query 参数',
+      label: $t('Query 参数'),
       element: (
         <MessageDataGrid
           apiRef={queryRef}
@@ -95,7 +96,7 @@ export function ApiRequestEditor({ editorRef ,apiInfo=null,loaded}: { editorRef?
       dirty: false
     },
     {
-      label: 'REST 参数',
+      label: $t('REST 参数'),
       element: (
         <MessageDataGrid
           apiRef={restRef}
@@ -123,12 +124,11 @@ export function ApiRequestEditor({ editorRef ,apiInfo=null,loaded}: { editorRef?
 
   return (
     <Box sx={{ 
-      // borderBottom: 1,
        borderColor: 'divider' }}>
       <Tabs
         value={tabValue}
         onChange={handleChange}
-        aria-label="api request editor"
+        aria-label={$t("api request editor")}
         sx={{
           minHeight: tabHeight,
           height: tabHeight,
