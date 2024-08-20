@@ -73,7 +73,7 @@ export const ResetPsw = forwardRef<ResetPswHandle,ResetPswProps>((props,ref)=>{
             layout='vertical'
             form={form}
             scrollToFirstError
-            className="mx-auto mt-mbase "
+            className="mx-auto mt-mbase  ml-mbase"
             name="resetPsw"
             // labelCol={{ span: 8 }}
             // wrapperCol={{ span: 10}}

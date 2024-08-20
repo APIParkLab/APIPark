@@ -39,6 +39,40 @@ type imlTeamModule struct {
 	transaction             store.ITransaction               `autowired:""`
 }
 
+func (m *imlTeamModule) SimpleTeams(ctx context.Context, keyword string) ([]*team_dto.SimpleTeam, error) {
+	teams, err := m.teamService.Search(ctx, keyword, nil)
+	if err != nil {
+		return nil, err
+	}
+	projects, err := m.serviceService.Search(ctx, "", nil)
+	projectCount := make(map[string]int64)
+	appCount := make(map[string]int64)
+	for _, p := range projects {
+		if p.AsServer {
+			if _, ok := projectCount[p.Team]; !ok {
+				projectCount[p.Team] = 0
+			}
+			projectCount[p.Team]++
+		}
+		if p.AsApp {
+			if _, ok := appCount[p.Team]; !ok {
+				appCount[p.Team] = 0
+			}
+			appCount[p.Team]++
+		}
+	}
+
+	return utils.SliceToSlice(teams, func(s *team.Team) *team_dto.SimpleTeam {
+		return &team_dto.SimpleTeam{
+			Id:          s.Id,
+			Name:        s.Name,
+			Description: s.Description,
+			ServiceNum:  projectCount[s.Id],
+			AppNum:      appCount[s.Id],
+		}
+	}), nil
+}
+
 func (m *imlTeamModule) UpdateMemberRole(ctx context.Context, id string, input *team_dto.UpdateMemberRole) error {
 	_, err := m.teamService.Get(ctx, id)
 	if err != nil {
@@ -157,7 +191,7 @@ func (m *imlTeamModule) Edit(ctx context.Context, id string, input *team_dto.Edi
 	return m.GetTeam(ctx, id)
 }
 
-func (m *imlTeamModule) SimpleTeams(ctx context.Context, keyword string) ([]*team_dto.SimpleTeam, error) {
+func (m *imlTeamModule) MySimpleTeams(ctx context.Context, keyword string) ([]*team_dto.SimpleTeam, error) {
 	userID := utils.UserId(ctx)
 	memberMap, err := m.teamMemberService.FilterMembersForUser(ctx, userID)
 	if err != nil {

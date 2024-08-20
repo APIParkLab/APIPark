@@ -81,6 +81,16 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      - name: Setup qshell
+        uses: foxundermoon/setup-qshell@v5
+        with:
+          version: '2.9.0'
+
       - name: build
-        run: cd scripts && ./docker_publish.sh ${{ secrets.DOCKER_USERNAME }} "backend"
+        env:
+          AccessKey: ${{ secrets.AK }}
+          SecretKey: ${{ secrets.SK }}
+          QINIU_BUCKET: ${{ secrets.QINIU_BUCKET }}
+          QINIU_NAME: ${{ secrets.QINIU_NAME }}
+        run: cd scripts && ./docker_publish.sh ${{ secrets.DOCKER_USERNAME }} "backend" "upload_qiniu"
 
