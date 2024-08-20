@@ -82,7 +82,9 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Setup qshell
-        uses: 7-zip/setup-qshell@v1
+        uses: foxundermoon/setup-qshell@v5
+        with:
+          version: '2.6.2'
 
       - name: build
         env:
