@@ -81,6 +81,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      - name: Setup qshell
+        uses: 7-zip/setup-qshell@v1
+
       - name: build
-        run: cd scripts && ./docker_publish.sh ${{ secrets.DOCKER_USERNAME }} "backend"
+        env:
+          AccessKey: ${{ secrets.AK }}
+          SecretKey: ${{ secrets.SK }}
+        run: cd scripts && ./docker_publish.sh ${{ secrets.DOCKER_USERNAME }} "backend" "upload"
 
