@@ -84,7 +84,7 @@ jobs:
       - name: Setup qshell
         uses: foxundermoon/setup-qshell@v5
         with:
-          version: '2.6.2'
+          version: '2.9.0'
 
       - name: build
         env:
