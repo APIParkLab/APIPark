@@ -2,33 +2,33 @@ package core
 
 import (
 	"net/http"
-	
+
 	plugin_cluster "github.com/APIParkLab/APIPark/controller/plugin-cluster"
-	
+
 	"github.com/APIParkLab/APIPark/controller/cluster"
-	
+
 	"github.com/eolinker/ap-account/controller/role"
-	
+
 	"github.com/APIParkLab/APIPark/controller/common"
-	
+
 	dynamic_module "github.com/APIParkLab/APIPark/controller/dynamic-module"
-	
+
 	"github.com/APIParkLab/APIPark/controller/release"
-	
+
 	application_authorization "github.com/APIParkLab/APIPark/controller/application-authorization"
-	
+
 	"github.com/APIParkLab/APIPark/controller/subscribe"
-	
+
 	"github.com/APIParkLab/APIPark/controller/api"
-	
+
 	"github.com/APIParkLab/APIPark/controller/upstream"
-	
+
 	"github.com/APIParkLab/APIPark/controller/service"
-	
+
 	"github.com/APIParkLab/APIPark/controller/catalogue"
-	
+
 	"github.com/APIParkLab/APIPark/controller/my_team"
-	
+
 	"github.com/APIParkLab/APIPark/controller/certificate"
 	"github.com/APIParkLab/APIPark/controller/team_manager"
 	"github.com/eolinker/go-common/autowire"
@@ -47,7 +47,7 @@ func (d *Driver) Access() map[string][]string {
 }
 
 func (d *Driver) Create() (pm3.IPlugin, error) {
-	
+
 	p := new(plugin)
 	autowire.Autowired(p)
 	return p, nil
@@ -76,7 +76,6 @@ type plugin struct {
 }
 
 func (p *plugin) OnComplete() {
-	p.apis = append(p.apis, p.partitionApi()...)
 	p.apis = append(p.apis, p.certificateApi()...)
 	p.apis = append(p.apis, p.clusterApi()...)
 	p.apis = append(p.apis, p.TeamManagerApi()...)
@@ -89,7 +88,7 @@ func (p *plugin) OnComplete() {
 	p.apis = append(p.apis, p.projectAuthorizationApis()...)
 	p.apis = append(p.apis, p.releaseApis()...)
 	p.apis = append(p.apis, p.DynamicModuleApis()...)
-	
+
 	p.apis = append(p.apis, p.PartitionPluginApi()...)
 	p.apis = append(p.apis, p.commonApis()...)
 }

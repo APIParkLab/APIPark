@@ -142,7 +142,6 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
             <Form.Item<ManagementConfigFieldType>
                 label="应用 ID"
                 name="id"
-                extra="应用ID（app_id）可用于检索服务或日志"
                 rules={[{ required: true, message: '必填项' ,whitespace:true }]}
             >
                 <Input className="w-INPUT_NORMAL" placeholder="请输入" disabled={type === 'edit'}/>
