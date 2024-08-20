@@ -1,13 +1,14 @@
 import {forwardRef, useImperativeHandle, useState} from 'react'
 
 import { Input } from '@formily/antd-v5'
+import { $t } from '@common/locales'
 export const SimpleMapComponent = forwardRef(
   (props: { [k: string]: unknown }, ref) => {
     const {
       onChange,
       value,
-      placeholderKey = '请输入Key',
-      placeholderValue = '请输入Value'
+      placeholderKey = $t('请输入Key'),
+      placeholderValue = $t('请输入Value')
     } = props
 
     const [kvList, setKvList] = useState(

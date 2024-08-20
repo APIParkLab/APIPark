@@ -2,6 +2,7 @@ import { cloneDeep } from 'lodash-es'
 import { parseFormData, parseFileValue, parseFileType, parseHeaders, parseRequestBodyToString, parseUri, payloadStr, goCodeParseFormData } from './transform'
 // import { getJson } from '../.@common/utils/';
 import { ApiBodyType } from '@common/const/api-detail';
+import { $t } from '@common/locales';
 
 function sameNameToParams(params: unknown) {
   params = cloneDeep(params)
@@ -522,7 +523,7 @@ export function generateCode(
       if (multipart) {
         code =
           '<?php\r\n' +
-          '//获取文件,需填路径 \r\n' +
+          `//${$t('获取文件,需填路径')} \r\n` +
           '$file_path = "";\r\n' +
           `$file_name = "${langTmp.fileValue}";\r\n` +
           '$client = new http\\Client;\r\n' +
@@ -599,7 +600,7 @@ export function generateCode(
       if (multipart) {
         code =
           '<?php\r\n\r\n' +
-          '//获取文件,需填路径 \r\n' +
+          `//${$t('获取文件,需填路径')} \r\n` +
           '$file_path = "";  \r\n\r\n' +
           '$curl = curl_init();\r\n\r\n' +
           'curl_setopt_array($curl, array(\r\n' +

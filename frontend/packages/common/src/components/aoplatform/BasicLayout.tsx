@@ -6,23 +6,26 @@ import {
     Button} from 'antd';
 import Logo from '@common/assets/layout-logo.png';
 import AvatarPic from '@common/assets/default-avatar.png'
-import { routerKeyMap, TOTAL_MENU_ITEMS } from "./Navigation";
 import {Outlet, useLocation, useNavigate} from "react-router-dom";
-import {useEffect, useMemo, useRef, useState} from "react";
+import { useEffect, useMemo, useState} from "react";
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx';
 import { PERMISSION_DEFINITION } from '@common/const/permissions.ts';
   import {
     ProConfigProvider,
     ProLayout,
   } from '@ant-design/pro-components';
-import { UserProfile } from './UserProfile.tsx';
-import { ResetPsw, ResetPswHandle } from './ResetPsw.tsx';
-import { BasicResponse, STATUS_CODE } from '@common/const/const.ts';
-import { UserInfoType, UserProfileHandle } from '@common/const/type.ts';
+import { BasicResponse, RESPONSE_TIPS, routerKeyMap, STATUS_CODE } from '@common/const/const.tsx';
+import { UserInfoType } from '@common/const/type.ts';
 import { useFetch } from '@common/hooks/http.ts';
-import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Icon } from '@iconify/react/dist/iconify.js';
-  
+import { ProjectFilled } from '@ant-design/icons';
+import { getNavItem } from '@common/utils/navigation';
+import { Icon } from '@iconify/react';
+import { $t } from '@common/locales';
+import LanguageSetting from './LanguageSetting';
+
+const APP_MODE = import.meta.env.VITE_APP_MODE;
+export type MenuItem = Required<MenuProps>['items'][number];
+
 const themeToken = {
     bgLayout:'#17163E;',
     header: {
@@ -38,9 +41,45 @@ const themeToken = {
      const navigator = useNavigate()
      const location = useLocation()
      const currentUrl = location.pathname
-    const { accessData,checkPermission} = useGlobalContext()
+    const { state,accessData,checkPermission} = useGlobalContext()
     const [pathname, setPathname] = useState(currentUrl);
      const mainPage = project === 'core' ?'/service/list':'/serviceHub/list'
+
+   const TOTAL_MENU_ITEMS:MenuProps['items'] =  useMemo(() => [
+    getNavItem($t('工作空间'), 'workspace','/tenantManagement',<Icon icon="ic:baseline-space-dashboard" width="18" height="18"/>, [
+      getNavItem($t('我的'), 'my','/tenantManagement',null,[
+        getNavItem(<a>{$t('应用')}</a>, 'tenantManagement','/tenantManagement',<Icon icon="ic:baseline-apps" width="18" height="18"/>,undefined,undefined,''),
+        getNavItem(<a>{$t('服务')}</a>, 'service','/service',<Icon icon="ic:baseline-blinds-closed" width="18" height="18"/>,undefined,undefined,''),
+        getNavItem(<a>{$t('团队')}</a>, 'team','/team',<Icon icon="ic:baseline-people-alt" width="18" height="18"/>,undefined,undefined,''),
+      ],undefined,''),
+        getNavItem(<a>{$t('API 市场')}</a>, 'serviceHub','/serviceHub',<Icon icon="ic:baseline-hub" width="18" height="18"/>,undefined,undefined,'system.workspace.api_market.view'),
+    ]),
+  
+    APP_MODE === 'pro' ? getNavItem($t('仪表盘'), 'mainPage', '/dashboard',<Icon icon="ic:baseline-bar-chart" width="18" height="18"/>,[
+      getNavItem(<a >{$t('运行视图')}</a>, 'dashboard','/dashboard',<ProjectFilled />,undefined,undefined,''),
+      getNavItem(<a >{$t('系统拓扑图')}</a>, 'systemrunning','/systemrunning',<ProjectFilled />,undefined,undefined,''),
+    ]):null,
+  
+    getNavItem($t('系统设置'), 'operationCenter','/member',<Icon icon="ic:baseline-settings" width="18" height="18"/>, [
+      getNavItem($t('组织'), 'organization','/member',null,[
+        getNavItem(<a>{$t('成员')}</a>, 'member','/member',<Icon icon="ic:baseline-people-alt" width="18" height="18"/>,undefined,undefined,'system.organization.member.view'),
+        getNavItem(<a>{$t('角色')}</a>, 'role','/role',<Icon icon="ic:baseline-verified-user" width="18" height="18"/>,undefined,undefined,'system.organization.role.view'),
+      ],undefined,''),
+      getNavItem($t('API 市场'), 'serviceHubSetting','/servicecategories',null,[
+        getNavItem(<a>{$t('服务分类管理')}</a>, 'servicecategories','/servicecategories',<Icon icon="ic:baseline-hub" width="18" height="18"/>,undefined,undefined,'system.api_market.service_classification.view'),
+      ],undefined,'system.api_market.service_classification.view'),
+  
+      getNavItem($t('运维与集成'), 'maintenanceCenter','/cluster', null, [
+        getNavItem(<a>{$t('集群')}</a>, 'cluster','/cluster',<Icon icon="ic:baseline-device-hub" width="18" height="18"/>,undefined,undefined,'system.devops.cluster.view'),
+        getNavItem(<a>{$t('证书')}</a>, 'cert','/cert',<Icon icon="ic:baseline-security" width="18" height="18"/>,undefined,undefined,'system.devops.ssl_certificate.view'),
+        getNavItem(<a>{$t('日志')}</a>, 'logsettings','/logsettings',<Icon icon="ic:baseline-sticky-note-2" width="18" height="18"/>,undefined,undefined,'system.devops.log_configuration.view'),
+        APP_MODE === 'pro' ? getNavItem(<a>{$t('资源')}</a>, 'resourcesettings','/resourcesettings',null,undefined,undefined,'system.partition.self.view'):null,
+        APP_MODE === 'pro' ? getNavItem(<a>{$t('Open API')}</a>, 'openapi','/openapi',null,undefined,undefined,'system.openapi.self.view'):null,
+      ]),
+    ]),
+  ],[state.language])
+
+  useEffect(()=>{console.log(state.language, $t('工作空间'))},[state.language])
 
      useEffect(() => {
          if(currentUrl === '/'){
@@ -82,13 +121,13 @@ const themeToken = {
         const res = [...TOTAL_MENU_ITEMS]!.filter(x => x).map((x: any) => (x.routes ? { ...x, routes: filterMenu(x.routes) } : x));
         // 返回处理后的数据
         return { path: '/', routes: res.map(x=> ({...x, routes: x.routes?.filter(x=> (x.access || x.routes?.length > 0))})).filter(x=> (x.access || x.routes?.length > 0)) };
-    }, [accessData]);
+    }, [accessData, state.language]);
+    
 
-    const { modal,message } = App.useApp()
+     
+    const { message } = App.useApp()
     const { dispatch,resetAccess,getGlobalAccessData} = useGlobalContext()
     const [userInfo,setUserInfo] = useState<UserInfoType>()
-    const resetPswRef = useRef<ResetPswHandle>(null)
-    const userProfileRef = useRef<UserProfileHandle>(null)
     const {fetchData} = useFetch()
     const navigate = useNavigate();
 
@@ -100,7 +139,7 @@ const themeToken = {
                 setUserInfo(data.profile)
                 dispatch({type:'UPDATE_USERDATA',userData:data.profile})
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -116,10 +155,10 @@ const themeToken = {
             if(code === STATUS_CODE.SUCCESS){
                 dispatch({type:'LOGOUT'})
                 resetAccess()
-                message.success(msg || '退出成功，将跳转至登录页')
+                message.success(msg || RESPONSE_TIPS.logoutSuccess)
                 navigate('/login')
             }else{
-                message.error(msg ||'操作失败')
+                message.error(msg ||RESPONSE_TIPS.error)
             }
         })
     }
@@ -129,49 +168,19 @@ const themeToken = {
             key: '2',
             label: (
                 <Button key="changePsw" type="text" className="border-none p-0 flex items-center bg-transparent " onClick={()=>navigator('/userProfile/changepsw')}>
-                账号设置
+                {$t('账号设置')}
                 </Button>)
         },
         {
             key: '3',
             label: (
                 <Button key="logout" type="text" className="border-none p-0 flex items-center bg-transparent " onClick={logOut}>
-                退出登录
+                {$t('退出登录')}
                 </Button>)
         },
     ];
 
-    const openModal = (type:'userSetting'|'resetPsw')=>{
-        let title:string = ''
-        let content:string|React.ReactNode = ''
-        switch (type){
-            case 'userSetting':
-                title='用户设置'
-                content=<UserProfile ref={userProfileRef} entity={userInfo}/>
-                break;
-            case 'resetPsw':
-                title='重置密码'
-                content=<ResetPsw ref={resetPswRef} entity={userInfo}  />
-                break;
-        }
-        modal.confirm({
-            title,
-            content,
-            onOk:()=>{
-                switch (type){
-                    case 'userSetting':
-                        return userProfileRef.current?.save().then((res)=>{if(res === true) getUserInfo()})
-                    case 'resetPsw':
-                        return resetPswRef.current?.save().then((res)=>{if(res === true) logOut()})
-                }
-            },
-            width:600,
-            okText:'确认',
-            cancelText:'取消',
-            closable:true,
-            icon:<></>,
-        })
-    }
+
 
     return(
         <div
@@ -182,97 +191,98 @@ const themeToken = {
             }}
         >
             <ProConfigProvider hashed={false}>
-            <ConfigProvider
-                getTargetContainer={() => {
-                return document.getElementById('test-pro-layout') || document.body;
-                }}
-            >
-                <ProLayout
-                prefixCls="apipark-layout"
-                location={{
-                    pathname,
-                }}
-                siderWidth={220}
-                breakpoint={'lg'}
-                route={headerMenuData}
-                token={themeToken}
-                siderMenuType="group"
-                menu={{
-                    type: 'group',
-                    collapsedShowGroupTitle: true,
-                }}
-                disableMobile={true}
-                avatarProps={{
-                    src: AvatarPic || userInfo?.avatar,
-                    size: 'small',
-                    title: userInfo?.username||'unknown',
-                    render: (props, dom) => {
-                    return (
-                        <Dropdown
-                        menu={{
-                            items
-                        }}
-                        >
-                        <div className='avatar-dom'>{dom}
-                        </div>
-                        </Dropdown>
-                    );
-                    },
-                }}
-                actionsRender={(props) => {
-                  if (props.isMobile) return [];
-                  if (typeof window === 'undefined') return [];
-                  return [
-                    <Button  className=" text-[#ffffffb3] hover:text-[#fff] border-none" type="default" ghost onClick={()=>{window.open('https://docs.apipark.com','_blank')}}>
-                      <span className='flex items-center gap-[8px]'> <Icon icon="ic:baseline-help" width="14" height="14"/>文档</span>
-                    </Button> 
-                  ];
-                }}
-                headerTitleRender={() => (
-                <div className="w-[192px]  flex items-center">
-                  <img
-                    className="h-[20px] cursor-pointer "
-                    src={Logo}
-                    onClick={()=> navigator(mainPage)}
-                  />
-                </div>
-                )}
-                logo={Logo}
-                pageTitleRender={()=>'APIPark - 企业API数据开放平台'}
-                menuFooterRender={(props) => {
-                    if (props?.collapsed) return undefined;
-                }}
-                menuItemRender={(item, dom) => (
-                    <div
-                        onClick={() => {
-                        // 同级目录点击无效
-                        if(item.key && routerKeyMap.get(item.key) && routerKeyMap.get(item.key).length > 0 && routerKeyMap.get(item.key)?.indexOf(pathname.split('/')[1]) !== -1){
-                          return
-                        }
-                        if(item.key === pathname.split('/')[1]){
-                          return
-                        }
-                        
-                        if(item.path){
-                          navigator(item.path)
-                        }
-                        setPathname(item.path || '');
+                <ConfigProvider
+                    getTargetContainer={() => {
+                    return document.getElementById('test-pro-layout') || document.body;
                     }}
-                    >
-                    {dom}
-                    </div>
-                )}
-                fixSiderbar={true}
-                layout='mix'
-                splitMenus={true}
-                collapsed={false}
-                collapsedButtonRender={false}
                 >
-                  <div className={`w-full h-calc-100vh-minus-navbar pl-PAGE_INSIDE_X pt-PAGE_INSIDE_T ${currentUrl.startsWith('/role/list') ? 'overflow-auto' : 'overflow-hidden' }`}>
-                    <Outlet />
-                  </div>
-                </ProLayout>
-            </ConfigProvider>
+                    <ProLayout
+                        prefixCls="apipark-layout"
+                        location={{
+                            pathname,
+                        }}
+                        siderWidth={220}
+                        breakpoint={'lg'}
+                        route={headerMenuData}
+                        token={themeToken}
+                        siderMenuType="group"
+                        menu={{
+                            type: 'group',
+                            collapsedShowGroupTitle: true,
+                        }}
+                        disableMobile={true}
+                        avatarProps={{
+                            src: AvatarPic || userInfo?.avatar,
+                            size: 'small',
+                            title: userInfo?.username||'unknown',
+                            render: (props, dom) => {
+                            return (
+                                <Dropdown
+                                menu={{
+                                    items
+                                }}
+                                >
+                                <div className='avatar-dom'>{dom}
+                                </div>
+                                </Dropdown>
+                            );
+                            },
+                        }}
+                        actionsRender={(props) => {
+                          if (props.isMobile) return [];
+                          if (typeof window === 'undefined') return [];
+                          return [
+                            <LanguageSetting />,
+                            <Button  className=" text-[#ffffffb3] hover:text-[#fff] border-none" type="default" ghost onClick={()=>{window.open('https://docs.apipark.com','_blank')}}>
+                              <span className='flex items-center gap-[8px]'> <Icon icon="ic:baseline-help" width="14" height="14"/>{$t('文档')}</span>
+                            </Button> 
+                          ];
+                        }}
+                        headerTitleRender={() => (
+                        <div className="w-[192px]  flex items-center">
+                        <img
+                            className="h-[20px] cursor-pointer "
+                            src={Logo}
+                            onClick={()=> navigator(mainPage)}
+                        />
+                        </div>
+                        )}
+                        logo={Logo}
+                        pageTitleRender={()=>$t('APIPark - 企业API数据开放平台')}
+                        menuFooterRender={(props) => {
+                            if (props?.collapsed) return undefined;
+                        }}
+                        menuItemRender={(item, dom) => (
+                            <div
+                                onClick={() => {
+                                // 同级目录点击无效
+                                if(item.key && routerKeyMap.get(item.key) && routerKeyMap.get(item.key).length > 0 && routerKeyMap.get(item.key)?.indexOf(pathname.split('/')[1]) !== -1){
+                                return
+                                }
+                                if(item.key === pathname.split('/')[1]){
+                                return
+                                }
+                                
+                                if(item.path){
+                                navigator(item.path)
+                                }
+                                setPathname(item.path || '');
+                            }}
+                            >
+                            {dom}
+                            </div>
+                        )}
+                        fixSiderbar={true}
+                        layout='mix'
+                        splitMenus={true}
+                        collapsed={false}
+                        collapsedButtonRender={false}
+                    >
+                    <div className={`w-full h-calc-100vh-minus-navbar pl-PAGE_INSIDE_X pt-PAGE_INSIDE_T ${currentUrl.startsWith('/role/list') ? 'overflow-auto' : 'overflow-hidden' }`}>
+                        <Outlet />
+                    </div>
+                    </ProLayout>
+                </ConfigProvider>
             </ProConfigProvider>
       </div>
     )

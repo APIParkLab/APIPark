@@ -32,7 +32,7 @@ export type SystemConfigFieldType = {
 
 export type SystemSubServiceTableListItem = {
     id:string;
-    applyStatus:SubscribeEnum;
+    applyStatus:typeof SubscribeEnum;
     project:EntityItem;
     team:EntityItem
     service:EntityItem
@@ -46,7 +46,7 @@ export type SystemSubServiceTableListItem = {
 export type SystemSubscriberTableListItem = {
     id:string
     service:EntityItem
-    applyStatus:SubscribeEnum
+    applyStatus:typeof SubscribeEnum
     project:EntityItem
     team:EntityItem;
     applier:EntityItem

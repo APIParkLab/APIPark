@@ -17,6 +17,7 @@ import { ImportMessage, ImportMessageChangeType, ImportMessageOption } from './I
 import {ApiBodyType, ApiDetail, ParseCurlResult, TestApiBodyType} from "@common/const/api-detail";
 import {TestMessageDataGrid, TestMessageDataGridApi} from "../TestMessageDataGrid";
 import {Indicator} from "../../../../Indicator";
+import { $t } from '@common/locales'
 
 export interface ApiRequestTesterApi {
   getEditMeta: () => {
@@ -113,13 +114,13 @@ export function ApiRequestTester({ apiRef, onQueryChange ,apiInfo, loaded=true}:
   )
 
   const handleImportChange = (changeType: ImportMessageChangeType, data: ImportMessageOption[]) => {
-    tabValue === '请求头' && headersApiRef.current?.importData(changeType, data)
-    tabValue === 'Query 参数' && queryApiRef.current?.importData(changeType, data)
+    tabValue === $t('请求头') && headersApiRef.current?.importData(changeType, data)
+    tabValue === $t('Query 参数') && queryApiRef.current?.importData(changeType, data)
   }
 
   const tabs = [
     {
-      label: '请求头',
+      label: $t('请求头'),
       element: (
         <TestMessageDataGrid
           apiRef={headersApiRef}
@@ -131,12 +132,12 @@ export function ApiRequestTester({ apiRef, onQueryChange ,apiInfo, loaded=true}:
       dirty: false
     },
     {
-      label: '请求体',
+      label: $t('请求体'),
       element: <TestBody bodyApiRef={bodyApiRef} onContentTypeChange={handleContentTypeChange} />,
       dirty: false
     },
     {
-      label: 'Query 参数',
+      label: $t('Query 参数'),
       element: (
         <TestMessageDataGrid
           apiRef={queryApiRef}
@@ -150,7 +151,7 @@ export function ApiRequestTester({ apiRef, onQueryChange ,apiInfo, loaded=true}:
       dirty: false
     },
     {
-      label: 'Rest 参数',
+      label: $t('Rest 参数'),
       element: <TestMessageDataGrid apiRef={restApiRef} initialRows={apiRest} messageType="REST" />,
       dirty: false
     }

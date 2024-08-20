@@ -6,6 +6,7 @@ import {collapseTableSx, PreviewGridActionsCellItem, previewTableHoverSx} from "
 import {Collapse} from "../../../Collapse";
 import { PreviewBodyBinary } from './components/Binary';
 import { PreviewBodyRaw } from './components/Raw';
+import { $t } from '@common/locales';
 
 export interface RenderMessageBody extends BodyParamsType {
   path: string[]
@@ -50,13 +51,13 @@ export default function MessageBodyComponent({
   const columns: GridColDef<RenderMessageBody>[] = [
     {
       field: 'dataType',
-      headerName: '类型',
+      headerName: $t('类型'),
       valueGetter: (params) => ApiParamsType[params.row.dataType as ApiParamsType],
       width: 80
     },
     {
       field: 'isRequired',
-      headerName: '必需',
+      headerName: $t('必需'),
       sortable: false,
       valueGetter: (params) => Boolean(params.row.isRequired),
       type: 'boolean',
@@ -64,12 +65,12 @@ export default function MessageBodyComponent({
     },
     {
       field: 'description',
-      headerName: '描述',
+      headerName: $t('描述'),
       flex: 1
     },
     {
       field: 'paramAttr',
-      headerName: '示例',
+      headerName:$t('示例'),
       valueGetter: (params) => params.row.paramAttr?.example,
       flex: 1
     },
@@ -83,7 +84,7 @@ export default function MessageBodyComponent({
       getActions: (params) => [
         <PreviewGridActionsCellItem
             icon="more"
-            label="More"
+            label={$t("More")}
             key="more"
             onClick={() => onMoreSettingChange?.(params.row)}
         />
@@ -105,7 +106,7 @@ export default function MessageBodyComponent({
           rowHeight={40}
           pagination={false}
           groupingColDef={{
-            headerName: '参数名',
+            headerName: $t('参数名'),
             sortable:true,
             width: 200,
             hideable: false,

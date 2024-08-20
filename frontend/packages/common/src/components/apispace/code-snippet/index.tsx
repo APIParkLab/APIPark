@@ -12,6 +12,7 @@ import {ApiDetail} from "@common/const/api-detail";
 import {Codebox} from "@common/components/postcat//api/Codebox";
 import {Collapse} from "@common/components/postcat/api/Collapse";
 import {Box} from "@mui/material";
+import { $t } from '@common/locales';
 
 type CodeSnippetCompoType = {
   title:string
@@ -156,7 +157,7 @@ type CodeSnippetCompoType = {
     let tempCode = ''
     const getCode = (language: number | string) => {
       if (!['HTTPS', 'HTTP'].includes(api.protocol?.toUpperCase())) {
-        tempCode = '暂不支持生成非 HTTPS 或非 HTTP 协议的代码示例'
+        tempCode = $t('暂不支持生成非 HTTPS 或非 HTTP 协议的代码示例')
         setCode(tempCode)
         return
       }
@@ -186,7 +187,7 @@ type CodeSnippetCompoType = {
             (option) => (option.label as string).toLowerCase().indexOf(inputValue.toLowerCase()) > -1,
         );
 
-    const [placeholderTxt, setPlaceholderTxt] = useState('搜索编程语言...')
+    const [placeholderTxt, setPlaceholderTxt] = useState($t('搜索编程语言...'))
     const [selectItemTxt, setSelectItemTxt ] = useState('')
 
     return  (
@@ -194,7 +195,7 @@ type CodeSnippetCompoType = {
         <Collapse title={title}>
           <Box width="100%">
             <>
-            <Codebox extraContent={<><span className="ml-[12px]">编程语言：</span><Cascader
+            <Codebox extraContent={<><span className="ml-[12px]">{$t('编程语言')}：</span><Cascader
                   options={CODE_LANG}
                   onChange={(value,record) => onChange(value as unknown as number[],record)}
                   placeholder={placeholderTxt}

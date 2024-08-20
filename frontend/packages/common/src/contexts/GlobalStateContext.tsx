@@ -1,7 +1,7 @@
 import {createContext, Dispatch, FC, ReactNode, useContext, useReducer, useState} from "react";
 import { useFetch } from "@common/hooks/http";
 import { App } from "antd";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { checkAccess } from "@common/utils/permission";
 import { PERMISSION_DEFINITION } from "@common/const/permissions";
 
@@ -11,31 +11,31 @@ interface GlobalState {
     version: string;
     updateDate: string;
     powered:string;
-    mainPage:string
+    mainPage:string;
+    language:string;
 }
 
-// Define the shape of the user data
 interface UserData {
     username: string;
-    // Add other user-related fields as needed
 }
 
-// Define actions for state updates
-type Action =
+export type GlobalAction =
     | { type: 'LOGIN'}
     | { type: 'LOGOUT' }
     | { type: 'UPDATE_USERDATA'; userData: UserData }
     | { type: 'UPDATE_VERSION'; version: string }
     | { type: 'UPDATE_DATE'; updateDate: string }
     | { type: 'UPDATE_POWER'; powered: string }
-    | { type: 'UPDATE_MAIN_PAGE'; mainPage: string };
+    | { type: 'UPDATE_MAIN_PAGE'; mainPage: string }
+    | { type: 'UPDATE_LANGUAGE'; language: string }
+
 
 /*
     存储用户登录、信息、权限等数据
 */
-const GlobalContext = createContext<{
+export const GlobalContext = createContext<{
     state: GlobalState;
-    dispatch: Dispatch<Action>;
+    dispatch: Dispatch<GlobalAction>;
     accessData:Map<string,string[]>;
     pluginAccessDictionary:{[k:string]:string};
     getGlobalAccessData:()=>void;
@@ -49,8 +49,7 @@ const GlobalContext = createContext<{
 
 } | undefined>(undefined);
 
-// Define a reducer function to handle state updates
-const globalReducer = (state: GlobalState, action: Action): GlobalState => {
+const globalReducer = (state: GlobalState, action: GlobalAction): GlobalState => {
     switch (action.type) {
         case 'LOGIN':
             return {
@@ -88,6 +87,11 @@ const globalReducer = (state: GlobalState, action: Action): GlobalState => {
                 ...state,
                 mainPage: action.mainPage,
             };
+        case 'UPDATE_LANGUAGE':
+            return {
+                ...state,
+                language: action.language,
+            };
         default:
             return state;
     }
@@ -103,7 +107,8 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
         version: '1.0.0',
         updateDate: '2024-07-01',
         powered:'Powered by https://apipark.com',
-        mainPage:'/service/list'
+        mainPage:'/service/list',
+        language:'en'
     });
     const [accessData,setAccessData] = useState<Map<string,string[]>>(new Map())
     const [pluginAccessDictionary, setPluginAccessDictionary] = useState<{[k:string]:string}>({})
@@ -119,8 +124,8 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
                 setAccessData(prevData => new Map(prevData).set('system', data.access))
                 resolve(data.response)
             }else{
-                message.error(msg || '操作失败')
-                reject(data.msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
+                reject(data.msg || RESPONSE_TIPS.error)
             }
         })
         )
@@ -134,7 +139,7 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
                 setAccessData(prevData => new Map(prevData).set('team', data.access))
                 setTeamDataFlushed(true)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
             })
         }

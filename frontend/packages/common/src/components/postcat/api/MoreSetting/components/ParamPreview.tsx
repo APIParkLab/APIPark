@@ -2,6 +2,7 @@ import { Box } from '@mui/material'
 import { DataGridPro, GridColDef, useGridApiRef } from '@mui/x-data-grid-pro'
 import { useEffect, useMemo } from 'react'
 import {previewTableHoverSx } from '../../PreviewTable'
+import { $t } from '@common/locales'
 
 interface ParamPreviewProps {
   name?: string
@@ -48,17 +49,17 @@ export function ParamPreview(props: ParamPreviewProps) {
   const columns: GridColDef[] = [
     {
       field: 'name',
-      headerName: '参数名',
+      headerName: $t('参数名'),
       width: 120
     },
     {
       field: 'type',
-      headerName: '类型',
+      headerName: $t('类型'),
       width: 120
     },
     {
       field: 'required',
-      headerName: '必需',
+      headerName: $t('必需'),
       sortable: false,
       valueGetter: (params) => Boolean(params.row.isRequired),
       type: 'boolean',
@@ -66,7 +67,7 @@ export function ParamPreview(props: ParamPreviewProps) {
     },
     {
       field: 'description',
-      headerName: '描述',
+      headerName: $t('描述'),
       flex: 1
     }
   ]

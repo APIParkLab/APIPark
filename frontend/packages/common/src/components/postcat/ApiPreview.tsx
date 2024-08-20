@@ -15,11 +15,12 @@ import {MessageType} from "./api/ApiManager/components/MessageDataGrid";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "./ApiEdit.tsx";
+import { $t } from "@common/locales/index.ts";
 
 export const SearchBtn = ({entity}:{entity:unknown})=>{
     return (
         <Tooltip >
-            <span className="text-disabled">测试 API</span>
+            <span className="text-disabled">{$t('测试 API')}</span>
         </Tooltip>
     )
 }
@@ -90,13 +91,13 @@ export default function ApiPreview(props:{testClick?:()=>void, entity:ApiDetail}
 
         {
             requestParams?.headerParams?.length > 0 &&
-            <HeaderFields title='请求 Header' rows={requestParams?.headerParams}
+            <HeaderFields title={$t('请求 Header')} rows={requestParams?.headerParams}
                           onMoreSettingChange={setCurrentMoreSettingParam}  />
         }
 
         {requestBodyList?.length > 0 &&
             <MessageBodyComponent
-                title="请求 Body"
+                title={$t("请求 Body")}
                 rows={requestBodyList}
                 contentType={requestParams?.bodyParams[0]?.contentType}
                 onMoreSettingChange={setCurrentMoreSettingParam}
@@ -105,40 +106,40 @@ export default function ApiPreview(props:{testClick?:()=>void, entity:ApiDetail}
 
         {
             requestParams?.queryParams?.length > 0 &&
-            <HeaderFields title='Query 参数' rows={requestParams?.queryParams}
+            <HeaderFields title={$t('Query 参数')} rows={requestParams?.queryParams}
                           onMoreSettingChange={setCurrentMoreSettingParam}  />
         }
 
         {
             requestParams?.restParams?.length > 0 &&
-            <HeaderFields title='Rest 参数' rows={requestParams?.restParams}
+            <HeaderFields title={$t('Rest 参数')} rows={requestParams?.restParams}
                           onMoreSettingChange={setCurrentMoreSettingParam}/>
         }
 
         {/*<h3 className="text-lg mb-btnybase font-normal flex items-center">请求示例代码</h3>*/}
         <CodeSnippetCompo
-            title='请求示例代码'
+            title={$t('请求示例代码')}
             api={entity}
             extraContent={ testClick ? <div className="ml-5">
                 <Tooltip >
                 <WithPermission access="" > 
-                    <Button type='primary' onClick={handleTest}    size='small' className='w-[114px]'>测试 API</Button>
+                    <Button type='primary' onClick={handleTest}    size='small' className='w-[114px]'>{$t('测试 API')}</Button>
                 </WithPermission>
                 </Tooltip>
             </div> : undefined }
         />
 
-        {resultList?.length > 0 && <ResponseExampleCompo title='响应示例' detail={resultList}/>}
+        {resultList?.length > 0 && <ResponseExampleCompo title={$t('响应示例')} detail={resultList}/>}
 
         {
             responseList?.[0]?.responseParams?.headerParams?.length > 0 &&
-            <HeaderFields title='响应 Header' rows={ responseList?.[0]?.responseParams?.headerParams}
+            <HeaderFields title={$t('响应 Header')} rows={ responseList?.[0]?.responseParams?.headerParams}
                           onMoreSettingChange={setCurrentMoreSettingParam} />
         }
 
         {responseBodyList?.length > 0 &&
             <MessageBodyComponent
-                title="响应 Body"
+                title={$t("响应 Body")}
                 rows={responseBodyList}
                 contentType={responseList?.[0]?.contentType}
                 onMoreSettingChange={setCurrentMoreSettingParam}

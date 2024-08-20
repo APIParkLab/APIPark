@@ -39,6 +39,7 @@ import {
 } from '@formily/antd-v5'
 import { CustomCodeboxComponent } from './CustomCodeboxComponent.tsx'
 import { SimpleMapComponent } from './SimpleMapComponent.tsx'
+import { $t } from '@common/locales/index.ts'
 
 const SchemaField = createSchemaField({
   components: {
@@ -96,7 +97,7 @@ export const CustomDialogComponent = forwardRef(
           className="ant-formily-array-base-config"
           onClick={() => {
             const dialog = FormDialog(
-              editPage ? `编辑${title || ''}` : `添加${title || ''}`,
+              editPage ? $t('编辑(0)',[title||'']) : $t('添加(0)',[title||'']),
               () => {
                 return (
                   <FormLayout

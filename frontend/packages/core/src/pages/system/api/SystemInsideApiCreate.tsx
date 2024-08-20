@@ -1,16 +1,15 @@
 import {App, Col, Form, Input, Row, Select} from "antd";
 import  {forwardRef, useEffect, useImperativeHandle, useRef} from "react";
-import { useParams} from "react-router-dom";
-import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import EditableTableWithModal from "@common/components/aoplatform/EditableTableWithModal.tsx";
 import styles from "./SystemInsideApi.module.css"
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { HTTP_METHOD, MATCH_CONFIG } from "../../../const/system/const.tsx";
 import { SystemInsideApiCreateHandle, SystemInsideApiCreateProps, SystemApiProxyFieldType, SystemInsideApiProxyHandle } from "../../../const/system/type.ts";
 import { MatchItem } from "@common/const/type.ts";
 import { validateUrlSlash } from "@common/utils/validate.ts";
-import SystemInsideApiProxy from "./SystemInsideApiProxy.tsx";
+import { $t } from "@common/locales/index.ts";
+import SystemInsideApiProxy from "@core/pages/system/api/SystemInsideApiProxy";
 
 const SystemInsideApiCreate = forwardRef<SystemInsideApiCreateHandle,SystemInsideApiCreateProps>((props, ref) => {
     const { message } = App.useApp()
@@ -25,11 +24,11 @@ const SystemInsideApiCreate = forwardRef<SystemInsideApiCreateHandle,SystemInsid
             return fetchData<BasicResponse<{api:SystemApiProxyFieldType}>>('service/api',{method:'POST',eoBody:(body), eoParams: {service:serviceId,team:teamId},eoTransformKeys:['matchType']}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功，即将刷新页面')
+                    message.success(msg || RESPONSE_TIPS.success)
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    return Promise.reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    return Promise.reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch(errInfo=>Promise.reject(errInfo))
         })
@@ -41,11 +40,11 @@ const SystemInsideApiCreate = forwardRef<SystemInsideApiCreateHandle,SystemInsid
                 fetchData<BasicResponse<{api:SystemApiProxyFieldType}>>('service/api/copy',{method:'POST',eoParams:{service:serviceId,team:teamId, api:entity!.id},eoBody:({...value,path:value.path.trim()})}).then(response=>{
                     const {code,data,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功，即将刷新页面')
+                        message.success(msg || RESPONSE_TIPS.success)
                         return resolve(data.api.id)
                     }else{
-                        message.error(msg || '操作失败')
-                        return reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        return reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -62,7 +61,7 @@ const SystemInsideApiCreate = forwardRef<SystemInsideApiCreateHandle,SystemInsid
         if(type === 'copy'){
             form.setFieldsValue({
                 ...entity,
-                name:`副本-${entity!.name}`,
+                name:`${$t('副本')}-${entity!.name}`,
                 ...(prefixForce?
                     {prefix:apiPrefix,path: entity!.path.substring(apiPrefix?.length|| 0)}:
                     {}),
@@ -89,48 +88,48 @@ const SystemInsideApiCreate = forwardRef<SystemInsideApiCreateHandle,SystemInsid
                 autoComplete="off"
             >
                 <div className="">
-                    <Row className="mb-btnybase" > <Col  ><span className="font-bold mr-[13px]">API 基础信息 </span></Col></Row>
+                    <Row className="mb-btnybase" > <Col  ><span className="font-bold mr-[13px]">{$t('API 基础信息')}</span></Col></Row>
                     <Form.Item<SystemApiProxyFieldType>
-                        label="API 名称"
+                        label={$t("API 名称")}
                         name="name"
-                        rules={[{ required: true, message: '必填项' ,whitespace:true }]}
+                        rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
                     >
-                        <Input className="w-INPUT_NORMAL" placeholder="请输入 API 名称"/>
+                        <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                     </Form.Item>
 
                     <Form.Item<SystemApiProxyFieldType>
-                        label="描述"
+                        label={$t("描述")}
                         name="description"
                     >
-                        <Input.TextArea className="w-INPUT_NORMAL" placeholder="请输入"/>
+                        <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                     </Form.Item>
 
                     <Form.Item<SystemApiProxyFieldType>
-                        label="请求方式"
+                        label={$t("请求方式")}
                         name="method"
-                        rules={[{ required: true, message: '必填项' }]}
+                        rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
                     >
-                        <Select className="w-INPUT_NORMAL" placeholder="请选择" options={HTTP_METHOD.map((method:string)=>{
+                        <Select className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.select} options={HTTP_METHOD.map((method:string)=>{
                             return { label:method, value:method}
                         })}>
                         </Select>
                     </Form.Item>
 
                     <Form.Item<SystemApiProxyFieldType>
-                        label="请求路径"
+                        label={$t("请求路径")}
                         name="path"
-                        rules={[{ required: true, message: '必填项',whitespace:true  },
+                        rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  },
                         {
                           validator: validateUrlSlash,
                         }]}
                         className={styles['form-input-group']}
                     >
                         <Input  prefix={(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
-                               placeholder="请输入请求路径"/>
+                               placeholder={PLACEHOLDER.input}/>
                     </Form.Item>
 
                     <Form.Item<SystemApiProxyFieldType>
-                        label="高级匹配"
+                        label={$t("高级匹配")}
                         name="match"
                     >
                         <EditableTableWithModal<MatchItem & {_id:string}>
@@ -141,7 +140,7 @@ const SystemInsideApiCreate = forwardRef<SystemInsideApiCreateHandle,SystemInsid
 
                     { type !== 'copy' &&<>
 
-                    <Row className="mb-btnybase mt-[40px]"><Col  ><span className="font-bold mr-[13px]">转发规则设置 </span></Col></Row>
+                    <Row className="mb-btnybase mt-[40px]"><Col  ><span className="font-bold mr-[13px]">{$t('转发规则设置')} </span></Col></Row>
                     <Form.Item<SystemApiProxyFieldType>
                         className="mb-0 bg-transparent border-none p-0"
                         name="proxy"

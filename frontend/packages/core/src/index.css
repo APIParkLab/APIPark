@@ -353,17 +353,20 @@ p{
     color:var(--primary-color) !important;
   }
 
-  button.ant-btn.ant-btn-text{
+  button.ant-btn.ant-btn-text.ant-btn-icon-only{
     height:22px !important;
+    width:18px !important;
   }
 
-  button.ant-btn:not(:disabled):not(.text-table_text){
+  
+
+  /* button.ant-btn:not(:disabled):not(.text-table_text){
     color:var(--primary-color);
   }
 
   button.ant-btn:not(:disabled):not(.text-table_text):hover{
     color:var(--button-primary-hover-background-color) !important;
-  }
+  } */
 
 }
 .ant-popover .ant-popover-inner{

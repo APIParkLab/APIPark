@@ -1,106 +1,13 @@
-import {App, Col, Form, Input, Row, Table, Tooltip} from "antd";
+import {App, Col, Form, Input, Row, Table} from "antd";
 import {forwardRef, useEffect, useImperativeHandle} from "react";
-import {PublishApprovalInfoType, PublishVersionTableListItem} from "@common/const/approval/type.tsx";
+import {PublishApprovalInfoType, PublishApprovalModalHandle, PublishApprovalModalProps, PublishVersionTableListItem} from "@common/const/approval/type.tsx";
 import {useFetch} from "@common/hooks/http.ts";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, FORM_ERROR_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { SYSTEM_PUBLISH_ONLINE_COLUMNS } from "@core/const/system/const.tsx";
-import { SystemInsidePublishOnlineItems } from "@core/pages/system/publish/SystemInsidePublishOnline.tsx";
+import { $t } from "@common/locales";
+import { ApprovalApiColumns, ApprovalUpstreamColumns } from "@common/const/approval/const";
 
-enum ChangeTypeEnum  {
-    'new' = '新增',
-    'update' = '变更',
-    'delete' = '删除',
-    'none' = '无变更',
-    'error' = '缺失字段'
-}
-
-const statusColorClass = {
-    new: 'text-[#138913]', // 使用 Tailwind 的 Arbitrary Properties
-    update: 'text-[#03a9f4]',
-    delete: 'text-[#ff3b30]',
-    none: 'text-[var(--MAIN_TEXT)]', // 假设你也有一个“none”的状态
-  };
-
-const apiColumns = [
-    {
-        title:'API 名称',
-        dataIndex:'name',
-        ellipsis:true
-    },
-    {
-        title:'请求方式',
-        dataIndex:'method',
-        ellipsis:true
-    },
-    {
-        title:'路径',
-        dataIndex:'path',
-        ellipsis:true
-    },
-    {
-        title:'类型',
-        dataIndex:'change',
-        render:(_,entity)=>(
-            <Tooltip placement="top" title={entity.change === 'error' ?`该 API 缺失 ${entity.proxyStatus == 1 && '转发信息,'} ${entity.docStatus == 1 && '文档信息,'} ${entity.upstreamStatus == 1 && '上游信息,'}请先补充`:''}>
-                <span className={`${statusColorClass[entity.change as keyof typeof statusColorClass]} truncate block`}>
-                    {ChangeTypeEnum[entity.change as (keyof typeof ChangeTypeEnum)] || '-'}
-                    {entity.change === 'error' ?` 该 API 缺失 ${entity.proxyStatus == 1 && '转发信息,'} ${entity.docStatus == 1 && '文档信息,'} ${entity.upstreamStatus == 1 && '上游信息,'}请先补充`:''}
-                    </span>
-          </Tooltip>)
-          
-    }
-]
-
-const upstreamColumns = [
-    {
-        title:'上游类型',
-        dataIndex:'type',
-        ellipsis:true,
-        // filters: true,
-        // onFilter: true,
-        // valueType: 'select',
-        // filterSearch: true,
-        valueEnum:{
-            'static':{
-                text:'静态上游'
-            },
-            // 'dynamic':{
-            //     text:'动态上游'
-            // }
-        }
-    },
-    {
-        title:'地址',
-        dataIndex:'addr',
-        render:(text:string[])=>(<>{text.join(',')}</>),
-        ellipsis:true
-    },
-    {
-        title:'类型',
-        dataIndex:'change',
-        render:(_,entity)=>(
-            <Tooltip placement="top" title={entity.change === 'error' ?`该 API 缺失 ${entity.proxyStatus == 1 && '转发信息,'} ${entity.docStatus == 1 && '文档信息,'} ${entity.upstreamStatus == 1 && '上游信息,'}请先补充`:''}>
-                <span className={`${statusColorClass[entity.change as keyof typeof statusColorClass]} truncate block`}>{ChangeTypeEnum[entity.change as (keyof typeof ChangeTypeEnum)] || '-'}
-                    {entity.change === 'error' ?` 该 API 缺失 ${entity.proxyStatus == 1 && '转发信息,'} ${entity.docStatus == 1 && '文档信息,'} ${entity.upstreamStatus == 1 && '上游信息,'}请先补充`:''}</span>
-          </Tooltip>)
-    }
-]
-
-type PublishApprovalModalProps = {
-    type:'approval'|'view'|'add'|'publish'|'online'
-    data:PublishApprovalInfoType | PublishApprovalInfoType &{id?:string} | PublishVersionTableListItem
-    insideSystem?:boolean
-    serviceId:string
-    teamId:string
-    clusterPublishStatus?:SystemInsidePublishOnlineItems[]
-}
-
-export type PublishApprovalModalHandle = {
-    save:(operate:'pass'|'refuse') =>Promise<boolean|string>
-    publish:(notSave?:boolean)=>Promise<boolean|string|Record<string, unknown>>
-    online:()=>Promise<boolean|string>
-}
 
 export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle,PublishApprovalModalProps>((props, ref) => {
     const { message } = App.useApp()
@@ -115,19 +22,19 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
             return form.validateFields().then((value)=>{
                 if(operate === 'refuse' && form.getFieldValue('opinion') === '' ){
                     form.setFields([{
-                        name:'opinion',errors:['选择拒绝时，审批意见为必填']
+                        name:'opinion',errors:[FORM_ERROR_TIPS.refuseOpinion]
                     }])
                     form.scrollToField('opinion')
-                    return Promise.reject('未填写审核意见')
+                    return Promise.reject(RESPONSE_TIPS.refuseOpinion)
                 }
                 return fetchData<BasicResponse<null>>(`service/publish/${operate === 'pass' ? 'accept' : 'refuse'}`,{method: 'PUT',eoBody:({comments:value.opinion}), eoParams:{id:data!.id, project:serviceId},eoTransformKeys:['versionRemark']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         return Promise.resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        return Promise.reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        return Promise.reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> Promise.reject(errorInfo))
             }).catch((err)=> {form.scrollToField(err.errorFields[0].name[0]); return Promise.reject(err)})
@@ -141,11 +48,11 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                     notSave ? 'service/publish/apply' : 'service/publish/release/do',{method: 'POST',eoBody:body, eoParams:{service:serviceId, team:teamId},eoTransformKeys:['versionRemark']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(response)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
             }).catch((errorInfo)=> reject(errorInfo))
         }).catch((errorInfo)=> reject(errorInfo))
@@ -158,11 +65,11 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                 fetchData<BasicResponse<null>>('service/publish/execute',{method: 'PUT', eoParams:{project:serviceId,id:(data as PublishVersionTableListItem).flowId},eoTransformKeys:['versionRemark']}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         }).catch((errorInfo)=> reject(errorInfo))
@@ -184,22 +91,22 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
         <>
             {!insideSystem && <>
             <Row className="my-mbase">
-                <Col className="text-left" span={4}><span >申请系统：</span></Col>
+                <Col className="text-left" span={4}><span >{$t('申请系统')}：</span></Col>
                 <Col span={18}>{(data as PublishApprovalInfoType).project || '-'}</Col>
             </Row>
 
             <Row className="my-mbase">
-                <Col className="text-left" span={4}><span >所属团队：</span></Col>
+                <Col className="text-left" span={4}><span >{$t('所属团队')}：</span></Col>
                 <Col span={18}>{(data as PublishApprovalInfoType).team || '-'}</Col>
             </Row>
 
             <Row className="my-mbase">
-                <Col className="text-left" span={4}><span >申请人：</span></Col>
+                <Col className="text-left" span={4}><span >{$t('申请人')}：</span></Col>
                 <Col span={18}>{(data as PublishApprovalInfoType).applier || '-'}</Col>
             </Row>
 
             <Row className="my-mbase">
-                <Col className="text-left" span={4}><span >申请时间：</span></Col>
+                <Col className="text-left" span={4}><span >{$t('申请时间')}：</span></Col>
                 <Col span={18}>{(data as PublishApprovalInfoType).applyTime || '-'}</Col>
             </Row>
                 </> }
@@ -220,54 +127,54 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                     insideSystem && 
                     <>
                         <Form.Item
-                            label="版本号"
+                            label={$t("版本号")}
                             name="version"
-                            rules={[{required: true, message: '必填项',whitespace:true }]}
+                            rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true }]}
                         >
-                            <Input className="w-INPUT_NORMAL" disabled={type !== 'add'} placeholder="请输入" />
+                            <Input className="w-INPUT_NORMAL" disabled={type !== 'add'} placeholder={PLACEHOLDER.input} />
                         </Form.Item>
 
                         <Form.Item
-                            label="版本说明"
+                            label={$t("版本说明")}
                             name="versionRemark"
                         >
-                            <Input.TextArea className="w-INPUT_NORMAL" disabled={type !== 'add' && type !== 'publish'} placeholder="请输入" />
+                            <Input.TextArea className="w-INPUT_NORMAL" disabled={type !== 'add' && type !== 'publish'} placeholder={PLACEHOLDER.input} />
                         </Form.Item>
                     </>
                 }
-                    <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >API 列表：</span></Row>
+                    <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('API 列表')}：</span></Row>
                     <Row  className="mb-mbase ">
                         <Table
-                            columns={apiColumns}
+                            columns={ApprovalApiColumns}
                             bordered={true}
                             rowKey="id"
                             size="small"
                             dataSource={data.diffs?.apis || []}
                             pagination={false}
                         /></Row>
-                    <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >上游列表：</span></Row>
+                    <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('上游列表')}：</span></Row>
                     <Row  className="mb-mbase ">
                         <Table
                             bordered={true}
-                            columns={upstreamColumns}
+                            columns={ApprovalUpstreamColumns}
                             size="small"
                             rowKey="id"
                             dataSource={data.diffs?.upstreams || []}
                             pagination={false}
                         /></Row>
                 <Form.Item
-                    label="备注"
+                    label={$t("备注")}
                     name="remark"
                 >
-                    <Input.TextArea className="w-INPUT_NORMAL" disabled={type !== 'add' && type !== 'publish'} placeholder="请输入" />
+                    <Input.TextArea className="w-INPUT_NORMAL" disabled={type !== 'add' && type !== 'publish'} placeholder={PLACEHOLDER.input} />
                 </Form.Item>
 {/* 
                 {type !== 'add' && type !== 'publish' && <Form.Item
-                    label="审批意见"
+                    label={$t("审批意见"
                     name="opinion"
                     extra="选择拒绝时，审批意见为必填"
                 >
-                    <Input.TextArea className="w-INPUT_NORMAL" placeholder="请输入" onChange={()=>{  form.setFields([
+                    <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input} onChange={()=>{  form.setFields([
                         {
                             name: 'opinion',
                             errors: [], // 设置为空数组来移除错误信息
