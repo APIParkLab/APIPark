@@ -2,13 +2,12 @@
 
 set -e
 
-
 Version=$1
 ImageName=$2
 APP="apipark"
 
 ARCH=$3
-if [[ $ARCH == "" ]];then
+if [ "$ARCH" == "" ];then
   ARCH="amd64"
 fi
 
