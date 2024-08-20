@@ -88,5 +88,5 @@ jobs:
         env:
           AccessKey: ${{ secrets.AK }}
           SecretKey: ${{ secrets.SK }}
-        run: cd scripts && ./docker_publish.sh ${{ secrets.DOCKER_USERNAME }} "backend" "upload"
+        run: cd scripts && ./docker_publish.sh ${{ secrets.DOCKER_USERNAME }} "backend" "upload_qiniu"
 
