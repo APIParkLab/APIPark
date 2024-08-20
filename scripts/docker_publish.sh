@@ -45,4 +45,9 @@ docker manifest annotate "${ImageName}:${Version}" "${ImageName}:${Version}-arm6
 echo "Push manifest ${ImageName}:${Version}"
 docker manifest push "${ImageName}:${Version}"
 
+if [[ $3 == "upload_qiniu" ]];then
+  echo "Upload QINIU Cloud..."
+  ./scripts/qiniu_publish.sh ${Version} ${ImageName} amd64
+  ./scripts/qiniu_publish.sh ${Version} ${ImageName} arm64
+fi
 
