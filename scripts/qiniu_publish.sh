@@ -19,7 +19,7 @@ echo "docker save -o ${Tar} ${ImageName}:${Version}"
 docker save -o ${Tar} ${ImageName}:${Version}
 
 echo "login qiniu..."
-qshell account ${AccessKey} ${SecretKey}
+qshell account ${AccessKey} ${SecretKey} ${QINIU_NAME}
 
 echo "qshell rput ${QINIU_BUCKET} \"${APP}/images/${Tar}\" ${Tar}"
 qshell rput ${QINIU_BUCKET} "${APP}/images/${Tar}" ${Tar}

@@ -91,5 +91,6 @@ jobs:
           AccessKey: ${{ secrets.AK }}
           SecretKey: ${{ secrets.SK }}
           QINIU_BUCKET: ${{ secrets.QINIU_BUCKET }}
+          QINIU_NAME: ${{ secrets.QINIU_NAME }}
         run: cd scripts && ./docker_publish.sh ${{ secrets.DOCKER_USERNAME }} "backend" "upload_qiniu"
 
