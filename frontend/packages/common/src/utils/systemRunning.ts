@@ -251,7 +251,7 @@ import {  TopologyProjectItem, TopologyServiceItem } from "@core/pages/systemRun
 //       },
 //       defaultEdge: {
 //         type: 'line-running',
-//         label: '详情',
+//         label: $t('详情',
 //         labelCfg: {
 //           style: {
 //             fill: '5B8FF9',

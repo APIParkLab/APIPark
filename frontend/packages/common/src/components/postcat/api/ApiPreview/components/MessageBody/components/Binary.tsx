@@ -3,7 +3,7 @@ import { TextField } from '@mui/material'
 export function PreviewBodyBinary({ value }: { value: string;}) {
   return (
     <TextField
-      label="Binary"
+      label={$t("Binary")}
       multiline
       disabled={true}
       rows={4}

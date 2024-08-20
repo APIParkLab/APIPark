@@ -5,6 +5,7 @@ import { RenderMessageBody } from '../MessageBody'
 import {HeaderParamsType} from "@common/const/api-detail";
 import {collapseTableSx, PreviewGridActionsCellItem, previewTableHoverSx} from "../../../PreviewTable";
 import {Collapse} from "../../../Collapse";
+import { $t } from "@common/locales";
 
 interface HeaderFieldsProps {
   rows?: HeaderParamsType[]
@@ -29,13 +30,13 @@ export default function HeaderFields({ rows = [], title, loading = false, onMore
   const columns: GridColDef<HeaderParamsType>[] = [
     {
       field: 'name',
-      headerName: '标签',
+      headerName: $t('标签'),
       width: 200,
       hideable: false
     },
     {
       field: 'isRequired',
-      headerName: '必需',
+      headerName: $t('必需'),
       sortable: false,
       valueGetter: (params) => Boolean(params.row.isRequired),
       type: 'boolean',
@@ -43,7 +44,7 @@ export default function HeaderFields({ rows = [], title, loading = false, onMore
     },
     {
       field: 'description',
-      headerName: '描述',
+      headerName: $t('描述'),
       flex: 1
     },
     {
@@ -57,7 +58,7 @@ export default function HeaderFields({ rows = [], title, loading = false, onMore
       getActions: (params) => [
         <PreviewGridActionsCellItem
           icon="more"
-          label="More"
+          label={$t("More")}
           key="more"
           onClick={() => onMoreSettingChange?.(params.row as unknown as RenderMessageBody)}
         />

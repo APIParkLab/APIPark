@@ -43,12 +43,10 @@ import {CustomDialogComponent} from "@common/components/aoplatform/formily2-cust
 import {ArrayItemBlankComponent} from "@common/components/aoplatform/formily2-customize/ArrayItemBlankComponent.tsx";
 import {DefaultOptionType} from "antd/es/cascader";
 import {createSchemaField, FormProvider, RecursionField, useField, useForm} from "@formily/react";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {App} from "antd";
-import { config } from "process";
-
-
+import { $t } from "@common/locales";
 
 export const DynamicRender = (props) => {
     const {schema} = props
@@ -158,7 +156,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
               properties: {
                 id: {
                     type: 'string',
-                    title: 'ID',
+                    title: $t('ID'),
                     required: true,
                     pattern: /^[a-zA-Z][a-zA-Z0-9-_]*$/,
                     'x-decorator': 'FormItem',
@@ -169,13 +167,13 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                     },
                     'x-component': 'Input',
                     'x-component-props': {
-                        placeholder: '支持字母开头、英文数字中横线下划线组合',
+                        placeholder: PLACEHOLDER.specialStartWithAlphabet,
                     },
                     'x-disabled': type === 'edit'
                 },
                 title: {
                     type: 'string',
-                    title: '名称',
+                    title: $t('名称'),
                     required: true,
                     'x-decorator': 'FormItem',
                     'x-decorator-props': {
@@ -185,12 +183,12 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                     },
                     'x-component': 'Input',
                     'x-component-props': {
-                        placeholder: '请输入名称',
+                        placeholder: PLACEHOLDER.input,
                     }
                 },
                 driver: {
                     type: 'string',
-                    title: 'Driver',
+                    title: $t('Driver'),
                     required: true,
                     'x-decorator': 'FormItem',
                     'x-decorator-props': {
@@ -207,7 +205,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                 },
                 description: {
                     type: 'string',
-                    title: '描述',
+                    title: $t('描述'),
                     'x-decorator': 'FormItem',
                     'x-decorator-props': {
                         labelCol:4,
@@ -216,7 +214,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                     },
                     'x-component': 'Input.TextArea',
                     'x-component-props': {
-                        placeholder: '请输入描述',
+                        placeholder: PLACEHOLDER.input,
                     }
                 },
                 config: {
@@ -238,11 +236,11 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                 fetchData<BasicResponse<null>>(type === 'add'?`dynamic/${moduleId}`:`dynamic/${moduleId}/config`,{method:type === 'add'? 'POST' : 'PUT',eoBody:form.values, eoParams:{...(type !== 'add' && {id:initFormValue.id})}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo:unknown)=> reject(errorInfo))
@@ -262,8 +260,8 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                 if(code === STATUS_CODE.SUCCESS){
                     resolve(data[skill]?.map((x:{name:string,title:string})=>{return{label:x.title, value:x.name}}) || [])
                 }else{
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             })
         })

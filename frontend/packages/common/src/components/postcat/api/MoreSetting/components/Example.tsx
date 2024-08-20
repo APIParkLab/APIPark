@@ -1,5 +1,6 @@
 import { Box, Typography, useTheme } from '@mui/material'
 import {Codebox} from "../../Codebox";
+import { $t } from '@common/locales';
 
 interface ExampleProps {
   code: string
@@ -29,7 +30,7 @@ export function Example({ code, onChange, readOnly = false }: ExampleProps) {
         }}
       >
         <Typography fontSize={14} px={'12px'}>
-          示例
+          {$t('示例')}
         </Typography>
       </Box>
       <Codebox

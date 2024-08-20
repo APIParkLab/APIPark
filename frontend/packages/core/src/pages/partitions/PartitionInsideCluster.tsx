@@ -1,13 +1,14 @@
 import  { FC, useEffect,  useRef, useState} from "react";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {App, Button, Card, Col, Row, Spin, Tag} from "antd";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {  ClusterPageShowStatus, NodeModalHandle, PartitionClusterNodeTableListItem } from "../../const/partitions/types.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import  { ClusterNodeModal } from "./PartitionInsideClusterNode.tsx";
 import { LoadingOutlined } from "@ant-design/icons";
 import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
+import { $t } from "@common/locales/index.ts";
 
 const PartitionInsideCluster:FC = ()=> {
     const {setBreadcrumb} = useBreadcrumb()
@@ -26,7 +27,7 @@ const PartitionInsideCluster:FC = ()=> {
                 data.nodes && data.nodes.length > 0 && setNodeData(data.nodes[0])
                 setShowStatus('view')
             } else {
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         }).catch(() => {
             return {data: [], success: false}
@@ -38,7 +39,7 @@ const PartitionInsideCluster:FC = ()=> {
 
     useEffect(() => {
         setBreadcrumb([
-            {title: '集群'}
+            {title: $t('集群')}
         ])
         getPartitionClusterInfo()
     }, []);
@@ -46,7 +47,7 @@ const PartitionInsideCluster:FC = ()=> {
     const setClusterBtn = ()=>{
             return (<>
                     {showStatus === 'view' && <WithPermission access="system.devops.cluster.edit" key="changeClusterConfig">
-                        <Button type="primary" onClick={() => setShowStatus('edit')}>修改配置</Button>
+                        <Button type="primary" onClick={() => setShowStatus('edit')}>{$t('修改配置')}</Button>
                     </WithPermission> }</>
             )
     }
@@ -54,8 +55,8 @@ const PartitionInsideCluster:FC = ()=> {
     return (
         <>
             <InsidePage 
-                pageTitle='集群' 
-                description="设置访问 API 的集群，让 API 在分布式环境中稳定运行，并且能够根据业务需求进行灵活扩展和优化。"
+                pageTitle={$t('集群')} 
+                description={$t("设置访问 API 的集群，让 API 在分布式环境中稳定运行，并且能够根据业务需求进行灵活扩展和优化。")}
                 showBorder={false}
                 scrollPage={true}
                 >
@@ -69,9 +70,9 @@ const PartitionInsideCluster:FC = ()=> {
                                     className="overflow-hidden w-full max-h-full flex flex-col justify-between"
                                     title={<div><span className="text-MAIN_TEXT my-btnybase mr-btnbase" > APIPark Node</span>
                                                {!loading &&  <Tag color={nodeData && nodeData.status === 1 ?'#87d068' : '#f50'}>
-                                                    { !nodeData && '未配置'}
-                                                    { nodeData?.status === 1 && '正常' }
-                                                    { nodeData?.status === 0 && '异常'}
+                                                    { !nodeData && $t('未配置')}
+                                                    { nodeData?.status === 1 && $t('正常') }
+                                                    { nodeData?.status === 0 && $t('异常')}
                                                 </Tag>}</div>} 
                                     extra={setClusterBtn()}>
                                 {showStatus === 'view'&& nodeData && ClusterConfigPreview(nodeData) }

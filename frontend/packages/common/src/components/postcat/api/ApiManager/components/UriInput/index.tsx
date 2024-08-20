@@ -3,6 +3,7 @@ import { SyntheticEvent } from 'react'
 import {ParseCurlResult} from "@common/const/api-detail";
 import {HTTPMethod, RequestMethod} from "../../../RequestMethod";
 import {ParseCurl} from "@common/utils/curl.ts";
+import { $t } from '@common/locales';
 
 interface UriInputProps {
   inputValue?: string
@@ -51,7 +52,7 @@ export function UriInput({
   return (
     <TextField
       fullWidth
-      placeholder="输入 URL 或 cURL"
+      placeholder={$t("输入 URL 或 cURL")}
       value={inputValue}
       onChange={handleInputChange}
       sx={{
