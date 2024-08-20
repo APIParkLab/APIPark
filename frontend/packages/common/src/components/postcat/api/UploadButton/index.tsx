@@ -2,6 +2,7 @@ import { Box, Button, Typography } from '@mui/material'
 import type { ChangeEvent } from 'react'
 import { useRef } from 'react'
 import {file2Base64} from "@common/utils/postcat.tsx";
+import { $t } from '@common/locales';
 
 interface UploadButtonProps {
   value?:
@@ -42,9 +43,9 @@ export function UploadButton({ value, onChange }: UploadButtonProps): JSX.Elemen
     <Box display="flex" alignItems="center">
       <input multiple type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
       <Button variant="outlined" color="primary" onClick={handleButtonClick}>
-        Upload Files
+        {$t('Upload Files')}
       </Button>
-      {value?.length ? <Typography sx={{ marginLeft: 1 }}>Files Selected: {value.length}</Typography> : null}
+      {value?.length ? <Typography sx={{ marginLeft: 1 }}>{$t('Files Selected')}: {value.length}</Typography> : null}
     </Box>
   )
 }

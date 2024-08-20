@@ -11,6 +11,8 @@ import { SystemApiDetail, SystemInsideApiProxyHandle } from "@core/const/system/
 import SystemInsideApiProxy from "@core/pages/system/api/SystemInsideApiProxy";
 import ApiMatch from "./api/ApiPreview/components/ApiMatch";
 import {v4 as uuidv4} from 'uuid'
+import { PLACEHOLDER } from "@common/const/const";
+import { $t } from "@common/locales";
 
 const PROTOCOL_LIST = ['HTTP','HTTPS']
 const HTTP_METHOD_LIST = ['POST','GET','PUT', 'DELETE','HEAD','OPTIONS','PATCH']
@@ -165,7 +167,7 @@ export default function ApiEdit({apiInfo,editorRef,loaded,serviceId, teamId}:{ap
         getData: () => {
             return proxyRef.current?.validate().then((res)=>{
                 const name = apiNameRef.current?.getData()
-                if(!name) return Promise.reject('请填写接口名称')
+                if(!name) return Promise.reject($t('请填写接口名称'))
                 const newData :{apiInfo:Partial<SystemApiDetail>}= {
                     apiInfo:{
                         info:{
@@ -200,7 +202,7 @@ export default function ApiEdit({apiInfo,editorRef,loaded,serviceId, teamId}:{ap
             getData:()=>description
         }))
         return (
-                <Input.TextArea className="w-full border-none" value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="请输入"/>
+                <Input.TextArea className="w-full border-none" value={description} onChange={(e)=>setDescription(e.target.value)} placeholder={PLACEHOLDER.input}/>
         )
     })
 
@@ -229,25 +231,25 @@ export default function ApiEdit({apiInfo,editorRef,loaded,serviceId, teamId}:{ap
                 <Box>
                     <Stack direction="column" spacing={3}>
                         <ApiName apiInfo={apiInfo} ref={apiNameRef}/>
-                        <Collapse key="description" title='详细说明'>
+                        <Collapse key="description" title={$t('详细说明')}>
                             <Description initDescription={apiInfo?.description}  ref={descriptionRef}/>
                         </Collapse>
                         {
                             apiInfo?.match && apiInfo.match?.length > 0 &&
-                            <ApiMatch title='高级匹配' rows={apiInfo?.match.map((x)=>{x.id = uuidv4();return x})}  />
+                            <ApiMatch title={$t('高级匹配')} rows={apiInfo?.match.map((x)=>{x.id = uuidv4();return x})}  />
                         }
 
-                        <Collapse title='转发配置' key="proxy"  >
+                        <Collapse title={$t('转发配置')} key="proxy"  >
                             <SystemInsideApiProxy className="m-[12px] px-[12px]" initProxyValue={apiInfo?.proxy} serviceId={serviceId!} ref={proxyRef} />
                         </Collapse>
 
-                        <Collapse title='请求参数' key="request"  >
+                        <Collapse title={$t('请求参数')} key="request"  >
                             <ApiRequestEditor editorRef={requestRef} apiInfo={apiInfo?.doc} loaded={loaded} />
                         </Collapse>
-                        <Collapse title='返回值'  key="response">
+                        <Collapse title={$t('返回值')}  key="response">
                             <ApiResponseEditor editorRef={responseRef}  apiInfo={apiInfo?.doc} loaded={loaded}/>
                         </Collapse>
-                            <ResponseExampleCompo editorRef={resultListRef} mode='edit' title='返回示例' detail={resultList}/>
+                            <ResponseExampleCompo editorRef={resultListRef} mode='edit' title={$t('返回示例')} detail={resultList}/>
                     </Stack>
                 </Box>
             </Box>

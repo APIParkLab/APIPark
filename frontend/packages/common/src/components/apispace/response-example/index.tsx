@@ -5,14 +5,15 @@ import {Collapse} from "@common/components/postcat/api/Collapse";
 import {Box} from "@mui/material";
 import {Codebox} from "@common/components/postcat/api/Codebox";
 import { cloneDeep } from 'lodash-es';
+import { $t } from '@common/locales';
 
 export interface ResponseExampleCompoEditorApi {
     getData: () => ResultListType[] | []
 }
 
 const DEFAULT_RESULT_LIST = [
-    {id:'success',name:'成功示例',httpCode:'200',content:''},
-    {id:'failed',name:'失败示例',httpCode:'200',content:''},
+    {id:'success',name:$t('成功示例'),httpCode:'200',content:''},
+    {id:'failed',name:$t('失败示例'),httpCode:'200',content:''},
 ]
 
 export const HTTP_STATUS_CODE = ['200', '403', '404', '410', '422', '500', '502', '503', '504']
@@ -76,7 +77,7 @@ export function ResponseExampleCompo ({ editorRef,title,detail,mode='view' }: {e
                             value={item.httpCode}
                             status={item.httpCode ? '' : 'error'}
                             onSelect={(value)=>updateResultList(item.id,'httpCode',value)}
-                            placeholder="HTTP 状态码"
+                            placeholder={$t("HTTP 状态码")}
                         />
                     }
                      {mode === 'view' ?
@@ -86,7 +87,7 @@ export function ResponseExampleCompo ({ editorRef,title,detail,mode='view' }: {e
                              style={{ width: 200 }}
                              value={item.httpContentType || 'text/html;charset=UTF-8'}
                              onSelect={(value)=>updateResultList(item.id,'httpContentType',value)}
-                             placeholder="默认 text/html;charset=UTF-8"
+                             placeholder={$t("默认 text/html;charset=UTF-8")}
                          />}
                 </div>
                   {mode === 'view' ?
@@ -94,7 +95,7 @@ export function ResponseExampleCompo ({ editorRef,title,detail,mode='view' }: {e
                           { item.content ?
                           <pre className="border-[1px] border-solid border-BORDER p-[6px] rounded w-auto min-h-[130px] max-h-[500px] overflow-auto mt-[0px]">{item.content}</pre>
                               :
-                          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂未填写示例"/>
+                          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂未填写示例")}/>
                         }</>
                       : <>
                           <Codebox value={item.content} language='json' width="100%" height={'250px'} onChange={(value)=>updateResultList(item.id,'content',value)}/>

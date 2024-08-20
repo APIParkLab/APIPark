@@ -4,6 +4,7 @@ import {useNavigate} from "react-router-dom";
 import WithPermission from "@common/components/aoplatform/WithPermission";
 import { FC, ReactNode } from "react";
 import { ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons";
+import { $t } from "@common/locales";
 
 
 class InsidePageProps {
@@ -36,7 +37,7 @@ const InsidePage:FC<InsidePageProps> = ({showBanner=true,pageTitle,tagList,showB
             { showBanner &&  <div className={`border-[0px] mr-PAGE_INSIDE_X ${showBorder ? 'border-b-[1px] border-solid border-BORDER' : ''}`}>
                 <div className="mb-[30px]">
                     {backUrl &&<div className="text-[18px] leading-[25px] mb-[12px]">
-                            <Button type="text" onClick={goBack}><ArrowLeftOutlined className="max-h-[14px]" />返回</Button>
+                            <Button type="text" onClick={goBack}><ArrowLeftOutlined className="max-h-[14px]" />{$t('返回')}</Button>
                         </div>}
                     <div className="flex justify-between mb-[20px] items-center ">
                         <div className="flex items-center  gap-TAG_LEFT ">

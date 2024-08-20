@@ -1,11 +1,12 @@
 import {  useEffect, useMemo, useState} from "react";
 import {App, Button, Checkbox, Collapse, Form, GetProp, Input} from "antd";
 import {useFetch} from "@common/hooks/http.ts";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { useNavigate, useParams } from "react-router-dom";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
-import { ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined } from "@ant-design/icons";
+import { $t } from "@common/locales";
 
 type PermissionItem = {
     name:string 
@@ -93,8 +94,6 @@ const PermissionContent = ({permits,onChange,value=[],id,dependenciesMap}:{permi
 const RoleConfig = ()=>{
     const { message } = App.useApp()
     const [form] = Form.useForm();
-    // const [formData, dispatch] = useReducer(formReducer, {});
-    // const [dataSource,setDataSource] = useState<RoleNodeModalTableListItem[]>([])
     const {fetchData} = useFetch()
     const navigateTo = useNavigate()
     const { roleType, roleId} = useParams<RouterParams>()
@@ -153,7 +152,7 @@ const RoleConfig = ()=>{
                 generateDependenciesMap(newPermits)
                 setPermissionTemplate(newPermits)
             }else{
-                message.error(msg || '获取权限模板失败')
+                message.error(msg || RESPONSE_TIPS.dataError)
             }
         })
     }
@@ -165,8 +164,8 @@ const RoleConfig = ()=>{
                 form.setFieldsValue({name:data.role.name,permits:data.role.permit})
                 return Promise.resolve(true)
             }else{
-                message.error(msg || '操作失败')
-                return Promise.reject(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
+                return Promise.reject(msg || RESPONSE_TIPS.error)
             }
         }).catch((errInfo)=>Promise.reject(errInfo))
     }
@@ -185,11 +184,11 @@ const RoleConfig = ()=>{
             return fetchData<BasicResponse<null>>(`${roleType}/role`,{method:roleId === undefined? 'POST' : 'PUT',eoBody:({...body}),...(roleId !== undefined?{eoParams:{role:roleId}}:{})}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    return Promise.reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    return Promise.reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errInfo)=>Promise.reject(errInfo))
     };
@@ -214,9 +213,9 @@ const RoleConfig = ()=>{
                     <Form.Item
                         className=" m-btnbase  mr-PAGE_INSIDE_X"
                         name="name"
-                        rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                        rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                     >
-                        <Input className="w-INPUT_NORMAL" placeholder="请输入角色名称"/>
+                        <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                     </Form.Item>
                     <Form.Item
                         name="permits"
@@ -228,11 +227,11 @@ const RoleConfig = ()=>{
                     {APP_MODE === 'pro' && <div className="p-btnbase">
                         <WithPermission access={roleId === undefined ?`system.organization.role.${roleType}.edit`:`system.organization.role.${roleType}.add`}>
                             <Button type="primary" htmlType="submit">
-                                保存
+                                {$t('保存')}
                             </Button>
                         </WithPermission>
                         <Button className="ml-btnrbase" type="default" onClick={() => navigateTo(-1)}>
-                                取消
+                                {$t('取消')}
                         </Button>
                     </div>}
                     </div>

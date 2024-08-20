@@ -4,24 +4,25 @@ import {Link, useLocation, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import ApprovalList from "./ApprovalList.tsx";
 import { getItem } from "@common/utils/navigation.tsx";
+import { $t } from "@common/locales/index.ts";
 
 
 const menuItems: MenuProps['items'] = [
-    getItem('管理', 'mng', null,
+    getItem($t('管理'), 'mng', null,
         [
-            getItem(<Link to="/approval?type=subscribe">订阅申请</Link>, 'subscribe'),
-            getItem(<Link to="/approval?type=release">发布申请</Link>, 'release')],
+            getItem(<Link to="/approval?type=subscribe">{$t('订阅申请')}</Link>, 'subscribe'),
+            getItem(<Link to="/approval?type=release">{$t('发布申请')}</Link>, 'release')],
         'group'),
 ];
 
 const items: TabsProps['items'] = [
     {
         key: '0',
-        label: '待审批',
+        label: $t('待审批'),
     },
     {
         key: '1',
-        label: '已审批',
+        label: $t('已审批'),
     }
 ];
 

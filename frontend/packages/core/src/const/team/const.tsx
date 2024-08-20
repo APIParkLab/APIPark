@@ -1,16 +1,17 @@
 
-import { ProColumns } from "@ant-design/pro-components";
 import { TeamMemberTableListItem, TeamTableListItem } from "./type";
 import { ColumnsType } from "antd/es/table";
 import { MemberItem } from "@common/const/type";
-import { getItem, getTabItem } from "@common/utils/navigation";
+import { getItem } from "@common/utils/navigation";
 import { SystemTableListItem } from "../system/type";
-import { MenuProps, TabsProps } from "antd/lib";
+import { MenuProps } from "antd/lib";
 import { Link } from "react-router-dom";
+import { $t } from "@common/locales";
+import { PageProColumns } from "@common/components/aoplatform/PageList";
 
-export const TEAM_TABLE_COLUMNS: ProColumns<TeamTableListItem>[] = [
+export const TEAM_TABLE_COLUMNS: PageProColumns<TeamTableListItem>[] = [
     {
-        title: '名称',
+        title:$t('名称'),
         dataIndex: 'name',
         ellipsis:true,
         width:160,
@@ -20,18 +21,18 @@ export const TEAM_TABLE_COLUMNS: ProColumns<TeamTableListItem>[] = [
         },
     },
     {
-        title: 'ID',
+        title:$t('ID'),
         dataIndex: 'id',
         width: 140,
         ellipsis:true
     },
     {
-        title: '描述',
+        title: $t('描述'),
         dataIndex: 'description',
         ellipsis:true
     },
     {
-        title: '服务数量',
+        title:$t('服务数量'),
         dataIndex: 'serviceNum',
         ellipsis:true,
         sorter: (a,b)=> {
@@ -39,7 +40,7 @@ export const TEAM_TABLE_COLUMNS: ProColumns<TeamTableListItem>[] = [
         },
     },
     {
-        title: '负责人',
+        title:$t('负责人'),
         dataIndex: ['master','name'],
         ellipsis: true,
         width:108,
@@ -49,7 +50,7 @@ export const TEAM_TABLE_COLUMNS: ProColumns<TeamTableListItem>[] = [
         filterSearch: true,
     },
     {
-        title: '创建时间',
+        title:$t('创建时间'),
         dataIndex: 'createTime',
         ellipsis:true,
         width:182,
@@ -60,9 +61,9 @@ export const TEAM_TABLE_COLUMNS: ProColumns<TeamTableListItem>[] = [
 ];
 
 
-export const TEAM_SYSTEM_TABLE_COLUMNS: ProColumns<SystemTableListItem>[] = [
+export const TEAM_SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
     {
-        title: '服务名称',
+        title:$t('服务名称'),
         dataIndex: 'name',
         ellipsis:true,
         width:160,
@@ -72,18 +73,18 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: ProColumns<SystemTableListItem>[] = [
         },
     },
     {
-        title: '服务 ID',
+        title:$t('服务 ID'),
         dataIndex: 'id',
         width: 140,
         ellipsis:true
     },
     {
-        title: '所属团队',
+        title:$t('所属团队'),
         dataIndex: ['team','name'],
         ellipsis:true
     },
     {
-        title: 'API数量',
+        title:$t('API数量'),
         dataIndex: 'apiNum',
         ellipsis:true,
         sorter: (a,b)=> {
@@ -91,7 +92,7 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: ProColumns<SystemTableListItem>[] = [
         },
     },
     {
-        title: '服务数量',
+        title:$t('服务数量'),
         dataIndex: 'serviceNum',
         ellipsis:true,
         sorter: (a,b)=> {
@@ -99,7 +100,7 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: ProColumns<SystemTableListItem>[] = [
         },
     },
     {
-        title: '负责人',
+        title:$t('负责人'),
         dataIndex: ['master','name'],
         ellipsis: true,
         width:108,
@@ -109,7 +110,7 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: ProColumns<SystemTableListItem>[] = [
         filterSearch: true
     },
     {
-        title: '添加日期',
+        title:$t('添加日期'),
         dataIndex: 'createTime',
         ellipsis: true,
         sorter: (a,b)=> {
@@ -118,9 +119,9 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: ProColumns<SystemTableListItem>[] = [
     },
 ];
 
-export const TEAM_MEMBER_TABLE_COLUMNS: ProColumns<TeamMemberTableListItem>[] = [
+export const TEAM_MEMBER_TABLE_COLUMNS: PageProColumns<TeamMemberTableListItem>[] = [
     {
-        title: '姓名',
+        title:$t('姓名'),
         dataIndex: ['user','name'],
         ellipsis:true,
         width:160,
@@ -130,12 +131,12 @@ export const TEAM_MEMBER_TABLE_COLUMNS: ProColumns<TeamMemberTableListItem>[] = 
         },
     },
     {
-        title: '团队角色',
+        title:$t('团队角色'),
         dataIndex: 'roles',
         ellipsis:true,
     },
     {
-        title: '添加日期',
+        title:$t('添加日期'),
         dataIndex: 'attachTime',
         ellipsis:true,
         sorter: (a,b)=> {
@@ -146,7 +147,7 @@ export const TEAM_MEMBER_TABLE_COLUMNS: ProColumns<TeamMemberTableListItem>[] = 
 
 
 export const TEAM_MEMBER_MODAL_TABLE_COLUMNS:ColumnsType<MemberItem> = [
-    {title:'成员',
+    {title:$t('成员'),
     render:(_,entity)=>{
         return <>
             <div>
@@ -161,10 +162,10 @@ export const TEAM_MEMBER_MODAL_TABLE_COLUMNS:ColumnsType<MemberItem> = [
 ]
 
     export const TEAM_INSIDE_MENU_ITEMS: MenuProps['items'] = [
-        getItem('管理', 'grp', null,
+        getItem($t('管理'), 'grp', null,
             [
-                getItem(<Link to="member">成员</Link>, 'member',undefined, undefined, undefined,'team.team.member.view'),
-                getItem(<Link to="setting">设置</Link>, 'setting',undefined,undefined,undefined,'team.team.team.edit')],
+                getItem(<Link to="member">{$t('成员')}</Link>, 'member',undefined, undefined, undefined,'team.team.member.view'),
+                getItem(<Link to="setting">{$t('设置')}</Link>, 'setting',undefined,undefined,undefined,'team.team.team.edit')],
             'group'),
     ];
     

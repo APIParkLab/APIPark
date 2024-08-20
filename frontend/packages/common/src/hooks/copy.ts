@@ -1,10 +1,5 @@
-/*
- * @Name:
- * @Description:
- * @Copyright: 广州银云信息科技有限公司
- * @LastEditors: maggieyyy
- * @LastEditTime: 2024-05-10 16:38:56
- */
+
+import { RESPONSE_TIPS } from '@common/const/const';
 import { message } from 'antd';
 import { useEffect, useState } from 'react';
 
@@ -14,7 +9,7 @@ const useCopyToClipboard = () => {
   const copyToClipboard = (text: string) => {
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(text)?.then(() => {
-      message.success('复制成功')
+      message.success(RESPONSE_TIPS.copySuccess)
         setIsCopied(true)
       })
       .catch((error) => {
@@ -34,7 +29,7 @@ const useCopyToClipboard = () => {
         textArea.select();
         new Promise<void>((resolve, reject) => {
           if(document.execCommand('copy')) {
-            message.success('复制成功')
+            message.success(RESPONSE_TIPS.copySuccess)
             setIsCopied(true)
             resolve()
           } else {

@@ -9,23 +9,23 @@ export const MimeTypes: {
   value: ContentType
 }[] = [
     {
-      title: 'Text',
+      title:'Text',
       value: 'text/plain'
     },
     {
-      title: 'JSON',
+      title:'JSON',
       value: 'application/json'
     },
     {
-      title: 'XML',
+      title:'XML',
       value: 'application/xml'
     },
     {
-      title: 'HTML',
+      title:'HTML',
       value: 'text/html'
     },
     {
-      title: 'JavaScript',
+      title:'JavaScript',
       value: 'application/javascript'
     }
   ]
@@ -35,11 +35,11 @@ export const FormContentTypes: {
   value: ContentType
 }[] = [
     {
-      title: 'x-www-form-urlencoded',
+      title:'x-www-form-urlencoded',
       value: 'application/x-www-form-urlencoded'
     },
     {
-      title: 'multipart/form-data',
+      title:'multipart/form-data',
       value: 'multipart/form-data'
     }
   ]

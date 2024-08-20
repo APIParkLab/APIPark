@@ -1,8 +1,9 @@
 
 import { App, Button, Form, Input } from "antd";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
-import { BasicResponse, STATUS_CODE } from "@common/const/const.ts";
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE } from "@common/const/const";
 import { useFetch } from "@common/hooks/http.ts";
+import { $t } from "@common/locales";
 
 const ChangePsw= () => {
     const { message } = App.useApp()
@@ -20,9 +21,9 @@ const ChangePsw= () => {
                 }).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                     }else{
-                        message.error(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
                     }
                     form.resetFields()
                 }).catch((errorInfo)=> {console.warn(errorInfo)})
@@ -46,11 +47,11 @@ const ChangePsw= () => {
 
                                 <Form.Item
                                     name="old_password"
-                                    label="旧密码"
+                                    label={$t("旧密码")}
                                     rules={[
                                     {
                                         required: true,
-                                        message: '必填项',
+                                        message: VALIDATE_MESSAGE.required,
                                     },
                                     ]}
                                 >
@@ -58,11 +59,11 @@ const ChangePsw= () => {
                                 </Form.Item>
                                 <Form.Item
                                     name="new_password"
-                                    label="新密码"
+                                    label={$t("新密码")}
                                     rules={[
                                     {
                                         required: true,
-                                        message: '必填项',
+                                        message: VALIDATE_MESSAGE.required,
                                     },
                                     ]}
                                 >
@@ -71,19 +72,19 @@ const ChangePsw= () => {
 
                                 <Form.Item
                                     name="confirm"
-                                    label="确认密码"
+                                    label={$t("确认密码")}
                                     dependencies={['new_password']}
                                     rules={[
                                     {
                                         required: true,
-                                        message: '必填项',
+                                        message: VALIDATE_MESSAGE.required,
                                     },
                                     ({ getFieldValue }) => ({
                                         validator(_, value) {
                                         if (!value || getFieldValue('new_password') === value) {
                                             return Promise.resolve();
                                         }
-                                        return Promise.reject(new Error('两次密码不一致'));
+                                        return Promise.reject(new Error($t('两次密码不一致')));
                                         },
                                     }),
                                     ]}
@@ -95,7 +96,7 @@ const ChangePsw= () => {
                                     className="border-none bg-transparent pt-btnrbase mb-0 pb-0 pl-0"
                                 >
                                     <WithPermission access=''><Button type="primary" htmlType="submit" >
-                                        修改密码
+                                        {$t('修改密码')}
                                     </Button></WithPermission>
                                 </Form.Item>
                             </Form>

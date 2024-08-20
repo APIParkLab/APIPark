@@ -1,4 +1,5 @@
 // import { TabRouteObject, useTabStore } from '@/stores/tab'
+import { $t } from '@common/locales'
 import { Button, Typography } from '@mui/material'
 import { TouchRippleActions } from '@mui/material/ButtonBase/TouchRipple'
 import { useEffect, useRef, useState } from 'react'
@@ -66,15 +67,15 @@ export function TestControl({ onTest, onAbort, loading }: TestControlProps) {
     <>
       {!loading ? (
         <Button touchRippleRef={testRippleRef} variant="contained" onClick={onTest}>
-        发送(Enter)
+        {$t('发送(Enter)')}
         </Button>
       ) : (
         <Button variant="outlined" color="warning" onClick={onAbort}>
-          <Typography>中止</Typography>
+          <Typography>{$t('中止')}</Typography>
           {loadingTime ? (
             <Typography sx={{ paddingLeft: 1 }}>
               {' '}
-              ({loadingTime} {'秒'}){' '}
+              ({loadingTime} {$t('秒')}){' '}
             </Typography>
           ) : null}
         </Button>

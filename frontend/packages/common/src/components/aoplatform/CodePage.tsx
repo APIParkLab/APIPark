@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import { $t } from '@common/locales';
 
 interface DataType {
   httpStatusCode: string;
@@ -11,17 +12,17 @@ interface DataType {
 
 const columns: ColumnsType<DataType> = [
   {
-    title: 'HTTP 状态码',
+    title:$t('HTTP 状态码'),
     dataIndex: 'httpStatusCode',
     key: 'httpStatusCode',
   },
   {
-    title: '系统状态码',
+    title:$t('系统状态码'),
     dataIndex: 'systemStatusCode',
     key: 'systemStatusCode',
   },
   {
-    title: '描述',
+    title: $t('描述'),
     dataIndex: 'description',
     key: 'description',
     ellipsis:true

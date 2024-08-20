@@ -4,6 +4,7 @@ import { IconButton } from '../../../../IconButton'
 import {BaseDialog} from "../../../../Dialog";
 import {Icon} from "../../../../Icon";
 import {Codebox} from "../../../../Codebox";
+import { $t } from '@common/locales';
 
 export type ImportMessageChangeType = 'replace-all' | 'insert-end' | 'replace-changed'
 
@@ -65,7 +66,7 @@ export function ImportMessage({ type, onChange }: ImportMessageDialogProps) {
   return (
     <>
       <IconButton name="import" sx={{ height: '30px' }} onClick={() => setOpen(true)} variant="outlined">
-        导入
+        {$t('导入')}
       </IconButton>
       <BaseDialog open={open} onClose={() => setOpen(false)} actionRender={null} title={`Import ${type}`}>
         <DialogContent sx={{ paddingTop: 0, minWidth: '800px' }}>
@@ -74,7 +75,7 @@ export function ImportMessage({ type, onChange }: ImportMessageDialogProps) {
               <Paper elevation={0} sx={{ padding: 2, bgcolor: theme.palette.grey[200] }}>
                 <Typography component="div" sx={{ display: 'flex', alignItems: 'center' }}>
                   <Icon name="attention" mx={0} px={0} sx={{ display: 'inline-flex', marginRight: 0.5 }} />
-                  导入格式
+                  {$t('导入格式')}
                 </Typography>
                 <Typography variant="body2" component="div">
                   <pre>{example}</pre>
@@ -86,16 +87,16 @@ export function ImportMessage({ type, onChange }: ImportMessageDialogProps) {
         </DialogContent>
         <Box display="flex" p={3} pt={0} gap={2} justifyContent="flex-end">
           <Button variant="outlined" onClick={() => setOpen(false)}>
-            取消
+            {$t('取消')}
           </Button>
           <Button variant="outlined" onClick={() => handleChange('replace-all')}>
-            全量替换
+            {$t('全量替换')} 
           </Button>
           <Button variant="outlined" onClick={() => handleChange('insert-end')}>
-            在末端插入
+            {$t('在末端插入')}
           </Button>
           <Button variant="contained" onClick={() => handleChange('replace-changed')}>
-            增量更新
+            {$t('增量更新')}
           </Button>
         </Box>
       </BaseDialog>

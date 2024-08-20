@@ -2,7 +2,7 @@
 import  {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
 import ApiEdit, {ApiEditApi} from "@common/components/postcat/ApiEdit.tsx";
 import { Spin, message} from "antd";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { SystemApiDetail, SystemInsideApiDocumentHandle, SystemInsideApiDocumentProps } from "../../../const/system/type.ts";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -33,7 +33,7 @@ const SystemInsideApiDocument = forwardRef<SystemInsideApiDocumentHandle,SystemI
                 setApiDetail(data.api)
                 setLoaded(true)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         }).finally(()=>{setLoading(false)})
     }
@@ -43,11 +43,11 @@ const SystemInsideApiDocument = forwardRef<SystemInsideApiDocumentHandle,SystemI
             return fetchData<BasicResponse<{id:string}>>('service/api',{method:'PUT',eoParams:{service:serviceId,team:teamId,api:apiId},eoBody:(res.apiInfo)}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功')
+                    message.success(msg || RESPONSE_TIPS.success)
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    return Promise.reject(msg|| '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    return Promise.reject(msg|| RESPONSE_TIPS.error)
                 }
             }).catch(errInfo => Promise.reject(errInfo))
         })

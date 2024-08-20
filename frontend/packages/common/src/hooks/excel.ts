@@ -2,12 +2,13 @@
 import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { ProColumnType } from '@ant-design/pro-components';
+import { $t } from '@common/locales';
 
 export const useExcelExport = <T>() => {
 
   const createExcel = (sheetTitle: string, columns: ExcelJS.Column[], tableData: T[]) => {
     const workBook = new ExcelJS.Workbook()
-    const sheet = workBook.addWorksheet(sheetTitle || '默认工作表');
+    const sheet = workBook.addWorksheet(sheetTitle || $t('默认工作表'));
     sheet.columns = columns;
     sheet.addRows(tableData);
     return workBook
@@ -47,7 +48,7 @@ export const useExcelExport = <T>() => {
 
   const getFileName = (fileTitle: string, date: [number, number]): string => {
     const [start, end] = date.map((time) => getDateFormat(time));
-    return `${fileTitle}-${start}至${end}`;
+    return `${fileTitle}-${start}${$t('至')}${end}`;
   };
 
   const getDateFormat = (time: number): string => {

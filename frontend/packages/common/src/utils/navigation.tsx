@@ -1,5 +1,7 @@
+import { MenuProps } from "antd";
 
-import { MenuItem } from "@common/components/aoplatform/Navigation";
+
+export type MenuItem = Required<MenuProps>['items'][number];
 
 export function getNavItem(
   label: React.ReactNode,
