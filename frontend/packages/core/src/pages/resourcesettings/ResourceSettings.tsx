@@ -58,7 +58,7 @@ const LogSettings = ()=>{
     
     return (
         <> 
-          <Skeleton className='m-btnbase w-[calc(100%-20px)]' active loading={loading}>
+          <Skeleton className='m-btnbase w-calc-100vw-minus-padding-r' active loading={loading}>
                 <InsidePage 
                     pageTitle={$t('资源配置')}
                     >

@@ -1,5 +1,6 @@
 
 import { RangeValue } from "@common/components/aoplatform/TimeRangeSelector";
+import { $t } from "@common/locales";
 
 export function getTime (
     timeButton: string,
@@ -45,23 +46,23 @@ export function getTime (
     // 相差秒数
     switch (timeInterval) {
       case '1m': {
-        timeUnit = '每分钟'
+        timeUnit = $t('每分钟')
         break
       }
       case '5m': {
-        timeUnit = '每5分钟'
+        timeUnit = $t('每5分钟')
         break
       }
       case '1h': {
-        timeUnit = '每小时'
+        timeUnit = $t('每小时')
         break
       }
       case '1d': {
-        timeUnit = '每天'
+        timeUnit = $t('每天')
         break
       }
       case '1w': {
-        timeUnit = '每周'
+        timeUnit = $t('每周')
         break
       }
     }
@@ -71,23 +72,23 @@ export function getTime (
   // 当数据超过10万时，保留两个小数点，单位为万，如123212，显示12.32万；
   export function changeNumberUnit (value?:number):string {
     if (value && value > 1000000000) {
-      return (value && value / 100000000).toFixed(2) + '亿'
+      return (value && value / 100000000).toFixed(2) + $t('亿')
     } else if (value && value > 1000000) {
-      return (value && value / 10000).toFixed(0) + '万'
+      return (value && value / 10000).toFixed(0) + $t('万')
     } else if (value && value > 10000) {
-      return (value && value / 10000).toFixed(2) + '万'
+      return (value && value / 10000).toFixed(2) + $t('万')
     }
-    return (value ?? '-') + ' 次'
+    return (value ?? '-') + $t(' 次')
   }
   
   export function yUnitFormatter (value:number):string {
     let res:string = ''
     if (value > 100000000) {
-      res = (value / 100000000).toFixed(2) + '亿'
+      res = (value / 100000000).toFixed(2) + $t('亿')
     } else if (value > 1000000) {
-      res = (value / 10000).toFixed(0) + '万'
+      res = (value / 10000).toFixed(0) + $t('万')
     } else if (value > 100000) {
-      res = (value / 10000).toFixed(2) + '万'
+      res = (value / 10000).toFixed(2) + $t('万')
     } else {
       res = value.toFixed(0)
     }

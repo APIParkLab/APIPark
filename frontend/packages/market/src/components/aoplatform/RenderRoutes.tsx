@@ -147,7 +147,7 @@ const generateRoutes = (routerConfig: RouteConfig[]) => {
                 const LazyComponent = route.lazy as React.ExoticComponent<unknown>;
 
                 routeElement = (
-                    <Suspense fallback={ <div className=''><Skeleton className='m-btnbase w-[calc(100%-20px)]' active /></div>}>
+                    <Suspense fallback={ <div className=''><Skeleton className='m-btnbase w-calc-100vw-minus-padding-r' active /></div>}>
                         {route.provider ? (
                             createElement(route.provider, {}, <LazyComponent  />)
                         ) : (

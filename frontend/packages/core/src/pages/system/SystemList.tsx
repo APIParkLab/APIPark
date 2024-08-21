@@ -1,4 +1,5 @@
 import PageList from "@common/components/aoplatform/PageList.tsx"
+import Tour from "@common/components/aoplatform/Tour.tsx"
 import {ActionType} from "@ant-design/pro-components";
 import  {FC, useEffect, useMemo, useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
@@ -13,6 +14,7 @@ import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter
 import SystemConfig from "./SystemConfig.tsx";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { $t } from "@common/locales/index.ts";
+import Joyride from "react-joyride";
 
 const SystemList:FC = ()=>{
     const navigate = useNavigate();
@@ -114,15 +116,28 @@ const SystemList:FC = ()=>{
             return res
     },[memberValueEnum,teamList])
 
+    const steps = [
+        {
+          target: '.my-first-step',
+          content: '点击按钮新建服务',
+        },
+        {
+          target: '.ant-table-tbody',
+          content: '点击表格查看详情',
+          placement: 'top'
+        },
+      ];
+      
     return (
           <div className="h-full w-full pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B">
-            
+                <Joyride steps={steps} run={true} />
             <PageList
                 id="global_system"
                 ref={pageListRef}
                 columns={[...columns]}
                 request={()=>getSystemList()}
                 addNewBtnTitle={$t("添加服务")}
+                addNewBtnWrapperClass={'my-first-step'}
                 searchPlaceholder={$t("输入名称、ID、所属团队、负责人查找服务")}
                 onAddNewBtnClick={() => {
                     setOpen(true) 
@@ -140,7 +155,6 @@ const SystemList:FC = ()=>{
                         <SystemConfig ref={drawerFormRef} />
                     </DrawerWithFooter>
                 </div>
-            // </Skeleton>
     )
 
 }

@@ -5,13 +5,14 @@ import { EntityItem } from "@common/const/type";
 import TimeRangeSelector, { RangeValue, TimeRange, TimeRangeButton } from "@common/components/aoplatform/TimeRangeSelector";
 import MonitorTable, { MonitorTableHandler } from "./MonitorTable";
 import { DefaultOptionType } from "antd/es/select";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { getTime } from "../utils/dashboard";
 import { useExcelExport } from "@common/hooks/excel";
 import { APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG } from "@dashboard/const/const";
 import { CloseOutlined, ExpandOutlined } from "@ant-design/icons";
 import { useFetch } from "@common/hooks/http";
 import { MonitorSubQueryData } from "./MonitorSubPage";
+import { $t } from "@common/locales";
 
 export type MonitorAppPageProps = {
     fetchTableData:(body:SearchBody)=>Promise<BasicResponse<{statistics:MonitorSubscriberData[]}>>
@@ -60,7 +61,7 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
         if(code === STATUS_CODE.SUCCESS){
           setListOfApps(data.projects?.map((x:EntityItem)=>({label:x.name, value:x.id})))
         }else{
-            message.error(msg || '获取数据失败，请重试')
+            message.error(msg || RESPONSE_TIPS.dataError)
             return setListOfApps([])
         }
       }).catch(() => {
@@ -98,9 +99,9 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
          fetchTableData(data).then((resp) => {
           const {code,data,msg} = resp
           if(code === STATUS_CODE.SUCCESS){
-            exportExcel('应用调用统计', [query!.start!, query!.end!], '应用调用统计', 'dashboard_application', APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG, data.statistics)
+            exportExcel($t('应用调用统计'), [query!.start!, query!.end!], $t('应用调用统计'), 'dashboard_application', APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG, data.statistics)
           }else{
-              message.error(msg || '获取数据失败，请重试')
+              message.error(msg || RESPONSE_TIPS.dataError)
           }
         })
     };
@@ -117,7 +118,7 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
            if(code === STATUS_CODE.SUCCESS){
                return  {data:data.statistics?.map((x:MonitorSubscriberData)=>{x.proxyRate = Number((x.proxyRate*100).toFixed(2));x.requestRate = Number((x.requestRate*100).toFixed(2));return x}), success: true}
            }else{
-               message.error(msg || '获取数据失败，请重试')
+               message.error(msg || RESPONSE_TIPS.dataError)
                return {data:[], success:false}
            }
          }).catch(() => {
@@ -143,13 +144,13 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
                   onTimeRangeChange={handleTimeRangeChange}/>
             <div className="flex flex-wrap items-center row-gap-[12px]  pt-btnybase mr-btnybase">
               <div>
-                <label className="inline-block  whitespace-nowrap">应用：</label>
+                <label className="inline-block  whitespace-nowrap">{$t('应用')}：</label>
                 <Select
                   className="w-[346px]"
                   mode="multiple"
                   maxTagCount={1}
                   // maxTagPlaceholder={(selectedList) => `and ${selectedList.length} more selected`}
-                  placeholder="请选择"
+                  placeholder={$t("请选择应用")}
                   value={queryData?.projects}
                   options={listOfApps}
                   onChange={(value)=>{setQueryData(prevData=>({...prevData || {}, projects:value}))}}
@@ -157,13 +158,13 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
               </div>
               <div>
                 <Button className="ml-btnybase" onClick={clearSearch}>
-                  重置
+                  {$t('重置')}
                 </Button>
                 <Button type="primary" loading={queryBtnLoading} className="ml-btnybase" onClick={()=>{setQueryBtnLoading(true);getAppTableList()}}>
-                  查询
+                  {$t('查询')}
                 </Button>
                 <Button className="ml-btnybase" loading={exportLoading} onClick={exportData}>
-                  导出
+                  {$t('导出')}
                 </Button>
               </div>
             </div>

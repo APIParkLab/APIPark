@@ -8,6 +8,7 @@ import {ApiDetail} from "@common/const/api-detail";
 import {ServiceDetailType } from "../../const/serviceHub/type.ts";
 import ApiMatch from "@common/components/postcat/api/ApiPreview/components/ApiMatch/index.tsx";
 import ApiProxy from "@common/components/postcat/api/ApiPreview/components/ApiProxy/index.tsx";
+import { $t } from "@common/locales/index.ts";
 
 const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
     const {serviceId} = useParams<RouterParams>();
@@ -28,7 +29,7 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
         {
             key: 'apiDocument-list',
             href: '#apiDocument-list',
-            title: 'API 列表',
+            title:$t('API 列表'),
             children:apiDocs?.map((x)=>({
                 key:x.id,
                 href:`#apiDocument-${x.id}`,
@@ -38,7 +39,7 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
         // {
         //     key: 'apiDocument-statusCode',
         //     href: '#apiDocument-statusCode',
-        //     title: '状态码',
+        //     title:$t('状态码',
         // },
     ], [apiDocs]);
 
@@ -63,9 +64,6 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
     return (
         <>
                 <div className="flex flex-col p-btnbase pt-[4px] h-full flex-1 overflow-auto" id='layout-ref'>
-                    {/* <div className="bg-[#fff] rounded p-btnbase pl-0   mb-[16px]">
-                        <Descriptions className="bg-bar-theme p-[16px] rounded service-hub-description" title="" items={getBasicInfo} column={4} labelStyle={{width:'80px',justifyContent:'flex-end',fontWeight:'bold'}}  contentStyle={{color:'#333'}}/>
-                    </div> */}
                     <div  className='bg-[#fff] rounded p-btnbase  pl-0  flex justify-between'>
                         <div className="w-[calc(100%-220px)]" >
                         <p className="font-bold text-[20px] leading-[32px] mb-[12px] h-[32px]" id="apiDocument-list">API 列表</p>
@@ -83,23 +81,20 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
                                                         readOnly
                                                         addonBefore={apiDetail?.method}
                                                         value={apiDetail?.path}
-                                                        // enterButton={<SearchBtn  entity={apiDetail}/>}
-                                                        // onSearch={handleTest}
                                                     />
                                                 </Space>
                                             {
                                                 apiDetail?.match && apiDetail.match?.length > 0 &&
-                                                <ApiMatch title='高级匹配' rows={apiDetail?.match}  />
+                                                <ApiMatch title={$t('高级匹配')} rows={apiDetail?.match}  />
                                             }
                             
                                             {
                                                 apiDetail?.proxy && Object.keys(apiDetail?.proxy).length > 0 &&
-                                                <ApiProxy title='转发规则' proxyInfo={apiDetail?.proxy}  />
+                                                <ApiProxy title={$t('转发规则')} proxyInfo={apiDetail?.proxy}  />
                                             }
                             
                                             {apiDetail && <ApiPreview entity={{...apiDetail.doc,name:apiDetail.name, method:apiDetail.method,uri:apiDetail.path, protocol:apiDetail.protocol||'HTTP'}}  />}
                                         </div>
-                                            // <ApiPreview testClick={()=>testClick(apiDocs.id)} entity={doc}  /> 
                                         }]} 
                                         activeKey={activeKey}
                                         onChange={(val)=>{setActiveKey(val as string[])}}
@@ -108,18 +103,10 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
                                 ))}
 
                         </div>
-                            {/* <div className="h-[16px] bg-[#f7f8fa] mx-[-16px]"></div>
-                            <div className='bg-[#fff] rounded  pt-btnbase'>
-                                <p className="font-bold text-[20px] leading-[32px] mb-[12px] h-[32px]" id="apiDocument-statusCode">状态码</p>
-                                <CodePage />
-                            </div> */}
                             </div>
 
                             <FloatButton.Group shape="circle" style={floatButtonStyle}>
                                 <Anchor
-                                    // className='absolute py-5 px-btnbase left-0 z-[13]'
-                                    // affix={false}
-                                    // showInkInFixed={true}
                                     targetOffset={60}
                                     getContainer = {()=> document.getElementById('layout-ref')!}
                                     items={category}
@@ -133,7 +120,7 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
               maskClosable={false}
               width="100%" placement="right" onClose={onClose} open={apiTestDrawOpen}
                     extra={
-                            <Button onClick={onClose}>退出测试</Button>
+                            <Button onClick={onClose}>{$t('退出测试')}</Button>
                     }
                     closeIcon={false}
             >

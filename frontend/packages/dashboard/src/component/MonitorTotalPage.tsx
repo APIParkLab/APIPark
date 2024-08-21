@@ -16,8 +16,10 @@ import MonitorPieGraph from "./MonitorPieGraph";
 import MonitorTable, { MonitorTableHandler } from "./MonitorTable";
 import { CloseOutlined, ExpandOutlined, LoadingOutlined } from "@ant-design/icons";
 import DashboardDetail from "@dashboard/pages/DashboardDetail";
+import { $t } from "@common/locales";
 
 dayjs.extend(customParseFormat);
+const APP_MODE = import.meta.env.VITE_APP_MODE;
 
 export type MonitorTotalPageProps = {
     fetchPieData:(body:SearchBody)=>Promise<BasicResponse<PieData>>
@@ -127,7 +129,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   setTotalEmpty(data.requestSummary.total === 0 && data.proxySummary.total === 0)
                 }else{
                   setPieError(true)
-                  message.error(msg || '获取数据失败，请重试')
+                  message.error(msg || RESPONSE_TIPS.dataError)
                 }
         }).finally(()=>{
           dispatch({ type: ACTIONS.REQUEST_COMPLETE, payload: 'getPieData' });
@@ -146,7 +148,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   // this.invokeLineRef?.changeLineChart()
                 }else{
                   setInvokeStaticError(true)
-                  message.error(msg || '获取数据失败，请重试')
+                  message.error(msg || RESPONSE_TIPS.dataError)
                 }
         }).finally(()=>{
           dispatch({ type: ACTIONS.REQUEST_COMPLETE, payload: 'getInvokeData' });
@@ -163,7 +165,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   // this.trafficLineRef?.changeLineChart()
                 }else{
                   setTrafficStaticError(true)
-                  message.error(msg || '获取数据失败，请重试')
+                  message.error(msg || RESPONSE_TIPS.dataError)
                 }
         }).finally(()=>{
           dispatch({ type: ACTIONS.REQUEST_COMPLETE, payload: 'getMessageData' });
@@ -178,7 +180,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                 if(code === STATUS_CODE.SUCCESS){
               return  {data:data.top10.map((x:MonitorApiData | MonitorSubscriberData)=>{x.proxyRate = Number((x.proxyRate*100).toFixed(2));x.requestRate = Number((x.requestRate*100).toFixed(2));return x}), success: true}
           }else{
-              message.error(msg || '获取数据失败，请重试')
+              message.error(msg || RESPONSE_TIPS.dataError)
               return {data:[], success:false}
           }
         }).catch(() => {
@@ -205,19 +207,19 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
       
      const monitorTopDataTabItems:TabsProps['items'] = [
       {
-          label:'API 请求量 Top10',
+          label:$t('API 请求量 Top10'),
           key:'api',
-          children:<MonitorTable className="pb-[10px]" ref={monitorApiTableRef} type='api' id="dashboard_top10_api" onRowClick={(record)=>{getDetailData(record as MonitorApiData,'api')}} request={()=>getTablesData(queryData||{},'api')}/>
+          children:<MonitorTable className="pb-[10px]" ref={monitorApiTableRef} type='api' id="dashboard_top10_api" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorApiData,'api')}} request={()=>getTablesData(queryData||{},'api')}/>
       },
       {
-          label:'应用调用量 Top10',
+          label:$t('应用调用量 Top10'),
           key:'subscribers',
-          children:<MonitorTable className="pb-[10px]"  ref={monitorSubTableRef} type='subscribers'  id="dashboard_top10_subscriber" onRowClick={(record)=>{getDetailData(record as MonitorSubscriberData,'subscriber')}}  request={()=>getTablesData(queryData||{},'subscriber')} />
+          children:<MonitorTable className="pb-[10px]"  ref={monitorSubTableRef} type='subscribers'  id="dashboard_top10_subscriber" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorSubscriberData,'subscriber')}}  request={()=>getTablesData(queryData||{},'subscriber')} />
       },
       {
-          label:'服务被调用量 Top10',
+          label:$t('服务被调用量 Top10'),
           key:'providers',
-          children:<MonitorTable className="pb-[10px]"  ref={monitorSubTableRef} type='provider'  id="dashboard_top10_provider" onRowClick={(record)=>{getDetailData(record as MonitorSubscriberData,'provider')}}  request={()=>getTablesData(queryData||{},'provider')} />
+          children:<MonitorTable className="pb-[10px]"  ref={monitorSubTableRef} type='provider'  id="dashboard_top10_provider" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorSubscriberData,'provider')}}  request={()=>getTablesData(queryData||{},'provider')} />
       }
     ]
 
@@ -230,31 +232,17 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
 
       return (
         <div className={`h-[calc(100vh-140px)] overflow-hidden pb-btnybase flex flex-col  ${totalEmpty ?  'bg-[#fff]' : 'bg-MENU_BG'}`}>
-          {/* 筛选区域 */}
           <ScrollableSection>
           <div className="flex items-center flex-wrap pb-[10px] px-btnbase content-before bg-MAIN_BG">
-            {/* 筛选集群 */}
-            {/* <div className="flex flex-nowrap items-center  pt-btnybase mr-btnybase">
-                <label className="whitespace-nowrap">集群：</label>
-                <Select
-                    className="w-INPUT_NORMAL"
-                    mode="multiple"
-                    placeholder="请选择"
-                    value={queryData?.clusters}
-                    options={clusterList}
-                    onChange={(value)=>{setQueryData(prevData=>({...prevData || {}, clusters:value}))}}
-                />
-            </div> */}
             <TimeRangeSelector 
               labelSize="small"
               initialTimeButton={timeButton}
               onTimeButtonChange={setTimeButton}
               initialDatePickerValue={datePickerValue}
               onTimeRangeChange={handleTimeRangeChange}/>
-            {/* 重置和查询按钮 */}
             <div className="flex flex-nowrap items-center  pt-btnybase">
-                <Button onClick={resetQuery}>重置</Button>
-                <Button className="ml-btnybase" type="primary" loading={queryBtnLoading} onClick={() => {getMonitorData();setQueryBtnLoading(true)}}>查询</Button>
+                <Button onClick={resetQuery}>{$t('重置')}</Button>
+                <Button className="ml-btnybase" type="primary" loading={queryBtnLoading} onClick={() => {getMonitorData();setQueryBtnLoading(true)}}>{$t('查询')}</Button>
             </div>
           </div>
           <Spin wrapperClassName={`flex-1 ${totalEmpty ?'':'overflow-auto'}`} indicator={<LoadingOutlined style={{ fontSize: 24 }} spin/>} spinning={queryBtnLoading}>
@@ -263,25 +251,25 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
               {/* 图表区域 */}
               <div className=" px-btnbase  mt-[12px] mb-[16px] grid gap-[20px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(570px, 1fr))'}}>
                 {/* 请求统计饼图 */}
-                {pieError ? <Empty className="pt-[80px] bg-MAIN_BG  w-[50%] h-[200px]  m-0 mr-[16px]" image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无请求统计数据"/>: <MonitorPieGraph
+                {pieError ? <Empty className="pt-[80px] bg-MAIN_BG  w-[50%] h-[200px]  m-0 mr-[16px]" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无请求统计数据")}/>: <MonitorPieGraph
                   className="bg-MAIN_BG"
-                  title="请求统计"
+                  title={$t("请求统计")}
                   pieData={requestPie}
-                  labelName="请求成功率"
+                  labelName={$t("请求成功率")}
                   labelValue={requestSucRate}
-                  subText="请求总数"
+                  subText={$t("请求总数")}
                   subValue={changeNumberUnit(requestStatic?.total)}
                   status4xxCount={requestStatic?.status_4xx}
                   status5xxCount={requestStatic?.status_5xx}
                 />}
                 {/* 转发统计饼图 */}
-                {pieError ? <Empty className="pt-[80px] bg-MAIN_BG w-[50%] h-[200px] m-0" image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无转发统计数据"/>: <MonitorPieGraph
+                {pieError ? <Empty className="pt-[80px] bg-MAIN_BG w-[50%] h-[200px] m-0" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无转发统计数据")}/>: <MonitorPieGraph
                   className=" bg-MAIN_BG"
-                  title="转发统计"
+                  title={$t("转发统计")}
                   pieData={proxyPie}
-                  labelName="转发成功率"
+                  labelName={$t("转发成功率")}
                   labelValue={proxySucRate}
-                  subText="转发总数"
+                  subText={$t("转发总数")}
                   subValue={changeNumberUnit(proxyStatic?.total)}
                   status4xxCount={proxyStatic?.status_4xx}
                   status5xxCount={proxyStatic?.status_5xx}
@@ -289,18 +277,18 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
               </div>
               {/* 折线图区域 */}
                 {/* 调用量统计折线图 */}
-                {invokeStaticError ? <Empty className="pt-[80px] m-btnbase mb-[16px] h-[200px] bg-MAIN_BG" image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无调用量统计数据"/>: <MonitorLineGraph
+                {invokeStaticError ? <Empty className="pt-[80px] m-btnbase mb-[16px] h-[200px] bg-MAIN_BG" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无调用量统计数据")}/>: <MonitorLineGraph
                 className=" bg-MAIN_BG pt-[16px]"
                   lineData={invokeStatic}
-                  titles={['调用量统计']}
+                  titles={[$t('调用量统计')]}
                   yAxisTitle={timeUnit || '-'}
                   type="invoke"
                 />}
                 {/* 报文量统计折线图 */}
-                {trafficStaticError ? <Empty className=" bg-MAIN_BG pt-[80px] m-btnbase mb-0 h-[200px]" image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无报文量统计数据"/>:<MonitorLineGraph
+                {trafficStaticError ? <Empty className=" bg-MAIN_BG pt-[80px] m-btnbase mb-0 h-[200px]" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无报文量统计数据")}/>:<MonitorLineGraph
                 className=" bg-MAIN_BG pt-[16px]"
                 lineData={trafficStatic}
-                  titles={['报文量统计']}
+                  titles={[$t('报文量统计')]}
                   yAxisTitle={timeUnit || '-'}
                   type="traffic"
                 />}
@@ -314,9 +302,9 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   mask={!fullScreen} 
                   title={<>
                       {fullScreen && <a className="mr-btnrbase text-[14px]" onClick={()=>{setFullScreen(false)}}>
-                        <CloseOutlined className="mr-[4px]"/>退出全屏
+                        <CloseOutlined className="mr-[4px]"/>{$t('退出全屏')}
                         </a>}
-                      <span className="mr-btnrbase">{detailEntityName}调用详情</span>
+                      <span className="mr-btnrbase">{detailEntityName}{$t('调用详情')}</span>
                       {!fullScreen && <ExpandOutlined className="text-MAIN_TEXT hover:text-MAIN_HOVER_TEXT" onClick={()=>{setFullScreen(true)}}/>}
                       </>} 
                   width={fullScreen ? '100%' : '60%'} 
