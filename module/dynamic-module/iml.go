@@ -6,23 +6,23 @@ import (
 	"fmt"
 	"strings"
 	"time"
-	
+
 	"github.com/eolinker/eosc/log"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
-	
+
 	"github.com/eolinker/go-common/store"
-	
+
 	"github.com/eolinker/ap-account/service/user"
-	
+
 	"github.com/APIParkLab/APIPark/service/cluster"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/google/uuid"
-	
+
 	"github.com/APIParkLab/APIPark/module/dynamic-module/driver"
-	
+
 	dynamic_module_dto "github.com/APIParkLab/APIPark/module/dynamic-module/dto"
 	dynamic_module "github.com/APIParkLab/APIPark/service/dynamic-module"
 )
@@ -50,7 +50,7 @@ func (i *imlDynamicModule) Online(ctx context.Context, module string, id string)
 	//if len(clusterInput.Clusters) == 0 {
 	//	return fmt.Errorf("上线分区失败，分区为空")
 	//}
-	
+
 	id = strings.ToLower(fmt.Sprintf("%s_%s", id, module))
 	info, err := i.dynamicModuleService.Get(ctx, id)
 	if err != nil {
@@ -60,10 +60,10 @@ func (i *imlDynamicModule) Online(ctx context.Context, module string, id string)
 	if err != nil || len(clusters) == 0 {
 		return fmt.Errorf("上线失败，集群不存在")
 	}
-	
+
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		for _, c := range clusters {
-			
+
 			// 插入发布历史
 			err = i.dynamicModulePublishService.Create(ctx, &dynamic_module.CreateDynamicModulePublish{
 				ID:            uuid.New().String(),
@@ -95,9 +95,9 @@ func (i *imlDynamicModule) Online(ctx context.Context, module string, id string)
 			if err != nil {
 				return err
 			}
-			
+
 		}
-		
+
 		return nil
 	})
 }
@@ -127,7 +127,7 @@ func (i *imlDynamicModule) Offline(ctx context.Context, module string, id string
 			if err != nil {
 				return err
 			}
-			
+
 		}
 		return nil
 	})
@@ -185,7 +185,7 @@ func (i *imlDynamicModule) Offline(ctx context.Context, module string, id string
 
 func (i *imlDynamicModule) dynamicClient(ctx context.Context, clusterId string, resource string, h func(gateway.IDynamicClient) error) error {
 	client, err := i.clusterService.GatewayClient(ctx, clusterId)
-	
+
 	if err != nil {
 		return err
 	}
@@ -213,7 +213,7 @@ func (i *imlDynamicModule) dynamicClient(ctx context.Context, clusterId string, 
 //	if err != nil {
 //		return nil, err
 //	}
-//	partitionIds := utils.SliceToSlice(partitions, func(s *partition.Partition) string {
+//	partitionIds := utils.SliceToSlice(partitions, func(s *partition.Cluster) string {
 //		return s.UUID
 //	})
 //	suffix := fmt.Sprintf("_%s", module)
@@ -278,7 +278,7 @@ func (i *imlDynamicModule) ModuleDrivers(ctx context.Context, group string) ([]*
 			Title: s.Title(),
 			Path:  s.Front(),
 		}
-		
+
 	}), nil
 }
 
@@ -295,9 +295,9 @@ func (i *imlDynamicModule) PluginInfo(ctx context.Context, module string, cluste
 	if !has {
 		return nil, fmt.Errorf("module %s not found", module)
 	}
-	
+
 	fields := make([]*driver.Field, 0, 1)
-	
+
 	fields = append(fields, &driver.Field{
 		Name:  "status",
 		Title: fmt.Sprintf("状态"),
@@ -336,7 +336,7 @@ func (i *imlDynamicModule) Create(ctx context.Context, module string, input *dyn
 	if !has {
 		return nil, fmt.Errorf("module %s not found", module)
 	}
-	
+
 	id := strings.ToLower(fmt.Sprintf("%s_%s", input.Id, module))
 	err := i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		cfg, err := json.Marshal(input.Config)
@@ -358,7 +358,7 @@ func (i *imlDynamicModule) Create(ctx context.Context, module string, input *dyn
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return i.Get(ctx, module, input.Id)
 }
 
@@ -402,10 +402,10 @@ func (i *imlDynamicModule) Delete(ctx context.Context, module string, ids []stri
 				return err
 			}
 		}
-		
+
 		return nil
 	})
-	
+
 }
 
 func (i *imlDynamicModule) Get(ctx context.Context, module string, id string) (*dynamic_module_dto.DynamicModule, error) {
@@ -413,7 +413,7 @@ func (i *imlDynamicModule) Get(ctx context.Context, module string, id string) (*
 	if !strings.HasSuffix(id, suffix) {
 		id = strings.ToLower(fmt.Sprintf("%s_%s", id, module))
 	}
-	
+
 	info, err := i.get(ctx, module, id)
 	if err != nil {
 		return nil, err
@@ -437,7 +437,7 @@ func (i *imlDynamicModule) get(ctx context.Context, module string, id string) (*
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if info.Module != module {
 		return nil, fmt.Errorf("module not match")
 	}
@@ -455,7 +455,7 @@ func (i *imlDynamicModule) List(ctx context.Context, module string, keyword stri
 	if err != nil {
 		return nil, 0, err
 	}
-	
+
 	userIDs := utils.SliceToSlice(list, func(s *dynamic_module.DynamicModule) string {
 		return s.Updater
 	})
@@ -463,7 +463,7 @@ func (i *imlDynamicModule) List(ctx context.Context, module string, keyword stri
 	if err != nil {
 		return nil, 0, err
 	}
-	
+
 	userMap := i.userService.GetLabels(ctx, userIDs...)
 	items := make([]map[string]interface{}, 0, len(list))
 	suffix := fmt.Sprintf("_%s", module)
@@ -478,7 +478,7 @@ func (i *imlDynamicModule) List(ctx context.Context, module string, keyword stri
 			for _, l := range list {
 				status := "未发布"
 				id := strings.TrimSuffix(l.ID, suffix)
-				
+
 				item := map[string]interface{}{
 					"id":          id,
 					"title":       l.Name,
@@ -487,7 +487,7 @@ func (i *imlDynamicModule) List(ctx context.Context, module string, keyword stri
 					"updater":     userMap[l.Updater],
 					"update_time": l.UpdateAt.Format("2006-01-02 15:04:05"),
 				}
-				
+
 				tmp := make(map[string]interface{})
 				err = json.Unmarshal([]byte(l.Config), &tmp)
 				if err == nil {
@@ -496,7 +496,7 @@ func (i *imlDynamicModule) List(ctx context.Context, module string, keyword stri
 							continue
 						}
 						item[column] = tmp[column]
-						
+
 					}
 				}
 				if versions != nil {
@@ -516,8 +516,8 @@ func (i *imlDynamicModule) List(ctx context.Context, module string, keyword stri
 		if err != nil {
 			return nil, 0, err
 		}
-		
+
 	}
-	
+
 	return items, total, nil
 }

@@ -1,0 +1,1418 @@
+-
+  task_name: "apinto_minute_request_request_v1"
+  cron: "* * * * *"
+  offset: "10s"
+  flux: |
+    
+    request_request =
+    from(bucket: "apinto")
+        |> range(start: -1m)
+        |> filter(fn: (r) => r._measurement == "request")
+        |> filter(fn: (r) => r._field == "request")
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_measurement",
+            ],
+        )
+    request_request
+    |> sum()
+    |> set(key: "_field", value: "request")
+    |> to(
+    bucket: "apinto/minute",
+    timeColumn: "_start",
+    tagColumns: [
+      "api",
+      "app",
+      "method",
+      "upstream",
+      "node",
+      "cluster",
+      "provider",
+    ],
+      )
+      request_request
+      |> max()
+      |> set(key: "_field", value: "request_max")
+      |> to(
+    bucket: "apinto/minute",
+    tagColumns: [
+      "api",
+      "app",
+      "method",
+      "upstream",
+      "node",
+      "cluster",
+      "provider",
+    ],
+    timeColumn: "_start",
+      )
+      request_request
+      |> min()
+      |> set(key: "_field", value: "request_min")
+      |> to(
+    bucket: "apinto/minute",
+    timeColumn: "_start",
+    tagColumns: [
+      "api",
+      "app",
+      "method",
+      "upstream",
+      "node",
+      "cluster",
+      "provider",
+    ],
+      )
+-
+  task_name: "apinto_minute_request_response_v1"
+  cron: "* * * * *"
+  offset: "12s"
+  flux: |
+    
+    request_response =
+        from(bucket: "apinto")
+            |> range(start: -1m)
+            |> filter(fn: (r) => r._measurement == "request")
+            |> filter(fn: (r) => r._field == "response")
+            |> group(
+                columns: [
+                    "api",
+                    "app",
+                    "upstream",
+                    "method",
+                    "node",
+                    "cluster",
+                    "provider",
+                    "_measurement",
+                ],
+            )
+
+    request_response
+        |> sum()
+        |> set(key: "_field", value: "response")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    request_response
+        |> max()
+        |> set(key: "_field", value: "response_max")
+        |> to(
+            bucket: "apinto/minute",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+            timeColumn: "_start",
+        )
+    request_response
+        |> min()
+        |> set(key: "_field", value: "response_min")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_minute_request_retry_v1"
+  cron: "* * * * *"
+  offset: "14s"
+  flux: |
+    
+    request_retry =
+        from(bucket: "apinto")
+            |> range(start: -1m)
+            |> filter(fn: (r) => r._measurement == "request")
+            |> filter(fn: (r) => r._field == "retry")
+            |> group(
+                columns: [
+                    "api",
+                    "app",
+                    "upstream",
+                    "method",
+                    "node",
+                    "cluster",
+                    "provider",
+                    "_measurement",
+                ],
+            )
+
+    request_retry
+        |> sum()
+        |> set(key: "_field", value: "retry")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    request_retry
+        |> max()
+        |> set(key: "_field", value: "retry_max")
+        |> to(
+            bucket: "apinto/minute",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+            timeColumn: "_start",
+        )
+    request_retry
+        |> min()
+        |> set(key: "_field", value: "retry_min")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_minute_request_status_v1"
+  cron: "* * * * *"
+  offset: "16s"
+  flux: |
+    
+    request_status =
+        from(bucket: "apinto")
+            |> range(start: -1m)
+            |> filter(fn: (r) => r._measurement == "request")
+            |> filter(fn: (r) => r._field == "status")
+            |> group(
+                columns: [
+                    "api",
+                    "app",
+                    "upstream",
+                    "method",
+                    "node",
+                    "cluster",
+                    "provider",
+                    "_measurement",
+                ],
+            )
+
+    request_status
+        |> count()
+        |> set(key: "_field", value: "total")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    request_status
+        |> filter(fn: (r) => r._value < 400)
+        |> count()
+        |> set(key: "_field", value: "success")
+        |> to(
+            bucket: "apinto/minute",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+            timeColumn: "_start",
+        )
+    request_status
+        |> filter(fn: (r) => r._value >= 400 and r._value < 500)
+        |> count()
+        |> set(key: "_field", value: "s4xx")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    request_status
+        |> filter(fn: (r) => r._value >= 500)
+        |> count()
+        |> set(key: "_field", value: "s5xx")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_minute_request_timing_v1"
+  cron: "* * * * *"
+  offset: "18s"
+  flux: |
+    
+    request_timing =
+        from(bucket: "apinto")
+            |> range(start: -1m)
+            |> filter(fn: (r) => r._measurement == "request")
+            |> filter(fn: (r) => r._field == "timing")
+            |> group(
+                columns: [
+                    "api",
+                    "app",
+                    "upstream",
+                    "method",
+                    "node",
+                    "cluster",
+                    "_measurement",
+                ],
+            )
+
+    request_timing
+        |> sum()
+        |> set(key: "_field", value: "timing")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    request_timing
+        |> max()
+        |> set(key: "_field", value: "timing_max")
+        |> to(
+            bucket: "apinto/minute",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+            timeColumn: "_start",
+        )
+    request_timing
+        |> min()
+        |> set(key: "_field", value: "timing_min")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_minute_proxy_timing_v1"
+  cron: "* * * * *"
+  offset: "20s"
+  flux: |
+    
+    proxy_timing =
+        from(bucket: "apinto")
+            |> range(start: -1m)
+            |> filter(fn: (r) => r._measurement == "proxy")
+            |> filter(fn: (r) => r._field == "timing")
+            |> group(
+                columns: [
+                    "api",
+                    "app",
+                    "upstream",
+                    "addr",
+                    "method",
+                    "node",
+                    "cluster",
+                    "provider",
+                    "_measurement",
+                ],
+            )
+
+    proxy_timing
+        |> sum()
+        |> set(key: "_field", value: "p_timing")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    proxy_timing
+        |> max()
+        |> set(key: "_field", value: "p_timing_max")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    proxy_timing
+        |> min()
+        |> set(key: "_field", value: "p_timing_min")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_minute_proxy_status_v1"
+  cron: "* * * * *"
+  offset: "22s"
+  flux: |
+    
+    proxy_status =
+        from(bucket: "apinto")
+            |> range(start: -1m)
+            |> filter(fn: (r) => r._measurement == "proxy")
+            |> filter(fn: (r) => r._field == "status")
+            |> group(
+                columns: [
+                    "api",
+                    "app",
+                    "upstream",
+                    "addr",
+                    "method",
+                    "node",
+                    "cluster",
+                    "provider",
+                    "_measurement",
+                ],
+            )
+
+    proxy_status
+        |> count()
+        |> set(key: "_field", value: "p_total")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    proxy_status
+        |> filter(fn: (r) => r._value < 400)
+        |> count()
+        |> set(key: "_field", value: "p_success")
+        |> to(
+            bucket: "apinto/minute",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+            timeColumn: "_start",
+        )
+    proxy_status
+        |> filter(fn: (r) => r._value >= 400 and r._value < 500)
+        |> count()
+        |> set(key: "_field", value: "p_s4xx")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    proxy_status
+        |> filter(fn: (r) => r._value >= 500)
+        |> count()
+        |> set(key: "_field", value: "p_s5xx")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_minute_proxy_request_v1"
+  cron: "* * * * *"
+  offset: "24s"
+  flux: |
+    
+    proxy_request =
+        from(bucket: "apinto")
+            |> range(start: -1m)
+            |> filter(fn: (r) => r._measurement == "proxy")
+            |> filter(fn: (r) => r._field == "request")
+            |> group(
+                columns: [
+                    "api",
+                    "app",
+                    "upstream",
+                    "addr",
+                    "method",
+                    "node",
+                    "cluster",
+                    "provider",
+                    "_measurement",
+                ],
+            )
+
+    proxy_request
+        |> sum()
+        |> set(key: "_field", value: "p_request")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    proxy_request
+        |> max()
+        |> set(key: "_field", value: "p_request_max")
+        |> to(
+            bucket: "apinto/minute",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+            timeColumn: "_start",
+        )
+    proxy_request
+        |> min()
+        |> set(key: "_field", value: "p_request_min")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_minute_proxy_response_v1"
+  cron: "* * * * *"
+  offset: "26s"
+  flux: |
+    
+    proxy_response =
+        from(bucket: "apinto")
+            |> range(start: -1m)
+            |> filter(fn: (r) => r._measurement == "proxy")
+            |> filter(fn: (r) => r._field == "response")
+            |> group(
+                columns: [
+                    "api",
+                    "app",
+                    "upstream",
+                    "addr",
+                    "method",
+                    "node",
+                    "cluster",
+                    "provider",
+                    "_measurement",
+                ],
+            )
+    proxy_response
+        |> sum()
+        |> set(key: "_field", value: "p_response")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    proxy_response
+        |> max()
+        |> set(key: "_field", value: "p_response_max")
+        |> to(
+            bucket: "apinto/minute",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+            timeColumn: "_start",
+        )
+    proxy_response
+        |> min()
+        |> set(key: "_field", value: "p_response_min")
+        |> to(
+            bucket: "apinto/minute",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_hour_request_v1"
+  cron: "0 * * * *"
+  offset: "1m30s"
+  flux: |
+    
+    from(bucket: "apinto/minute")
+        |> range(start: -1h)
+        |> filter(fn: (r) => r._measurement == "request")
+        |> filter(
+            fn: (r) =>
+                r._field == "total" or r._field == "success" or r._field == "s4xx" or r._field == "s5xx"
+                    or
+                    r._field == "timing" or r._field == "request" or r._field == "response" or r._field
+                    ==
+                    "retry",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+                "_measurement",
+            ],
+        )
+        |> sum()
+        |> to(
+            bucket: "apinto/hour",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    from(bucket: "apinto/minute")
+        |> range(start: -1h)
+        |> filter(fn: (r) => r._measurement == "request")
+        |> filter(
+            fn: (r) =>
+                r._field == "timing_max" or r._field == "request_max" or r._field == "response_max"
+                    or
+                    r._field == "retry_max",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+                "_measurement",
+            ],
+        )
+        |> max()
+        |> to(
+            bucket: "apinto/hour",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    from(bucket: "apinto/minute")
+        |> range(start: -1h)
+        |> filter(fn: (r) => r._measurement == "request")
+        |> filter(
+            fn: (r) =>
+                r._field == "timing_min" or r._field == "request_min" or r._field == "response_min"
+                    or
+                    r._field == "retry_min",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+                "_measurement",
+            ],
+        )
+        |> max()
+        |> to(
+            bucket: "apinto/hour",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_hour_proxy_v1"
+  cron: "0 * * * *"
+  offset: "1m45s"
+  flux: |
+    
+    from(bucket: "apinto/minute")
+        |> range(start: -1h)
+        |> filter(fn: (r) => r._measurement == "proxy")
+        |> filter(
+            fn: (r) =>
+                r._field == "p_total" or r._field == "p_success" or r._field == "p_s4xx" or r._field
+                    ==
+                    "p_s5xx" or r._field == "p_timing" or r._field == "p_request" or r._field
+                    ==
+                    "p_response" or r._field == "p_retry",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "addr",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+                "_measurement",
+            ],
+        )
+        |> sum()
+        |> to(
+            bucket: "apinto/hour",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+
+    from(bucket: "apinto/minute")
+        |> range(start: -1h)
+        |> filter(fn: (r) => r._measurement == "proxy")
+        |> filter(
+            fn: (r) =>
+                r._field == "p_timing_max" or r._field == "p_request_max" or r._field
+                    ==
+                    "p_response_max" or r._field == "p_retry_max",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "addr",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+                "_measurement",
+            ],
+        )
+        |> max()
+        |> to(
+            bucket: "apinto/hour",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+
+    from(bucket: "apinto/minute")
+        |> range(start: -1h)
+        |> filter(fn: (r) => r._measurement == "proxy")
+        |> filter(
+            fn: (r) =>
+                r._field == "p_timing_min" or r._field == "p_request_min" or r._field
+                    ==
+                    "p_response_min" or r._field == "p_retry_min",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "addr",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+                "_measurement",
+            ],
+        )
+        |> max()
+        |> to(
+            bucket: "apinto/hour",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_day_request_v1"
+  cron: "0 0 * * *"
+  offset: "2m30s"
+  flux: |
+    
+    from(bucket: "apinto/hour")
+        |> range(start: -1d)
+        |> filter(fn: (r) => r._measurement == "request")
+        |> filter(
+            fn: (r) =>
+                r._field == "total" or r._field == "success" or r._field == "s4xx" or r._field == "s5xx"
+                    or
+                    r._field == "timing" or r._field == "request" or r._field == "response" or r._field
+                    ==
+                    "retry",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> sum()
+        |> set(key: "_measurement", value: "request")
+        |> to(
+            bucket: "apinto/day",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    from(bucket: "apinto/hour")
+        |> range(start: -1d)
+        |> filter(fn: (r) => r._measurement == "request")
+        |> filter(
+            fn: (r) =>
+                r._field == "timing_max" or r._field == "request_max" or r._field == "response_max"
+                    or
+                    r._field == "retry_max",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> max()
+        |> set(key: "_measurement", value: "request")
+        |> to(
+            bucket: "apinto/day",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    from(bucket: "apinto/hour")
+        |> range(start: -1d)
+        |> filter(fn: (r) => r._measurement == "request")
+        |> filter(
+            fn: (r) =>
+                r._field == "timing_min" or r._field == "request_min" or r._field == "response_min"
+                    or
+                    r._field == "retry_min",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> max()
+        |> set(key: "_measurement", value: "request")
+        |> to(
+            bucket: "apinto/day",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_day_proxy_v1"
+  cron: "0 0 * * *"
+  offset: "2m45s"
+  flux: |
+    
+    from(bucket: "apinto/hour")
+        |> range(start: -1d)
+        |> filter(fn: (r) => r._measurement == "proxy")
+        |> filter(
+            fn: (r) =>
+                r._field == "p_total" or r._field == "p_success" or r._field == "p_s4xx" or r._field
+                    ==
+                    "p_s5xx" or r._field == "p_timing" or r._field == "p_request" or r._field
+                    ==
+                    "p_response" or r._field == "p_retry",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "addr",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> sum()
+        |> set(key: "_measurement", value: "proxy")
+        |> to(
+            bucket: "apinto/day",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+
+    from(bucket: "apinto/hour")
+        |> range(start: -1d)
+        |> filter(fn: (r) => r._measurement == "proxy")
+        |> filter(
+            fn: (r) =>
+                r._field == "p_timing_max" or r._field == "p_request_max" or r._field
+                    ==
+                    "p_response_max" or r._field == "p_retry_max",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "addr",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> max()
+        |> set(key: "_measurement", value: "proxy")
+        |> to(
+            bucket: "apinto/day",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+
+    from(bucket: "apinto/hour")
+        |> range(start: -1d)
+        |> filter(fn: (r) => r._measurement == "proxy")
+        |> filter(
+            fn: (r) =>
+                r._field == "p_timing_min" or r._field == "p_request_min" or r._field
+                    ==
+                    "p_response_min" or r._field == "p_retry_min",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "addr",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> max()
+        |> set(key: "_measurement", value: "proxy")
+        |> to(
+            bucket: "apinto/day",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_week_request_v1"
+  cron: "0 0 * * 1"
+  offset: "3m30s"
+  flux: |
+    
+    from(bucket: "apinto/day")
+        |> range(start: -1w)
+        |> filter(fn: (r) => r._measurement == "request")
+        |> filter(
+            fn: (r) =>
+                r._field == "total" or r._field == "success" or r._field == "s4xx" or r._field == "s5xx"
+                    or
+                    r._field == "timing" or r._field == "request" or r._field == "response" or r._field
+                    ==
+                    "retry",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> sum()
+        |> set(key: "_measurement", value: "request")
+        |> to(
+            bucket: "apinto/week",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    from(bucket: "apinto/day")
+        |> range(start: -1w)
+        |> filter(fn: (r) => r._measurement == "request")
+        |> filter(
+            fn: (r) =>
+                r._field == "timing_max" or r._field == "request_max" or r._field == "response_max"
+                    or
+                    r._field == "retry_max",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> max()
+        |> set(key: "_measurement", value: "request")
+        |> to(
+            bucket: "apinto/week",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    from(bucket: "apinto/day")
+        |> range(start: -1w)
+        |> filter(fn: (r) => r._measurement == "request")
+        |> filter(
+            fn: (r) =>
+                r._field == "timing_min" or r._field == "request_min" or r._field == "response_min"
+                    or
+                    r._field == "retry_min",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> max()
+        |> set(key: "_measurement", value: "request")
+        |> to(
+            bucket: "apinto/week",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+-
+  task_name: "apinto_week_proxy_v1"
+  cron: "0 0 * * 1"
+  offset: "3m45s"
+  flux: |
+    
+    from(bucket: "apinto/day")
+        |> range(start: -1w)
+        |> filter(fn: (r) => r._measurement == "proxy")
+        |> filter(
+            fn: (r) =>
+                r._field == "p_total" or r._field == "p_success" or r._field == "p_s4xx" or r._field
+                    ==
+                    "p_s5xx" or r._field == "p_timing" or r._field == "p_request" or r._field
+                    ==
+                    "p_response" or r._field == "p_retry",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "addr",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> sum()
+        |> set(key: "_measurement", value: "proxy")
+        |> to(
+            bucket: "apinto/week",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    from(bucket: "apinto/day")
+        |> range(start: -1w)
+        |> filter(fn: (r) => r._measurement == "proxy")
+        |> filter(
+            fn: (r) =>
+                r._field == "p_timing_max" or r._field == "p_request_max" or r._field
+                    ==
+                    "p_response_max" or r._field == "p_retry_max",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "addr",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> max()
+        |> set(key: "_measurement", value: "proxy")
+        |> to(
+            bucket: "apinto/week",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
+    from(bucket: "apinto/day")
+        |> range(start: -1w)
+        |> filter(fn: (r) => r._measurement == "proxy")
+        |> filter(
+            fn: (r) =>
+                r._field == "p_timing_min" or r._field == "p_request_min" or r._field
+                    ==
+                    "p_response_min" or r._field == "p_retry_min",
+        )
+        |> group(
+            columns: [
+                "api",
+                "app",
+                "upstream",
+                "addr",
+                "method",
+                "node",
+                "cluster",
+                "provider",
+                "_field",
+            ],
+        )
+        |> max()
+        |> set(key: "_measurement", value: "proxy")
+        |> to(
+            bucket: "apinto/week",
+            timeColumn: "_start",
+            tagColumns: [
+                "api",
+                "app",
+                "method",
+                "upstream",
+                "addr",
+                "node",
+                "cluster",
+                "provider",
+            ],
+        )
