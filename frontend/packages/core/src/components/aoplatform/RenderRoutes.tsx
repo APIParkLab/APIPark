@@ -11,8 +11,6 @@ import {useGlobalContext} from "@common/contexts/GlobalStateContext.tsx";
 import {FC,lazy} from 'react';
 import { TeamProvider } from '@core/contexts/TeamContext.tsx';
 import SystemOutlet from '@core/pages/system/SystemOutlet.tsx';
-import { DashboardProvider } from '@core/contexts/DashboardContext.tsx';
-import { PartitionProvider } from '@core/contexts/PartitionContext.tsx';
 import { TenantManagementProvider } from '@market/contexts/TenantManagementContext.tsx';
 
 type RouteConfig = {
@@ -211,6 +209,11 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                 ]
             },
             {
+                path:'dashboardsetting',
+                key: uuidv4(),
+                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/partitions/PartitionInsideDashboardSetting.tsx')),
+            },
+            {
                 path:'cluster',
                 key: uuidv4(),
                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/partitions/PartitionInsideCluster.tsx')),
@@ -344,6 +347,18 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                 key:uuidv4()
             },
             {
+                path:'dashboard',
+                lazy:lazy(() => import(/* webpackChunkName: "[request]" */  '@dashboard/pages/Dashboard.tsx')),
+                key:uuidv4(),
+                children:[
+                    {
+                        path:'total',
+                        key:uuidv4(),
+                        lazy:lazy(() => import(/* webpackChunkName: "[request]" */  '@dashboard/pages/DashboardTotal.tsx')),
+                    },
+                ]
+            },
+            {
                 path:'template/:moduleId',
                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@common/components/aoplatform/intelligent-plugin/IntelligentPluginList.tsx')),
                 key:uuidv4()
@@ -403,7 +418,7 @@ const generateRoutes = (routerConfig: RouteConfig[]) => {
                 const LazyComponent = route.lazy as React.ExoticComponent<unknown>;
 
                 routeElement = (
-                    <Suspense fallback={ <div className=''><Skeleton className='m-btnbase w-[calc(100%-20px)]' active /></div>}>
+                    <Suspense fallback={ <div className=''><Skeleton className='m-btnbase w-calc-100vw-minus-padding-r' active /></div>}>
                         {route.provider ? (
                             createElement(route.provider, {}, <LazyComponent  />)
                         ) : (

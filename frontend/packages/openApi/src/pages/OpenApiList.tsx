@@ -1,71 +1,18 @@
-import PageList from "@common/components/aoplatform/PageList.tsx";
+import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx";
 import  {useEffect, useRef, useState} from "react";
-import {ActionType, ProColumns} from "@ant-design/pro-components";
+import {ActionType} from "@ant-design/pro-components";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import { App, Divider, Switch} from "antd";
 import copy from "copy-to-clipboard";
 import {useFetch} from "@common/hooks/http.ts";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {OpenApiConfig, OpenApiConfigFieldType, OpenApiConfigHandle} from "./OpenApiConfig.tsx";
-import { EntityItem } from "@common/const/type.ts";
 import { SimpleMemberItem } from "@common/const/type.ts";
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission.tsx";
 import { frontendTimeSorter } from "@common/utils/dataTransfer.ts"; 
-
-type OpenApiTableListItem = {
-    id:string;
-    name: string;
-    token:string;
-    tags:string;
-    status:boolean;
-    operator:EntityItem;
-    updateTime:string;
-};
-
-const OPENAPI_LIST_COLUMNS: ProColumns<OpenApiTableListItem>[] = [
-    {
-        title: '应用名称',
-        dataIndex: 'name',
-        ellipsis:true,
-        width:160,
-        fixed:'left'
-    },
-    {
-        title: '应用 ID',
-        dataIndex: 'id',
-        ellipsis:true,
-        width: 140,
-    },
-    {
-        title: '鉴权 Token',
-        dataIndex: 'token',
-        ellipsis:{
-            showTitle:true
-        }
-    },
-    {
-        title: '关联标签',
-        dataIndex: 'tag'
-    },
-    {
-        title: '启用',
-        dataIndex: 'status'
-    },
-    {
-        title: '更新者',
-        dataIndex: ['operator','name'],
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        filterSearch: true
-    },
-    {
-        title: '更新时间',
-        width:182,
-        dataIndex: 'updateTime',
-        sorter: (a,b)=>(new Date(a.updateTime)).getTime() - (new Date(b.updateTime)).getTime()
-    }
-];
+import { OPENAPI_LIST_COLUMNS } from "@market/consts/const.tsx";
+import { OpenApiTableListItem } from "@market/consts/type.ts";
+import { $t } from "@common/locales/index.ts";
 
 
 export default function OpenApiList(){
@@ -74,7 +21,7 @@ export default function OpenApiList(){
     const [init, setInit] = useState<boolean>(true)
     const [tableListDataSource, setTableListDataSource] = useState<OpenApiTableListItem[]>([]);
     const [tableHttpReload, setTableHttpReload] = useState(true);
-    const [columns,setColumns] = useState<ProColumns<OpenApiTableListItem>[] >([])
+    const [columns,setColumns] = useState<PageProColumns<OpenApiTableListItem>[] >([])
     const pageListRef = useRef<ActionType>(null);
     const addOpenApiRef = useRef<OpenApiConfigHandle>(null)
     const editOpenApiRef = useRef<OpenApiConfigHandle>(null)
@@ -82,21 +29,21 @@ export default function OpenApiList(){
     const { setBreadcrumb } = useBreadcrumb()
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
 
-    const operation:ProColumns<OpenApiTableListItem>[] =[
+    const operation:PageProColumns<OpenApiTableListItem>[] =[
         {
-            title: '操作',
+            title: COLUMNS_TITLE.operate,
             key: 'option',
-            width: 266,
+            btnNums:4,
             valueType: 'option',
             fixed:'right',
             render: (_: React.ReactNode, entity: OpenApiTableListItem) => [
-                <TableBtnWithPermission  access="system.openapi.self.updateToken" key="refreshToken" onClick={()=>{refreshToken(entity)}} btnTitle="更新token"/>,
+                <TableBtnWithPermission  access="system.openapi.self.updateToken" key="refresh"  btnType="refresh"   onClick={()=>{refreshToken(entity)}} btnTitle="更新token"/>,
                 <Divider type="vertical" className="mx-0"  key="div1"/>,
-                <TableBtnWithPermission  access="system.openapi.self.view" key="copyToken" onClick={()=>{copyToken(entity)}} btnTitle="复制token"/>,
+                <TableBtnWithPermission  access="system.openapi.self.view" key="copy" btnType="copy"  onClick={()=>{copyToken(entity)}} btnTitle="复制token"/>,
                 <Divider type="vertical" className="mx-0"  key="div2"/>,
-                <TableBtnWithPermission  access="system.openapi.self.edit" key="edit"  onClick={()=>{openModal('edit',entity)}} btnTitle="编辑"/>,
+                <TableBtnWithPermission  access="system.openapi.self.edit" key="edit"   btnType="edit" onClick={()=>{openModal('edit',entity)}} btnTitle="编辑"/>,
                 <Divider type="vertical" className="mx-0"  key="div3"/>,
-                <TableBtnWithPermission  access="system.openapi.self.delete" key="delete" onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/>
+                <TableBtnWithPermission  access="system.openapi.self.delete" key="delete"  btnType="delete"  onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/>
             ],
         }
     ]
@@ -118,7 +65,7 @@ export default function OpenApiList(){
                 setTableHttpReload(false)
                 return  {data:data.apps, success: true}
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -130,19 +77,19 @@ export default function OpenApiList(){
         fetchData<BasicResponse<null>>('external-app/token',{method:'PUT',eoParams:{id:entity.id}}).then(response=>{
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                message.success(msg || '操作成功！')
+                message.success(msg || RESPONSE_TIPS.success)
                 manualReloadTable()
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
 
     const copyToken = (entity: OpenApiTableListItem)=>{
         if(copy(entity.token)){
-            message.success('复制成功')
+            message.success(RESPONSE_TIPS.copySuccess)
         }else{
-            message.error('复制失败，请重试')
+            message.error(RESPONSE_TIPS.copyError)
         }
     }
 
@@ -156,11 +103,11 @@ export default function OpenApiList(){
             fetchData<BasicResponse<null>>('external-app',{method:'DELETE',eoParams:{id:entity!.id}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -172,24 +119,24 @@ export default function OpenApiList(){
         let content:string|React.ReactNode = ''
         switch (type){
             case 'add':
-                title='添加 Open Api'
+                title=$t('添加 Open Api')
                 content=<OpenApiConfig ref={addOpenApiRef} type={type} />
                 break;
             case 'edit':{
-                title='配置 Open Api'
-                message.loading('正在加载数据')
+                title=$t('配置 Open Api')
+                message.loading(RESPONSE_TIPS.loading)
                 const {code,data,msg} = await fetchData<BasicResponse<{app:OpenApiConfigFieldType}>>('external-app',{method:'GET',eoParams:{id:entity!.id}})
                 message.destroy()
                 if(code === STATUS_CODE.SUCCESS){
                     content=<OpenApiConfig ref={editOpenApiRef} type={type} entity={data.app}/>
                 }else{
-                    message.error(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
                     return
                 }
                 break;}
             case 'delete':
-                title='删除'
-                content='该数据删除后将无法找回，请确认是否删除？'
+                title=$t('删除')
+                content=DELETE_TIPS.default
                 break;
         }
 
@@ -207,8 +154,8 @@ export default function OpenApiList(){
                 }
             },
             width:600,
-            okText:'确认',
-            cancelText:'取消',
+            okText:$t('确认'),
+            cancelText:$t('取消'),
             closable:true,
             icon:<></>,
         })
@@ -218,10 +165,10 @@ export default function OpenApiList(){
         fetchData<BasicResponse<null>>(`external-app/${enabled ? 'disable' :'enable'}`,{method:'PUT',eoParams:{id:entity.id}}).then(response=>{
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                message.success(msg || '操作成功！')
+                message.success(msg || RESPONSE_TIPS.success)
                 manualReloadTable()
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -237,13 +184,13 @@ export default function OpenApiList(){
             })
             setMemberValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || '操作失败')
+            message.error(msg || RESPONSE_TIPS.error)
         }
     }
 
 
     useEffect(() => {
-        setBreadcrumb([{ title: 'Open Api'}])
+        setBreadcrumb([{ title:$t('Open Api')}])
         getMemberList()
         setColumns(OPENAPI_LIST_COLUMNS
                         .map((x)=>{
@@ -269,7 +216,7 @@ export default function OpenApiList(){
         dataSource={tableListDataSource}
         showPagination={false}
         primaryKey="id"
-        addNewBtnTitle="添加应用"
+        addNewBtnTitle={$t("添加应用")}
         addNewBtnAccess="system.openapi.self.add"
         onChange={() => {
             setTableHttpReload(false)

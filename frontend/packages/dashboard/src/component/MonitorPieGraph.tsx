@@ -1,6 +1,7 @@
 import {FC} from 'react';
 import ECharts,{EChartsOption} from 'echarts-for-react';
 import { changeNumberUnit } from '../utils/dashboard';
+import { $t } from '@common/locales';
 
 type PieGraphProps = {
   className?:string,
@@ -98,13 +99,13 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
             <ul className="list-none truncate my-0 ps-[10px]">
               <li className="h-[18px]"></li>
               <li className="text-[#999999] mt-[16px]">
-                状态码4XX数
+                {$t('状态码4XX数')}
                 <span className="text-[#999999] inline-block w-[50px] ml-[10px] text-right">
                   {changeNumberUnit(status4xxCount)}
                 </span>
               </li>
               <li className="text-[#999999]  mt-[18px]">
-                状态码5XX数
+                {$t('状态码5XX数')}
                 <span className="text-[#999999] inline-block w-[50px] ml-[10px] text-right">
                   {changeNumberUnit(status5xxCount)}
                 </span>

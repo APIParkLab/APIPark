@@ -3,11 +3,12 @@ import {SearchOutlined} from "@ant-design/icons";
 import {App, Divider, Input, TreeDataNode} from "antd";
 import  {useCallback, useEffect, useState} from "react";
 import Tree, {DataNode} from "antd/es/tree";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { CategorizesType } from "../../const/serviceHub/type.ts";
 import { filterServiceList, initialServiceHubListState, SERVICE_HUB_LIST_ACTIONS, ServiceHubListActionType } from "./ServiceHubList.tsx";
 import { EntityItem } from "@common/const/type.ts";
+import { $t } from "@common/locales/index.ts";
 
 type ServiceHubGroup = {
     children:JSX.Element
@@ -35,11 +36,11 @@ export const ServiceHubGroup = ({children,filterOption,dispatch}:ServiceHubGroup
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 dispatch({type:SERVICE_HUB_LIST_ACTIONS.GET_CATEGORIES,payload:data.catalogues})
-                dispatch({type:SERVICE_HUB_LIST_ACTIONS.GET_TAGS,payload:[...data.tags,{id:'empty',name:'无标签'}]})
+                dispatch({type:SERVICE_HUB_LIST_ACTIONS.GET_TAGS,payload:[...data.tags,{id:'empty',name:$t('无标签')}]})
                 dispatch({type:SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_CATE,payload:[...data.catalogues.map((x:CategorizesType)=>x.id)]})
                 dispatch({type:SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_TAG,payload:[...data.tags.map((x:EntityItem)=>x.id),'empty']})
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -75,11 +76,11 @@ export const ServiceHubGroup = ({children,filterOption,dispatch}:ServiceHubGroup
             <div className="w-[220px] border-0 border-solid border-r-[1px] border-r-BORDER">
             <div className=" h-full">
                 <Input className="rounded-SEARCH_RADIUS m-[10px] h-[40px] bg-[#f8f8f8] w-[200px]" onChange={(e) => debounce(onSearchWordChange, 500)(e.target.value)}
-                    allowClear placeholder="搜索服务"
+                    allowClear placeholder={$t("搜索服务")}
                     prefix={<SearchOutlined className="cursor-pointer"/>}/>
                     <div className="h-[calc(100%-60px)] overflow-auto">
                         <div className="mt-[20px] ml-[20px] pr-[10px] ">
-                            <p className="text-[18px] h-[25px] leading-[25px] font-bold mb-[15px]">分类</p>
+                            <p className="text-[18px] h-[25px] leading-[25px] font-bold mb-[15px]">{$t('分类')}</p>
                             <Tree
                                 className={`no-selected-tree ${transferToTreeData(filterOption.categoriesList).filter(x=>x.children && x.children.length > 0).length > 0 ? '' : 'no-first-switch-tree'}`}
                                 checkable
@@ -93,7 +94,7 @@ export const ServiceHubGroup = ({children,filterOption,dispatch}:ServiceHubGroup
                         </div>
                         <Divider  className="my-[20px]" />
                         <div className="ml-[20px] pr-[10px]">
-                        <p className="text-[18px] h-[25px] leading-[25px] font-bold mb-[15px]">标签</p>
+                        <p className="text-[18px] h-[25px] leading-[25px] font-bold mb-[15px]">{$t('标签')}</p>
                             <Tree
                                 className="no-first-switch-tree no-selected-tree"
                                 checkable

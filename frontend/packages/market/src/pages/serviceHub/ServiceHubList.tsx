@@ -3,7 +3,7 @@ import  {FC, forwardRef, useEffect, useReducer, useRef} from "react";
 import { useNavigate, useParams} from "react-router-dom";
 import {App,Card, Avatar, Tag, Empty, Spin, Tooltip} from "antd";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import {  CategorizesType, ServiceHubTableListItem } from "../../const/serviceHub/type.ts";
@@ -11,6 +11,7 @@ import { VirtuosoGrid } from 'react-virtuoso';
 import { ApiOutlined,LoadingOutlined } from "@ant-design/icons";
 import ServiceHubGroup from "./ServiceHubGroup.tsx";
 import { EntityItem } from "@common/const/type.ts";
+import { $t } from "@common/locales/index.ts";
 
 export enum SERVICE_HUB_LIST_ACTIONS {
     GET_CATEGORIES = 'GET_CATEGORIES',
@@ -102,7 +103,7 @@ const ServiceHubList:FC = ()=>{
                 dispatch({type:SERVICE_HUB_LIST_ACTIONS.SET_SERVICES,payload: filterServiceList({...filterOption, servicesList:data.services})})
                
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         }).finally(()=>{ dispatch({type:SERVICE_HUB_LIST_ACTIONS.LIST_LOADING,payload:false})})
     }
@@ -117,7 +118,7 @@ const ServiceHubList:FC = ()=>{
     useEffect(() => {
         setBreadcrumb(
             [
-                {title:'服务市场'}
+                {title:$t('服务市场')}
             ]
         )
         getServiceList()
@@ -137,7 +138,7 @@ const ServiceHubList:FC = ()=>{
                 <div className="pt-[20px]">
                 <Card title={CardTitle(item)} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px] m-0 transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]"  classNames={{header:'border-b-[0px] p-[20px] ', body:"pt-0"}} onClick={()=>showDocumentDetail(item)}>
                    <span className="line-clamp-3  text-[12px] text-[#666] " 
-                    style={{'word-break':'auto-phrase'}}>{item.description || '暂无服务描述'}</span> 
+                    style={{'word-break':'auto-phrase'}}>{item.description || $t('暂无服务描述')}</span> 
                 </Card>
                 </div>
             );
@@ -182,10 +183,10 @@ const CardTitle = (service:ServiceHubTableListItem)=>{
                 <div className="mt-[10px] h-[20px] flex items-center font-normal">
                     <Tag color="#7371fc1b" className="text-theme font-normal border-0 mr-[12px] max-w-[150px] truncate" key={service.id} bordered={false} title={service.catalogue?.name || '-'}>{service.catalogue?.name || '-'}</Tag>
                    
-                    <Tooltip  title='API 数量'>
+                    <Tooltip  title={$t('API 数量')}>
                         <span className="mr-[12px]"><ApiOutlined className="mr-[1px] text-[14px] h-[14px] w-[14px]"/><span className="font-normal text-[14px]">{service.apiNum ?? '-'}</span></span>
                     </Tooltip>
-                    <Tooltip  title='接入应用数量'>
+                    <Tooltip  title={$t('接入应用数量')}>
                         <span className="mr-[12px] flex items-center"><span className="h-[14px] mr-[4px] flex items-center"><iconpark-icon  className="max-h-[14px]  h-[14px] w-[14px]"  name="auto-generate-api"></iconpark-icon></span><span className="font-normal text-[14px]">{service.subscriberNum ?? '-'}</span></span>
                     </Tooltip>
                 </div>

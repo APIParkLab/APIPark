@@ -1,10 +1,11 @@
 
 import {App, Form, Input} from "antd";
 import  {forwardRef, useEffect, useImperativeHandle} from "react";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import {v4 as uuidv4} from 'uuid'
+import { $t } from "@common/locales";
 
 export type OpenApiConfigFieldType = {
     id?:string
@@ -33,11 +34,11 @@ export const OpenApiConfig = forwardRef<OpenApiConfigHandle,OpenApiConfigProps>(
                 fetchData<BasicResponse<null>>('external-app',{method:type === 'add'? 'POST' : 'PUT',eoBody:(value), eoParams:type === 'add' ? {}:{id:entity!.id}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -65,31 +66,29 @@ export const OpenApiConfig = forwardRef<OpenApiConfigHandle,OpenApiConfigProps>(
             form={form}
             className="mx-auto "
             name="OpenApiConfig"
-            // labelCol={{ offset:1, span: 4 }}
-            // wrapperCol={{ span: 19}}
             autoComplete="off"
         >
             <Form.Item<OpenApiConfigFieldType>
-                label="应用名称"
+                label={$t("应用名称")}
                 name="name"
-                rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
             >
-                <Input className="w-INPUT_NORMAL" placeholder="请输入"/>
+                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
             </Form.Item>
 
             <Form.Item<OpenApiConfigFieldType>
-                label="应用 ID"
+                label={$t("应用 ID")}
                 name="id"
-                rules={[{ required: true, message: '必填项' ,whitespace:true }]}
+                rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
             >
-                <Input className="w-INPUT_NORMAL" placeholder="请输入" disabled={type === 'edit'}/>
+                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input} disabled={type === 'edit'}/>
             </Form.Item>
 
             <Form.Item
-                label="描述"
+                label={$t("描述")}
                 name="desc"
             >
-                <Input.TextArea className="w-INPUT_NORMAL" placeholder="请输入"/>
+                <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
             </Form.Item>
 
         </Form>

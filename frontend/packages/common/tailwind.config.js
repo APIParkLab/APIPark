@@ -91,6 +91,9 @@ module.exports = {
         '.h-calc-100vh-minus-navbar': {
           height: 'calc(100vh - var(--layout-header-height))',
         },
+        '.w-calc-100vw-minus-padding-r': {
+          width: 'calc(100% - 40px)',
+        },
       }, ['responsive', 'hover']);
     }
   ],
