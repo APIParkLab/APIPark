@@ -12,6 +12,7 @@ import 'dayjs/locale/zh-cn';
 import dayjs from 'dayjs';
 import { useTranslation } from "react-i18next";
 import { useGlobalContext } from '@common/contexts/GlobalStateContext';
+import Joyride from 'react-joyride';
 
 type Locale = ConfigProviderProps['locale'];
 
@@ -138,6 +139,7 @@ const antdComponentThemeToken = {
       },
   }
 }
+
 
 function App() {
   const [locale, setLocal] = useState<Locale>(enUS);

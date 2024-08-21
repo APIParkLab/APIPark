@@ -2,10 +2,11 @@
 import { App, Form, Row, Col, Input } from "antd"
 import { forwardRef, useImperativeHandle, useEffect } from "react"
 import WithPermission from "@common/components/aoplatform/WithPermission"
-import { BasicResponse, STATUS_CODE } from "@common/const/const"
+import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const"
 import { useFetch } from "@common/hooks/http"
 import { SYSTEM_SUBSCRIBE_APPROVAL_DETAIL_LIST } from "@core/const/system/const"
 import { SubSubscribeApprovalModalHandle, SubSubscribeApprovalModalProps } from "@core/const/system/type"
+import { $t } from "@common/locales"
 
 type FieldType = {
     reason: string
@@ -28,11 +29,11 @@ export const ApprovalModalContent = forwardRef<SubSubscribeApprovalModalHandle,S
                 fetchData<BasicResponse<null>>('catalogue/service/subscribe',{method: 'POST',eoParams:{team:teamId}, eoBody:({service:data!.service.id, applications:[serviceId], reason:value.reason})}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -59,8 +60,6 @@ export const ApprovalModalContent = forwardRef<SubSubscribeApprovalModalHandle,S
                 form={form}
                 className="mx-auto "
                 name="subSubscribeApprovalDetailModalContent"
-                // labelCol={{ span: 8 }}
-                // wrapperCol={{ span: 12}}
                 autoComplete="off"
                 disabled={type === 'view'}
             >
@@ -69,22 +68,21 @@ export const ApprovalModalContent = forwardRef<SubSubscribeApprovalModalHandle,S
                 return (
                     <Row key={x.key} className="leading-[32px] mb-btnbase">
                         <Col className="text-left" span={8}>{x.title}：</Col>
-                        {/* <Col >{showData(x)}</Col> */}
                         <Col >{x.nested ? data?.[x.key]?.[x.nested] : ( (data as {[k:string]:unknown})?.[x.key] || '-')}</Col>
                     </Row>)
                 })}
 
                 <Form.Item<FieldType>
-                    label="申请原因"
+                    label={$t("申请原因")}
                     name="reason"
                 >
-                    <Input.TextArea className="w-INPUT_NORMAL" disabled={type === 'view'} placeholder="请输入"  />
+                    <Input.TextArea className="w-INPUT_NORMAL" disabled={type === 'view'} placeholder={PLACEHOLDER.input}  />
                 </Form.Item>
                 <Form.Item<FieldType>
-                    label="审核意见"
+                    label={$t("审核意见")}
                     name="opinion"
                 >
-                    <Input.TextArea className="w-INPUT_NORMAL" placeholder="请输入" disabled={true} />
+                    <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input} disabled={true} />
                 </Form.Item>
             </Form>
             </WithPermission>

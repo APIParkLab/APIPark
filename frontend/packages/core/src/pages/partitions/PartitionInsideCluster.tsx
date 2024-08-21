@@ -1,7 +1,7 @@
 import  { FC, useEffect,  useRef, useState} from "react";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {App, Button, Card, Col, Row, Spin, Tag} from "antd";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.tsx";
+import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {  ClusterPageShowStatus, NodeModalHandle, PartitionClusterNodeTableListItem } from "../../const/partitions/types.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
@@ -12,7 +12,7 @@ import { $t } from "@common/locales/index.ts";
 
 const PartitionInsideCluster:FC = ()=> {
     const {setBreadcrumb} = useBreadcrumb()
-    const {modal, message} = App.useApp()
+    const { message} = App.useApp()
     const {fetchData} = useFetch()
     const [nodeData, setNodeData] = useState<PartitionClusterNodeTableListItem>()
     const [loading, setLoading] = useState<boolean>(false)
@@ -65,7 +65,7 @@ const PartitionInsideCluster:FC = ()=> {
                         <div className="h-full  overflow-auto">
                                 <Card 
                                     classNames={{
-                                        body: 'overflow-auto',
+                                        body: `overflow-auto ${!nodeData && showStatus === 'view' ? 'hidden': ''}`,
                                     }}
                                     className="overflow-hidden w-full max-h-full flex flex-col justify-between"
                                     title={<div><span className="text-MAIN_TEXT my-btnybase mr-btnbase" > APIPark Node</span>

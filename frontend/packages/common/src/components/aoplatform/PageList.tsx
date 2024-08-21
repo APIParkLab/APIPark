@@ -53,7 +53,7 @@ interface PageListProps<T> extends ProTableProps<T, unknown>, RefAttributes<Acti
 
 
 const PageList = <T extends Record<string, unknown>>(props: React.PropsWithChildren<PageListProps<T>>,ref: React.Ref<ActionType>) => {
-  const {id,columns,request,dropMenu,searchPlaceholder,showPagination=true,primaryKey='id',addNewBtnTitle,addNewBtnAccess,tableClickAccess,tableClass,onAddNewBtnClick,beforeSearchNode,onSearchWordChange,manualReloadTable,afterNewBtn,dragSortKey,onDragSortEnd,tableTitle,rowSelection,onChange,dataSource,onRowClick,showColSetting=false,minVirtualHeight,noTop,addNewBtnWrapperClass,tableTitleClass,delayLoading = true,besidesTableHeight, noScroll} = props
+  const {id,columns,request,dropMenu,searchPlaceholder,showPagination=true,primaryKey='id',addNewBtnTitle,addNewBtnAccess,tableClickAccess,tableClass,onAddNewBtnClick,beforeSearchNode,onSearchWordChange,manualReloadTable,afterNewBtn,dragSortKey,onDragSortEnd,tableTitle,rowSelection,onChange,dataSource,onRowClick,showColSetting=false,minVirtualHeight,noTop,addNewBtnWrapperClass = '',tableTitleClass,delayLoading = true,besidesTableHeight, noScroll} = props
   const parentRef = useRef<HTMLDivElement>(null);
   const [tableHeight, setTableHeight] = useState(minVirtualHeight || window.innerHeight);
   const [tableWidth, setTableWidth] = useState<number|undefined>(undefined);
