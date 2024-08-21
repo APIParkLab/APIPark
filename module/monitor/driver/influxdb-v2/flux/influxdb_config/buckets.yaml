@@ -1,0 +1,15 @@
+-
+  bucket_name: apinto
+  retention: 3600 #1个小时
+-
+  bucket_name: apinto/minute
+  retention: 604800 #7天
+-
+  bucket_name: apinto/hour
+  retention: 7776000 #90天
+-
+  bucket_name: apinto/day
+  retention: 157680000 #5年
+-
+  bucket_name: apinto/week
+  retention: 0 #永久

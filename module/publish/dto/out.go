@@ -22,7 +22,7 @@ type Publish struct {
 }
 
 func FromModel(m *publish.Publish, versionRemark string) *Publish {
-	
+
 	p := &Publish{
 		Id:            m.Id,
 		Version:       m.Version,
@@ -32,7 +32,7 @@ func FromModel(m *publish.Publish, versionRemark string) *Publish {
 		Service:       auto.UUID(m.Service),
 		Applicant:     auto.UUID(m.Applicant),
 		Release:       auto.UUID(m.Release),
-		
+
 		Status:      m.Status,
 		ApplyTIme:   auto.TimeLabel(m.ApplyTime),
 		ApproveTime: auto.TimeLabel(m.ApproveTime),
@@ -53,7 +53,7 @@ type PublishDetail struct {
 }
 
 type PublishStatus struct {
-	//Partition auto.Label `json:"partition" aolabel:"partition"`
+	//Cluster auto.Label `json:"partition" aolabel:"partition"`
 	//Cluster auto.Label `json:"cluster" aolabel:"cluster"`
 	Status string `json:"status"`
 	Error  string `json:"error"`
