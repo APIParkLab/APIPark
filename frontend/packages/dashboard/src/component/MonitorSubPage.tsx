@@ -5,7 +5,7 @@ import { EntityItem } from "@common/const/type";
 import TimeRangeSelector, { RangeValue, TimeRange, TimeRangeButton } from "@common/components/aoplatform/TimeRangeSelector";
 import MonitorTable, { MonitorTableHandler } from "./MonitorTable";
 import { DefaultOptionType } from "antd/es/select";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { getTime } from "../utils/dashboard";
 import { useParams } from "react-router-dom";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
@@ -13,6 +13,7 @@ import { useExcelExport } from "@common/hooks/excel";
 import { SERVICE_TABLE_GLOBAL_COLUMNS_CONFIG } from "@dashboard/const/const";
 import { CloseOutlined, ExpandOutlined } from "@ant-design/icons";
 import { useFetch } from "@common/hooks/http";
+import { $t } from "@common/locales";
 
 export type MonitorSubQueryData = SearchBody & { projects?:string[] ,type?:'subscriber'|'provider'}
 
@@ -64,7 +65,7 @@ export default function MonitorSubPage(props:MonitorSubPageProps){
         if(code === STATUS_CODE.SUCCESS){
           setListOfProjects(data.projects?.map((x:EntityItem)=>({label:x.name, value:x.id})))
         }else{
-            message.error(msg || '获取数据失败，请重试')
+            message.error(msg || RESPONSE_TIPS.dataError)
             return setListOfProjects([])
         }
       }).catch(() => {
@@ -102,9 +103,9 @@ export default function MonitorSubPage(props:MonitorSubPageProps){
          fetchTableData(data).then((resp) => {
           const {code,data,msg} = resp
           if(code === STATUS_CODE.SUCCESS){
-            exportExcel('服务调用统计', [query!.start!, query!.end!], '服务调用统计', 'dashboard_service', SERVICE_TABLE_GLOBAL_COLUMNS_CONFIG, data.statistics)
+            exportExcel($t('服务调用统计'), [query!.start!, query!.end!], $t('服务调用统计'), 'dashboard_service', SERVICE_TABLE_GLOBAL_COLUMNS_CONFIG, data.statistics)
           }else{
-              message.error(msg || '获取数据失败，请重试')
+              message.error(msg || RESPONSE_TIPS.dataError)
           }
         })
     };
@@ -121,7 +122,7 @@ export default function MonitorSubPage(props:MonitorSubPageProps){
            if(code === STATUS_CODE.SUCCESS){
                return  {data:data.statistics?.map((x:MonitorSubscriberData)=>{x.proxyRate = Number((x.proxyRate*100).toFixed(2));x.requestRate = Number((x.requestRate*100).toFixed(2));return x}), success: true}
            }else{
-               message.error(msg || '获取数据失败，请重试')
+               message.error(msg || RESPONSE_TIPS.dataError)
                return {data:[], success:false}
            }
          }).catch(() => {
@@ -152,8 +153,7 @@ export default function MonitorSubPage(props:MonitorSubPageProps){
                   className="w-[346px]"
                   mode="multiple"
                   maxTagCount={1}
-                  // maxTagPlaceholder={(selectedList) => `and ${selectedList.length} more selected`}
-                  placeholder="请选择"
+                  placeholder={$t("请选择服务")}
                   value={queryData?.projects}
                   options={listOfProjects}
                   onChange={(value)=>{setQueryData(prevData=>({...prevData || {}, projects:value}))}}
@@ -161,13 +161,13 @@ export default function MonitorSubPage(props:MonitorSubPageProps){
               </div>
               <div>
                 <Button className="ml-btnybase" onClick={clearSearch}>
-                  重置
+                  {$t('重置')}
                 </Button>
                 <Button type="primary" loading={queryBtnLoading} className="ml-btnybase" onClick={()=>{setQueryBtnLoading(true);getAppTableList()}}>
-                  查询
+                  {$t('查询')}
                 </Button>
                 <Button className="ml-btnybase" loading={exportLoading} onClick={exportData}>
-                  导出
+                 {$t('导出')}
                 </Button>
               </div>
             </div>
@@ -182,9 +182,9 @@ export default function MonitorSubPage(props:MonitorSubPageProps){
           mask={!fullScreen} 
           title={<>
               {fullScreen && <a className="mr-btnrbase text-[14px]" onClick={()=>{setFullScreen?.(false)}}>
-                <CloseOutlined className="mr-[4px]"/>退出全屏
+                <CloseOutlined className="mr-[4px]"/>{$t('退出全屏')}
                 </a>}
-              <span className="mr-btnrbase">{detailEntityName}调用详情</span>
+              <span className="mr-btnrbase">{detailEntityName}{$t('调用详情')}</span>
               {!fullScreen && <ExpandOutlined className="text-MAIN_TEXT hover:text-MAIN_HOVER_TEXT" onClick={()=>{setFullScreen?.(true)}}/>}
               </>} 
           width={fullScreen ? '100%' : '60%'} 

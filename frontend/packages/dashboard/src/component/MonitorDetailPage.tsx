@@ -3,13 +3,14 @@ import { useState, useEffect, useRef } from "react";
 import {  InvokeData, MonitorApiData, MonitorSubscriberData, SearchBody } from "@dashboard/const/type";
 import TimeRangeSelector, { RangeValue, TimeRange, TimeRangeButton } from "@common/components/aoplatform/TimeRangeSelector";
 import MonitorLineGraph from "./MonitorLineGraph";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { getTime, getTimeUnit } from "../utils/dashboard";
 import MonitorTable, { MonitorTableHandler } from "./MonitorTable";
 import { DashboardDetailInvokeType } from "@dashboard/pages/DashboardDetail";
 import { MonitorApiQueryData } from "./MonitorApiPage";
 import { MonitorSubQueryData } from "./MonitorSubPage";
 import dayjs from "dayjs";
+import { $t } from "@common/locales";
 
 type MonitorDetailPageProps = {
   fetchInvokeData:(body:SearchBody)=>Promise<BasicResponse<DashboardDetailInvokeType>>
@@ -38,7 +39,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
     const [timeUnit, setTimeUnit] = useState<string>()
     const [invokeStaticError,setInvokeStaticError] = useState<boolean>(false)
     const monitorTableRef = useRef<MonitorTableHandler>(null)
-    const [modalTitle, setModalTitle] = useState<string>('调用趋势')
+    const [modalTitle, setModalTitle] = useState<string>($t('调用趋势'))
     const [queryBtnLoading, setQueryBtnLoading] = useState<boolean>(false)
 
     useEffect(() => {
@@ -71,7 +72,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
               // this.invokeLineRef?.changeLineChart()
             }else{
               setInvokeStaticError(true)
-              message.error(msg || '获取数据失败，请重试')
+              message.error(msg || RESPONSE_TIPS.dataError)
             }
     }).catch(()=>{setQueryBtnLoading(false)})
   };
@@ -83,7 +84,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
           if(code === STATUS_CODE.SUCCESS){
             return  {data:data.statistics?.map((x:(MonitorApiData|MonitorSubscriberData))=>{x.proxyRate = Number((x.proxyRate*100).toFixed(2));x.requestRate = Number((x.requestRate*100).toFixed(2));return x}), success: true}
         }else{
-            message.error(msg || '获取数据失败，请重试')
+            message.error(msg || RESPONSE_TIPS.dataError)
             return {data:[], success:false}
         }
       }).catch(() => {
@@ -108,18 +109,13 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
           setDetailInvokeStatic(tendency)
           setDetailInvokeError(false)
           setTimeUnit(getTimeUnit(timeInterval!))
-          // this.invokeLineRef?.changeLineChart()
-          setModalTitle(`${entity.name}-${detailName}调用趋势`);
+          setModalTitle($t('(0)-(1)调用趋势', [entity.name, detailName]))
           setModalVisible(true);
         }else{
           setInvokeStaticError(true)
-          message.error(msg || '获取数据失败，请重试')
+          message.error(msg || RESPONSE_TIPS.dataError)
         }
         })
-
-        // setModalTitle(`${entity.name}-${detailName}调用趋势`);
-        // setModalVisible(true);
-
     };
 
     const handleCloseModal = () => {
@@ -144,10 +140,10 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
               onTimeRangeChange={handleTimeRangeChange}
               hideTitle={!fullScreen}/>
           <Button className="ml-btnybase mt-btnybase" onClick={clearSearch}>
-              重置
+              {$t('重置')}
             </Button>
             <Button className="ant-btn-primary ml-btnybase mt-btnybase" loading={queryBtnLoading} onClick={()=>{setQueryBtnLoading(true);getMonitorData();}}>
-              查询
+              {$t('查询')}
             </Button>
         </div>
       </div>
@@ -156,7 +152,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
           {/* 这里应该添加图表组件 */}
           {invokeStaticError ? <Empty className="mt-[20%]" image={Empty.PRESENTED_IMAGE_SIMPLE}/>: <MonitorLineGraph
               lineData={invokeStatic}
-              titles={['调用量统计']}
+              titles={[$t('调用量统计')]}
               yAxisTitle={timeUnit || '-'}
               type="invoke"
             />}
@@ -175,11 +171,11 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
         maskClosable={false}
       >
         <div className=" pb-btnybase flex flex-nowrap flex-col w-full items-center justify-between">
-          <div className="w-full flex flex-row-reverse"><Checkbox  checked={compareTotal} onChange={(e) => {setCompareTotal(e.target.checked)}}>加入总体数据对比</Checkbox></div>
+          <div className="w-full flex flex-row-reverse"><Checkbox  checked={compareTotal} onChange={(e) => {setCompareTotal(e.target.checked)}}>{$t('加入总体数据对比')}</Checkbox></div>
           {(detailInvokeError||!modalVisible) ? <Empty className="w-[calc(100%-20px)]" image={Empty.PRESENTED_IMAGE_SIMPLE}/>: <MonitorLineGraph
           className="w-[calc(100%-22px)] w-min-[300px]"
               lineData={detailInvokeStatic!}
-              titles={['调用量统计']}
+              titles={[$t('调用量统计')]}
               yAxisTitle={timeUnit || '-'}
               type="invoke"
             />}
@@ -188,7 +184,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
             (invokeStaticError ||!modalVisible ) ? <Empty className="w-[calc(100%-20px)]" image={Empty.PRESENTED_IMAGE_SIMPLE}/>: <MonitorLineGraph
             className="w-[calc(100%-20px)]"
             lineData={invokeStatic}
-            titles={['调用量统计']}
+            titles={[$t('调用量统计')]}
             yAxisTitle={timeUnit || '-'}
             type="invoke"
           />

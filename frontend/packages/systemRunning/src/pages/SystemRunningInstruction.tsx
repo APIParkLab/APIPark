@@ -1,4 +1,5 @@
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext";
+import { $t } from "@common/locales";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 export default function SystemRunningInstruction() {
@@ -6,7 +7,7 @@ export default function SystemRunningInstruction() {
 
     useEffect(()=>{
         setBreadcrumb([
-            {title:'系统拓扑图'}
+            {title:$t('系统拓扑图')}
         ])
     },[])
     return (

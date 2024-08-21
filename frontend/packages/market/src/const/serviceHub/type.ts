@@ -93,7 +93,7 @@ export type ServiceHubAppListItem = {
 export type TenantManagementServiceListItem = {
     id:string
     service:EntityItem
-    applyStatus:SubscribeEnum
+    applyStatus:typeof SubscribeEnum
     app:EntityItem
     team:EntityItem
     from:SubscribeFromEnum

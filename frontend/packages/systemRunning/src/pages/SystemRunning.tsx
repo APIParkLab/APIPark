@@ -11,9 +11,10 @@ import { PictureTypeEnum, NodeClickItem, GraphData } from "@core/const/system-ru
 import { UnionFind, edgesFormatter, getNodeSpacing, nodesFormatter } from "@common/utils/systemRunning.ts";
 import { EDGE_STYLE, END_ARROW_STYLE, OUT_SPACE_CONTENT_EDGE_COLOR, RELATIVE_PICTURE_NODE_FONTSIZE, SELF_SPACE_CONTENT_EDGE_COLOR, SYSTEM_TUNNING_CONFIG } from "@core/const/system-running/const.ts";
 import ReactDOM from "react-dom";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import SystemRunningInstruction from "./SystemRunningInstruction.tsx";
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext.tsx";
+import { $t } from "@common/locales/index.ts";
 
 export type TopologyItem = {
     projects:TopologyProjectItem[]
@@ -114,9 +115,6 @@ export default function SystemRunning(){
     const newNodes = nodesFormatter(projects)
     const newEdges = edgesFormatter(tmpProjectConnectMap)
 
-    // 从 edges 中提取所有唯一的节点
-    // const allNodeIds = tmpProjectConnectMap.map(({ source, target }) => source || []).concat(tmpProjectConnectMap.map(({ source, target }) => target || [])).filter(Boolean);
-    // const nodes: Node[] = allNodeIds.map(id => ({ id }));
    // 从 edges 中提取所有唯一的节点，并将 Set 转换为数组
     const allNodeIds:string[] = Array.from(new Set(newEdges.flatMap(edge => [edge.source, edge.target]))) as string[];
 
@@ -239,7 +237,7 @@ export default function SystemRunning(){
                 setShowGraph(newGraphData?.nodes?.length > 0)
 
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         }).finally(()=>setLoading(false))
     }
@@ -351,7 +349,7 @@ export default function SystemRunning(){
         },
         defaultEdge: {
           // type: 'quadratic',
-          label: '调用服务',
+          label: $t('调用服务'),
           labelCfg: {
             style: {
               fill: '5B8FF9',
@@ -544,24 +542,24 @@ export default function SystemRunning(){
 
 
     useEffect(() => {
-      setBreadcrumb([{title:'系统拓扑图'}])
+      setBreadcrumb([{title:$t('系统拓扑图')}])
         getNodeData()
       }, []);
 
       return (<>
         {
         showGraph ?
-          <div className="h-full overflow-hidden w-full">
-          <div className="mt-[10px] ml-[10px] absolute top-navbar-height right-0">
-            <div className="flex justify-between">
-              <div>
-              </div>
-              <div className="border border-solid border-color-base rounded mr-[20px] z-[999] h-8 bg-[#fff]">
-                <Button id="zoom-in-button" type="text" title="放大" icon={<ZoomInOutlined />} onClick={()=>updateZoomTo(true)}/>
-                <Button id="zoom-out-button" type="text" title="缩小" icon={<ZoomOutOutlined />} onClick={()=>updateZoomTo(false)} />
+          <div className="h-full overflow-hidden w-full  pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X relative">
+            <div className=" absolute top-[10px] right-PAGE_INSIDE_X">
+              <div className="flex justify-between">
+                <div>
+                </div>
+                <div className="border border-solid border-color-base rounded  z-[999] h-8 bg-[#fff]">
+                  <Button id="zoom-in-button" type="text" title={$t("放大")} icon={<ZoomInOutlined />} onClick={()=>updateZoomTo(true)}/>
+                  <Button id="zoom-out-button" type="text" title={$t("缩小")} icon={<ZoomOutOutlined />} onClick={()=>updateZoomTo(false)} />
+                </div>
               </div>
             </div>
-          </div>
             <div className="h-full w-full"  ref={graphContainerRef} >
 
             

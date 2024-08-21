@@ -7,6 +7,7 @@ import {DataNode} from "antd/es/tree";
 import {ApiDetail} from "@common/const/api-detail";
 import ApiTest from "@common/components/postcat/ApiTest.tsx";
 import DirectoryTree from "antd/es/tree/DirectoryTree";
+import { $t } from "@common/locales";
 
 type ApiTestGroupType = {
     apiInfoList:ApiDetail[]
@@ -62,7 +63,7 @@ export default function ApiTestGroup({apiInfoList,selectedApiId }:ApiTestGroupTy
         <div className="flex flex-1 h-full w-full">
             <div className="w-[220px] p-btnbase border-0 border-solid border-r-[1px] border-r-BORDER">
                 <Input className=" my-btnybase" onChange={(e) => debounce(onSearchWordChange, 100)(e)}
-                        allowClear placeholder="搜索分类或标签"
+                        allowClear placeholder={$t("搜索分类或标签")}
                        prefix={<SearchOutlined className="cursor-pointer" onClick={(e) => {
                            onSearchWordChange(e)
                        }}/>}/>
@@ -78,7 +79,7 @@ export default function ApiTestGroup({apiInfoList,selectedApiId }:ApiTestGroupTy
             </div>
             {selectedApiInfo ?
             <ApiTest apiInfo={selectedApiInfo} /> :
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无API数据"/>
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无API数据")}/>
             }
         </div>
     )

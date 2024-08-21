@@ -4,6 +4,7 @@ import ECharts, { EChartsOption } from 'echarts-for-react';
 import { InvokeData, LineGraphType, MessageData } from '@dashboard/const/type';
 import {  MONITOR_LINE_CHART_BASIC_INVOKE_SELECTED, MONITOR_LINE_CHART_BASIC_MESSAGE_SELECTED, MONITOR_LINE_CHART_OPTION_CONFIG, MONITOR_NAME_MAP } from '@dashboard/const/const';
 import { yUnitFormatter } from '../utils/dashboard';
+import { $t } from '@common/locales';
 
 type LineGraphProps = {
   className?:string
@@ -133,7 +134,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     },
     yAxis: [{
       type: 'value',
-      name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用量` : '',
+      name: (lineData as InvokeData)?.date.length > 0 ? $t('(0)调用量',[yAxisTitle]) : '',
       nameLocation: 'end',
       nameTextStyle: {
         align: 'left'
@@ -148,7 +149,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     },
     {
       type: 'value',
-      name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用成功率` : '',
+      name: (lineData as InvokeData)?.date.length > 0 ? $t('(0)调用成功率',[yAxisTitle])  : '',
       position: 'right',
       min: 0,
       max: 100,
@@ -165,12 +166,12 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       }
     }],
     series: [
-      { type: 'line', symbol: 'none', name: '请求总数', data: (lineData as InvokeData)?.requestTotal, yAxisIndex: 0 },
-      { type: 'line', symbol: 'none', name: '请求成功率', data: (lineData as InvokeData)?.requestRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], yAxisIndex: 1 },
-      { type: 'line', symbol: 'none', name: '转发总数', data: (lineData as InvokeData)?.proxyTotal, yAxisIndex: 0 },
-      { type: 'line', symbol: 'none', name: '转发成功率', data: (lineData as InvokeData)?.proxyRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], yAxisIndex: 1 },
-      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: '状态码4xx数', data: (lineData as InvokeData)?.status_4xx, yAxisIndex: 0 },
-      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: '状态码5xx数', data: (lineData as InvokeData)?.status_5xx, yAxisIndex: 0 }
+      { type: 'line', symbol: 'none', name: $t('请求总数'), data: (lineData as InvokeData)?.requestTotal, yAxisIndex: 0 },
+      { type: 'line', symbol: 'none', name: $t('请求成功率'), data: (lineData as InvokeData)?.requestRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], yAxisIndex: 1 },
+      { type: 'line', symbol: 'none', name: $t('转发总数'), data: (lineData as InvokeData)?.proxyTotal, yAxisIndex: 0 },
+      { type: 'line', symbol: 'none', name: $t('转发成功率'), data: (lineData as InvokeData)?.proxyRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], yAxisIndex: 1 },
+      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: $t('状态码4xx数'), data: (lineData as InvokeData)?.status_4xx, yAxisIndex: 0 },
+      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: $t('状态码5xx数'), data: (lineData as InvokeData)?.status_5xx, yAxisIndex: 0 }
     ]
   })
 
@@ -185,11 +186,11 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
           // echarts会根据你定义的颜色返回一个生成好的带颜色的标记，直接实用即可
           let str = ''
           if (i === Math.floor(params.length / 2)) {
-            str = '<br/><div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + (params[0].seriesIndex === 0 ? dataTitle + '调用总体趋势' :modalTitle) + '</span>&nbsp&nbsp&nbsp<span>' + params[0].axisValue + '</span></div><div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + item.marker
+            str = '<br/><div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + (params[0].seriesIndex === 0 ? dataTitle + $t('调用总体趋势') :modalTitle) + '</span>&nbsp&nbsp&nbsp<span>' + params[0].axisValue + '</span></div><div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + item.marker
           } else {
             str = '<div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + item.marker
           }
-          if (item.seriesName === '请求成功率' || item.seriesName === '转发成功率') {
+          if (item.seriesName === $t('请求成功率') || item.seriesName === $t('转发成功率')) {
             str += (item.seriesName + '&nbsp&nbsp&nbsp </span><span style="font-weight:bold"> ' + item.value + '% </span></section></div>')
           } else {
             str += (item.seriesName + '&nbsp&nbsp&nbsp </span><span style="font-weight:bold"> ' + item.value + '</span></section></div>')
@@ -258,7 +259,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     yAxis: [
       {
         type: 'value',
-        name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用量` : '',
+        name: (lineData as InvokeData)?.date.length > 0 ? $t('(0)调用量',[yAxisTitle]) : '',
         nameLocation: 'end',
         nameTextStyle: {
           align: 'left'
@@ -274,7 +275,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       },
       {
         type: 'value',
-        name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用成功率` : '',
+        name: (lineData as InvokeData)?.date.length > 0 ? $t('(0)调用成功率',[yAxisTitle]) : '',
         position: 'right',
         min: 0,
         max: 100,
@@ -294,7 +295,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       {
         gridIndex: 1,
         type: 'value',
-        name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用量` : '',
+        name: (lineData as InvokeData)?.date.length > 0 ? $t('(0)调用量',[yAxisTitle]) : '',
         nameLocation: 'end',
         nameTextStyle: {
           align: 'left'
@@ -311,7 +312,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       {
         gridIndex: 1,
         type: 'value',
-        name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用成功率` : '',
+        name: (lineData as InvokeData)?.date.length > 0 ? $t('(0)调用成功率',[yAxisTitle]): '',
         position: 'right',
         min: 0,
         max: 100,
@@ -329,18 +330,18 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
         }
       }],
     series: [
-      { type: 'line', symbol: 'none', name: '请求总数', data: (lineData as InvokeData)?.requestTotal, xAxisIndex: 0, yAxisIndex: 0 },
-      { type: 'line', symbol: 'none', name: '请求成功率', data: (lineData as InvokeData)?.requestRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], xAxisIndex: 0, yAxisIndex: 1 },
-      { type: 'line', symbol: 'none', name: '转发总数', data: (lineData as InvokeData)?.proxyTotal, xAxisIndex: 0, yAxisIndex: 0 },
-      { type: 'line', symbol: 'none', name: '转发成功率', data: (lineData as InvokeData)?.proxyRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], xAxisIndex: 0, yAxisIndex: 1 },
-      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: '状态码4xx数', data: (lineData as InvokeData)?.status_4xx, xAxisIndex: 0, yAxisIndex: 0 },
-      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: '状态码5xx数', data: (lineData as InvokeData)?.status_5xx, xAxisIndex: 0, yAxisIndex: 0 },
-      { type: 'line', symbol: 'none', name: '请求总数', data: (compareData as InvokeData)?.requestTotal, xAxisIndex: 1, yAxisIndex: 2 },
-      { type: 'line', symbol: 'none', name: '请求成功率', data: (compareData as InvokeData)?.requestRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], xAxisIndex: 1, yAxisIndex: 3 },
-      { type: 'line', symbol: 'none', name: '转发总数', data: (compareData as InvokeData)?.proxyTotal, xAxisIndex: 1, yAxisIndex: 2 },
-      { type: 'line', symbol: 'none', name: '转发成功率', data: (compareData as InvokeData)?.proxyRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], xAxisIndex: 1, yAxisIndex: 3 },
-      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: '状态码4xx数', data: (compareData as InvokeData)?.status_4xx, xAxisIndex: 1, yAxisIndex: 2 },
-      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: '状态码5xx数', data: (compareData as InvokeData)?.status_5xx, xAxisIndex: 1, yAxisIndex: 2 }
+      { type: 'line', symbol: 'none', name: $t('请求总数'), data: (lineData as InvokeData)?.requestTotal, xAxisIndex: 0, yAxisIndex: 0 },
+      { type: 'line', symbol: 'none', name: $t('请求成功率'), data: (lineData as InvokeData)?.requestRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], xAxisIndex: 0, yAxisIndex: 1 },
+      { type: 'line', symbol: 'none', name: $t('转发总数'), data: (lineData as InvokeData)?.proxyTotal, xAxisIndex: 0, yAxisIndex: 0 },
+      { type: 'line', symbol: 'none', name: $t('转发成功率'), data: (lineData as InvokeData)?.proxyRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], xAxisIndex: 0, yAxisIndex: 1 },
+      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: $t('状态码4xx数'), data: (lineData as InvokeData)?.status_4xx, xAxisIndex: 0, yAxisIndex: 0 },
+      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: $t('状态码5xx数'), data: (lineData as InvokeData)?.status_5xx, xAxisIndex: 0, yAxisIndex: 0 },
+      { type: 'line', symbol: 'none', name: $t('请求总数'), data: (compareData as InvokeData)?.requestTotal, xAxisIndex: 1, yAxisIndex: 2 },
+      { type: 'line', symbol: 'none', name: $t('请求成功率'), data: (compareData as InvokeData)?.requestRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], xAxisIndex: 1, yAxisIndex: 3 },
+      { type: 'line', symbol: 'none', name: $t('转发总数'), data: (compareData as InvokeData)?.proxyTotal, xAxisIndex: 1, yAxisIndex: 2 },
+      { type: 'line', symbol: 'none', name: $t('转发成功率'), data: (compareData as InvokeData)?.proxyRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], xAxisIndex: 1, yAxisIndex: 3 },
+      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: $t('状态码4xx数'), data: (compareData as InvokeData)?.status_4xx, xAxisIndex: 1, yAxisIndex: 2 },
+      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: $t('状态码5xx数'), data: (compareData as InvokeData)?.status_5xx, xAxisIndex: 1, yAxisIndex: 2 }
     ]
   })
 
@@ -381,7 +382,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     yAxis: [
       {
         type: 'value',
-        name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用量` : '',
+        name: (lineData as InvokeData)?.date.length > 0 ?$t('(0)调用量',[yAxisTitle]) : '',
         nameLocation: 'end',
         nameTextStyle: {
           align: 'left'
@@ -398,7 +399,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       },
       {
         type: 'value',
-        name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用成功率` : '',
+        name: (lineData as InvokeData)?.date.length > 0 ? $t('(0)调用成功率',[yAxisTitle]) : '',
         position: 'right',
         min: 0,
         max: 100,
@@ -415,10 +416,10 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
         }
       }],
     series: [
-      { type: 'line', symbol: 'none', name: '转发总数', data: (lineData as InvokeData)?.proxyTotal, yAxisIndex: 0 },
-      { type: 'line', symbol: 'none', name: '转发成功率', data: (lineData as InvokeData)?.proxyRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], yAxisIndex: 1 },
-      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: '状态码4xx数', data: (lineData as InvokeData)?.status_4xx, yAxisIndex: 0 },
-      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: '状态码5xx数', data: (lineData as InvokeData)?.status_5xx, yAxisIndex: 0 }
+      { type: 'line', symbol: 'none', name: $t('转发总数'), data: (lineData as InvokeData)?.proxyTotal, yAxisIndex: 0 },
+      { type: 'line', symbol: 'none', name: $t('转发成功率'), data: (lineData as InvokeData)?.proxyRate?.map((x) => Number((Number(x) * 100).toFixed(2))) || [], yAxisIndex: 1 },
+      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: $t('状态码4xx数'), data: (lineData as InvokeData)?.status_4xx, yAxisIndex: 0 },
+      { type: 'line', lineStyle: { type: 'dashed' }, symbol: 'none', name: $t('状态码5xx数'), data: (lineData as InvokeData)?.status_5xx, yAxisIndex: 0 }
     ]})
 
   const generateInvokeServiceCompareLineChartOption = ()=>({
@@ -452,18 +453,18 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     tooltip: {
       trigger: 'axis',
       formatter: (params:Array<Record<string,unknown>>) => {
-        const startHtml = '<div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + (params[0].seriesIndex === 0 ? modalTitle : dataTitle + '调用总体趋势') + '</span>&nbsp&nbsp&nbsp<span>' + params[0].axisValue + '</span></div>'
+        const startHtml = '<div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + (params[0].seriesIndex === 0 ? modalTitle : dataTitle + $t('调用总体趋势')) + '</span>&nbsp&nbsp&nbsp<span>' + params[0].axisValue + '</span></div>'
         const listArr = []
         for (let i = 0; i < params.length; i++) {
           const item = params[i]
           // echarts会根据你定义的颜色返回一个生成好的带颜色的标记，直接实用即可
           let str = ''
           if (i === Math.floor(params.length / 2)) {
-            str = '<br/><div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + (params[0].seriesIndex === 0 ? dataTitle + '调用总体趋势' : modalTitle) + '</span>&nbsp&nbsp&nbsp<span>' + params[0].axisValue + '</span></div><div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + item.marker
+            str = '<br/><div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + (params[0].seriesIndex === 0 ? dataTitle + $t('调用总体趋势') : modalTitle) + '</span>&nbsp&nbsp&nbsp<span>' + params[0].axisValue + '</span></div><div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + item.marker
           } else {
             str = '<div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + item.marker
           }
-          if (item.seriesName === '请求成功率' || item.seriesName === '转发成功率') {
+          if (item.seriesName === $t('请求成功率') || item.seriesName === $t('转发成功率')) {
             str += (item.seriesName + '&nbsp&nbsp&nbsp </span><span style="font-weight:bold"> ' + item.value + '% </span></section></div>')
           } else {
             str += (item.seriesName + '&nbsp&nbsp&nbsp </span><span style="font-weight:bold"> ' + item.value + '</span></section></div>')
@@ -513,7 +514,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     yAxis: [
       {
         type: 'value',
-        name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用量` : '',
+        name: (lineData as InvokeData)?.date.length > 0 ?  $t('(0)调用量',[yAxisTitle]) : '',
         nameLocation: 'end',
         nameTextStyle: {
           align: 'left'
@@ -529,7 +530,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       },
       {
         type: 'value',
-        name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用成功率` : '',
+        name: (lineData as InvokeData)?.date.length > 0 ?  $t('(0)调用成功率',[yAxisTitle])  : '',
         position: 'right',
         min: 0,
         max: 100,
@@ -549,7 +550,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       {
         gridIndex: 1,
         type: 'value',
-        name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用量` : '',
+        name: (lineData as InvokeData)?.date.length > 0 ? $t('(0)调用量',[yAxisTitle]): '',
         nameLocation: 'end',
         nameTextStyle: {
           align: 'left'
@@ -566,7 +567,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       {
         gridIndex: 1,
         type: 'value',
-        name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用成功率` : '',
+        name: (lineData as InvokeData)?.date.length > 0 ? $t('(0)调用成功率',[yAxisTitle]) : '',
         position: 'right',
         min: 0,
         max: 100,
@@ -584,14 +585,14 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
         }
       }],
     series: [
-      { type: 'line', symbol: 'none', name: '转发总数', data: (lineData as InvokeData)?.proxyTotal, xAxisIndex: 0, yAxisIndex: 0 },
-      { type: 'line', symbol: 'none', name: '转发成功率', data: (lineData as InvokeData)?.proxyRate, xAxisIndex: 0, yAxisIndex: 1 },
-      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: '状态码4xx数', data: (lineData as InvokeData)?.status_4xx, xAxisIndex: 0, yAxisIndex: 0 },
-      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: '状态码5xx数', data: (lineData as InvokeData)?.status_5xx, xAxisIndex: 0, yAxisIndex: 0 },
-      { type: 'line', symbol: 'none', name: '转发总数', data: (compareData as InvokeData)?.proxyTotal, xAxisIndex: 1, yAxisIndex: 2 },
-      { type: 'line', symbol: 'none', name: '转发成功率', data: (compareData as InvokeData)?.proxyRate, xAxisIndex: 1, yAxisIndex: 3 },
-      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: '状态码4xx数', data: (compareData as InvokeData)?.status_4xx, xAxisIndex: 1, yAxisIndex: 2 },
-      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: '状态码5xx数', data: (compareData as InvokeData)?.status_5xx, xAxisIndex: 1, yAxisIndex: 2 }
+      { type: 'line', symbol: 'none', name: $t('转发总数'), data: (lineData as InvokeData)?.proxyTotal, xAxisIndex: 0, yAxisIndex: 0 },
+      { type: 'line', symbol: 'none', name: $t('转发成功率'), data: (lineData as InvokeData)?.proxyRate, xAxisIndex: 0, yAxisIndex: 1 },
+      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: $t('状态码4xx数'), data: (lineData as InvokeData)?.status_4xx, xAxisIndex: 0, yAxisIndex: 0 },
+      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: $t('状态码5xx数'), data: (lineData as InvokeData)?.status_5xx, xAxisIndex: 0, yAxisIndex: 0 },
+      { type: 'line', symbol: 'none', name: $t('转发总数'), data: (compareData as InvokeData)?.proxyTotal, xAxisIndex: 1, yAxisIndex: 2 },
+      { type: 'line', symbol: 'none', name: $t('转发成功率'), data: (compareData as InvokeData)?.proxyRate, xAxisIndex: 1, yAxisIndex: 3 },
+      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: $t('状态码4xx数'), data: (compareData as InvokeData)?.status_4xx, xAxisIndex: 1, yAxisIndex: 2 },
+      { type: 'line', symbol: 'none', lineStyle: { type: 'dashed' }, name: $t('状态码5xx数'), data: (compareData as InvokeData)?.status_5xx, xAxisIndex: 1, yAxisIndex: 2 }
     ]})
 
   const generateTrafficLineChartOption = ()=>({
@@ -645,7 +646,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     },
     {
       type: 'value',
-      name: (lineData as InvokeData)?.date.length > 0 ? `${yAxisTitle}调用成功率` : '',
+      name: (lineData as InvokeData)?.date.length > 0 ? $t('(0)调用成功率',[yAxisTitle]) : '',
       position: 'right',
       min: 0,
       max: 100,
@@ -663,8 +664,8 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       }
     }],
     series: [
-      { type: 'line', symbol: 'none', name: '请求报文量', data: (lineData as MessageData).requestMessage, yAxisIndex: 0 },
-      { type: 'line', symbol: 'none', name: '响应报文量', data: (lineData as MessageData).responseMessage, yAxisIndex: 0 }
+      { type: 'line', symbol: 'none', name: $t('请求报文量'), data: (lineData as MessageData).requestMessage, yAxisIndex: 0 },
+      { type: 'line', symbol: 'none', name: $t('响应报文量'), data: (lineData as MessageData).responseMessage, yAxisIndex: 0 }
     ]})
 
     
@@ -694,9 +695,9 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       }
        // 当勾选请求成功率或转发成功率其中之一时，显示右侧y轴
       if (legendSelected && lineData?.date && lineData?.date.length > 0) {
-        if (!legendSelected['转发成功率'] && !legendSelected['请求成功率'] && (option.yAxis as Array<unknown>)?.length > 1 && option.yAxis[1].show !== false) {
+        if (!legendSelected[$t('转发成功率')] && !legendSelected[$t('请求成功率')] && (option.yAxis as Array<unknown>)?.length > 1 && option.yAxis[1].show !== false) {
           option.yAxis[1].show = false
-        } else if ((legendSelected['转发成功率'] || legendSelected['请求成功率']) && (option.yAxis as Array<unknown>)?.length > 1 && option.yAxis[1].show !== true) {
+        } else if ((legendSelected[$t('转发成功率')] || legendSelected[$t('请求成功率')]) && (option.yAxis as Array<unknown>)?.length > 1 && option.yAxis[1].show !== true) {
           option.yAxis[1].show = true
         }
       }
