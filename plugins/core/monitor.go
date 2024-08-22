@@ -13,7 +13,7 @@ func (p *plugin) monitorStatisticApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/monitor/overview/invoke", []string{"context", "body"}, []string{"date", "request_total", "proxy_total", "status_4xx", "status_5xx", "request_rate", "proxy_rate", "time_interval"}, p.monitorStatisticController.OverviewInvokeTrend),
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/monitor/overview/message", []string{"context", "body"}, []string{"date", "request_message", "response_message", "time_interval"}, p.monitorStatisticController.OverviewMessageTrend),
 
-		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/partition/monitor", []string{"context", "body"}, []string{"info"}, p.monitorConfigController.SaveMonitorConfig),
-		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/partition/monitor", []string{"context"}, []string{"info"}, p.monitorConfigController.GetMonitorConfig),
+		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/monitor/config", []string{"context", "body"}, []string{"info"}, p.monitorConfigController.SaveMonitorConfig),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/monitor/config", []string{"context"}, []string{"info"}, p.monitorConfigController.GetMonitorConfig),
 	}
 }

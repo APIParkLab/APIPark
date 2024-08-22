@@ -30,16 +30,9 @@ type imlMonitorService struct {
 	store monitor.IMonitorStore `autowired:""`
 }
 
-func (i *imlMonitorService) DeleteByPartition(ctx context.Context, partitionId string) error {
-	_, err := i.store.DeleteWhere(ctx, map[string]interface{}{
-		"partition": partitionId,
-	})
-	return err
-}
-
 func (i *imlMonitorService) GetByCluster(ctx context.Context, partitionId string) (*Monitor, error) {
 	info, err := i.store.First(ctx, map[string]interface{}{
-		"partition": partitionId,
+		"cluster": partitionId,
 	})
 	if err != nil {
 		return nil, err
@@ -80,7 +73,7 @@ func (i *imlMonitorService) MapByCluster(ctx context.Context, partitionIds ...st
 		return make(map[string]*Monitor), nil
 	}
 	list, err := i.store.List(ctx, map[string]interface{}{
-		"partition": partitionIds,
+		"cluster": partitionIds,
 	})
 	if err != nil {
 		return nil, err
@@ -103,7 +96,7 @@ func (i *imlMonitorService) Save(ctx context.Context, m *SaveMonitor) error {
 	userId := utils.UserId(ctx)
 	now := time.Now()
 	info, err := i.store.First(ctx, map[string]interface{}{
-		"partition": m.Cluster,
+		"cluster": m.Cluster,
 	})
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
