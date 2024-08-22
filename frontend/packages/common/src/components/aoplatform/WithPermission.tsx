@@ -16,12 +16,12 @@ type WithPermissionProps = {
 const WithPermission = ({access, tooltip, children,disabled, showDisabled = true}:WithPermissionProps) => {
   
     const [editAccess, setEditAccess] = useState<boolean>(access ? false:true)
-    const {accessData,checkPermission} = useGlobalContext()
+    const {accessData,checkPermission,accessInit} = useGlobalContext()
 
     const lastAccess = useMemo(()=>{
       if(!access) return true
       return checkPermission(access as keyof typeof PERMISSION_DEFINITION[0])
-  },[access, accessData,checkPermission])
+  },[access, accessData,checkPermission,accessInit])
 
     useEffect(()=>{
       // 先判断权限，无论权限是否为true，如果disabled为true时则必须为ture

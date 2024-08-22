@@ -13,6 +13,7 @@ import { useTenantManagementContext } from "../../../contexts/TenantManagementCo
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 import { $t } from "@common/locales";
+import WithPermission from "@common/components/aoplatform/WithPermission";
 
 export default function ServiceHubManagement() {
     const { message ,modal} = App.useApp()
@@ -26,11 +27,15 @@ export default function ServiceHubManagement() {
     const [teamList, setTeamList] = useState<MenuItem[]>([])
     const {setAppName} = useTenantManagementContext()
     const navigateTo = useNavigate()
-    const {getTeamAccessData,cleanTeamAccessData,checkPermission} = useGlobalContext()
+    const {getTeamAccessData,cleanTeamAccessData,checkPermission,getGlobalAccessData,accessInit} = useGlobalContext()
     type MenuItem = Required<MenuProps>['items'][number];
 
 
 const getServiceList = ()=>{
+    if(!accessInit){
+        getGlobalAccessData()?.then(()=>{getServiceList()})
+        return
+    }
     setServiceLoading(true)
         return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team:teamId,keyword:''},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num']}).then(response=>{
         const {code,data,msg} = response
@@ -50,6 +55,10 @@ const getServiceList = ()=>{
 
   
   const getTeamsList = ()=>{
+    if(!accessInit){
+        getGlobalAccessData()?.then(()=>{getTeamsList()})
+        return
+    }
     setPageLoading(true)
     fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(!checkPermission('system.workspace.team.view_all') ?'simple/teams/mine' :'simple/teams',{method:'GET',eoTransformKeys:['app_num','subscribe_num']}).then(response=>{
         const {code,data,msg} = response
@@ -159,9 +168,9 @@ useEffect(() => {
                     const item = serviceList[index];
                 return (
                 <div className="pt-[20px]">{
-                item.type === 'addNewItem' ?<Card className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px]  transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{body:'h-[180px] flex items-center justify-center cursor-pointer'}} onClick={()=>{openModal('add')}}>
+                item.type === 'addNewItem' ?<WithPermission access="team.application.application.add" showDisabled={false}><Card className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px]  transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{body:'h-[180px] flex items-center justify-center cursor-pointer'}} onClick={()=>{openModal('add')}}>
                         <div className="flex items-center"><Icon icon="ic:baseline-add" width="18" height="18"/><span>{$t('添加应用')}</span></div>
-                  </Card> : <Card title={CardTitle(item)} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px]  transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] ', body:"pt-0"}} onClick={()=>{setAppName(item.name);navigateTo(`/tenantManagement/${teamId}/inside/${item.id}/service`)}}>
+                  </Card></WithPermission> : <Card title={CardTitle(item)} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px]  transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] ', body:"pt-0"}} onClick={()=>{setAppName(item.name);navigateTo(`/tenantManagement/${teamId}/inside/${item.id}/service`)}}>
                    <span className="line-clamp-3 break-all">{item.description || $t('暂无服务描述')}</span> 
 
                     </Card>}</div>
@@ -205,7 +214,7 @@ const CardTitle = (service:ServiceHubAppListItem)=>{
                 <p className="text-[14px] h-[20px] leading-[20px] truncate">{service.name}</p>
                 <div className="mt-[10px] h-[20px] flex items-center font-normal">
                     <Tooltip title={$t('订阅的服务数量：已通过 (0) 个，申请中 (1) 个',[service.subscribeNum ?? '-', service.subscribeVerifyNum ?? '-'])}>
-                        <span className="mr-[12px] flex items-center"><span className="h-[14px] mr-[4px] flex items-center"><iconpark-icon  className="max-h-[14px] h-[14px] w-[14px]" name="auto-generate-api"></iconpark-icon></span><span className="font-normal text-[14px]">{(service.subscribeNum + service.subscribeVerifyNum)?? '-'}</span></span>
+                        <span className="mr-[12px] flex items-center"><span className="h-[14px] mr-[4px] flex items-center"><iconpark-icon  size="14px" name="auto-generate-api"></iconpark-icon></span><span className="font-normal text-[14px]">{(service.subscribeNum + service.subscribeVerifyNum)?? '-'}</span></span>
                     </Tooltip>
                 </div>
             </div>

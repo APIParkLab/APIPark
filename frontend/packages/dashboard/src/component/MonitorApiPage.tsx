@@ -151,7 +151,7 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
     }
     
     return (
-      <div className="h-[calc(100vh-140px)] overflow-hidden">
+      <div className="h-full overflow-hidden">
         <ScrollableSection>
           <div className="pl-btnbase pr-btnrbase pb-btnbase content-before">
             <TimeRangeSelector  

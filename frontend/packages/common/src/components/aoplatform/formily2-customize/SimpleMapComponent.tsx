@@ -2,6 +2,7 @@ import {forwardRef, useImperativeHandle, useState} from 'react'
 
 import { Input } from '@formily/antd-v5'
 import { $t } from '@common/locales'
+import { Icon } from '@iconify/react/dist/iconify.js'
 export const SimpleMapComponent = forwardRef(
   (props: { [k: string]: unknown }, ref) => {
     const {
@@ -89,27 +90,9 @@ export const SimpleMapComponent = forwardRef(
               {index !== kvList.length - 1 && (
                 <div style={{ display: 'inline-block' }}>
                   {n.key && (
-                    <a
-                      className="arrayItemAddition ant-btn-text anticon"
-                      onClick={() => addLine(index)}
-                    >
-                      <span>
-                        <svg className="iconpark-icon">
-                          <use href="#add-circle"></use>
-                        </svg>
-                      </span>
-                    </a>
+                    <Icon icon="ic:baseline-add" onClick={() => addLine(index as unknown as number)} width="14" height="14"/>
                   )}
-                  <a
-                    className="arrayItemAddition ant-btn-text anticon"
-                    onClick={() => removeLine(index)}
-                  >
-                    <span>
-                      <svg className="iconpark-icon">
-                        <use href="#reduce-one"></use>
-                      </svg>
-                    </span>
-                  </a>
+                      <Icon icon="ic:baseline-minus" onClick={() => removeLine(index as unknown as number)} width="14" height="14"/>
                 </div>
               )}
             </div>

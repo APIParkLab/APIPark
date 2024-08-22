@@ -78,7 +78,7 @@ const EditableTable = <T extends { _id: string }>({
                     }}
                     btnTitle="增加"/>,
 
-                    (config.index !== configurations.length - 1 )&& <TableBtnWithPermission key="delete" btnType="delete" btnTitle="删除"
+                    (config.index !== configurations.length - 1 )&& <TableBtnWithPermission key="remove" btnType="remove" btnTitle="删除"
                     onClick={() => {
                         setConfigurations((prev)=>{
                             const tmpPreData = [...prev];

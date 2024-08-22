@@ -2,6 +2,7 @@
 import {forwardRef, useImperativeHandle, useState} from 'react'
 
 import { Input } from 'antd'
+import { Icon } from '@iconify/react/dist/iconify.js'
 export const ArrayItemBlankComponent = forwardRef(
   (props: { [k: string]: any }, ref) => {
     const { onChange, value, dataFormat } = props
@@ -135,27 +136,9 @@ export const ArrayItemBlankComponent = forwardRef(
               {index !== resList.length - 1 && (
                 <div style={{ display: 'inline-block' }}>
                   {n[dataFormat[0].key] && (
-                    <a
-                      className="array_item_addition ant-btn-text anticon"
-                      onClick={() => addLine(index)}
-                    >
-                      <span>
-                        <svg className="iconpark-icon">
-                          <use href="#add-circle"></use>
-                        </svg>
-                      </span>
-                    </a>
+                    <Icon icon="ic:baseline-add" onClick={() => addLine(index as unknown as number)} width="14" height="14"/>
                   )}
-                  <a
-                    className="array_item_addition ant-btn-text anticon"
-                    onClick={() => removeLine(index)}
-                  >
-                    <span>
-                      <svg className="iconpark-icon">
-                        <use href="#reduce-one"></use>
-                      </svg>
-                    </span>
-                  </a>
+                   <Icon icon="ic:baseline-minus" onClick={() => removeLine(index as unknown as number)} width="14" height="14"/>
                 </div>
               )}
             </div>

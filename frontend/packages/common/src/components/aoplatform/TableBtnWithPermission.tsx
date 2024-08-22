@@ -22,6 +22,7 @@ const TableIconName={
     'add':'ic:baseline-add',
     'edit':'ic:baseline-edit',
     'delete':'ic:baseline-delete',
+    'remove':'ic:baseline-minus',
     'copy':'ic:baseline-file-copy',
     'view':'ic:baseline-remove-red-eye',
     'publish':'ic:baseline-publish',
@@ -35,12 +36,13 @@ const TableIconName={
 const TableBtnWithPermission = ({btnTitle, access, tooltip, disabled, navigateTo, onClick,className,btnType}:TableBtnWithPermissionProps) => {
   
     const [btnAccess, setBtnAccess] = useState<boolean>(false)
-    const {accessData,checkPermission} = useGlobalContext()
+    const {accessData,checkPermission,accessInit} = useGlobalContext()
     const navigate = useNavigate()
     const lastAccess = useMemo(()=>{
+        if(!accessInit) return false
         if(!access) return true
         return checkPermission(access)
-    },[access, accessData,checkPermission])
+    },[access, accessData,checkPermission,accessInit])
 
     useEffect(()=>{
         access ? setBtnAccess(lastAccess) :  setBtnAccess(true)
