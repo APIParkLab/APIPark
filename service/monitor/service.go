@@ -12,7 +12,7 @@ type IMonitorService interface {
 	// Get 获取监控配置
 	Get(ctx context.Context, id string) (*Monitor, error)
 	// MapByCluster 获取监控配置
-	MapByCluster(ctx context.Context, clusterIds ...string) (map[string]*Monitor, error)
+	//MapByCluster(ctx context.Context, clusterIds ...string) (map[string]*Monitor, error)
 	GetByCluster(ctx context.Context, clusterId string) (*Monitor, error)
 	// Save 保存监控配置
 	Save(ctx context.Context, monitor *SaveMonitor) error

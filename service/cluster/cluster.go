@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 	"time"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
 	"github.com/APIParkLab/APIPark/gateway/admin"
 	"github.com/APIParkLab/APIPark/stores/cluster"
@@ -58,7 +58,7 @@ func (s *imlClusterService) GatewayClient(ctx context.Context, id string) (gatew
 
 func (s *imlClusterService) ListByClusters(ctx context.Context, ids ...string) ([]*Cluster, error) {
 	wm := make(map[string]interface{})
-	
+
 	if len(ids) > 0 {
 		wm["uuid"] = ids
 	}
@@ -129,7 +129,7 @@ func (s *imlClusterService) Create(ctx context.Context, name string, resume stri
 		return nil, err
 	}
 	operator := utils.UserId(ctx)
-	
+
 	// check cluster
 	query, err := s.store.FirstQuery(ctx, "`uuid` = ?", []interface{}{apintoInfo.Cluster}, "id desc")
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -145,7 +145,7 @@ func (s *imlClusterService) Create(ctx context.Context, name string, resume stri
 	nodeNames := utils.SliceToSlice(apintoInfo.Nodes, func(i *admin.Node) string {
 		return i.Name
 	})
-	
+
 	nodeExist, err := s.nodeStore.FirstQuery(ctx, "`uuid` in (?) or `name` in (?)", []interface{}{nodeIds, nodeNames}, "id desc")
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
@@ -153,7 +153,7 @@ func (s *imlClusterService) Create(ctx context.Context, name string, resume stri
 	if nodeExist != nil {
 		return nil, errors.New("node already exists")
 	}
-	
+
 	en := &cluster.Cluster{
 		Id:       0,
 		UUID:     apintoInfo.Cluster,
@@ -166,7 +166,7 @@ func (s *imlClusterService) Create(ctx context.Context, name string, resume stri
 	}
 	nodeEn, addrEn := s.genNodeEntity(apintoInfo.Cluster, apintoInfo.Nodes)
 	err = s.store.Transaction(ctx, func(ctx context.Context) error {
-		
+
 		err := s.store.Insert(ctx, en)
 		if err != nil {
 			return err
@@ -231,9 +231,9 @@ func (s *imlClusterService) genNodeEntity(id string, nodes []*admin.Node) ([]*cl
 		}
 		addrAllTemp = append(addrAllTemp, aden)
 	}
-	
+
 	return nodeEn, utils.SliceMerge(addrAllTemp)
-	
+
 }
 func (s *imlClusterService) UpdateInfo(ctx context.Context, id string, name *string, resume *string) (c *Cluster, errOut error) {
 	operator := utils.UserId(ctx)
@@ -263,13 +263,13 @@ func (s *imlClusterService) UpdateInfo(ctx context.Context, id string, name *str
 		c = FromEntity(v)
 		return nil
 	})
-	
+
 	return
-	
+
 }
 
 func (s *imlClusterService) UpdateAddress(ctx context.Context, id string, address string) ([]*Node, error) {
-	
+
 	info, err := admin.Admin(address).Info(ctx)
 	if err != nil {
 		return nil, err
@@ -292,7 +292,7 @@ func (s *imlClusterService) UpdateAddress(ctx context.Context, id string, addres
 			CreateAt: now,
 		}
 	}
-	
+
 	// check node
 	nodeIds := utils.SliceToSlice(info.Nodes, func(i *admin.Node) string {
 		return i.Id
@@ -300,7 +300,7 @@ func (s *imlClusterService) UpdateAddress(ctx context.Context, id string, addres
 	nodeNames := utils.SliceToSlice(info.Nodes, func(i *admin.Node) string {
 		return i.Name
 	})
-	
+
 	nodeExist, err := s.nodeStore.FirstQuery(ctx, "`cluster` = ? and (`uuid` in (?) or `name` in (?))", []interface{}{id, nodeIds, nodeNames}, "id desc")
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
@@ -346,7 +346,7 @@ func (s *imlClusterService) UpdateAddress(ctx context.Context, id string, addres
 		return nil, err
 	}
 	return s.Nodes(ctx, id)
-	
+
 }
 
 func (s *imlClusterService) Nodes(ctx context.Context, clusterIds ...string) ([]*Node, error) {
@@ -362,16 +362,16 @@ func (s *imlClusterService) Nodes(ctx context.Context, clusterIds ...string) ([]
 	if err != nil {
 		return nil, err
 	}
-	
+
 	addrOfNode := utils.SliceToMapArray(nodeAddrs, func(i *cluster.NodeAddr) string {
 		return i.Node
 	})
-	
+
 	return utils.SliceToSlice(nodes, func(i *cluster.Node) *Node {
 		addrs := utils.SliceToMapArrayO(addrOfNode[i.UUID], func(i *cluster.NodeAddr) (string, string) {
 			return i.Type, i.Addr
 		})
-		
+
 		return &Node{
 			Uuid:       i.UUID,
 			Name:       i.Name,
@@ -382,7 +382,7 @@ func (s *imlClusterService) Nodes(ctx context.Context, clusterIds ...string) ([]
 			CreateTime: i.UpdateTime,
 		}
 	}), nil
-	
+
 }
 
 func (s *imlClusterService) CountByPartition(ctx context.Context) (map[string]int, error) {
@@ -395,7 +395,7 @@ func (s *imlClusterService) Search(ctx context.Context, keyword string, clusterI
 		wheres = append(wheres, "(`name` like ? or `resume` like ? or `uuid` like ?)")
 		value = append(value, "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%")
 	}
-	
+
 	if len(clusterId) > 0 {
 		if len(clusterId) == 1 {
 			wheres = append(wheres, "`uuid` = ?")
@@ -404,7 +404,7 @@ func (s *imlClusterService) Search(ctx context.Context, keyword string, clusterI
 			wheres = append(wheres, "`uuid` in (?)")
 			value = append(value, clusterId)
 		}
-		
+
 	}
 	if len(wheres) == 0 {
 		return s.List(ctx)
@@ -424,12 +424,12 @@ func (s *imlClusterService) List(ctx context.Context, clusterIds ...string) ([]*
 		}
 		return utils.SliceToSlice(list, FromEntity), nil
 	}
-	list, err := s.store.ListQuery(ctx, "`cluster` in (?)", []interface{}{clusterIds}, "update_at desc")
+	list, err := s.store.ListQuery(ctx, "`uuid` in (?)", []interface{}{clusterIds}, "update_at desc")
 	if err != nil {
 		return nil, err
 	}
 	return utils.SliceToSlice(list, FromEntity), nil
-	
+
 }
 
 func init() {
