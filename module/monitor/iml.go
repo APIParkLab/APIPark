@@ -87,11 +87,17 @@ func (i *imlMonitorStatisticModule) genCommonWheres(ctx context.Context, cluster
 	})
 
 	wheres := make([]monitor.MonWhereItem, 0, 1)
-
+	nodes, err := i.clusterService.Nodes(ctx, clusterIds...)
+	if err != nil {
+		return nil, err
+	}
+	nodeIds := utils.SliceToSlice(nodes, func(s *cluster.Node) string {
+		return s.Name
+	})
 	wheres = append(wheres, monitor.MonWhereItem{
-		Key:       "cluster",
-		Operation: "=",
-		Values:    clusterIds,
+		Key:       "node",
+		Operation: "in",
+		Values:    nodeIds,
 	})
 
 	return wheres, nil
