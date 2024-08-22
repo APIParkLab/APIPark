@@ -50,8 +50,7 @@ export type DashboardSettingEditProps = {
                     <Form
                         form={form}
                         className="mx-auto flex flex-col justify-between h-full"
-                        labelCol={{ span: 7 }}
-                        wrapperCol={{ span: 17}}
+                        layout="vertical"
                         onFinish={onFinish}
                         autoComplete="off"
                     >

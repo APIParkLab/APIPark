@@ -28,12 +28,16 @@ const TeamList:FC = ()=>{
     const {fetchData} = useFetch()
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
     const teamConfigRef = useRef<TeamConfigHandle>(null)
-    const {accessData,checkPermission} = useGlobalContext()
+    const {accessData,checkPermission,accessInit, getGlobalAccessData} = useGlobalContext()
     const [curTeam, setCurTeam] = useState<TeamConfigFieldType>({} as TeamConfigFieldType)
     const [modalVisible, setModalVisible] = useState<boolean>(false)
     const [modalType, setModalType] = useState<'add'|'edit'>('add')
 
     const getTeamList = ()=>{
+        if(!accessInit){
+            getGlobalAccessData()?.then(()=>{getTeamList()})
+            return
+        }
         return fetchData<BasicResponse<{teams:TeamTableListItem}>>(!checkPermission('system.workspace.team.view_all') ? 'teams':'manager/teams',{method:'GET',eoParams:{keyword:searchWord},eoTransformKeys:['create_time','service_num','can_delete']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){

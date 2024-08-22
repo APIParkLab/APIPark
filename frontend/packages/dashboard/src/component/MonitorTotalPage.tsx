@@ -209,17 +209,17 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
       {
           label:$t('API 请求量 Top10'),
           key:'api',
-          children:<MonitorTable className="pb-[10px]" ref={monitorApiTableRef} type='api' id="dashboard_top10_api" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorApiData,'api')}} request={()=>getTablesData(queryData||{},'api')}/>
+          children:<MonitorTable className="py-[10px]" ref={monitorApiTableRef} type='api' id="dashboard_top10_api" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorApiData,'api')}} request={()=>getTablesData(queryData||{},'api')}/>
       },
       {
           label:$t('应用调用量 Top10'),
           key:'subscribers',
-          children:<MonitorTable className="pb-[10px]"  ref={monitorSubTableRef} type='subscribers'  id="dashboard_top10_subscriber" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorSubscriberData,'subscriber')}}  request={()=>getTablesData(queryData||{},'subscriber')} />
+          children:<MonitorTable className="py-[10px]"  ref={monitorSubTableRef} type='subscribers'  id="dashboard_top10_subscriber" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorSubscriberData,'subscriber')}}  request={()=>getTablesData(queryData||{},'subscriber')} />
       },
       {
           label:$t('服务被调用量 Top10'),
           key:'providers',
-          children:<MonitorTable className="pb-[10px]"  ref={monitorSubTableRef} type='provider'  id="dashboard_top10_provider" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorSubscriberData,'provider')}}  request={()=>getTablesData(queryData||{},'provider')} />
+          children:<MonitorTable className="py-[10px]"  ref={monitorSubTableRef} type='provider'  id="dashboard_top10_provider" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorSubscriberData,'provider')}}  request={()=>getTablesData(queryData||{},'provider')} />
       }
     ]
 
@@ -231,7 +231,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
     }
 
       return (
-        <div className={`h-[calc(100vh-140px)] overflow-hidden pb-btnybase flex flex-col  ${totalEmpty ?  'bg-[#fff]' : 'bg-MENU_BG'}`}>
+        <div className={`h-full overflow-hidden pb-btnybase flex flex-col  ${totalEmpty ?  'bg-[#fff]' : 'bg-MENU_BG'}`}>
           <ScrollableSection>
           <div className="flex items-center flex-wrap pb-[10px] px-btnbase content-before bg-MAIN_BG">
             <TimeRangeSelector 

@@ -23,7 +23,7 @@ const SystemInsidePage:FC = ()=> {
     const currentUrl = location.pathname
     const {fetchData} = useFetch()
     const { setPrefixForce,setApiPrefix ,systemInfo,setSystemInfo} = useSystemContext()
-    const { accessData,checkPermission} = useGlobalContext()
+    const { accessData,checkPermission,accessInit} = useGlobalContext()
     const [activeMenu, setActiveMenu] = useState<string>()
     const navigateTo = useNavigate()
 
@@ -70,7 +70,7 @@ const SystemInsidePage:FC = ()=> {
             return pre ?? 'api'
         })
         return  filteredMenu || []
-    },[accessData])
+    },[accessData,accessInit])
     
     const onMenuClick: MenuProps['onClick'] = ({key}) => {
         setActiveMenu(key)

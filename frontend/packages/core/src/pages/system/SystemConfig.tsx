@@ -40,7 +40,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
     const [tagOptionList, setTagOptionList] = useState<DefaultOptionType[]>([])
     const [serviceClassifyOptionList, setServiceClassifyOptionList] = useState<DefaultOptionType[]>()
     const [uploadLoading, setUploadLoading] = useState<boolean>(false)
-    const {checkPermission} = useGlobalContext()
+    const {checkPermission,accessInit, getGlobalAccessData} = useGlobalContext()
 
     useImperativeHandle(ref, () => ({
         save:onFinish
@@ -186,7 +186,13 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
     }
 
     useEffect(() => {
-        getTeamOptionList()
+        if(accessInit){
+            getTeamOptionList
+        }else{
+            getGlobalAccessData()?.then(()=>{
+                getTeamOptionList()
+            })
+        }
         getTagAndServiceClassifyList()
         if (serviceId !== undefined) {
             setOnEdit(true);
