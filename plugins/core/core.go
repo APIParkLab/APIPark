@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/APIParkLab/APIPark/controller/monitor"
 	"net/http"
 
 	plugin_cluster "github.com/APIParkLab/APIPark/controller/plugin-cluster"
@@ -54,13 +55,14 @@ func (d *Driver) Create() (pm3.IPlugin, error) {
 }
 
 type plugin struct {
-	clusterController     cluster.IClusterController          `autowired:""`
-	certificateController certificate.ICertificateController  `autowired:""`
-	teamManagerController team_manager.ITeamManagerController `autowired:""`
-	myTeamController      my_team.ITeamController             `autowired:""`
-	appController         service.IAppController              `autowired:""`
-	serviceController     service.IServiceController          `autowired:""`
-	//serviceController              service.IServiceController                         `autowired:""`
+	clusterController           cluster.IClusterController                         `autowired:""`
+	certificateController       certificate.ICertificateController                 `autowired:""`
+	teamManagerController       team_manager.ITeamManagerController                `autowired:""`
+	myTeamController            my_team.ITeamController                            `autowired:""`
+	appController               service.IAppController                             `autowired:""`
+	serviceController           service.IServiceController                         `autowired:""`
+	monitorStatisticController  monitor.IMonitorStatisticController                `autowired:""`
+	monitorConfigController     monitor.IMonitorConfigController                   `autowired:""`
 	catalogueController         catalogue.ICatalogueController                     `autowired:""`
 	upstreamController          upstream.IUpstreamController                       `autowired:""`
 	apiController               api.IAPIController                                 `autowired:""`
@@ -88,7 +90,7 @@ func (p *plugin) OnComplete() {
 	p.apis = append(p.apis, p.projectAuthorizationApis()...)
 	p.apis = append(p.apis, p.releaseApis()...)
 	p.apis = append(p.apis, p.DynamicModuleApis()...)
-
+	p.apis = append(p.apis, p.monitorStatisticApis()...)
 	p.apis = append(p.apis, p.PartitionPluginApi()...)
 	p.apis = append(p.apis, p.commonApis()...)
 }

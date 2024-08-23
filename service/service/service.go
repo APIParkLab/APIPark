@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"reflect"
-	
+
 	"github.com/APIParkLab/APIPark/service/universally"
 	"github.com/eolinker/go-common/autowire"
 )
@@ -17,6 +17,7 @@ type IServiceService interface {
 	AppCountByTeam(ctx context.Context, teamId ...string) (map[string]int64, error)
 	SearchPublicServices(ctx context.Context, keyword string) ([]*Service, error)
 	Check(ctx context.Context, id string, rule map[string]bool) (*Service, error)
+	ServiceList(ctx context.Context, serviceIds ...string) ([]*Service, error)
 	AppList(ctx context.Context, appIds ...string) ([]*Service, error)
 }
 
