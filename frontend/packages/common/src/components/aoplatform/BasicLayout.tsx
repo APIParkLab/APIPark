@@ -41,7 +41,7 @@ const themeToken = {
      const navigator = useNavigate()
      const location = useLocation()
      const currentUrl = location.pathname
-    const { state,accessData,checkPermission} = useGlobalContext()
+    const { state,accessData,checkPermission,accessInit} = useGlobalContext()
     const [pathname, setPathname] = useState(currentUrl);
      const mainPage = project === 'core' ?'/service/list':'/serviceHub/list'
 
@@ -70,15 +70,15 @@ const themeToken = {
       ],undefined,'system.api_market.service_classification.view'),
   
       getNavItem($t('运维与集成'), 'maintenanceCenter','/cluster', null, [
-        getNavItem(<a>{$t('监控报表')}</a>, 'dashboardsetting','/dashboardsetting',<Icon icon="ic:baseline-monitor-heart" width="18" height="18"/>,undefined,undefined,'system.devops.dashboardsetting.view'),
         getNavItem(<a>{$t('集群')}</a>, 'cluster','/cluster',<Icon icon="ic:baseline-device-hub" width="18" height="18"/>,undefined,undefined,'system.devops.cluster.view'),
+        getNavItem(<a>{$t('监控报表')}</a>, 'dashboardsetting','/dashboardsetting',<Icon icon="ic:baseline-monitor-heart" width="18" height="18"/>,undefined,undefined,'system.devops.dashboardsetting.view'),
         getNavItem(<a>{$t('证书')}</a>, 'cert','/cert',<Icon icon="ic:baseline-security" width="18" height="18"/>,undefined,undefined,'system.devops.ssl_certificate.view'),
         getNavItem(<a>{$t('日志')}</a>, 'logsettings','/logsettings',<Icon icon="ic:baseline-sticky-note-2" width="18" height="18"/>,undefined,undefined,'system.devops.log_configuration.view'),
         APP_MODE === 'pro' ? getNavItem(<a>{$t('资源')}</a>, 'resourcesettings','/resourcesettings',null,undefined,undefined,'system.partition.self.view'):null,
         APP_MODE === 'pro' ? getNavItem(<a>{$t('Open API')}</a>, 'openapi','/openapi',null,undefined,undefined,'system.openapi.self.view'):null,
       ]),
     ]),
-  ],[state.language])
+  ],[state.language,accessInit])
 
 
      useEffect(() => {

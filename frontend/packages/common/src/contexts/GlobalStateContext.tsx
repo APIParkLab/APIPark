@@ -38,7 +38,7 @@ export const GlobalContext = createContext<{
     dispatch: Dispatch<GlobalAction>;
     accessData:Map<string,string[]>;
     pluginAccessDictionary:{[k:string]:string};
-    getGlobalAccessData:()=>void;
+    getGlobalAccessData:()=>Promise<{ access:string[]}>;
     getTeamAccessData:(teamId:string)=>void;
     getPluginAccessDictionary:(pluginData:{[k:string]:string})=>void
     resetAccess:()=>void
@@ -117,12 +117,16 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
     let getGlobalAccessPromise: Promise<BasicResponse<{ access:string[] }>> | null = null
 
     const getGlobalAccessData = ()=>{
+        if(getGlobalAccessPromise){
+            return getGlobalAccessPromise
+        }
         getGlobalAccessPromise = new Promise((resolve, reject) => fetchData<BasicResponse<{ access:string[]}>>('profile/permission/system',{method:'GET'},).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setAccessInit(true)
                 setAccessData(prevData => new Map(prevData).set('system', data.access))
                 resolve(data.response)
+                getGlobalAccessPromise = null
             }else{
                 message.error(msg || RESPONSE_TIPS.error)
                 reject(data.msg || RESPONSE_TIPS.error)
@@ -156,16 +160,11 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
 
     const resetAccess = ()=>{
         setAccessData(new Map())
+        setAccessInit(false)
         setPluginAccessDictionary({})
     }
 
-    const checkPermission = async (access:keyof typeof PERMISSION_DEFINITION[0] | Array<keyof typeof PERMISSION_DEFINITION[0]>)=>{
-        if( !accessInit && getGlobalAccessPromise){
-            await getGlobalAccessPromise
-        }
-        if( !accessInit && !getGlobalAccessPromise){
-           await getGlobalAccessData()
-        }
+    const checkPermission =  (access:keyof typeof PERMISSION_DEFINITION[0] | Array<keyof typeof PERMISSION_DEFINITION[0]>)=>{
         let revs = false;
         if (Array.isArray(access)) {
             revs = access.some(item => checkAccess(item, accessData));

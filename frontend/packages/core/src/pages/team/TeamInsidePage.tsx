@@ -21,8 +21,8 @@ const TeamInsidePage:FC = ()=> {
     const {teamId} = useParams<RouterParams>();
     const {fetchData} = useFetch()
     const location = useLocation()
-    const { teamInfo ,setTeamInfo } = useTeamContext()
-    const {getTeamAccessData,cleanTeamAccessData,accessData,checkPermission,teamDataFlushed} = useGlobalContext()
+    const { teamInfo ,setTeamInfo ,} = useTeamContext()
+    const {getTeamAccessData,cleanTeamAccessData,accessData,checkPermission,teamDataFlushed,accessInit} = useGlobalContext()
     const navigateTo = useNavigate()
     const [activeMenu, setActiveMenu] = useState<string>()
 
@@ -52,7 +52,7 @@ const TeamInsidePage:FC = ()=> {
             return pre
         })
         return  filteredMenu || []
-    },[accessData])
+    },[accessData,accessInit])
 
     const getTeamInfo = ()=>{
         setTeamInfo?.(undefined)

@@ -187,7 +187,7 @@ const CardTitle = (service:ServiceHubTableListItem)=>{
                         <span className="mr-[12px]"><ApiOutlined className="mr-[1px] text-[14px] h-[14px] w-[14px]"/><span className="font-normal text-[14px]">{service.apiNum ?? '-'}</span></span>
                     </Tooltip>
                     <Tooltip  title={$t('接入应用数量')}>
-                        <span className="mr-[12px] flex items-center"><span className="h-[14px] mr-[4px] flex items-center"><iconpark-icon  className="max-h-[14px]  h-[14px] w-[14px]"  name="auto-generate-api"></iconpark-icon></span><span className="font-normal text-[14px]">{service.subscriberNum ?? '-'}</span></span>
+                        <span className="mr-[12px] flex items-center"><span className="h-[14px] mr-[4px] flex items-center"><iconpark-icon size="14px" name="auto-generate-api"></iconpark-icon></span><span className="font-normal text-[14px]">{service.subscriberNum ?? '-'}</span></span>
                     </Tooltip>
                 </div>
             </div>

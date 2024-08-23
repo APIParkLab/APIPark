@@ -29,9 +29,15 @@ const SystemList:FC = ()=>{
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
     const [open, setOpen] = useState(false);
     const drawerFormRef = useRef<SystemConfigHandle>(null)
-    const {checkPermission} = useGlobalContext()
+    const {checkPermission,accessInit, getGlobalAccessData} = useGlobalContext()
 
     const getSystemList = ()=>{
+        if(!accessInit){
+            getGlobalAccessData()?.then(()=>{
+                getSystemList()
+            })
+            return
+        }
         if(!tableHttpReload){
             setTableHttpReload(true)
             return Promise.resolve({
@@ -55,6 +61,12 @@ const SystemList:FC = ()=>{
     }
 
     const getTeamsList = ()=>{
+        if(!accessInit){
+            getGlobalAccessData()?.then(()=>{
+                getTeamsList()
+            })
+            return
+        }
         fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(!checkPermission('system.workspace.team.view_all') ?'simple/teams/mine' :'simple/teams',{method:'GET',eoTransformKeys:[]}).then(response=>{
             const {code,data,msg} = response
             setTeamList(data.teams)
