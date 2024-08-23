@@ -32,7 +32,7 @@ export const routerKeyMap = new Map<string, string[]|string>([
   
     
   export const COLUMNS_TITLE  = {
-    operate : $t('操作')
+    operate : ''
   }
   
   export const VALIDATE_MESSAGE = {

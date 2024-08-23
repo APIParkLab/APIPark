@@ -66,7 +66,7 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
                 <div className="flex flex-col p-btnbase pt-[4px] h-full flex-1 overflow-auto" id='layout-ref'>
                     <div  className='bg-[#fff] rounded p-btnbase  pl-0  flex justify-between'>
                         <div className="w-[calc(100%-220px)]" >
-                        <p className="font-bold text-[20px] leading-[32px] mb-[12px] h-[32px]" id="apiDocument-list">API 列表</p>
+                        <p className="font-bold text-[20px] leading-[32px] mb-[12px] h-[32px]" id="apiDocument-list">{$t('API 列表')}</p>
                             <div className="">
                                 {apiDocs?.map((apiDetail)=>(
                                     <div  className="mb-btnbase "  key={apiDetail.id} id={`apiDocument-${apiDetail.id}`}>

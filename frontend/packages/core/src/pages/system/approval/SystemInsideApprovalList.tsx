@@ -39,7 +39,7 @@ const SystemInsideApprovalList:FC = ()=>{
     const subscribeRef = useRef<SubscribeApprovalModalHandle>(null)
     const [approvalBtnLoading,setApprovalBtnLoading] = useState<boolean>(false)
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
 
     const openModal = async (type:'approval'|'view',entity:SubscribeApprovalTableListItem)=>{
         message.loading(RESPONSE_TIPS.loading)
@@ -166,8 +166,8 @@ const SystemInsideApprovalList:FC = ()=>{
     const columns = useMemo(()=>{
         const newCol = [...(!(query.get('status'))? SUBSCRIBE_APPROVAL_INNER_TODO_TABLE_COLUMN:SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN)]
         const filteredCol = pageStatus === 0 ? newCol.filter((x)=>TODO_LIST_COLUMN_NOT_INCLUDE_KEY.indexOf(x.dataIndex as string) === -1): newCol
-        return filteredCol.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){x.valueEnum = memberValueEnum} return x})
-    },[pageStatus,memberValueEnum])
+        return filteredCol.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){x.valueEnum = memberValueEnum} return {...x,title: typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+    },[pageStatus,memberValueEnum,state.language])
 
     return (
         <div className="h-full not-top-padding-table">

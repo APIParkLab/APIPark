@@ -1,7 +1,8 @@
-import {FC} from 'react';
+import {FC, useMemo} from 'react';
 import ECharts,{EChartsOption} from 'echarts-for-react';
 import { changeNumberUnit } from '../utils/dashboard';
 import { $t } from '@common/locales';
+import { useGlobalContext } from '@common/contexts/GlobalStateContext';
 
 type PieGraphProps = {
   className?:string,
@@ -16,7 +17,7 @@ type PieGraphProps = {
 }
 
 const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelName, labelValue, subText, subValue,status4xxCount,status5xxCount }) => {
-  
+    const {state} = useGlobalContext()
   const transferData: (value:{[key:string]:number})=>Array<{name:string, value:number}>  = (value:{[key:string]:number})=> {
     const res:Array<{name:string, value:number}> = []
     const keys = Object.keys(value)
@@ -26,14 +27,14 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
     return res
   }
 
-  const option: EChartsOption = {
+  const option: EChartsOption = useMemo(()=>({
     tooltip: {
       trigger: 'item',
     },
     title: [
       {
         right: '10',
-        subtext: `{title|${subText}}{percent|${subValue}}`,
+        subtext: `{title|${$t(subText)}}{percent|${subValue}}`,
         top: '15%',
         subtextStyle: {
           rich: {
@@ -53,7 +54,7 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
         right: '10',
         orient: 'vertical',
         formatter: (name) => {
-          return `{title|${name}}{percent|${changeNumberUnit(pieData[name]) || '0'}}`;
+          return `{title|${$t(name)}}{percent|${changeNumberUnit(pieData[name]) || '0'}}`;
         },
         textStyle: {
           rich: {
@@ -74,7 +75,7 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
         label: {
           show: true,
           position: 'center',
-          formatter: '{text|' + labelName + '}\n{value|' + labelValue + '}',
+          formatter: '{text|' + $t(labelName) + '}\n{value|' + labelValue + '}',
           rich: {
             text: { fontSize: 14, color: '#666666', lineHeight: 22, padding: [0, 0, 6, 0] },
             value: { fontSize: 20, color: '#333333', lineHeight: 32, padding: [0, 0, 6, 0] },
@@ -86,7 +87,7 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
         data: transferData(pieData),
       },
     ],
-  }
+  }),[state.language])
   
   return (
   <div className={`${className} min-w-[570px] p-[16px] relative text-DESC_TEXT overflow-x-auto rounded`}>

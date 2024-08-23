@@ -2,13 +2,14 @@
 import { Menu, MenuProps, Skeleton, message } from "antd";
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import InsidePage from "@common/components/aoplatform/InsidePage";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { DynamicMenuItem,  } from "@common/const/type";
 import { useFetch } from "@common/hooks/http";
 import { getItem } from "@common/utils/navigation";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
 import { $t } from "@common/locales";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 const LogSettings = ()=>{
     const {moduleId} = useParams<RouterParams>();
@@ -17,31 +18,40 @@ const LogSettings = ()=>{
     const {fetchData} = useFetch()
     const [loading, setLoading] = useState<boolean>(true)
     const navigateTo = useNavigate()
+    const {state} = useGlobalContext()
 
     const getDynamicMenuList = ()=>{
         return fetchData<BasicResponse<{ dynamics:DynamicMenuItem[] }>>(`simple/dynamics/log`,{method:'GET'}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                const newMenu:MenuProps['items'] =  data.dynamics.map((x:DynamicMenuItem)=>
-                    getItem(
-                        <Link to={`template/${x.name}`}>{x.title}</Link>, 
-                        x.name,
-                        undefined,
-                        undefined,
-                        undefined,
-                        'system.devops.log_configuration.view')) 
                 
-                    setMenuItems(newMenu)
+                    setMenuItems(data.dynamics)
                     if(!activeMenu || activeMenu.length === 0){
                         navigateTo(`/logsettings/template/${data.dynamics[0].name}`)
                     }
-                    return Promise.resolve(newMenu)
+                    return Promise.resolve(data.dynamics)
             }else{
                 message.error(msg || RESPONSE_TIPS.error)
                 return Promise.reject(msg || RESPONSE_TIPS.error)
             }
         })
     }
+
+    const menuData = useMemo(()=>{
+        const newMenu =  menuItems?.map((x:DynamicMenuItem)=>{
+            console.log(state.language, $t(x.title))
+            
+            return getItem(
+                <Link to={`template/${x.name}`}>{$t(x.title)}</Link>, 
+                x.name,
+                undefined,
+                undefined,
+                undefined,
+                'system.devops.log_configuration.view')
+        })
+            console.log(newMenu)
+        return newMenu
+    },[state.language,menuItems])
 
     const onMenuClick: MenuProps['onClick'] = ({key}) => {
         setActiveMenu(key)
@@ -71,7 +81,7 @@ const LogSettings = ()=>{
                             onClick={onMenuClick}
                             style={{ width: 220 }}
                             mode="inline"
-                            items={menuItems}
+                            items={menuData}
                         />
                         <div className={`w-full flex flex-1 flex-col h-full overflow-auto bg-MAIN_BG pt-btnbase pl-btnbase pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B overflow-x-hidden`}>
                             <Outlet  context={{accessPrefix:'system.devops.log_configuration'}}/>

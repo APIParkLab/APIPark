@@ -64,7 +64,7 @@ const Login:FC = ()=> {
 
             if (code === STATUS_CODE.SUCCESS) {
                 dispatch({type:'LOGIN'})
-                message.success(RESPONSE_TIPS.loginSuccess);
+                // message.success(RESPONSE_TIPS.loginSuccess);
                 const callbackUrl = new URLSearchParams(window.location.search).get('callbackUrl');
                 if (callbackUrl && callbackUrl !== 'null') {
                     navigate(callbackUrl);

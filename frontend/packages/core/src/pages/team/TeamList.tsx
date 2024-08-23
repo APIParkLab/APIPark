@@ -28,7 +28,7 @@ const TeamList:FC = ()=>{
     const {fetchData} = useFetch()
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
     const teamConfigRef = useRef<TeamConfigHandle>(null)
-    const {accessData,checkPermission,accessInit, getGlobalAccessData} = useGlobalContext()
+    const {accessData,checkPermission,accessInit, getGlobalAccessData,state} = useGlobalContext()
     const [curTeam, setCurTeam] = useState<TeamConfigFieldType>({} as TeamConfigFieldType)
     const [modalVisible, setModalVisible] = useState<boolean>(false)
     const [modalType, setModalType] = useState<'add'|'edit'>('add')
@@ -159,8 +159,8 @@ const TeamList:FC = ()=>{
     },[])
 
     const columns = useMemo(()=>{
-        return TEAM_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('master') !== -1 ) ){x.valueEnum = memberValueEnum} return x})
-    },[memberValueEnum])
+        return TEAM_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('master') !== -1 ) ){x.valueEnum = memberValueEnum} return {...x, title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+    },[memberValueEnum,state.language])
 
 
     return (
