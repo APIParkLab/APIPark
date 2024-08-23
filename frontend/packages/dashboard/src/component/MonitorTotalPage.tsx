@@ -231,7 +231,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
     }
 
       return (
-        <div className={`h-full overflow-hidden pb-btnybase flex flex-col  ${totalEmpty ?  'bg-[#fff]' : 'bg-MENU_BG'}`}>
+        <div className={`h-full overflow-hidden pb-btnybase flex flex-col  bg-[#fff]`}>
           <ScrollableSection>
           <div className="flex items-center flex-wrap pb-[10px] px-btnbase content-before bg-MAIN_BG">
             <TimeRangeSelector 
@@ -252,7 +252,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
               <div className=" px-btnbase  mt-[12px] mb-[16px] grid gap-[20px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(570px, 1fr))'}}>
                 {/* 请求统计饼图 */}
                 {pieError ? <Empty className="pt-[80px] bg-MAIN_BG  w-[50%] h-[200px]  m-0 mr-[16px]" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无请求统计数据")}/>: <MonitorPieGraph
-                  className="bg-MAIN_BG"
+                  className="bg-MAIN_BG border-[1px] border-solid border-BORDER rounded-[10px]"
                   title={$t("请求统计")}
                   pieData={requestPie}
                   labelName={$t("请求成功率")}
@@ -264,7 +264,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                 />}
                 {/* 转发统计饼图 */}
                 {pieError ? <Empty className="pt-[80px] bg-MAIN_BG w-[50%] h-[200px] m-0" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无转发统计数据")}/>: <MonitorPieGraph
-                  className=" bg-MAIN_BG"
+                  className=" bg-MAIN_BG border-[1px] border-solid border-BORDER rounded-[10px]"
                   title={$t("转发统计")}
                   pieData={proxyPie}
                   labelName={$t("转发成功率")}
@@ -279,7 +279,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
               <div className=" px-btnbase  mt-[12px] mb-[16px] grid gap-[20px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(570px, 1fr))'}}>
               {/* 调用量统计折线图 */}
                 {invokeStaticError ? <Empty className="pt-[80px]  mb-[16px] h-[200px] bg-MAIN_BG" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无调用量统计数据")}/>: <MonitorLineGraph
-                className=" bg-MAIN_BG pt-[16px]"
+                className=" bg-MAIN_BG pt-[16px] border-[1px] border-solid border-BORDER rounded-[10px]"
                   lineData={invokeStatic}
                   titles={[$t('调用量统计')]}
                   yAxisTitle={timeUnit || '-'}
@@ -287,7 +287,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                 />}
                 {/* 报文量统计折线图 */}
                 {trafficStaticError ? <Empty className=" bg-MAIN_BG pt-[80px]  mb-0 h-[200px]" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无报文量统计数据")}/>:<MonitorLineGraph
-                className=" bg-MAIN_BG pt-[16px]"
+                className=" bg-MAIN_BG pt-[16px] border-[1px] border-solid border-BORDER rounded-[10px]"
                 lineData={trafficStatic}
                   titles={[$t('报文量统计')]}
                   yAxisTitle={timeUnit || '-'}
