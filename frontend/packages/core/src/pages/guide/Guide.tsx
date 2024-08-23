@@ -1,4 +1,5 @@
 import InsidePage from "@common/components/aoplatform/InsidePage"
+import { useGlobalContext } from "@common/contexts/GlobalStateContext"
 import { $t } from "@common/locales"
 import { Icon } from "@iconify/react/dist/iconify.js"
 import { Button, Card, Collapse } from "antd"
@@ -6,9 +7,13 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react"
 
 export default function Guide(){
     const [showGuide, setShowGuide] = useState(localStorage.getItem('showGuide') !== 'false' )
+    const [, forceUpdate] = useState<unknown>(null);
+    const {state} = useGlobalContext()
+
     useEffect(()=>{
         localStorage.setItem('showGuide', showGuide.toString())
     },[showGuide])
+    useEffect(()=>{forceUpdate({})},[state.language])
     return (
        <InsidePage 
             pageTitle={<div className="flex items-center gap-[8px]">
@@ -51,13 +56,13 @@ const QuickGuideContent = ({changeGuideShow}:{changeGuideShow:Dispatch<SetStateA
                                 gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 0fr))',
                                 gridAutoRows: '1fr'
                                 }}>
-                            <Card title={$t("团队")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px] text-[14px] font-normal ', body:"p-[20px] pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/category/%E5%9B%A2%E9%98%9F','_blank')}}>
+                            <Card title={$t("团队")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px] text-[14px] font-normal ', body:"p-[20px] pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/quick/pre-work/team','_blank')}}>
                                 <span className="">{$t('团队中包含了人员、应用和服务，不同团队之间的应用和服务数据是隔离的，可用于管理企业内部不同的部门/项目组/团队。')}</span> 
                             </Card>
-                            <Card title={$t("服务")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px]  pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/category/%E6%9C%8D%E5%8A%A1','_blank')}}>
+                            <Card title={$t("服务")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px]  pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/quick/provider/service','_blank')}}>
                                 <span className="">{$t('服务内包含一组 API，并且可以发布到 API 市场被其他团队使用。')}</span> 
                             </Card>
-                            <Card title={$t("应用")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px]  pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/category/%E5%BA%94%E7%94%A8','_blank')}}>
+                            <Card title={$t("应用")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px]  pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/quick/suberscriber/application','_blank')}}>
                                 <span className="">{$t('应用是申请服务和调用 API 的身份，可以在 API 市场申请调用服务，并且每个应用拥有独立的 API 访问鉴权。')}</span> 
                             </Card>
                         </div>
@@ -68,13 +73,13 @@ const QuickGuideContent = ({changeGuideShow}:{changeGuideShow:Dispatch<SetStateA
                                 gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 0fr))',
                                 gridAutoRows: '1fr'
                                 }}>
-                            <Card title={$t("检索服务和 API")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px] pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/category/api-market','_blank')}}>
+                            <Card title={$t("检索服务和 API")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px] pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/tutorials/api-market/service','_blank')}}>
                                 <span className="">{$t('你可以在 API 市场中查看所有公开的服务。')}</span> 
                             </Card>
-                            <Card title={$t("订阅服务")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px]  pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/tutorials/application/subscribe-service','_blank')}}>
+                            <Card title={$t("订阅服务")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px]  pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/quick/suberscriber/subscribe','_blank')}}>
                                 <span className="">{$t('如果需要调用某个服务的 API，需要先订阅该服务，并且等待提供服务的团队审批后才可发起 API 请求。')}</span> 
                             </Card>
-                            <Card title={$t("审批订阅申请")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px]  pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/tutorials/service/subscriber-approve','_blank')}}>
+                            <Card title={$t("审批订阅申请")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px]  pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/quick/provider/approve','_blank')}}>
                                 <span className="">{$t('提供服务的团队可以审批来自其他团队的订阅申请，审批通过后的应用才可发起 API请求。')}</span> 
                             </Card>
                         </div>

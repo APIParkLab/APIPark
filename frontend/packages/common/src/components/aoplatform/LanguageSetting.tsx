@@ -1,11 +1,11 @@
 import { Dropdown, Row, Col, Button } from 'antd';
 import i18n from '@common/locales';
 import { $t } from '@common/locales';
-import { memo } from 'react';
+import { memo, useEffect, useMemo } from 'react';
 import { useGlobalContext } from '@common/contexts/GlobalStateContext';
 import { Icon } from '@iconify/react/dist/iconify.js';
 
-const LanguageSetting = () => {
+const LanguageSetting = ({mode = 'light'}:{mode?:'dark'|'light'}) => {
     const { dispatch,state} = useGlobalContext()
     const items = [
     {
@@ -24,7 +24,12 @@ const LanguageSetting = () => {
     }
   ];
 
-  const langLabel = items.find((item) => item?.key === state.language)?.title;
+  const langLabel = useMemo(()=>items.find((item) => item?.key === state.language)?.title,[state.language])
+
+  useEffect(()=>{
+    sessionStorage.getItem('i18nextLng') && dispatch({ type: 'UPDATE_LANGUAGE',  language: sessionStorage.getItem('i18nextLng') as 'en' | 'cn'  });
+  },[
+  ])
   return (
     <Dropdown
       trigger={['hover']}
@@ -35,10 +40,11 @@ const LanguageSetting = () => {
           const { key } = e;
           dispatch({ type: 'UPDATE_LANGUAGE',  language: key  });
           i18n.changeLanguage(key);
+          // window.location.reload()
         }
       }}
     >
-       <Button  className=" text-[#ffffffb3] hover:text-[#fff] border-none" type="default" ghost >
+       <Button  className={`border-none ${mode==='dark' ? "text-[#333] hover:text-[#333333b3]" : "text-[#ffffffb3] hover:text-[#fff] "}`}  type="default" ghost >
           <span className='flex items-center gap-[8px]'> <Icon icon="ic:baseline-language" width="14" height="14"/>{langLabel}</span>
         </Button> 
     </Dropdown>
