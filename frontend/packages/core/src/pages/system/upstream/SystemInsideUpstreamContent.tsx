@@ -10,9 +10,10 @@ import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { typeOptions, SYSTEM_UPSTREAM_GLOBAL_CONFIG_TABLE_COLUMNS, schemeOptions, balanceOptions, passHostOptions, PROXY_HEADER_CONFIG } from "../../../const/system/const.tsx";
 import { Link, useParams } from "react-router-dom";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
-import { BasicResponse, STATUS_CODE } from "@common/const/const.ts";
+import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE } from "@common/const/const.tsx";
 import { useFetch } from "@common/hooks/http.ts";
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext.tsx";
+import { $t } from "@common/locales/index.ts";
 
 const DEFAULT_FORM_VALUE = {
     driver:'static',
@@ -58,11 +59,11 @@ const SystemInsideUpstreamContent= forwardRef<SystemInsideUpstreamContentHandle>
             }).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    return Promise.reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    return Promise.reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> {return Promise.reject(errorInfo)})
         })
@@ -79,7 +80,7 @@ const SystemInsideUpstreamContent= forwardRef<SystemInsideUpstreamContentHandle>
                     setFormShowHost(data.upstream.passHost === 'rewrite')
                 },0)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         }).finally(()=>{
             setLoading(false)
@@ -98,7 +99,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
         if (filteredValue.length > 0) {
           return Promise.resolve();
         } else {
-          return Promise.reject(new Error('必填项'));
+          return Promise.reject(new Error(VALIDATE_MESSAGE.required));
         }
       },
     },
@@ -107,10 +108,10 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
     useEffect(() => {
         setBreadcrumb([
             {
-                title: <Link to={`/service/list`}>服务</Link>
+                title: <Link to={`/service/list`}>{$t('服务')}</Link>
             },
             {
-                title: '上游'
+                title: $t('上游')
             }])
 
             getUpstreamInfo();
@@ -132,19 +133,19 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
                                 >
 
                                 <Form.Item<ServiceUpstreamFieldType>
-                                    label="上游类型"
+                                    label={$t("上游类型")}
                                     name="driver"
-                                    rules={[{ required: true, message: '必填项' }]}
+                                    rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
                                 >
                                     <Radio.Group options={typeOptions} />
                                 </Form.Item>
 
 
                                 <Form.Item<ServiceUpstreamFieldType>
-                                    label="服务地址"
+                                    label={$t("服务地址")}
                                     name="nodes"
-                                    tooltip="后端默认使用的IP地址"
-                                    rules={[{ required: true, message: '必填项' },
+                                    tooltip={$t("后端默认使用的IP地址")}
+                                    rules={[{ required: true, message: VALIDATE_MESSAGE.required },
                                     ...globalConfigNodesRule]}
                                 >
                                     <EditableTable<GlobalNodeItem & {_id:string}>
@@ -153,68 +154,68 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
                                 </Form.Item>
 
                                 <Form.Item<ServiceUpstreamFieldType>
-                                    label="请求协议"
+                                    label={$t("请求协议")}
                                     name="scheme"
-                                    rules={[{ required: true, message: '必填项' }]}
+                                    rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
                                 >
-                                <Select className="w-INPUT_NORMAL" placeholder="请选择" options={schemeOptions}>
+                                <Select className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.select} options={schemeOptions}>
                                 </Select>
                                 </Form.Item>
 
                                 <Form.Item<ServiceUpstreamFieldType>
-                                    label="负载均衡"
+                                    label={$t("负载均衡")}
                                     name="balance"
-                                    rules={[{ required: true, message: '必填项' }]}
+                                    rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
                                 >
                                     <Radio.Group className="flex flex-col gap-[8px] mt-[5px]" options={balanceOptions} />
                                 </Form.Item>
 
                                 <Form.Item<ServiceUpstreamFieldType>
-                                    label="转发 Host"
+                                    label={$t("转发 Host")}
                                     name="passHost"
-                                    rules={[{ required: true, message: '必填项' }]}
+                                    rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
                                 >
-                                    <Select className="w-INPUT_NORMAL" placeholder="请选择" options={passHostOptions} onChange={(val)=>setFormShowHost(val === 'rewrite')}>
+                                    <Select className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.select} options={passHostOptions} onChange={(val)=>setFormShowHost(val === 'rewrite')}>
                                     </Select>
                                 </Form.Item>
 
                                 {formShowHost && <Form.Item<ServiceUpstreamFieldType>
-                                    label="重写域名"
+                                    label={$t("重写域名")}
                                     name="upstreamHost"
-                                    rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                                 >
-                                    <Input className="w-INPUT_NORMAL" placeholder="请输入上游名称"/>
+                                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                                 </Form.Item>
                             }
 
                                 <Divider />
                                 
                                 <Form.Item<ServiceUpstreamFieldType>
-                                    label="超时时间"
+                                    label={$t("超时时间")}
                                     name="timeout"
-                                    rules={[{ required: true, message: '必填项' }]}
+                                    rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
                                 >
                                     <InputNumber className="w-INPUT_NORMAL" min={1} addonAfter={<span className="whitespace-nowrap">ms</span> }/> 
                                 </Form.Item>
 
                                 <Form.Item<ServiceUpstreamFieldType>
-                                    label="超时重试次数"
+                                    label={$t("超时重试次数")}
                                     name="retry"
-                                    rules={[{ required: true, message: '必填项' }]}
+                                    rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
                                 >
                                     <InputNumber className="w-INPUT_NORMAL" min={1} addonAfter={<span>次</span>} /> 
                                 </Form.Item>
 
                                 <Form.Item<ServiceUpstreamFieldType>
-                                    label="调用频率限制"
+                                    label={$t("调用频率限制")}
                                     name="limitPeerSecond"
-                                    rules={[{ required: true, message: '必填项' }]}
+                                    rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
                                 >
                                     <InputNumber className="w-INPUT_NORMAL"  min={1} addonAfter={<span className="whitespace-nowrap">次/秒</span> } />
                                 </Form.Item>
 
                                 <Form.Item<ServiceUpstreamFieldType>
-                                    label="转发上游请求头"
+                                    label={$t("转发上游请求头")}
                                     name="proxyHeaders"
                                     className="mb-0"
                                 >
@@ -227,7 +228,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
                                     className="border-none bg-transparent pt-btnrbase mb-0 pb-0"
                                 >
                                     <WithPermission access='team.service.upstream.edit'><Button type="primary" htmlType="submit" >
-                                        保存
+                                        {$t('保存')}
                                     </Button></WithPermission>
                                 </Form.Item>
                             </Form>

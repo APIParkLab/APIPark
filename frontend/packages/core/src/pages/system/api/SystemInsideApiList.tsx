@@ -1,10 +1,10 @@
-import PageList from "@common/components/aoplatform/PageList.tsx"
-import {ActionType, ProColumns} from "@ant-design/pro-components";
+import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx"
+import {ActionType} from "@ant-design/pro-components";
 import  {FC, useEffect, useMemo, useRef, useState} from "react";
 import {Link, useParams} from "react-router-dom";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {App, Divider} from "antd";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import { SimpleMemberItem} from '@common/const/type.ts'
 import {useFetch} from "@common/hooks/http.ts";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
@@ -18,6 +18,7 @@ import { checkAccess } from "@common/utils/permission.ts";
 import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter.tsx";
 import SystemInsideApiDetail from "./SystemInsideApiDetail.tsx";
 import SystemInsideApiDocument from "./SystemInsideApiDocument.tsx";
+import { $t } from "@common/locales/index.ts";
 
 const SystemInsideApiList:FC = ()=>{
     const [searchWord, setSearchWord] = useState<string>('')
@@ -32,7 +33,7 @@ const SystemInsideApiList:FC = ()=>{
     const copyRef = useRef<SystemInsideApiCreateHandle>(null)
     const {apiPrefix, prefixForce} = useSystemContext()
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
     const [drawerType,setDrawerType]= useState<'add'|'edit'|'view'|'upstream'|undefined>()
     const [open, setOpen] = useState(false);
     const drawerEditFormRef = useRef<SystemInsideApiDocumentHandle>(null)
@@ -59,7 +60,7 @@ const SystemInsideApiList:FC = ()=>{
                 setTableHttpReload(false)
                 return  {data:data.apis, success: true}
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -72,11 +73,11 @@ const SystemInsideApiList:FC = ()=>{
             fetchData<BasicResponse<null>>('service/api',{method:'DELETE',eoParams:{service:serviceId,team:teamId, api:entity!.id}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -87,20 +88,20 @@ const SystemInsideApiList:FC = ()=>{
         let content:string|React.ReactNode = ''
         switch (type){
             case 'copy':{
-                title='复制 API'
-                message.loading('正在加载数据')
+                title=$t('复制 API')
+                message.loading(RESPONSE_TIPS.loading)
                 const {code,data,msg} = await fetchData<BasicResponse<{api:SystemApiSimpleFieldType}>>('service/api/detail/simple',{method:'GET',eoParams:{service:serviceId,team:teamId, api:entity!.id}})
                 message.destroy()
                 if(code === STATUS_CODE.SUCCESS){
                     content=<SystemInsideApiCreate ref={copyRef} type={type} entity={{...data.api, path:(data.api.path?.startsWith('/')? data.api.path.substring(1): data.api.path),serviceId:serviceId}} serviceId={serviceId!} teamId={teamId!} modalApiPrefix={apiPrefix} modalPrefixForce={prefixForce}/>
                 }else{
-                    message.error(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
                     return
                 }
                 break;}
             case 'delete':
-                title='删除'
-                content='该数据删除后将无法找回，请确认是否删除？'
+                title=$t('删除')
+                content=DELETE_TIPS.default
                 break;
         }
 
@@ -118,31 +119,31 @@ const SystemInsideApiList:FC = ()=>{
                 }
             },
             width:type==='copy'? 900: 600,
-            okText:'确认',
+            okText:$t('确认'),
             okButtonProps:{
                 disabled : !checkAccess( `team.service.api.${type}`, accessData )
             },
-            cancelText:'取消',
+            cancelText:$t('取消'),
             closable:true,
             icon:<></>,
         })
     }
 
-    const operation:ProColumns<SystemApiTableListItem>[] =[
+    const operation:PageProColumns<SystemApiTableListItem>[] =[
         {
-            title: '操作',
+            title: COLUMNS_TITLE.operate,
             key: 'option',
-            width: 194,
+            btnNums:4,
             fixed:'right',
             valueType: 'option',
             render: (_: React.ReactNode, entity: SystemApiTableListItem) => [
-                <TableBtnWithPermission  access="team.service.api.view" key="view"  onClick={()=>{openDrawer('view',entity)}} btnTitle="详情"/>,
+                <TableBtnWithPermission  access="team.service.api.view" key="view"  btnType="view"  onClick={()=>{openDrawer('view',entity)}} btnTitle="详情"/>,
                 <Divider type="vertical" className="mx-0"  key="div1" />,
-                <TableBtnWithPermission  access="team.service.api.copy" key="copy"  onClick={()=>{openModal('copy',entity)}} btnTitle="复制"/>,
+                <TableBtnWithPermission  access="team.service.api.copy" key="copy"  btnType="copy"   onClick={()=>{openModal('copy',entity)}} btnTitle="复制"/>,
                 <Divider type="vertical" className="mx-0"  key="div2"/>,
-                <TableBtnWithPermission  access="team.service.api.edit" key="edit" onClick={()=>{openDrawer('edit',entity)}}  btnTitle="编辑"/>,
+                <TableBtnWithPermission  access="team.service.api.edit" key="edit"  btnType="edit"  onClick={()=>{openDrawer('edit',entity)}}  btnTitle="编辑"/>,
                 entity.canDelete && <Divider type="vertical" className="mx-0"  key="div3"/>,
-                entity.canDelete && <TableBtnWithPermission  access="team.service.api.delete" key="delete" onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/>,
+                entity.canDelete && <TableBtnWithPermission  access="team.service.api.delete" key="delete"   btnType="delete"  onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/>,
             ],
         }
     ]
@@ -162,7 +163,7 @@ const SystemInsideApiList:FC = ()=>{
             })
             setMemberValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || '操作失败')
+            message.error(msg || RESPONSE_TIPS.error)
         }
     }
 
@@ -176,10 +177,10 @@ const SystemInsideApiList:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>服务</Link>
+                title:<Link to={`/service/list`}>{$t('服务')}</Link>
             },
             {
-                title:'API'
+                title:$t('API')
             }
         ])
         getMemberList()
@@ -192,8 +193,8 @@ const SystemInsideApiList:FC = ()=>{
       };
     
     const columns = useMemo(()=>{
-        return SYSTEM_API_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('creator') !== -1) ){x.valueEnum = memberValueEnum} return x})
-    },[memberValueEnum])
+        return SYSTEM_API_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('creator') !== -1) ){x.valueEnum = memberValueEnum} return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+    },[memberValueEnum,state.language])
 
     const handlerSubmit:() => Promise<string | boolean>|undefined= ()=>{
         switch(drawerType){
@@ -215,8 +216,8 @@ const SystemInsideApiList:FC = ()=>{
                 columns = {[...columns,...operation]}
                 request={()=>getApiList()}
                 dataSource={tableListDataSource}
-                addNewBtnTitle="添加 API"
-                searchPlaceholder="输入名称、URL 查找 API"
+                addNewBtnTitle={$t('添加 API')}
+                searchPlaceholder={$t('输入名称、URL 查找 API')}
                 onAddNewBtnClick={()=>{openDrawer('add')}}
                 addNewBtnAccess="team.service.api.add"
                 tableClickAccess="team.service.api.view"
@@ -229,7 +230,7 @@ const SystemInsideApiList:FC = ()=>{
                 tableClass="mr-PAGE_INSIDE_X "
                 />
                 <DrawerWithFooter 
-                    title={drawerType === 'add' ? "添加 API":"API 详情"} 
+                    title={drawerType === 'add' ? $t("添加 API"):$t("API 详情")} 
                     open={open} 
                     onClose={onClose} 
                     onSubmit={()=>handlerSubmit()} 

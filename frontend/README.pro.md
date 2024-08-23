@@ -2,7 +2,7 @@
 
 ## 代码同步
     packages目录下，部分子项目为企业版独有，不要同步到开源版：
-    packages/businessEntry, packages/dashboard, packages/openApi, packages/systemRunning, README.pro.md
+    packages/businessEntry, packages/openApi, packages/systemRunning, README.pro.md
 
 ## 安装依赖
     建议使用pnpm

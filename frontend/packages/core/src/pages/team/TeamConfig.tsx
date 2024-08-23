@@ -1,9 +1,9 @@
-import  { forwardRef, useEffect, useImperativeHandle, useState} from "react";
+import  { forwardRef, useEffect, useImperativeHandle, useMemo, useState} from "react";
 import {App, Button, Form, Input, Row, Select} from "antd";
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import { v4 as uuidv4 } from 'uuid'
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import {MemberItem} from "@common/const/type.ts";
 import {useFetch} from "@common/hooks/http.ts";
 import {DefaultOptionType} from "antd/es/cascader";
@@ -12,6 +12,7 @@ import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext.tsx";
 import { useTeamContext } from "../../contexts/TeamContext.tsx";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
+import { $t } from "@common/locales/index.ts";
 
 export type TeamConfigHandle = {
     save:()=>Promise<string|boolean>|undefined
@@ -33,8 +34,12 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
     const [managerOption, setManagerOption] = useState<DefaultOptionType[]>([])
     const { setBreadcrumb} = useBreadcrumb()
     const { setTeamInfo } =useTeamContext()
-    const {checkPermission} = useGlobalContext()
-    const pageType= checkPermission('system.organization.team.view') ? 'manage' : 'myteam'
+    const {checkPermission,accessInit} = useGlobalContext()
+    const pageType= useMemo(()=>{
+        if(!accessInit) return 'myteam'
+        return checkPermission('system.organization.team.view') ? 'manage' : 'myteam'
+    },[checkPermission,accessInit]) 
+    
     const [canDelete, setCanDelete] = useState<boolean>(false)
     const navigateTo = useNavigate()
     useImperativeHandle(ref, () => ({
@@ -52,12 +57,12 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
             return fetchData<BasicResponse<{team:TeamConfigFieldType}>>(pageType === 'manage'?'manager/team' : 'team',{method:onEdit ? 'PUT' : 'POST', eoParams:params,eoBody:(value),eoTransformKeys:['teamId']}).then(response=>{
                 const {code,data,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     setTeamInfo?.(data.team)
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    return Promise.reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    return Promise.reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=>{
                 return Promise.reject(errorInfo)
@@ -73,7 +78,7 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
                 setCanDelete(data.team.canDelete)
                 setTimeout(()=>{form.setFieldsValue({...data.team})},0)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     };
@@ -87,7 +92,7 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
                     label:x.name, value:x.id
                 }}) || [])
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -97,13 +102,13 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
             fetchData<BasicResponse<null>>(`manager/team`,{method:'DELETE',eoParams:{id:form.getFieldValue('id')}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     navigateTo('/team/list')
 
                     resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -116,8 +121,8 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
             form.setFieldsValue(entity)
         }else if (teamId !== undefined) {
             setBreadcrumb([
-                {title:<Link to="/team/list">团队</Link>},
-                {title:'设置'}
+                {title:<Link to="/team/list">{$t('团队')}</Link>},
+                {title:$t('设置')}
             ])
             setOnEdit(true);
             getTeamInfo();
@@ -139,63 +144,60 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
                         form={form}
                         className={`mx-auto`}
                         name="teamConfig"
-                        // labelCol={{ offset:1, span: 4 }}
-                        // wrapperCol={{ span: 19}}
                         onFinish={onFinish}
                         autoComplete="off"
                     >
                         <Form.Item<TeamConfigFieldType>
-                            label="团队名称"
+                            label={$t("团队名称")}
                             name="name"
-                            rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                            rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                         >
-                            <Input className="w-INPUT_NORMAL" placeholder="请输入团队名称"/>
+                            <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                         </Form.Item>
 
                         <Form.Item<TeamConfigFieldType>
-                            label="团队 ID"
+                            label={$t("团队 ID")}
                             name="id"
-                            extra="团队 ID（team_id）可用于检索团队，一旦保存无法修改。"
-                            rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                            extra={$t("团队 ID（team_id）可用于检索团队，一旦保存无法修改。")}
+                            rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                         >
-                            <Input className="w-INPUT_NORMAL" disabled={onEdit} placeholder="请输入团队ID"/>
+                            <Input className="w-INPUT_NORMAL" disabled={onEdit} placeholder={PLACEHOLDER.input}/>
                         </Form.Item>
 
                         {!onEdit &&
                         <Form.Item<TeamConfigFieldType>
-                            label="团队负责人"
+                            label={$t("团队负责人")}
                             name="master"
-                            extra="负责人对团队内的团队、服务、成员有管理权限"
-                            rules={[{required: true, message: '必填项'}]}
+                            extra={$t("负责人对团队内的团队、服务、成员有管理权限")}
+                            rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
                         >
-                            <Select className="w-INPUT_NORMAL" placeholder="请选择负责人" options={managerOption}>
+                            <Select className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.select} options={managerOption}>
                             </Select>
                         </Form.Item>}
 
 
                         <Form.Item<TeamConfigFieldType>
-                            label="描述"
+                            label={$t("描述")}
                             name="description"
                         >
-                            <Input.TextArea className="w-INPUT_NORMAL" placeholder="请输入描述"/>
+                            <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                         </Form.Item>
 
                     { onEdit &&
                     <Row className="mb-[10px]" 
-                    // wrapperCol={{ offset: 5, span: 19 }}
                     >
                         <WithPermission access={['system.organization.team.edit','team.team.team.edit']}><Button type="primary" htmlType="submit">
-                                保存
+                                {$t('保存')}
                             </Button></WithPermission>
                     </Row>
                 }
                   {onEdit &&
                     <WithPermission access="system.organization.team.delete" showDisabled={false}>
                         <div className="bg-[rgb(255_120_117_/_5%)] rounded-[10px] mt-[50px] p-btnrbase pb-0">
-                        <p className="text-left"><span className="font-bold">删除团队：</span>删除操作不可恢复，请谨慎操作！</p>
+                        <p className="text-left"><span className="font-bold">{$t('删除团队')}：</span>{$t('删除操作不可恢复，请谨慎操作！')}</p>
                             <div className="text-left">
-                            <WithPermission access="system.organization.team.delete" disabled={!canDelete}  tooltip={canDelete ? '':'服务数据清除后，方可删除'}>
-                                <Button className="m-auto mt-[16px] mb-[20px]" type="default" danger onClick={()=>deleteTeam(entity!)}>删除</Button>
+                            <WithPermission access="system.organization.team.delete" disabled={!canDelete}  tooltip={canDelete ? '':$t('服务数据清除后，方可删除')}>
+                                <Button className="m-auto mt-[16px] mb-[20px]" type="default" danger onClick={()=>deleteTeam(entity!)}>{$t('删除')}</Button>
                                 </WithPermission>
                             </div>
                         </div>

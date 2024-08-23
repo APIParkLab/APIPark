@@ -1,39 +1,38 @@
-import {ActionType, ProColumns} from "@ant-design/pro-components";
+import {ActionType} from "@ant-design/pro-components";
 import  {FC, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
 import {Link, useParams} from "react-router-dom";
-import {App, Form, Select,TreeSelect} from "antd";
+import {App, Form,TreeSelect} from "antd";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
-import PageList from "@common/components/aoplatform/PageList.tsx";
+import {BasicResponse, COLUMNS_TITLE, DELETE_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
+import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx";
 import {DefaultOptionType} from "antd/es/cascader";
 import { SYSTEM_SUBSCRIBER_TABLE_COLUMNS } from "../../const/system/const.tsx";
 import { SystemSubscriberTableListItem, SystemSubscriberConfigFieldType, SystemSubscriberConfigHandle, SystemSubscriberConfigProps, SimpleSystemItem } from "../../const/system/type.ts";
-import {  NewSimpleMemberItem, SimpleMemberItem } from "@common/const/type.ts";
+import {  SimpleMemberItem } from "@common/const/type.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission.tsx";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { checkAccess } from "@common/utils/permission.ts";
+import { $t } from "@common/locales/index.ts";
 
 const SystemInsideSubscriber:FC = ()=>{
     const { setBreadcrumb } = useBreadcrumb()
     const { modal,message } = App.useApp()
     const {fetchData} = useFetch()
-    const [init, setInit] = useState<boolean>(true)
     const {serviceId, teamId} = useParams<RouterParams>()
     const addRef = useRef<SystemSubscriberConfigHandle>(null)
     const pageListRef = useRef<ActionType>(null);
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
     const getSystemSubscriber = ()=>{
         return fetchData<BasicResponse<{subscribers:SystemSubscriberTableListItem[]}>>('service/subscribers',{method:'GET',eoParams:{service:serviceId,team:teamId},eoTransformKeys:['apply_time']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                setInit((prev)=>prev ? false : prev)
                 return  {data:data.subscribers, success: true}
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -51,7 +50,7 @@ const SystemInsideSubscriber:FC = ()=>{
             })
             setMemberValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || '操作失败')
+            message.error(msg || RESPONSE_TIPS.error)
         }
     }
 
@@ -64,11 +63,11 @@ const SystemInsideSubscriber:FC = ()=>{
             fetchData<BasicResponse<null>>('service/subscriber',{method:'DELETE',eoParams:{application:entity!.id,service:entity!.service.id,team:teamId}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -79,12 +78,12 @@ const SystemInsideSubscriber:FC = ()=>{
         let content:string|React.ReactNode = ''
         switch (type){
             case 'add':
-                title='新增订阅方'
+                title=$t('新增订阅方')
                 content=<SystemSubscriberConfig ref={addRef} serviceId={serviceId!} teamId={teamId!}/>
                 break;
             case 'delete':
-                title='删除'
-                content='该数据删除后将无法找回，请确认是否删除？'
+                title=$t('删除')
+                content=DELETE_TIPS.default
                 break;
         }
 
@@ -100,25 +99,25 @@ const SystemInsideSubscriber:FC = ()=>{
                 }
             },
             width:600,
-            okText:'确认',
+            okText:$t('确认'),
             okButtonProps:{
                 disabled : !checkAccess( `team.service.subscription.${type}`, accessData)
             },
-            cancelText:'取消',
+            cancelText:$t('取消'),
             closable:true,
             icon:<></>,
         })
     }
 
-    const operation:ProColumns<SystemSubscriberTableListItem>[] =[
+    const operation:PageProColumns<SystemSubscriberTableListItem>[] =[
         {
-            title: '操作',
+            title: COLUMNS_TITLE.operate,
             key: 'option',
-            width: 62,
+            btnNums:1,
             fixed:'right',
             valueType: 'option',
             render: (_: React.ReactNode, entity: SystemSubscriberTableListItem) => [
-                <TableBtnWithPermission  access="team.service.subscription.delete" key="delete" onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/>,
+                <TableBtnWithPermission  access="team.service.subscription.delete" key="delete"  btnType="delete" onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/>,
             ],
         }
     ]
@@ -126,10 +125,10 @@ const SystemInsideSubscriber:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>服务</Link>
+                title:<Link to={`/service/list`}>{$t('服务')}</Link>
             },
             {
-                title:'订阅方管理'
+                title:$t('订阅方管理')
             }
         ])
         getMemberList()
@@ -137,8 +136,8 @@ const SystemInsideSubscriber:FC = ()=>{
     }, [serviceId]);
 
     const columns = useMemo(()=>{
-        return SYSTEM_SUBSCRIBER_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){x.valueEnum = memberValueEnum} return x})
-    },[memberValueEnum])
+        return SYSTEM_SUBSCRIBER_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){x.valueEnum = memberValueEnum} return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+    },[memberValueEnum,state.language])
 
     return (
         <PageList
@@ -148,7 +147,7 @@ const SystemInsideSubscriber:FC = ()=>{
             request={()=>getSystemSubscriber()}
             // dataSource={tableListDataSource}
             showPagination={false}
-            addNewBtnTitle="新增订阅方"
+            addNewBtnTitle={$t("新增订阅方")}
             onAddNewBtnClick={()=>{openModal('add')}}
             addNewBtnAccess="team.service.subscription.add"
             tableClass="pr-PAGE_INSIDE_X"
@@ -157,7 +156,6 @@ const SystemInsideSubscriber:FC = ()=>{
 }
 
 export default SystemInsideSubscriber
-
 
 export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,SystemSubscriberConfigProps>((props, ref) => {
     const { message } = App.useApp()
@@ -171,11 +169,11 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
                 fetchData<BasicResponse<null>>('service/subscriber',{method:'POST',eoBody:({...value}), eoParams:{service:serviceId,team:teamId}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
                 })
             }).catch((errorInfo)=> reject(errorInfo))
@@ -218,7 +216,7 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
                 });
                 setSystemOptionList(Array.from(teamMap.values()))
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -236,20 +234,18 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
             form={form}
             className="mx-auto  "
             name="systemInsideSubscriber"
-            // labelCol={{ offset:1, span: 4 }}
-            // wrapperCol={{ span: 19}}
             autoComplete="off"
         >
             <Form.Item<SystemSubscriberConfigFieldType>
-                label="订阅方"
+                label={$t("订阅方")}
                 name="application"
-                rules={[{ required: true, message: '必填项' }]}
+                rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
             >
                 <TreeSelect
                     className="w-INPUT_NORMAL" 
                     dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                     treeData={systemOptionList}
-                    placeholder="请选择"
+                    placeholder={PLACEHOLDER.input}
                     treeDefaultExpandAll
                 />
             </Form.Item>

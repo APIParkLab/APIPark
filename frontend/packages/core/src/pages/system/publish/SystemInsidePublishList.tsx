@@ -1,12 +1,12 @@
-import { ActionType, ParamsType, ProColumns } from "@ant-design/pro-components";
+import { ActionType, ParamsType } from "@ant-design/pro-components";
 import { App, Button, Divider } from "antd";
 import { useState, useRef, useEffect, useMemo, FC } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
-import PageList from "@common/components/aoplatform/PageList";
-import { PublishApprovalModalHandle, PublishApprovalModalContent } from "@common/components/aoplatform/PublishApprovalModalContent";
+import PageList, { PageProColumns } from "@common/components/aoplatform/PageList";
+import { PublishApprovalModalContent } from "@common/components/aoplatform/PublishApprovalModalContent";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
 import { PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN, PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN } from "@common/const/approval/const";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { SimpleMemberItem } from "@common/const/type.ts";
 import { MemberTableListItem } from "../../../const/member/type";
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext";
@@ -18,8 +18,9 @@ import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 import { PERMISSION_DEFINITION } from "@common/const/permissions";
 import { checkAccess } from "@common/utils/permission";
 import SystemInsidePublishOnline from "./SystemInsidePublishOnline";
-import { PublishVersionTableListItem, PublishTableListItem, PublishApprovalInfoType } from "@common/const/approval/type";
+import { PublishVersionTableListItem, PublishTableListItem, PublishApprovalInfoType, PublishApprovalModalHandle } from "@common/const/approval/type";
 import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter";
+import { $t } from "@common/locales";
 
 const SystemInsidePublicList:FC = ()=>{
     const { setBreadcrumb } = useBreadcrumb()
@@ -31,16 +32,13 @@ const SystemInsidePublicList:FC = ()=>{
     const [tableListDataSource, setTableListDataSource] = useState<MemberTableListItem[]>([]);
     const {serviceId, teamId} = useParams<RouterParams>();
     const drawerRef = useRef<PublishApprovalModalHandle>(null)
-    // const approvalRef = useRef<PublishApprovalModalHandle>(null)
-    // const addRef = useRef<PublishApprovalModalHandle>(null)
-    // const onlineRef = useRef<PublishApprovalModalHandle>(null)
     const [extraModalBtnLoading,setExtraModalBtnLoading] = useState<boolean>(false)
     const [pageStatus,setPageStatus] = useState<0|1>(0 as 0|1)
     const [pageType, setPageType] = useState<'insideSystem'|'global'>('insideSystem')
     const query =new URLSearchParams(useLocation().search)
     const currLocation = useLocation().pathname
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
     const [drawerTitle, setDrawerTitle] = useState<string>('')
     const [drawerType, setDrawerType] = useState<'approval'|'view'|'add'|'publish'|'online'>('view')
     const [drawerVisible, setDrawerVisible] = useState<boolean>(false)
@@ -69,7 +67,7 @@ const SystemInsidePublicList:FC = ()=>{
                 setInit((prev)=>prev ? false : prev)
                 return  {data:finalRes, success: true}
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 setInit((prev)=>prev ? false : prev)
                 return {data:[], success:false}
             }
@@ -102,11 +100,11 @@ const SystemInsidePublicList:FC = ()=>{
             fetchData<BasicResponse<null>>(url,{method,eoParams:params}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })}
@@ -119,7 +117,7 @@ const SystemInsidePublicList:FC = ()=>{
 
     const handleOnline = (entity:PublishTableListItem | PublishVersionTableListItem)=>{
         modal.confirm({
-            title:'发布结果',
+            title:$t('发布结果'),
             content:<SystemInsidePublishOnline serviceId={serviceId!} teamId={teamId!} id={(entity as PublishVersionTableListItem).id}/>,
             width: 600,
             closable: true,
@@ -136,7 +134,7 @@ const SystemInsidePublicList:FC = ()=>{
         setIsOkToPublish(false)
         switch (type) {
             case 'view':{
-                message.loading('正在加载数据');
+                message.loading(RESPONSE_TIPS.loading);
                 const viewPublish:boolean =  pageStatus !== 0 || ((entity as PublishVersionTableListItem)?.status && (entity as PublishVersionTableListItem)?.status !== 'none') 
                 const { code, data, msg } = await fetchData<BasicResponse<{ publish: PublishApprovalInfoType } | { release:SystemPublishReleaseItem}>>(
                     viewPublish ? 'service/publish':'service/release',
@@ -144,66 +142,66 @@ const SystemInsidePublicList:FC = ()=>{
                 );
                 message.destroy();
                 if (code === STATUS_CODE.SUCCESS) {
-                    setDrawerTitle('查看详情')
+                    setDrawerTitle($t('查看详情'))
                     setDrawerType(type)
                     setDrawerData(viewPublish ? data.publish : data.release)} else {
-                    message.error(msg || '操作失败');
+                    message.error(msg || RESPONSE_TIPS.error);
                     return
                 }
                 break;
             }
             case 'online':{
-                message.loading('正在加载数据');
+                message.loading(RESPONSE_TIPS.loading);
                 const { code, data, msg } = await fetchData<BasicResponse<{ publish: PublishApprovalInfoType }>>(
                     'service/publish',
                     { method: 'GET', eoParams:{ id: (entity as PublishVersionTableListItem)?.flowId,service:serviceId,team:teamId },eoTransformKeys:['version_remark'] }
                 );
                 message.destroy();
                 if (code === STATUS_CODE.SUCCESS) {
-                    setDrawerTitle('上线')
+                    setDrawerTitle($t('上线'))
                     setDrawerType(type)
-                    setDrawerOkTitle('上线')
+                    setDrawerOkTitle($t('上线'))
                     setDrawerData({...data.publish, flowId:(entity as PublishVersionTableListItem)?.flowId})
                 } else {
-                    message.error(msg || '操作失败');
+                    message.error(msg || RESPONSE_TIPS.error);
                     return
                 }
                 break;
             }
             case 'approval':{
-                message.loading('正在加载数据');
+                message.loading(RESPONSE_TIPS.loading);
                 const { code, data, msg } = await fetchData<BasicResponse<{ publish: PublishApprovalInfoType }>>(
                     'service/publish',
                     { method: 'GET', eoParams:{ id: (entity as PublishVersionTableListItem)?.flowId,service:serviceId,team:teamId },eoTransformKeys:['version_remark'] }
                 );
                 message.destroy();
                 if (code === STATUS_CODE.SUCCESS) {
-                    setDrawerTitle('审批')
+                    setDrawerTitle($t('审批'))
                     setDrawerType(type)
                     setDrawerData(data.publish)
-                    setDrawerOkTitle('通过')
+                    setDrawerOkTitle($t('通过'))
                 } else {
-                    message.error(msg || '操作失败');
+                    message.error(msg || RESPONSE_TIPS.error);
                     return
                 }
                 break;
             }
             case 'publish':
             case 'add':{
-                    message.loading('正在加载数据');
+                    message.loading(RESPONSE_TIPS.loading);
                     const { code, data, msg } = await fetchData<BasicResponse<{ diffs: PublishApprovalInfoType }>>(
                         'service/publish/check',
                         { method: 'GET', eoParams:{service:serviceId,team:teamId, ...(type === 'publish' ?{ release:entity?.id }:{})},eoTransformKeys:['version_remark'] }
                     );
                     message.destroy();
                     if (code === STATUS_CODE.SUCCESS) {
-                        setDrawerTitle('申请发布')
+                        setDrawerTitle($t('申请发布'))
                         setDrawerType(type)
                         setDrawerData({...data, ...(type === 'publish'&& {version:entity?.version, id:entity?.id})})
-                        setDrawerOkTitle('确认')
+                        setDrawerOkTitle($t('确认'))
                         setIsOkToPublish(data.isOk??true)
                     } else {
-                        message.error(msg || '操作失败');
+                        message.error(msg || RESPONSE_TIPS.error);
                         return
                     }
                     break;
@@ -218,20 +216,20 @@ const SystemInsidePublicList:FC = ()=>{
         let content: string | React.ReactNode = '';
         switch (type) {
             case 'delete':
-                title = '删除';
-                content = '该数据删除后将无法找回，请确认是否删除？';
+                title = $t('删除');
+                content = DELETE_TIPS.default;
                 break;
             case 'rollback':
-                title = '回滚';
-                content = '请确认是否回滚？';
+                title = $t('回滚');
+                content = $t('请确认是否回滚？');
                 break;
             case 'cancel':
-                title = '撤销申请';
-                content = '请确认是否撤销申请？';
+                title = $t('撤销申请');
+                content = $t('请确认是否撤销申请？');
                 break;
             case 'stop':
-                title = '终止发布';
-                content = '请确认是否终止发布？';
+                title = $t('终止发布');
+                content = $t('请确认是否终止发布？');
                 break;
         }
 
@@ -250,8 +248,8 @@ const SystemInsidePublicList:FC = ()=>{
                 }
             },
             width: 600,
-            okText: '确认',
-            cancelText: '取消',
+            okText: $t('确认'),
+            cancelText: $t('取消'),
             onCancel:()=>{setExtraModalBtnLoading(false)},
             closable: true,
             icon: <></>,
@@ -270,7 +268,7 @@ const SystemInsidePublicList:FC = ()=>{
     };
 
     const tableOperation = (entity:PublishTableListItem | PublishVersionTableListItem)=>{
-        const viewBtn = <TableBtnWithPermission  access="team.service.release.view" key="view"  onClick={()=>{openDrawer('view',entity)}} btnTitle="查看详情"/>
+        const viewBtn = <TableBtnWithPermission  access="team.service.release.view" key="view" btnType="view"  onClick={()=>{openDrawer('view',entity)}} btnTitle="查看详情"/>
         let btnArr:React.ReactNode[] = []
         if(pageType !== 'insideSystem' && pageStatus !== 0){
             btnArr =  [
@@ -281,11 +279,11 @@ const SystemInsidePublicList:FC = ()=>{
 
         if((entity as PublishVersionTableListItem).status === 'accept'){
             btnArr =  [
-                    <TableBtnWithPermission  access="team.service.release.online" key="online"  onClick={()=>{openDrawer('online',entity)}} btnTitle="上线"/>,
+                    <TableBtnWithPermission  access="team.service.release.online" key="online"  btnType="online"  onClick={()=>{openDrawer('online',entity)}} btnTitle="上线"/>,
                     <Divider type="vertical" className="mx-0"  key="div1"/>,
                     viewBtn,
                     <Divider type="vertical" className="mx-0"  key="div2"/>,
-                    <TableBtnWithPermission  access="team.service.release.stop" key="stop"  onClick={()=>{openModal('stop',entity)}} btnTitle="终止发布"/>
+                    <TableBtnWithPermission  access="team.service.release.stop" key="stop"  btnType="stop"  onClick={()=>{openModal('stop',entity)}} btnTitle="终止发布"/>
                 ]
         }
 
@@ -294,17 +292,17 @@ const SystemInsidePublicList:FC = ()=>{
             btnArr =  [
                     viewBtn,
                     <Divider type="vertical" className="mx-0"  key="div2"/>,
-                    <TableBtnWithPermission  access="team.service.release.stop" key="stop"  onClick={()=>{openModal('stop',entity)}} btnTitle="终止发布"/>
+                    <TableBtnWithPermission  access="team.service.release.stop" key="stop" btnType="stop"   onClick={()=>{openModal('stop',entity)}} btnTitle="终止发布"/>
                 ]
         }
 
         if((entity as PublishVersionTableListItem).status === 'apply'){
             btnArr =  [
-                    <TableBtnWithPermission  access="team.service.release.approval" key="approval"  onClick={()=>{openDrawer('approval',entity)}} btnTitle="审批"/>,
+                    <TableBtnWithPermission  access="team.service.release.approval" key="approval" btnType="approval" onClick={()=>{openDrawer('approval',entity)}} btnTitle="审批"/>,
                     <Divider type="vertical" className="mx-0"  key="div1"/>,
                     viewBtn,
                     <Divider type="vertical" className="mx-0"  key="div2"/>,
-                    <TableBtnWithPermission  access="team.service.release.cancel" key="cancel"  onClick={()=>{openModal('cancel',entity)}} btnTitle="撤回申请"/>
+                    <TableBtnWithPermission  access="team.service.release.cancel" key="cancel" btnType="cancel" onClick={()=>{openModal('cancel',entity)}} btnTitle="撤回申请"/>
                 ]
         }
 
@@ -333,18 +331,18 @@ const SystemInsidePublicList:FC = ()=>{
         }
 
         if((entity as PublishVersionTableListItem).canDelete){
-            btnArr = [...btnArr, btnArr.length > 0 && <Divider type="vertical" className="mx-0"  key="div5"/>,<TableBtnWithPermission  access="team.service.release.delete" key="delete"  onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/> ]
+            btnArr = [...btnArr, btnArr.length > 0 && <Divider type="vertical" className="mx-0"  key="div5"/>,<TableBtnWithPermission  access="team.service.release.delete" key="delete" btnType="delete" onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/> ]
         }
 
         return btnArr
 
     }
 
-    const operation:ProColumns<PublishTableListItem>[] =[
+    const operation:PageProColumns<PublishTableListItem>[] =[
         {
-            title: '操作',
+            title: COLUMNS_TITLE.operate,
             key: 'option',
-            width:pageStatus === 0 ? 231 : 93,
+            btnNums:pageStatus === 0 ? 2 : 1,
             valueType: 'option',
             fixed:'right',
             render: (_: React.ReactNode, entity: PublishTableListItem|PublishVersionTableListItem) => tableOperation(entity)
@@ -354,10 +352,10 @@ const SystemInsidePublicList:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>服务</Link>
+                title:<Link to={`/service/list`}>{$t('服务')}</Link>
             },
             {
-                title:'发布'
+                title:$t('发布')
             }
         ])
         getMemberList()
@@ -375,13 +373,13 @@ const SystemInsidePublicList:FC = ()=>{
             })
             setMemberValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || '操作失败')
+            message.error(msg || RESPONSE_TIPS.error)
         }
     }
 
     const columns = useMemo(()=>{
-        return ((pageType === 'insideSystem' || pageStatus === 0 ) ? PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN:PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN).map(x=>{if(x.filters &&(x.dataIndex as string[])?.indexOf('creator') !== -1){x.valueEnum = memberValueEnum} return x})
-    },[pageType, pageStatus, memberValueEnum])
+        return ((pageType === 'insideSystem' || pageStatus === 0 ) ? PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN:PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN).map(x=>{if(x.filters &&(x.dataIndex as string[])?.indexOf('creator') !== -1){x.valueEnum = memberValueEnum} return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+    },[pageType, pageStatus, memberValueEnum,state.language])
 
     useEffect(() => {
         !init && pageListRef.current?.reload()
@@ -438,7 +436,7 @@ const SystemInsidePublicList:FC = ()=>{
                     current?: number | undefined;
                     keyword?: string | undefined;
                 })=>getSystemPublishList(params)}
-                addNewBtnTitle={pageStatus === 0 ? "新建版本":''}
+                addNewBtnTitle={pageStatus === 0 ? $t("新建版本"):''}
                 onAddNewBtnClick={()=>{openDrawer('add')}}
                 addNewBtnAccess="team.service.release.add"
                 onChange={() => {
@@ -457,7 +455,7 @@ const SystemInsidePublicList:FC = ()=>{
               okBtnTitle={drawerOkTitle}
               submitDisabled={drawerType === 'add' ? !isOkToPublish : false}
               submitAccess={`team.service.release.${drawerType === 'publish'? 'add' : drawerType}`}
-              cancelBtnTitle={drawerType === 'online' ? '关闭' : undefined}
+              cancelBtnTitle={drawerType === 'online' ? $t('关闭') : undefined}
               showOkBtn={drawerType !== 'view'}
               onSubmit={onSubmit}
               extraBtn={(drawerType === 'approval'||drawerType === 'online')  ? <WithPermission access={`team.service.release.${drawerType === 'approval'? 'approval' : 'stop'}`}>
@@ -487,7 +485,7 @@ const SystemInsidePublicList:FC = ()=>{
                                 }
                         }}
                     >
-                        {drawerType === 'approval'? "拒绝" : '终止发布'}
+                        {drawerType === 'approval'? $t("拒绝") : $t('终止发布')}
                     </Button>
                     </WithPermission> :undefined}
               >

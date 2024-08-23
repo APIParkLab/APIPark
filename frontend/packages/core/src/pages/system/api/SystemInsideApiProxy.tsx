@@ -4,6 +4,8 @@ import { forwardRef, useEffect, useImperativeHandle } from "react"
 import EditableTableWithModal from "@common/components/aoplatform/EditableTableWithModal";
 import { PROXY_HEADER_CONFIG } from "../../../const/system/const";
 import { SystemApiProxyType, ProxyHeaderItem, SystemInsideApiProxyHandle, SystemInsideApiProxyProps } from "../../../const/system/type";
+import { PLACEHOLDER, VALIDATE_MESSAGE } from "@common/const/const";
+import { $t } from "@common/locales";
 
 const SystemInsideApiProxy = forwardRef<SystemInsideApiProxyHandle,SystemInsideApiProxyProps>((props,ref)=>{
     const {value, onChange, className,initProxyValue} = props
@@ -33,37 +35,35 @@ const SystemInsideApiProxy = forwardRef<SystemInsideApiProxyHandle,SystemInsideA
             form={form}
             className={`mx-auto  flex flex-col overflow-hidden h-full ${className}`}
             name="systemInsideApiProxy"
-            // labelCol={{ offset:1,span: 4 }}
-            // wrapperCol={{ span: 19}}
             onValuesChange={(_,allValues)=>{onChange?.(allValues)}}
             autoComplete="off">
 
             <Form.Item<SystemApiProxyType>
-                label="转发上游路径"
+                label={$t("转发上游路径")}
                 name={'path'}
             >
-                <Input  prefix="/" className="w-INPUT_NORMAL" placeholder="请输入上游路径"/>
+                <Input  prefix="/" className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
             </Form.Item>
 
             <Form.Item<SystemApiProxyType>
-                label="请求超时时间"
+                label={$t("请求超时时间")}
                 name={'timeout'}
-                extra="单位：ms，最小值：1"
-                rules={[{required: true, message: '必填项'}]}
+                extra={$t("单位：ms，最小值：1")}
+                rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
             >
-                <InputNumber className="w-INPUT_NORMAL"min={1} placeholder="请输入请求超时时间" />
+                <InputNumber className="w-INPUT_NORMAL"min={1} placeholder={PLACEHOLDER.input} />
             </Form.Item>
 
             <Form.Item<SystemApiProxyType>
-                label="重试次数"
+                label={$t("重试次数")}
                 name={'retry'}
-                rules={[{required: true, message: '必填项'}]}
+                rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
             >
-                <InputNumber className="w-INPUT_NORMAL" min={0}  placeholder="请输入重试次数" />
+                <InputNumber className="w-INPUT_NORMAL" min={0}  placeholder={PLACEHOLDER.input} />
             </Form.Item>
 
             <Form.Item<SystemApiProxyType>
-                label="转发上游请求头"
+                label={$t("转发上游请求头")}
                 name={'headers'}
             >
                 <EditableTableWithModal<ProxyHeaderItem & {_id:string}>

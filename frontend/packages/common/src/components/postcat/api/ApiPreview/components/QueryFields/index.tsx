@@ -6,6 +6,7 @@ import { RenderMessageBody } from '../MessageBody'
 import {QueryParamsType} from "@common/const/api-detail";
 import {collapseTableSx, PreviewGridActionsCellItem, previewTableHoverSx} from "../../../PreviewTable";
 import {Collapse} from "../../../Collapse";
+import { $t } from '@common/locales';
 
 interface QueryFieldsProps {
   rows?: QueryParamsType[]
@@ -30,13 +31,13 @@ export default function QueryFields({ rows = [], title, loading = false, onMoreS
   const columns: GridColDef<QueryParamsType>[] = [
     {
       field: 'name',
-      headerName: '参数名',
+      headerName: $t('参数名'),
       width: 200,
       hideable: false
     },
     {
       field: 'isRequired',
-      headerName: '必需',
+      headerName: $t('必需'),
       sortable: false,
       valueGetter: (params) => Boolean(params.row.isRequired),
       type: 'boolean',
@@ -44,7 +45,7 @@ export default function QueryFields({ rows = [], title, loading = false, onMoreS
     },
     {
       field: 'description',
-      headerName: '描述',
+      headerName: $t('描述'),
       flex: 1
     },
     {
@@ -58,7 +59,7 @@ export default function QueryFields({ rows = [], title, loading = false, onMoreS
       getActions: (params) => [
         <PreviewGridActionsCellItem
           icon="more"
-          label="More"
+          label={$t("More")}
           key="more"
           onClick={() => onMoreSettingChange?.(params.row as unknown as RenderMessageBody)}
         />

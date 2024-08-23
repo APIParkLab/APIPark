@@ -1,9 +1,9 @@
 
 import  {FC, useEffect, useMemo, useState} from "react";
-import { Outlet, useLocation, useNavigate, useParams} from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import {App, Menu, MenuProps} from "antd";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { TEAM_INSIDE_MENU_ITEMS } from "../../const/team/const.tsx";
 import { useTeamContext } from "../../contexts/TeamContext.tsx";
@@ -13,22 +13,31 @@ import Paragraph from "antd/es/typography/Paragraph";
 import { MenuItemGroupType, MenuItemType } from "antd/es/menu/hooks/useItems";
 import { cloneDeep } from "lodash-es";
 import { PERMISSION_DEFINITION } from "@common/const/permissions.ts";
-import { SimpleTeamItem } from "@common/const/type.ts";
 import { TeamConfigType } from "@core/const/team/type.ts";
+import { $t } from "@common/locales/index.ts";
+import { getItem } from "@common/utils/navigation.tsx";
 
 const TeamInsidePage:FC = ()=> {
     const { message } = App.useApp()
     const {teamId} = useParams<RouterParams>();
     const {fetchData} = useFetch()
     const location = useLocation()
-    const { teamInfo ,setTeamInfo } = useTeamContext()
-    const {getTeamAccessData,cleanTeamAccessData,accessData,checkPermission,teamDataFlushed} = useGlobalContext()
+    const { teamInfo ,setTeamInfo ,} = useTeamContext()
+    const {getTeamAccessData,cleanTeamAccessData,accessData,checkPermission,teamDataFlushed,accessInit,state} = useGlobalContext()
     const navigateTo = useNavigate()
     const [activeMenu, setActiveMenu] = useState<string>()
 
     const onMenuClick: MenuProps['onClick'] = ({key}) => {
         setActiveMenu(key)
     };
+
+    const TEAM_INSIDE_MENU_ITEMS = useMemo(()=> [
+        getItem(('管理'), 'grp', null,
+            [
+                getItem(<Link to="member">{$t('成员')}</Link>, 'member',undefined, undefined, undefined,'team.team.member.view'),
+                getItem(<Link to="setting">{$t('设置')}</Link>, 'setting',undefined,undefined,undefined,'team.team.team.view')],
+            'group'),
+    ], [state.language])
 
     const menuData = useMemo(()=>{
         const filterMenu = (menu:MenuItemGroupType<MenuItemType>[])=>{
@@ -52,7 +61,7 @@ const TeamInsidePage:FC = ()=> {
             return pre
         })
         return  filteredMenu || []
-    },[accessData])
+    },[accessData,accessInit, state.language])
 
     const getTeamInfo = ()=>{
         setTeamInfo?.(undefined)
@@ -61,7 +70,7 @@ const TeamInsidePage:FC = ()=> {
             if(code === STATUS_CODE.SUCCESS){
                 setTeamInfo?.(data.team)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -92,7 +101,7 @@ const TeamInsidePage:FC = ()=> {
             <InsidePage 
                 pageTitle={teamInfo?.name || '-'} 
                 tagList={[{label:
-                    <Paragraph className="mb-0" copyable={teamId ? { text: teamId } : false}>团队 ID：{teamId || '-'}</Paragraph>
+                    <Paragraph className="mb-0" copyable={teamId ? { text: teamId } : false}>{$t('团队 ID')}：{teamId || '-'}</Paragraph>
             }]}
                 backUrl="/team/list"
                 >

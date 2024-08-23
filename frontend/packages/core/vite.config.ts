@@ -57,6 +57,7 @@ export default defineConfig({
       { find: '@common', replacement: path.resolve(__dirname, '../common/src') },
       { find: '@market', replacement: path.resolve(__dirname, '../market/src') },
       { find: '@core', replacement: path.resolve(__dirname, './src') },
+      { find: '@dashboard', replacement: path.resolve(__dirname, '../dashboard/src') },
     ]
   },
   server: {

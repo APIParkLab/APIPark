@@ -3,7 +3,7 @@ import  {forwardRef, useEffect, useImperativeHandle, useState} from "react";
 import {App, Button, Form, Input, Radio, Row, Select, TreeSelect, Upload} from "antd";
 import { Link, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, DELETE_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {DefaultOptionType} from "antd/es/cascader";
 import { EntityItem, MemberItem, SimpleTeamItem} from "@common/const/type.ts";
@@ -21,6 +21,7 @@ import { CategorizesType } from "@market/const/serviceHub/type.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
+import { $t } from "@common/locales/index.ts";
 
 const MAX_SIZE = 2 * 1024; // 1KB
 
@@ -39,7 +40,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
     const [tagOptionList, setTagOptionList] = useState<DefaultOptionType[]>([])
     const [serviceClassifyOptionList, setServiceClassifyOptionList] = useState<DefaultOptionType[]>()
     const [uploadLoading, setUploadLoading] = useState<boolean>(false)
-    const {checkPermission} = useGlobalContext()
+    const {checkPermission,accessInit, getGlobalAccessData} = useGlobalContext()
 
     useImperativeHandle(ref, () => ({
         save:onFinish
@@ -47,7 +48,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
 
     const beforeUpload = async (file: RcFile) => {
         if (!['image/png', 'image/jpeg', 'image/svg+xml'].includes(file.type)) {
-            alert('只允许上传PNG、JPG或SVG格式的图片');
+            alert($t('只允许上传PNG、JPG或SVG格式的图片'));
             return false;
           }
       
@@ -104,7 +105,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                 setServiceClassifyOptionList(data.catalogues)
 
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -133,7 +134,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                     setShowClassify(data.service.serviceType === 'public')
                             },0)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     };
@@ -143,12 +144,12 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
             return fetchData<BasicResponse<{service:{id:string}}>>(serviceId === undefined? 'team/service':'service/info',{method:serviceId === undefined? 'POST' : 'PUT',eoParams: {...(serviceId === undefined ? {team:value.team} :{service:serviceId,team:teamId})},eoBody:({...value,prefix:value.prefix?.trim()}), eoTransformKeys:['serviceType']},).then(response=>{
                 const {code,data,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     setSystemInfo(data.service)
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    return Promise.reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    return Promise.reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=>{
                 return Promise.reject(errorInfo)
@@ -167,7 +168,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                     label:x.name, value:x.id
                 }}))
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -176,26 +177,32 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
         fetchData<BasicResponse<null>>('team/service',{method:'DELETE',eoParams:{team:teamId,service:serviceId}}).then(response=>{
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                message.success(msg || '操作成功！')
+                message.success(msg || RESPONSE_TIPS.success)
                 navigate(`/service/list`)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
 
     useEffect(() => {
-        getTeamOptionList()
+        if(accessInit){
+            getTeamOptionList
+        }else{
+            getGlobalAccessData()?.then(()=>{
+                getTeamOptionList()
+            })
+        }
         getTagAndServiceClassifyList()
         if (serviceId !== undefined) {
             setOnEdit(true);
             getSystemInfo();
             setBreadcrumb([
                 {
-                    title: <Link to={`/service/list`}>服务</Link>
+                    title: <Link to={`/service/list`}>{$t('服务')}</Link>
                 },
                 {
-                    title: '设置'
+                    title: $t('设置')
                 }])
 
         } else {
@@ -210,17 +217,17 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
     
     const deleteSystemModal = async ()=>{
         modal.confirm({
-            title:'删除',
-            content:'该数据删除后将无法找回，请确认是否删除？',
+            title:$t('删除'),
+            content:DELETE_TIPS.default,
             onOk:()=> {
                 return deleteSystem()
             },
             width:600,
-            okText:'确认',
+            okText:$t('确认'),
             okButtonProps:{
                 danger:true
             },
-            cancelText:'取消',
+            cancelText:$t('取消'),
             closable:true,
             icon:<></>
         })
@@ -241,37 +248,37 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                 >
                     <div>
                         <Form.Item<SystemConfigFieldType>
-                            label="服务名称"
+                            label={$t("服务名称")}
                             name="name"
-                            rules={[{ required: true, message: '必填项' ,whitespace:true }]}
+                            rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
                         >
-                            <Input className="w-INPUT_NORMAL" placeholder="请输入服务名称"/>
+                            <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                         </Form.Item>
 
                         <Form.Item<SystemConfigFieldType>
-                            label="服务ID"
+                            label={$t("服务ID")}
                             name="id"
-                            rules={[{ required: true, message: '必填项' ,whitespace:true }]}
+                            rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
                         >
-                            <Input className="w-INPUT_NORMAL" disabled={onEdit} placeholder="请输入服务ID"/>
+                            <Input className="w-INPUT_NORMAL" disabled={onEdit} placeholder={PLACEHOLDER.input}/>
                         </Form.Item>
 
                         <Form.Item<SystemConfigFieldType>
-                            label="API 调用前缀"
+                            label={$t("API 调用前缀")}
                             name="prefix"
-                            extra="选填，作为服务内所有API的前缀，比如host/{service_name}/{api_path}，一旦保存无法修改"
+                            extra={$t("选填，作为服务内所有API的前缀，比如host/{service_name}/{api_path}，一旦保存无法修改")}
                             rules={[
                             {
                             validator: validateUrlSlash,
                             }]}
                         >
-                            <Input prefix={onEdit ? '' : '/'} className="w-INPUT_NORMAL" disabled={onEdit} placeholder="请输入 API 调用前缀"/>
+                            <Input prefix={onEdit ? '' : '/'} className="w-INPUT_NORMAL" disabled={onEdit} placeholder={PLACEHOLDER.input}/>
                         </Form.Item>
 
                         <Form.Item<SystemConfigFieldType>
-                            label="图标"
+                            label={$t("图标")}
                             name="logoFile"
-                            extra="仅支持 .png .jpg .jpeg .svg 格式的图片文件, 大于 1KB 的文件将被压缩"
+                            extra={$t("仅支持 .png .jpg .jpeg .svg 格式的图片文件, 大于 1KB 的文件将被压缩")}
                             valuePropName="fileList" getValueFromEvent={normFile}
                         >
                             <Upload
@@ -290,62 +297,62 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         </Form.Item>
 
                         <Form.Item<SystemConfigFieldType>
-                            label="描述"
+                            label={$t("描述")}
                             name="description"
                         >
-                            <Input.TextArea className="w-INPUT_NORMAL" placeholder="请输入描述"/>
+                            <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                         </Form.Item>
 
                         <Form.Item<SystemConfigFieldType>
-                            label="Logo"
+                            label={$t("Logo")}
                             name="logo"
                             hidden
                         >
                         </Form.Item>
 
                         {!onEdit && <Form.Item<SystemConfigFieldType>
-                            label="所属团队"
+                            label={$t("所属团队")}
                             name="team"
-                            rules={[{ required: true, message: '必填项' }]}
+                            rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
                         >
-                            <Select className="w-INPUT_NORMAL" disabled={onEdit} placeholder="请选择" options={teamOptionList} >
+                            <Select className="w-INPUT_NORMAL" disabled={onEdit} placeholder={PLACEHOLDER.input} options={teamOptionList} >
                             </Select>
                         </Form.Item>}
 
 
                         <Form.Item<SystemConfigFieldType>
-                            label="标签"
+                            label={$t("标签")}
                             name="tags"
                         >
                             <Select 
                                 className="w-INPUT_NORMAL" 
                                 mode="tags" 
-                                placeholder="请选择" 
+                                placeholder={PLACEHOLDER.select} 
                                 options={tagOptionList}>
                             </Select>
                         </Form.Item>
 
                         <Form.Item<SystemConfigFieldType>
-                            label="服务类型"
+                            label={$t("服务类型")}
                             name="serviceType"
-                            rules={[{required: true, message: '必填项'}]}
+                            rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
                         >
                             <Radio.Group className="flex flex-col" options={visualizations} onChange={(e)=>{setShowClassify(e.target.value === 'public')}} />
                         </Form.Item>
 
                         {showClassify &&
                         <Form.Item<SystemConfigFieldType>
-                            label="所属服务分类"
+                            label={$t("所属服务分类")}
                             name="catalogue"
-                            extra="设置服务展示在服务市场中的哪个分类下"
-                            rules={[{required: true, message: '必填项'}]}
+                            extra={$t("设置服务展示在服务市场中的哪个分类下")}
+                            rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
                         >
                             <TreeSelect
                                 className="w-INPUT_NORMAL"
                                 fieldNames={{label:'name',value:'id',children:'children'}}
                                 showSearch
                                 dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                                placeholder="请选择"
+                                placeholder={PLACEHOLDER.select}
                                 allowClear
                                 treeDefaultExpandAll
                                 treeData={serviceClassifyOptionList}
@@ -358,7 +365,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                             >
                         <WithPermission access={onEdit ? 'team.service.service.edit' :''}>
                             <Button type="primary" htmlType="submit">
-                                保存
+                                {$t('保存')}
                             </Button>
                             </WithPermission>
                         </Row></>}
@@ -366,10 +373,10 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                     {onEdit && <>
                         <WithPermission access="team.service.service.delete" showDisabled={false}>
                             <div className="bg-[rgb(255_120_117_/_5%)] rounded-[10px] mt-[50px] p-btnrbase pb-0">
-                            <p className="text-left"><span className="font-bold">删除服务：</span>删除操作不可恢复，请谨慎操作！</p>
+                            <p className="text-left"><span className="font-bold">{$t('删除服务')}：</span>{$t('删除操作不可恢复，请谨慎操作！')}</p>
                                 <div className="text-left">
                                     <WithPermission access="team.service.service.delete">
-                                        <Button className="m-auto mt-[16px] mb-[20px]" type="default"  danger={true} onClick={deleteSystemModal}>删除服务</Button>
+                                        <Button className="m-auto mt-[16px] mb-[20px]" type="default"  danger={true} onClick={deleteSystemModal}>{$t('删除服务')}</Button>
                                         </WithPermission>
                                 </div>
                             </div>

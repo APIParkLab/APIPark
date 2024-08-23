@@ -101,3 +101,19 @@ export type PublishTableListItem = {
     team:EntityItem
     status:keyof typeof PublishApplyStatusEnum
 }
+
+
+export type PublishApprovalModalProps = {
+    type:'approval'|'view'|'add'|'publish'|'online'
+    data:PublishApprovalInfoType | PublishApprovalInfoType &{id?:string} | PublishVersionTableListItem
+    insideSystem?:boolean
+    serviceId:string
+    teamId:string
+    clusterPublishStatus?:SystemInsidePublishOnlineItems[]
+}
+
+export type PublishApprovalModalHandle = {
+    save:(operate:'pass'|'refuse') =>Promise<boolean|string>
+    publish:(notSave?:boolean)=>Promise<boolean|string|Record<string, unknown>>
+    online:()=>Promise<boolean|string>
+}

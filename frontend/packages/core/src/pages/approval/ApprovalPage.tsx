@@ -1,27 +1,22 @@
 
 import { Menu, MenuProps, Tabs, TabsProps} from "antd";
 import {Link, useLocation, useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import ApprovalList from "./ApprovalList.tsx";
 import { getItem } from "@common/utils/navigation.tsx";
+import { $t } from "@common/locales/index.ts";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 
 
-const menuItems: MenuProps['items'] = [
-    getItem('管理', 'mng', null,
-        [
-            getItem(<Link to="/approval?type=subscribe">订阅申请</Link>, 'subscribe'),
-            getItem(<Link to="/approval?type=release">发布申请</Link>, 'release')],
-        'group'),
-];
 
 const items: TabsProps['items'] = [
     {
         key: '0',
-        label: '待审批',
+        label: $t('待审批'),
     },
     {
         key: '1',
-        label: '已审批',
+        label: $t('已审批'),
     }
 ];
 
@@ -32,6 +27,15 @@ export default function ApprovalPage(){
     const query =new URLSearchParams(useLocation().search)
     const [pageType,setPageType] = useState<'subscribe'|'release'>((query?.get('type') ||'subscribe') as 'subscribe'|'release')
     const [pageStatus,setPageStatus] = useState<0|1>(Number(query.get('status') ||0) as 0|1)
+    const {state} = useGlobalContext()
+
+    const menuItems = useMemo(()=>[
+        getItem($t('管理'), 'mng', null,
+            [
+                getItem(<Link to="/approval?type=subscribe">{$t('订阅申请')}</Link>, 'subscribe'),
+                getItem(<Link to="/approval?type=release">{$t('发布申请')}</Link>, 'release')],
+            'group'),
+    ],[state.language])
 
     const onMenuClick: MenuProps['onClick'] = (e) => {
         setPageType(e.key as 'subscribe'|'release')

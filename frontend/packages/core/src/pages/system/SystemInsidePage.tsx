@@ -1,12 +1,11 @@
 
 import  {FC, useEffect, useMemo, useState} from "react";
-import {Outlet, useLocation, useNavigate, useParams} from "react-router-dom";
+import {Link, Outlet, useLocation, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import {App, Menu, MenuProps} from "antd";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { useSystemContext} from "../../contexts/SystemContext.tsx";
-import { SYSTEM_PAGE_MENU_ITEMS } from "../../const/system/const.tsx";
 import { SystemConfigFieldType } from "../../const/system/type.ts";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { PERMISSION_DEFINITION } from "@common/const/permissions.ts";
@@ -14,6 +13,9 @@ import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 import Paragraph from "antd/es/typography/Paragraph";
 import { ItemType, MenuItemGroupType, MenuItemType } from "antd/es/menu/hooks/useItems";
 import { cloneDeep } from "lodash-es";
+import { $t } from "@common/locales/index.ts";
+import { getItem } from "@common/utils/navigation.tsx";
+const APP_MODE = import.meta.env.VITE_APP_MODE;
 
 const SystemInsidePage:FC = ()=> {
     const { message } = App.useApp()
@@ -22,7 +24,7 @@ const SystemInsidePage:FC = ()=> {
     const currentUrl = location.pathname
     const {fetchData} = useFetch()
     const { setPrefixForce,setApiPrefix ,systemInfo,setSystemInfo} = useSystemContext()
-    const { accessData,checkPermission} = useGlobalContext()
+    const { accessData,checkPermission,accessInit,state} = useGlobalContext()
     const [activeMenu, setActiveMenu] = useState<string>()
     const navigateTo = useNavigate()
 
@@ -32,7 +34,7 @@ const SystemInsidePage:FC = ()=> {
             if(code === STATUS_CODE.SUCCESS){
                 setSystemInfo(data.service)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -46,10 +48,35 @@ const SystemInsidePage:FC = ()=> {
                 setApiPrefix(data.prefix)
                 setPrefixForce(data.force)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
+
+    
+
+   const SYSTEM_PAGE_MENU_ITEMS = useMemo(()=>[
+    getItem($t('服务'), 'assets', null,
+        [
+            getItem(<Link to="./api">{$t('API')}</Link>, 'api',undefined,undefined,undefined,'team.service.api.view'),
+            getItem(<Link to="./upstream">{$t('上游')}</Link>, 'upstream',undefined,undefined,undefined,'team.service.upstream.view'),
+            getItem(<Link to="./document">{$t('使用说明')}</Link>, 'document',undefined,undefined,undefined,''),
+            getItem(<Link to="./publish">{$t('发布')}</Link>, 'publish',undefined,undefined,undefined,'team.service.release.view'),
+            ],
+        'group'),
+    getItem($t('订阅管理'), 'provideSer', null,
+        [
+            getItem(<Link to="./approval">{$t('订阅审批')}</Link>, 'approval',undefined,undefined,undefined,'team.service.subscription.view'),
+            getItem(<Link to="./subscriber">{$t('订阅方管理')}</Link>, 'subscriber',undefined,undefined,undefined,'team.service.subscription.view'),
+        ],
+        'group'),
+    getItem($t('管理'), 'mng', null,
+        [
+            APP_MODE === 'pro' ? getItem(<Link to="./topology">{$t('调用拓扑图')}</Link>, 'topology',undefined,undefined,undefined,'project.mySystem.topology.view'):null,
+            getItem(<Link to="./setting">{$t('设置')}</Link>, 'setting',undefined,undefined,undefined,'')],
+        'group'),
+],[state.language])
+
 
     const menuData = useMemo(()=>{
         const filterMenu = (menu:MenuItemGroupType<MenuItemType>[])=>{
@@ -69,7 +96,7 @@ const SystemInsidePage:FC = ()=> {
             return pre ?? 'api'
         })
         return  filteredMenu || []
-    },[accessData])
+    },[accessData,accessInit, SYSTEM_PAGE_MENU_ITEMS])
     
     const onMenuClick: MenuProps['onClick'] = ({key}) => {
         setActiveMenu(key)
@@ -105,7 +132,7 @@ const SystemInsidePage:FC = ()=> {
         <>
         <InsidePage pageTitle={systemInfo?.name || '-'} 
                 tagList={[{label:
-                    <Paragraph className="mb-0" copyable={serviceId ? { text: serviceId } : false}>服务 ID：{serviceId || '-'}</Paragraph>
+                    <Paragraph className="mb-0" copyable={serviceId ? { text: serviceId } : false}>{$t('服务 ID')}：{serviceId || '-'}</Paragraph>
                 }]}
                 backUrl="/service/list">
                 <div className="flex flex-1 h-full">

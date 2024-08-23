@@ -1,20 +1,23 @@
 
-import  {FC, useEffect, useState} from "react";
+import  {FC, useEffect, useMemo, useState} from "react";
 import { Link, Outlet, useLocation, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import { Menu} from "antd";
 import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 import { getItem } from "@common/utils/navigation.tsx";
+import { $t } from "@common/locales";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 const UserProfile:FC = ()=> {
     const {teamId} = useParams<RouterParams>();
     const location = useLocation()
     const navigateTo = useNavigate()
     const [activeMenu, setActiveMenu] = useState<string>()
+    const {state} = useGlobalContext()
 
 
-    const menuData = [
-        getItem(<Link to="changepsw">修改密码</Link>, 'changepsw')]
+    const menuData = useMemo(()=>[
+        getItem(<Link to="changepsw">{$t('修改密码')}</Link>, 'changepsw')],[state.language])
 
 
     useEffect(() => {
@@ -33,8 +36,8 @@ const UserProfile:FC = ()=> {
     return (
         <>
             <InsidePage 
-                pageTitle='账号设置'
-                description="管理个人账号"
+                pageTitle={$t('账号设置')}
+                description={$t("管理个人账号")}
                 >
                 <div className="flex h-full">
                     <Menu

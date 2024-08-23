@@ -27,6 +27,7 @@ import {Icon} from "../../../Icon";
 import {ApiParamsTypeOptions} from "../../../ApiManager/components/ApiMessageBody/constants.ts";
 import {UploadButton} from "../../../UploadButton";
 import {isNil} from "lodash-es";
+import { $t } from '@common/locales/index.ts';
 
 type SafeAny = unknown
 export interface RenderBodyParamsType extends BodyParamsType {
@@ -171,7 +172,7 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
   const columns: (GridColDef<RenderBodyParamsType> | false)[] = [
     messageType === 'Headers' && {
       field: 'name',
-      headerName: '标签',
+      headerName: $t('标签'),
       editable: true,
       sortable: false,
       renderEditCell: (params) => {
@@ -214,7 +215,7 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
     },
     messageType !== 'Headers' && {
       field: 'name',
-      headerName:'参数名',
+      headerName:$t('参数名'),
       width: 200,
       editable: true,
       sortable: false,
@@ -244,7 +245,7 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
     },
     messageType === 'Body' && {
       field: 'dataType',
-      headerName: '类型',
+      headerName: $t('类型'),
       sortable: false,
       width: 120,
       type: 'singleSelect',
@@ -286,7 +287,7 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
     {
       field: 'paramAttr',
       sortable: false,
-      headerName: '参数值',
+      headerName: $t('参数值'),
       flex: 1,
       minWidth: 200,
       editable: true,

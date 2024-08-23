@@ -1,9 +1,10 @@
 import {App, Form, Input} from "antd";
 import  {forwardRef, useEffect, useImperativeHandle} from "react";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { ServiceHubCategoryConfigHandle, ServiceHubCategoryConfigFieldType, ServiceHubCategoryConfigProps } from "@market/const/serviceHub/type.ts"
 import WithPermission from "@common/components/aoplatform/WithPermission";
+import { $t } from "@common/locales";
 
 export const ServiceHubCategoryConfig = forwardRef<ServiceHubCategoryConfigHandle,ServiceHubCategoryConfigProps>((props,ref)=>{
     const { message } = App.useApp()
@@ -25,18 +26,18 @@ export const ServiceHubCategoryConfig = forwardRef<ServiceHubCategoryConfigHandl
         }
         return new Promise((resolve, reject)=>{
             if(!url || !method){
-                reject('类型错误')
+                reject(RESPONSE_TIPS.error)
                 return
             }
             form.validateFields().then((value)=>{
                 fetchData<BasicResponse<null>>(url,{method,eoBody:(value), eoParams:{ ...(type === 'renameCate' ? {catalogue:value.id} :undefined)}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -52,14 +53,12 @@ export const ServiceHubCategoryConfig = forwardRef<ServiceHubCategoryConfigHandl
 
         switch(type){
             case 'addCate':
-                //console.log(entity)
                 form.setFieldsValue({})
                 break
             case 'addChildCate':
                 form.setFieldsValue({parent:entity!.id})
                 break
             case 'renameCate':
-                //console.log(entity)
                 form.setFieldsValue(entity)
                 break
         }
@@ -76,46 +75,44 @@ export const ServiceHubCategoryConfig = forwardRef<ServiceHubCategoryConfigHandl
             form={form}
             className="mx-auto "
             name="serviceHubCategoryConfig"
-            // labelCol={{ span: 5 }}
-            // wrapperCol={{ span: 19}}
             autoComplete="off"
         >
 
             {type === 'renameCate' &&
                 <Form.Item<ServiceHubCategoryConfigFieldType>
-                    label="ID"
+                    label={$t("ID")}
                     name="id"
                     hidden
-                    rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder="ID"/>
+                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                 </Form.Item>
             }
             {(type === 'addCate' || type === 'renameCate') &&
                 <Form.Item<ServiceHubCategoryConfigFieldType>
-                    label="分类名称"
+                    label={$t("分类名称")}
                     name="name"
-                    rules={[{ required: true, message: '必填项' ,whitespace:true }]}
+                    rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder="请输入分类名称"/>
+                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                 </Form.Item>}
 
             {type === 'addChildCate' &&<>
                 <Form.Item<ServiceHubCategoryConfigFieldType>
-                    label="父分类 ID"
+                    label={$t("父分类 ID")}
                     name="parent"
                     hidden
-                    rules={[{ required: true, message: '必填项',whitespace:true  }]}
+                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder="父分类 ID"/>
+                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                 </Form.Item>
 
                 <Form.Item<ServiceHubCategoryConfigFieldType>
-                    label="子分类名称"
+                    label={$t("子分类名称")}
                     name="name"
-                    rules={[{ required: true, message: '必填项' ,whitespace:true }]}
+                    rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder="请输入子分类名称"/>
+                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                 </Form.Item>
             </>
             }

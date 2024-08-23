@@ -10,11 +10,11 @@ export interface TagWithPermission extends TagProps{
 export default function TagWithPermission(props:TagWithPermission){
     const {access,onClose} = props
     const [editAccess, setEditAccess] = useState<boolean>(access ? false:true)
-    const {accessData,checkPermission} = useGlobalContext()
+    const {accessData,checkPermission,accessInit} = useGlobalContext()
     const lastAccess = useMemo(()=>{
       if(!access) return true
       return checkPermission(access as keyof typeof PERMISSION_DEFINITION[0])
-  },[access, accessData,checkPermission])
+  },[access, accessData,checkPermission,accessInit])
 
     useEffect(()=>{
         access ? setEditAccess(lastAccess) :  setEditAccess(true)

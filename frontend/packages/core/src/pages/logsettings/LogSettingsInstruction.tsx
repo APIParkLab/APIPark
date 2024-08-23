@@ -1,5 +1,6 @@
 
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext";
+import { $t } from "@common/locales";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
@@ -8,7 +9,7 @@ export default function LogSettingsInstruction() {
 
     useEffect(()=>{
         setBreadcrumb([
-            {title:'日志配置'}
+            {title:$t('日志配置')}
         ])
     },[])
     return (

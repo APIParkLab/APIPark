@@ -1,10 +1,11 @@
+import { $t } from '@common/locales';
 import { TextField } from '@mui/material'
 import { SyntheticEvent } from 'react'
 
 export function RequestBodyBinary({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   return (
     <TextField
-      label="Binary"
+      label={$t("Binary")}
       multiline
       rows={4}
       value={value}

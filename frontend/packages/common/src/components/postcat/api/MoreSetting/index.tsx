@@ -9,6 +9,7 @@ import { ParamLimit } from './components/ParamLimit'
 import {ParamAttrType} from "@common/const/api-detail";
 import { BaseDialog} from "../Dialog/base-dialog.tsx";
 import {ApiParamsTypeOptions} from "../ApiManager/components/ApiMessageBody/constants.ts";
+import { $t } from '@common/locales/index.ts'
 
 interface MoreSettingProps {
   open: boolean
@@ -77,7 +78,7 @@ export function MoreSetting({ open, readOnly,onClose, param, onChange, hiddenCon
   }
 
   return (
-    <BaseDialog open={open} onClose={onClose} title='更多设置' onConfirm={handleConfirm}>
+    <BaseDialog open={open} onClose={onClose} title={$t('更多设置')} onConfirm={handleConfirm}>
       <Box px={2} pb={2} width={880}>
         <Stack spacing={2}>
           <ParamPreview
@@ -90,8 +91,8 @@ export function MoreSetting({ open, readOnly,onClose, param, onChange, hiddenCon
             <ParamLimit
               min={param?.paramAttr?.minLength ?? 0}
               max={param?.paramAttr?.maxLength ?? 0}
-              minLabel='最小长度'
-              maxLabel='最大长度'
+              minLabel={$t('最小长度')}
+              maxLabel={$t('最大长度')}
               onChange={handleParamLengthChange}
             />
           ) : null}
@@ -99,8 +100,8 @@ export function MoreSetting({ open, readOnly,onClose, param, onChange, hiddenCon
             <ParamLimit
               min={param?.paramAttr?.minValue ?? 0}
               max={param?.paramAttr?.maxValue ?? 0}
-              minLabel='最小值'
-              maxLabel='最大值'
+              minLabel={$t('最小值')}
+              maxLabel={$t('最大值')}
               onChange={handleParamValueChange}
             />
           ) : null}

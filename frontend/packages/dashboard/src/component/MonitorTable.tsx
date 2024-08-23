@@ -1,16 +1,19 @@
 
-import { ActionType, ProColumns } from "@ant-design/pro-components"
+import { ActionType } from "@ant-design/pro-components"
 import { useImperativeHandle, useRef, useState } from "react"
-import PageList from "@common/components/aoplatform/PageList"
+import PageList, { PageProColumns } from "@common/components/aoplatform/PageList"
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission"
 import { API_TABLE_GLOBAL_COLUMNS_CONFIG,SERVICE_TABLE_GLOBAL_COLUMNS_CONFIG, APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG } from "@dashboard/const/const"
 import {forwardRef} from "react"
+import { COLUMNS_TITLE } from "@common/const/const"
 
 const  TableType = {
     api :API_TABLE_GLOBAL_COLUMNS_CONFIG,
     provider :SERVICE_TABLE_GLOBAL_COLUMNS_CONFIG,
     subscribers :APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG
 }
+const APP_MODE = import.meta.env.VITE_APP_MODE;
+
 
 type MonitorTableProps<T> = {
     type:'api'|'subscribers'|'provider'
@@ -60,17 +63,17 @@ const MonitorTable = forwardRef<MonitorTableHandler, MonitorTableProps<unknown>>
         })
     }
 
-    const operation:ProColumns<unknown>[] =[
+    const operation:PageProColumns<unknown>[] =[
         {
-            title: '操作',
+            title: COLUMNS_TITLE.operate,
             key: 'option',
-            width: 98,
+            btnNums:2,
             fixed:'right',
             hideInSetting:true,
             valueType: 'option',
             render: (_: React.ReactNode, entity: unknown) => [
             // <TableBtnWithPermission  access="system.dashboard.self.view" key="view" onClick={()=>onRowClick(entity)} btnTitle="查看"/>,
-            <TableBtnWithPermission  access="" key="view" onClick={()=>onRowClick(entity)} btnTitle="查看"/>,
+            APP_MODE === 'pro' ? <TableBtnWithPermission  access="" key="view" btnType="view"  onClick={()=>onRowClick(entity)} btnTitle="查看"/> : null
             ],
         }
     ]
