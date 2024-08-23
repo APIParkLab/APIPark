@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"time"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/eolinker/go-common/auto"
-	
+
 	"github.com/APIParkLab/APIPark/service/universally"
 	"github.com/APIParkLab/APIPark/stores/service"
 )
@@ -23,6 +23,19 @@ type imlServiceService struct {
 	universally.IServiceDelete
 	universally.IServiceCreate[Create]
 	universally.IServiceEdit[Edit]
+}
+
+func (i *imlServiceService) ServiceList(ctx context.Context, serviceIds ...string) ([]*Service, error) {
+	w := make(map[string]interface{})
+	if len(serviceIds) > 0 {
+		w["uuid"] = serviceIds
+	}
+	w["as_server"] = true
+	list, err := i.store.List(ctx, w)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(list, FromEntity), nil
 }
 
 func (i *imlServiceService) SearchPublicServices(ctx context.Context, keyword string) ([]*Service, error) {
@@ -102,11 +115,11 @@ func (i *imlServiceService) GetLabels(ctx context.Context, ids ...string) map[st
 
 func (i *imlServiceService) OnComplete() {
 	i.IServiceGet = universally.NewGetSoftDelete[Service, service.Service](i.store, FromEntity)
-	
+
 	i.IServiceDelete = universally.NewSoftDelete[service.Service](i.store)
-	
+
 	i.IServiceCreate = universally.NewCreatorSoftDelete[Create, service.Service](i.store, "service", createEntityHandler, uniquestHandler, labelHandler)
-	
+
 	i.IServiceEdit = universally.NewEdit[Edit, service.Service](i.store, updateHandler, labelHandler)
 	auto.RegisterService("service", i)
 }
@@ -151,5 +164,5 @@ func updateHandler(e *service.Service, i *Edit) {
 	if i.Logo != nil {
 		e.Logo = *i.Logo
 	}
-	
+
 }

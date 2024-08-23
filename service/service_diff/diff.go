@@ -32,7 +32,7 @@ type UpstreamConfig struct {
 }
 type UpstreamDiff struct {
 	Upstream string `json:"upstream,omitempty" `
-	//Partition string           `json:"partition,omitempty"`
+	//Cluster string           `json:"partition,omitempty"`
 	Data   *upstream.Config `json:"data,omitempty"`
 	Change ChangeType       `json:"change,omitempty"`
 	Status StatusType       `json:"status,omitempty"`
