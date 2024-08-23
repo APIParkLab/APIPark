@@ -123,6 +123,7 @@ const themeToken = {
         // 返回处理后的数据
         return { path: '/', routes: res.map(x=> ({...x, routes: x.routes?.filter(x=> (x.access || x.routes?.length > 0))})).filter(x=> (x.access || x.routes?.length > 0)) };
     }, [accessData, state.language]);
+
     
 
      

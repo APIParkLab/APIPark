@@ -10,13 +10,11 @@ import useInitializeMonaco from "@common/hooks/useInitializeMonaco";
 import { useEffect, useState } from 'react';
 import 'dayjs/locale/zh-cn';
 import dayjs from 'dayjs';
-import { useTranslation } from "react-i18next";
 import { useGlobalContext } from '@common/contexts/GlobalStateContext';
-import Joyride from 'react-joyride';
+import i18next from 'i18next';
 
 type Locale = ConfigProviderProps['locale'];
 
-dayjs.locale('en');
 
 
 const antdComponentThemeToken = {
@@ -142,12 +140,12 @@ const antdComponentThemeToken = {
 
 
 function App() {
-  const [locale, setLocal] = useState<Locale>(enUS);
+  const [locale, setLocal] = useState<Locale>(sessionStorage.getItem('i18nextLng') === 'cn'? zhCN : enUS);
+  dayjs.locale(sessionStorage.getItem('i18nextLng') || 'en');
   useInitializeMonaco()
   const { state} = useGlobalContext()
-
+  
   useEffect(() => {
-      console.log(state.language)
       dayjs.locale(state.language);
       setLocal(state.language === 'cn' ? zhCN : enUS);
   },[state.language])
