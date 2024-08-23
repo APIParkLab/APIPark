@@ -91,13 +91,13 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
   const getTimeFormatter = (time:string)=>{
     switch (yAxisTitle) {
       case '分钟': {
-        return `${new Date(time).getMonth() < 9 ? '0' + (new Date(time).getMonth() + 1) : (new Date(time).getMonth() + 1)}/${new Date(time).getDate() < 10 ? '0' + new Date(time).getDate() : new Date(time).getDate()} ${new Date(time).getHours() < 10 ? '0' + new Date(time).getHours() : new Date(time).getHours()}:${new Date(time).getMinutes() < 10 ? '0' + new Date(time).getMinutes() : new Date(time).getMinutes()}`
+        return `${new Date(time).getMonth() < 9 ? '0' + (new Date(time).getMonth() + 1) : (new Date(time).getMonth() + 1)}/${new Date(time).getDate() < 10 ? '0' + new Date(time).getDate() : new Date(time).getDate()} \n ${new Date(time).getHours() < 10 ? '0' + new Date(time).getHours() : new Date(time).getHours()}:${new Date(time).getMinutes() < 10 ? '0' + new Date(time).getMinutes() : new Date(time).getMinutes()}`
       }
       case '5分钟': {
-        return `${new Date(time).getMonth() < 9 ? '0' + (new Date(time).getMonth() + 1) : (new Date(time).getMonth() + 1)}/${new Date(time).getDate() < 10 ? '0' + new Date(time).getDate() : new Date(time).getDate()} ${new Date(time).getHours() < 10 ? '0' + new Date(time).getHours() : new Date(time).getHours()}:${new Date(time).getMinutes() < 10 ? '0' + new Date(time).getMinutes() : new Date(time).getMinutes()}   `
+        return `${new Date(time).getMonth() < 9 ? '0' + (new Date(time).getMonth() + 1) : (new Date(time).getMonth() + 1)}/${new Date(time).getDate() < 10 ? '0' + new Date(time).getDate() : new Date(time).getDate()} \n ${new Date(time).getHours() < 10 ? '0' + new Date(time).getHours() : new Date(time).getHours()}:${new Date(time).getMinutes() < 10 ? '0' + new Date(time).getMinutes() : new Date(time).getMinutes()}   `
       }
       case '1小时': {
-        return `${new Date(time).getMonth() < 9 ? '0' + (new Date(time).getMonth() + 1) : (new Date(time).getMonth() + 1)}/${new Date(time).getDate() < 10 ? '0' + new Date(time).getDate() : new Date(time).getDate()} ${new Date(time).getHours() < 10 ? '0' + new Date(time).getHours() : new Date(time).getHours()}     `
+        return `${new Date(time).getMonth() < 9 ? '0' + (new Date(time).getMonth() + 1) : (new Date(time).getMonth() + 1)}/${new Date(time).getDate() < 10 ? '0' + new Date(time).getDate() : new Date(time).getDate()} \n${new Date(time).getHours() < 10 ? '0' + new Date(time).getHours() : new Date(time).getHours()}     `
       }
       case '1天': {
         return `${new Date(time).getFullYear().toString().slice(2)}年-${new Date(time).getMonth() < 9 ? '0' + (new Date(time).getMonth() + 1) : (new Date(time).getMonth() + 1)}/${new Date(time).getDate() < 10 ? '0' + new Date(time).getDate() : new Date(time).getDate()}      `
@@ -106,15 +106,15 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
         return `${new Date(time).getFullYear().toString().slice(2)}年-${new Date(time).getMonth() < 9 ? '0' + (new Date(time).getMonth() + 1) : (new Date(time).getMonth() + 1)}/${new Date(time).getDate() < 10 ? '0' + new Date(time).getDate() : new Date(time).getDate()}      `
       }
     }
-    return `${new Date(time).getMonth() + 1}/${new Date(time).getDate() < 10 ? '0' + new Date(time).getDate() : new Date(time).getDate()} ${new Date(time).getHours() < 10 ? '0' + new Date(time).getHours() : new Date(time).getHours()}:${new Date(time).getMinutes() < 10 ? '0' + new Date(time).getMinutes() : new Date(time).getMinutes()}`
+    return `${new Date(time).getMonth() + 1}/${new Date(time).getDate() < 10 ? '0' + new Date(time).getDate() : new Date(time).getDate()} \n${new Date(time).getHours() < 10 ? '0' + new Date(time).getHours() : new Date(time).getHours()}:${new Date(time).getMinutes() < 10 ? '0' + new Date(time).getMinutes() : new Date(time).getMinutes()}`
   }
 
   const generateInvokeLineChartOption = ()=>({
     ...MONITOR_LINE_CHART_OPTION_CONFIG,
     grid: {
-      left: '16',
-      right: '16',
-      bottom: '16',
+      left: '26',
+      right: '6',
+      bottom: '30',
       top: '120',
       containLabel: true
     },
@@ -215,16 +215,16 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     },
     grid: [
       {
-        left: '16',
-        right: '16',
+        left: '26',
+        right: '6',
         top: '120',
         containLabel: true,
         bottom: '50%'
       },
       {
-        left: '16',
-        right: '16',
-        bottom: '16',
+        left: '26',
+        right: '6',
+        bottom: '30',
         containLabel: true,
         top: '60%'
       }
@@ -361,9 +361,9 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       }
     },
     grid: {
-      left: '16',
-      right: '16',
-      bottom: '16',
+      left: '26',
+      right: '6',
+      bottom: '30',
       top: '120',
       containLabel: true
     },
@@ -440,16 +440,16 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     },
     grid: [
       {
-        left: '16',
-        right: '16',
+        left: '26',
+        right: '6',
         top: '120',
         containLabel: true,
         bottom: '50%'
       },
       {
-        left: '16',
-        right: '16',
-        bottom: '16',
+        left: '26',
+        right: '6',
+        bottom: '30',
         containLabel: true,
         top: '60%'
       }
@@ -608,9 +608,9 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
       selected: {...MONITOR_LINE_CHART_BASIC_MESSAGE_SELECTED}
     },
     grid: {
-      left: '16',
-      right: '16',
-      bottom: '20',
+      left: '26',
+      right: '6',
+      bottom: '30',
       top: '120',
       containLabel: true
     },

@@ -8,6 +8,7 @@ import {useNavigate} from "react-router-dom";
 import Logo from '@common/assets/logo.png'
 import { $t } from "@common/locales";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import LanguageSetting from "@common/components/aoplatform/LanguageSetting";
 
 const Login:FC = ()=> {
      const {state, dispatch} = useGlobalContext()
@@ -99,7 +100,8 @@ const Login:FC = ()=> {
     }, []);
 
      return (
-         <div className="h-full w-full flex bg-[#f5f7fa] items-center overflow-auto min-h-[490px]">
+         <div className="h-full w-full flex flex-col bg-[#f5f7fa] items-center overflow-auto min-h-[490px]">
+            <div className="w-full text-right pr-[40px]"><LanguageSetting mode="dark"/></div>
              <div className="w-[410px] mx-auto">
                  <div className="mx-auto">
                     <span className="flex items-center justify-center">
