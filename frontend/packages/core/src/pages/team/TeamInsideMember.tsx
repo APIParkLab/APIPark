@@ -46,7 +46,7 @@ const TeamInsideMember:FC = ()=>{
     const addRef = useRef<TransferTableHandle<TeamMemberTableListItem>>(null)
     const pageListRef = useRef<ActionType>(null);
     const [allMemberIds, setAllMemberIds] = useState<string[]>([])
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
     const [selectableMemberIds,setSelectableMemberIds] = useState<Set<string>>(new Set())
     const [addMemberBtnLoading, setAddMemberBtnLoading] = useState<boolean>(false)
     const [modalVisible, setModalVisible] = useState<boolean>(false)
@@ -267,6 +267,11 @@ const TeamInsideMember:FC = ()=>{
         })
     }
 
+    const translatedCol = useMemo(()=>{
+        const res = columns?.map(x=>{
+            return({...x, title: typeof x.title  === 'string' ? $t(x.title as string) : x.title}) })
+        return res
+    },[columns, state.language])
 
     useEffect(() => {
         getRoleList()
@@ -284,7 +289,7 @@ const TeamInsideMember:FC = ()=>{
         <PageList
             id="global_team_member"
             ref={pageListRef}
-            columns = {[...columns,...operation]}
+            columns = {[...translatedCol,...operation]}
             request={()=>getMemberList()}
             primaryKey="user.id"
             addNewBtnTitle={$t('添加成员')}

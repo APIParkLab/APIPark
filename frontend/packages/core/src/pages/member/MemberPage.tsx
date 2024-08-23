@@ -170,7 +170,7 @@ const MemberPage = ()=>{
         const treeData = useMemo(() => {
             const loop = (data: DepartmentListItem[], parentIds:string[] = []): DataNode[] =>
                 data?.map((item) => {
-                    const strTitle = item.name as string;
+                    const strTitle = $t(item.name) as string;
                     const index = strTitle.indexOf(searchWord);
                     const beforeStr = strTitle.substring(0, index);
                     const afterStr = strTitle.slice(index + searchWord.length);

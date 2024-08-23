@@ -38,7 +38,7 @@ const SystemInsidePublicList:FC = ()=>{
     const query =new URLSearchParams(useLocation().search)
     const currLocation = useLocation().pathname
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
     const [drawerTitle, setDrawerTitle] = useState<string>('')
     const [drawerType, setDrawerType] = useState<'approval'|'view'|'add'|'publish'|'online'>('view')
     const [drawerVisible, setDrawerVisible] = useState<boolean>(false)
@@ -378,8 +378,8 @@ const SystemInsidePublicList:FC = ()=>{
     }
 
     const columns = useMemo(()=>{
-        return ((pageType === 'insideSystem' || pageStatus === 0 ) ? PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN:PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN).map(x=>{if(x.filters &&(x.dataIndex as string[])?.indexOf('creator') !== -1){x.valueEnum = memberValueEnum} return x})
-    },[pageType, pageStatus, memberValueEnum])
+        return ((pageType === 'insideSystem' || pageStatus === 0 ) ? PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN:PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN).map(x=>{if(x.filters &&(x.dataIndex as string[])?.indexOf('creator') !== -1){x.valueEnum = memberValueEnum} return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+    },[pageType, pageStatus, memberValueEnum,state.language])
 
     useEffect(() => {
         !init && pageListRef.current?.reload()

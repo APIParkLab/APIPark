@@ -67,7 +67,7 @@ export const ApprovalModalContent = forwardRef<SubSubscribeApprovalModalHandle,S
             {SYSTEM_SUBSCRIBE_APPROVAL_DETAIL_LIST?.map((x)=>{
                 return (
                     <Row key={x.key} className="leading-[32px] mb-btnbase">
-                        <Col className="text-left" span={8}>{x.title}：</Col>
+                        <Col className="text-left" span={8}>{$t(x.title)}：</Col>
                         <Col >{x.nested ? data?.[x.key]?.[x.nested] : ( (data as {[k:string]:unknown})?.[x.key] || '-')}</Col>
                     </Row>)
                 })}

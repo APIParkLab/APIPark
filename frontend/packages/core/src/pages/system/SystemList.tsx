@@ -29,7 +29,7 @@ const SystemList:FC = ()=>{
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
     const [open, setOpen] = useState(false);
     const drawerFormRef = useRef<SystemConfigHandle>(null)
-    const {checkPermission,accessInit, getGlobalAccessData} = useGlobalContext()
+    const {checkPermission,accessInit, getGlobalAccessData,state} = useGlobalContext()
 
     const getSystemList = ()=>{
         if(!accessInit){
@@ -124,9 +124,9 @@ const SystemList:FC = ()=>{
                 x.valueEnum = teamList
             } 
             
-            return x})
+            return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
             return res
-    },[memberValueEnum,teamList])
+    },[memberValueEnum,teamList,state.language])
 
     const steps = [
         {

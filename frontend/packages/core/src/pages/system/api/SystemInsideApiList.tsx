@@ -33,7 +33,7 @@ const SystemInsideApiList:FC = ()=>{
     const copyRef = useRef<SystemInsideApiCreateHandle>(null)
     const {apiPrefix, prefixForce} = useSystemContext()
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
     const [drawerType,setDrawerType]= useState<'add'|'edit'|'view'|'upstream'|undefined>()
     const [open, setOpen] = useState(false);
     const drawerEditFormRef = useRef<SystemInsideApiDocumentHandle>(null)
@@ -193,8 +193,8 @@ const SystemInsideApiList:FC = ()=>{
       };
     
     const columns = useMemo(()=>{
-        return SYSTEM_API_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('creator') !== -1) ){x.valueEnum = memberValueEnum} return x})
-    },[memberValueEnum])
+        return SYSTEM_API_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('creator') !== -1) ){x.valueEnum = memberValueEnum} return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+    },[memberValueEnum,state.language])
 
     const handlerSubmit:() => Promise<string | boolean>|undefined= ()=>{
         switch(drawerType){

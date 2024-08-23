@@ -72,7 +72,7 @@ export const SubscribeApprovalModalContent = forwardRef<SubscribeApprovalModalHa
         <div className="my-btnybase">{
             SubscribeApprovalList?.map((x)=>(
                 <Row key={x.key} className="leading-[32px] mb-btnbase mx-auto">
-                    <Col className="text-left" span={6}>{x.title}：</Col>
+                    <Col className="text-left" span={6}>{$t(x.title)}：</Col>
                     <Col >{(data as {[k:string]:unknown})?.[x.key]?.name || (data as {[k:string]:unknown})?.[x.key] || '-'}</Col>
                 </Row>
             ))
