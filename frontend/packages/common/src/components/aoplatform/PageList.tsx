@@ -15,9 +15,11 @@ import { useGlobalContext } from '../../contexts/GlobalStateContext';
 import { PERMISSION_DEFINITION } from '@common/const/permissions';
 import { withMinimumDelay } from '@common/utils/ux';
 
+export type PageProColumns<T = any, ValueType = 'text'> = ProColumns<T , ValueType> & {btnNums? : number}
+
 interface PageListProps<T> extends ProTableProps<T, unknown>, RefAttributes<ActionType>  {
   id?:string
-  columns: ProColumns<T,'text'>[]
+  columns: PageProColumns<T,'text'>[]
   request?:(params: (ParamsType & {pageSize?: number | undefined, current?: number | undefined, keyword?: string | undefined}), sorter: unknown, filter: unknown)=>Promise<{data:T[], success:boolean}>
   dropMenu?:MenuProps
   searchPlaceholder?:string
@@ -49,23 +51,28 @@ interface PageListProps<T> extends ProTableProps<T, unknown>, RefAttributes<Acti
 }
 
 
+
 const PageList = <T extends Record<string, unknown>>(props: React.PropsWithChildren<PageListProps<T>>,ref: React.Ref<ActionType>) => {
-  const {id,columns,request,dropMenu,searchPlaceholder,showPagination=true,primaryKey='id',addNewBtnTitle,addNewBtnAccess,tableClickAccess,tableClass,onAddNewBtnClick,beforeSearchNode,onSearchWordChange,manualReloadTable,afterNewBtn,dragSortKey,onDragSortEnd,tableTitle,rowSelection,onChange,dataSource,onRowClick,showColSetting=false,minVirtualHeight,noTop,addNewBtnWrapperClass,tableTitleClass,delayLoading = true,besidesTableHeight, noScroll} = props
+  const {id,columns,request,dropMenu,searchPlaceholder,showPagination=true,primaryKey='id',addNewBtnTitle,addNewBtnAccess,tableClickAccess,tableClass,onAddNewBtnClick,beforeSearchNode,onSearchWordChange,manualReloadTable,afterNewBtn,dragSortKey,onDragSortEnd,tableTitle,rowSelection,onChange,dataSource,onRowClick,showColSetting=false,minVirtualHeight,noTop,addNewBtnWrapperClass = '',tableTitleClass,delayLoading = true,besidesTableHeight, noScroll} = props
   const parentRef = useRef<HTMLDivElement>(null);
   const [tableHeight, setTableHeight] = useState(minVirtualHeight || window.innerHeight);
   const [tableWidth, setTableWidth] = useState<number|undefined>(undefined);
   const actionRef = useRef<ActionType>();
   const [allowTableClick,setAllowTableClick] = useState<boolean>(false)
-  const {accessData,checkPermission} = useGlobalContext()
+  const {accessData,checkPermission,accessInit,state} = useGlobalContext()
   const [minTableWidth, setMinTableWidth] = useState<number>(0)
 
   // 使用useImperativeHandle来自定义暴露给父组件的实例值
   useImperativeHandle(ref, () => actionRef.current!);
+
+  useEffect(()=>{
+    actionRef?.current?.reload?.()
+  },[state.language])
   
   const lastAccess = useMemo(()=>{
     if(!tableClickAccess) return true
     return checkPermission(tableClickAccess as keyof typeof PERMISSION_DEFINITION[0]) 
-},[allowTableClick, accessData])
+},[allowTableClick, accessData,accessInit])
 
   useEffect(()=>{
     tableClickAccess ? setAllowTableClick(lastAccess) :  setAllowTableClick(true)
@@ -79,7 +86,6 @@ const PageList = <T extends Record<string, unknown>>(props: React.PropsWithChild
         const res = parentRef.current.getBoundingClientRect();
         const height = res.height - ((noTop ? 0 : 59) + 54  + (showPagination && !dragSortKey ? 52 : 0) +( besidesTableHeight ?? 0) + 1); // 减去顶部按钮、底部分页、表头高度
         setTableWidth(minTableWidth - 5> res.width ? minTableWidth : undefined);
-        console.log(minTableWidth,res.width )
         height && setTableHeight(minVirtualHeight === undefined ? height : (height > minVirtualHeight ? height : minVirtualHeight));
       }
     };
@@ -114,7 +120,6 @@ const PageList = <T extends Record<string, unknown>>(props: React.PropsWithChild
     let width:number = 0
     const res = columns?.map(
       (x, index)=>{
-        width += Number(x.width ?? ((x.filters || x.sorter) ? 120 : 100))
         const sorter = localStorage.getItem(`${id}_sorter`)
         const filters = localStorage.getItem(`${id}_filters`)
         x.copyable = x.copyable ?? (index === 0 || x.dataIndex === 'id' || x.dataIndex === 'email')
@@ -129,6 +134,11 @@ const PageList = <T extends Record<string, unknown>>(props: React.PropsWithChild
           const xName = Array.isArray(x.dataIndex) ? x.dataIndex.join(','):x.dataIndex
           x.defaultFilteredValue = filtersObj?.[xName as string]
         }
+        if((index === columns.length -1 || x.key === 'option') && x.btnNums){
+          const optionWidth = 24 + 18 * x.btnNums + (x.btnNums - 1) * 21
+          x.width = Math.max(optionWidth, 54)
+        }
+        width += Number(x.width ?? ((x.filters || x.sorter) ? 120 : 100))
         return x})
         setMinTableWidth(width)
     return res

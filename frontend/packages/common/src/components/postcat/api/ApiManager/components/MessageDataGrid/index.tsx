@@ -42,6 +42,7 @@ import {collapseTableSx} from "../../../PreviewTable";
 import {IconButton} from "../../../IconButton";
 import {Icon} from "../../../Icon";
 import {useMoreSettingHiddenConfig} from "./hooks/useMoreSettingHiddenConfig.ts";
+import { $t } from '@common/locales/index.ts'
 
 export interface RenderMessageBody extends BodyParamsType {
   path?: string[]
@@ -251,14 +252,14 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
   const getActions = useCallback(
     (params: GridRowParams<RenderMessageBody>) => {
       const actions = [
-        <IconButton title="更多设置" name="more" onClick={() => handleOpenMoreSetting(params)} />
+        <IconButton title={$t("更多设置")} name="more" onClick={() => handleOpenMoreSetting(params)} />
       ]
       const isXML = contentType === 'XML'
       const isRoot = params.row.__globalIndex__ === 0
       if (['JSON', 'XML'].includes(contentType)) {
         actions.unshift(
           <IconButton
-            title="添加子参数"
+            title={$t("添加子参数")}
             name="add"
             onClick={() => {
               const newRow = EmptyRow()
@@ -288,7 +289,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
         if (!(isXML && isRoot)) {
           actions.unshift(
             <IconButton
-              title="向下添加行"
+              title={$t("向下添加行")}
               name="down-small"
               onClick={() => {
                 const newRow = EmptyRow()
@@ -301,7 +302,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
         }
       }
       if (renderRows.length > 1) {
-        actions.push(<IconButton title="删除" name="delete" onClick={() => handleRowDelete(params)} />)
+        actions.push(<IconButton title={$t("删除")} name="delete" onClick={() => handleRowDelete(params)} />)
       }
       return actions
     },
@@ -312,7 +313,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
   const columns: (GridColDef<RenderMessageBody> | false)[] = [
     messageType === 'Header' && {
       field: 'name',
-      headerName: '标签',
+      headerName: $t('标签'),
       editable: true,
       sortable:false,
       renderEditCell: (params) => {
@@ -340,7 +341,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
     },
     messageType !== 'Header' && {
       field: 'name',
-      headerName: '参数名',
+      headerName: $t('参数名'),
       width: 200,
       editable: true,
       sortable: false,
@@ -373,7 +374,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
             <TextField
               fullWidth
               value={params.value}
-              placeholder='参数名'
+              placeholder={$t('参数名')}
               onChange={(e) => {
                 const newValue = e.target.value as string
                 const rowIndex = params.row.__globalIndex__
@@ -395,7 +396,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
     },
     messageType === 'Body' && {
       field: 'dataType',
-      headerName: '类型',
+      headerName: $t('类型'),
       sortable: false,
       width: 120,
       type: 'singleSelect',
@@ -429,7 +430,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
     },
     {
       field: 'isRequired',
-      headerName: '必需',
+      headerName: $t('必需'),
       headerAlign: 'left',
       sortable: false,
       type: 'boolean',
@@ -443,7 +444,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
               indeterminate={selectAll === 'indeterminate'}
               onChange={handleSelectAllChange}
             />
-            <Typography sx={{fontSize:'14px'}}>必需</Typography>
+            <Typography sx={{fontSize:'14px'}}>{$t('必需')}</Typography>
           </Box>
         )
       },
@@ -463,7 +464,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
     },
     {
       field: 'description',
-      headerName: '描述',
+      headerName: $t('描述'),
       sortable: false,
       flex: 1,
       minWidth: 200,
@@ -484,7 +485,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
                 paddingRight: theme.spacing(1)
               }
             }}
-            placeholder='描述'
+            placeholder={$t('描述')}
           />
         )
       }
@@ -492,7 +493,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
     {
       field: 'paramAttr',
       sortable: false,
-      headerName: '示例',
+      headerName: $t('示例'),
       flex: 1,
       minWidth: 200,
       editable: true,
@@ -515,8 +516,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
                 paddingRight: theme.spacing(1)
               }
             }}
-            placeholder='示例'
-          />
+            placeholder={$t('示例')}          />
         )
       }
     },

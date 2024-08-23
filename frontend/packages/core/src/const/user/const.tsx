@@ -1,12 +1,13 @@
 
-import { ProColumns } from "@ant-design/pro-components";
 import { ColumnsType } from "antd/es/table";
 import { MemberItem } from "@common/const/type";
 import { Tooltip } from "antd";
 
-export const USER_LIST_COLUMNS: ProColumns<MemberItem>[]= [
+import { PageProColumns } from "@common/components/aoplatform/PageList";
+
+export const USER_LIST_COLUMNS: PageProColumns<MemberItem>[]= [
     {
-        title: '用户名',
+        title:('用户名'),
         dataIndex: 'name',
         ellipsis:true,
         width:160,
@@ -16,12 +17,12 @@ export const USER_LIST_COLUMNS: ProColumns<MemberItem>[]= [
         },
     },
     {
-        title: '邮箱',
+        title:('邮箱'),
         dataIndex: 'email',
         ellipsis:true,
     },
     {
-        title: '部门',
+        title:('部门'),
         dataIndex: 'department',
         ellipsis:{
             showTitle:true
@@ -36,7 +37,7 @@ export const USER_LIST_COLUMNS: ProColumns<MemberItem>[]= [
 ];
 
 export const MEMBER_MODAL_COLUMNS:ColumnsType<MemberItem> = [
-    {title:'所有成员',
+    {title:('所有成员'),
     width:215,
     
         render:(_,entity)=>{

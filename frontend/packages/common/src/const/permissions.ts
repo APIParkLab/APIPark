@@ -139,6 +139,11 @@ export const PERMISSION_DEFINITION = [
           "anyOf": [{ "backend": ["system.api_market.service_classification.manager"] }]
         }
       },
+      "system.devops.dashboardsetting.view":{
+        "grented":{
+          "anyOf":[{"backend":[]}]
+        }
+      },
       "system.devops.cluster.view": {
         "granted": {
           "anyOf": [{ "backend": ["system.devops.cluster.view"] }]
@@ -222,6 +227,16 @@ export const PERMISSION_DEFINITION = [
       "system.workspace.api_market.view": {
         "granted": {
           "anyOf": [{ "backend": ["system.workspace.api_market.view"] }]
+        }
+      },
+      "system.dashboard.dashboard.view": {
+        "granted": {
+          "anyOf": [{ "backend": [] }]
+        }
+      },
+      "system.dashboard.systemrunning.view": {
+        "granted": {
+          "anyOf": [{ "backend": [] }]
         }
       },
       "team.service.api.view": {

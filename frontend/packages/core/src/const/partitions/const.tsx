@@ -1,12 +1,13 @@
-import { ProColumns } from "@ant-design/pro-components";
 import { PartitionCertTableListItem, PartitionClusterNodeModalTableListItem, PartitionClusterNodeTableListItem, PartitionClusterTableListItem, PartitionTableListItem } from "./types";
 import { ColumnType } from "antd/es/table";
 import CopyAddrList from "@common/components/aoplatform/CopyAddrList";
 
+import { PageProColumns } from "@common/components/aoplatform/PageList";
 
-export const PARTITION_CERT_TABLE_COLUMNS: ProColumns<PartitionCertTableListItem>[] = [
+
+export const PARTITION_CERT_TABLE_COLUMNS: PageProColumns<PartitionCertTableListItem>[] = [
     {
-        title: '证书',
+        title:('证书'),
         dataIndex: 'name',
         ellipsis:true,
         width:160,
@@ -16,7 +17,7 @@ export const PARTITION_CERT_TABLE_COLUMNS: ProColumns<PartitionCertTableListItem
         },
     },
     {
-        title: '绑定域名',
+        title:('绑定域名'),
         dataIndex: 'domains',
         renderText:(_,entity) =>(
             entity.domains.join(',')
@@ -24,7 +25,7 @@ export const PARTITION_CERT_TABLE_COLUMNS: ProColumns<PartitionCertTableListItem
         ellipsis:true
     },
     {
-        title: '过期日期',
+        title:('过期日期'),
         ellipsis: true,
         dataIndex: 'notAfter',
         width:100,
@@ -34,7 +35,7 @@ export const PARTITION_CERT_TABLE_COLUMNS: ProColumns<PartitionCertTableListItem
         },
     },
     {
-        title: '更新者',
+        title:('更新者'),
         dataIndex: ['updater','name'],
         ellipsis: true,
         filters: true,
@@ -43,7 +44,7 @@ export const PARTITION_CERT_TABLE_COLUMNS: ProColumns<PartitionCertTableListItem
         filterSearch: true
     },
     {
-        title: '更新时间',
+        title:('更新时间'),
         key: 'updateTime',
         dataIndex: 'updateTime',
         ellipsis:true,
@@ -54,9 +55,9 @@ export const PARTITION_CERT_TABLE_COLUMNS: ProColumns<PartitionCertTableListItem
     },
 ];
 
-export const PARTITION_CLUSTER_TABLE_COLUMNS : ProColumns<PartitionClusterTableListItem>[] = [
+export const PARTITION_CLUSTER_TABLE_COLUMNS : PageProColumns<PartitionClusterTableListItem>[] = [
     {
-        title: '集群名称',
+        title:('集群名称'),
         dataIndex: 'name',
         ellipsis:true,
         width:160,
@@ -66,13 +67,13 @@ export const PARTITION_CLUSTER_TABLE_COLUMNS : ProColumns<PartitionClusterTableL
         },
     },
     {
-        title: '集群 ID',
+        title:('集群 ID'),
         dataIndex: 'id',
         width: 140,
         ellipsis:true
     },
     {
-        title: '状态',
+        title:('状态'),
         dataIndex: 'status',
         ellipsis:true,
         valueType: 'select',
@@ -84,16 +85,16 @@ export const PARTITION_CLUSTER_TABLE_COLUMNS : ProColumns<PartitionClusterTableL
         ])
     },
     {
-        title: '描述',
+        title: ('描述'),
         dataIndex: 'description',
         ellipsis:true
     }
 ];
 
 
-export const PARTITION_CLUSTER_NODE_COLUMNS: ProColumns<PartitionClusterNodeTableListItem>[] = [
+export const PARTITION_CLUSTER_NODE_COLUMNS: PageProColumns<PartitionClusterNodeTableListItem>[] = [
     {
-        title: '节点名称',
+        title:('节点名称'),
         dataIndex: 'name',
         ellipsis:true,
         fixed:'left',
@@ -102,28 +103,28 @@ export const PARTITION_CLUSTER_NODE_COLUMNS: ProColumns<PartitionClusterNodeTabl
         },
     },
     {
-        title: '管理地址',
+        title:('管理地址'),
         dataIndex: 'managerAddress',
         ellipsis:true,
         width:200,
         render:(_,entity)=>(<CopyAddrList keyName="managerAddress" addrItem={entity} />)
     },
     {
-        title: '服务地址',
+        title:('服务地址'),
         dataIndex: 'serviceAddress',
         ellipsis:true,
         width:230,
         render:(_,entity)=>(<CopyAddrList keyName="serviceAddress" addrItem={entity} />)
     },
     {
-        title: '集群同步地址',
+        title:('集群同步地址'),
         dataIndex: 'peerAddress',
         ellipsis:true,
         width:230,
         render:(_,entity)=>(<CopyAddrList keyName="peerAddress" addrItem={entity} />)
     },
     {
-        title: '状态',
+        title:('状态'),
         dataIndex: 'status',
         ellipsis:true,
         width:86,
@@ -138,20 +139,20 @@ export const PARTITION_CLUSTER_NODE_COLUMNS: ProColumns<PartitionClusterNodeTabl
 ];
 
 export const NODE_MODAL_COLUMNS:ColumnType<PartitionClusterNodeModalTableListItem>[] = [
-    {title:'名称', dataIndex:'name',width:200,
+    {title:('名称'), dataIndex:'name',width:200,
     ellipsis:true,
     fixed:'left'},
-    {title:'管理地址', dataIndex:'managerAddress',width:240,ellipsis:true,render:(_,entity)=>(<CopyAddrList keyName="managerAddress" addrItem={entity} />)},
-    {title:'服务地址', dataIndex:'serviceAddress',width:240,ellipsis:true,render:(_,entity)=>(<CopyAddrList keyName="serviceAddress" addrItem={entity} />)},
-    {title:'状态', dataIndex:'status',
+    {title:('管理地址'), dataIndex:'managerAddress',width:240,ellipsis:true,render:(_,entity)=>(<CopyAddrList keyName="managerAddress" addrItem={entity} />)},
+    {title:('服务地址'), dataIndex:'serviceAddress',width:240,ellipsis:true,render:(_,entity)=>(<CopyAddrList keyName="serviceAddress" addrItem={entity} />)},
+    {title:('状态'), dataIndex:'status',
     render:(text)=>(
         <span className={text === 0 ? 'text-status_fail' : 'text-status_success'}>{ClusterStatusEnum[text]}</span>
     )}
 ]
 
-export const PARTITION_LIST_COLUMNS: ProColumns<PartitionTableListItem>[] = [
+export const PARTITION_LIST_COLUMNS: PageProColumns<PartitionTableListItem>[] = [
     {
-        title: '环境名称',
+        title:('环境名称'),
         dataIndex: 'name',
         ellipsis:true,
         fixed:'left',
@@ -160,20 +161,20 @@ export const PARTITION_LIST_COLUMNS: ProColumns<PartitionTableListItem>[] = [
         },
     },
     {
-        title: 'ID',
+        title:('ID'),
         dataIndex: 'id',
         ellipsis:true,
         width:140,
     },
     // {
-    //     title: '集群数量',
+    //     title:('集群数量',
     //     dataIndex: 'clusterNum',
     //     sorter: (a,b)=> {
     //         return a.clusterNum - b.clusterNum
     //     },
     // },
     {
-        title: '更新者',
+        title:('更新者'),
         dataIndex: ['updater','name'],
         ellipsis: true,
         filters: true,
@@ -183,7 +184,7 @@ export const PARTITION_LIST_COLUMNS: ProColumns<PartitionTableListItem>[] = [
         filterSearch: true
     },
     {
-        title: '更新时间',
+        title:('更新时间'),
         dataIndex: 'updateTime',
         ellipsis:true,
         width:182,
@@ -193,9 +194,9 @@ export const PARTITION_LIST_COLUMNS: ProColumns<PartitionTableListItem>[] = [
     },
 ];
 
-export enum ClusterStatusEnum {
-    '异常',
-    '正常'
+export const ClusterStatusEnum ={
+   0: ('异常'),
+   1: ('正常')
 }
 
 export const DASHBOARD_SETTING_DRIVER_OPTION_LIST = [

@@ -12,6 +12,9 @@ import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
 import { useTenantManagementContext } from "@market/contexts/TenantManagementContext";
 import { ManagementConfigFieldType } from "./ManagementConfig";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
+import { $t } from "@common/locales";
+import { getItem } from "@common/utils/navigation";
+import { MenuItemType } from "antd/es/menu/interface";
 
 export default function ManagementInsidePage(){
     const { message } = App.useApp()
@@ -24,8 +27,14 @@ export default function ManagementInsidePage(){
     const [openKeys, setOpenKeys] = useState<string[]>([])
     const [loading, setLoading] = useState<boolean>(false)
     const {appName,setAppName} = useTenantManagementContext()
-    const {getTeamAccessData,cleanTeamAccessData} = useGlobalContext()
+    const {getTeamAccessData,cleanTeamAccessData,state} = useGlobalContext()
     
+    const TENANT_MANAGEMENT_APP_MENU: MenuProps['items'] = useMemo(()=>[
+        getItem($t('订阅的服务'), 'service'),
+        getItem($t('访问授权'), 'authorization'),
+        getItem($t('应用管理'), 'setting'),
+    ],[state.language]) 
+
     const menuData = useMemo(()=>{
         return  TENANT_MANAGEMENT_APP_MENU
     },[])
@@ -51,7 +60,7 @@ export default function ManagementInsidePage(){
             }
             setBreadcrumb(
                 [
-                    {title:<Link to={`/tenantManagement/list/${teamId}`}>应用</Link>},
+                    {title:<Link to={`/tenantManagement/list/${teamId}`}>{$t('应用')}</Link>},
                    ...(_appName ? [{title:_appName}] : [])
                 ]
             )
@@ -75,7 +84,7 @@ useEffect(()=>{
         <div className="flex flex-1 h-full">
             <div className="w-[220px] border-0 border-solid border-r-[1px] border-r-BORDER">
             <div className="text-[18px] leading-[25px] pl-[12px] py-[12px]">
-                <Button type="text" onClick={()=>navigateTo(`/tenantManagement/list/${teamId}`)}><ArrowLeftOutlined className="max-h-[14px]" />返回</Button>
+                <Button type="text" onClick={()=>navigateTo(`/tenantManagement/list/${teamId}`)}><ArrowLeftOutlined className="max-h-[14px]" />{$t('返回')}</Button>
             </div>
             <Menu
                 onClick={onMenuClick}

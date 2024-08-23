@@ -1,11 +1,14 @@
-import { EditableProTable, ProColumns } from "@ant-design/pro-components";
+import { EditableProTable } from "@ant-design/pro-components";
 import { Button } from "antd";
 import { useState, useEffect } from "react";
 import { v4 as uuidv4} from 'uuid';
 import WithPermission from "./WithPermission";
+import { PageProColumns } from "./PageList";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import TableBtnWithPermission from "./TableBtnWithPermission";
   
 interface EditableTableProps<T> {
-    configFields: ProColumns<T>[];
+    configFields: PageProColumns<T>[];
     value?: T[]; // 外部传入的值
     className?: string;
     onChange?: (newConfigItems: T[]) => void; // 当配置项变化时，外部传入的回调函数
@@ -54,43 +57,36 @@ const EditableTable = <T extends { _id: string }>({
                 editableKeys:disabled ? [] : configurations?.map(x=>x._id),
                 actionRender: (row, config) => {
                     return [
-                        <WithPermission access=""  key="addPermission" ><Button type="text" className="h-[22px] border-none p-0 flex items-center bg-transparent "
-                            key="add"
-                            onClick={() => {
-                                const newId = uuidv4();
-                                setConfigurations((prev)=>{
-                                    const tmpPreData = [...prev];
-                                    const newId = uuidv4()
-                                    const lastRecord:{[k:string]:unknown} = tmpPreData[tmpPreData.length - 1];
-                                    const newRecord :{[k:string]:unknown, _id:string}= { _id: newId };
-                                    
-                                    // 当extendsId的长度大于0时，根据extendsId指定的字段从最后一个record中复制值
-                                    if(extendsId && extendsId.length > 0) {
-                                        extendsId.forEach(field => {
-                                            newRecord[field] = lastRecord[field];
-                                        });
-                                    }
-                                    tmpPreData.splice(Number(config.index) + 1, 0,newRecord);
-                                    onChange?.(getNotEmptyValue(tmpPreData));
-                                    return tmpPreData});
-                                setEditableRowKeys((prev)=>([...prev,newId]))
-                            }}
-                            >
-                            增加
-                        </Button></WithPermission>,
-                        (config.index !== configurations.length - 1 )&& <WithPermission access=""><Button type="text" className="h-[22px] border-none p-0 flex items-center bg-transparent "
-                            key="edit"
-                            onClick={() => {
-                                setConfigurations((prev)=>{
-                                    const tmpPreData = [...prev];
-                                    tmpPreData.splice(Number(config.index), 1);
-                                    onChange?.(tmpPreData);
-                                    return tmpPreData});
-                                setEditableRowKeys((prev)=>(prev.filter(x=>x !== config._id)))
-                            }}
-                        >
-                            删除
-                        </Button></WithPermission>,
+                    <TableBtnWithPermission key="add" btnType="add" onClick={() => {
+                        const newId = uuidv4();
+                        setConfigurations((prev)=>{
+                            const tmpPreData = [...prev];
+                            const newId = uuidv4()
+                            const lastRecord:{[k:string]:unknown} = tmpPreData[tmpPreData.length - 1];
+                            const newRecord :{[k:string]:unknown, _id:string}= { _id: newId };
+                            
+                            // 当extendsId的长度大于0时，根据extendsId指定的字段从最后一个record中复制值
+                            if(extendsId && extendsId.length > 0) {
+                                extendsId.forEach(field => {
+                                    newRecord[field] = lastRecord[field];
+                                });
+                            }
+                            tmpPreData.splice(Number(config.index) + 1, 0,newRecord);
+                            onChange?.(getNotEmptyValue(tmpPreData));
+                            return tmpPreData});
+                        setEditableRowKeys((prev)=>([...prev,newId]))
+                    }}
+                    btnTitle="增加"/>,
+
+                    (config.index !== configurations.length - 1 )&& <TableBtnWithPermission key="remove" btnType="remove" btnTitle="删除"
+                    onClick={() => {
+                        setConfigurations((prev)=>{
+                            const tmpPreData = [...prev];
+                            tmpPreData.splice(Number(config.index), 1);
+                            onChange?.(tmpPreData);
+                            return tmpPreData});
+                        setEditableRowKeys((prev)=>(prev.filter(x=>x !== config._id)))
+                    }}/>,,
                     ];
                 },
                 onValuesChange: (record, recordList) => {

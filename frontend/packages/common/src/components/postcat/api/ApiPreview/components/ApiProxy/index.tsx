@@ -6,6 +6,7 @@ import { SystemApiProxyType, ProxyHeaderItem } from "@core/const/system/type"
 import { previewTableHoverSx, collapseTableSx } from "../../../PreviewTable"
 import { RenderMessageBody } from "../MessageBody"
 import { Collapse } from "../../../Collapse"
+import { $t } from "@common/locales"
 
 interface HeaderFieldsProps {
   proxyInfo:SystemApiProxyType
@@ -30,19 +31,19 @@ export default function ApiProxy({ proxyInfo, title, loading = false, onMoreSett
   const columns: GridColDef<ProxyHeaderItem>[] = [
     {
       field: 'key',
-      headerName: '参数名',
+      headerName: $t('参数名'),
       width: 200,
       hideable: false
     },
     {
       field: 'optType',
-      headerName: '操作类型',
-      valueGetter: (params) => params.row.optType === 'ADD'?'新增或修改':'删除',
+      headerName: $t('操作类型'),
+      valueGetter: (params) => params.row.optType === 'ADD'?$t('新增或修改'):$t('删除'),
       width: 200
     },
     {
       field: 'value',
-      headerName: '匹配参数值',
+      headerName: $t('匹配参数值'),
       flex: 1
     },
   ]
@@ -51,31 +52,31 @@ export default function ApiProxy({ proxyInfo, title, loading = false, onMoreSett
     return [
       {
         key: 'path',
-        label: '转发上游路径',
+        label: $t('转发上游路径'),
         children: proxyInfo?.path,
         style: {paddingBottom: '10px'},
       },
       {
         key: 'timeout',
-        label: '请求超时时间',
+        label: $t('请求超时时间'),
         children: proxyInfo?.timeout,
         style: {paddingBottom: '10px'},
       },
       // {
       //   key: 'upstream',
-      //   label: '绑定上游服务',
+      //   label: $t('绑定上游服务',
       //   children: proxyInfo?.upstream.name,
       //   style: {paddingBottom: '10px'},
       // },
       {
         key: 'retry',
-        label: '重试时间',
+        label: $t('重试时间'),
         children: proxyInfo?.retry,
         style: {paddingBottom: '10px'},
       },
       ...(proxyInfo.headers.length > 0 ? [{
         key: 'headers',
-        label: '转发上游请求头',
+        label: $t('转发上游请求头'),
         children: '',
         style: {paddingBottom: '10px'},
       }]:[])

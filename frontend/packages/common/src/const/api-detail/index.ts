@@ -9,34 +9,6 @@ export interface MenuItem {
   content?: unknown
 }
 
-export const GetMenuItem = (org_domain_id: string, project_domain_id: string, commonQuestionRes: unknown) => {
-  const Menus = [
-    { key: 'introduction', name: '介绍', emoji: '📃', path: `/${org_domain_id}/api/${project_domain_id}/introduction` },
-    { key: 'apiDocument', name: 'API 文档', emoji: '🔗', path: `/${org_domain_id}/api/${project_domain_id}/apiDocument`  },
-    { key: 'price', name: '价格套餐', emoji: '💎', path: `/${org_domain_id}/api/${project_domain_id}/price` },
-    { key: 'guidence', name: '接入指南', emoji: '💡', path: `/${org_domain_id}/api/${project_domain_id}/guidence`  }
-  ];
-
-  if (commonQuestionRes?.success && commonQuestionRes?.data?.content) {
-    Menus.splice(2, 0, { key: 'commonQuestion', name: '常见问题', emoji: '🌷', path: `/${org_domain_id}/api/${project_domain_id}/commonQuestion`  });
-  }
-
-  return Menus;
-};
-
-
-export const SKU_LIST = [
-  {
-    name: '流量包',
-    key: 'flow'
-  },
-  {
-    name: '订阅套餐',
-    key: 'subscribe'
-  }
-]
-
-export const PROMISE_TEXT = ['服务保障', '未使用部分七天无理由退款', '正规企业商品来源', '交易流程全程监控']
 
 export const DATA_TYPE = {
   JSON: '[json]',

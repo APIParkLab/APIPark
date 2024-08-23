@@ -2,9 +2,10 @@
 import { App, Form, Input, TreeSelect } from "antd";
 import { forwardRef, useState, useImperativeHandle, useEffect } from "react";
 import WithPermission from "@common/components/aoplatform/WithPermission";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE } from "@common/const/const";
 import { MemberDropdownModalHandle, MemberDropdownModalProps, DepartmentListItem, MemberTableListItem, MemberDropdownModalFieldType } from "../../../const/member/type";
 import { useFetch } from "@common/hooks/http";
+import { $t } from "@common/locales";
 
 export const EditMemberModal = forwardRef<MemberDropdownModalHandle,MemberDropdownModalProps>((props,ref)=>{
     const { message} = App.useApp()
@@ -25,11 +26,11 @@ export const EditMemberModal = forwardRef<MemberDropdownModalHandle,MemberDropdo
                     }),eoTransformKeys:['departmentIds']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -47,7 +48,7 @@ export const EditMemberModal = forwardRef<MemberDropdownModalHandle,MemberDropdo
             if(code === STATUS_CODE.SUCCESS){
                 setDepartmentList([{...data.departments,children:data.departments.children?.filter((x)=>['unknown','disable'].indexOf(x.id) === -1),disabled:true}])
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
             }
         })
@@ -75,26 +76,24 @@ export const EditMemberModal = forwardRef<MemberDropdownModalHandle,MemberDropdo
             form={form}
             className="mx-auto "
             name="EditMember"
-            // labelCol={{ offset:1, span: 3 }}
-            // wrapperCol={{ span: 20}}
             autoComplete="off"
         >
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="用户名"
+                    label={$t("用户名")}
                     name="name"
-                    rules={[{required: true, message: '必填项',whitespace:true }]}
+                    rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder="请输入用户名"/>
+                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="邮箱"
+                    label={$t("邮箱")}
                     name="email"
-                    rules={[{required: true, message: '必填项',whitespace:true },{type:"email",message: '不是有效邮箱地址'}]}
+                    rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true },{type:"email",message: VALIDATE_MESSAGE.email}]}
                 >
-                    <Input className="w-INPUT_NORMAL" disabled={type ==='editMember'} placeholder="请输入"/>
+                    <Input className="w-INPUT_NORMAL" disabled={type ==='editMember'} placeholder={PLACEHOLDER.input}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
-                    label="部门"
+                    label={$t("部门")}
                     name="departmentIds"
                 >
                     <TreeSelect
@@ -103,7 +102,7 @@ export const EditMemberModal = forwardRef<MemberDropdownModalHandle,MemberDropdo
                             fieldNames={{label:'name',value:'id',children:'children'}}
                             showSearch
                             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                            placeholder="请选择"
+                            placeholder={PLACEHOLDER.input}
                             allowClear
                             treeDefaultExpandAll
                             treeData={departmentList}

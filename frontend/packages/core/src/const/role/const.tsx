@@ -1,7 +1,7 @@
 
 export const ROLE_TABLE_COLUMNS = [
     {
-        title: '角色名称',
+        title:'角色名称',
         dataIndex: 'name',
         ellipsis:true,
         fixed:'left',

@@ -5,6 +5,7 @@ import {ApiBodyType, BodyParamsType, HeaderParamsType} from "@common/const/api-d
 import {Indicator} from "../../../../Indicator";
 import { v4 as uuidv4} from 'uuid'
 import { ApiMessageBody, ApiMessageBodyApi } from '../ApiMessageBody';
+import { $t } from '@common/locales';
 
 interface ApiRequestEditorTab {
   label: string
@@ -54,7 +55,7 @@ export function ApiResponseEditor({ editorRef ,apiInfo=null, loaded}: { editorRe
 
   const tabs: ApiRequestEditorTab[] = [
     {
-      label: '返回头部',
+      label: $t('返回头部'),
       element: (
         <MessageDataGrid
           apiRef={headersRef}
@@ -68,7 +69,7 @@ export function ApiResponseEditor({ editorRef ,apiInfo=null, loaded}: { editorRe
       dirty: false
     },
     {
-      label: '返回值',
+      label: $t('返回值'),
       element: <ApiMessageBody bodyApiRef={bodyRef} mode="response"  apiInfo={apiInfo}
       loaded={innerLoaded} />,
       dirty: false
@@ -93,7 +94,7 @@ export function ApiResponseEditor({ editorRef ,apiInfo=null, loaded}: { editorRe
       <Tabs
         value={tabValue}
         onChange={handleChange}
-        aria-label="api request editor"
+        aria-label={$t("api request editor")}
         sx={{
           minHeight: tabHeight,
           height: tabHeight,

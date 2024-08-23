@@ -1,8 +1,8 @@
 
-import {ActionType, ProColumns} from "@ant-design/pro-components";
+import {ActionType} from "@ant-design/pro-components";
 import  {FC, useEffect, useMemo, useRef, useState} from "react";
 import {Link, useLocation, useParams} from "react-router-dom";
-import PageList from "@common/components/aoplatform/PageList.tsx";
+import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {App, Button} from "antd";
 import {
@@ -10,20 +10,20 @@ import {
     SUBSCRIBE_APPROVAL_INNER_TODO_TABLE_COLUMN,
     SubscribeApprovalTableListItem, TODO_LIST_COLUMN_NOT_INCLUDE_KEY
 } from "@common/const/approval/const.tsx";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, COLUMNS_TITLE, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import {
     SubscribeApprovalModalContent,
     SubscribeApprovalModalHandle
 } from "@common/components/aoplatform/SubscribeApprovalModalContent.tsx";
-import {useSystemContext} from "../../../contexts/SystemContext.tsx";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
-import { EntityItem,SimpleMemberItem } from "@common/const/type.ts";
+import { SimpleMemberItem } from "@common/const/type.ts";
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission.tsx";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { checkAccess } from "@common/utils/permission.ts";
 import { SubscribeApprovalInfoType } from "@common/const/approval/type.tsx";
+import { $t } from "@common/locales";
 
 const SystemInsideApprovalList:FC = ()=>{
     const { setBreadcrumb } = useBreadcrumb()
@@ -39,22 +39,22 @@ const SystemInsideApprovalList:FC = ()=>{
     const subscribeRef = useRef<SubscribeApprovalModalHandle>(null)
     const [approvalBtnLoading,setApprovalBtnLoading] = useState<boolean>(false)
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
 
     const openModal = async (type:'approval'|'view',entity:SubscribeApprovalTableListItem)=>{
-        message.loading('正在加载数据')
+        message.loading(RESPONSE_TIPS.loading)
         const {code,data,msg} = await fetchData<BasicResponse<{approval:SubscribeApprovalInfoType}>>('service/approval/subscribe',{method:'GET',eoParams:{apply:entity!.id, service:serviceId,team:teamId},eoTransformKeys:['apply_project','apply_team','apply_time','approval_time']})
         message.destroy()
         if(code === STATUS_CODE.SUCCESS){
             const modalIns = modal.confirm({
-                title:type === 'approval' ? '审批' : '查看',
+                title:type === 'approval' ? $t('审批') : $t('查看'),
                 content:<SubscribeApprovalModalContent ref={subscribeRef} data={{...data.approval}  as SubscribeApprovalInfoType} type={type} serviceId={serviceId!} teamId={teamId!} inSystem/>,
                 onOk:()=>{
                     return subscribeRef.current?.save('pass').then((res)=>res === true && manualReloadTable())
                 },
                 width:600,
-                okText:type === 'approval' ? '通过' : '确认',
-                cancelText:type === 'approval' ?'取消':'关闭',
+                okText:type === 'approval' ? $t('通过') : $t('确认'),
+                cancelText:type === 'approval' ?$t('取消'):$t('关闭'),
                 okButtonProps:{
                     disabled : type === 'approval' ? !checkAccess('team.service.release.approval', accessData): false
                 },
@@ -66,12 +66,11 @@ const SystemInsideApprovalList:FC = ()=>{
                         <>
                             {type === 'approval' ? <>
                                     <CancelBtn/>
-                                    <WithPermission access="team.service.release.approval"><Button type="primary" danger loading={approvalBtnLoading} onClick={()=>{setApprovalBtnLoading(true);subscribeRef.current?.save('refuse').then((res)=>{if(res === true ){manualReloadTable();modalIns?.destroy()}}).finally(()=>{setApprovalBtnLoading(false)})}}>拒绝</Button></WithPermission>
+                                    <WithPermission access="team.service.release.approval"><Button type="primary" danger loading={approvalBtnLoading} onClick={()=>{setApprovalBtnLoading(true);subscribeRef.current?.save('refuse').then((res)=>{if(res === true ){manualReloadTable();modalIns?.destroy()}}).finally(()=>{setApprovalBtnLoading(false)})}}>{$t('拒绝')}</Button></WithPermission>
                                     <OkBtn/>
                                 </> :
                                 <>
                                     <CancelBtn/>
-                                    {/* <OkBtn/> */}
                                     </>
                             }
                         </>
@@ -79,22 +78,22 @@ const SystemInsideApprovalList:FC = ()=>{
                 },
             })
         }else{
-            message.error(msg || '操作失败')
+            message.error(msg || RESPONSE_TIPS.error)
             return
         }
     }
 
-    const operation:ProColumns<SubscribeApprovalTableListItem>[] =[
+    const operation:PageProColumns<SubscribeApprovalTableListItem>[] =[
         {
-            title: '操作',
+            title: COLUMNS_TITLE.operate,
             key: 'option',
-            width: 62,
+            btnNums:1,
             fixed:'right',
             valueType: 'option',
             render: (_: React.ReactNode, entity: SubscribeApprovalTableListItem) => [
                 pageStatus === 0 ? 
-                <TableBtnWithPermission  access="team.service.subscription.approval" key="approval" onClick={()=>{openModal('approval',entity)}} btnTitle="审批"/>
-                :<TableBtnWithPermission  access="team.service.subscription.view" key="view" onClick={()=>{openModal('view',entity)}} btnTitle="查看"/>,
+                <TableBtnWithPermission  access="team.service.subscription.approval" key="approval"  btnType="approval" onClick={()=>{openModal('approval',entity)}} btnTitle="审批"/>
+                :<TableBtnWithPermission  access="team.service.subscription.view" key="view"  btnType="view" onClick={()=>{openModal('view',entity)}} btnTitle="查看"/>,
             ],
         }
     ]
@@ -114,7 +113,7 @@ const SystemInsideApprovalList:FC = ()=>{
                 setInit((prev)=>prev ? false : prev)
                 return  {data:data.approvals, success: true}
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -132,7 +131,7 @@ const SystemInsideApprovalList:FC = ()=>{
             })
             setMemberValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || '操作失败')
+            message.error(msg || RESPONSE_TIPS.error)
         }
     }
 
@@ -148,10 +147,10 @@ const SystemInsideApprovalList:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>服务</Link>
+                title:<Link to={`/service/list`}>{$t('服务')}</Link>
             },
             {
-                title:'订阅审批'
+                title:$t('订阅审批')
             }
         ])
         getMemberList()
@@ -167,8 +166,8 @@ const SystemInsideApprovalList:FC = ()=>{
     const columns = useMemo(()=>{
         const newCol = [...(!(query.get('status'))? SUBSCRIBE_APPROVAL_INNER_TODO_TABLE_COLUMN:SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN)]
         const filteredCol = pageStatus === 0 ? newCol.filter((x)=>TODO_LIST_COLUMN_NOT_INCLUDE_KEY.indexOf(x.dataIndex as string) === -1): newCol
-        return filteredCol.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){x.valueEnum = memberValueEnum} return x})
-    },[pageStatus,memberValueEnum])
+        return filteredCol.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){x.valueEnum = memberValueEnum} return {...x,title: typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+    },[pageStatus,memberValueEnum,state.language])
 
     return (
         <div className="h-full not-top-padding-table">

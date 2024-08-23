@@ -1,6 +1,6 @@
 import TreeWithMore from "@common/components/aoplatform/TreeWithMore";
 import WithPermission from "@common/components/aoplatform/WithPermission";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { PERMISSION_DEFINITION } from "@common/const/permissions";
 import { useFetch } from "@common/hooks/http";
 import { checkAccess } from "@common/utils/permission";
@@ -16,6 +16,7 @@ import { cloneDeep } from "lodash-es";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import InsidePage from "@common/components/aoplatform/InsidePage";
 import { EntityItem } from "@common/const/type";
+import { $t } from "@common/locales";
 
 export default function ServiceCategory(){
    const [gData, setGData] = useState<CategorizesType[]>([]);
@@ -92,7 +93,7 @@ export default function ServiceCategory(){
             key: 'addChildCate',
             label: (
                 <WithPermission access="system.api_market.service_classification.add"><Button className="border-none p-0 flex items-center bg-transparent " onClick={()=>openModal('addChildCate',entity)}>
-                    添加子分类
+                    {$t('添加子分类')}
                 </Button></WithPermission>
             ),
         },
@@ -100,7 +101,7 @@ export default function ServiceCategory(){
             key: 'renameCate',
             label: (
                 <WithPermission access="system.api_market.service_classification.edit"><Button className=" border-none p-0 flex items-center bg-transparent " onClick={()=>openModal('renameCate',entity)}>
-                    修改分类名称
+                    {$t('修改分类名称')}
                 </Button></WithPermission>
             ),
         },
@@ -108,7 +109,7 @@ export default function ServiceCategory(){
             key: 'delete',
             label: (
                 <WithPermission access="system.api_market.service_classification.delete"><Button className=" border-none p-0 flex items-center bg-transparent " onClick={()=>openModal('delete',entity)}>
-                    删除
+                    {$t('删除')}
                 </Button></WithPermission>
             ),
         },
@@ -157,20 +158,20 @@ export default function ServiceCategory(){
         let content:string|React.ReactNode = ''
         switch (type){
             case 'addCate':
-                title='添加分类'
+                title=$t('添加分类')
                 content=<ServiceHubCategoryConfig WithPermission={WithPermission} ref={addRef} type={type} />
                 break;
             case 'addChildCate':
-                title='添加子分类'
+                title=$t('添加子分类')
                 content=<ServiceHubCategoryConfig WithPermission={WithPermission} ref={addChildRef} type={type} entity={entity}  />
                 break;
             case 'renameCate':
-                title='重命名分类'
+                title=$t('重命名分类')
                 content=<ServiceHubCategoryConfig WithPermission={WithPermission} ref={renameRef} type={type} entity={entity}  />
                 break;
             case 'delete':
-                title='删除'
-                content='该数据删除后将无法找回，请确认是否删除？'
+                title=$t('删除')
+                content=DELETE_TIPS.default
                 break;
         }
         modal.confirm({
@@ -189,11 +190,11 @@ export default function ServiceCategory(){
                 }
             },
             width:600,
-            okText:'确认',
+            okText:$t('确认'),
             okButtonProps:{
                 disabled : isActionAllowed(type)
             },
-            cancelText:'取消',
+            cancelText:$t('取消'),
             closable:true,
             icon:<></>,
         })
@@ -204,11 +205,11 @@ export default function ServiceCategory(){
             fetchData<BasicResponse<null>>('catalogue',{method:'DELETE',eoParams:{catalogue:entity.id},}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功，即将刷新页面')
+                    message.success(msg || RESPONSE_TIPS.success)
                     resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -222,7 +223,7 @@ export default function ServiceCategory(){
                 getCategoryList()
             }else{
                 setGData(cateData)
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         }).catch(()=>{setGData(cateData)}).finally(()=>{setLoading(false)})
     }
@@ -235,7 +236,7 @@ export default function ServiceCategory(){
                 setGData(data.catalogues)
                 setCateData(data.catalogues)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         }).finally(()=>{setLoading(false)})
     }
@@ -243,14 +244,14 @@ export default function ServiceCategory(){
     useEffect(()=>{
         setBreadcrumb([
             {
-                title: '服务分类管理'}])
+                title: $t('服务分类管理')}])
         getCategoryList()
     },[])
 
     return (
         <InsidePage 
-                pageTitle='服务分类管理' 
-                description="设置服务可选择的分类，方便团队成员快速找到API。"
+                pageTitle={$t('服务分类管理')} 
+                description={$t("设置服务可选择的分类，方便团队成员快速找到API。")}
                 showBorder={false}
                 contentClassName="pr-PAGE_INSIDE_X"
                 scrollPage={false}
@@ -267,7 +268,7 @@ export default function ServiceCategory(){
                         treeData={treeData}
                         />
                         <WithPermission access="system.api_market.service_classification.add">
-                            <Button type="link" className="mt-[12px] pl-[0px]" onClick={()=>openModal('addCate')}><Icon icon="ic:baseline-add" width="18" height="18" className='mr-[2px]'/>添加分类</Button>
+                            <Button type="link" className="mt-[12px] pl-[0px]" onClick={()=>openModal('addCate')}><Icon icon="ic:baseline-add" width="18" height="18" className='mr-[2px]'/>{$t('添加分类')}</Button>
                         </WithPermission>
                     </Spin>
                 </div>

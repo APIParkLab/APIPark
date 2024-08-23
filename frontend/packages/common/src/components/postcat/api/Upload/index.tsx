@@ -4,6 +4,7 @@ import { useDropzone } from 'react-dropzone'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { Icon } from '../Icon'
 import { IconButton } from '../IconButton'
+import { $t } from '@common/locales'
 
 export interface UploadProps {
   value?: File | null
@@ -48,7 +49,7 @@ export function Upload({ value, onChange }: UploadProps): JSX.Element {
         <Box>
           <Icon size="30px" name="link-cloud" />
         </Box>
-        <Typography>{'将文件拖拽至此处上传，或点击选择文件上传'}</Typography>
+        <Typography>{$t('将文件拖拽至此处上传，或点击选择文件上传')}</Typography>
       </Paper>
       {value ? (
         <Box>

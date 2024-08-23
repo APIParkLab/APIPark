@@ -1,3 +1,5 @@
+import { $t } from "@common/locales"
+
 export type PARAM_TYPE =
   | 'string'
   | 'float'
@@ -113,7 +115,7 @@ export const CODE_SNIPPETS: CODE_LANGUAGE_SNIPPETS_TYPE[] = [
     ]
   },
   {
-    label: '微信小程序',
+    label: $t('微信小程序'),
     value: 21,
     isLeaf: true
   },

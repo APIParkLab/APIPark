@@ -1,19 +1,21 @@
-import PageList from "@common/components/aoplatform/PageList.tsx";
+import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx";
 import {App, Divider, Spin} from "antd";
-import  {useEffect, useRef, useState} from "react";
+import  {useEffect, useMemo, useRef, useState} from "react";
 import { useLocation, useOutletContext, useParams} from "react-router-dom";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
-import {ActionType, ParamsType, ProColumns} from "@ant-design/pro-components";
+import {ActionType, ParamsType} from "@ant-design/pro-components";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import {DefaultOptionType} from "antd/es/cascader";
 import {IntelligentPluginConfig, IntelligentPluginConfigHandle} from "./IntelligentPluginConfig.tsx";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {EntityItem} from "@common/const/type.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission.tsx";
 import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter.tsx";
 import { LoadingOutlined } from "@ant-design/icons";
+import { $t } from "@common/locales/index.ts";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 
  type DynamicTableField = {
     name: string,
@@ -95,7 +97,7 @@ export default function IntelligentPluginList(){
     const [tableListDataSource, setTableListDataSource] = useState<DynamicTableItem[]>([]);
 
     const [tableHttpReload, setTableHttpReload] = useState(true);
-    const [columns,setColumns] = useState<ProColumns<DynamicTableItem>[] >([])
+    const [columns,setColumns] = useState<PageProColumns<DynamicTableItem>[] >([])
     const {fetchData} = useFetch()
     const pageListRef = useRef<ActionType>(null);
     const [publishBtnLoading, setPublishBtnLoading] = useState<boolean>(false)
@@ -105,6 +107,7 @@ export default function IntelligentPluginList(){
     const [drawerLoading, setDrawerLoading] = useState<boolean>(false)
     const location = useLocation().pathname
     const {accessPrefix} = useOutletContext<{accessPrefix:string}>()
+    const {state} = useGlobalContext()
 
 
     const getIntelligentPluginTableList=(params:ParamsType & {
@@ -154,12 +157,14 @@ export default function IntelligentPluginList(){
                 return ({ data: [], success: false });})
     }
 
+    const translatedCol = useMemo(()=>columns.map(x=>({...x, title:typeof x.title  === 'string' ? $t(x.title as string) : x.title})),[columns,state.language])
+
     const getConfig = (data:DynamicTableConfig)=>{
         const {basic,list } = data
         const {title,drivers} = basic
         
         setBreadcrumb([
-            {title:location.includes('resourcesettings') ? '资源配置': '日志配置'},
+            {title:location.includes('resourcesettings') ? $t('资源'): $t('日志')},
             {
                 title
             }
@@ -178,23 +183,23 @@ export default function IntelligentPluginList(){
                 setRenderSchema(resp.data.render)
                 return Promise.resolve(resp.data.render)
             }
-            return Promise.reject(resp.msg || '操作失败')
+            return Promise.reject(resp.msg || RESPONSE_TIPS.error)
         })
     }
 
-    const operation:ProColumns<DynamicTableItem>[] =[
+    const operation:PageProColumns<DynamicTableItem>[] =[
         {
-            title: '操作',
+            title: COLUMNS_TITLE.operate,
             key: 'option',
-            width: 150,
             fixed:'right',
             valueType: 'option',
+            btnNums:3,
             render: (_: React.ReactNode, entity: DynamicTableItem) => [
-                <TableBtnWithPermission  access={`${accessPrefix}.publish`} key="publish" onClick={()=>{openModal('publish',entity)}} btnTitle={entity.status === '已发布' ? '下线' : '上线'}/>,
+                <TableBtnWithPermission  access={`${accessPrefix}.publish`} key="publish" btnType="publish" onClick={()=>{openModal('publish',entity)}} btnTitle={entity.status === $t('已发布') ? $t('下线') : $t('上线')}/>,
                 <Divider type="vertical" className="mx-0"  key="div1"/>,
-                <TableBtnWithPermission  access={`${accessPrefix}.view`} key="edit" onClick={()=>{openDrawer('edit',entity)}} btnTitle="查看"/>,
+                <TableBtnWithPermission  access={`${accessPrefix}.view`} key="edit"  btnType="edit" onClick={()=>{openDrawer('edit',entity)}} btnTitle={$t("查看")}/>,
                 <Divider type="vertical" className="mx-0"  key="div2"/>,
-                <TableBtnWithPermission  access={`${accessPrefix}.delete`}  key="delete" onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/>,
+                <TableBtnWithPermission  access={`${accessPrefix}.delete`}  key="delete"  btnType="delete"  onClick={()=>{openModal('delete',entity)}} btnTitle={$t("删除")}/>,
             ],
         }
     ]
@@ -213,11 +218,11 @@ export default function IntelligentPluginList(){
             fetchData<BasicResponse<null>>(`dynamic/${moduleId}/batch`,{method:'DELETE',eoParams:{ids:JSON.stringify([entity!.id])}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             })
         })
@@ -239,7 +244,7 @@ export default function IntelligentPluginList(){
                             }
                             setCurDetail(data.info)
                         }else{
-                            message.error(msg || '操作失败')
+                            message.error(msg || RESPONSE_TIPS.error)
                         }
                     }).finally(()=>setDrawerLoading(false))
                 break;
@@ -254,25 +259,25 @@ export default function IntelligentPluginList(){
         let content:string|React.ReactNode = ''
         switch (type){
             case 'publish':{
-                message.loading('正在操作')
-                await fetchData<BasicResponse<DynamicPublish>>(`dynamic/${moduleId}/${entity!.status === '已发布' ? 'offline':'online'}`, {
+                message.loading(RESPONSE_TIPS.operating)
+                await fetchData<BasicResponse<DynamicPublish>>(`dynamic/${moduleId}/${entity!.status === $t('已发布') ? 'offline':'online'}`, {
                     method: 'PUT',
                     eoParams:{id:entity!.id},
                 }).then(response => {
                     const {code, msg} = response
                     if (code === STATUS_CODE.SUCCESS) {
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         return Promise.resolve(true)
                     } else {
-                        message.error(msg || '操作失败')
-                        return Promise.reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        return Promise.reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> Promise.reject(errorInfo))
                 message.destroy()
                 return;}
             case 'delete':
                 title='删除'
-                content=<span>确定删除<span className="text-status_fail"></span>？此操作无法恢复，确认操作？</span>
+                content=<span>{DELETE_TIPS.default}</span>
                 break;
         }
 
@@ -287,11 +292,11 @@ export default function IntelligentPluginList(){
                 }
             },
             width: type === 'delete'? 600 : 900,
-            okText:'确认',
+            okText:$t('确认'),
             okButtonProps:{
                 disabled:false
             },
-            cancelText:'取消',
+            cancelText:$t('取消'),
             closable:true,
             icon:<></>,
             footer:(_, { OkBtn, CancelBtn }) =>{
@@ -314,10 +319,10 @@ export default function IntelligentPluginList(){
     return (<>
     <PageList
             ref={pageListRef}
-            columns = {[...columns,...operation]}
+            columns = {[...translatedCol,...operation]}
             request={(params)=>getIntelligentPluginTableList(params)}
-            addNewBtnTitle={`添加${pluginName}`}
-            searchPlaceholder={`搜索${pluginName}名称`}
+            addNewBtnTitle={$t('添加(0)',[$t(pluginName)])}
+            searchPlaceholder={$t('搜索(0)名称',[$t(pluginName)])}
             onChange={() => {
                 setTableHttpReload(false)
             }}
@@ -326,7 +331,7 @@ export default function IntelligentPluginList(){
             onSearchWordChange={(e)=>{setSearchWord(e.target.value);setTableHttpReload(true);setTableHttpReload(true)}}
         />
         
-        <DrawerWithFooter title={`${drawerType === 'add' ? '添加' : '编辑'}${pluginName }`} open={drawerOpen} onClose={()=>{setCurDetail(undefined);setDrawerOpen(false)}} onSubmit={()=>drawerFormRef.current?.save()?.then((res)=>{res && manualReloadTable();return res})}  submitAccess=''>
+        <DrawerWithFooter title={`${drawerType === 'add' ? $t('添加') : $t('编辑')}${pluginName }`} open={drawerOpen} onClose={()=>{setCurDetail(undefined);setDrawerOpen(false)}} onSubmit={()=>drawerFormRef.current?.save()?.then((res)=>{res && manualReloadTable();return res})}  submitAccess=''>
             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin/>} spinning={drawerLoading}>
                 <IntelligentPluginConfig 
                     ref={drawerFormRef!} 

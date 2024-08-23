@@ -7,6 +7,7 @@ import { type ReactNode } from 'react'
 import type { LoadingButtonProps } from '@mui/lab'
 import { LoadingButton } from '@mui/lab'
 import {renderComponent} from "@common/utils/postcat.tsx";
+import { $t } from '@common/locales'
 
 export interface BaseDialogProps extends DialogActionProps {
   open: boolean
@@ -56,9 +57,8 @@ interface DialogActionProps {
 
 export function DialogActions(props: DialogActionProps): JSX.Element {
 
-  const CancelText = '取消'
-  const ConfirmText = '确定'
-
+  const CancelText = $t('取消')
+  const ConfirmText = $t('确定')
   const {
     onClose,
     confirmBtn,

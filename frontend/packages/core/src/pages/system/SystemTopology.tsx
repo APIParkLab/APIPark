@@ -9,13 +9,14 @@ import { Link, useParams } from "react-router-dom";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
 import { useFetch } from "@common/hooks/http";
 import { App, Button } from "antd";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { useSystemContext } from "../../contexts/SystemContext";
 import { ZoomInOutlined, ZoomOutOutlined } from "@ant-design/icons";
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext";
 import { debounce } from "lodash-es";
 import { SYSTEM_TOPOLOGY_NODE_TYPE_COLOR_MAP } from "../../const/system/const";
 import { SystemTopologyResponse } from "../../const/system/type";
+import { $t } from "@common/locales";
 
 
 export default function SystemTopology() {
@@ -36,7 +37,7 @@ export default function SystemTopology() {
             if(code === STATUS_CODE.SUCCESS){
                 setGraphData(transformData({...data,currentSystem:{id:serviceId,name:systemInfo?.name || ''}}))
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
@@ -109,10 +110,10 @@ export default function SystemTopology() {
       getNodeData()
       setBreadcrumb([
         {
-            title: <Link to={`/service/list`}>服务</Link>
+            title: <Link to={`/service/list`}>{$t('服务')}</Link>
         },
         {
-            title: '调用拓扑图'
+            title: $t('调用拓扑图')
         }])
     },[serviceId])
 

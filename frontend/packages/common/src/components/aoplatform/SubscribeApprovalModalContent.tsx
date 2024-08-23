@@ -1,9 +1,11 @@
-import {App, Checkbox, Col, Form, Input, Row} from "antd";
+import {App, Col, Form, Input, Row} from "antd";
 import { forwardRef, useEffect, useImperativeHandle} from "react";
 import {SubscribeApprovalInfoType} from "@common/const/approval/type.tsx";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, FORM_ERROR_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
+import { SubscribeApprovalList } from "@common/const/approval/const";
+import { $t } from "@common/locales";
 
 type SubscribeApprovalModalProps = {
     type:'approval'|'view'
@@ -22,26 +24,6 @@ type FieldType = {
     opinion?:string;
 };
 
-const list = [
-    {
-        title:'申请方应用',key:'application'
-    },
-    {
-        title:'申请方所属团队',key:'applyTeam'
-    },
-    {
-        title:'申请人',key:'applier'
-    },
-    {
-        title:'申请时间',key:'applyTime'
-    },
-    {
-        title:'申请服务',key:'service'
-    },
-    {
-        title:'服务所属团队',key:'team'
-    }
-]
 export const SubscribeApprovalModalContent = forwardRef<SubscribeApprovalModalHandle,SubscribeApprovalModalProps>((props, ref) => {
     const { message } = App.useApp()
     const {data, type,inSystem=false, teamId, serviceId} = props
@@ -57,20 +39,20 @@ export const SubscribeApprovalModalContent = forwardRef<SubscribeApprovalModalHa
             form.validateFields().then((value)=>{
                 if(operate === 'refuse' && form.getFieldValue('opinion') === ''){
                     form.setFields([{
-                        name:'opinion',errors:['必填项']
+                        name:'opinion',errors:[FORM_ERROR_TIPS.refuseOpinion]
                     }])
                     form.scrollToField('opinion')
-                    reject('未填写审核意见')
+                    reject(RESPONSE_TIPS.refuseOpinion)
                     return
                 }
                 fetchData<BasicResponse<null>>(`${inSystem?'service/':''}approval/subscribe`,{method: 'POST',eoBody:({opinion:value.opinion,operate}), eoParams:(inSystem ? {apply:data!.id, team:teamId} : {id:data!.id,team:teamId})}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -88,9 +70,9 @@ export const SubscribeApprovalModalContent = forwardRef<SubscribeApprovalModalHa
 
     return (
         <div className="my-btnybase">{
-            list?.map((x)=>(
+            SubscribeApprovalList?.map((x)=>(
                 <Row key={x.key} className="leading-[32px] mb-btnbase mx-auto">
-                    <Col className="text-left" span={6}>{x.title}：</Col>
+                    <Col className="text-left" span={6}>{$t(x.title)}：</Col>
                     <Col >{(data as {[k:string]:unknown})?.[x.key]?.name || (data as {[k:string]:unknown})?.[x.key] || '-'}</Col>
                 </Row>
             ))
@@ -109,17 +91,17 @@ export const SubscribeApprovalModalContent = forwardRef<SubscribeApprovalModalHa
             >
 
                 <Form.Item<FieldType>
-                    label="申请原因"
+                    label={$t("申请原因")}
                     name="reason"
                 >
                     <Input.TextArea className="w-INPUT_NORMAL" disabled={true} placeholder=" "  />
                 </Form.Item>
                 <Form.Item<FieldType>
-                    label="审核意见"
+                    label={$t("审核意见")}
                     name="opinion"
-                    extra="选择拒绝时，审批意见为必填"
+                    extra={FORM_ERROR_TIPS.refuseOpinion}
                 >
-                    <Input.TextArea className="w-INPUT_NORMAL" placeholder="请输入" onChange={()=>{  form.setFields([
+                    <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input} onChange={()=>{  form.setFields([
                         {
                             name: 'opinion',
                             errors: [], // 设置为空数组来移除错误信息

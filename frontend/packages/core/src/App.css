@@ -1,5 +1,12 @@
 @tailwind base;
 @tailwind components;
+
+@layer components {
+  .button-bottom-default {
+    @apply border-[0px] border-b-[1px] border-solid border-BORDER;
+  }
+}
+
 @tailwind utilities;
 
 
@@ -36,17 +43,6 @@
   background-color:'transparent'
 }
 
-/* .ant-layout-sider-children{
-  ul.ant-menu.ant-menu-root.ant-menu-inline > li:not(.ant-menu-item-selected) {
-    border-radius: 10px;
-    background-color: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.15);
-  } 
-  .ant-menu-item {
-    height:40px;
-    margin-block:10px;
-  }
-} */
 
 .apipark-layout-global-header-collapsed-button{
   color:hsl(0, 0%, 100%);

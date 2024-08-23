@@ -2,12 +2,12 @@
 import Tree, {DataNode} from "antd/es/tree";
 import {Outlet, useNavigate, useParams } from "react-router-dom";
 import  {Key, useEffect, useMemo, useRef, useState} from "react";
-import {App, Button, Divider, Input } from "antd";
+import {App, Button, Input } from "antd";
 import {debounce} from "lodash-es";
 import {DownOutlined, SearchOutlined} from "@ant-design/icons";
 import TreeWithMore from "@common/components/aoplatform/TreeWithMore.tsx";
 import {useFetch} from "@common/hooks/http.ts";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import { DepartmentListItem, MemberDropdownModalHandle } from "../../const/member/type.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
@@ -18,6 +18,7 @@ import { RenameDepModal } from "./Modal/RenameDepModal.tsx";
 import { AddDepModal } from "./Modal/AddDepModal.tsx";
 import { EditMemberModal } from "./Modal/EditMember.tsx";
 import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
+import { $t } from "@common/locales/index.ts";
 
 const MemberPage = ()=>{
         const [searchWord, setSearchWord] = useState<string>('')
@@ -46,11 +47,11 @@ const MemberPage = ()=>{
                 fetchData<BasicResponse<null>>('user/department',{method:'DELETE',eoParams:{id}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             })
@@ -61,24 +62,24 @@ const MemberPage = ()=>{
             let content:string|React.ReactNode = ''
             switch (type){
                 case 'addDep':
-                    title='添加部门'
+                    title=$t('添加部门')
                     content=<AddDepModal ref={AddDepRef} type={type} />
                     break;
                 case 'addChild':
-                    title='添加子部门'
+                    title=$t('添加子部门')
                     content=<AddDepModal ref={AddChildRef} type={type} entity={{id:entity.id}}  />
                     break;
                 case 'addMember':
-                    title='添加账号'
+                    title=$t('添加账号')
                     content=<EditMemberModal ref={AddMemberRef} type={type} entity={{id:entity.id,departmentIds:entity.departmentIds}} selectedMemberGroupId={entity.id}/>
                     break;
                 case 'rename':
-                    title='重命名'
+                    title=$t('重命名')
                     content=<RenameDepModal  ref={RenameRef} type={type} entity={{id:entity.id,name:entity.name}} />
                     break;
                 case 'delete':
-                    title='删除'
-                    content='该数据删除后将无法找回，请确认是否删除？'
+                    title=$t('删除')
+                    content=$t('该数据删除后将无法找回，请确认是否删除？')
                     break;
             }
             modal.confirm({
@@ -99,11 +100,11 @@ const MemberPage = ()=>{
                     }
                 },
                 width:600,
-                okText:'确认',
+                okText:$t('确认'),
                 okButtonProps:{
                     disabled : isActionAllowed(type)
                 },
-                cancelText:'取消',
+                cancelText:$t('取消'),
                 closable:true,
                 icon:<></>,
             })
@@ -128,7 +129,7 @@ const MemberPage = ()=>{
                 key: 'addDep',
                 label: (
                     <WithPermission access="system.organization.member.department.add" key="addDepPermission"><Button key="addDep" type="text" className="border-none p-0 flex items-center bg-transparent " onClick={()=>openModal('addDep',entity)}>
-                        添加部门
+                       {$t('添加部门')} 
                     </Button></WithPermission>
                 ),
             },
@@ -136,7 +137,7 @@ const MemberPage = ()=>{
                 key: 'addChild',
                 label: (
                     <WithPermission access="system.organization.member.department.add" key="addChildPermission"><Button key="addChild" type="text" className=" border-none p-0 flex items-center bg-transparent " onClick={()=>openModal('addChild',entity)}>
-                        添加子部门
+                       {$t('添加子部门')} 
                     </Button></WithPermission>
                 ),
             },
@@ -144,7 +145,7 @@ const MemberPage = ()=>{
                 key: 'addMember',
                 label: (
                     <WithPermission access="system.organization.member.add" key="addMemberPermission"><Button key="addMember" type="text" className=" border-none p-0 flex items-center bg-transparent " onClick={()=>openModal('addMember',{...entity,...(entity.departmentIds ? {departmentIds:[entity.departmentIds?.[entity.departmentIds.length - 1]]}:{})})}>
-                        添加账号
+                       {$t('添加账号')} 
                     </Button></WithPermission>
                 ),
             },
@@ -152,7 +153,7 @@ const MemberPage = ()=>{
                 key: 'rename',
                 label: (
                     <WithPermission access="system.organization.member.department.edit"  key="renamePermission"><Button type="text" key="rename" className=" border-none p-0 flex items-center bg-transparent " onClick={()=>openModal('rename',entity)}>
-                        重命名
+                       {$t('重命名')} 
                     </Button></WithPermission>
                 ),
             },
@@ -160,7 +161,7 @@ const MemberPage = ()=>{
                 key: 'delete',
                 label: (
                     <WithPermission access="system.organization.member.department.delete"  key="deletePermission"><Button key="delete" type="text" className=" border-none p-0 flex items-center bg-transparent " onClick={()=>openModal('delete',entity)}>
-                        删除
+                       {$t('删除')} 
                     </Button></WithPermission>
                 ),
             },
@@ -169,7 +170,7 @@ const MemberPage = ()=>{
         const treeData = useMemo(() => {
             const loop = (data: DepartmentListItem[], parentIds:string[] = []): DataNode[] =>
                 data?.map((item) => {
-                    const strTitle = item.name as string;
+                    const strTitle = $t(item.name) as string;
                     const index = strTitle.indexOf(searchWord);
                     const beforeStr = strTitle.substring(0, index);
                     const afterStr = strTitle.slice(index + searchWord.length);
@@ -216,28 +217,14 @@ const MemberPage = ()=>{
                 if(code === STATUS_CODE.SUCCESS){
                     setDepartmentList([data.departments])
                 }else{
-                    message.error(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
                     return {data:[], success:false}
                 }
             })
         }
 
-    // const getModalDepartmentList = ()=>{
-    //         setModalDepartmentList([])
-    //         fetchData<BasicResponse<{department:DepartmentListItem[]}>>('simple/departments',{method:'GET'}).then(response=>{
-    //             const {code,data,msg} = response
-    //             if(code === STATUS_CODE.SUCCESS){
-    //                 setModalDepartmentList([data.department])
-    //             }else{
-    //                 message.error(msg || '操作失败')
-    //                 return {data:[], success:false}
-    //             }
-    //         })
-    // }
-
         useEffect(() => {
             getDepartmentList()
-            // getModalDepartmentList()
         }, []);
 
         useEffect(()=>{
@@ -246,14 +233,14 @@ const MemberPage = ()=>{
 
         return (
             <InsidePage 
-                pageTitle='成员' 
-                description="设置成员和对应的角色，成员只能够看到权限范围内的功能和数据。"
+                pageTitle={$t('成员')} 
+                description={$t("设置成员和对应的角色，成员只能够看到权限范围内的功能和数据。")}
                 >
                 <div className="flex flex-1 h-full w-full">
                     <div className="w-[200px] border-0 border-solid border-r-[1px] border-r-BORDER">
                     <div className="px-btnbase pb-[0px]">
                         <Input className=" my-btnybase" onChange={(e) => debounce(onSearchWordChange, 100)(e.target.value)}
-                            allowClear placeholder="搜索部门"
+                            allowClear placeholder={$t("搜索部门")}
                             prefix={<SearchOutlined className="cursor-pointer"/>}/>
                             </div>
                     <div className="h-[calc(100%-52px)] overflow-auto">

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { Box } from '@mui/material'
 import { IconButton } from '../IconButton'
 import useCopyToClipboard from "@common/hooks/copy.ts";
+import { $t } from '@common/locales';
 
 export interface ClipboardProps {
   text: string
@@ -14,7 +15,7 @@ export interface ClipboardProps {
 
 export function Clipboard(props: ClipboardProps): JSX.Element {
   const { text, children, onError, onSuccess } = props
-  const DefaultText = '复制'
+  const DefaultText = $t('复制')
   const [buttonTitle, setButtonTitle] = useState(DefaultText)
   const { copyToClipboard } = useCopyToClipboard();
   const handleCopy = (): void => {

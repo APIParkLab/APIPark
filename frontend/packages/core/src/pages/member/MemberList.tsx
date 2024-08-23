@@ -1,14 +1,14 @@
-import PageList from "@common/components/aoplatform/PageList.tsx";
-import  {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
+import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx";
+import  {forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
 import {  useOutletContext, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
-import {ActionType, ProColumns } from "@ant-design/pro-components";
+import {ActionType } from "@ant-design/pro-components";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {Alert, App, Button, Select, Tree, TreeProps} from "antd";
 import {DataNode} from "antd/es/tree";
 import {FolderOpenOutlined, FolderOutlined} from "@ant-design/icons";
 import {MemberDropdownModal} from "./MemberDropdownModal.tsx";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse,COLUMNS_TITLE, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { AddToDepartmentHandle, AddToDepartmentProps, DepartmentListItem, MemberDropdownModalHandle, MemberTableListItem } from "../../const/member/type.ts";
 import { MEMBER_TABLE_COLUMNS } from "../../const/member/const.tsx";
@@ -21,6 +21,7 @@ import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { checkAccess } from "@common/utils/permission.ts";
 import { PERMISSION_DEFINITION } from "@common/const/permissions.ts";
 import { EntityItem } from "@common/const/type.ts";
+import { $t } from "@common/locales/index.ts";
 
 const AddToDepartment = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((props,ref)=>{
     const {selectedUserIds} = props
@@ -34,11 +35,11 @@ const AddToDepartment = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((
                 fetchData<BasicResponse<null>>('user/department/member',{method:'POST',eoBody:({userIds:selectedUserIds,departmentIds:selectedKeys}),eoTransformKeys:['departmentIds','userIds']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || '操作成功！')
+                        message.success(msg || RESPONSE_TIPS.success)
                         resolve(true)
                     }else{
-                        message.error(msg || '操作失败')
-                        reject(msg || '操作失败')
+                        message.error(msg || RESPONSE_TIPS.error)
+                        reject(msg || RESPONSE_TIPS.error)
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -63,7 +64,7 @@ const AddToDepartment = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((
                     children:data.departments.children.filter((x)=>x.id !== 'unknown' && x.id !== 'disable')}])
                 setExpandedKeys([newId])
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
             }
         })
@@ -81,8 +82,8 @@ const AddToDepartment = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((
 
     return (
         <div>
-            <Alert className="my-btnybase" message="未激活、已禁用的成员无法加入到部门" type="info" />
-            <p className="font-bold leading-[24px]">请选择成员需要新加入的部门<span className="text-status_fail">*</span></p>
+            <Alert className="my-btnybase" message={$t("未激活、已禁用的成员无法加入到部门")} type="info" />
+            <p className="font-bold leading-[24px]">{$t('请选择成员需要新加入的部门')}<span className="text-status_fail">*</span></p>
             <div className="border-[1px] border-solid border-BORDER min-h-[200px]">
                 <Tree
                     checkable
@@ -95,7 +96,7 @@ const AddToDepartment = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((
                     treeData={treeData}
                     selectedKeys={[selectedKeys]}
                     expandedKeys={expandedKeys}
-                    fieldNames={{title:'name',key:'id',children:'children'}}
+                    fieldNames={{title:$t('name'),key:'id',children:'children'}}
                 />
             </div>
         </div>)
@@ -118,18 +119,18 @@ const MemberList = ()=>{
     const { setBreadcrumb } = useBreadcrumb()
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [departmentValueEnum,setDepartmentValueEnum] = useState<ColumnFilterItem[] >([])
-    const {accessData} = useGlobalContext()
-    const [columns,setColumns] = useState<ProColumns<MemberTableListItem>[]>([])
+    const {accessData,state} = useGlobalContext()
+    const [columns,setColumns] = useState<PageProColumns<MemberTableListItem>[]>([])
 
-    const operation:ProColumns<MemberTableListItem>[] =[
+    const operation:PageProColumns<MemberTableListItem>[] =[
         {
-            title: '操作',
+            title: COLUMNS_TITLE.operate,
             key: 'option',
-            width: 62,
+            btnNums:1,
             fixed:'right',
             valueType: 'option',
             render: (_: React.ReactNode, entity: MemberTableListItem) => [
-                <TableBtnWithPermission  access="system.organization.role.system.edit" key="editMember" onClick={()=>{openModal('editMember',entity)}} btnTitle="编辑"/>,
+                <TableBtnWithPermission  access="system.organization.role.system.edit" key="edit" btnType="edit" onClick={()=>{openModal('editMember',entity)}} btnTitle="编辑"/>,
             ],
         }
     ]
@@ -150,7 +151,7 @@ const MemberList = ()=>{
                 setInit((prev)=>prev ? false : prev)
                 return  {data:data.members, success: true}
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -206,11 +207,11 @@ const MemberList = ()=>{
             fetchData<BasicResponse<null>>(url,{method,eoTransformKeys:['user_ids','userIds'],eoParams:params,eoBody:(body)}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     resolve(true)
                 }else{
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })}
@@ -237,20 +238,20 @@ const MemberList = ()=>{
         let content:string|React.ReactNode = ''
         switch (type){
             case 'addMember':
-                title='添加账号'
+                title=$t('添加账号')
                 content=<MemberDropdownModal  topGroupId={topGroupId} ref={AddMemberRef} type={type} entity={{id:memberGroupId,departmentIds:selectedDepartmentIds||[]}}  selectedMemberGroupId={memberGroupId} />
                 break;
             case 'editMember':
-                title='编辑成员信息'
+                title=$t('编辑成员信息')
                 content=<MemberDropdownModal topGroupId={topGroupId} ref={EditMemberRef} type={type} entity={entity} />
                 break;
             case 'addToDep':
-                title='加入部门'
+                title=$t('加入部门')
                 content=<AddToDepartment ref={AddToDepRef}  selectedUserIds={selectedRowKeys as string[]} />
                 break;
             case 'delete':
-                title='删除'
-                content=<span>确定删除成员<span className="text-status_fail"></span>？此操作无法恢复，确认操作？</span>
+                title=$t('删除')
+                content=<span>{$t('确定删除成员？此操作无法恢复，确认操作？')}</span>
                 break;
         }
 
@@ -270,11 +271,11 @@ const MemberList = ()=>{
                 }
             },
             width:600,
-            okText:'确认',
+            okText:$t('确认'),
             okButtonProps:{
                 disabled : isActionAllowed(type)
             },
-            cancelText:'取消',
+            cancelText:$t('取消'),
             closable:true,
             icon:<></>,
         })
@@ -287,7 +288,7 @@ const MemberList = ()=>{
 
     useEffect(()=>{
         getRoleList()
-        setBreadcrumb([{ title: '成员与部门'}])
+        setBreadcrumb([{ title: $t('成员与部门')}])
         getDepartmentList()
     },[])
 
@@ -298,7 +299,7 @@ const MemberList = ()=>{
             const tmpValueEnum:ColumnFilterItem[]   = [{text:data.department.name, value:data.department.id,children:handleDepartmentListToFilter(data.department.children)}]
             setDepartmentValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || '操作失败')
+            message.error(msg || RESPONSE_TIPS.error)
         }
     }
     
@@ -308,11 +309,11 @@ const MemberList = ()=>{
             fetchData<BasicResponse<null>>(`account/role`, {method: 'PUT',eoBody:({roles:value, users:[entity.id]})}).then(response => {
                 const {code, msg} = response
                 if (code === STATUS_CODE.SUCCESS) {
-                    message.success(msg || '操作成功！')
+                    message.success(msg || RESPONSE_TIPS.success)
                     resolve(true)
                 } else {
-                    message.error(msg || '操作失败')
-                    reject(msg || '操作失败')
+                    message.error(msg || RESPONSE_TIPS.error)
+                    reject(msg || RESPONSE_TIPS.error)
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -331,7 +332,7 @@ const MemberList = ()=>{
                                     className="w-full"
                                     mode="multiple"
                                     value={entity.roles?.map((x:EntityItem)=>x.id)}
-                                    options={data.roles?.map((x:{id:string,name:string})=>({label:x.name, value:x.id}))}
+                                    options={data.roles?.map((x:{id:string,name:string})=>({label:$t(x.name), value:x.id}))}
                                     onChange={(value)=>{
                                         changeMemberInfo(value,entity ).then((res)=>{
                                             if(res) manualReloadTable()
@@ -348,20 +349,22 @@ const MemberList = ()=>{
                 setColumns(newCol)
                 return
             } else {
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         })
     }
+
+    const translatedCol = useMemo(()=>columns?.map(x=>({...x, title:typeof x.title  === 'string' ? $t(x.title as string) : x.title})), [columns, state.language])
 
     return (
         <>
         <PageList
             id="global_member"
             ref={pageListRef}
-            columns={[...columns, ...operation]}
+            columns={[...translatedCol, ...operation]}
             request={()=>getMemberList()}
-            addNewBtnTitle={(!memberGroupId ||['unknown','disable'].indexOf(memberGroupId?.toString()) === -1)?"添加账号" : ""}
-            searchPlaceholder="输入用户名、邮箱查找成员"
+            addNewBtnTitle={(!memberGroupId ||['unknown','disable'].indexOf(memberGroupId?.toString()) === -1)?$t("添加账号") : ""}
+            searchPlaceholder={$t("输入用户名、邮箱查找成员")}
             onAddNewBtnClick={() => {
             openModal('addMember')
             }}

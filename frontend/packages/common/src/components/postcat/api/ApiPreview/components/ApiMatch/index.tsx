@@ -6,6 +6,7 @@ import {collapseTableSx, previewTableHoverSx} from "../../../PreviewTable";
 import {Collapse} from "../../../Collapse";
 import { MatchPositionEnum, MatchTypeEnum } from "@core/const/system/const";
 import { MatchItem } from "@common/const/type";
+import { $t } from "@common/locales";
 
 interface ApiMatchProps {
   rows?: MatchItem[]
@@ -29,25 +30,25 @@ export default function ApiMatch({ rows = [], title, loading = false }: ApiMatch
   const columns: GridColDef<MatchItem>[] = [
     {
       field: 'key',
-      headerName: '参数名',
+      headerName: $t('参数名'),
       hideable: false,
       width:200
     },
     {
       field: 'position',
-      headerName: '参数位置',
+      headerName: $t('参数位置'),
       valueGetter: (params) => MatchPositionEnum[params.row.position],
       width:160
     },
     {
       field: 'matchType',
-      headerName: '匹配类型',
+      headerName: $t('匹配类型'),
       valueGetter: (params) => MatchTypeEnum[params.row.matchType],
       width:160
     },
     {
       field: 'pattern',
-      headerName: '参数值',
+      headerName: $t('参数值'),
       flex:1
     }
   ]

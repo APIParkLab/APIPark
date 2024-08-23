@@ -1,6 +1,6 @@
 
 import  {useEffect, useRef, useState} from "react";
-import {BasicResponse, STATUS_CODE} from "@common/const/const.ts";
+import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {App, Button, Spin} from "antd";
 import ApiBasicInfoDisplay from "@common/components/postcat/api/ApiPreview/components/ApiBasicInfoDisplay";
@@ -15,6 +15,7 @@ import SystemInsideApiDocument from "./SystemInsideApiDocument.tsx";
 import ScrollableSection from "@common/components/aoplatform/ScrollableSection.tsx";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { LoadingOutlined } from "@ant-design/icons";
+import { $t } from "@common/locales/index.ts";
 
 const SystemInsideApiDetail = (props:SystemInsideApiDetailProps)=>{
     const { message } = App.useApp()
@@ -40,7 +41,7 @@ const SystemInsideApiDetail = (props:SystemInsideApiDetailProps)=>{
                 }
                 setApiDetail(newApiDetail)
             }else{
-                message.error(msg || '操作失败')
+                message.error(msg || RESPONSE_TIPS.error)
             }
         }).finally(()=>{setLoading(false)})
     }
@@ -62,29 +63,29 @@ const SystemInsideApiDetail = (props:SystemInsideApiDetailProps)=>{
                     apiDetail !== undefined && <>
                     <div className="flex justify-between">
                     <ApiBasicInfoDisplay apiName={apiDetail?.name} protocol={apiDetail?.protocol || 'HTTP'} method={apiDetail?.method} uri={apiDetail?.path} />
-                    <WithPermission access="team.service.api.edit"><Button type="primary" onClick={()=>setOpen(true)}>编辑文档</Button></WithPermission>
+                    <WithPermission access="team.service.api.edit"><Button type="primary" onClick={()=>setOpen(true)}>{$t('编辑文档')}</Button></WithPermission>
                         </div>
                     <p className="text-[14px] leading-[22px] text-[#999999]">
-                        <span className="mr-[20px]">创建者:{apiDetail?.creator.name || '-'}</span>
-                        <span className="mr-[20px]">最后编辑人:{apiDetail?.updater.name || '-'}</span><span>更新时间:{apiDetail?.updateTime || '-'}</span></p></>
+                        <span className="mr-[20px]">{$t('创建者')}:{apiDetail?.creator.name || '-'}</span>
+                        <span className="mr-[20px]">{$t('最后编辑人')}:{apiDetail?.updater.name || '-'}</span><span>{$t('更新时间')}:{apiDetail?.updateTime || '-'}</span></p></>
                 }
             </div>
             <div className="scroll-area h-[calc(100%-84px)] overflow-auto">
                 {
                     apiDetail?.match && apiDetail.match?.length > 0 &&
-                    <ApiMatch title='高级匹配' rows={apiDetail?.match}  />
+                    <ApiMatch title={$t('高级匹配')} rows={apiDetail?.match}  />
                 }
 
                 {
                     apiDetail?.proxy && Object.keys(apiDetail?.proxy).length > 0 &&
-                    <ApiProxy title='转发规则' proxyInfo={apiDetail?.proxy}  />
+                    <ApiProxy title={$t('转发规则')} proxyInfo={apiDetail?.proxy}  />
                 }
 
                 {apiDetail && <ApiPreview entity={{...apiDetail.doc,name:apiDetail.name, method:apiDetail.method,uri:apiDetail.path, protocol:apiDetail.protocol||'HTTP'}}  />}
             </div>
         </ScrollableSection>
         <DrawerWithFooter 
-            title="编辑 API" 
+            title={$t("编辑 API")} 
             open={open} 
             onClose={onClose} 
             onSubmit={()=>drawerFormRef.current?.save()?.then((res)=>{res&& getApiDetail();return res})} 

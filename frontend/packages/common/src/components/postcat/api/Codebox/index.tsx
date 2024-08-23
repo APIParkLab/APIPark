@@ -5,6 +5,8 @@ import { Editor, useMonaco } from '@monaco-editor/react'
 import { type editor as MonacoEditor } from 'monaco-editor'
 import { IconButton } from '../IconButton'
 import { message } from 'antd'
+import { $t } from '@common/locales'
+import { RESPONSE_TIPS } from '@common/const/const'
 
 export interface CodeboxApiRef {
   insertCode: (value: string) => void
@@ -126,7 +128,7 @@ export const Codebox =  memo((props: CodeboxProps) => {
   const copyCode = async (): Promise<void> => {
     if (editorRef.current) {
        await navigator.clipboard.writeText(editorRef.current.getValue())
-      message.success('复制成功')
+      message.success(RESPONSE_TIPS.copySuccess)
     }
   }
 
@@ -166,16 +168,16 @@ export const Codebox =  memo((props: CodeboxProps) => {
         {extraContent}
 
           <IconButton name="code" onClick={formatCode} sx={{color:'#333',transition:'none','&.MuiButtonBase-root:hover':{background:'transparent',color:'#3D46F2',transition:'none'}}}>
-            格式化
+            {$t('格式化')}
           </IconButton>
           <IconButton name="copy" onClick={copyCode}  sx={{color:'#333',transition:'none','&.MuiButtonBase-root:hover':{background:'transparent',color:'#3D46F2',transition:'none'}}}>
-           复制
+           {$t('复制')}
           </IconButton>
           <IconButton name="search" onClick={searchInCode}  sx={{color:'#333',transition:'none','&.MuiButtonBase-root:hover':{background:'transparent',color:'#3D46F2',transition:'none'}}}>
-            搜索
+            {$t('搜索')}
           </IconButton>
           {!readOnly &&<IconButton name="file-text" onClick={replaceInCode}  sx={{color:'#333',transition:'none','&.MuiButtonBase-root:hover':{background:'transparent',color:'#3D46F2',transition:'none'}}}>
-           替代
+           {$t('替代')}
           </IconButton>}
         </Box></>
       ) : null}

@@ -7,7 +7,7 @@ import { getTime } from "../utils/dashboard";
 import ScrollableSection from "@common/components/aoplatform/ScrollableSection";
 import TimeRangeSelector, { RangeValue, TimeRange, TimeRangeButton } from "@common/components/aoplatform/TimeRangeSelector";
 import  MonitorTable, { MonitorTableHandler } from "./MonitorTable";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { DefaultOptionType } from "antd/es/select";
 import { useParams } from "react-router-dom";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
@@ -15,6 +15,7 @@ import { useExcelExport } from "@common/hooks/excel";
 import { API_TABLE_GLOBAL_COLUMNS_CONFIG } from "@dashboard/const/const";
 import { useFetch } from "@common/hooks/http";
 import { EntityItem } from "@common/const/type";
+import { $t } from "@common/locales";
 export type MonitorApiPageProps = {
     fetchTableData:(body:SearchBody)=>Promise<BasicResponse<{statistics:MonitorApiData[]}>>
     detailDrawerContent:React.ReactNode
@@ -55,7 +56,7 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
         if(code === STATUS_CODE.SUCCESS){
             setApiOptionList(data.apis?.map((x:EntityItem)=>({label:x.name, value:x.id})))
         }else{
-            message.error(msg || '获取数据失败，请重试')
+            message.error(msg || RESPONSE_TIPS.dataError)
             return setApiOptionList([])
         }
       }).catch(() => {
@@ -69,7 +70,7 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
         if(code === STATUS_CODE.SUCCESS){
             setProjectOptionList(data.projects?.map((x:EntityItem)=>({label:x.name, value:x.id})))
         }else{
-            message.error(msg || '获取数据失败，请重试')
+            message.error(msg || RESPONSE_TIPS.dataError)
             return setProjectOptionList([])
         }
       }).catch(() => {
@@ -110,9 +111,9 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
        fetchTableData(data).then((resp) => {
         const {code,data,msg} = resp
         if(code === STATUS_CODE.SUCCESS){
-          exportExcel('API调用统计', [query!.start!, query!.end!], 'API调用统计', 'dashboard_api', API_TABLE_GLOBAL_COLUMNS_CONFIG, data.statistics)
+          exportExcel($t('API调用统计'), [query!.start!, query!.end!], $t('API调用统计'), 'dashboard_api', API_TABLE_GLOBAL_COLUMNS_CONFIG, data.statistics)
         }else{
-            message.error(msg || '获取数据失败，请重试')
+            message.error(msg || RESPONSE_TIPS.dataError)
         }
       })
     };
@@ -134,7 +135,7 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
            if(code === STATUS_CODE.SUCCESS){
                return  {data:data.statistics?.map((x:MonitorApiData)=>{x.proxyRate = Number((x.proxyRate*100).toFixed(2));x.requestRate = Number((x.requestRate*100).toFixed(2));return x}), success: true}
            }else{
-               message.error(msg || '获取数据失败，请重试')
+               message.error(msg || RESPONSE_TIPS.dataError)
                return {data:[], success:false}
            }
          }).catch(() => {
@@ -150,7 +151,7 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
     }
     
     return (
-      <div className="h-[calc(100vh-140px)] overflow-hidden">
+      <div className="h-full overflow-hidden">
         <ScrollableSection>
           <div className="pl-btnbase pr-btnrbase pb-btnbase content-before">
             <TimeRangeSelector  
@@ -160,7 +161,7 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
               initialDatePickerValue={datePickerValue}
               onTimeRangeChange={handleTimeRangeChange}/>
             <div className="flex flex-nowrap items-center  pt-btnybase mr-btnybase">
-              <label className=" whitespace-nowrap inline-block">服务：</label>
+              <label className=" whitespace-nowrap inline-block">{$t('服务')}：</label>
               <Select
                 className="w-[346px]"
                 value={queryData?.projects}
@@ -168,7 +169,7 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
                 mode="multiple"
                 allowClear
                 maxCount={3}
-                placeholder="选择服务"
+                placeholder={$t("选择服务")}
                 onChange={(value)=>{setQueryData(prevData=>({...prevData || {}, projects:value}));getApiList(value)}}
               />
               </div>
@@ -181,22 +182,22 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
                   mode="multiple"
                   allowClear
                   maxCount={3}
-                  placeholder="选择API"
+                  placeholder={$t("选择API")}
                   onChange={(value)=>{setQueryData(prevData=>({...prevData || {}, apis:value}))}}
                 />
-                <label className="ml-btnybase whitespace-nowrap">路径：</label>
+                <label className="ml-btnybase whitespace-nowrap">{$t('路径')}：</label>
                 <div className="w-[346px] inline-block">
                   {/* <SearchInputGroup eoSingle={false} eoInputVal={queryData.path} eoClick={() => setQueryData({ ...queryData, path: '' })} /> */}
-                  <Input value={queryData?.path} onChange={(e) => debounce((e)=>{setQueryData(prevData=>({...prevData || {}, path:e.target.value}))}, 100)(e)}  allowClear placeholder='请输入请求路径进行搜索'  prefix={<SearchOutlined className="cursor-pointer"/>}/>
+                  <Input value={queryData?.path} onChange={(e) => debounce((e)=>{setQueryData(prevData=>({...prevData || {}, path:e.target.value}))}, 100)(e)}  allowClear placeholder={$t('请输入请求路径进行搜索')}  prefix={<SearchOutlined className="cursor-pointer"/>}/>
               </div>
               <Button className="ml-btnybase" onClick={clearSearch}>
-                重置
+                {$t('重置')}
               </Button>
               <Button  type="primary" loading={queryBtnLoading} className="ml-btnybase" onClick={()=>{setQueryBtnLoading(true);getApiTableList()}}>
-                查询
+                {$t('查询')}
               </Button>
               <Button className="ml-btnybase" loading={exportLoading} onClick={exportData}>
-                导出
+                {$t('导出')}
               </Button>
             </div>
           </div>
@@ -212,9 +213,9 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
           mask={!fullScreen} 
           title={<>
               {fullScreen && <a className="mr-btnrbase text-[14px]" onClick={()=>{setFullScreen?.(false)}}>
-                <CloseOutlined className="mr-[4px]"/>退出全屏
+                <CloseOutlined className="mr-[4px]"/>{$t('退出全屏')}
                 </a>}
-              <span className="mr-btnrbase">{detailEntityName}调用详情</span>
+              <span className="mr-btnrbase">{$t('(0)调用详情',[detailEntityName])}</span>
               {!fullScreen && <ExpandOutlined className="text-MAIN_TEXT hover:text-MAIN_HOVER_TEXT" onClick={()=>{setFullScreen?.(true)}}/>}
               </>} 
           width={fullScreen ? '100%' : '60%'} 

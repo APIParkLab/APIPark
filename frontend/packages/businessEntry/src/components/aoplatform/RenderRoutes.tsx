@@ -11,7 +11,6 @@ import {FC,lazy} from 'react';
 import { TeamProvider } from '@core/contexts/TeamContext.tsx';
 import SystemOutlet from '@core/pages/system/SystemOutlet.tsx';
 import { DashboardProvider } from '@core/contexts/DashboardContext.tsx';
-import { PartitionProvider } from '@core/contexts/PartitionContext.tsx';
 import { TenantManagementProvider } from '@market/contexts/TenantManagementContext.tsx';
 
 type RouteConfig = {
@@ -183,6 +182,11 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/publish/SystemInsidePublish.tsx')),
                                         children:[
                                             {
+                                                path:'',
+                                                key: uuidv4(),
+                                                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/publish/SystemInsidePublishList.tsx')),
+                                            },
+                                            {
                                                 path:'*',
                                                 key: uuidv4(),
                                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/publish/SystemInsidePublishList.tsx')),
@@ -202,6 +206,10 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                         ]
                     }
                 ]
+            },{
+                path:'dashboardsetting',
+                key: uuidv4(),
+                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/partitions/PartitionInsideDashboardSetting.tsx')),
             },
             {
                 path:'cluster',
@@ -339,16 +347,6 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                 key:uuidv4(),
             },
             {
-                path:'logretrieval',
-                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/logRetrieval/LogRetrieval.tsx')),
-                key:uuidv4(),
-            },
-            {
-                path:'auditlog',
-                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/auditLog/AuditLog.tsx')),
-                key:uuidv4(),
-            },
-            {
                 path:'assets',
                 component:<p>设计中</p>,
                 key:uuidv4()
@@ -394,7 +392,7 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                 key: uuidv4(),
                 children:[{
                     path:'template/:moduleId',
-                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '../../../../common/src/components/aoplatform/intelligent-plugin/IntelligentPluginList.tsx')),
+                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@common/components/aoplatform/intelligent-plugin/IntelligentPluginList.tsx')),
                     key:uuidv4()
                 }]
                 
@@ -405,10 +403,20 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                 key: uuidv4(),
                 children:[{
                     path:'template/:moduleId',
-                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '../../../../common/src/components/aoplatform/intelligent-plugin/IntelligentPluginList.tsx')),
+                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@common/components/aoplatform/intelligent-plugin/IntelligentPluginList.tsx')),
                     key:uuidv4()
                 }]
-                
+                  
+            },
+            {
+                path:'userProfile/*',
+                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/userProfile/UserProfile.tsx')),
+                key:uuidv4(),
+                children:[{
+                    path:'changepsw',
+                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/userProfile/ChangePsw.tsx')),
+                    key:uuidv4()
+                }]
             }
         ]
     },
@@ -433,7 +441,7 @@ const generateRoutes = (routerConfig: RouteConfig[]) => {
                 const LazyComponent = route.lazy as React.ExoticComponent<unknown>;
 
                 routeElement = (
-                    <Suspense fallback={ <div className=''><Skeleton className='m-btnbase w-[calc(100%-20px)]' active /></div>}>
+                    <Suspense fallback={ <div className=''><Skeleton className='m-btnbase w-calc-100vw-minus-padding-r' active /></div>}>
                         {route.provider ? (
                             createElement(route.provider, {}, <LazyComponent  />)
                         ) : (
