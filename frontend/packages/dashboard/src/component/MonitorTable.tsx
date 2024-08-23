@@ -73,7 +73,7 @@ const MonitorTable = forwardRef<MonitorTableHandler, MonitorTableProps<unknown>>
             valueType: 'option',
             render: (_: React.ReactNode, entity: unknown) => [
             // <TableBtnWithPermission  access="system.dashboard.self.view" key="view" onClick={()=>onRowClick(entity)} btnTitle="查看"/>,
-            <TableBtnWithPermission  access="" key="view" btnType="view"  onClick={()=>onRowClick(entity)} btnTitle="查看"/>,
+            APP_MODE === 'pro' ? <TableBtnWithPermission  access="" key="view" btnType="view"  onClick={()=>onRowClick(entity)} btnTitle="查看"/> : null
             ],
         }
     ]
@@ -86,7 +86,7 @@ const MonitorTable = forwardRef<MonitorTableHandler, MonitorTableProps<unknown>>
             besidesTableHeight={inModal ? 64+56+258: undefined}
             ref={tableRef}
             showPagination={showPagination}
-            columns = {[...(TableType[type] || []),...(APP_MODE === 'pro' ? operation : [])]}
+            columns = {[...(TableType[type] || []),...operation]}
             request={getTableDataSource}
             dataSource={tableListDataSource}
             // tableClickAccess="system.dashboard.self.view"

@@ -165,7 +165,7 @@ export const TEAM_MEMBER_MODAL_TABLE_COLUMNS:ColumnsType<MemberItem> = [
         getItem($t('管理'), 'grp', null,
             [
                 getItem(<Link to="member">{$t('成员')}</Link>, 'member',undefined, undefined, undefined,'team.team.member.view'),
-                getItem(<Link to="setting">{$t('设置')}</Link>, 'setting',undefined,undefined,undefined,'team.team.team.edit')],
+                getItem(<Link to="setting">{$t('设置')}</Link>, 'setting',undefined,undefined,undefined,'team.team.team.view')],
             'group'),
     ];
     

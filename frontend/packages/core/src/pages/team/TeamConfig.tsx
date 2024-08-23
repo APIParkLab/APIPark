@@ -1,4 +1,4 @@
-import  { forwardRef, useEffect, useImperativeHandle, useState} from "react";
+import  { forwardRef, useEffect, useImperativeHandle, useMemo, useState} from "react";
 import {App, Button, Form, Input, Row, Select} from "antd";
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
@@ -34,8 +34,12 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
     const [managerOption, setManagerOption] = useState<DefaultOptionType[]>([])
     const { setBreadcrumb} = useBreadcrumb()
     const { setTeamInfo } =useTeamContext()
-    const {checkPermission} = useGlobalContext()
-    const pageType= checkPermission('system.organization.team.view') ? 'manage' : 'myteam'
+    const {checkPermission,accessInit} = useGlobalContext()
+    const pageType= useMemo(()=>{
+        if(!accessInit) return 'myteam'
+        return checkPermission('system.organization.team.view') ? 'manage' : 'myteam'
+    },[checkPermission,accessInit]) 
+    
     const [canDelete, setCanDelete] = useState<boolean>(false)
     const navigateTo = useNavigate()
     useImperativeHandle(ref, () => ({
