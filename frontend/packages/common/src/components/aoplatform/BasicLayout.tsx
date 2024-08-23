@@ -46,15 +46,16 @@ const themeToken = {
      const mainPage = project === 'core' ?'/service/list':'/serviceHub/list'
 
    const TOTAL_MENU_ITEMS:MenuProps['items'] =  useMemo(() => [
-    getNavItem($t('工作空间'), 'workspace','/tenantManagement',<Icon icon="ic:baseline-space-dashboard" width="18" height="18"/>, [
-      getNavItem($t('我的'), 'my','/tenantManagement',null,[
+    getNavItem($t('工作空间'), 'workspace','/guide',<Icon icon="ic:baseline-space-dashboard" width="18" height="18"/>, [
+      getNavItem($t('我的'), 'my','/guide',null,[
+        getNavItem(<a>{$t('首页')}</a>, 'guide','/guide',<Icon icon="ic:baseline-home" width="18" height="18"/>,undefined,undefined,''),
         getNavItem(<a>{$t('应用')}</a>, 'tenantManagement','/tenantManagement',<Icon icon="ic:baseline-apps" width="18" height="18"/>,undefined,undefined,''),
         getNavItem(<a>{$t('服务')}</a>, 'service','/service',<Icon icon="ic:baseline-blinds-closed" width="18" height="18"/>,undefined,undefined,''),
         getNavItem(<a>{$t('团队')}</a>, 'team','/team',<Icon icon="ic:baseline-people-alt" width="18" height="18"/>,undefined,undefined,''),
       ],undefined,''),
-        getNavItem(<a>{$t('API 市场')}</a>, 'serviceHub','/serviceHub',<Icon icon="ic:baseline-hub" width="18" height="18"/>,undefined,undefined,'system.workspace.api_market.view'),
     ]),
-  
+    getNavItem(<a>{$t('API 市场')}</a>, 'serviceHub','/serviceHub',<Icon icon="ic:baseline-hub" width="18" height="18"/>,undefined,undefined,'system.workspace.api_market.view'),
+
      getNavItem($t('仪表盘'), 'mainPage', APP_MODE === 'pro' ? '/dashboard' : '/dashboard/total',<Icon icon="ic:baseline-bar-chart" width="18" height="18"/>,[
       getNavItem(<a >{$t('运行视图')}</a>, 'dashboard',APP_MODE === 'pro' ? '/dashboard' : '/dashboard/total' ,<ProjectFilled />,undefined,undefined,'system.dashboard.dashboard.view'),
       APP_MODE === 'pro' ? getNavItem(<a >{$t('系统拓扑图')}</a>, 'systemrunning','/systemrunning',<ProjectFilled />,undefined,undefined,'system.dashboard.systemrunning.view') : null,
@@ -119,7 +120,6 @@ const themeToken = {
     
         // 初始过滤操作
         const res = [...TOTAL_MENU_ITEMS]!.filter(x => x).map((x: any) => (x.routes ? { ...x, routes: filterMenu(x.routes) } : x));
-        console.log(res)
         // 返回处理后的数据
         return { path: '/', routes: res.map(x=> ({...x, routes: x.routes?.filter(x=> (x.access || x.routes?.length > 0))})).filter(x=> (x.access || x.routes?.length > 0)) };
     }, [accessData, state.language]);

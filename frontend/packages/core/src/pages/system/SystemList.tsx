@@ -142,7 +142,7 @@ const SystemList:FC = ()=>{
       
     return (
           <div className="h-full w-full pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B">
-                <Joyride steps={steps} run={true} />
+                {/* <Joyride steps={steps} run={true} /> */}
             <PageList
                 id="global_system"
                 ref={pageListRef}

@@ -276,8 +276,9 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                 />}
               </div>
               {/* 折线图区域 */}
-                {/* 调用量统计折线图 */}
-                {invokeStaticError ? <Empty className="pt-[80px] m-btnbase mb-[16px] h-[200px] bg-MAIN_BG" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无调用量统计数据")}/>: <MonitorLineGraph
+              <div className=" px-btnbase  mt-[12px] mb-[16px] grid gap-[20px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(570px, 1fr))'}}>
+              {/* 调用量统计折线图 */}
+                {invokeStaticError ? <Empty className="pt-[80px]  mb-[16px] h-[200px] bg-MAIN_BG" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无调用量统计数据")}/>: <MonitorLineGraph
                 className=" bg-MAIN_BG pt-[16px]"
                   lineData={invokeStatic}
                   titles={[$t('调用量统计')]}
@@ -285,13 +286,14 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   type="invoke"
                 />}
                 {/* 报文量统计折线图 */}
-                {trafficStaticError ? <Empty className=" bg-MAIN_BG pt-[80px] m-btnbase mb-0 h-[200px]" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无报文量统计数据")}/>:<MonitorLineGraph
+                {trafficStaticError ? <Empty className=" bg-MAIN_BG pt-[80px]  mb-0 h-[200px]" image={Empty.PRESENTED_IMAGE_SIMPLE} description={$t("暂无报文量统计数据")}/>:<MonitorLineGraph
                 className=" bg-MAIN_BG pt-[16px]"
                 lineData={trafficStatic}
                   titles={[$t('报文量统计')]}
                   yAxisTitle={timeUnit || '-'}
                   type="traffic"
                 />}
+                </div>
               {/* 表格区域 */}
               <div className="bg-MAIN_BG pt-[4px] m-btnbase mt-[16px] rounded">
                 <Tabs defaultActiveKey={'total'} items={monitorTopDataTabItems} destroyInactiveTabPane={true} className="h-auto mt-[4px] not-top-border-table not-top-padding-table mx-[12px]" size="small"  tabBarStyle={{paddingLeft:'10px',marginTop:'0px',marginBottom:'0px'}} />
