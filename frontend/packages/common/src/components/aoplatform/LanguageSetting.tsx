@@ -5,7 +5,7 @@ import { memo, useEffect, useMemo } from 'react';
 import { useGlobalContext } from '@common/contexts/GlobalStateContext';
 import { Icon } from '@iconify/react/dist/iconify.js';
 
-const LanguageSetting = () => {
+const LanguageSetting = ({mode = 'light'}:{mode?:'dark'|'light'}) => {
     const { dispatch,state} = useGlobalContext()
     const items = [
     {
@@ -44,7 +44,7 @@ const LanguageSetting = () => {
         }
       }}
     >
-       <Button  className=" text-[#ffffffb3] hover:text-[#fff] border-none" type="default" ghost >
+       <Button  className={`border-none ${mode==='dark' ? "text-[#333] hover:text-[#333333b3]" : "text-[#ffffffb3] hover:text-[#fff] "}`}  type="default" ghost >
           <span className='flex items-center gap-[8px]'> <Icon icon="ic:baseline-language" width="14" height="14"/>{langLabel}</span>
         </Button> 
     </Dropdown>
