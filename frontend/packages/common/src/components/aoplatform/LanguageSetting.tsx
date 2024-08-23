@@ -1,7 +1,7 @@
 import { Dropdown, Row, Col, Button } from 'antd';
 import i18n from '@common/locales';
 import { $t } from '@common/locales';
-import { memo } from 'react';
+import { memo, useEffect, useMemo } from 'react';
 import { useGlobalContext } from '@common/contexts/GlobalStateContext';
 import { Icon } from '@iconify/react/dist/iconify.js';
 
@@ -24,7 +24,12 @@ const LanguageSetting = () => {
     }
   ];
 
-  const langLabel = items.find((item) => item?.key === state.language)?.title;
+  const langLabel = useMemo(()=>items.find((item) => item?.key === state.language)?.title,[state.language])
+
+  useEffect(()=>{
+    sessionStorage.getItem('i18nextLng') && dispatch({ type: 'UPDATE_LANGUAGE',  language: sessionStorage.getItem('i18nextLng') as 'en' | 'cn'  });
+  },[
+  ])
   return (
     <Dropdown
       trigger={['hover']}
@@ -35,6 +40,7 @@ const LanguageSetting = () => {
           const { key } = e;
           dispatch({ type: 'UPDATE_LANGUAGE',  language: key  });
           i18n.changeLanguage(key);
+          // window.location.reload()
         }
       }}
     >
