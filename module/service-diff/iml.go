@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	
+
 	"github.com/APIParkLab/APIPark/service/api"
 	"github.com/APIParkLab/APIPark/service/cluster"
 	"github.com/APIParkLab/APIPark/service/release"
@@ -26,9 +26,9 @@ func (m *imlServiceDiff) Diff(ctx context.Context, serviceId string, baseRelease
 	if targetRelease == "" {
 		return nil, fmt.Errorf("target release is required")
 	}
-	
+
 	var target *projectInfo
-	
+
 	targetReleaseValue, err := m.releaseService.GetRelease(ctx, targetRelease)
 	if err != nil {
 		return nil, fmt.Errorf("get target release  failed:%w", err)
@@ -36,7 +36,7 @@ func (m *imlServiceDiff) Diff(ctx context.Context, serviceId string, baseRelease
 	if targetReleaseValue.Service != serviceId {
 		return nil, errors.New("project not match")
 	}
-	
+
 	target, err = m.getReleaseInfo(ctx, targetRelease)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (m *imlServiceDiff) Diff(ctx context.Context, serviceId string, baseRelease
 	})
 	diff := m.diff(clusterIds, base, target)
 	return diff, nil
-	
+
 }
 func (m *imlServiceDiff) getBaseInfo(ctx context.Context, serviceId, baseRelease string) (*projectInfo, error) {
 	if baseRelease == "" {
@@ -72,16 +72,16 @@ func (m *imlServiceDiff) getBaseInfo(ctx context.Context, serviceId, baseRelease
 	if err != nil {
 		return nil, fmt.Errorf("get base release info failed:%w", err)
 	}
-	
+
 	return base, nil
 }
 func (m *imlServiceDiff) DiffForLatest(ctx context.Context, serviceId string, baseRelease string) (*service_diff.Diff, bool, error) {
-	
+
 	apis, err := m.apiService.ListForService(ctx, serviceId)
 	if err != nil {
 		return nil, false, err
 	}
-	
+
 	apiIds := utils.SliceToSlice(apis, func(i *api.API) string {
 		return i.UUID
 	})
@@ -97,12 +97,12 @@ func (m *imlServiceDiff) DiffForLatest(ctx context.Context, serviceId string, ba
 	if err != nil {
 		return nil, false, err
 	}
-	
+
 	upstreamCommits, err := m.upstreamService.ListLatestCommit(ctx, serviceId)
 	if err != nil {
 		return nil, false, err
 	}
-	
+
 	base, err := m.getBaseInfo(ctx, serviceId, baseRelease)
 	if err != nil {
 		return nil, false, err
@@ -128,7 +128,7 @@ func (m *imlServiceDiff) getReleaseInfo(ctx context.Context, releaseId string) (
 	if err != nil {
 		return nil, err
 	}
-	
+
 	apiIds := utils.SliceToSlice(commits, func(i *release.ProjectCommits) string {
 		return i.Target
 	}, func(c *release.ProjectCommits) bool {
@@ -187,14 +187,14 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 	baseAPIDoc := utils.SliceToMap(base.apiDocs, func(i *commit.Commit[api.Document]) string {
 		return i.Target
 	})
-	
+
 	targetApiProxy := utils.SliceToMap(target.apiCommits, func(i *commit.Commit[api.Proxy]) string {
 		return i.Target
 	})
 	targetAPIDoc := utils.SliceToMap(target.apiDocs, func(i *commit.Commit[api.Document]) string {
 		return i.Target
 	})
-	
+
 	for _, apiInfo := range target.apis {
 		apiId := apiInfo.UUID
 		a := &service_diff.ApiDiff{
@@ -204,7 +204,7 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 			Path:   apiInfo.Path,
 			Status: service_diff.Status{},
 		}
-		
+
 		pc, hasPc := targetApiProxy[apiId]
 		dc, hasDC := targetAPIDoc[apiId]
 		if !hasPc {
@@ -215,12 +215,12 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 			// 未设置文档
 			a.Status.Doc = service_diff.StatusUnset
 		}
-		
+
 		if !baseApis.Has(apiId) {
 			a.Change = service_diff.ChangeTypeNew
 		} else {
 			a.Change = service_diff.ChangeTypeNone
-			
+
 			baseProxy, hasBaseProxy := baseApiProxy[apiId]
 			baseDoc, hasBaseDoc := baseAPIDoc[apiId]
 			if hasBaseDoc != hasDC || hasBaseProxy != hasPc {
@@ -232,7 +232,7 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 			}
 		}
 		out.Apis = append(out.Apis, a)
-		
+
 	}
 	baseApis.Remove(utils.SliceToSlice(out.Apis, func(i *service_diff.ApiDiff) string {
 		return i.APi
@@ -248,7 +248,7 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 				Change: service_diff.ChangeTypeDelete,
 			})
 		}
-		
+
 	}
 	// upstream diff
 	targetUpstreamMap := utils.SliceToMap(target.upstreamCommits, func(i *commit.Commit[upstream.Config]) string {
@@ -257,12 +257,12 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 	baseUpstreamMap := utils.SliceToMap(base.upstreamCommits, func(i *commit.Commit[upstream.Config]) string {
 		return fmt.Sprintf("%s-%s", i.Target, i.Key)
 	})
-	
+
 	for _, partitionId := range partitions {
 		key := fmt.Sprintf("%s-%s", target.id, partitionId)
 		o := &service_diff.UpstreamDiff{
 			Upstream: target.id,
-			//Partition: partitionId,
+			//Cluster: partitionId,
 			Data:   nil,
 			Change: service_diff.ChangeTypeNone,
 			Status: 0,
@@ -277,7 +277,7 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 			} else if tu.UUID != bu.UUID {
 				o.Change = service_diff.ChangeTypeUpdate
 			}
-			
+
 		} else {
 			o.Status = service_diff.StatusLoss
 			if hasBu {
@@ -285,12 +285,12 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 			}
 		}
 	}
-	
+
 	return out
 }
 
 func (m *imlServiceDiff) Out(ctx context.Context, diff *service_diff.Diff) (*DiffOut, error) {
-	
+
 	clusters, err := m.clusterService.List(ctx, diff.Clusters...)
 	if err != nil {
 		return nil, err
@@ -298,7 +298,7 @@ func (m *imlServiceDiff) Out(ctx context.Context, diff *service_diff.Diff) (*Dif
 	if len(clusters) == 0 {
 		return nil, fmt.Errorf("unset gateway for clusters %v", diff.Clusters)
 	}
-	
+
 	out := &DiffOut{}
 	out.Apis = utils.SliceToSlice(diff.Apis, func(i *service_diff.ApiDiff) *ApiDiffOut {
 		return &ApiDiffOut{
@@ -310,10 +310,10 @@ func (m *imlServiceDiff) Out(ctx context.Context, diff *service_diff.Diff) (*Dif
 			Status: i.Status,
 		}
 	})
-	
+
 	for _, u := range diff.Upstreams {
 		typeValue := u.Data.Type
-		
+
 		if typeValue == "" {
 			typeValue = "static"
 		}
