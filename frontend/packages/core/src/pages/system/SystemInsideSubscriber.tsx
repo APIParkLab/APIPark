@@ -25,7 +25,7 @@ const SystemInsideSubscriber:FC = ()=>{
     const addRef = useRef<SystemSubscriberConfigHandle>(null)
     const pageListRef = useRef<ActionType>(null);
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
     const getSystemSubscriber = ()=>{
         return fetchData<BasicResponse<{subscribers:SystemSubscriberTableListItem[]}>>('service/subscribers',{method:'GET',eoParams:{service:serviceId,team:teamId},eoTransformKeys:['apply_time']}).then(response=>{
             const {code,data,msg} = response
@@ -136,8 +136,8 @@ const SystemInsideSubscriber:FC = ()=>{
     }, [serviceId]);
 
     const columns = useMemo(()=>{
-        return SYSTEM_SUBSCRIBER_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){x.valueEnum = memberValueEnum} return x})
-    },[memberValueEnum])
+        return SYSTEM_SUBSCRIBER_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){x.valueEnum = memberValueEnum} return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+    },[memberValueEnum,state.language])
 
     return (
         <PageList

@@ -27,6 +27,7 @@ import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { SimpleMemberItem } from "@common/const/type.ts";
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission.tsx";
 import { $t } from "@common/locales";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 export default function ApprovalList({pageType,pageStatus}:{pageType:'subscribe'|'release',pageStatus:0|1}){
     const { modal,message } = App.useApp()
@@ -41,6 +42,7 @@ export default function ApprovalList({pageType,pageStatus}:{pageType:'subscribe'
     const publishRef = useRef<PublishApprovalModalHandle>(null)
     const [approvalBtnLoading,setApprovalBtnLoading] = useState<boolean>(false)
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
+    const {state} = useGlobalContext()
 
     const getApprovalList = ()=>{
         if(!tableHttpReload){
@@ -152,8 +154,8 @@ export default function ApprovalList({pageType,pageStatus}:{pageType:'subscribe'
     const columns = useMemo(()=>{
         const newCol = [...(pageType === 'subscribe'? SUBSCRIBE_APPROVAL_TABLE_COLUMN:PUBLISH_APPROVAL_TABLE_COLUMN)]
         const res = pageStatus === 0 ? newCol.filter((x)=>TODO_LIST_COLUMN_NOT_INCLUDE_KEY.indexOf(x.dataIndex as string) === -1): newCol
-        return res
-    },[pageType,pageStatus])
+        return res.map(x=>({...x, title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}))
+    },[pageType,pageStatus, state.language])
 
 
     const manualReloadTable = () => {

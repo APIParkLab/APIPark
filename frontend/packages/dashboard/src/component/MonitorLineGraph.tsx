@@ -5,6 +5,7 @@ import { InvokeData, LineGraphType, MessageData } from '@dashboard/const/type';
 import {  MONITOR_LINE_CHART_BASIC_INVOKE_SELECTED, MONITOR_LINE_CHART_BASIC_MESSAGE_SELECTED, MONITOR_LINE_CHART_OPTION_CONFIG, MONITOR_NAME_MAP } from '@dashboard/const/const';
 import { yUnitFormatter } from '../utils/dashboard';
 import { $t } from '@common/locales';
+import { useGlobalContext } from '@common/contexts/GlobalStateContext';
 
 type LineGraphProps = {
   className?:string
@@ -22,6 +23,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
   const [legendSelected, setLegendSelected] = useState<Record<string,boolean>>(type === 'traffic' ? {...MONITOR_LINE_CHART_BASIC_MESSAGE_SELECTED}:{...MONITOR_LINE_CHART_BASIC_INVOKE_SELECTED})
   const chartRef = useRef<ECharts>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const {state} = useGlobalContext()
   
   const handleWindowResize = () => {
     // 直接使用引用中的实例和DOM元素
@@ -349,7 +351,8 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     ...MONITOR_LINE_CHART_OPTION_CONFIG,
     legend: {
       orient: 'horizontal',
-      top: '50',
+      top: '40',
+      left:'16',
       selected: {
         转发总数: true,
         转发成功率: true,
@@ -426,7 +429,8 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     ...MONITOR_LINE_CHART_OPTION_CONFIG,
     legend: {
       orient: 'horizontal',
-      top: '50',
+      top: '40',
+      left:'16',
       selected: {
         转发总数: true,
         转发成功率: true,
@@ -599,8 +603,8 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     ...MONITOR_LINE_CHART_OPTION_CONFIG,
     legend: {
       orient: 'horizontal',
-      top: '50',
-      left:'10',
+      top: '40',
+      left:'16',
       selected: {...MONITOR_LINE_CHART_BASIC_MESSAGE_SELECTED}
     },
     grid: {
@@ -627,7 +631,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     },
     yAxis: [{
       type: 'value',
-      name: (lineData as MessageData)?.date.length > 0 ? `${yAxisTitle}报文量（KB）` : '',
+      name: (lineData as MessageData)?.date.length > 0 ? `${yAxisTitle}${$t('报文量')}（KB）` : '',
       nameLocation: 'end',
       nameTextStyle: {
         align: 'left'
@@ -687,10 +691,11 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
 
       option.title = {
         text: titles[0],
-        left: '10',
+        left: '16',
         textStyle: {
           fontSize: 16,
-          color: '#666666'
+          color: '#666666',
+          fontWeight:'normal',
         }
       }
        // 当勾选请求成功率或转发成功率其中之一时，显示右侧y轴
@@ -708,7 +713,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     }
     return getOption()
 
-  },[compare, type,lineData,yAxisTitle,titles,legendSelected])
+  },[compare, type,lineData,yAxisTitle,titles,legendSelected, state.language])
 
 
 

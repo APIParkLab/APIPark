@@ -1,6 +1,6 @@
 import { App} from "antd";
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx";
-import  { useEffect, useRef,} from "react";
+import  { useEffect, useMemo, useRef,} from "react";
 import {ActionType} from "@ant-design/pro-components";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
@@ -21,7 +21,7 @@ const RoleList = ()=>{
     const { setBreadcrumb } = useBreadcrumb()
     const {fetchData} = useFetch()
     const pageListRef = useRef<ActionType>(null);
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
     const navigateTo = useNavigate()
 
     const operation:(type:string)=>PageProColumns<RoleTableListItem>[] =(type:string)=>[
@@ -45,7 +45,7 @@ const RoleList = ()=>{
         return fetchData<BasicResponse<{roles:RoleTableListItem[]}>>(`${group}/roles`,{method:'GET'}).then(response=>{
             const {code,data,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                return  {data:data.roles, success: true}
+                return  {data:data.roles?.map((x:RoleTableListItem)=>({...x,name:$t(x.name)})), success: true}
             }else{
                 message.error(msg || RESPONSE_TIPS.error)
                 return {data:[], success:false}
@@ -117,6 +117,8 @@ const RoleList = ()=>{
                 title: $t('角色')}])
     }, []);
 
+    const columns = useMemo(()=>ROLE_TABLE_COLUMNS.map((x)=>({...x, title:typeof x.title  === 'string' ? $t(x.title as string) : x.title})),[state.language])
+
     return (<>
         <InsidePage 
             className="pb-PAGE_INSIDE_B overflow-y-auto"
@@ -131,7 +133,7 @@ const RoleList = ()=>{
                         id="global_role"
                         tableClass="role_table  mb-btnrbase"
                         ref={pageListRef}
-                        columns={[...ROLE_TABLE_COLUMNS as PageProColumns<RoleTableListItem, "text">[], ...operation('system')]}
+                        columns={[...columns as PageProColumns<RoleTableListItem, "text">[], ...operation('system')]}
                         request={()=>getRoleList('system')}
                         addNewBtnTitle={$t("添加角色")}
                         showPagination={false}

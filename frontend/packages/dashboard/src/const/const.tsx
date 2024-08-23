@@ -247,7 +247,8 @@ export const MONITOR_LINE_CHART_BASIC_MESSAGE_SELECTED = {
 export const MONITOR_LINE_CHART_OPTION_CONFIG : EChartsOption = {
   legend: {
     orient: 'horizontal',
-    top: '50',
+    top: '40',
+    left:'16',
     selected: MONITOR_LINE_CHART_BASIC_INVOKE_SELECTED
   },
   tooltip: {

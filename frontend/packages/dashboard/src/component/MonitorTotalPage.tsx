@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useState, useEffect, useRef, useReducer } from "react";
 import { useParams } from "react-router-dom";
-import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { SummaryPieData, SearchBody, PieData, MonitorApiData, MonitorSubscriberData, InvokeData, MessageData } from "@dashboard/const/type";
 import { getTime, getTimeUnit, changeNumberUnit } from "../utils/dashboard";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
@@ -119,8 +119,8 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   setPieError(false)
                   setRequestStatic(data.requestSummary)
                   setProxyStatic(data.proxySummary)
-                  setRequestPie({ 请求成功数: data.requestSummary.success, 请求失败数: data.requestSummary.fail })
-                  setProxyPie({ 转发成功数: data.proxySummary.success, 转发失败数: data.proxySummary.fail })
+                  setRequestPie({ [('请求成功数')]: data.requestSummary.success, [('请求失败数')]: data.requestSummary.fail })
+                  setProxyPie({ [('转发成功数')]: data.proxySummary.success, [('转发失败数')]: data.proxySummary.fail })
                   setPieError(false)
                   // this.requestPieRef?.changePieChart()
                   // this.proxyPieRef?.changePieChart()

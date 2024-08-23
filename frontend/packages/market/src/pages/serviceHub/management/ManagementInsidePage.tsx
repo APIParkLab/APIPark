@@ -13,6 +13,8 @@ import { useTenantManagementContext } from "@market/contexts/TenantManagementCon
 import { ManagementConfigFieldType } from "./ManagementConfig";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 import { $t } from "@common/locales";
+import { getItem } from "@common/utils/navigation";
+import { MenuItemType } from "antd/es/menu/interface";
 
 export default function ManagementInsidePage(){
     const { message } = App.useApp()
@@ -25,8 +27,14 @@ export default function ManagementInsidePage(){
     const [openKeys, setOpenKeys] = useState<string[]>([])
     const [loading, setLoading] = useState<boolean>(false)
     const {appName,setAppName} = useTenantManagementContext()
-    const {getTeamAccessData,cleanTeamAccessData} = useGlobalContext()
+    const {getTeamAccessData,cleanTeamAccessData,state} = useGlobalContext()
     
+    const TENANT_MANAGEMENT_APP_MENU: MenuProps['items'] = useMemo(()=>[
+        getItem($t('订阅的服务'), 'service'),
+        getItem($t('访问授权'), 'authorization'),
+        getItem($t('应用管理'), 'setting'),
+    ],[state.language]) 
+
     const menuData = useMemo(()=>{
         return  TENANT_MANAGEMENT_APP_MENU
     },[])
