@@ -21,7 +21,7 @@ export const STATUS_COLOR = {
 
 // avoid changing route within ths same category
 export const routerKeyMap = new Map<string, string[]|string>([
-    ['workspace',['tenantManagement','service','team','serviceHub']],
+    ['workspace',['tenantManagement','service','team','guide']],
     ['my',['tenantManagement','service','team']],
     ['mainPage',['dashboard','systemrunning']],
     ['operationCenter',['member','user','role','servicecategories']],
