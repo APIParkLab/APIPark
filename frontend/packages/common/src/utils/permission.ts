@@ -12,7 +12,6 @@ export const checkAccess:(access:AccessDataType, accessData:Map<string,string[]>
         console.warn('权限字段有误：',access)
         return false
     }
-    console.log(access, PERMISSION_DEFINITION)
     const neededBackendAccessArr = PERMISSION_DEFINITION[0]?.[access]?.granted?.anyOf[0].backend || []
     return accessData?.has(accLevel)&& accessData.get(accLevel)!.length > 0 ? hasIntersection(neededBackendAccessArr, accessData.get(accLevel)!) : false
 }

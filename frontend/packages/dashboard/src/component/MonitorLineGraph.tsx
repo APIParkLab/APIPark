@@ -600,6 +600,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     legend: {
       orient: 'horizontal',
       top: '50',
+      left:'10',
       selected: {...MONITOR_LINE_CHART_BASIC_MESSAGE_SELECTED}
     },
     grid: {
@@ -686,11 +687,10 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
 
       option.title = {
         text: titles[0],
-        left: 'center',
-        top: '0',
+        left: '10',
         textStyle: {
           fontSize: 16,
-          fontWeight: 500
+          color: '#666666'
         }
       }
        // 当勾选请求成功率或转发成功率其中之一时，显示右侧y轴
@@ -722,7 +722,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
   // }, 400), []);
   
   return (
-    <div ref={containerRef} className={`${className} m-btnbase mb-mbase rounded`}>
+    <div ref={containerRef} className={`${className}  mb-mbase rounded`}>
       <ECharts ref={chartRef} option={option} style={{ height: compare ? '672px' :'320px', width: '100%',minWidth:'300px' }} onEvents={{'legendselectchanged':handleLegendSelectChange}}/>
     </div>
     )

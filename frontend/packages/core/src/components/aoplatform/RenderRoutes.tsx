@@ -12,6 +12,7 @@ import {FC,lazy} from 'react';
 import { TeamProvider } from '@core/contexts/TeamContext.tsx';
 import SystemOutlet from '@core/pages/system/SystemOutlet.tsx';
 import { TenantManagementProvider } from '@market/contexts/TenantManagementContext.tsx';
+import  Guide  from '@core/pages/guide/Guide';
 
 type RouteConfig = {
     path:string
@@ -59,9 +60,14 @@ const PUBLIC_ROUTES:RouteConfig[] = [
         component:<ProtectedRoute/>,
         key: uuidv4(),
         children:[
+            // {
+            //     path:'approval/*',
+            //     component:<ApprovalPage />,
+            //     key:uuidv4()
+            // },
             {
-                path:'approval/*',
-                component:<ApprovalPage />,
+                path:'guide/*',
+                component:<Guide />,
                 key:uuidv4()
             },
             {
