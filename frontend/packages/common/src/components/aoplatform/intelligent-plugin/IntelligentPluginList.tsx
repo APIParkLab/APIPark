@@ -1,6 +1,6 @@
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx";
 import {App, Divider, Spin} from "antd";
-import  {useEffect, useRef, useState} from "react";
+import  {useEffect, useMemo, useRef, useState} from "react";
 import { useLocation, useOutletContext, useParams} from "react-router-dom";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {ActionType, ParamsType} from "@ant-design/pro-components";
@@ -15,6 +15,7 @@ import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPe
 import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter.tsx";
 import { LoadingOutlined } from "@ant-design/icons";
 import { $t } from "@common/locales/index.ts";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 
  type DynamicTableField = {
     name: string,
@@ -106,6 +107,7 @@ export default function IntelligentPluginList(){
     const [drawerLoading, setDrawerLoading] = useState<boolean>(false)
     const location = useLocation().pathname
     const {accessPrefix} = useOutletContext<{accessPrefix:string}>()
+    const {state} = useGlobalContext()
 
 
     const getIntelligentPluginTableList=(params:ParamsType & {
@@ -154,6 +156,8 @@ export default function IntelligentPluginList(){
             }).catch((e)=>{console.warn(e);
                 return ({ data: [], success: false });})
     }
+
+    const translatedCol = useMemo(()=>columns.map(x=>({...x, title:typeof x.title  === 'string' ? $t(x.title as string) : x.title})),[columns,state.language])
 
     const getConfig = (data:DynamicTableConfig)=>{
         const {basic,list } = data
@@ -315,7 +319,7 @@ export default function IntelligentPluginList(){
     return (<>
     <PageList
             ref={pageListRef}
-            columns = {[...columns,...operation]}
+            columns = {[...translatedCol,...operation]}
             request={(params)=>getIntelligentPluginTableList(params)}
             addNewBtnTitle={$t('添加(0)',[$t(pluginName)])}
             searchPlaceholder={$t('搜索(0)名称',[$t(pluginName)])}

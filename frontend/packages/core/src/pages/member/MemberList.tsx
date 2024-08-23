@@ -1,5 +1,5 @@
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx";
-import  {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
+import  {forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
 import {  useOutletContext, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import {ActionType } from "@ant-design/pro-components";
@@ -119,7 +119,7 @@ const MemberList = ()=>{
     const { setBreadcrumb } = useBreadcrumb()
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [departmentValueEnum,setDepartmentValueEnum] = useState<ColumnFilterItem[] >([])
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
     const [columns,setColumns] = useState<PageProColumns<MemberTableListItem>[]>([])
 
     const operation:PageProColumns<MemberTableListItem>[] =[
@@ -332,7 +332,7 @@ const MemberList = ()=>{
                                     className="w-full"
                                     mode="multiple"
                                     value={entity.roles?.map((x:EntityItem)=>x.id)}
-                                    options={data.roles?.map((x:{id:string,name:string})=>({label:x.name, value:x.id}))}
+                                    options={data.roles?.map((x:{id:string,name:string})=>({label:$t(x.name), value:x.id}))}
                                     onChange={(value)=>{
                                         changeMemberInfo(value,entity ).then((res)=>{
                                             if(res) manualReloadTable()
@@ -354,12 +354,14 @@ const MemberList = ()=>{
         })
     }
 
+    const translatedCol = useMemo(()=>columns?.map(x=>({...x, title:typeof x.title  === 'string' ? $t(x.title as string) : x.title})), [columns, state.language])
+
     return (
         <>
         <PageList
             id="global_member"
             ref={pageListRef}
-            columns={[...columns, ...operation]}
+            columns={[...translatedCol, ...operation]}
             request={()=>getMemberList()}
             addNewBtnTitle={(!memberGroupId ||['unknown','disable'].indexOf(memberGroupId?.toString()) === -1)?$t("添加账号") : ""}
             searchPlaceholder={$t("输入用户名、邮箱查找成员")}

@@ -21,6 +21,7 @@ export default function Guide(){
                 <p>{$t("如果你喜欢我们的产品，欢迎给我们 Star 或提供产品反馈意见。")}</p>
             </div>}
             showBorder={false}
+            scrollPage={false}
             contentClassName=" pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B"
             >
                 {showGuide && 
@@ -28,7 +29,7 @@ export default function Guide(){
                 size="large"
                 expandIconPosition='end'
                 defaultActiveKey={['1']}
-                className="bg-[linear-gradient(153.41deg,rgba(244,245,255,1)_0.23%,rgba(255,255,255,1)_83.32%)] rounded-[10px] h-full [&>.ant-collapse-item]:h-full [&>.ant-collapse-item]:flex [&>.ant-collapse-item]:flex-col  [&>.ant-collapse-item>.ant-collapse-content]:bg-transparent [&>.ant-collapse-item>.ant-collapse-content]:overflow-auto "
+                className="bg-[linear-gradient(153.41deg,rgba(244,245,255,1)_0.23%,rgba(255,255,255,1)_83.32%)] rounded-[10px]  [&>.ant-collapse-item>.ant-collapse-content]:bg-transparent  "
                 items={[{ key: '1', 
                             label: 
                                 <div className="">

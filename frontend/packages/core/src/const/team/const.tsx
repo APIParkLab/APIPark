@@ -6,12 +6,12 @@ import { getItem } from "@common/utils/navigation";
 import { SystemTableListItem } from "../system/type";
 import { MenuProps } from "antd/lib";
 import { Link } from "react-router-dom";
-import { $t } from "@common/locales";
+
 import { PageProColumns } from "@common/components/aoplatform/PageList";
 
 export const TEAM_TABLE_COLUMNS: PageProColumns<TeamTableListItem>[] = [
     {
-        title:$t('名称'),
+        title:('名称'),
         dataIndex: 'name',
         ellipsis:true,
         width:160,
@@ -21,18 +21,18 @@ export const TEAM_TABLE_COLUMNS: PageProColumns<TeamTableListItem>[] = [
         },
     },
     {
-        title:$t('ID'),
+        title:('ID'),
         dataIndex: 'id',
         width: 140,
         ellipsis:true
     },
     {
-        title: $t('描述'),
+        title: ('描述'),
         dataIndex: 'description',
         ellipsis:true
     },
     {
-        title:$t('服务数量'),
+        title:('服务数量'),
         dataIndex: 'serviceNum',
         ellipsis:true,
         sorter: (a,b)=> {
@@ -40,7 +40,7 @@ export const TEAM_TABLE_COLUMNS: PageProColumns<TeamTableListItem>[] = [
         },
     },
     {
-        title:$t('负责人'),
+        title:('负责人'),
         dataIndex: ['master','name'],
         ellipsis: true,
         width:108,
@@ -50,7 +50,7 @@ export const TEAM_TABLE_COLUMNS: PageProColumns<TeamTableListItem>[] = [
         filterSearch: true,
     },
     {
-        title:$t('创建时间'),
+        title:('创建时间'),
         dataIndex: 'createTime',
         ellipsis:true,
         width:182,
@@ -63,7 +63,7 @@ export const TEAM_TABLE_COLUMNS: PageProColumns<TeamTableListItem>[] = [
 
 export const TEAM_SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
     {
-        title:$t('服务名称'),
+        title:('服务名称'),
         dataIndex: 'name',
         ellipsis:true,
         width:160,
@@ -73,18 +73,18 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = 
         },
     },
     {
-        title:$t('服务 ID'),
+        title:('服务 ID'),
         dataIndex: 'id',
         width: 140,
         ellipsis:true
     },
     {
-        title:$t('所属团队'),
+        title:('所属团队'),
         dataIndex: ['team','name'],
         ellipsis:true
     },
     {
-        title:$t('API数量'),
+        title:('API数量'),
         dataIndex: 'apiNum',
         ellipsis:true,
         sorter: (a,b)=> {
@@ -92,7 +92,7 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = 
         },
     },
     {
-        title:$t('服务数量'),
+        title:('服务数量'),
         dataIndex: 'serviceNum',
         ellipsis:true,
         sorter: (a,b)=> {
@@ -100,7 +100,7 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = 
         },
     },
     {
-        title:$t('负责人'),
+        title:('负责人'),
         dataIndex: ['master','name'],
         ellipsis: true,
         width:108,
@@ -110,7 +110,7 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = 
         filterSearch: true
     },
     {
-        title:$t('添加日期'),
+        title:('添加日期'),
         dataIndex: 'createTime',
         ellipsis: true,
         sorter: (a,b)=> {
@@ -121,7 +121,7 @@ export const TEAM_SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = 
 
 export const TEAM_MEMBER_TABLE_COLUMNS: PageProColumns<TeamMemberTableListItem>[] = [
     {
-        title:$t('姓名'),
+        title:'姓名',
         dataIndex: ['user','name'],
         ellipsis:true,
         width:160,
@@ -131,12 +131,12 @@ export const TEAM_MEMBER_TABLE_COLUMNS: PageProColumns<TeamMemberTableListItem>[
         },
     },
     {
-        title:$t('团队角色'),
+        title:('团队角色'),
         dataIndex: 'roles',
         ellipsis:true,
     },
     {
-        title:$t('添加日期'),
+        title:('添加日期'),
         dataIndex: 'attachTime',
         ellipsis:true,
         sorter: (a,b)=> {
@@ -147,7 +147,7 @@ export const TEAM_MEMBER_TABLE_COLUMNS: PageProColumns<TeamMemberTableListItem>[
 
 
 export const TEAM_MEMBER_MODAL_TABLE_COLUMNS:ColumnsType<MemberItem> = [
-    {title:$t('成员'),
+    {title:('成员'),
     render:(_,entity)=>{
         return <>
             <div>
@@ -161,11 +161,4 @@ export const TEAM_MEMBER_MODAL_TABLE_COLUMNS:ColumnsType<MemberItem> = [
     }}
 ]
 
-    export const TEAM_INSIDE_MENU_ITEMS: MenuProps['items'] = [
-        getItem($t('管理'), 'grp', null,
-            [
-                getItem(<Link to="member">{$t('成员')}</Link>, 'member',undefined, undefined, undefined,'team.team.member.view'),
-                getItem(<Link to="setting">{$t('设置')}</Link>, 'setting',undefined,undefined,undefined,'team.team.team.view')],
-            'group'),
-    ];
     

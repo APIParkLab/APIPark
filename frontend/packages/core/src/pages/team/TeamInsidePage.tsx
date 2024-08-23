@@ -1,6 +1,6 @@
 
 import  {FC, useEffect, useMemo, useState} from "react";
-import { Outlet, useLocation, useNavigate, useParams} from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import {App, Menu, MenuProps} from "antd";
 import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
@@ -15,6 +15,7 @@ import { cloneDeep } from "lodash-es";
 import { PERMISSION_DEFINITION } from "@common/const/permissions.ts";
 import { TeamConfigType } from "@core/const/team/type.ts";
 import { $t } from "@common/locales/index.ts";
+import { getItem } from "@common/utils/navigation.tsx";
 
 const TeamInsidePage:FC = ()=> {
     const { message } = App.useApp()
@@ -22,13 +23,21 @@ const TeamInsidePage:FC = ()=> {
     const {fetchData} = useFetch()
     const location = useLocation()
     const { teamInfo ,setTeamInfo ,} = useTeamContext()
-    const {getTeamAccessData,cleanTeamAccessData,accessData,checkPermission,teamDataFlushed,accessInit} = useGlobalContext()
+    const {getTeamAccessData,cleanTeamAccessData,accessData,checkPermission,teamDataFlushed,accessInit,state} = useGlobalContext()
     const navigateTo = useNavigate()
     const [activeMenu, setActiveMenu] = useState<string>()
 
     const onMenuClick: MenuProps['onClick'] = ({key}) => {
         setActiveMenu(key)
     };
+
+    const TEAM_INSIDE_MENU_ITEMS = useMemo(()=> [
+        getItem(('管理'), 'grp', null,
+            [
+                getItem(<Link to="member">{$t('成员')}</Link>, 'member',undefined, undefined, undefined,'team.team.member.view'),
+                getItem(<Link to="setting">{$t('设置')}</Link>, 'setting',undefined,undefined,undefined,'team.team.team.view')],
+            'group'),
+    ], [state.language])
 
     const menuData = useMemo(()=>{
         const filterMenu = (menu:MenuItemGroupType<MenuItemType>[])=>{
@@ -52,7 +61,7 @@ const TeamInsidePage:FC = ()=> {
             return pre
         })
         return  filteredMenu || []
-    },[accessData,accessInit])
+    },[accessData,accessInit, state.language])
 
     const getTeamInfo = ()=>{
         setTeamInfo?.(undefined)

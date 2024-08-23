@@ -2,12 +2,12 @@
 import { ColumnsType } from "antd/es/table";
 import { MemberItem } from "@common/const/type";
 import { Tooltip } from "antd";
-import { $t } from "@common/locales";
+
 import { PageProColumns } from "@common/components/aoplatform/PageList";
 
 export const USER_LIST_COLUMNS: PageProColumns<MemberItem>[]= [
     {
-        title:$t('用户名'),
+        title:('用户名'),
         dataIndex: 'name',
         ellipsis:true,
         width:160,
@@ -17,12 +17,12 @@ export const USER_LIST_COLUMNS: PageProColumns<MemberItem>[]= [
         },
     },
     {
-        title:$t('邮箱'),
+        title:('邮箱'),
         dataIndex: 'email',
         ellipsis:true,
     },
     {
-        title:$t('部门'),
+        title:('部门'),
         dataIndex: 'department',
         ellipsis:{
             showTitle:true
@@ -37,7 +37,7 @@ export const USER_LIST_COLUMNS: PageProColumns<MemberItem>[]= [
 ];
 
 export const MEMBER_MODAL_COLUMNS:ColumnsType<MemberItem> = [
-    {title:$t('所有成员'),
+    {title:('所有成员'),
     width:215,
     
         render:(_,entity)=>{

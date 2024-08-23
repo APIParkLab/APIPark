@@ -156,7 +156,7 @@ const themeToken = {
             if(code === STATUS_CODE.SUCCESS){
                 dispatch({type:'LOGOUT'})
                 resetAccess()
-                message.success(msg || RESPONSE_TIPS.logoutSuccess)
+                // message.success(msg || RESPONSE_TIPS.logoutSuccess)
                 navigate('/login')
             }else{
                 message.error(msg ||RESPONSE_TIPS.error)

@@ -150,7 +150,7 @@ const PartitionInsideCert:FC = ()=>{
     const editRef = useRef<PartitionCertConfigHandle>(null)
     const pageListRef = useRef<ActionType>(null);
     const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
-    const {accessData} = useGlobalContext()
+    const {accessData,state} = useGlobalContext()
 
     const getPartitionCertList =(): Promise<{ data: PartitionCertTableListItem[], success: boolean }>=> {
         return fetchData<BasicResponse<{certificates:PartitionCertTableListItem}>>('certificates',{method:'GET',eoTransformKeys:['partition_id','update_time','not_before','not_after']}).then(response=>{
@@ -273,8 +273,9 @@ const PartitionInsideCert:FC = ()=>{
     }
 
     const columns = useMemo(()=>{
-        return PARTITION_CERT_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('updater') !== -1) ){x.valueEnum = memberValueEnum} return x})
-    },[memberValueEnum])
+        const res = PARTITION_CERT_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('updater') !== -1) ){x.valueEnum = memberValueEnum} return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+        return res
+    },[memberValueEnum, state.language])
 
     return (
         <InsidePage 

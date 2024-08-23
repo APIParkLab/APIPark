@@ -56,7 +56,7 @@ const InsidePage:FC<InsidePageProps> = ({showBanner=true,pageTitle,tagList,showB
                     </p>
                 </div>
             </div>}
-            <div className={`max-h-full  ${scrollPage ? 'overflow-hidden' : 'overflow-auto'} ${contentClassName || ''}`}>{children}</div>
+            <div className={`h-full  ${scrollPage ? 'overflow-hidden' : 'overflow-auto'} ${contentClassName || ''}`}>{children}</div>
         </div>
     )
 }

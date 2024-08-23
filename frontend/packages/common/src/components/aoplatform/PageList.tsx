@@ -59,11 +59,15 @@ const PageList = <T extends Record<string, unknown>>(props: React.PropsWithChild
   const [tableWidth, setTableWidth] = useState<number|undefined>(undefined);
   const actionRef = useRef<ActionType>();
   const [allowTableClick,setAllowTableClick] = useState<boolean>(false)
-  const {accessData,checkPermission,accessInit} = useGlobalContext()
+  const {accessData,checkPermission,accessInit,state} = useGlobalContext()
   const [minTableWidth, setMinTableWidth] = useState<number>(0)
 
   // 使用useImperativeHandle来自定义暴露给父组件的实例值
   useImperativeHandle(ref, () => actionRef.current!);
+
+  useEffect(()=>{
+    actionRef?.current?.reload?.()
+  },[state.language])
   
   const lastAccess = useMemo(()=>{
     if(!tableClickAccess) return true
