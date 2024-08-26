@@ -32,11 +32,11 @@ export default function ManagementInsideService(){
             fetchData<BasicResponse<null>>('application/subscription/cancel_apply',{method:'POST',eoParams:{subscription:entity.id!,application:appId!,team:teamId}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -47,11 +47,11 @@ export default function ManagementInsideService(){
             fetchData<BasicResponse<null>>('application/subscription/cancel',{method:'POST',eoParams:{subscription:entity.id!,application:appId!,team:teamId}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -62,14 +62,14 @@ export default function ManagementInsideService(){
         let content:string|React.ReactNode = ''
         switch (type){
             case 'view':{
-                message.loading(RESPONSE_TIPS.loading)
+                message.loading($t(RESPONSE_TIPS.loading))
                 const {code,data,msg} = await fetchData<BasicResponse<{approval:SubscribeApprovalInfoType}>>('app/subscription/approval',{method:'GET',eoParams:{subscription:entity!.id, app:appId,team:teamId},eoTransformKeys:['apply_project','apply_team','apply_time','approval_time']})
                 message.destroy()
                 if(code === STATUS_CODE.SUCCESS){
                     title=$t('审批详情')
                         content = <ApprovalModalContent data={data.approval} type={type} systemId={appId}/>;
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
                     return
                 }
                 break;
@@ -148,7 +148,7 @@ export default function ManagementInsideService(){
                 setServiceList(data.subscriptions && data.subscriptions.length > 0 ? [...data.subscriptions] : [])
                 // return  {data:data.services, success: true,total:data.total}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 // return {data:[], success:false}
             }
         })

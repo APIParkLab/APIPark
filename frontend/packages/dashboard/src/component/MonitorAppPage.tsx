@@ -61,7 +61,7 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
         if(code === STATUS_CODE.SUCCESS){
           setListOfApps(data.projects?.map((x:EntityItem)=>({label:x.name, value:x.id})))
         }else{
-            message.error(msg || RESPONSE_TIPS.dataError)
+            message.error(msg || $t(RESPONSE_TIPS.dataError))
             return setListOfApps([])
         }
       }).catch(() => {
@@ -101,7 +101,7 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
           if(code === STATUS_CODE.SUCCESS){
             exportExcel($t('应用调用统计'), [query!.start!, query!.end!], $t('应用调用统计'), 'dashboard_application', APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG, data.statistics)
           }else{
-              message.error(msg || RESPONSE_TIPS.dataError)
+              message.error(msg || $t(RESPONSE_TIPS.dataError))
           }
         })
     };
@@ -118,7 +118,7 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
            if(code === STATUS_CODE.SUCCESS){
                return  {data:data.statistics?.map((x:MonitorSubscriberData)=>{x.proxyRate = Number((x.proxyRate*100).toFixed(2));x.requestRate = Number((x.requestRate*100).toFixed(2));return x}), success: true}
            }else{
-               message.error(msg || RESPONSE_TIPS.dataError)
+               message.error(msg || $t(RESPONSE_TIPS.dataError))
                return {data:[], success:false}
            }
          }).catch(() => {

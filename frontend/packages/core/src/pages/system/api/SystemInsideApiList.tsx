@@ -32,7 +32,7 @@ const SystemInsideApiList:FC = ()=>{
     const pageListRef = useRef<ActionType>(null);
     const copyRef = useRef<SystemInsideApiCreateHandle>(null)
     const {apiPrefix, prefixForce} = useSystemContext()
-    const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
+    const [memberValueEnum, setMemberValueEnum] = useState<SimpleMemberItem[]>([])
     const {accessData,state} = useGlobalContext()
     const [drawerType,setDrawerType]= useState<'add'|'edit'|'view'|'upstream'|undefined>()
     const [open, setOpen] = useState(false);
@@ -60,7 +60,7 @@ const SystemInsideApiList:FC = ()=>{
                 setTableHttpReload(false)
                 return  {data:data.apis, success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -73,11 +73,11 @@ const SystemInsideApiList:FC = ()=>{
             fetchData<BasicResponse<null>>('service/api',{method:'DELETE',eoParams:{service:serviceId,team:teamId, api:entity!.id}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -89,19 +89,19 @@ const SystemInsideApiList:FC = ()=>{
         switch (type){
             case 'copy':{
                 title=$t('复制 API')
-                message.loading(RESPONSE_TIPS.loading)
+                message.loading($t(RESPONSE_TIPS.loading))
                 const {code,data,msg} = await fetchData<BasicResponse<{api:SystemApiSimpleFieldType}>>('service/api/detail/simple',{method:'GET',eoParams:{service:serviceId,team:teamId, api:entity!.id}})
                 message.destroy()
                 if(code === STATUS_CODE.SUCCESS){
                     content=<SystemInsideApiCreate ref={copyRef} type={type} entity={{...data.api, path:(data.api.path?.startsWith('/')? data.api.path.substring(1): data.api.path),serviceId:serviceId}} serviceId={serviceId!} teamId={teamId!} modalApiPrefix={apiPrefix} modalPrefixForce={prefixForce}/>
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
                     return
                 }
                 break;}
             case 'delete':
                 title=$t('删除')
-                content=DELETE_TIPS.default
+                content=$t(DELETE_TIPS.default)
                 break;
         }
 
@@ -154,16 +154,12 @@ const SystemInsideApiList:FC = ()=>{
     };
     
     const getMemberList = async ()=>{
-        setMemberValueEnum({})
+        setMemberValueEnum([])
         const {code,data,msg}  = await fetchData<BasicResponse<{ members: SimpleMemberItem[] }>>('simple/member',{method:'GET'})
         if(code === STATUS_CODE.SUCCESS){
-            const tmpValueEnum:{[k:string]:{text:string}} = {}
-            data.members?.forEach((x:SimpleMemberItem)=>{
-                tmpValueEnum[x.name] = {text:x.name}
-            })
-            setMemberValueEnum(tmpValueEnum)
+            setMemberValueEnum(data.members)
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }
 
@@ -193,7 +189,15 @@ const SystemInsideApiList:FC = ()=>{
       };
     
     const columns = useMemo(()=>{
-        return SYSTEM_API_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('creator') !== -1) ){x.valueEnum = memberValueEnum} return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+        return [...SYSTEM_API_TABLE_COLUMNS].map(x=>{
+            if(x.filters &&((x.dataIndex as string[])?.indexOf('creator') !== -1) ){
+                const tmpValueEnum:{[k:string]:{text:string}} = {}
+                memberValueEnum?.forEach((x:SimpleMemberItem)=>{
+                    tmpValueEnum[x.name] = {text:x.name}
+                })
+                x.valueEnum = tmpValueEnum
+            }
+            return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
     },[memberValueEnum,state.language])
 
     const handlerSubmit:() => Promise<string | boolean>|undefined= ()=>{

@@ -237,7 +237,7 @@ export default function SystemRunning(){
                 setShowGraph(newGraphData?.nodes?.length > 0)
 
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         }).finally(()=>setLoading(false))
     }

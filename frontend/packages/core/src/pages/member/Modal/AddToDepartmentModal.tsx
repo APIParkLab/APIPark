@@ -19,11 +19,11 @@ const AddToDepartmentModal = forwardRef<AddToDepartmentHandle,AddToDepartmentPro
                 fetchData<BasicResponse<null>>('user/department/member',{method:'POST',eoBody:({userIds:selectedUserIds,departmentIds:selectedKeys}),eoTransformKeys:['departmentIds','userIds']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -48,7 +48,7 @@ const AddToDepartmentModal = forwardRef<AddToDepartmentHandle,AddToDepartmentPro
                     children:data.departments.children.filter((x)=>x.id !== 'unknown' && x.id !== 'disable')}])
                 setExpandedKeys([newId])
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         })

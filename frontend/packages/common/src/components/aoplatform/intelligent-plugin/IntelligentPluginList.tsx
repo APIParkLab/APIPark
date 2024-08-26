@@ -183,7 +183,7 @@ export default function IntelligentPluginList(){
                 setRenderSchema(resp.data.render)
                 return Promise.resolve(resp.data.render)
             }
-            return Promise.reject(resp.msg || RESPONSE_TIPS.error)
+            return Promise.reject(resp.msg || $t(RESPONSE_TIPS.error))
         })
     }
 
@@ -218,11 +218,11 @@ export default function IntelligentPluginList(){
             fetchData<BasicResponse<null>>(`dynamic/${moduleId}/batch`,{method:'DELETE',eoParams:{ids:JSON.stringify([entity!.id])}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             })
         })
@@ -244,7 +244,7 @@ export default function IntelligentPluginList(){
                             }
                             setCurDetail(data.info)
                         }else{
-                            message.error(msg || RESPONSE_TIPS.error)
+                            message.error(msg || $t(RESPONSE_TIPS.error))
                         }
                     }).finally(()=>setDrawerLoading(false))
                 break;
@@ -259,25 +259,25 @@ export default function IntelligentPluginList(){
         let content:string|React.ReactNode = ''
         switch (type){
             case 'publish':{
-                message.loading(RESPONSE_TIPS.operating)
+                message.loading($t(RESPONSE_TIPS.operating))
                 await fetchData<BasicResponse<DynamicPublish>>(`dynamic/${moduleId}/${entity!.status === $t('已发布') ? 'offline':'online'}`, {
                     method: 'PUT',
                     eoParams:{id:entity!.id},
                 }).then(response => {
                     const {code, msg} = response
                     if (code === STATUS_CODE.SUCCESS) {
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         return Promise.resolve(true)
                     } else {
-                        message.error(msg || RESPONSE_TIPS.error)
-                        return Promise.reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        return Promise.reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> Promise.reject(errorInfo))
                 message.destroy()
                 return;}
             case 'delete':
                 title='删除'
-                content=<span>{DELETE_TIPS.default}</span>
+                content=<span>{$t(DELETE_TIPS.default)}</span>
                 break;
         }
 

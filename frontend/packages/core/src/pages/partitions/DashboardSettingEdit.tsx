@@ -57,32 +57,32 @@ export type DashboardSettingEditProps = {
                             <Form.Item<PartitionDashboardConfigFieldType>
                                 label="数据源类型"
                                 name="driver"
-                                rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
+                                rules={[{ required: true }]}
                             >
-                                <Select className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.select} options={[...DASHBOARD_SETTING_DRIVER_OPTION_LIST]}/>
+                                <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={[...DASHBOARD_SETTING_DRIVER_OPTION_LIST]}/>
                             </Form.Item>
 
                             <Form.Item<PartitionDashboardConfigFieldType>
                                 label="数据源地址"
                                 name={['config','addr']}
-                                rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
+                                rules={[{ required: true }]}
                             >
-                                <Input className="w-INPUT_NORMAL"  placeholder={PLACEHOLDER.input}/>
+                                <Input className="w-INPUT_NORMAL"  placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
 
                             <Form.Item<PartitionDashboardConfigFieldType>
                                 label="Organization"
                                 name={['config','org']}
-                                rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
+                                rules={[{ required: true }]}
                             >
-                                <Input className="w-INPUT_NORMAL"  placeholder={PLACEHOLDER.input}/>
+                                <Input className="w-INPUT_NORMAL"  placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
 
                             <Form.Item<PartitionDashboardConfigFieldType>
                                 label="鉴权 Token"
                                 name={['config','token']}
                             >
-                                <Input className="w-INPUT_NORMAL"  placeholder={PLACEHOLDER.input}/>
+                                <Input className="w-INPUT_NORMAL"  placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
 
                             <div className="flex gap-btnbase">

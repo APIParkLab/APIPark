@@ -23,11 +23,11 @@ export const ApplyServiceModal = forwardRef<ApplyServiceHandle,ApplyServiceProps
                 fetchData<BasicResponse<null>>('catalogue/service/subscribe',{method:'POST',eoParams:{team:entity?.team?.id}, eoBody:({...value,service:entity.id})}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -59,7 +59,7 @@ export const ApplyServiceModal = forwardRef<ApplyServiceHandle,ApplyServiceProps
             <Form.Item
                 label={$t("应用")}
                 name="applications"
-                rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
+                rules={[{ required: true }]}
             >
                 <Select className="w-INPUT_NORMAL" disabled={reApply} placeholder={$t("搜索或选择应用")} mode="multiple" options={mySystemOptionList?.filter((x)=>x.value !== entity.id)}/>
             </Form.Item>

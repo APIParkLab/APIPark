@@ -1,16 +1,18 @@
-import  {useEffect, useState} from 'react';
+import  {useEffect, useMemo, useState} from 'react';
 import { Button, Modal, Form, Table, FormInstance, TableProps, Divider } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import { ColumnsType } from 'antd/es/table';
 import WithPermission from './WithPermission';
 import { $t } from '@common/locales';
 import { COLUMNS_TITLE, VALIDATE_MESSAGE } from '@common/const/const';
+import { useGlobalContext } from '@common/contexts/GlobalStateContext';
+import TableBtnWithPermission from './TableBtnWithPermission';
 
 export interface ConfigField<T> {
     title: string;
     key: keyof T;
     component: React.ReactNode;
-    renderText?: (value: unknown, record: T) => React.ReactNode;
+    renderText?: (value: unknown, record: T) => string;
     required?: boolean;
     ellipsis?:boolean
 }
@@ -36,6 +38,7 @@ const EditableTableWithModal = <T extends { _id?: string }>({
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [configurations, setConfigurations] = useState<T[]>(value ||[]);
     const [editingConfig, setEditingConfig] = useState<T | null>(null);
+    const {state} = useGlobalContext()
 
     const showModal = (config?: T) => {
         if (config) {
@@ -83,35 +86,37 @@ const EditableTableWithModal = <T extends { _id?: string }>({
             setConfigurations(value?.map((x)=>x._id ? x : {...x,_id:uuidv4()}) || []);
     }, [value]);
 
-    const columns: ColumnsType<T> = configFields.map(({ title, key, renderText }) => ({
-        title,
-        dataIndex: key as string,
-        key: key as string,
-        render: renderText ? (value, record) => renderText(value, record) : undefined,
-        ellipsis:true
-    }));
+    const columns = useMemo(()=>[
+        ...configFields.map(({ title, key, renderText }) => ({
+            title:$t(title),
+            dataIndex: key as string,
+            key: key as string,
+            render: renderText ? (value, record) => $t(renderText(value, record)) : undefined,
+            ellipsis:true
+        })),
+        ...(disabled ? []:[{
+            title: COLUMNS_TITLE.operate,
+            key: 'action',
+            btnNums:2,
+            render: (_: unknown, record: T) => (
+                <>
+                <div className="flex items-center">
+                    <TableBtnWithPermission key="add" disabled={disabled} btnType="edit" onClick={()=>{showModal(record)}} btnTitle='编辑'/>
+                    <Divider key="div1" type="vertical" />
+                    <TableBtnWithPermission key="delete" disabled={disabled} btnType="delete" onClick={()=>{handleDelete(record._id || '')}} btnTitle='删除'/>
+                    </div>
+                </>
+            ),
+        }] )
+    ],[state.language, disabled, configFields])
 
-    !disabled && columns.push({
-        title: COLUMNS_TITLE.operate,
-        key: 'action',
-        btnNums:2,
-        render: (_: unknown, record: T) => (
-            <>
-            <div className="flex items-center">
-                <Button key="edit" disabled={disabled} onClick={()=>{showModal(record)}} className={`h-[22px] border-none p-0 flex items-center bg-transparent`}>编辑</Button>
-                <Divider key="div1" type="vertical" />
-                <Button  key="delete" disabled={disabled} onClick={()=>{handleDelete(record._id || '')}} className={`h-[22px] border-none p-0 flex items-center bg-transparent`} >删除</Button>
-                </div>
-            </>
-        ),
-    });
     
     const formItems = configFields.map(({ title,key, component, required }) => {
         return (
                 <Form.Item
-                    label={title as string}
+                    label={$t(title as string)}
                     name={key as string}
-                    rules={[{ required, message: VALIDATE_MESSAGE.required}]}
+                    rules={[{ required}]}
                 >
                     {component}
                 </Form.Item>

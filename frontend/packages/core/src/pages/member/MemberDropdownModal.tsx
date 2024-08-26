@@ -37,7 +37,7 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
         }
         return new Promise((resolve, reject)=>{
             if(!url || !method){
-                reject(RESPONSE_TIPS.error)
+                reject($t(RESPONSE_TIPS.error))
                 return
             }
             form.validateFields().then((value)=>{
@@ -50,11 +50,11 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                     }),eoTransformKeys:['departmentIds']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -72,7 +72,7 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
             if(code === STATUS_CODE.SUCCESS){
                 setDepartmentList([{...data.departments,disabled:true}])
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         })
@@ -114,18 +114,18 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                     label={$t("ID")}
                     name="id"
                     hidden
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                    rules={[{ required: true,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
             }
             {(type === 'addDep' || type === 'rename') &&
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("部门名称")}
                     name="name"
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                    rules={[{ required: true,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>}
 
             {type === 'addChild' &&<>
@@ -133,17 +133,17 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                     label={$t("父部门 ID")}
                     name="parent"
                     hidden
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                    rules={[{ required: true,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
 
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("子部门名称")}
                     name="name"
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                    rules={[{ required: true,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
             </>
             }
@@ -152,16 +152,16 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("用户名")}
                     name="name"
-                    rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true }]}
+                    rules={[{required: true,whitespace:true }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("邮箱")}
                     name="email"
-                    rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true },{type:"email",message: VALIDATE_MESSAGE.email}]}
+                    rules={[{required: true,whitespace:true },{type:"email",message: $t(VALIDATE_MESSAGE.email)}]}
                 >
-                    <Input className="w-INPUT_NORMAL" disabled={type ==='editMember'} placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" disabled={type ==='editMember'} placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("部门")}
@@ -173,7 +173,7 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                             fieldNames={{label:'name',value:'id',children:'children'}}
                             showSearch
                             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                            placeholder={PLACEHOLDER.select}
+                            placeholder={$t(PLACEHOLDER.select)}
                             allowClear
                             treeDefaultExpandAll
                             treeData={departmentList}

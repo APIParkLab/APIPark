@@ -7,11 +7,12 @@ import { StyleProvider } from '@ant-design/cssinjs';
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
 import useInitializeMonaco from "@common/hooks/useInitializeMonaco";
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import 'dayjs/locale/zh-cn';
 import dayjs from 'dayjs';
 import { useGlobalContext } from '@common/contexts/GlobalStateContext';
 import i18next from 'i18next';
+import { $t } from '@common/locales';
 
 type Locale = ConfigProviderProps['locale'];
 
@@ -150,13 +151,18 @@ function App() {
       setLocal(state.language === 'cn' ? zhCN : enUS);
   },[state.language])
   
+  const validateMessages = useMemo(()=>({
+    required: $t('必填项'),
+    email:$t('不是有效邮箱地址')}
+  ),[state.language])
   
   return (
       <StyleProvider hashPriority={"high"}>
         <ConfigProvider 
           locale={locale}
           wave={{disabled:true}}
-          theme={antdComponentThemeToken}>
+          theme={antdComponentThemeToken}
+          form={{validateMessages }}>
                 <BreadcrumbProvider>
                     <RenderRoutes />
                 </BreadcrumbProvider>
