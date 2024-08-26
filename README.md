@@ -3,7 +3,7 @@
 <p align="center">
   English
   | 
-  <a href="readme/readme-zh-cn.md">简体中文</a>
+  <a href="/readme/readme-zh-cn.md">简体中文</a>
 </p>
 
 APIPark is the world's first open-source enterprise API open platform, helping organizations quickly build internal API portals/marketplaces and enjoy ultimate forwarding performance, API observability, service governance, multi tenant management, subscription approval processes, and many other benefits.
@@ -23,7 +23,7 @@ APIPark is committed to addressing several key challenges that enterprises face 
 
 <br>
 
-😍 APIPark deployment is very simple, just one command line can deploy your API asset open platform in 5 minutes.
+😍 APIPark deployment is very simple, just one command line can deploy your API open platform in 5 minutes.
 
 ```
 curl -sSO  https://download.apipark.com/install/quick-start.sh ;  bash quick-start.sh
