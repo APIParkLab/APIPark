@@ -9,7 +9,7 @@ const useCopyToClipboard = () => {
   const copyToClipboard = (text: string) => {
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(text)?.then(() => {
-      message.success(RESPONSE_TIPS.copySuccess)
+      message.success($t(RESPONSE_TIPS.copySuccess))
         setIsCopied(true)
       })
       .catch((error) => {
@@ -29,7 +29,7 @@ const useCopyToClipboard = () => {
         textArea.select();
         new Promise<void>((resolve, reject) => {
           if(document.execCommand('copy')) {
-            message.success(RESPONSE_TIPS.copySuccess)
+            message.success($t(RESPONSE_TIPS.copySuccess))
             setIsCopied(true)
             resolve()
           } else {

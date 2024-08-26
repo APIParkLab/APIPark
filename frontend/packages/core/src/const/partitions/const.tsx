@@ -3,6 +3,7 @@ import { ColumnType } from "antd/es/table";
 import CopyAddrList from "@common/components/aoplatform/CopyAddrList";
 
 import { PageProColumns } from "@common/components/aoplatform/PageList";
+import { $t } from "@common/locales";
 
 
 export const PARTITION_CERT_TABLE_COLUMNS: PageProColumns<PartitionCertTableListItem>[] = [
@@ -55,88 +56,6 @@ export const PARTITION_CERT_TABLE_COLUMNS: PageProColumns<PartitionCertTableList
     },
 ];
 
-export const PARTITION_CLUSTER_TABLE_COLUMNS : PageProColumns<PartitionClusterTableListItem>[] = [
-    {
-        title:('集群名称'),
-        dataIndex: 'name',
-        ellipsis:true,
-        width:160,
-        fixed:'left',
-        sorter: (a,b)=> {
-            return a.name.localeCompare(b.name)
-        },
-    },
-    {
-        title:('集群 ID'),
-        dataIndex: 'id',
-        width: 140,
-        ellipsis:true
-    },
-    {
-        title:('状态'),
-        dataIndex: 'status',
-        ellipsis:true,
-        valueType: 'select',
-        filters: true,
-        onFilter: true,
-        valueEnum: new Map([
-            [0, <span className="text-status_fail">异常</span>],
-            [1,<span className="text-status_success">正常</span>],
-        ])
-    },
-    {
-        title: ('描述'),
-        dataIndex: 'description',
-        ellipsis:true
-    }
-];
-
-
-export const PARTITION_CLUSTER_NODE_COLUMNS: PageProColumns<PartitionClusterNodeTableListItem>[] = [
-    {
-        title:('节点名称'),
-        dataIndex: 'name',
-        ellipsis:true,
-        fixed:'left',
-        sorter: (a,b)=> {
-            return a.name.localeCompare(b.name)
-        },
-    },
-    {
-        title:('管理地址'),
-        dataIndex: 'managerAddress',
-        ellipsis:true,
-        width:200,
-        render:(_,entity)=>(<CopyAddrList keyName="managerAddress" addrItem={entity} />)
-    },
-    {
-        title:('服务地址'),
-        dataIndex: 'serviceAddress',
-        ellipsis:true,
-        width:230,
-        render:(_,entity)=>(<CopyAddrList keyName="serviceAddress" addrItem={entity} />)
-    },
-    {
-        title:('集群同步地址'),
-        dataIndex: 'peerAddress',
-        ellipsis:true,
-        width:230,
-        render:(_,entity)=>(<CopyAddrList keyName="peerAddress" addrItem={entity} />)
-    },
-    {
-        title:('状态'),
-        dataIndex: 'status',
-        ellipsis:true,
-        width:86,
-        valueType: 'select',
-        filters: true,
-        onFilter: true,
-        valueEnum: new Map([
-            [0, <span className="text-status_fail">异常</span>],
-            [1,<span className="text-status_success">正常</span>],
-        ])
-    },
-];
 
 export const NODE_MODAL_COLUMNS:ColumnType<PartitionClusterNodeModalTableListItem>[] = [
     {title:('名称'), dataIndex:'name',width:200,

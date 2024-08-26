@@ -27,7 +27,7 @@ export default function Guide(){
             </div>}
             showBorder={false}
             scrollPage={false}
-            contentClassName=" pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B"
+            contentClassName=" w-full pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B"
             >
                 {showGuide && 
                 <Collapse

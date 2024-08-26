@@ -23,11 +23,11 @@ export const RenameDepModal = forwardRef<MemberDropdownModalHandle,MemberDropdow
                     }),eoParams: {id:entity!.id}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -55,16 +55,16 @@ export const RenameDepModal = forwardRef<MemberDropdownModalHandle,MemberDropdow
                     label={$t("ID")}
                     name="id"
                     hidden
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                    rules={[{ required: true,whitespace:true  }]}
                 >
                     <Input className="w-INPUT_NORMAL" placeholder="ID"/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("部门名称")}
                     name="name"
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                    rules={[{ required: true,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
         </Form>
     </WithPermission>)

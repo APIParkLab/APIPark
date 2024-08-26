@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import { Link } from "react-router-dom";
 
 import { PageProColumns } from "@common/components/aoplatform/PageList";
+import { $t } from "@common/locales";
 
 export enum SubscribeEnum{
     Rejected = 0,
@@ -141,83 +142,6 @@ export const SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
     }
 ];
 
-export const SYSTEM_SUBSERVICE_TABLE_COLUMNS: PageProColumns<SystemSubServiceTableListItem>[] = [
-    {
-        title:('服务名称'),
-        dataIndex: ['service','name'],
-        ellipsis:true,
-        width:160,
-        fixed:'left',
-        sorter: (a,b)=> {
-            return a.service.name.localeCompare(b.service.name)
-        },
-    },
-    {
-        title:('服务 ID'),
-        dataIndex: ['service','name'],
-        width: 140,
-        ellipsis:true
-    },
-    {
-        title:('申请状态'),
-        dataIndex: 'applyStatus',
-        ellipsis:{
-            showTitle:true
-        },
-        width:80,
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        valueEnum:new Map([
-            [0,<span className={SubscribeStatusColor[0]}>{('驳回')}</span>],
-            [1,<span className={SubscribeStatusColor[1]}>{('审核中')}</span>],
-            [2,<span className={SubscribeStatusColor[2]}>{('已订阅')}</span>],
-            [3,<span className={SubscribeStatusColor[3]}>{('取消订阅')}</span>],
-            [4,<span className={SubscribeStatusColor[4]}>{('取消申请')}</span>],
-        ])
-    },
-    {
-        title:('所属服务'),
-        dataIndex: ['project','name'],
-        ellipsis:true
-    },
-    {
-        title:('所属团队'),
-        dataIndex: ['team','name'],
-        ellipsis:true
-    },
-    {
-        title:('申请人'),
-        dataIndex: ['applier','name'],
-        ellipsis: true,
-        width:88,
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        filterSearch: true,
-    },
-    {
-        title:('来源'),
-        dataIndex: 'from',
-        ellipsis: true,
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        valueEnum:new Map([
-            [0,<span>{('手动添加')}</span>],
-            [1,<span>{('订阅申请')}</span>],
-        ])
-    },
-    {
-        title:('添加时间'),
-        dataIndex: 'createTime',
-        ellipsis:true,
-        width:182,
-        sorter: (a,b)=> {
-            return a.createTime.localeCompare(b.createTime)
-        },
-    },
-];
 
 
 export const SYSTEM_SUBSCRIBER_TABLE_COLUMNS: PageProColumns<SystemSubscriberTableListItem>[] = [
@@ -254,10 +178,6 @@ export const SYSTEM_SUBSCRIBER_TABLE_COLUMNS: PageProColumns<SystemSubscriberTab
         filters: true,
         onFilter: true,
         valueType: 'select',
-        valueEnum:new Map([
-            [0,<span>{('手动添加')}</span>],
-            [1,<span>{('订阅申请')}</span>],
-        ])
     },
     {
         title:('订阅时间'),
@@ -318,7 +238,7 @@ export const MATCH_CONFIG:ConfigField<MatchItem>[] = [
             return { label:value, value:key}
         })}/>,
         renderText: (value:keyof typeof MatchPositionEnum) => {
-            return (<>{MatchPositionEnum[value]}</>)
+            return MatchPositionEnum[value]
         },
         required: true,
         ellipsis:true
@@ -326,7 +246,7 @@ export const MATCH_CONFIG:ConfigField<MatchItem>[] = [
         title:('参数名'),
         key: 'key',
         component: <Input className="w-INPUT_NORMAL" />,
-        renderText: (value: unknown) => <>{value}</>,
+        renderText: (value: unknown) => value,
         required: true
     }, {
         title:('匹配类型'),
@@ -335,7 +255,7 @@ export const MATCH_CONFIG:ConfigField<MatchItem>[] = [
             return { label:value, value:key}
         })}/>,
         renderText: (value:keyof typeof MatchTypeEnum) => {
-            return (<>{MatchTypeEnum[value]}</>)
+            return MatchTypeEnum[value]
         },
         required: true
     }, {
@@ -343,7 +263,7 @@ export const MATCH_CONFIG:ConfigField<MatchItem>[] = [
         key: 'pattern',
         component: <Input className="w-INPUT_NORMAL"/>,
         renderText: (value: string) => {
-            return (<>{value}</>)
+            return value
         },
         required: true
     }
@@ -465,7 +385,7 @@ export const UpstreamDriverEnum = {
     'discoveries':('动态服务发现'),
 }
 
-export const typeOptions = [
+export const UPSTREAM_TYPE_OPTIONS = [
     { label: ('静态上游'), value: 'static' },
     // { label: ('动态服务发现', value: 'discoveries' },
 ];
@@ -474,18 +394,18 @@ export const schemeOptions = [
     { label:('HTTPS'), value:'HTTPS'},
     { label:('HTTP'), value:'HTTP'},
 ]
-export const balanceOptions = [
+export const UPSTREAM_BALANCE_OPTIONS = [
     { label: ('带权轮询'), value: 'round-robin' },
     { label: ('IP Hash'), value: 'ip-hash' },
 ];
 
-export const passHostOptions = [
+export const UPSTREAM_PASS_HOST_OPTIONS = [
     { label:('透传客户端请求 Host'), value:'pass'},
     { label:('使用上游服务 Host'), value:'node'},
     { label:('重写 Host'), value:'rewrite'},
 ]
 
-export const proxyHeaderTypeOptions =[
+export const UPSTREAM_PROXY_HEADER_TYPE_OPTIONS =[
     {label:('新增或修改'), value: 'ADD' },
     { label: ('删除'), value: 'DELETE' }
 ]
@@ -494,9 +414,8 @@ export const PROXY_HEADER_CONFIG:ConfigField<ProxyHeaderItem>[] = [
     {
         title:('操作类型'),
         key: 'optType',
-        component: <Select className="w-INPUT_NORMAL" options={proxyHeaderTypeOptions}/>,
         renderText: (value: string) => {
-            return (<>{value === 'ADD' ? ('新增或修改'):('删除')}</>)
+            return value === 'ADD' ? ('新增或修改'):('删除')
         },
         required: true
     }, {
@@ -504,7 +423,7 @@ export const PROXY_HEADER_CONFIG:ConfigField<ProxyHeaderItem>[] = [
         key: 'key',
         component: <Input className="w-INPUT_NORMAL"/>,
         renderText: (value: string) => {
-            return (<>{value}</>)
+            return value
         },
         required: true
     }, {
@@ -512,7 +431,7 @@ export const PROXY_HEADER_CONFIG:ConfigField<ProxyHeaderItem>[] = [
         key: 'value',
         component: <Input className="w-INPUT_NORMAL" />,
         renderText: (value: string) => {
-            return (<>{value}</>)
+            return value
         },
         required: true
     }
@@ -529,7 +448,7 @@ export const NODE_CONFIG:ConfigField<NodeItem>[] = [
         key: 'address',
         component: <Input className="w-INPUT_NORMAL" />,
         renderText: (value: string) => {
-            return (<>{value}</>)
+            return value
         },
         required: true
     }, {
@@ -537,13 +456,13 @@ export const NODE_CONFIG:ConfigField<NodeItem>[] = [
         key: 'weight',
         component: <InputNumber className="w-INPUT_NORMAL"/>,
         renderText: (value: string) => {
-            return (<>{value}</>)
+            return value
         },
         required: true
     }
 ]
 
-export const visualizations = [
+export const SERVICE_VISUALIZATION_OPTIONS = [
     {label:('内部服务：可通过网关访问，但不展示在服务广场'),value:'inner'},
     {label:('公开服务：可通过网关访问，展示在服务广场，可被其他应用订阅'),value:'public'}];
 
@@ -594,162 +513,6 @@ export const apiModalColumn:ColumnsType<SimpleApiItem> = [
 ]
 
 
-export const SYSTEM_AUTHORITY_TABLE_COLUMNS: PageProColumns<SystemAuthorityTableListItem>[] = [
-    {
-        title:('名称'),
-        dataIndex: 'name',
-        ellipsis:true,
-        width:160,
-        fixed:'left',
-        sorter: (a,b)=> {
-            return a.name.localeCompare(b.name)
-        },
-    },
-    {
-        title:('类型'),
-        dataIndex: 'driver',
-        ellipsis:true,
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        valueEnum:{
-            basic:{
-                text:'Basic'
-            },
-            apikey:{
-                text:'Apikey'
-            }
-        }
-    },
-    {
-        title:('隐藏鉴权信息'),
-        dataIndex: 'hideCredential',
-        ellipsis:{
-            showTitle:true
-        },
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        valueEnum:new Map([
-            [true,<span>是</span>],
-            [false,<span>否</span>],
-        ])
-    },
-    {
-        title:('过期时间'),
-        dataIndex: 'expireTime',
-        ellipsis:true,
-        width:182,
-        render:(_: React.ReactNode, entity: SystemAuthorityTableListItem) => (
-            <span className={entity.expireTime !== 0 &&  dayjs().valueOf() - (entity.expireTime * 1000) > 0 ? 'text-status_fail' : ''}>{entity.expireTime === 0 ? '永不过期'  :dayjs(entity.expireTime * 1000).format('YYYY-MM-DD hh:mm:ss')}</span>
-        ),
-        sorter: (a,b)=> {
-            return a.expireTime - b.expireTime
-        },
-    },
-    {
-        title:('更新者'),
-        dataIndex: ['updater','name'],
-        ellipsis: true,
-        width:88,
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        filterSearch: true,
-    },
-    {
-        title:('创建时间'),
-        key: 'createTime',
-        dataIndex: 'createTime',
-        width:182,
-        ellipsis:true,
-        sorter: (a,b)=> {
-            return a.createTime.localeCompare(b.createTime)
-        },
-    },
-];
-
-
-export const SYSTEM_MYSERVICE_TABLE_COLUMNS: PageProColumns<MyServiceTableListItem>[] = [
-    {
-        title:('服务名称'),
-        dataIndex: 'name',
-        ellipsis:true,
-        width:160,
-        fixed:'left',
-        sorter: (a,b)=> {
-            return a.name.localeCompare(b.name)
-        },
-    },
-    {
-        title:('服务ID'),
-        dataIndex: 'id',
-        width: 140,
-        ellipsis:true
-    },
-    {
-        title:('服务类型'),
-        dataIndex: 'serviceType',
-        ellipsis:{
-            showTitle:true
-        },
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        valueEnum:{
-            'public':{
-                text:('公开服务')
-            },
-            'inner':{
-                text:('内部服务')
-            }
-        }
-    },
-    {
-        title:('API 数量'),
-        dataIndex: 'apiNum',
-        sorter: (a,b)=> {
-            return a.apiNum - b.apiNum
-        },
-    },
-    {
-        title:('状态'),
-        dataIndex: 'status',
-        ellipsis:{
-            showTitle:true
-        },
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        valueEnum:{
-            'on':<span className="text-status_success">{('启用')}</span> ,
-            'off':<span className="text-status_fail">{('停用')}</span>  
-        }
-    },
-    {
-        title:('更新时间'),
-        key: 'updateTime',
-        dataIndex: 'updateTime',
-        ellipsis:true,
-        width:182,
-        sorter: (a,b)=> {
-            return a.updateTime.localeCompare(b.updateTime)
-        },
-    },
-    {
-        title:('创建时间'),
-        key: 'createTime',
-        dataIndex: 'createTime',
-        width:182,
-        ellipsis:true,
-        sorter: (a,b)=> {
-            return a.createTime.localeCompare(b.createTime)
-        },
-    },
-];
-
-
-
 export const SYSTEM_UPSTREAM_GLOBAL_CONFIG_TABLE_COLUMNS: PageProColumns<GlobalNodeItem & {_id:string}>[] = [
     {
       title:('地址(IP 端口或域名）'),
@@ -761,8 +524,7 @@ export const SYSTEM_UPSTREAM_GLOBAL_CONFIG_TABLE_COLUMNS: PageProColumns<GlobalN
         rules: [
           {
             required: true,
-            whitespace: true,
-            message: VALIDATE_MESSAGE.required,
+            whitespace: true
           },
         ],
       },

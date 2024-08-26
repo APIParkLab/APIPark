@@ -34,7 +34,7 @@ const SystemInsidePage:FC = ()=> {
             if(code === STATUS_CODE.SUCCESS){
                 setSystemInfo(data.service)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -48,7 +48,7 @@ const SystemInsidePage:FC = ()=> {
                 setApiPrefix(data.prefix)
                 setPrefixForce(data.force)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }

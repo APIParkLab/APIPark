@@ -33,7 +33,7 @@ export default function SystemInsidePublishOnline(props:SystemInsidePublishOnlin
                     setIsStopped(true)
                 }
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         }).catch((errorInfo)=> message.error(errorInfo))
     }

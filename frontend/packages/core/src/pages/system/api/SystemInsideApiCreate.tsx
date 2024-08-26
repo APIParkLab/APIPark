@@ -24,11 +24,11 @@ const SystemInsideApiCreate = forwardRef<SystemInsideApiCreateHandle,SystemInsid
             return fetchData<BasicResponse<{api:SystemApiProxyFieldType}>>('service/api',{method:'POST',eoBody:(body), eoParams: {service:serviceId,team:teamId},eoTransformKeys:['matchType']}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    return Promise.reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    return Promise.reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch(errInfo=>Promise.reject(errInfo))
         })
@@ -40,11 +40,11 @@ const SystemInsideApiCreate = forwardRef<SystemInsideApiCreateHandle,SystemInsid
                 fetchData<BasicResponse<{api:SystemApiProxyFieldType}>>('service/api/copy',{method:'POST',eoParams:{service:serviceId,team:teamId, api:entity!.id},eoBody:({...value,path:value.path.trim()})}).then(response=>{
                     const {code,data,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         return resolve(data.api.id)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        return reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        return reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -92,24 +92,24 @@ const SystemInsideApiCreate = forwardRef<SystemInsideApiCreateHandle,SystemInsid
                     <Form.Item<SystemApiProxyFieldType>
                         label={$t("API 名称")}
                         name="name"
-                        rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
+                        rules={[{ required: true ,whitespace:true }]}
                     >
-                        <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                        <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                     </Form.Item>
 
                     <Form.Item<SystemApiProxyFieldType>
                         label={$t("描述")}
                         name="description"
                     >
-                        <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                        <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                     </Form.Item>
 
                     <Form.Item<SystemApiProxyFieldType>
                         label={$t("请求方式")}
                         name="method"
-                        rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
+                        rules={[{ required: true }]}
                     >
-                        <Select className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.select} options={HTTP_METHOD.map((method:string)=>{
+                        <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={HTTP_METHOD.map((method:string)=>{
                             return { label:method, value:method}
                         })}>
                         </Select>
@@ -118,14 +118,14 @@ const SystemInsideApiCreate = forwardRef<SystemInsideApiCreateHandle,SystemInsid
                     <Form.Item<SystemApiProxyFieldType>
                         label={$t("请求路径")}
                         name="path"
-                        rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  },
+                        rules={[{ required: true,whitespace:true  },
                         {
                           validator: validateUrlSlash,
                         }]}
                         className={styles['form-input-group']}
                     >
                         <Input  prefix={(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
-                               placeholder={PLACEHOLDER.input}/>
+                               placeholder={$t(PLACEHOLDER.input)}/>
                     </Form.Item>
 
                     <Form.Item<SystemApiProxyFieldType>

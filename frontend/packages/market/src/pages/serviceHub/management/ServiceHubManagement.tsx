@@ -42,7 +42,7 @@ const getServiceList = ()=>{
         if(code === STATUS_CODE.SUCCESS){
             setServiceList([...data.apps,{type:'addNewItem'}])
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }).finally(()=>{
         setServiceLoading(false)
@@ -68,7 +68,7 @@ const getServiceList = ()=>{
                 navigateTo(data.teams[0].id)
             }
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }).finally(()=>{
         setPageLoading(false)
@@ -93,7 +93,7 @@ const getServiceList = ()=>{
         //     if(code === STATUS_CODE.SUCCESS){
         //         content=<ManagementConfig ref={editManagementRef} type={type} entity={data.app}/>
         //     }else{
-        //         message.error(msg || RESPONSE_TIPS.error)
+        //         message.error(msg || $t(RESPONSE_TIPS.error))
         //         return
         //     }
         //     break;}

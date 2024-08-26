@@ -43,7 +43,7 @@ const TeamList:FC = ()=>{
             if(code === STATUS_CODE.SUCCESS){
                 return  {data:data.teams, success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -56,11 +56,11 @@ const TeamList:FC = ()=>{
             fetchData<BasicResponse<null>>(`manager/team`,{method:'DELETE',eoParams:{id:entity.id}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -76,7 +76,7 @@ const TeamList:FC = ()=>{
             })
             setMemberValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }
 
@@ -94,21 +94,21 @@ const TeamList:FC = ()=>{
                 setModalVisible(true)
                 return;}
             case 'edit':{
-                message.loading(RESPONSE_TIPS.loading)
+                message.loading($t(RESPONSE_TIPS.loading))
                 const {code,data,msg} = await fetchData<BasicResponse<{team:TeamConfigFieldType}>>(`manager/team`,{method:'GET',eoParams:{id:entity!.id}})
                 message.destroy()
                 if(code === STATUS_CODE.SUCCESS){
                     setCurTeam({...data.team,master:data.team.master.id})
                     setModalVisible(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
                     return
                 }
                 setModalType('edit')
                 return;}
             case 'delete':
                 title=$t('删除')
-                content=DELETE_TIPS.default
+                content=$t(DELETE_TIPS.default)
                 break;
         }
 
