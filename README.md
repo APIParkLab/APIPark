@@ -45,11 +45,11 @@ Covering the entire process of API design, release, operation, and deployment
 
 <tr>
 <td width="50%">
-<img src=" https://apipark.com/wp-content/uploads/2024/08/%E9%A1%B5%E9%9D%A2 -1.png" />
+<img src="https://apipark.com/wp-content/uploads/2024/08/%E9%A1%B5%E9%9D%A2-1.png" />
 API Service Square is one of the core functions of APIPark, aimed at solving the problem of scattered and chaotic management of APIs within enterprises. Through API Service Square, enterprises can display all API services on a unified platform, making it easy for different departments and teams to find and use the required API services.
 </td>
 <td width="50%">
-<img src=" https://apipark.com/wp-content/uploads/2024/08/Life-Cycle.png " />
+<img src="https://apipark.com/wp-content/uploads/2024/08/Life-Cycle.png" />
 The API lifecycle management function helps enterprises standardize the API management process, manage API traffic forwarding and load balancing, and manage all API versions released to the public. Improve the quality and maintainability of APIs. Through this feature, enterprises can achieve efficient API development and stable operation, thereby supporting rapid business development and innovation.
 </td>
 </tr>
@@ -66,11 +66,11 @@ API resources need to be applied for and approved before they can be called
 
 <tr>
 <td width="50%">
-<img src=" https://apipark.com/wp-content/uploads/2024/08/Multi-tenant.png " />
+<img src="https://apipark.com/wp-content/uploads/2024/08/Multi-tenant.png" />
 The multi tenant management function provides enterprises with the ability to manage multiple tenants on the same platform. Each tenant can have independent resource, user, and permission settings, ensuring the isolation of data and operations, and helping to improve resource utilization efficiency and management convenience.
 </td>
 <td width="50%">
-<img src=" https://apipark.com/wp-content/uploads/2024/08/Application.png " />
+<img src="https://apipark.com/wp-content/uploads/2024/08/Application.png" />
 APIPark provides a process approval function for all API resources to avoid violating regulations or bypassing the platform to call APIs. The caller needs to first apply for API resources and wait for the service provider's approval before officially calling the API.
 </td>
 </tr>
@@ -87,11 +87,11 @@ Rich statistical reports*
 
 <tr>
 <td width="50%">
-<img src=" https://apipark.com/wp-content/uploads/2024/08/Chart-1.png " />
+<img src="https://apipark.com/wp-content/uploads/2024/08/Chart-1.png" />
 The API call log function provides comprehensive logging capabilities for enterprises, detailing all relevant information of each API call. Through these logs, enterprises can quickly track and troubleshoot issues in API calls, ensuring stable system operation and data security.
 </td>
 <td width="50%">
-<img src=" https://apipark.com/wp-content/uploads/2024/08/Chart.png " />
+<img src="https://apipark.com/wp-content/uploads/2024/08/Chart.png" />
 By analyzing historical call data, APIPark can display the long-term call trends and performance changes of APIs, helping enterprises to conduct preventive maintenance before problems occur.
 </td>
 </tr>
