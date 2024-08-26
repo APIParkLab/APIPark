@@ -26,11 +26,11 @@ export const ClusterNodeModal = forwardRef<NodeModalHandle, NodeModalPropsType>(
                 fetchData<BasicResponse<{ nodes: PartitionClusterNodeTableListItem[] }>>('cluster/check', {method: 'POST', eoBody: (value),eoTransformKeys:['manager_address','service_address','peer_address']}).then(response => {
                     const {code,data, msg} = response
                     if (code === STATUS_CODE.SUCCESS) {
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         setDataSource(data.nodes)
                         changeStatus('preview')
                     } else {
-                        message.error(msg ||FORM_ERROR_TIPS.clusterTest)
+                        message.error(msg || $t(FORM_ERROR_TIPS.clusterTest))
                         setAddressError('error')
                         
                     }
@@ -44,10 +44,10 @@ export const ClusterNodeModal = forwardRef<NodeModalHandle, NodeModalPropsType>(
             fetchData<BasicResponse<null>>('cluster/reset',{method:'PUT' ,eoBody:({managerAddress:form.getFieldValue('address')}), eoTransformKeys:['managerAddress']}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     getClusterInfo()
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=>
                 console.warn(errorInfo))
@@ -78,9 +78,9 @@ export const ClusterNodeModal = forwardRef<NodeModalHandle, NodeModalPropsType>(
                     name="address"
                     className="mb-0"
                     validateStatus={addressError}
-                    help={addressError ? form.getFieldValue('address')? FORM_ERROR_TIPS.clusterTest : VALIDATE_MESSAGE.required : ''}
+                    help={addressError ? form.getFieldValue('address')? $t(FORM_ERROR_TIPS.clusterTest) : $t($t(VALIDATE_MESSAGE.required)) : ''}
                 >  
-                        <Input placeholder={PLACEHOLDER.input} onPressEnter={()=>test()} onChange={(e)=>setAddressError(e.target?.value ? '' : 'error')}/>
+                        <Input placeholder={$t(PLACEHOLDER.input)} onPressEnter={()=>test()} onChange={(e)=>setAddressError(e.target?.value ? '' : 'error')}/>
                 </Form.Item> :  dataSource && ClusterConfigPreview(dataSource?.[0] as unknown as PartitionClusterNodeTableListItem)}
 
                 <div className="flex gap-btnbase mt-[20px]">

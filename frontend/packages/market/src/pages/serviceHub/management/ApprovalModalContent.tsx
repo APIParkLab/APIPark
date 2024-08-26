@@ -29,11 +29,11 @@ export const ApprovalModalContent = forwardRef<SubSubscribeApprovalModalHandle,S
                 fetchData<BasicResponse<null>>('catalogue/service/subscribe',{method: 'POST',eoParams:{team:teamId}, eoBody:({service:data!.service.id, applications:[serviceId], reason:value.reason})}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -76,13 +76,13 @@ export const ApprovalModalContent = forwardRef<SubSubscribeApprovalModalHandle,S
                     label={$t("申请原因")}
                     name="reason"
                 >
-                    <Input.TextArea className="w-INPUT_NORMAL" disabled={type === 'view'} placeholder={PLACEHOLDER.input}  />
+                    <Input.TextArea className="w-INPUT_NORMAL" disabled={type === 'view'} placeholder={$t(PLACEHOLDER.input)}  />
                 </Form.Item>
                 <Form.Item<FieldType>
                     label={$t("审核意见")}
                     name="opinion"
                 >
-                    <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input} disabled={true} />
+                    <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} disabled={true} />
                 </Form.Item>
             </Form>
             </WithPermission>

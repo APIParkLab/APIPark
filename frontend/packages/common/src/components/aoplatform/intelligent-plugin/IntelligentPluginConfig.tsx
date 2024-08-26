@@ -167,7 +167,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                     },
                     'x-component': 'Input',
                     'x-component-props': {
-                        placeholder: PLACEHOLDER.specialStartWithAlphabet,
+                        placeholder: $t(PLACEHOLDER.specialStartWithAlphabet),
                     },
                     'x-disabled': type === 'edit'
                 },
@@ -183,7 +183,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                     },
                     'x-component': 'Input',
                     'x-component-props': {
-                        placeholder: PLACEHOLDER.input,
+                        placeholder: $t(PLACEHOLDER.input),
                     }
                 },
                 driver: {
@@ -214,7 +214,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                     },
                     'x-component': 'Input.TextArea',
                     'x-component-props': {
-                        placeholder: PLACEHOLDER.input,
+                        placeholder: $t(PLACEHOLDER.input),
                     }
                 },
                 config: {
@@ -236,11 +236,11 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                 fetchData<BasicResponse<null>>(type === 'add'?`dynamic/${moduleId}`:`dynamic/${moduleId}/config`,{method:type === 'add'? 'POST' : 'PUT',eoBody:form.values, eoParams:{...(type !== 'add' && {id:initFormValue.id})}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo:unknown)=> reject(errorInfo))
@@ -260,8 +260,8 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                 if(code === STATUS_CODE.SUCCESS){
                     resolve(data[skill]?.map((x:{name:string,title:string})=>{return{label:x.title, value:x.name}}) || [])
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             })
         })

@@ -103,7 +103,7 @@ const ServiceHubList:FC = ()=>{
                 dispatch({type:SERVICE_HUB_LIST_ACTIONS.SET_SERVICES,payload: filterServiceList({...filterOption, servicesList:data.services})})
                
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         }).finally(()=>{ dispatch({type:SERVICE_HUB_LIST_ACTIONS.LIST_LOADING,payload:false})})
     }

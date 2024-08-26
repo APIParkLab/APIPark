@@ -1,11 +1,10 @@
 import { EditableProTable } from "@ant-design/pro-components";
-import { Button } from "antd";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { v4 as uuidv4} from 'uuid';
-import WithPermission from "./WithPermission";
 import { PageProColumns } from "./PageList";
-import { Icon } from "@iconify/react/dist/iconify.js";
 import TableBtnWithPermission from "./TableBtnWithPermission";
+import { $t } from "@common/locales";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
   
 interface EditableTableProps<T> {
     configFields: PageProColumns<T>[];
@@ -26,10 +25,8 @@ const EditableTable = <T extends { _id: string }>({
                                                                 className,
                                                                 extendsId,
                                                             }: EditableTableProps<T>) => {
-    // const [form] = Form.useForm<FormInstance>();
-    // const [isModalVisible, setIsModalVisible] = useState(false);
     const [configurations, setConfigurations] = useState<(T | {_id:string})[]>(value ||[{_id:'1234'}]);
-    // const [editingConfig, setEditingConfig] = useState<T | null>(null);
+    const {state} = useGlobalContext()
 
     const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() =>
     value?.map((item) => item._id) || ['1234']
@@ -43,10 +40,12 @@ const EditableTable = <T extends { _id: string }>({
         return value
     }
 
+    const translatedColumns = useMemo(()=>configFields.map((x)=>({...x, title:$t(x.title as string)})),[state.language,configFields])
+
     return (
         <EditableProTable<T>
             className={className}
-            columns={configFields}
+            columns={translatedColumns}
             rowKey="_id"
             value={configurations as T[]}
             size="small"

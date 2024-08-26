@@ -72,7 +72,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
               // this.invokeLineRef?.changeLineChart()
             }else{
               setInvokeStaticError(true)
-              message.error(msg || RESPONSE_TIPS.dataError)
+              message.error(msg || $t(RESPONSE_TIPS.dataError))
             }
     }).catch(()=>{setQueryBtnLoading(false)})
   };
@@ -84,7 +84,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
           if(code === STATUS_CODE.SUCCESS){
             return  {data:data.statistics?.map((x:(MonitorApiData|MonitorSubscriberData))=>{x.proxyRate = Number((x.proxyRate*100).toFixed(2));x.requestRate = Number((x.requestRate*100).toFixed(2));return x}), success: true}
         }else{
-            message.error(msg || RESPONSE_TIPS.dataError)
+            message.error(msg || $t(RESPONSE_TIPS.dataError))
             return {data:[], success:false}
         }
       }).catch(() => {
@@ -113,7 +113,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
           setModalVisible(true);
         }else{
           setInvokeStaticError(true)
-          message.error(msg || RESPONSE_TIPS.dataError)
+          message.error(msg || $t(RESPONSE_TIPS.dataError))
         }
         })
     };

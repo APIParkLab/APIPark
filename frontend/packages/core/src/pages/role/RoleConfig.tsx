@@ -152,7 +152,7 @@ const RoleConfig = ()=>{
                 generateDependenciesMap(newPermits)
                 setPermissionTemplate(newPermits)
             }else{
-                message.error(msg || RESPONSE_TIPS.dataError)
+                message.error(msg || $t(RESPONSE_TIPS.dataError))
             }
         })
     }
@@ -164,8 +164,8 @@ const RoleConfig = ()=>{
                 form.setFieldsValue({name:data.role.name,permits:data.role.permit})
                 return Promise.resolve(true)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
-                return Promise.reject(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
+                return Promise.reject(msg || $t(RESPONSE_TIPS.error))
             }
         }).catch((errInfo)=>Promise.reject(errInfo))
     }
@@ -184,11 +184,11 @@ const RoleConfig = ()=>{
             return fetchData<BasicResponse<null>>(`${roleType}/role`,{method:roleId === undefined? 'POST' : 'PUT',eoBody:({...body}),...(roleId !== undefined?{eoParams:{role:roleId}}:{})}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    return Promise.reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    return Promise.reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errInfo)=>Promise.reject(errInfo))
     };
@@ -213,9 +213,9 @@ const RoleConfig = ()=>{
                     <Form.Item
                         className=" m-btnbase  mr-PAGE_INSIDE_X"
                         name="name"
-                        rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                        rules={[{ required: true,whitespace:true  }]}
                     >
-                        <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                        <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                     </Form.Item>
                     <Form.Item
                         name="permits"

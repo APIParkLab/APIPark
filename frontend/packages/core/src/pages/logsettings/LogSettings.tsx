@@ -31,8 +31,8 @@ const LogSettings = ()=>{
                     }
                     return Promise.resolve(data.dynamics)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
-                return Promise.reject(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
+                return Promise.reject(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }

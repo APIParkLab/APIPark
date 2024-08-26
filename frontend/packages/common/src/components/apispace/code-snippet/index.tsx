@@ -1,4 +1,4 @@
-import  { useEffect } from 'react';
+import  { useEffect, useMemo } from 'react';
 import { Cascader } from 'antd';
 import CODE_LANG from '@common/const/code/const';
 import type { DefaultOptionType } from 'antd/es/cascader';
@@ -13,6 +13,7 @@ import {Codebox} from "@common/components/postcat//api/Codebox";
 import {Collapse} from "@common/components/postcat/api/Collapse";
 import {Box} from "@mui/material";
 import { $t } from '@common/locales';
+import { useGlobalContext } from '@common/contexts/GlobalStateContext';
 
 type CodeSnippetCompoType = {
   title:string
@@ -36,6 +37,7 @@ type CodeSnippetCompoType = {
   let isMultipart: boolean = false
 
   export default function CodeSnippetCompo({title,api, extraTitle, extraContent, minLines=15}: CodeSnippetCompoType) {
+    const {state }  = useGlobalContext()
     // const [tokenState ] = useTokenBasicInfo()
     const pretreatmentRequestInfo = (apiDoc: ApiDetail) =>{
       isMultipart = false
@@ -190,13 +192,14 @@ type CodeSnippetCompoType = {
     const [placeholderTxt, setPlaceholderTxt] = useState($t('搜索编程语言...'))
     const [selectItemTxt, setSelectItemTxt ] = useState('')
 
+    const codeLangOptions = useMemo(()=>CODE_LANG.map(x=>({...x, label:$t(x.label as string)})),[state.language])
     return  (
 
         <Collapse title={title}>
           <Box width="100%">
             <>
             <Codebox extraContent={<><span className="ml-[12px]">{$t('编程语言')}：</span><Cascader
-                  options={CODE_LANG}
+                  options={codeLangOptions}
                   onChange={(value,record) => onChange(value as unknown as number[],record)}
                   placeholder={placeholderTxt}
                   value={lang} // 当前的值

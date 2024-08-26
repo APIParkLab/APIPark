@@ -110,6 +110,7 @@ export type PublishApprovalModalProps = {
     serviceId:string
     teamId:string
     clusterPublishStatus?:SystemInsidePublishOnlineItems[]
+    
 }
 
 export type PublishApprovalModalHandle = {

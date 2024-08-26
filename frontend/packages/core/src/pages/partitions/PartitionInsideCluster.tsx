@@ -27,7 +27,7 @@ const PartitionInsideCluster:FC = ()=> {
                 data.nodes && data.nodes.length > 0 && setNodeData(data.nodes[0])
                 setShowStatus('view')
             } else {
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         }).catch(() => {
             return {data: [], success: false}

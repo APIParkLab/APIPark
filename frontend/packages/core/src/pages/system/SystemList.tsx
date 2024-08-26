@@ -52,7 +52,7 @@ const SystemList:FC = ()=>{
                 setTableHttpReload(false)
                 return  {data:data.services, success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -77,7 +77,7 @@ const SystemList:FC = ()=>{
                     })
                     setTeamList(tmpValueEnum)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         })
@@ -98,7 +98,7 @@ const SystemList:FC = ()=>{
             })
             setMemberValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }
 

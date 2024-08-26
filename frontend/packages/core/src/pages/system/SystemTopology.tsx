@@ -37,7 +37,7 @@ export default function SystemTopology() {
             if(code === STATUS_CODE.SUCCESS){
                 setGraphData(transformData({...data,currentSystem:{id:serviceId,name:systemInfo?.name || ''}}))
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }

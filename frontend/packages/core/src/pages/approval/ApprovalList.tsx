@@ -56,11 +56,11 @@ export default function ApprovalList({pageType,pageStatus}:{pageType:'subscribe'
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setTableListDataSource(data.approvals)
-                !init && message.success(msg || RESPONSE_TIPS.success)
+                !init && message.success(msg || $t(RESPONSE_TIPS.success))
                 setInit((prev)=>prev ? false : prev)
                 return  {data:data.approvals, success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -77,7 +77,7 @@ export default function ApprovalList({pageType,pageStatus}:{pageType:'subscribe'
     }, [pageType,pageStatus]);
 
     const openModal = async(type:'approval'|'view',entity:ApprovalTableListItem)=>{
-        message.loading(RESPONSE_TIPS.loading)
+        message.loading($t(RESPONSE_TIPS.loading))
         const {code,data,msg} = await fetchData<BasicResponse<{approval:PublishApprovalInfoType|SubscribeApprovalInfoType}>>(`approval/${pageType}`,{method:'GET',eoParams:{id:entity!.id},eoTransformKeys:['apply_project','apply_team','apply_time','approval_time']})
         message.destroy()
         if(code === STATUS_CODE.SUCCESS){
@@ -116,7 +116,7 @@ export default function ApprovalList({pageType,pageStatus}:{pageType:'subscribe'
                 },
             })
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
             return
         }
     }
@@ -132,7 +132,7 @@ export default function ApprovalList({pageType,pageStatus}:{pageType:'subscribe'
             })
             setMemberValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }
 

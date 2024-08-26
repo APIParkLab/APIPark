@@ -57,12 +57,12 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
             return fetchData<BasicResponse<{team:TeamConfigFieldType}>>(pageType === 'manage'?'manager/team' : 'team',{method:onEdit ? 'PUT' : 'POST', eoParams:params,eoBody:(value),eoTransformKeys:['teamId']}).then(response=>{
                 const {code,data,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     setTeamInfo?.(data.team)
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    return Promise.reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    return Promise.reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=>{
                 return Promise.reject(errorInfo)
@@ -78,7 +78,7 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
                 setCanDelete(data.team.canDelete)
                 setTimeout(()=>{form.setFieldsValue({...data.team})},0)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     };
@@ -92,7 +92,7 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
                     label:x.name, value:x.id
                 }}) || [])
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -102,13 +102,13 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
             fetchData<BasicResponse<null>>(`manager/team`,{method:'DELETE',eoParams:{id:form.getFieldValue('id')}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     navigateTo('/team/list')
 
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -150,18 +150,18 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
                         <Form.Item<TeamConfigFieldType>
                             label={$t("团队名称")}
                             name="name"
-                            rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                            rules={[{ required: true,whitespace:true  }]}
                         >
-                            <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                            <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
 
                         <Form.Item<TeamConfigFieldType>
                             label={$t("团队 ID")}
                             name="id"
                             extra={$t("团队 ID（team_id）可用于检索团队，一旦保存无法修改。")}
-                            rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                            rules={[{ required: true,whitespace:true  }]}
                         >
-                            <Input className="w-INPUT_NORMAL" disabled={onEdit} placeholder={PLACEHOLDER.input}/>
+                            <Input className="w-INPUT_NORMAL" disabled={onEdit} placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
 
                         {!onEdit &&
@@ -169,9 +169,9 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
                             label={$t("团队负责人")}
                             name="master"
                             extra={$t("负责人对团队内的团队、服务、成员有管理权限")}
-                            rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
+                            rules={[{required: true}]}
                         >
-                            <Select className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.select} options={managerOption}>
+                            <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={managerOption}>
                             </Select>
                         </Form.Item>}
 
@@ -180,7 +180,7 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
                             label={$t("描述")}
                             name="description"
                         >
-                            <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                            <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
 
                     { onEdit &&
