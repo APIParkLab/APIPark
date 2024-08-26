@@ -34,11 +34,11 @@ const CertConfigModal = forwardRef<PartitionCertConfigHandle,PartitionCertConfig
                 fetchData<BasicResponse<null>>('certificate',{method:type === 'add'? 'POST' : 'PUT',eoBody:(body), eoParams:type === 'add' ? {}:{id:entity!.id}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -72,7 +72,7 @@ const CertConfigModal = forwardRef<PartitionCertConfigHandle,PartitionCertConfig
                 label={$t("密钥")}
                 name="key"
                 className="mb-0 bg-transparent p-0 border-none rounded-none"
-                rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
+                rules={[{ required: true }]}
             >
                     <Upload maxCount={1} showUploadList={false} beforeUpload={(file)=>{
                         const reader = new FileReader();
@@ -108,7 +108,7 @@ const CertConfigModal = forwardRef<PartitionCertConfigHandle,PartitionCertConfig
                 label={$t("证书")}
                 name="pem"
                 className="mb-0 bg-transparent p-0 border-none rounded-none"
-                rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
+                rules={[{ required: true }]}
             >
                     <Upload  maxCount={1} showUploadList={false} beforeUpload={(file)=>{
                         const reader = new FileReader();
@@ -158,7 +158,7 @@ const PartitionInsideCert:FC = ()=>{
             if(code === STATUS_CODE.SUCCESS){
                 return  {data:data.certificates, success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -171,11 +171,11 @@ const PartitionInsideCert:FC = ()=>{
             fetchData<BasicResponse<null>>('certificate',{method:'DELETE',eoParams:{id:entity.id}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -191,19 +191,19 @@ const PartitionInsideCert:FC = ()=>{
                 break;
             case 'edit':{
                 title=$t('修改证书')
-                message.loading(RESPONSE_TIPS.loading)
+                message.loading($t(RESPONSE_TIPS.loading))
                 const {code,data,msg} = await fetchData<BasicResponse<{cert:{key:string, pem:string}}>>('certificate',{method:'GET',eoParams:{id:entity!.id}})
                 message.destroy()
                 if(code === STATUS_CODE.SUCCESS){
                     content= <CertConfigModal ref={editRef}  type="edit" entity={{...data.cert,id:entity!.id}}/>
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
                     return
                 }
                 break;}
             case 'delete':
                 title=$t('删除')
-                content=DELETE_TIPS.default
+                content=$t(DELETE_TIPS.default)
                 break;
         }
 
@@ -268,7 +268,7 @@ const PartitionInsideCert:FC = ()=>{
             })
             setMemberValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }
 

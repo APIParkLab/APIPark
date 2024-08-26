@@ -5,7 +5,7 @@ import { useParams, Link, useLocation } from "react-router-dom";
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList";
 import { PublishApprovalModalContent } from "@common/components/aoplatform/PublishApprovalModalContent";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
-import { PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN, PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN } from "@common/const/approval/const";
+import { PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN, PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN, PublishApplyStatusEnum, PublishStatusEnum, PublishTableStatusColorClass } from "@common/const/approval/const";
 import { BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { SimpleMemberItem } from "@common/const/type.ts";
 import { MemberTableListItem } from "../../../const/member/type";
@@ -37,7 +37,7 @@ const SystemInsidePublicList:FC = ()=>{
     const [pageType, setPageType] = useState<'insideSystem'|'global'>('insideSystem')
     const query =new URLSearchParams(useLocation().search)
     const currLocation = useLocation().pathname
-    const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
+    const [memberValueEnum, setMemberValueEnum] = useState<SimpleMemberItem[]>([])
     const {accessData,state} = useGlobalContext()
     const [drawerTitle, setDrawerTitle] = useState<string>('')
     const [drawerType, setDrawerType] = useState<'approval'|'view'|'add'|'publish'|'online'>('view')
@@ -67,7 +67,7 @@ const SystemInsidePublicList:FC = ()=>{
                 setInit((prev)=>prev ? false : prev)
                 return  {data:finalRes, success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 setInit((prev)=>prev ? false : prev)
                 return {data:[], success:false}
             }
@@ -100,11 +100,11 @@ const SystemInsidePublicList:FC = ()=>{
             fetchData<BasicResponse<null>>(url,{method,eoParams:params}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })}
@@ -134,7 +134,7 @@ const SystemInsidePublicList:FC = ()=>{
         setIsOkToPublish(false)
         switch (type) {
             case 'view':{
-                message.loading(RESPONSE_TIPS.loading);
+                message.loading($t(RESPONSE_TIPS.loading));
                 const viewPublish:boolean =  pageStatus !== 0 || ((entity as PublishVersionTableListItem)?.status && (entity as PublishVersionTableListItem)?.status !== 'none') 
                 const { code, data, msg } = await fetchData<BasicResponse<{ publish: PublishApprovalInfoType } | { release:SystemPublishReleaseItem}>>(
                     viewPublish ? 'service/publish':'service/release',
@@ -145,13 +145,13 @@ const SystemInsidePublicList:FC = ()=>{
                     setDrawerTitle($t('查看详情'))
                     setDrawerType(type)
                     setDrawerData(viewPublish ? data.publish : data.release)} else {
-                    message.error(msg || RESPONSE_TIPS.error);
+                    message.error(msg || $t(RESPONSE_TIPS.error));
                     return
                 }
                 break;
             }
             case 'online':{
-                message.loading(RESPONSE_TIPS.loading);
+                message.loading($t(RESPONSE_TIPS.loading));
                 const { code, data, msg } = await fetchData<BasicResponse<{ publish: PublishApprovalInfoType }>>(
                     'service/publish',
                     { method: 'GET', eoParams:{ id: (entity as PublishVersionTableListItem)?.flowId,service:serviceId,team:teamId },eoTransformKeys:['version_remark'] }
@@ -163,13 +163,13 @@ const SystemInsidePublicList:FC = ()=>{
                     setDrawerOkTitle($t('上线'))
                     setDrawerData({...data.publish, flowId:(entity as PublishVersionTableListItem)?.flowId})
                 } else {
-                    message.error(msg || RESPONSE_TIPS.error);
+                    message.error(msg || $t(RESPONSE_TIPS.error));
                     return
                 }
                 break;
             }
             case 'approval':{
-                message.loading(RESPONSE_TIPS.loading);
+                message.loading($t(RESPONSE_TIPS.loading));
                 const { code, data, msg } = await fetchData<BasicResponse<{ publish: PublishApprovalInfoType }>>(
                     'service/publish',
                     { method: 'GET', eoParams:{ id: (entity as PublishVersionTableListItem)?.flowId,service:serviceId,team:teamId },eoTransformKeys:['version_remark'] }
@@ -181,14 +181,14 @@ const SystemInsidePublicList:FC = ()=>{
                     setDrawerData(data.publish)
                     setDrawerOkTitle($t('通过'))
                 } else {
-                    message.error(msg || RESPONSE_TIPS.error);
+                    message.error(msg || $t(RESPONSE_TIPS.error));
                     return
                 }
                 break;
             }
             case 'publish':
             case 'add':{
-                    message.loading(RESPONSE_TIPS.loading);
+                    message.loading($t(RESPONSE_TIPS.loading));
                     const { code, data, msg } = await fetchData<BasicResponse<{ diffs: PublishApprovalInfoType }>>(
                         'service/publish/check',
                         { method: 'GET', eoParams:{service:serviceId,team:teamId, ...(type === 'publish' ?{ release:entity?.id }:{})},eoTransformKeys:['version_remark'] }
@@ -201,7 +201,7 @@ const SystemInsidePublicList:FC = ()=>{
                         setDrawerOkTitle($t('确认'))
                         setIsOkToPublish(data.isOk??true)
                     } else {
-                        message.error(msg || RESPONSE_TIPS.error);
+                        message.error(msg || $t(RESPONSE_TIPS.error));
                         return
                     }
                     break;
@@ -217,7 +217,7 @@ const SystemInsidePublicList:FC = ()=>{
         switch (type) {
             case 'delete':
                 title = $t('删除');
-                content = DELETE_TIPS.default;
+                content = $t(DELETE_TIPS.default);
                 break;
             case 'rollback':
                 title = $t('回滚');
@@ -364,21 +364,49 @@ const SystemInsidePublicList:FC = ()=>{
 
     
     const getMemberList = async ()=>{
-        setMemberValueEnum({})
+        setMemberValueEnum([])
         const {code,data,msg}  = await fetchData<BasicResponse<{ members: SimpleMemberItem[] }>>('simple/member',{method:'GET'})
         if(code === STATUS_CODE.SUCCESS){
-            const tmpValueEnum:{[k:string]:{text:string}} = {}
-            data.members?.forEach((x:SimpleMemberItem)=>{
-                tmpValueEnum[x.name] = {text:x.name}
-            })
-            setMemberValueEnum(tmpValueEnum)
+            setMemberValueEnum(data.members)
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }
 
     const columns = useMemo(()=>{
-        return ((pageType === 'insideSystem' || pageStatus === 0 ) ? PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN:PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN).map(x=>{if(x.filters &&(x.dataIndex as string[])?.indexOf('creator') !== -1){x.valueEnum = memberValueEnum} return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+        return ((pageType === 'insideSystem' || pageStatus === 0 ) ?
+             PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN
+             :PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN)
+             .map(x=>{
+                if(x.filters &&(x.dataIndex as string[])?.indexOf('creator') !== -1){
+                    const tmpValueEnum:{[k:string]:{text:string}} = {}
+                    memberValueEnum?.forEach((x:SimpleMemberItem)=>{
+                        tmpValueEnum[x.name] = {text:$t(x.name)}
+                    })
+                    x.valueEnum = tmpValueEnum
+                }
+                if(x.dataIndex === 'status'){
+                    x.valueEnum = (pageType === 'insideSystem' || pageStatus === 0 ) ? new Map([
+                        ['apply',<span className={PublishTableStatusColorClass.apply}>{$t(PublishApplyStatusEnum.apply || '-')}</span>],
+                        ['running',<span className={PublishTableStatusColorClass.running}>{$t(PublishApplyStatusEnum.running || '-')}</span>],
+                        ['none',<span className={PublishTableStatusColorClass.none}>{$t(PublishApplyStatusEnum.none || '-')}</span>],
+                        ['refuse',<span className={PublishTableStatusColorClass.refuse}>{$t(PublishApplyStatusEnum.refuse || '-')}</span>],
+                        ['publishing',<span className={PublishTableStatusColorClass.publishing}>{$t(PublishApplyStatusEnum.publishing || '-')}</span>],
+                        ['error',<span className={PublishTableStatusColorClass.error}>{$t(PublishApplyStatusEnum.error || '-')}</span>],
+                    ]) : new Map([
+                        ['apply',<span className={PublishTableStatusColorClass.apply}>{$t(PublishStatusEnum.apply || '-')}</span>],
+                        ['accept',<span className={PublishTableStatusColorClass.accept}>{$t(PublishStatusEnum.accept || '-')}</span>],
+                        ['done',<span className={PublishTableStatusColorClass.done}>{$t(PublishStatusEnum.done || '-')}</span>],
+                        ['stop',<span className={PublishTableStatusColorClass.stop}>{$t(PublishStatusEnum.stop || '-')}</span>],
+                        ['close',<span className={PublishTableStatusColorClass.close}>{$t(PublishStatusEnum.close || '-')}</span>],
+                        ['refuse',<span className={PublishTableStatusColorClass.refuse}>{$t(PublishStatusEnum.refuse || '-')}</span>],
+                        ['publishing',<span className={PublishTableStatusColorClass.publishing}>{$t(PublishStatusEnum.publishing || '-')}</span>],
+                        ['error',<span className={PublishTableStatusColorClass.error}>{$t(PublishStatusEnum.error || '-')}</span>],
+                    ])
+                } 
+                return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}
+            }
+        )
     },[pageType, pageStatus, memberValueEnum,state.language])
 
     useEffect(() => {

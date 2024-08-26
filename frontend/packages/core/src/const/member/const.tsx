@@ -43,9 +43,5 @@ export const MEMBER_TABLE_COLUMNS: PageProColumns<MemberTableListItem>[] = [
         valueType: 'select',
         filters: true,
         onFilter: true,
-        valueEnum:new Map([
-            [true,<span className="text-status_success">{('启用')}</span>],
-            [false,<span className="text-status_fail">{('禁用')}</span>],
-        ])
     }
 ];

@@ -1,5 +1,5 @@
 
-import  {forwardRef, useEffect, useImperativeHandle, useState} from "react";
+import  {forwardRef, useEffect, useImperativeHandle, useMemo, useState} from "react";
 import {App, Button, Form, Input, Radio, Row, Select, TreeSelect, Upload} from "antd";
 import { Link, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
@@ -13,7 +13,7 @@ import { validateUrlSlash } from "@common/utils/validate.ts";
 import { compressImage, normFile } from "@common/utils/uploadPic.ts"; 
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext.tsx";
 import { useSystemContext } from "../../contexts/SystemContext.tsx";
-import { visualizations } from "@core/const/system/const.tsx";
+import { SERVICE_VISUALIZATION_OPTIONS } from "@core/const/system/const.tsx";
 import { RcFile, UploadChangeParam, UploadFile, UploadProps } from "antd/es/upload/interface";
 import { LoadingOutlined } from "@ant-design/icons";
 import { getImgBase64 } from "@common/utils/dataTransfer.ts";
@@ -40,7 +40,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
     const [tagOptionList, setTagOptionList] = useState<DefaultOptionType[]>([])
     const [serviceClassifyOptionList, setServiceClassifyOptionList] = useState<DefaultOptionType[]>()
     const [uploadLoading, setUploadLoading] = useState<boolean>(false)
-    const {checkPermission,accessInit, getGlobalAccessData} = useGlobalContext()
+    const {checkPermission,accessInit, getGlobalAccessData,state} = useGlobalContext()
 
     useImperativeHandle(ref, () => ({
         save:onFinish
@@ -105,10 +105,11 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                 setServiceClassifyOptionList(data.catalogues)
 
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
+
 
     // 获取表单默认值
     const getSystemInfo = () => {
@@ -134,7 +135,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                     setShowClassify(data.service.serviceType === 'public')
                             },0)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     };
@@ -144,12 +145,12 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
             return fetchData<BasicResponse<{service:{id:string}}>>(serviceId === undefined? 'team/service':'service/info',{method:serviceId === undefined? 'POST' : 'PUT',eoParams: {...(serviceId === undefined ? {team:value.team} :{service:serviceId,team:teamId})},eoBody:({...value,prefix:value.prefix?.trim()}), eoTransformKeys:['serviceType']},).then(response=>{
                 const {code,data,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     setSystemInfo(data.service)
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    return Promise.reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    return Promise.reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=>{
                 return Promise.reject(errorInfo)
@@ -168,7 +169,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                     label:x.name, value:x.id
                 }}))
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -177,10 +178,10 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
         fetchData<BasicResponse<null>>('team/service',{method:'DELETE',eoParams:{team:teamId,service:serviceId}}).then(response=>{
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                message.success(msg || RESPONSE_TIPS.success)
+                message.success(msg || $t(RESPONSE_TIPS.success))
                 navigate(`/service/list`)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -218,7 +219,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
     const deleteSystemModal = async ()=>{
         modal.confirm({
             title:$t('删除'),
-            content:DELETE_TIPS.default,
+            content:$t(DELETE_TIPS.default),
             onOk:()=> {
                 return deleteSystem()
             },
@@ -232,6 +233,8 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
             icon:<></>
         })
     }
+
+    const visualizationOptions = useMemo(()=>SERVICE_VISUALIZATION_OPTIONS.map((x)=>({...x, label:$t(x.label)})),[state.language])
 
     return (
         <>
@@ -250,17 +253,17 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         <Form.Item<SystemConfigFieldType>
                             label={$t("服务名称")}
                             name="name"
-                            rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
+                            rules={[{ required: true ,whitespace:true }]}
                         >
-                            <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                            <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
 
                         <Form.Item<SystemConfigFieldType>
                             label={$t("服务ID")}
                             name="id"
-                            rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
+                            rules={[{ required: true ,whitespace:true }]}
                         >
-                            <Input className="w-INPUT_NORMAL" disabled={onEdit} placeholder={PLACEHOLDER.input}/>
+                            <Input className="w-INPUT_NORMAL" disabled={onEdit} placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
 
                         <Form.Item<SystemConfigFieldType>
@@ -272,7 +275,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                             validator: validateUrlSlash,
                             }]}
                         >
-                            <Input prefix={onEdit ? '' : '/'} className="w-INPUT_NORMAL" disabled={onEdit} placeholder={PLACEHOLDER.input}/>
+                            <Input prefix={onEdit ? '' : '/'} className="w-INPUT_NORMAL" disabled={onEdit} placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
 
                         <Form.Item<SystemConfigFieldType>
@@ -300,7 +303,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                             label={$t("描述")}
                             name="description"
                         >
-                            <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                            <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
 
                         <Form.Item<SystemConfigFieldType>
@@ -313,9 +316,9 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         {!onEdit && <Form.Item<SystemConfigFieldType>
                             label={$t("所属团队")}
                             name="team"
-                            rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
+                            rules={[{ required: true }]}
                         >
-                            <Select className="w-INPUT_NORMAL" disabled={onEdit} placeholder={PLACEHOLDER.input} options={teamOptionList} >
+                            <Select className="w-INPUT_NORMAL" disabled={onEdit} placeholder={$t(PLACEHOLDER.input)} options={teamOptionList} >
                             </Select>
                         </Form.Item>}
 
@@ -327,7 +330,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                             <Select 
                                 className="w-INPUT_NORMAL" 
                                 mode="tags" 
-                                placeholder={PLACEHOLDER.select} 
+                                placeholder={$t(PLACEHOLDER.select)}
                                 options={tagOptionList}>
                             </Select>
                         </Form.Item>
@@ -335,9 +338,9 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         <Form.Item<SystemConfigFieldType>
                             label={$t("服务类型")}
                             name="serviceType"
-                            rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
+                            rules={[{required: true}]}
                         >
-                            <Radio.Group className="flex flex-col" options={visualizations} onChange={(e)=>{setShowClassify(e.target.value === 'public')}} />
+                            <Radio.Group className="flex flex-col" options={visualizationOptions} onChange={(e)=>{setShowClassify(e.target.value === 'public')}} />
                         </Form.Item>
 
                         {showClassify &&
@@ -345,14 +348,14 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                             label={$t("所属服务分类")}
                             name="catalogue"
                             extra={$t("设置服务展示在服务市场中的哪个分类下")}
-                            rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
+                            rules={[{required: true}]}
                         >
                             <TreeSelect
                                 className="w-INPUT_NORMAL"
                                 fieldNames={{label:'name',value:'id',children:'children'}}
                                 showSearch
                                 dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                                placeholder={PLACEHOLDER.select}
+                                placeholder={$t(PLACEHOLDER.select)}
                                 allowClear
                                 treeDefaultExpandAll
                                 treeData={serviceClassifyOptionList}

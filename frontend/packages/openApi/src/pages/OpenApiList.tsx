@@ -65,7 +65,7 @@ export default function OpenApiList(){
                 setTableHttpReload(false)
                 return  {data:data.apps, success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -77,19 +77,19 @@ export default function OpenApiList(){
         fetchData<BasicResponse<null>>('external-app/token',{method:'PUT',eoParams:{id:entity.id}}).then(response=>{
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                message.success(msg || RESPONSE_TIPS.success)
+                message.success(msg || $t(RESPONSE_TIPS.success))
                 manualReloadTable()
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
 
     const copyToken = (entity: OpenApiTableListItem)=>{
         if(copy(entity.token)){
-            message.success(RESPONSE_TIPS.copySuccess)
+            message.success($t(RESPONSE_TIPS.copySuccess))
         }else{
-            message.error(RESPONSE_TIPS.copyError)
+            message.error($t(RESPONSE_TIPS.copyError))
         }
     }
 
@@ -103,11 +103,11 @@ export default function OpenApiList(){
             fetchData<BasicResponse<null>>('external-app',{method:'DELETE',eoParams:{id:entity!.id}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -124,19 +124,19 @@ export default function OpenApiList(){
                 break;
             case 'edit':{
                 title=$t('配置 Open Api')
-                message.loading(RESPONSE_TIPS.loading)
+                message.loading($t(RESPONSE_TIPS.loading))
                 const {code,data,msg} = await fetchData<BasicResponse<{app:OpenApiConfigFieldType}>>('external-app',{method:'GET',eoParams:{id:entity!.id}})
                 message.destroy()
                 if(code === STATUS_CODE.SUCCESS){
                     content=<OpenApiConfig ref={editOpenApiRef} type={type} entity={data.app}/>
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
                     return
                 }
                 break;}
             case 'delete':
                 title=$t('删除')
-                content=DELETE_TIPS.default
+                content=$t(DELETE_TIPS.default)
                 break;
         }
 
@@ -165,10 +165,10 @@ export default function OpenApiList(){
         fetchData<BasicResponse<null>>(`external-app/${enabled ? 'disable' :'enable'}`,{method:'PUT',eoParams:{id:entity.id}}).then(response=>{
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                message.success(msg || RESPONSE_TIPS.success)
+                message.success(msg || $t(RESPONSE_TIPS.success))
                 manualReloadTable()
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -184,7 +184,7 @@ export default function OpenApiList(){
             })
             setMemberValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }
 

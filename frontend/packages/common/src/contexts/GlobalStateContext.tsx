@@ -128,8 +128,8 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
                 resolve(data.response)
                 getGlobalAccessPromise = null
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
-                reject(data.msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
+                reject(data.msg || $t(RESPONSE_TIPS.error))
             }
         })
         )
@@ -143,7 +143,7 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
                 setAccessData(prevData => new Map(prevData).set('team', data.access))
                 setTeamDataFlushed(true)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
             })
         }

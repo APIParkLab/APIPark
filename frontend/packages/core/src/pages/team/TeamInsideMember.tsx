@@ -127,7 +127,7 @@ const TeamInsideMember:FC = ()=>{
                 }
                 return  {data:data.members, success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -143,13 +143,13 @@ const TeamInsideMember:FC = ()=>{
             fetchData<BasicResponse<null>>('team/member',{method:'POST' ,eoBody:({users:memberKeyFromModal}),eoParams:{team:teamId}}).then(response=>{
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                message.success(msg || RESPONSE_TIPS.success)
+                message.success(msg || $t(RESPONSE_TIPS.success))
                 manualReloadTable()
                 cleanModalData()
                 resolve(true)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
-                reject(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
+                reject(msg || $t(RESPONSE_TIPS.error))
             }
         }).catch((errorInfo)=> reject(errorInfo)).finally(()=>setAddMemberBtnLoading(false))
     })
@@ -161,11 +161,11 @@ const TeamInsideMember:FC = ()=>{
             fetchData<BasicResponse<null>>(`team/member`,{method:'DELETE',eoParams:{team:teamId,user:entity.user.id}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -219,11 +219,11 @@ const TeamInsideMember:FC = ()=>{
             fetchData<BasicResponse<null>>(`team/member/role`, {method: 'PUT',eoBody:({roles:value, users:[entity.user.id]}), eoParams: {team:teamId}}).then(response => {
                 const {code, msg} = response
                 if (code === STATUS_CODE.SUCCESS) {
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 } else {
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -262,7 +262,7 @@ const TeamInsideMember:FC = ()=>{
                 setColumns(newCol)
                 return
             } else {
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }

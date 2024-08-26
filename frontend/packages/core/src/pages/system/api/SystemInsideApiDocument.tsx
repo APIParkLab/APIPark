@@ -33,7 +33,7 @@ const SystemInsideApiDocument = forwardRef<SystemInsideApiDocumentHandle,SystemI
                 setApiDetail(data.api)
                 setLoaded(true)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         }).finally(()=>{setLoading(false)})
     }
@@ -43,11 +43,11 @@ const SystemInsideApiDocument = forwardRef<SystemInsideApiDocumentHandle,SystemI
             return fetchData<BasicResponse<{id:string}>>('service/api',{method:'PUT',eoParams:{service:serviceId,team:teamId,api:apiId},eoBody:(res.apiInfo)}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    return Promise.reject(msg|| RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    return Promise.reject(msg|| $t(RESPONSE_TIPS.error))
                 }
             }).catch(errInfo => Promise.reject(errInfo))
         })

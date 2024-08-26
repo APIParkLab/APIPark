@@ -128,7 +128,7 @@ export const Codebox =  memo((props: CodeboxProps) => {
   const copyCode = async (): Promise<void> => {
     if (editorRef.current) {
        await navigator.clipboard.writeText(editorRef.current.getValue())
-      message.success(RESPONSE_TIPS.copySuccess)
+      message.success($t(RESPONSE_TIPS.copySuccess))
     }
   }
 

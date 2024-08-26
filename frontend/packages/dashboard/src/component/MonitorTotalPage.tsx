@@ -129,7 +129,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   setTotalEmpty(data.requestSummary.total === 0 && data.proxySummary.total === 0)
                 }else{
                   setPieError(true)
-                  message.error(msg || RESPONSE_TIPS.dataError)
+                  message.error(msg || $t(RESPONSE_TIPS.dataError))
                 }
         }).finally(()=>{
           dispatch({ type: ACTIONS.REQUEST_COMPLETE, payload: 'getPieData' });
@@ -148,7 +148,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   // this.invokeLineRef?.changeLineChart()
                 }else{
                   setInvokeStaticError(true)
-                  message.error(msg || RESPONSE_TIPS.dataError)
+                  message.error(msg || $t(RESPONSE_TIPS.dataError))
                 }
         }).finally(()=>{
           dispatch({ type: ACTIONS.REQUEST_COMPLETE, payload: 'getInvokeData' });
@@ -165,7 +165,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   // this.trafficLineRef?.changeLineChart()
                 }else{
                   setTrafficStaticError(true)
-                  message.error(msg || RESPONSE_TIPS.dataError)
+                  message.error(msg || $t(RESPONSE_TIPS.dataError))
                 }
         }).finally(()=>{
           dispatch({ type: ACTIONS.REQUEST_COMPLETE, payload: 'getMessageData' });
@@ -180,7 +180,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                 if(code === STATUS_CODE.SUCCESS){
               return  {data:data.top10.map((x:MonitorApiData | MonitorSubscriberData)=>{x.proxyRate = Number((x.proxyRate*100).toFixed(2));x.requestRate = Number((x.requestRate*100).toFixed(2));return x}), success: true}
           }else{
-              message.error(msg || RESPONSE_TIPS.dataError)
+              message.error(msg || $t(RESPONSE_TIPS.dataError))
               return {data:[], success:false}
           }
         }).catch(() => {

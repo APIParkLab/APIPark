@@ -45,7 +45,7 @@ const ServiceHubDetail = ()=>{
                 setServiceDoc(DOMPurify.sanitize(data.service.document))
                 setActiveKey(data.service.apis.map((x)=>x.id))
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -79,7 +79,7 @@ const ServiceHubDetail = ()=>{
                     label:x.name, value:x.id
                 }}))
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }

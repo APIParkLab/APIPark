@@ -34,11 +34,11 @@ export const OpenApiConfig = forwardRef<OpenApiConfigHandle,OpenApiConfigProps>(
                 fetchData<BasicResponse<null>>('external-app',{method:type === 'add'? 'POST' : 'PUT',eoBody:(value), eoParams:type === 'add' ? {}:{id:entity!.id}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -71,24 +71,24 @@ export const OpenApiConfig = forwardRef<OpenApiConfigHandle,OpenApiConfigProps>(
             <Form.Item<OpenApiConfigFieldType>
                 label={$t("应用名称")}
                 name="name"
-                rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                rules={[{ required: true,whitespace:true  }]}
             >
-                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
             </Form.Item>
 
             <Form.Item<OpenApiConfigFieldType>
                 label={$t("应用 ID")}
                 name="id"
-                rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
+                rules={[{ required: true ,whitespace:true }]}
             >
-                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input} disabled={type === 'edit'}/>
+                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} disabled={type === 'edit'}/>
             </Form.Item>
 
             <Form.Item
                 label={$t("描述")}
                 name="desc"
             >
-                <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
             </Form.Item>
 
         </Form>

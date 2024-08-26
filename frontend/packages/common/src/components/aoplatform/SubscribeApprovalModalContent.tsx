@@ -39,20 +39,20 @@ export const SubscribeApprovalModalContent = forwardRef<SubscribeApprovalModalHa
             form.validateFields().then((value)=>{
                 if(operate === 'refuse' && form.getFieldValue('opinion') === ''){
                     form.setFields([{
-                        name:'opinion',errors:[FORM_ERROR_TIPS.refuseOpinion]
+                        name:'opinion',errors:[$t(FORM_ERROR_TIPS.refuseOpinion)]
                     }])
                     form.scrollToField('opinion')
-                    reject(RESPONSE_TIPS.refuseOpinion)
+                    reject($t(RESPONSE_TIPS.refuseOpinion))
                     return
                 }
                 fetchData<BasicResponse<null>>(`${inSystem?'service/':''}approval/subscribe`,{method: 'POST',eoBody:({opinion:value.opinion,operate}), eoParams:(inSystem ? {apply:data!.id, team:teamId} : {id:data!.id,team:teamId})}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -99,9 +99,9 @@ export const SubscribeApprovalModalContent = forwardRef<SubscribeApprovalModalHa
                 <Form.Item<FieldType>
                     label={$t("审核意见")}
                     name="opinion"
-                    extra={FORM_ERROR_TIPS.refuseOpinion}
+                    extra={$t(FORM_ERROR_TIPS.refuseOpinion)}
                 >
-                    <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input} onChange={()=>{  form.setFields([
+                    <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} onChange={()=>{  form.setFields([
                         {
                             name: 'opinion',
                             errors: [], // 设置为空数组来移除错误信息

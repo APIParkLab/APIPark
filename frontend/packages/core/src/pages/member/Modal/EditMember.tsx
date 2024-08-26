@@ -26,11 +26,11 @@ export const EditMemberModal = forwardRef<MemberDropdownModalHandle,MemberDropdo
                     }),eoTransformKeys:['departmentIds']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -48,7 +48,7 @@ export const EditMemberModal = forwardRef<MemberDropdownModalHandle,MemberDropdo
             if(code === STATUS_CODE.SUCCESS){
                 setDepartmentList([{...data.departments,children:data.departments.children?.filter((x)=>['unknown','disable'].indexOf(x.id) === -1),disabled:true}])
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         })
@@ -81,16 +81,16 @@ export const EditMemberModal = forwardRef<MemberDropdownModalHandle,MemberDropdo
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("用户名")}
                     name="name"
-                    rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true }]}
+                    rules={[{required: true,whitespace:true }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("邮箱")}
                     name="email"
-                    rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true },{type:"email",message: VALIDATE_MESSAGE.email}]}
+                    rules={[{required: true,whitespace:true },{type:"email",message: $t(VALIDATE_MESSAGE.email)}]}
                 >
-                    <Input className="w-INPUT_NORMAL" disabled={type ==='editMember'} placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" disabled={type ==='editMember'} placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("部门")}
@@ -102,7 +102,7 @@ export const EditMemberModal = forwardRef<MemberDropdownModalHandle,MemberDropdo
                             fieldNames={{label:'name',value:'id',children:'children'}}
                             showSearch
                             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                            placeholder={PLACEHOLDER.input}
+                            placeholder={$t(PLACEHOLDER.input)}
                             allowClear
                             treeDefaultExpandAll
                             treeData={departmentList}
