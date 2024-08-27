@@ -631,7 +631,7 @@ const MonitorLineGraph: FC<LineGraphProps> = ({ className, lineData, titles, yAx
     },
     yAxis: [{
       type: 'value',
-      name: (lineData as MessageData)?.date.length > 0 ? `${yAxisTitle}${$t('报文量')}（KB）` : '',
+      name: (lineData as MessageData)?.date.length > 0 ? `${$t('(0)报文量',[yAxisTitle])}（KB）` : '',
       nameLocation: 'end',
       nameTextStyle: {
         align: 'left'
