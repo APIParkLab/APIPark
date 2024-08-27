@@ -5,6 +5,7 @@ import { DASHBOARD_SETTING_DRIVER_OPTION_LIST } from "../../const/partitions/con
 import WithPermission from "@common/components/aoplatform/WithPermission";
 import { BasicResponse, PLACEHOLDER, STATUS_CODE, VALIDATE_MESSAGE } from "@common/const/const";
 import { useFetch } from "@common/hooks/http";
+import { $t } from "@common/locales";
 
 export type DashboardPageShowStatus = 'view'|'edit'
 
@@ -55,7 +56,7 @@ export type DashboardSettingEditProps = {
                         autoComplete="off"
                     >
                             <Form.Item<PartitionDashboardConfigFieldType>
-                                label="数据源类型"
+                                label={$t("数据源类型")}
                                 name="driver"
                                 rules={[{ required: true }]}
                             >
@@ -63,7 +64,7 @@ export type DashboardSettingEditProps = {
                             </Form.Item>
 
                             <Form.Item<PartitionDashboardConfigFieldType>
-                                label="数据源地址"
+                                label={$t("数据源地址")}
                                 name={['config','addr']}
                                 rules={[{ required: true }]}
                             >
@@ -71,7 +72,7 @@ export type DashboardSettingEditProps = {
                             </Form.Item>
 
                             <Form.Item<PartitionDashboardConfigFieldType>
-                                label="Organization"
+                                label={$t("Organization")}
                                 name={['config','org']}
                                 rules={[{ required: true }]}
                             >
@@ -79,7 +80,7 @@ export type DashboardSettingEditProps = {
                             </Form.Item>
 
                             <Form.Item<PartitionDashboardConfigFieldType>
-                                label="鉴权 Token"
+                                label={$t("鉴权 Token")}
                                 name={['config','token']}
                             >
                                 <Input className="w-INPUT_NORMAL"  placeholder={$t(PLACEHOLDER.input)}/>
@@ -88,11 +89,11 @@ export type DashboardSettingEditProps = {
                             <div className="flex gap-btnbase">
                                 <WithPermission access=''>
                                     <Button type="primary" htmlType="submit">
-                                        保存
+                                        {$t('保存')}
                                     </Button>
                                 </WithPermission>
                                 <Button type="default" onClick={()=>changeStatus('view')}>
-                                        取消
+                                        {$t('取消')}
                                 </Button>
                             </div>
                     </Form>
