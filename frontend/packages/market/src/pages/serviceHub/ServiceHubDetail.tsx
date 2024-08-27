@@ -106,7 +106,7 @@ const ServiceHubDetail = ()=>{
         {
             key: 'introduction',
             label: $t('介绍'),
-            children: <><div className="p-btnbase preview-document" dangerouslySetInnerHTML={{__html: serviceDoc || ''}}></div></>,
+            children: <><div className="p-btnbase preview-document mb-PAGE_INSIDE_B" dangerouslySetInnerHTML={{__html: serviceDoc || ''}}></div></>,
             icon: <Icon icon="ic:baseline-space-dashboard" width="14" height="14"/>,
         },
         {

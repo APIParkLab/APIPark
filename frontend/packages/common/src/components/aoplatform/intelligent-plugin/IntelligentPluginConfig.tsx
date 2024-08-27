@@ -1,4 +1,4 @@
-import {forwardRef, useEffect, useImperativeHandle, useState} from "react";
+import {forwardRef, useEffect, useImperativeHandle, useMemo, useState} from "react";
 import { action } from '@formily/reactive'
 import {
     FormItem,
@@ -45,14 +45,16 @@ import {DefaultOptionType} from "antd/es/cascader";
 import {createSchemaField, FormProvider, RecursionField, useField, useForm} from "@formily/react";
 import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
-import {App} from "antd";
+import {App, Descriptions} from "antd";
 import { $t } from "@common/locales";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 export const DynamicRender = (props) => {
     const {schema} = props
     const field = useField()
     const form = useForm()
     const [renderSchema, setRenderSchema] = useState({})
+    const {state} = useGlobalContext()
    
     useEffect(() => {
         form.clearFormGraph(`${field.address}.*`)
@@ -64,10 +66,41 @@ export const DynamicRender = (props) => {
         }
     }, [form.values.driver])
 
+
+    const  translateSchema = (render) =>{
+        console.log(render)
+        const res1 = {
+            ...render,
+            ...(render.title ? {title:$t(render.title)} : {}),
+            ...(render.description) ? {description:$t(render.description)} : {},
+            ...(render.label ? {label:$t(render.label)} : {}),
+            ...(render.properties ? {properties: Object.keys(render.properties).reduce((total, cur) => {
+                console.log(total, cur); // 可选：在生产环境中移除或注释掉
+                try {
+                    total[cur] = translateSchema(render.properties[cur]);
+                } catch (error) {
+                    console.error(`Error translating schema for property ${cur}:`, error);
+                }
+                return total;
+            }, {})} : {}),
+            ...(render.items && Array.isArray(render.items) ? {items:render.items.map(x=>translateSchema(x))} : {}),
+            ...(render.items && !Array.isArray(render.items) ? {items:translateSchema(render.items)} : {}),
+            ...(render.additionalProperties ? {additionalProperties: translateSchema(render.additionalProperties)} : {}),
+            ...(render.enum ?render.enum.map(x=>({...x, label:$t(x.label)})) : {}),
+
+        }
+        return res1
+    }
+
+    const translatedRenderSchema = useMemo(()=>{
+        const res =  renderSchema && translateSchema(renderSchema)
+        return res
+    },[state.language,renderSchema])
+
     return (
         <RecursionField
             basePath={field.address}
-            schema={renderSchema}
+            schema={translatedRenderSchema}
             onlyRenderProperties
         />
     )

@@ -39,7 +39,7 @@ export const useExcelExport = <T>() => {
     return tableColumnConfig
       .filter((head: ProColumnType<T>&{eoTitle:string}) => tableConfig?.[head.dataIndex as string]?.show)
       .map((head) => { return({
-        header: head.eoTitle,
+        header: $t(head.eoTitle),
         key: head.dataIndex,
         width: (head.eoTitle as string).length > 5 ? (head.eoTitle as string).length * 3 : 15,
         style: (head.dataIndex as string).includes('Rate') ? { numFmt: '0.00%' } : undefined,

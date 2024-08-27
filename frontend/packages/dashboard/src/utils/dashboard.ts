@@ -46,23 +46,23 @@ export function getTime (
     // 相差秒数
     switch (timeInterval) {
       case '1m': {
-        timeUnit = $t('每分钟')
+        timeUnit = ('每分钟')
         break
       }
       case '5m': {
-        timeUnit = $t('每5分钟')
+        timeUnit = ('每5分钟')
         break
       }
       case '1h': {
-        timeUnit = $t('每小时')
+        timeUnit = ('每小时')
         break
       }
       case '1d': {
-        timeUnit = $t('每天')
+        timeUnit = ('每天')
         break
       }
       case '1w': {
-        timeUnit = $t('每周')
+        timeUnit = ('每周')
         break
       }
     }
@@ -70,15 +70,15 @@ export function getTime (
   }
   
   // 当数据超过10万时，保留两个小数点，单位为万，如123212，显示12.32万；
-  export function changeNumberUnit (value?:number):string {
+  export function changeNumberUnit (value?:number):{value:string, unit:string} {
     if (value && value > 1000000000) {
-      return (value && value / 100000000).toFixed(2) + $t('亿')
+      return {value:(value && value / 100000000).toFixed(2) ,unit: ('亿')}
     } else if (value && value > 1000000) {
-      return (value && value / 10000).toFixed(0) + $t('万')
+      return {value: (value && value / 10000).toFixed(0) , unit: ('万')}
     } else if (value && value > 10000) {
-      return (value && value / 10000).toFixed(2) + $t('万')
+      return {value: (value && value / 10000).toFixed(2) , unit: ('万')}
     }
-    return (value ?? '-') + $t(' 次')
+    return {value: (value ?? '-') + '', unit: (' 次')}
   }
   
   export function yUnitFormatter (value:number):string {
