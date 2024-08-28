@@ -31,7 +31,6 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
     tooltip: {
       trigger: 'item',
       formatter: (params:Array<Record<string,unknown>>) => {
-        console.log(params)
         const startHtml = '<div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + $t(title) + '</span></div>'
         return startHtml + ($t(params.name || '-')  + '&nbsp&nbsp&nbsp </span><span style="font-weight:bold"> ' + params.value + '</span></section></div>')
       }

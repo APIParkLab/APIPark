@@ -165,7 +165,6 @@ const SystemInsideApprovalList:FC = ()=>{
         return filteredCol.map(x=>{
             if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){
                 const tmpValueEnum :Record<string,{text:string}>= {}
-                console.log(memberValueEnum)
                 memberValueEnum?.forEach((x:SimpleMemberItem)=>{
                     tmpValueEnum[x.name] = {text:$t(x.name)}
                 })

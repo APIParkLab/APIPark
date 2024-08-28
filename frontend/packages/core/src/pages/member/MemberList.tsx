@@ -332,10 +332,7 @@ const MemberList = ()=>{
             }
         })
     }
-
-    useEffect(()=>{
-        console.log(roleSelectableList,roleSelectableList?.map((x:{id:string,name:string})=>({label:$t(x.name), value:x.id})) )
-    },[state.language,roleSelectableList])
+    
     const translatedCol = useMemo(
         ()=> MEMBER_TABLE_COLUMNS.map((x)=>({...x, ...(x.dataIndex === 'roles' ? {
                     render:(_,entity)=>(
