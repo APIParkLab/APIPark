@@ -39,8 +39,6 @@ const LogSettings = ()=>{
 
     const menuData = useMemo(()=>{
         const newMenu =  menuItems?.map((x:DynamicMenuItem)=>{
-            console.log(state.language, $t(x.title))
-            
             return getItem(
                 <Link to={`template/${x.name}`}>{$t(x.title)}</Link>, 
                 x.name,
@@ -49,7 +47,6 @@ const LogSettings = ()=>{
                 undefined,
                 'system.devops.log_configuration.view')
         })
-            console.log(newMenu)
         return newMenu
     },[state.language,menuItems])
 

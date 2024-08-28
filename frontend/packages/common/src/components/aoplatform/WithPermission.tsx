@@ -26,7 +26,6 @@ const WithPermission = ({access, tooltip, children,disabled, showDisabled = true
     useEffect(()=>{
       // 先判断权限，无论权限是否为true，如果disabled为true时则必须为ture
       access && setEditAccess(lastAccess) 
-      console.log('editAccess',editAccess, children,children?.type?.displayName,showDisabled, children?.type?.displayName !== 'Button' && showDisabled)
     },[lastAccess,disabled])
 
 
