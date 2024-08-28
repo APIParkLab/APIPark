@@ -27,7 +27,13 @@ const LanguageSetting = ({mode = 'light'}:{mode?:'dark'|'light'}) => {
   const langLabel = useMemo(()=>items.find((item) => item?.key === state.language)?.title,[state.language])
 
   useEffect(()=>{
-    sessionStorage.getItem('i18nextLng') && dispatch({ type: 'UPDATE_LANGUAGE',  language: sessionStorage.getItem('i18nextLng') as 'en' | 'cn'  });
+    const savedLang = sessionStorage.getItem('i18nextLng') 
+    const browserLang = navigator.language || navigator.userLanguage
+    if(savedLang){
+       dispatch({ type: 'UPDATE_LANGUAGE',  language: savedLang.startsWith('cn') ? 'cn' : 'en'  });
+    }else{
+      dispatch({ type: 'UPDATE_LANGUAGE',  language: browserLang.startsWith('zh') ? 'cn'  : 'en' });
+    }
   },[
   ])
   return (
@@ -40,7 +46,6 @@ const LanguageSetting = ({mode = 'light'}:{mode?:'dark'|'light'}) => {
           const { key } = e;
           dispatch({ type: 'UPDATE_LANGUAGE',  language: key  });
           i18n.changeLanguage(key);
-          // window.location.reload()
         }
       }}
     >

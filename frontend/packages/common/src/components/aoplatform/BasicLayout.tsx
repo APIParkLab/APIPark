@@ -242,13 +242,13 @@ const themeToken = {
                           ];
                         }}
                         headerTitleRender={() => (
-                        <div className="w-[192px]  flex items-center">
-                        <img
-                            className="h-[20px] cursor-pointer "
-                            src={Logo}
-                            onClick={()=> navigator(mainPage)}
-                        />
-                        </div>
+                            <div className="w-[192px]  flex items-center">
+                            <img
+                                className="h-[20px] cursor-pointer "
+                                src={Logo}
+                                onClick={()=> navigator(mainPage)}
+                            />
+                            </div>
                         )}
                         logo={Logo}
                         pageTitleRender={()=>$t('APIPark - 企业API数据开放平台')}

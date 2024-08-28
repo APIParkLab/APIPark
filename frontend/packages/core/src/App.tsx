@@ -11,7 +11,6 @@ import { useEffect, useMemo, useState } from 'react';
 import 'dayjs/locale/zh-cn';
 import dayjs from 'dayjs';
 import { useGlobalContext } from '@common/contexts/GlobalStateContext';
-import i18next from 'i18next';
 import { $t } from '@common/locales';
 
 type Locale = ConfigProviderProps['locale'];
@@ -141,11 +140,11 @@ const antdComponentThemeToken = {
 
 
 function App() {
-  const [locale, setLocal] = useState<Locale>(sessionStorage.getItem('i18nextLng') === 'cn'? zhCN : enUS);
-  dayjs.locale(sessionStorage.getItem('i18nextLng') || 'en');
+  const [locale, setLocal] = useState<Locale>();
   useInitializeMonaco()
   const { state} = useGlobalContext()
   
+
   useEffect(() => {
       dayjs.locale(state.language);
       setLocal(state.language === 'cn' ? zhCN : enUS);
