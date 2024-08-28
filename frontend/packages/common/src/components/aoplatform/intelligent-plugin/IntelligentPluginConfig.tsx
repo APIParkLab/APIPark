@@ -48,6 +48,7 @@ import {useFetch} from "@common/hooks/http.ts";
 import {App, Descriptions} from "antd";
 import { $t } from "@common/locales";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
+import { setValidateLanguage } from '@formily/core'
 
 export const DynamicRender = (props) => {
     const {schema} = props
@@ -68,14 +69,12 @@ export const DynamicRender = (props) => {
 
 
     const  translateSchema = (render) =>{
-        console.log(render)
         const res1 = {
             ...render,
             ...(render.title ? {title:$t(render.title)} : {}),
             ...(render.description) ? {description:$t(render.description)} : {},
             ...(render.label ? {label:$t(render.label)} : {}),
             ...(render.properties ? {properties: Object.keys(render.properties).reduce((total, cur) => {
-                console.log(total, cur); // 可选：在生产环境中移除或注释掉
                 try {
                     total[cur] = translateSchema(render.properties[cur]);
                 } catch (error) {
@@ -86,7 +85,7 @@ export const DynamicRender = (props) => {
             ...(render.items && Array.isArray(render.items) ? {items:render.items.map(x=>translateSchema(x))} : {}),
             ...(render.items && !Array.isArray(render.items) ? {items:translateSchema(render.items)} : {}),
             ...(render.additionalProperties ? {additionalProperties: translateSchema(render.additionalProperties)} : {}),
-            ...(render.enum ?render.enum.map(x=>({...x, label:$t(x.label)})) : {}),
+            ...(render.enum ? {enum: render.enum.map(x=>({...x, label:$t(x.label)}))} : {}),
 
         }
         return res1
@@ -174,6 +173,11 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
     const {fetchData} = useFetch()
     const form = createForm({ validateFirst: type === 'edit' })
     form.setInitialValues(initFormValue || {})
+    const { state } = useGlobalContext()
+
+    useEffect(()=>{
+        setValidateLanguage(state.language === 'cn' ? 'zh-CN' : 'en-US')
+    },[state.language])
 
     const pluginEditSchema = {
         type: 'object',
@@ -313,7 +317,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
         }
     return (
         <div  className="pl-[12px]">
-            <FormProvider form={form}>
+            <FormProvider form={form} >
                 <SchemaField
                     schema={pluginEditSchema}
                     scope={{ useAsyncDataSource, getSkillData, form }}
