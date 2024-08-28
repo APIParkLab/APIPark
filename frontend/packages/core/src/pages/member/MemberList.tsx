@@ -305,7 +305,6 @@ const MemberList = ()=>{
     }
     
     const changeMemberInfo = (value:string[],entity:MemberTableListItem )=>{
-        //console.log(value)
         return new Promise((resolve, reject) => {
             fetchData<BasicResponse<null>>(`account/role`, {method: 'PUT',eoBody:({roles:value, users:[entity.id]})}).then(response => {
                 const {code, msg} = response
