@@ -8,11 +8,11 @@ import (
 )
 
 type IApiBaseStore interface {
-	store.ISearchStore[Api]
+	store.ISearchStore[API]
 }
 type IAPIInfoStore store.IBaseStore[Info]
 type imlApiBaseStore struct {
-	store.SearchStoreSoftDelete[Api]
+	store.SearchStoreSoftDelete[API]
 }
 
 type imlAPIDocStore struct {

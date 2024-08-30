@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/APIParkLab/APIPark/controller/monitor"
+	"github.com/APIParkLab/APIPark/controller/router"
 	"github.com/APIParkLab/APIPark/controller/system"
 	"net/http"
 
@@ -20,8 +21,6 @@ import (
 	application_authorization "github.com/APIParkLab/APIPark/controller/application-authorization"
 
 	"github.com/APIParkLab/APIPark/controller/subscribe"
-
-	"github.com/APIParkLab/APIPark/controller/api"
 
 	"github.com/APIParkLab/APIPark/controller/upstream"
 
@@ -66,8 +65,8 @@ type plugin struct {
 	monitorConfigController     monitor.IMonitorConfigController                   `autowired:""`
 	catalogueController         catalogue.ICatalogueController                     `autowired:""`
 	upstreamController          upstream.IUpstreamController                       `autowired:""`
-	apiController               api.IAPIController                                 `autowired:""`
-	apiDocController            api.IAPIDocController                              `autowired:""`
+	routerController            router.IRouterController                           `autowired:""`
+	apiDocController            router.IAPIDocController                           `autowired:""`
 	subscribeController         subscribe.ISubscribeController                     `autowired:""`
 	appAuthorizationController  application_authorization.IAuthorizationController `autowired:""`
 	releaseController           release.IReleaseController                         `autowired:""`

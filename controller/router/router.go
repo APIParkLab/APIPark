@@ -1,4 +1,4 @@
-package api
+package router
 
 import (
 	api_doc_dto "github.com/APIParkLab/APIPark/module/api-doc/dto"
@@ -8,18 +8,18 @@ import (
 
 	"github.com/eolinker/go-common/autowire"
 
-	api_dto "github.com/APIParkLab/APIPark/module/api/dto"
+	router_dto "github.com/APIParkLab/APIPark/module/router/dto"
 )
 
-type IAPIController interface {
+type IRouterController interface {
 	// Detail 获取API详情
-	Detail(ctx *gin.Context, serviceId string, apiId string) (*api_dto.ApiDetail, error)
+	Detail(ctx *gin.Context, serviceId string, apiId string) (*router_dto.Detail, error)
 	// Search 获取API列表
-	Search(ctx *gin.Context, keyword string, serviceId string) ([]*api_dto.ApiItem, error)
+	Search(ctx *gin.Context, keyword string, serviceId string) ([]*router_dto.Item, error)
 	// Create 创建API
-	Create(ctx *gin.Context, serviceId string, dto *api_dto.CreateApi) (*api_dto.ApiSimpleDetail, error)
+	Create(ctx *gin.Context, serviceId string, dto *router_dto.Create) (*router_dto.SimpleDetail, error)
 	// Edit 编辑API
-	Edit(ctx *gin.Context, serviceId string, apiId string, dto *api_dto.EditApi) (*api_dto.ApiSimpleDetail, error)
+	Edit(ctx *gin.Context, serviceId string, apiId string, dto *router_dto.Edit) (*router_dto.SimpleDetail, error)
 	// Delete 删除API
 	Delete(ctx *gin.Context, serviceId string, apiId string) error
 	// Prefix 获取API前缀
@@ -36,7 +36,7 @@ type IAPIDocController interface {
 }
 
 func init() {
-	autowire.Auto[IAPIController](func() reflect.Value {
+	autowire.Auto[IRouterController](func() reflect.Value {
 		return reflect.ValueOf(new(imlAPIController))
 	})
 

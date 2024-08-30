@@ -15,7 +15,7 @@ type IAPIService interface {
 	universally.IServiceDelete
 	CountByService(ctx context.Context, service string) (int64, error)
 	CountMapByService(ctx context.Context, service ...string) (map[string]int64, error)
-	Exist(ctx context.Context, aid string, api *ExistAPI) error
+	Exist(ctx context.Context, aid string, api *Exist) error
 	ListForService(ctx context.Context, serviceId string) ([]*API, error)
 	GetInfo(ctx context.Context, aid string) (*Info, error)
 	ListInfo(ctx context.Context, aids ...string) ([]*Info, error)
@@ -25,8 +25,8 @@ type IAPIService interface {
 	GetProxyCommit(ctx context.Context, commitId string) (*commit.Commit[Proxy], error)
 	ListProxyCommit(ctx context.Context, commitId ...string) ([]*commit.Commit[Proxy], error)
 	SaveProxy(ctx context.Context, aid string, data *Proxy) error
-	Save(ctx context.Context, id string, model *EditAPI) error
-	Create(ctx context.Context, input *CreateAPI) (err error)
+	Save(ctx context.Context, id string, model *Edit) error
+	Create(ctx context.Context, input *Create) (err error)
 }
 
 var (

@@ -20,10 +20,14 @@ type imlAPIDocService struct {
 }
 
 func (i *imlAPIDocService) UpdateDoc(ctx context.Context, serviceId string, input *UpdateDoc) error {
-	// 校验内容格式是否正确
-	if err := ValidDoc(input.Content); err != nil {
+	doc, err := NewDocLoader(input.Content)
+	if err != nil {
 		return err
 	}
+	if err := doc.Valid(); err != nil {
+		return err
+	}
+
 	info, err := i.store.First(ctx, map[string]interface{}{
 		"service": serviceId,
 	})
@@ -38,10 +42,12 @@ func (i *imlAPIDocService) UpdateDoc(ctx context.Context, serviceId string, inpu
 			Content:  input.Content,
 			Updater:  operator,
 			UpdateAt: time.Now(),
+			APICount: doc.APICount(),
 		})
 	}
 	info.Updater = operator
 	info.UpdateAt = time.Now()
+	info.APICount = doc.APICount()
 	return i.store.Save(ctx, info)
 }
 

@@ -81,10 +81,10 @@ func IndexHtml(ginCtx *gin.Context) {
 
 func (f *Frontend) Api() []pm3.Api {
 	return []pm3.Api{
-		pm3.CreateApiSimple(http.MethodGet, "/favicon.ico", func(ginCtx *gin.Context) {
+		pm3.CreateRouterSimple(http.MethodGet, "/favicon.ico", func(ginCtx *gin.Context) {
 			ginCtx.Data(http.StatusOK, iconType, iconContent)
 		}),
-		pm3.CreateApiSimple(http.MethodGet, "/vite.svg", func(ginCtx *gin.Context) {
+		pm3.CreateRouterSimple(http.MethodGet, "/vite.svg", func(ginCtx *gin.Context) {
 			ginCtx.Data(http.StatusOK, viteContentType, viteContent)
 		}),
 	}

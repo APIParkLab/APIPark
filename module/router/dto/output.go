@@ -1,4 +1,4 @@
-package api_dto
+package router_dto
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"github.com/eolinker/go-common/auto"
 )
 
-type ApiItem struct {
+type Item struct {
 	Id         string         `json:"id"`
 	Name       string         `json:"name"`
 	Methods    []string       `json:"methods"`
@@ -22,27 +22,27 @@ type ApiItem struct {
 	CanDelete  bool           `json:"can_delete"`
 }
 
-type ApiSimpleItem struct {
+type SimpleItem struct {
 	Id     string `json:"id"`
 	Name   string `json:"name"`
 	Method string `json:"method"`
 	Path   string `json:"request_path"`
 }
 
-type ApiDetail struct {
-	ApiSimpleDetail
+type Detail struct {
+	SimpleDetail
 	Proxy *Proxy `json:"proxy"`
 	//Doc   map[string]interface{} `json:"doc"`
 }
 
-func GenApiSimpleDetail(api *api.Info) *ApiSimpleDetail {
+func GenSimpleDetail(api *api.Info) *SimpleDetail {
 	match := make([]Match, 0)
 	if api.Match == "" {
 		api.Match = "[]"
 	}
 	json.Unmarshal([]byte(api.Match), &match)
 
-	return &ApiSimpleDetail{
+	return &SimpleDetail{
 		Id:          api.UUID,
 		Name:        api.Name,
 		Description: api.Description,
@@ -56,7 +56,7 @@ func GenApiSimpleDetail(api *api.Info) *ApiSimpleDetail {
 	}
 }
 
-type ApiSimpleDetail struct {
+type SimpleDetail struct {
 	Id          string         `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
@@ -106,11 +106,11 @@ type Header struct {
 	Opt   string `json:"opt"`
 }
 
-type ExportAPI struct {
+type Export struct {
 	Id          string                 `json:"id"`
 	Name        string                 `json:"name"`
 	Description string                 `json:"description"`
-	Method      string                 `json:"method"`
+	Method      []string               `json:"method"`
 	Path        string                 `json:"path"`
 	MatchRules  []Match                `json:"match"`
 	Service     string                 `json:"service"`
