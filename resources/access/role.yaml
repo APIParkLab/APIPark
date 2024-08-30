@@ -83,8 +83,10 @@ team:
       - team.application.authorization.view
       - team.application.subscription.manager
       - team.application.subscription.view
-      - team.service.api.manager
-      - team.service.api.view
+      - team.service.api_doc.view
+      - team.service.api_doc.manager
+      - team.service.router.manager
+      - team.service.router.view
       - team.service.release.manager
       - team.service.release.view
       - team.service.service.manager
@@ -103,8 +105,10 @@ team:
       - team.service.service.manager
       - team.service.upstream.manager
       - team.service.upstream.view
-      - team.service.api.manager
-      - team.service.api.view
+      - team.service.api_doc.view
+      - team.service.api_doc.manager
+      - team.service.router.manager
+      - team.service.router.view
       - team.service.subscription.manager
       - team.service.subscription.view
       - team.service.release.manager
@@ -115,8 +119,10 @@ team:
     permits:
       - team.service.upstream.manager
       - team.service.upstream.view
-      - team.service.api.manager
-      - team.service.api.view
+      - team.service.api_doc.view
+      - team.service.api_doc.manager
+      - team.service.router.manager
+      - team.service.router.view
       - team.service.release.manager
       - team.service.release.view
       - team.team.member.view
@@ -142,7 +148,7 @@ team:
     permits:
       - team.application.authorization.view
       - team.application.subscription.view
-      - team.service.api.view
+      - team.service.router.view
       - team.service.release.view
       - team.service.subscription.view
       - team.service.upstream.view

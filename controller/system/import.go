@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/APIParkLab/APIPark/module/api"
-	api_dto "github.com/APIParkLab/APIPark/module/api/dto"
 	application_authorization "github.com/APIParkLab/APIPark/module/application-authorization"
 	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
 	"github.com/APIParkLab/APIPark/module/catalogue"
@@ -16,6 +14,8 @@ import (
 	"github.com/APIParkLab/APIPark/module/publish/dto"
 	"github.com/APIParkLab/APIPark/module/release"
 	dto2 "github.com/APIParkLab/APIPark/module/release/dto"
+	"github.com/APIParkLab/APIPark/module/router"
+	router_dto "github.com/APIParkLab/APIPark/module/router/dto"
 	"github.com/APIParkLab/APIPark/module/service"
 	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
 	"github.com/APIParkLab/APIPark/module/subscribe"
@@ -52,7 +52,7 @@ type imlImportConfigController struct {
 	teamModule                     team.ITeamModule                               `autowired:""`
 	serviceModule                  service.IServiceModule                         `autowired:""`
 	appModule                      service.IAppModule                             `autowired:""`
-	apiModule                      api.IApiModule                                 `autowired:""`
+	apiModule                      router.IRouterModule                           `autowired:""`
 	upstreamModule                 upstream.IUpstreamModule                       `autowired:""`
 	applicationAuthorizationModule application_authorization.IAuthorizationModule `autowired:""`
 	catalogueModule                catalogue.ICatalogueModule                     `autowired:""`
@@ -231,14 +231,14 @@ func (i *imlImportConfigController) importApplications(ctx context.Context) erro
 }
 
 func (i *imlImportConfigController) importApis(ctx context.Context) error {
-	data, err := unmarshal[api_dto.ExportAPI]("api")
+	data, err := unmarshal[router_dto.Export]("api")
 	if err != nil {
 		return err
 	}
 	for _, d := range data {
-		var proxy *api_dto.InputProxy
+		var proxy *router_dto.InputProxy
 		if d.Proxy != nil {
-			proxy = &api_dto.InputProxy{
+			proxy = &router_dto.InputProxy{
 				Path:    d.Proxy.Path,
 				Timeout: d.Proxy.Timeout,
 				Retry:   d.Proxy.Retry,
@@ -253,11 +253,10 @@ func (i *imlImportConfigController) importApis(ctx context.Context) error {
 			if !errors.Is(err, gorm.ErrRecordNotFound) {
 				return err
 			}
-			_, err = i.apiModule.Create(ctx, d.Service, &api_dto.CreateApi{
+			_, err = i.apiModule.Create(ctx, d.Service, &router_dto.Create{
 				Id:          d.Id,
-				Name:        d.Name,
 				Path:        d.Path,
-				Method:      d.Method,
+				Methods:     d.Method,
 				Description: d.Description,
 				MatchRules:  d.MatchRules,
 				Proxy:       proxy,
@@ -268,11 +267,8 @@ func (i *imlImportConfigController) importApis(ctx context.Context) error {
 
 			continue
 		}
-		info := &api_dto.EditApi{
-			Info: api_dto.EditInfo{
-				Name:        &d.Name,
-				Description: &d.Description,
-			},
+		info := &router_dto.Edit{
+
 			Proxy: proxy,
 			//Doc:   &d.Doc,
 		}

@@ -5,9 +5,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/APIParkLab/APIPark/module/api"
 	application_authorization "github.com/APIParkLab/APIPark/module/application-authorization"
 	"github.com/APIParkLab/APIPark/module/catalogue"
+	"github.com/APIParkLab/APIPark/module/router"
 	"github.com/APIParkLab/APIPark/module/service"
 	"github.com/APIParkLab/APIPark/module/subscribe"
 	"github.com/APIParkLab/APIPark/module/team"
@@ -23,7 +23,7 @@ type imlExportConfigController struct {
 	teamModule                     team.ITeamExportModule                               `autowired:""`
 	serviceModule                  service.IExportServiceModule                         `autowired:""`
 	appModule                      service.IExportAppModule                             `autowired:""`
-	apiModule                      api.IExportApiModule                                 `autowired:""`
+	routerModule                   router.IExportRouterModule                           `autowired:""`
 	upstreamModule                 upstream.IExportUpstreamModule                       `autowired:""`
 	applicationAuthorizationModule application_authorization.IExportAuthorizationModule `autowired:""`
 	catalogueModule                catalogue.IExportCatalogueModule                     `autowired:""`
@@ -114,7 +114,7 @@ func (i *imlExportConfigController) appendFiles(ctx *gin.Context) ([]*ExportFile
 		},
 		{
 			exportFunc: func(ctx *gin.Context) (interface{}, error) {
-				return i.apiModule.ExportAll(ctx)
+				return i.routerModule.ExportAll(ctx)
 			},
 			driver: "api",
 		},

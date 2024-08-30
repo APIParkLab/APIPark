@@ -30,29 +30,32 @@ var (
 	loader = openapi3.NewLoader()
 )
 
-func ValidDoc(content string) error {
-	doc, err := loader.LoadFromData([]byte(content))
-	if err != nil {
-		return fmt.Errorf("failed to load OpenAPI document: %v", err)
-	}
-	err = doc.Validate(loader.Context)
-	if err != nil {
-		return fmt.Errorf("OpenAPI document is not valid: %v", err)
-	}
-
-	return nil
+type DocLoader struct {
+	doc *openapi3.T
 }
 
-func DocAPICount(content string) (int64, error) {
+func NewDocLoader(content string) (*DocLoader, error) {
 	doc, err := loader.LoadFromData([]byte(content))
 	if err != nil {
-		return 0, err
+		return nil, fmt.Errorf("load doc error:%v", err)
 	}
-	if doc.Paths == nil {
-		return 0, nil
+	return &DocLoader{doc: doc}, nil
+}
+
+func (d *DocLoader) Valid() error {
+	if d.doc == nil {
+		return fmt.Errorf("doc is nil")
+	}
+
+	return d.doc.Validate(loader.Context)
+}
+
+func (d *DocLoader) APICount() int64 {
+	if d.doc == nil || d.doc.Paths == nil {
+		return 0
 	}
 	var count int64
-	for _, item := range doc.Paths.Map() {
+	for _, item := range d.doc.Paths.Map() {
 		if item.Get != nil {
 			count++
 		}
@@ -78,5 +81,5 @@ func DocAPICount(content string) (int64, error) {
 			count++
 		}
 	}
-	return count, nil
+	return count
 }

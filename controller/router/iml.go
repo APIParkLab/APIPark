@@ -1,33 +1,33 @@
-package api
+package router
 
 import (
-	"github.com/APIParkLab/APIPark/module/api"
 	api_doc "github.com/APIParkLab/APIPark/module/api-doc"
 	api_doc_dto "github.com/APIParkLab/APIPark/module/api-doc/dto"
-	api_dto "github.com/APIParkLab/APIPark/module/api/dto"
+	"github.com/APIParkLab/APIPark/module/router"
+	router_dto "github.com/APIParkLab/APIPark/module/router/dto"
 	"github.com/gin-gonic/gin"
 	"io"
 )
 
-var _ IAPIController = (*imlAPIController)(nil)
+var _ IRouterController = (*imlAPIController)(nil)
 
 type imlAPIController struct {
-	module api.IApiModule `autowired:""`
+	module router.IRouterModule `autowired:""`
 }
 
-func (i *imlAPIController) Detail(ctx *gin.Context, serviceId string, apiId string) (*api_dto.ApiDetail, error) {
+func (i *imlAPIController) Detail(ctx *gin.Context, serviceId string, apiId string) (*router_dto.Detail, error) {
 	return i.module.Detail(ctx, serviceId, apiId)
 }
 
-func (i *imlAPIController) Search(ctx *gin.Context, keyword string, serviceId string) ([]*api_dto.ApiItem, error) {
+func (i *imlAPIController) Search(ctx *gin.Context, keyword string, serviceId string) ([]*router_dto.Item, error) {
 	return i.module.Search(ctx, keyword, serviceId)
 }
 
-func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, dto *api_dto.CreateApi) (*api_dto.ApiSimpleDetail, error) {
+func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, dto *router_dto.Create) (*router_dto.SimpleDetail, error) {
 	return i.module.Create(ctx, serviceId, dto)
 }
 
-func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string, dto *api_dto.EditApi) (*api_dto.ApiSimpleDetail, error) {
+func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string, dto *router_dto.Edit) (*router_dto.SimpleDetail, error) {
 	return i.module.Edit(ctx, serviceId, apiId, dto)
 }
 

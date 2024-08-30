@@ -1,9 +1,6 @@
 package api
 
 import (
-	"encoding/json"
-	"net/http"
-	"strings"
 	"time"
 
 	"github.com/APIParkLab/APIPark/model/plugin_model"
@@ -40,17 +37,8 @@ type Info struct {
 	Disable     bool
 }
 
-func FromEntity(e *api.Api) *API {
-	methods := make([]string, 0)
-	if e.Method != "" {
-		err := json.Unmarshal([]byte(e.Method), &methods)
-		if err != nil {
-			m := strings.ToUpper(e.Method)
-			if m == http.MethodGet || m == http.MethodPost || m == http.MethodPut || m == http.MethodDelete || m == http.MethodPatch || m == http.MethodHead || m == http.MethodOptions {
-				methods = append(methods, m)
-			}
-		}
-	}
+func FromEntity(e *api.API) *API {
+
 	return &API{
 		UUID:      e.UUID,
 		CreateAt:  e.CreateAt,
@@ -58,23 +46,13 @@ func FromEntity(e *api.Api) *API {
 		Service:   e.Service,
 		Team:      e.Team,
 		Creator:   e.Creator,
-		Method:    methods,
+		Method:    e.Method,
 		Path:      e.Path,
 		Protocols: e.Protocol,
 	}
 }
 
 func FromEntityInfo(e *api.Info) *Info {
-	methods := make([]string, 0)
-	if e.Method != "" {
-		err := json.Unmarshal([]byte(e.Method), &methods)
-		if err != nil {
-			m := strings.ToUpper(e.Method)
-			if m == http.MethodGet || m == http.MethodPost || m == http.MethodPut || m == http.MethodDelete || m == http.MethodPatch || m == http.MethodHead || m == http.MethodOptions {
-				methods = append(methods, m)
-			}
-		}
-	}
 	return &Info{
 		UUID:        e.UUID,
 		Name:        e.Name,
@@ -85,7 +63,7 @@ func FromEntityInfo(e *api.Info) *Info {
 		Team:        e.Team,
 		Creator:     e.Creator,
 		Updater:     e.Updater,
-		Methods:     methods,
+		Methods:     e.Method,
 		Protocols:   e.Protocol,
 		Path:        e.Path,
 		Match:       e.Match,
@@ -93,26 +71,30 @@ func FromEntityInfo(e *api.Info) *Info {
 	}
 }
 
-type CreateAPI struct {
+type Create struct {
 	UUID        string
-	Name        string
 	Description string
 	Service     string
 	Team        string
-	Method      string
+	Methods     []string
+	Protocols   []string
+	Disable     bool
 	Path        string
 	Match       string
 }
 
-type EditAPI struct {
-	Name        *string
-	Upstream    *string
+type Edit struct {
 	Description *string
+	Methods     *[]string
+	Protocols   *[]string
+	Disable     *bool
+	Path        *string
+	Match       *string
 }
 
-type ExistAPI struct {
-	Path   string
-	Method string
+type Exist struct {
+	Path    string
+	Methods []string
 }
 
 type Document struct {

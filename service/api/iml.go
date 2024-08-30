@@ -50,7 +50,7 @@ func (i *imlAPIService) ListInfoForService(ctx context.Context, serviceId string
 	apis, err := i.store.List(ctx, map[string]interface{}{
 		"service": serviceId,
 	})
-	aids := utils.SliceToSlice(apis, func(a *api.Api) int64 {
+	aids := utils.SliceToSlice(apis, func(a *api.API) int64 {
 		return a.Id
 	})
 	list, err := i.apiInfoStore.List(ctx, map[string]interface{}{
@@ -84,7 +84,7 @@ func (i *imlAPIService) GetInfo(ctx context.Context, aid string) (*Info, error) 
 	return FromEntityInfo(info), nil
 }
 
-func (i *imlAPIService) Save(ctx context.Context, id string, model *EditAPI) error {
+func (i *imlAPIService) Save(ctx context.Context, id string, model *Edit) error {
 	if model == nil {
 		return errors.New("input is nil")
 	}
@@ -93,12 +93,26 @@ func (i *imlAPIService) Save(ctx context.Context, id string, model *EditAPI) err
 		if err != nil {
 			return err
 		}
-		if model.Name != nil {
-			ev.Name = *model.Name
-		}
+
 		if model.Description != nil {
 			ev.Description = *model.Description
 		}
+		if model.Protocols != nil {
+			ev.Protocol = *model.Protocols
+		}
+		if model.Path != nil {
+			ev.Path = *model.Path
+		}
+		if model.Match != nil {
+			ev.Match = *model.Match
+		}
+		if model.Methods != nil {
+			ev.Method = *model.Methods
+		}
+		if model.Disable != nil {
+			ev.Disable = *model.Disable
+		}
+
 		e := i.apiInfoStore.Save(ctx, ev)
 		if e != nil {
 			return e
@@ -109,48 +123,31 @@ func (i *imlAPIService) Save(ctx context.Context, id string, model *EditAPI) err
 }
 func getLabels(input *api.Info, appends ...string) []string {
 	labels := make([]string, 0, len(appends)+9)
-	labels = append(labels, input.UUID, input.Name, input.Description, input.Method, input.Path, input.Service, input.Team, input.Updater)
+	labels = append(labels, input.UUID, input.Name, input.Description, input.Path, input.Service, input.Team, input.Updater)
 	labels = append(labels, appends...)
 	return labels
 }
-func (i *imlAPIService) Create(ctx context.Context, input *CreateAPI) (err error) {
+func (i *imlAPIService) Create(ctx context.Context, input *Create) (err error) {
 	operater := utils.UserId(ctx)
 	return i.store.Transaction(ctx, func(ctx context.Context) error {
-		t, err := i.store.First(ctx, map[string]interface{}{
-			"method": input.Method,
-			"path":   input.Path,
-		})
-		if err != nil {
-			if !errors.Is(err, gorm.ErrRecordNotFound) {
-				return err
-			}
-		}
-
-		if t != nil {
-			return fmt.Errorf("method(%s),path(%s) is exist", input.Method, input.Path)
-		}
 		if input.UUID != "" {
-			a, err := i.store.GetByUUID(ctx, input.UUID)
+			_, err = i.store.GetByUUID(ctx, input.UUID)
 			if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 				return err
-			}
-			if a != nil {
-				return fmt.Errorf("api(%s) is exist", input.UUID)
 			}
 
 		} else {
 			input.UUID = uuid.NewString()
 		}
 
-		ne := api.Api{
-			Id:       0,
+		ne := api.API{
 			UUID:     input.UUID,
+			Name:     input.UUID,
 			Service:  input.Service,
 			Team:     input.Team,
 			Creator:  operater,
 			CreateAt: time.Now(),
-			IsDelete: 0,
-			Method:   input.Method,
+			Method:   input.Methods,
 			Path:     input.Path,
 		}
 		err = i.store.Insert(ctx, &ne)
@@ -160,18 +157,17 @@ func (i *imlAPIService) Create(ctx context.Context, input *CreateAPI) (err error
 		ev := &api.Info{
 			Id:          ne.Id,
 			UUID:        ne.UUID,
-			Name:        input.Name,
+			Name:        ne.UUID,
 			Description: input.Description,
 			Updater:     operater,
 			UpdateAt:    time.Now(),
 			Creator:     operater,
 			CreateAt:    time.Now(),
-			//Upstream:    input.Upstream,
-			Method:  input.Method,
-			Path:    input.Path,
-			Match:   input.Match,
-			Service: input.Service,
-			Team:    input.Team,
+			Method:      input.Methods,
+			Path:        input.Path,
+			Match:       input.Match,
+			Service:     input.Service,
+			Team:        input.Team,
 		}
 		err = i.apiInfoStore.Save(ctx, ev)
 		if err != nil {
@@ -195,19 +191,29 @@ func (i *imlAPIService) CountByService(ctx context.Context, service string) (int
 	})
 }
 
-func (i *imlAPIService) Exist(ctx context.Context, aid string, a *ExistAPI) error {
-	t, err := i.store.First(ctx, map[string]interface{}{
-		"method": a.Method,
-		"path":   a.Path,
+func (i *imlAPIService) Exist(ctx context.Context, aid string, a *Exist) error {
+	list, err := i.store.Search(ctx, "", map[string]interface{}{
+		"path": a.Path,
 	})
 	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
-		return nil
+		return err
 	}
-	if t.UUID != aid {
-		return fmt.Errorf("method(%s),path(%s) is exist", a.Method, a.Path)
+	existMethodMap := make(map[string]struct{})
+	for _, t := range list {
+		if len(t.Method) == 0 {
+			if t.UUID != aid {
+				return fmt.Errorf("method(%v),path(%s) is exist", a.Methods, a.Path)
+			}
+			continue
+		}
+		for _, m := range t.Method {
+			existMethodMap[m] = struct{}{}
+		}
+	}
+	for _, m := range a.Methods {
+		if _, ok := existMethodMap[m]; ok {
+			return fmt.Errorf("method(%s),path(%s) is exist", m, a.Path)
+		}
 	}
 	return nil
 }
@@ -219,7 +225,7 @@ func (i *imlAPIService) ListForService(ctx context.Context, serviceId string) ([
 	}
 	return utils.SliceToSlice(list, FromEntity), nil
 }
-func (i *imlAPIService) listForService(ctx context.Context, serviceId string, isDelete bool) ([]*api.Api, error) {
+func (i *imlAPIService) listForService(ctx context.Context, serviceId string, isDelete bool) ([]*api.API, error) {
 	return i.store.ListQuery(ctx, "service=? and is_delete=?", []interface{}{serviceId, isDelete}, "id")
 }
 func (i *imlAPIService) ListLatestCommitProxy(ctx context.Context, apiUUID ...string) ([]*commit.Commit[Proxy], error) {
@@ -256,9 +262,9 @@ func (i *imlAPIService) GetLabels(ctx context.Context, ids ...string) map[string
 }
 
 func (i *imlAPIService) OnComplete() {
-	i.IServiceGet = universally.NewGetSoftDelete[API, api.Api](i.store, FromEntity)
+	i.IServiceGet = universally.NewGetSoftDelete[API, api.API](i.store, FromEntity)
 
-	i.IServiceDelete = universally.NewSoftDelete[api.Api](i.store)
+	i.IServiceDelete = universally.NewSoftDelete[api.API](i.store)
 
 	auto.RegisterService("api", i)
 }

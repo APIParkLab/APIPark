@@ -2,7 +2,7 @@ package api
 
 import "time"
 
-type Api struct {
+type API struct {
 	Id       int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
 	UUID     string    `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
 	Name     string    `gorm:"type:varchar(100);not null;column:name;comment:name"`
@@ -12,7 +12,7 @@ type Api struct {
 	Creator  string    `gorm:"size:36;not null;column:creator;comment:创建人;index:creator" aovalue:"creator"` // 创建人
 	CreateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
 	IsDelete int       `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除 0:未删除 1:已删除"`
-	Method   string    `gorm:"size:36;not null;column:method;comment:请求方法"`
+	Method   []string  `gorm:"size:36;not null;column:method;comment:请求方法;serializer:json"`
 	Protocol []string  `gorm:"type:text;not null;column:protocol;comment:协议;serializer:json"`
 	Path     string    `gorm:"size:512;not null;column:path;comment:请求路径"`
 }
@@ -23,7 +23,7 @@ type Info struct {
 	Description string    `gorm:"size:255;not null;column:description;comment:description"`
 	Service     string    `gorm:"size:36;not null;column:service;comment:服务;index:service"`
 	Team        string    `gorm:"size:36;not null;column:team;comment:团队;index:team"` // 团队id
-	Method      string    `gorm:"size:36;not null;column:method;comment:请求方法" `
+	Method      []string  `gorm:"size:36;not null;column:method;comment:请求方法;serializer:json" `
 	Path        string    `gorm:"size:512;not null;column:path;comment:请求路径"`
 	Protocol    []string  `gorm:"type:text;null;column:protocol;comment:协议;serializer:json"`
 	Match       string    `gorm:"type:text;null;column:match;comment:匹配规则"`
@@ -42,10 +42,10 @@ func (i *Info) IdValue() int64 {
 	return i.Id
 }
 
-func (a *Api) IdValue() int64 {
+func (a *API) IdValue() int64 {
 	return a.Id
 }
-func (a *Api) TableName() string {
+func (a *API) TableName() string {
 	return "api"
 }
 
@@ -56,4 +56,13 @@ type Doc struct {
 	Content  string    `gorm:"type:text;null;column:content;comment:文档内容"`
 	Updater  string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"`
 	UpdateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:更新时间"`
+	APICount int64     `gorm:"type:int(11);not null;column:api_count;comment:接口数量"`
+}
+
+func (i *Doc) TableName() string {
+	return "api_doc"
+}
+
+func (i *Doc) IdValue() int64 {
+	return i.Id
 }

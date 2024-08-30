@@ -235,28 +235,42 @@ team:
     cname: 服务
     value: 'service'
     children:
-      - name: api
-        cname: API
-        value: 'api'
+      - name: router
+        cname: 路由
+        value: 'router'
         children:
           - name: view
             cname: 查看
             value: 'view'
             guest_allow: true
             apis:
-              - "GET:/api/v1/service/apis"
-              - "GET:/api/v1/service/api/detail"
-              - "GET:/api/v1/service/api/detail/simple"
-              - "GET:/api/v1/service/api/define"
-              - "GET:/api/v1/service/apis/simple"
+              - "GET:/api/v1/service/routers"
+              - "GET:/api/v1/service/router/detail"
+              - "GET:/api/v1/service/router/detail/simple"
+              - "GET:/api/v1/service/router/define"
           - name: manager
             cname: 管理
             value: 'manager'
             apis:
-              - "POST:/api/v1/service/api"
-              - "PUT:/api/v1/service/api"
-              - "DELETE:/api/v1/service/api"
-              - "POST:/api/v1/service/api/copy"
+              - "POST:/api/v1/service/router"
+              - "PUT:/api/v1/service/router"
+              - "DELETE:/api/v1/service/router"
+      - name: api_doc
+        cname: API文档
+        value: 'api_doc'
+        children:
+          - name: view
+            cname: 查看
+            value: 'view'
+            guest_allow: true
+            apis:
+              - "GET:/api/v1/service/api_doc"
+          - name: manager
+            cname: 管理
+            value: 'manager'
+            apis:
+              - "PUT:/api/v1/service/api_doc"
+              - "POST:/api/v1/service/api_doc/upload"
       - name: upstream
         cname: 上游
         value: 'upstream'
