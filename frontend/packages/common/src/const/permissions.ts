@@ -139,9 +139,19 @@ export const PERMISSION_DEFINITION = [
           "anyOf": [{ "backend": ["system.api_market.service_classification.manager"] }]
         }
       },
-      "system.devops.dashboardsetting.view":{
+      "system.dashboard.run_view.view":{
+        "granted": {
+          "anyOf": [{ "backend": ['system.dashboard.run_view.view'] }]
+        }
+      },
+      "system.devops.data_source.view":{
         "grented":{
-          "anyOf":[{"backend":[]}]
+          "anyOf":[{"backend":['system.devops.data_source.view']}]
+        }
+      },
+      "system.devops.data_source.edit":{
+        "grented":{
+          "anyOf":[{"backend":['system.devops.data_source.manager']}]
         }
       },
       "system.devops.cluster.view": {
@@ -239,34 +249,44 @@ export const PERMISSION_DEFINITION = [
           "anyOf": [{ "backend": [] }]
         }
       },
-      "team.service.api.view": {
+      "team.service.api_doc.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api.view"] }]
+          "anyOf": [{ "backend": ["team.service.api_doc.view"] }]
         }
       },
-      "team.service.api.add": {
+      "team.service.api_doc.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api.manager"] }]
+          "anyOf": [{ "backend": ["team.service.api_doc.manager"] }]
         }
       },
-      "team.service.api.edit": {
+      "team.service.api_doc.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api.manager"] }]
+          "anyOf": [{ "backend": ["team.service.api_doc.manager"] }]
         }
       },
-      "team.service.api.copy": {
+      "team.service.api_doc.import": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api.manager"] }]
+          "anyOf": [{ "backend": ["team.service.api_doc.manager"] }]
         }
       },
-      "team.service.api.delete": {
+      "team.service.router.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api.manager"] }]
+          "anyOf": [{ "backend": ["team.service.router.view"] }]
         }
       },
-      "team.service.api.import": {
+      "team.service.router.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api.manager"] }]
+          "anyOf": [{ "backend": ["team.service.router.manager"] }]
+        }
+      },
+      "team.service.router.edit": {
+        "granted": {
+          "anyOf": [{ "backend": ["team.service.router.manager"] }]
+        }
+      },
+      "team.service.router.delete": {
+        "granted": {
+          "anyOf": [{ "backend": ["team.service.router.manager"] }]
         }
       },
       "team.service.upstream.view": {

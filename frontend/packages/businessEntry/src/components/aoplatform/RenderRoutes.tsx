@@ -132,7 +132,12 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                                     {
                                         path:'api',
                                         key: uuidv4(),
-                                        lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideApiList.tsx')),
+                                        lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideApiDocument.tsx')),
+                                    },
+                                    {
+                                        path:'router',
+                                        key: uuidv4(),
+                                        lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideRouterList')),
                                     },
                                     {
                                         path:'upstream',
@@ -207,7 +212,7 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                     }
                 ]
             },{
-                path:'dashboardsetting',
+                path:'datasourcing',
                 key: uuidv4(),
                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/partitions/PartitionInsideDashboardSetting.tsx')),
             },

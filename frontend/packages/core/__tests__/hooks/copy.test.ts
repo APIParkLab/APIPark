@@ -16,7 +16,6 @@ describe('useCopyToClipboard', () => {
       globalThis.navigator = {};
     }
     // 确保 clipboard 对象存在
-    console.log(globalThis.navigator, navigator,navigator.clipboard)
     if (!navigator.clipboard) {
       // @ts-expect-error clipboard object may not exist in some environments
       navigator.clipboard = {};

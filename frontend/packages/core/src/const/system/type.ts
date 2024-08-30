@@ -77,49 +77,9 @@ export type SystemMemberTableListItem = {
 };
 
 export type SystemApiDetail = {
-    id:string
-    name:string
-    description:string
-    protocol:Protocol
-    method:HTTPMethod
-    path:string
-    creator:EntityItem
-    createTime:string
-    updater:EntityItem
+    content:string
     updateTime:string
-    match?:MatchItem[]
-    proxy?:SystemApiProxyType
-    doc?:{
-        encoding: string,
-        tag: string,
-        requestParams: {
-            headerParams: HeaderParamsType[],
-            bodyParams: BodyParamsType[],
-            queryParams: QueryParamsType[],
-            restParams: RestParamsType[]
-        },
-        resultList: ResultListType[],
-        responseList: [{
-            id: number,
-            responseUuid: string,
-            apiUuid: string,
-            oldId: number,
-            name: string,
-            httpCode: string,
-            contentType: ApiBodyType,
-            isDefault: number,
-            updateUserId: number,
-            createUserId: number,
-            createTime: number,
-            updateTime: number,
-            responseParams: {
-                headerParams: HeaderParamsType[],
-                bodyParams: BodyParamsType[]
-                queryParams: QueryParamsType[],
-                restParams: RestParamsType[]
-            }
-        }]
-    }
+    updater:string
 }
 
 
@@ -131,11 +91,11 @@ export type SystemApiProxyType = {
 
 }
 export type SystemApiProxyFieldType = {
-    name: string;
+    protocols: string[];
     id:string;
     description?:string;
     path:string;
-    method:string;
+    method:string[];
     match:MatchItem[]
     isDisable?: boolean;
     service?:string;
@@ -155,16 +115,16 @@ export type SystemApiSimpleFieldType = {
         update_time: string
 }
 
-export type SystemInsideApiCreateProps = {
-    type?:'copy'
-    entity?:SystemApiProxyFieldType &{systemId:string}
+export type SystemInsideRouterCreateProps = {
+    type?:'add'|'edit'|'copy'
+    entity?:SystemApiTableListItem  
     modalApiPrefix?:string
     modalPrefixForce?:boolean
     serviceId:string
     teamId:string
 }
 
-export type SystemInsideApiCreateHandle = {
+export type SystemInsideRouterCreateHandle = {
     copy:()=>Promise<boolean|string>;
     save:()=>Promise<boolean|string>;
 }
@@ -172,14 +132,14 @@ export type SystemInsideApiCreateHandle = {
 
 export type SystemApiTableListItem = {
     id:string;
-    name: string;
     method:string;
+    protocols:string;
     requestPath:string;
+    description:string
     creator:EntityItem;
     createTime:string;
     updater:EntityItem
     updateTime:string
-    canDelete:boolean
 };
 
 
