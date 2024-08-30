@@ -94,7 +94,7 @@ system:
               - "PUT:/api/v1/catalogue/sort"
             dependents:
               - system.api_market.service_classification.view
-  - name: devops
+  - name: Devops
     cname: 运维
     value: 'devops'
     children:
@@ -132,6 +132,22 @@ system:
               - "POST:/api/v1/certificate"
               - "PUT:/api/v1/certificate"
               - "DELETE:/api/v1/certificate"
+      - name: Data Source
+        cname: '数据源'
+        value: 'data_source'
+        children:
+          - name: view
+            cname: '查看'
+            value: 'view'
+            guest_allow: true
+            apis:
+              - "GET:/api/v1/monitor/config"
+          - name: manager
+            cname: '管理'
+            value: 'manager'
+            apis:
+              - "POST:/api/v1/monitor/config"
+              - "PUT:/api/v1/monitor/config"
       - name: log configuration
         cname: 日志
         value: 'log_configuration'

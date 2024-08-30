@@ -229,24 +229,7 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 
 		return nil, fmt.Errorf("get running release failed: %w", err)
 	}
-	_, docCommits, _, err := i.releaseService.GetReleaseInfos(ctx, r.UUID)
-	if err != nil {
-		return nil, fmt.Errorf("get release apis failed: %w", err)
-	}
-	apiMap := make(map[string]*release.APIDocumentCommit)
-	apiIds := make([]string, 0, len(docCommits))
-	for _, v := range docCommits {
-		apiIds = append(apiIds, v.API)
-		apiMap[v.API] = v
-	}
-	//apiList, err := i.apiService.ListInfo(ctx, apiIds...)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//apiNum := 0
-	//if len(docCommits) > 0 {
-	//	i.apiDocService.ListDocCommit(ctx,docCommits[0].Commit)
-	//}
+
 	countMap, err := i.subscribeService.CountMapByService(ctx, subscribe.ApplyStatusSubscribe, sid)
 	if err != nil {
 		return nil, err
@@ -260,13 +243,27 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 	}, func(t *service_tag.Tag) bool {
 		return t.Sid == sid
 	})
+	_, _, docCommits, _, err := i.releaseService.GetReleaseInfos(ctx, r.UUID)
+	if err != nil {
+		return nil, fmt.Errorf("get release apis failed: %w", err)
+	}
+	var apiDoc string
+	var apiNum int
+	if len(docCommits) > 0 {
+		commit, err := i.apiDocService.GetDocCommit(ctx, docCommits[0].Commit)
+		if err != nil {
+			return nil, err
+		}
+		apiDoc = commit.Data.Content
+		apiNum = int(commit.Data.APICount)
+	}
 	return &catalogue_dto.ServiceDetail{
 		Name:        s.Name,
 		Description: s.Description,
 		Document:    docStr,
 		Basic: &catalogue_dto.ServiceBasic{
-			Team: auto.UUID(s.Team),
-			//ApiNum:     len(apis),
+			Team:       auto.UUID(s.Team),
+			ApiNum:     apiNum,
 			AppNum:     int(countMap[s.Id]),
 			Tags:       auto.List(tagIds),
 			Catalogue:  auto.UUID(s.Catalogue),
@@ -274,6 +271,7 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 			UpdateTime: auto.TimeLabel(r.CreateAt),
 			Logo:       s.Logo,
 		},
+		APIDoc: apiDoc,
 	}, nil
 }
 

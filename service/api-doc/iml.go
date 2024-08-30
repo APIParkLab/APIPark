@@ -19,6 +19,10 @@ type imlAPIDocService struct {
 	commitService commit.ICommitWithKeyService[DocCommit] `autowired:""`
 }
 
+func (i *imlAPIDocService) GetDocCommit(ctx context.Context, commitId string) (*commit.Commit[DocCommit], error) {
+	return i.commitService.Get(ctx, commitId)
+}
+
 func (i *imlAPIDocService) ListDocCommit(ctx context.Context, commitIds ...string) ([]*commit.Commit[DocCommit], error) {
 	return i.commitService.List(ctx, commitIds...)
 }
@@ -103,6 +107,17 @@ func (i *imlAPIDocService) LatestDocCommit(ctx context.Context, serviceId string
 	return i.commitService.Latest(ctx, serviceId)
 }
 
-func (i *imlAPIDocService) CommitDoc(ctx context.Context, serviceId string, data *DocCommit) error {
-	return i.commitService.Save(ctx, serviceId, data)
+func (i *imlAPIDocService) CommitDoc(ctx context.Context, serviceId string, data *Doc) error {
+	doc, err := NewDocLoader(data.Content)
+	if err != nil {
+		return err
+	}
+	if err := doc.Valid(); err != nil {
+		return err
+	}
+
+	return i.commitService.Save(ctx, serviceId, &DocCommit{
+		Content:  data.Content,
+		APICount: doc.APICount(),
+	})
 }
