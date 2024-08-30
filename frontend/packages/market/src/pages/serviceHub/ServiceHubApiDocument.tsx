@@ -1,49 +1,24 @@
 import { useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
-import {Anchor, Button, Collapse, Drawer, FloatButton, Input, Space} from "antd";
-import  { useEffect, useMemo, useState} from "react";
-import ApiPreview from "@common/components/postcat/ApiPreview.tsx";
+import { Button, Drawer, Empty} from "antd";
+import  { useEffect, useState} from "react";
 import ApiTestGroup from "./ApiTestGroup.tsx";
-import {ApiDetail} from "@common/const/api-detail";
 import {ServiceDetailType } from "../../const/serviceHub/type.ts";
-import ApiMatch from "@common/components/postcat/api/ApiPreview/components/ApiMatch/index.tsx";
-import ApiProxy from "@common/components/postcat/api/ApiPreview/components/ApiProxy/index.tsx";
 import { $t } from "@common/locales/index.ts";
+import ApiDocument from "@common/components/aoplatform/ApiDocument.tsx";
 
 const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
     const {serviceId} = useParams<RouterParams>();
     const [apiTestDrawOpen, setApiTestDrawOpen] = useState(false);
     const [serviceName, setServiceName] = useState<string>()
-    const [apiDocs,setApiDocs ] = useState<ApiDetail[]>()
     const [selectedTestApi,setSelectedTestApi] = useState<string>()
-    const [activeKey, setActiveKey] = useState<string[]>([])
+    const [apiDocument, setApiDocument] = useState<string>()
 
     useEffect(()=>{
         if(!service) return
         setServiceName(service?.name)
-        setApiDocs(service?.apis)
-        setActiveKey(service?.apis.map((x)=>x.id))
+        setApiDocument(service.apiDoc)
     },[service])
-
-    const category = useMemo(() => [
-        {
-            key: 'apiDocument-list',
-            href: '#apiDocument-list',
-            title:$t('API 列表'),
-            children:apiDocs?.map((x)=>({
-                key:x.id,
-                href:`#apiDocument-${x.id}`,
-                title:x.name
-            })) || []
-        },
-        // {
-        //     key: 'apiDocument-statusCode',
-        //     href: '#apiDocument-statusCode',
-        //     title:$t('状态码',
-        // },
-    ], [apiDocs]);
-
-    const floatButtonStyle = { top:'10px',position:'sticky', width:'180px',height:'200px'}
 
     useEffect(() => {
         if(!serviceId){
@@ -51,10 +26,6 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
             return
         }
     }, [serviceId]);
-
-    const testClick = (id:string)=>{//console.log('test');
-        setApiTestDrawOpen(true)
-        setSelectedTestApi(id)}
 
     const onClose = () => {
         setApiTestDrawOpen(false);
@@ -64,54 +35,9 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
     return (
         <>
                 <div className="flex flex-col p-btnbase pt-[4px] h-full flex-1 overflow-auto" id='layout-ref'>
-                    <div  className='bg-[#fff] rounded p-btnbase  pl-0  flex justify-between'>
-                        <div className="w-[calc(100%-220px)]" >
-                        <p className="font-bold text-[20px] leading-[32px] mb-[12px] h-[32px]" id="apiDocument-list">{$t('API 列表')}</p>
-                            <div className="">
-                                {apiDocs?.map((apiDetail)=>(
-                                    <div  className="mb-btnbase "  key={apiDetail.id} id={`apiDocument-${apiDetail.id}`}>
-                                    <Collapse key={`apiDocument-${apiDetail.id}`} 
-                                        expandIcon={({isActive})=>(isActive?  <iconpark-icon name="shouqi-2"></iconpark-icon>:<iconpark-icon name="zhankai"></iconpark-icon> )}
-                                        items={[{
-                                            key: apiDetail.id,
-                                            label: <span><span className="text-status_update font-bold mr-[8px]">{apiDetail.method}</span><span>{apiDetail.name}</span></span>,
-                                            children:<div className="scroll-area h-[calc(100%-84px)] overflow-auto">
-                                                    <Space direction="vertical" className="mb-btnybase w-full mt-btnybase">
-                                                    <Input
-                                                        readOnly
-                                                        addonBefore={apiDetail?.method}
-                                                        value={apiDetail?.path}
-                                                    />
-                                                </Space>
-                                            {
-                                                apiDetail?.match && apiDetail.match?.length > 0 &&
-                                                <ApiMatch title={$t('高级匹配')} rows={apiDetail?.match}  />
-                                            }
-                            
-                                            {
-                                                apiDetail?.proxy && Object.keys(apiDetail?.proxy).length > 0 &&
-                                                <ApiProxy title={$t('转发规则')} proxyInfo={apiDetail?.proxy}  />
-                                            }
-                            
-                                            {apiDetail && <ApiPreview entity={{...apiDetail.doc,name:apiDetail.name, method:apiDetail.method,uri:apiDetail.path, protocol:apiDetail.protocol||'HTTP'}}  />}
-                                        </div>
-                                        }]} 
-                                        activeKey={activeKey}
-                                        onChange={(val)=>{setActiveKey(val as string[])}}
-                                            />
-                                    </div>
-                                ))}
-
-                        </div>
-                            </div>
-
-                            <FloatButton.Group shape="circle" style={floatButtonStyle}>
-                                <Anchor
-                                    targetOffset={60}
-                                    getContainer = {()=> document.getElementById('layout-ref')!}
-                                    items={category}
-                                />
-                            </FloatButton.Group>
+                    <div  className='bg-[#fff] rounded p-btnbase  pt-0 pl-0  flex justify-between '>
+                        {apiDocument ? <ApiDocument spec={apiDocument } /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>
+}
                         </div>
                     </div>
 

@@ -26,7 +26,7 @@ export const routerKeyMap = new Map<string, string[]|string>([
     ['operationCenter',['member','user','role','servicecategories']],
     ['organization',['member','user','role']],
     ['serviceHubSetting',['servicecategories']],
-    ['maintenanceCenter',['dashboardsetting','cluster','cert','logsettings','resourcesettings','openapi']
+    ['maintenanceCenter',['datasourcing','cluster','cert','logsettings','resourcesettings','openapi']
   ]])
   
     

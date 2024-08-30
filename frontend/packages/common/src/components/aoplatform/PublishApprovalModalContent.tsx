@@ -2,12 +2,14 @@ import {App, Col, Form, Input, Row, Table, Tooltip} from "antd";
 import {forwardRef, useEffect, useImperativeHandle, useMemo} from "react";
 import {PublishApprovalInfoType, PublishApprovalModalHandle, PublishApprovalModalProps, PublishVersionTableListItem} from "@common/const/approval/type.tsx";
 import {useFetch} from "@common/hooks/http.ts";
-import {BasicResponse, FORM_ERROR_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
+import {BasicResponse, FORM_ERROR_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, STATUS_COLOR, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { SYSTEM_PUBLISH_ONLINE_COLUMNS } from "@core/const/system/const.tsx";
 import { $t } from "@common/locales";
-import { ApprovalApiColumns, ApprovalStatusColorClass, ApprovalUpstreamColumns, ChangeTypeEnum } from "@common/const/approval/const";
+import { ApprovalRouteColumns, ApprovalStatusColorClass, ApprovalUpstreamColumns, ChangeTypeEnum } from "@common/const/approval/const";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
+import { LoadingOutlined } from "@ant-design/icons";
+import { SystemInsidePublishOnlineItems } from "@core/pages/system/publish/SystemInsidePublishOnline";
 
 
 export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle,PublishApprovalModalProps>((props, ref) => {
@@ -107,7 +109,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
     })),[state.language])
 
     
-    const translatedApiColumns = useMemo(()=>ApprovalApiColumns.map((x)=>({
+    const translatedRouteColumns = useMemo(()=>ApprovalRouteColumns.map((x)=>({
         ...x, 
         ...(x.dataIndex === 'change' ? {
             render:(_,entity)=>(
@@ -121,6 +123,22 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
     ),
     title: typeof x.title === 'string' ? $t(x.title) : x.title,
 })),[state.language])
+
+    const translatedPublishColumns = useMemo(()=>SYSTEM_PUBLISH_ONLINE_COLUMNS.map((x)=>{
+        if(x.dataIndex === 'status'){
+            return {...x,title:$t(x.title),
+                render:(_:unknown,entity:SystemInsidePublishOnlineItems)=>{
+                    switch(entity.status){
+                        case 'done':
+                            return <span className={STATUS_COLOR[entity.status as keyof typeof STATUS_COLOR]}>{$t('成功')}</span>
+                        case 'error':
+                            return  <Tooltip title={entity.error || $t('上线失败')}><span className={`${STATUS_COLOR[entity.status  as keyof typeof STATUS_COLOR]} truncate block`}>{$t('失败')} {entity.error}</span></Tooltip>
+                        default:
+                            return <LoadingOutlined className="text-theme" spin />
+                    }
+                }}
+        }
+    }),[state.language])
 
     return (
         <>
@@ -180,11 +198,11 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                     <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('API 列表')}：</span></Row>
                     <Row  className="mb-mbase ">
                         <Table
-                            columns={translatedApiColumns}
+                            columns={translatedRouteColumns}
                             bordered={true}
                             rowKey="id"
                             size="small"
-                            dataSource={data.diffs?.apis || []}
+                            dataSource={data.diffs?.routers || []}
                             pagination={false}
                         /></Row>
                     <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('上游列表')}：</span></Row>
@@ -217,11 +235,12 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                     ]);}}/>
                 </Form.Item>} */}
                 
-                {['error','done'].indexOf(data.status) !== -1 && data.clusterPublishStatus &&data.clusterPublishStatus.length > 0 && <>                    <Row className="text-left h-[32px] mb-8px]" span={3}><span>上线情况：</span></Row>
+                {['error','done'].indexOf(data.status) !== -1 && data.clusterPublishStatus &&data.clusterPublishStatus.length > 0 && <>                    
+                <Row className="text-left h-[32px] mb-8px]" span={3}><span>{$t('上线情况')}：</span></Row>
                     <Row span={24} className="mb-mbase">
                         <Table
                             bordered={true}
-                            columns={[...SYSTEM_PUBLISH_ONLINE_COLUMNS]}
+                            columns={[...translatedPublishColumns]}
                             size="small"
                             rowKey="id"
                             dataSource={data.clusterPublishStatus || []}

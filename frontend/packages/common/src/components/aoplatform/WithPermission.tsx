@@ -4,6 +4,7 @@ import  {  ReactElement, cloneElement, useEffect, useMemo, useState } from "reac
 import { useGlobalContext } from "../../contexts/GlobalStateContext";
 import { PERMISSION_DEFINITION } from "@common/const/permissions";
 import { $t } from "@common/locales";
+import { last } from "lodash-es";
 
 type WithPermissionProps = {
     access?:string | string[]
@@ -36,7 +37,7 @@ const WithPermission = ({access, tooltip, children,disabled, showDisabled = true
         {editAccess && disabled  && <Tooltip  title={tooltip}> 
             { cloneElement(children, {disabled:true})}
              </Tooltip>}
-        {!editAccess && (children?.type?.displayName !== 'Button' && showDisabled ) && <Tooltip  title={tooltip ?? $t("暂无操作权限，请联系管理员分配。")}> 
+        {!editAccess && (children?.type?.displayName !== 'Button' && children?.type?.displayName !== 'Upload' && showDisabled ) && <Tooltip  title={tooltip ?? $t("暂无操作权限，请联系管理员分配。")}> 
             { cloneElement(children, {disabled:true})}
              </Tooltip>}
         

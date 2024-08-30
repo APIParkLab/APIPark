@@ -71,6 +71,10 @@ export const SYSTEM_I18NEXT_FOR_ENUM = {
 }
 
 export const HTTP_METHOD = ['GET','POST','PUT','DELETE','PATCH','HEAD']
+export const API_PROTOCOL = [
+    {label:'HTTP',value:'http'},
+    {label:'HTTPS',value:'https'}
+]
 
 
 export const ALGORITHM_ITEM = [
@@ -234,9 +238,6 @@ export const MATCH_CONFIG:ConfigField<MatchItem>[] = [
     {
         title:('参数位置'),
         key: 'position',
-        component: <Select className="w-INPUT_NORMAL" options={Object.entries(MatchPositionEnum)?.map(([key,value])=>{
-            return { label:value, value:key}
-        })}/>,
         renderText: (value:keyof typeof MatchPositionEnum) => {
             return MatchPositionEnum[value]
         },
@@ -251,9 +252,6 @@ export const MATCH_CONFIG:ConfigField<MatchItem>[] = [
     }, {
         title:('匹配类型'),
         key: 'matchType',
-        component: <Select className="w-INPUT_NORMAL" options={Object.entries(MatchTypeEnum)?.map(([key,value])=>{
-            return { label:value, value:key}
-        })}/>,
         renderText: (value:keyof typeof MatchTypeEnum) => {
             return MatchTypeEnum[value]
         },
@@ -272,34 +270,33 @@ export const MATCH_CONFIG:ConfigField<MatchItem>[] = [
 
 export const SYSTEM_API_TABLE_COLUMNS: PageProColumns<SystemApiTableListItem>[] = [
     {
-        title:('名称'),
-        dataIndex: 'name',
-        ellipsis:true,
-        width:160,
-        fixed:'left',
-        valueType: 'text',
-        sorter: (a,b)=> {
-            return a.name.localeCompare(b.name)
-        },
+        title:('URL'),
+        dataIndex: 'requestPath',
+        ellipsis:true
     },
     {
-        title:('协议/方法'),
+        title:('协议'),
+        dataIndex: 'protocols',
+        ellipsis:true,
+        renderText:(value)=>value?.join(',')
+    },
+    {
+        title:('方法'),
         dataIndex: 'method',
+        ellipsis:true,
+        renderText:(value)=>value?.join(',')
+    },
+    {
+        title:'是否放行',
+        dataIndex:'isDisabled',
         ellipsis:true,
         filters: true,
         onFilter: true,
-        valueType: 'select',
-        valueEnum: {
-            POST: { text: 'POST' },
-            PUT: { text: 'PUT' },
-            GET: { text: 'GET' },
-            DELETE: { text: 'DELETE' },
-            PATCH: { text: 'PATCH' },
-        },
+        valueType: 'select'
     },
     {
-        title:('URL'),
-        dataIndex: 'requestPath',
+        title:('描述'),
+        dataIndex: 'description',
         ellipsis:true
     },
     {
@@ -636,16 +633,6 @@ export const SYSTEM_TOPOLOGY_NODE_TYPE_COLOR_MAP = {
         ellipsis:{
             showTitle:true
         },
-        render:(_:unknown,entity:SystemInsidePublishOnlineItems)=>{
-            switch(entity.status){
-                case 'done':
-                    return <span className={STATUS_COLOR[entity.status as keyof typeof STATUS_COLOR]}>{('成功')}</span>
-                case 'error':
-                    return  <Tooltip title={entity.error || ('上线失败')}><span className={`${STATUS_COLOR[entity.status  as keyof typeof STATUS_COLOR]} truncate block`}>{('失败')} {entity.error}</span></Tooltip>
-                default:
-                    return <LoadingOutlined className="text-theme" spin />
-            }
-        }
     },
   ]
 

@@ -212,21 +212,22 @@ export const ApprovalStatusColorClass = {
 
   
 
-export const ApprovalApiColumns = [
-    {
-        title:('API 名称'),
-        dataIndex:'name',
-        ellipsis:true
-    },
+export const ApprovalRouteColumns = [
     {
         title:('请求方式'),
         dataIndex:'method',
-        ellipsis:true
+        ellipsis:true,
+        renderText:(value)=>value.join(',')
     },
     {
         title:('路径'),
         dataIndex:'path',
         ellipsis:true
+    },
+    {
+        title:('描述'),
+        dataIndex:'description',
+          
     },
     {
         title:('类型'),
