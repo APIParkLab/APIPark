@@ -91,7 +91,7 @@ const EditableTableWithModal = <T extends { _id?: string }>({
             title:$t(title),
             dataIndex: key as string,
             key: key as string,
-            render: renderText ? (value, record) => $t(renderText(value, record)) : undefined,
+            render: renderText ? (value, record) => $t(renderText(value, record) || '') : undefined,
             ellipsis:true
         })),
         ...(disabled ? []:[{

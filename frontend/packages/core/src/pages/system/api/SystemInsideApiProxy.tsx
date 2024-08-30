@@ -43,7 +43,7 @@ const SystemInsideApiProxy = forwardRef<SystemInsideApiProxyHandle,SystemInsideA
             scrollToFirstError
             form={form}
             className={`mx-auto  flex flex-col overflow-hidden h-full ${className}`}
-            name="systemInsideApiProxy"
+            name="SystemInsideApiProxy"
             onValuesChange={(_,allValues)=>{onChange?.(allValues)}}
             autoComplete="off">
 

@@ -1,6 +1,5 @@
 
 import { DefaultOptionType } from "antd/es/select"
-import { ApiDetail } from "@common/const/api-detail"
 import { EntityItem } from "@common/const/type"
 import { SubscribeEnum, SubscribeFromEnum } from "@core/const/system/const"
 import WithPermission from "@common/components/aoplatform/WithPermission"
@@ -22,7 +21,7 @@ export type ServiceDetailType = {
     name:string
     description:string
     basic:ServiceBasicInfoType
-    apis:ApiDetail[]
+    apiDoc:string
     applied:boolean
 }
 

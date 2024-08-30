@@ -209,3 +209,16 @@ a{
   border-radius: 10px;
   border:1px solid var(--table-border-color) !important;
 }
+
+.swagger-ui{
+  width: 100%;
+ .model-box-control:focus,.models-control:focus, .opblock-summary-control:focus{
+    outline:unset !important;
+ }
+  .information-container{
+    .info{
+      display: none;
+    }
+
+  }
+}
