@@ -17,7 +17,7 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
     useEffect(()=>{
         if(!service) return
         setServiceName(service?.name)
-        setApiDocument(service.apiDoc)
+        setApiDocument(service?.apiDoc)
     },[service])
 
     useEffect(() => {
@@ -41,7 +41,7 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
                         </div>
                     </div>
 
-            <Drawer 
+            {/* <Drawer 
             title={serviceName} 
               maskClosable={false}
               width="100%" placement="right" onClose={onClose} open={apiTestDrawOpen}
@@ -51,7 +51,7 @@ const ServiceHubApiDocument = ({service}:{service:ServiceDetailType})=>{
                     closeIcon={false}
             >
                 <ApiTestGroup apiInfoList={apiDocs} selectedApiId={selectedTestApi}/>
-            </Drawer>
+            </Drawer> */}
         </>
     )
 }

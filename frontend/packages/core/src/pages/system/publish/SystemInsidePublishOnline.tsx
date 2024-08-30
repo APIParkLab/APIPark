@@ -1,10 +1,13 @@
 
-import { App, Table } from "antd";
+import { App, Table, Tooltip } from "antd";
 import { SYSTEM_PUBLISH_ONLINE_COLUMNS } from "../../../const/system/const";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFetch } from "@common/hooks/http";
-import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE, STATUS_COLOR } from "@common/const/const";
 import { EntityItem } from "@common/const/type";
+import { LoadingOutlined } from "@ant-design/icons";
+import { $t } from "@common/locales";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 type SystemInsidePublishOnlineProps = {
     serviceId:string
@@ -23,6 +26,7 @@ export default function SystemInsidePublishOnline(props:SystemInsidePublishOnlin
     const [dataSource, setDataSource] = useState<[]>()
     const {fetchData} = useFetch()
     const [isStopped, setIsStopped] = useState(false);
+    const { state } = useGlobalContext()
 
     const getOnlineStatus = ()=>{
         fetchData<BasicResponse<{publishStatusList:SystemInsidePublishOnlineItems[]}>>('service/publish/status',{method:'GET',eoParams:{service:serviceId,team:teamId, id}, eoTransformKeys:['publish_status_list']}).then(response=>{
@@ -55,11 +59,28 @@ export default function SystemInsidePublishOnline(props:SystemInsidePublishOnlin
         };
     }, [isStopped]);
     
+    
+    const translatedPublishColumns = useMemo(()=>SYSTEM_PUBLISH_ONLINE_COLUMNS.map((x)=>{
+        if(x.dataIndex === 'status'){
+            return {...x,title:$t(x.title),
+                render:(_:unknown,entity:SystemInsidePublishOnlineItems)=>{
+                    switch(entity.status){
+                        case 'done':
+                            return <span className={STATUS_COLOR[entity.status as keyof typeof STATUS_COLOR]}>{$t('成功')}</span>
+                        case 'error':
+                            return  <Tooltip title={entity.error || $t('上线失败')}><span className={`${STATUS_COLOR[entity.status  as keyof typeof STATUS_COLOR]} truncate block`}>{$t('失败')} {entity.error}</span></Tooltip>
+                        default:
+                            return <LoadingOutlined className="text-theme" spin />
+                    }
+                }}
+        }
+    }),[state.language])
+
     return (
         <Table
             className="min-h-[100px] h-full"
             bordered={true}
-            columns={[...SYSTEM_PUBLISH_ONLINE_COLUMNS]}
+            columns={translatedPublishColumns}
             size="small"
             rowKey="id"
             dataSource={dataSource}
