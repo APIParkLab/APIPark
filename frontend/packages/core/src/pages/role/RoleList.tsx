@@ -150,7 +150,7 @@ const RoleList = ()=>{
                     id="global_role"
                     ref={pageListRef}
                     tableClass="role_table "
-                    columns={[...ROLE_TABLE_COLUMNS as PageProColumns<RoleTableListItem, "text">[], ...operation('team')]}
+                    columns={[...columns as PageProColumns<RoleTableListItem, "text">[], ...operation('team')]}
                     request={()=>getRoleList('team')}
                     showPagination={false}
                     addNewBtnTitle={$t("添加角色")}

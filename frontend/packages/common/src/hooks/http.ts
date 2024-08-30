@@ -140,7 +140,7 @@ type EoHeaders = Headers  | {[k:string]:string}
 export function useFetch(){
     function fetchData<T>(url:string, options: EoRequest ) {
         // 合并传入的headers与默认headers
-        const headers = { ...DEFAULT_HEADERS, ...options.headers };
+        const headers = { ...(options.body ?  {}:DEFAULT_HEADERS), ...options.headers };
 
         // 检查是否需要转换键
         const shouldTransformKeys = !shouldNotTransform(url) && options?.eoTransformKeys && options?.eoTransformKeys?.length > 0;

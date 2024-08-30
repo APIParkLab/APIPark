@@ -188,7 +188,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
 
     useEffect(() => {
         if(accessInit){
-            getTeamOptionList
+            getTeamOptionList()
         }else{
             getGlobalAccessData()?.then(()=>{
                 getTeamOptionList()

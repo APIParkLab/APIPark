@@ -22,8 +22,10 @@ interface CodeboxProps {
   height?: string | null
   readOnly?: boolean
   apiRef?: RefObject<CodeboxApiRef>
-  language?: 'html' | 'json' | 'xml' | 'javascript' | 'css' | 'plaintext'
+  language?: 'html' | 'json' | 'xml' | 'javascript' | 'css' | 'plaintext'|'yaml'
   extraContent?:React.ReactNode
+  sx?:Record<string,unknown>
+  editorTheme?:'vs' | 'vs-dark' | 'hc-black'
 }
 
 export const Codebox =  memo((props: CodeboxProps) => {
@@ -37,7 +39,8 @@ export const Codebox =  memo((props: CodeboxProps) => {
     apiRef,
     readOnly = false,
     language = 'plaintext',
-    extraContent
+    extraContent,
+    editorTheme = 'vs'
   } = props
 
   const [code, setCode] = useState<string>(``)
@@ -153,7 +156,8 @@ export const Codebox =  memo((props: CodeboxProps) => {
       sx={{
         // border: `1px solid ${theme.palette.divider}`,
         height: '100%',
-        width: '100%'
+        width: '100%',
+        ...props.sx
       }}
     >
       {enableToolbar ? (<>
@@ -189,6 +193,7 @@ export const Codebox =  memo((props: CodeboxProps) => {
         value={isControlled ? controlledValue : code}
         options={{ ...defaultOptions, ...options }}
         onChange={handleEditorChange}
+        theme={editorTheme}
       />
     </Box>
   )
