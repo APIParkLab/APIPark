@@ -3,17 +3,16 @@ package publish
 import (
 	"context"
 	"reflect"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
-	
+
 	"github.com/APIParkLab/APIPark/module/publish/dto"
 	"github.com/eolinker/go-common/autowire"
 )
 
 type IPublishModule interface {
 	CheckPublish(ctx context.Context, serviceId string, releaseId string) (*dto.DiffOut, error)
-	//ReleaseDo(ctx context.Context, serviceId string, input *dto.ApplyOnReleaseInput) error
-	
+
 	Apply(ctx context.Context, serviceId string, input *dto.ApplyInput) (*dto.Publish, error)
 	Stop(ctx context.Context, serviceId string, id string) error
 	Refuse(ctx context.Context, serviceId string, id string, commits string) error

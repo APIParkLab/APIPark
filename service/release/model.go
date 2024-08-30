@@ -2,7 +2,7 @@ package release
 
 import (
 	"time"
-	
+
 	"github.com/APIParkLab/APIPark/stores/release"
 )
 
@@ -52,7 +52,7 @@ type ProjectCommits struct {
 }
 
 //type Diff struct {
-//	Apis      []*APiDiff      `json:"apis"`
+//	Routers      []*APiDiff      `json:"apis"`
 //	Upstreams []*UpstreamDiff `json:"upstream"`
 //}
 

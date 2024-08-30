@@ -19,6 +19,38 @@ type imlAPIDocService struct {
 	commitService commit.ICommitWithKeyService[DocCommit] `autowired:""`
 }
 
+func (i *imlAPIDocService) ListDocCommit(ctx context.Context, commitIds ...string) ([]*commit.Commit[DocCommit], error) {
+	return i.commitService.List(ctx, commitIds...)
+}
+
+func (i *imlAPIDocService) ListLatestDocCommit(ctx context.Context, serviceIds ...string) ([]*commit.Commit[DocCommit], error) {
+	return i.commitService.ListLatest(ctx, serviceIds...)
+}
+
+func (i *imlAPIDocService) LatestAPICountByServices(ctx context.Context, serviceIds ...string) (map[string]int64, error) {
+	list, err := i.commitService.ListLatest(ctx, serviceIds...)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToMapO(list, func(i *commit.Commit[DocCommit]) (string, int64) {
+		return i.Target, i.Data.APICount
+	}), nil
+}
+
+func (i *imlAPIDocService) APICountByServices(ctx context.Context, serviceIds ...string) (map[string]int64, error) {
+	w := make(map[string]interface{})
+	if len(serviceIds) > 0 {
+		w["service"] = serviceIds
+	}
+	list, err := i.store.List(ctx, w)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToMapO(list, func(i *api.Doc) (string, int64) {
+		return i.Service, i.APICount
+	}), nil
+}
+
 func (i *imlAPIDocService) UpdateDoc(ctx context.Context, serviceId string, input *UpdateDoc) error {
 	doc, err := NewDocLoader(input.Content)
 	if err != nil {

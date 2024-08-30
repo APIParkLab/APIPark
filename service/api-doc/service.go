@@ -14,9 +14,14 @@ type IAPIDocService interface {
 	UpdateDoc(ctx context.Context, serviceId string, input *UpdateDoc) error
 	// GetDoc 获取文档
 	GetDoc(ctx context.Context, serviceId string) (*Doc, error)
+
+	APICountByServices(ctx context.Context, serviceIds ...string) (map[string]int64, error)
 	// LatestDocCommit 获取最新文档
 	LatestDocCommit(ctx context.Context, serviceId string) (*commit.Commit[DocCommit], error)
 	CommitDoc(ctx context.Context, serviceId string, data *DocCommit) error
+	ListLatestDocCommit(ctx context.Context, serviceIds ...string) ([]*commit.Commit[DocCommit], error)
+	ListDocCommit(ctx context.Context, commitIds ...string) ([]*commit.Commit[DocCommit], error)
+	LatestAPICountByServices(ctx context.Context, serviceIds ...string) (map[string]int64, error)
 }
 
 func init() {

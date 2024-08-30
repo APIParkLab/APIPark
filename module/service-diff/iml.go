@@ -4,19 +4,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
 	"github.com/APIParkLab/APIPark/service/api"
+	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	"github.com/APIParkLab/APIPark/service/cluster"
 	"github.com/APIParkLab/APIPark/service/release"
 	"github.com/APIParkLab/APIPark/service/service_diff"
 	"github.com/APIParkLab/APIPark/service/universally/commit"
 	"github.com/APIParkLab/APIPark/service/upstream"
-	"github.com/eolinker/go-common/auto"
 	"github.com/eolinker/go-common/utils"
 )
 
 type imlServiceDiff struct {
 	apiService      api.IAPIService           `autowired:""`
+	apiDocService   api_doc.IAPIDocService    `autowired:""`
 	upstreamService upstream.IUpstreamService `autowired:""`
 	releaseService  release.IReleaseService   `autowired:""`
 	clusterService  cluster.IClusterService   `autowired:""`
@@ -89,14 +89,29 @@ func (m *imlServiceDiff) DiffForLatest(ctx context.Context, serviceId string, ba
 	if err != nil {
 		return nil, false, err
 	}
+	request := make([]*commit.Commit[api.Request], 0, len(apiInfos))
+	for _, apiInfo := range apiInfos {
+		request = append(request, &commit.Commit[api.Request]{
+			Target: apiInfo.UUID,
+			Key:    "request",
+			Data: &api.Request{
+				Path:      apiInfo.Path,
+				Methods:   apiInfo.Methods,
+				Protocols: apiInfo.Protocols,
+				Match:     apiInfo.Match,
+				Disable:   apiInfo.Disable,
+			},
+		})
+
+	}
 	proxy, err := m.apiService.ListLatestCommitProxy(ctx, apiIds...)
 	if err != nil {
 		return nil, false, fmt.Errorf("diff for api commit %v", err)
 	}
-	//documents, err := m.apiService.ListLatestCommitDocument(ctx, apiIds...)
-	//if err != nil {
-	//	return nil, false, err
-	//}
+	apiDocCommits, err := m.apiDocService.ListLatestDocCommit(ctx, serviceId)
+	if err != nil {
+		return nil, false, err
+	}
 
 	upstreamCommits, err := m.upstreamService.ListLatestCommit(ctx, serviceId)
 	if err != nil {
@@ -108,11 +123,11 @@ func (m *imlServiceDiff) DiffForLatest(ctx context.Context, serviceId string, ba
 		return nil, false, err
 	}
 	target := &projectInfo{
-		id:         serviceId,
-		apis:       apiInfos,
-		apiCommits: proxy,
-		//apiDocs:         documents,
-		upstreamCommits: upstreamCommits,
+		id:                serviceId,
+		apiRequestCommits: request,
+		apiProxyCommits:   proxy,
+		apiDocCommits:     apiDocCommits,
+		upstreamCommits:   upstreamCommits,
 	}
 	clusters, err := m.clusterService.List(ctx)
 	if err != nil {
@@ -128,81 +143,91 @@ func (m *imlServiceDiff) getReleaseInfo(ctx context.Context, releaseId string) (
 	if err != nil {
 		return nil, err
 	}
-
-	apiIds := utils.SliceToSlice(commits, func(i *release.ProjectCommits) string {
+	apiRequestCommitIds := utils.SliceToSlice(commits, func(i *release.ProjectCommits) string {
 		return i.Target
 	}, func(c *release.ProjectCommits) bool {
-		return c.Type == release.CommitApiProxy || c.Type == release.CommitApiDocument
+		return c.Type == release.CommitApiRequest
 	})
-	apiInfos, err := m.apiService.ListInfo(ctx, apiIds...)
-	if err != nil {
-		return nil, err
-	}
 	apiProxyCommitIds := utils.SliceToSlice(commits, func(i *release.ProjectCommits) string {
 		return i.Commit
 	}, func(c *release.ProjectCommits) bool {
 		return c.Type == release.CommitApiProxy
 	})
-	//apiDocumentCommitIds := utils.SliceToSlice(commits, func(i *release.ProjectCommits) string {
-	//	return i.Commit
-	//}, func(c *release.ProjectCommits) bool {
-	//	return c.Type == release.CommitApiDocument
-	//})
+	apiDocumentCommitIds := utils.SliceToSlice(commits, func(i *release.ProjectCommits) string {
+		return i.Commit
+	}, func(c *release.ProjectCommits) bool {
+		return c.Type == release.CommitApiDocument
+	})
 	upstreamCommitIds := utils.SliceToSlice(commits, func(i *release.ProjectCommits) string {
 		return i.Commit
 	}, func(c *release.ProjectCommits) bool {
 		return c.Type == release.CommitUpstream
 	})
-	proxyCommits, err := m.apiService.ListProxyCommit(ctx, apiProxyCommitIds...)
-	if err != nil {
-		return nil, err
+	var requestCommits []*commit.Commit[api.Request]
+	var proxyCommits []*commit.Commit[api.Proxy]
+	var documentCommits []*commit.Commit[api_doc.DocCommit]
+	if len(apiRequestCommitIds) > 0 {
+		requestCommits, err = m.apiService.ListRequestCommit(ctx, apiRequestCommitIds...)
+		if err != nil {
+			return nil, err
+		}
 	}
-	//documentCommits, err := m.apiService.ListDocumentCommit(ctx, apiDocumentCommitIds...)
-	//if err != nil {
-	//	return nil, err
-	//}
+	if len(apiProxyCommitIds) > 0 {
+		proxyCommits, err = m.apiService.ListProxyCommit(ctx, apiProxyCommitIds...)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if len(apiDocumentCommitIds) > 0 {
+		documentCommits, err = m.apiDocService.ListDocCommit(ctx, apiDocumentCommitIds...)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	upstreamCommits, err := m.upstreamService.ListCommit(ctx, upstreamCommitIds...)
 	if err != nil {
 		return nil, err
 	}
 	return &projectInfo{
-		apis:       apiInfos,
-		apiCommits: proxyCommits,
-		//apiDocs:         documentCommits,
-		upstreamCommits: upstreamCommits,
+		apiRequestCommits: requestCommits,
+		apiProxyCommits:   proxyCommits,
+		apiDocCommits:     documentCommits,
+		upstreamCommits:   upstreamCommits,
 	}, nil
 }
 func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *service_diff.Diff {
 	out := &service_diff.Diff{
 		Apis:      nil,
 		Upstreams: nil,
-		//Clusters: partitions,
 	}
-	baseApis := utils.NewSet(utils.SliceToSlice(base.apis, func(i *api.Info) string {
-		return i.UUID
+	baseApis := utils.NewSet(utils.SliceToSlice(base.apiRequestCommits, func(i *commit.Commit[api.Request]) string {
+		return i.Target
 	})...)
-	baseApiProxy := utils.SliceToMap(base.apiCommits, func(i *commit.Commit[api.Proxy]) string {
+	baseApiProxy := utils.SliceToMap(base.apiProxyCommits, func(i *commit.Commit[api.Proxy]) string {
 		return i.Target
 	})
-	baseAPIDoc := utils.SliceToMap(base.apiDocs, func(i *commit.Commit[api.Document]) string {
-		return i.Target
-	})
-
-	targetApiProxy := utils.SliceToMap(target.apiCommits, func(i *commit.Commit[api.Proxy]) string {
-		return i.Target
-	})
-	targetAPIDoc := utils.SliceToMap(target.apiDocs, func(i *commit.Commit[api.Document]) string {
+	baseAPIDoc := utils.SliceToMap(base.apiDocCommits, func(i *commit.Commit[api_doc.DocCommit]) string {
 		return i.Target
 	})
 
-	for _, apiInfo := range target.apis {
-		apiId := apiInfo.UUID
+	targetApiProxy := utils.SliceToMap(target.apiProxyCommits, func(i *commit.Commit[api.Proxy]) string {
+		return i.Target
+	})
+	targetAPIDoc := utils.SliceToMap(target.apiDocCommits, func(i *commit.Commit[api_doc.DocCommit]) string {
+		return i.Target
+	})
+
+	for _, rc := range target.apiRequestCommits {
+		apiId := rc.Target
 		a := &service_diff.ApiDiff{
-			APi:  apiInfo.UUID,
-			Name: apiInfo.Name,
-			//Methods: apiInfo.Methods,
-			Path:   apiInfo.Path,
-			Status: service_diff.Status{},
+			APi:      rc.Target,
+			Method:   rc.Data.Methods,
+			Protocol: rc.Data.Protocols,
+			Disable:  false,
+			Path:     rc.Data.Path,
+			Change:   0,
+			Status:   service_diff.Status{},
 		}
 
 		pc, hasPc := targetApiProxy[apiId]
@@ -237,15 +262,17 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 	baseApis.Remove(utils.SliceToSlice(out.Apis, func(i *service_diff.ApiDiff) string {
 		return i.APi
 	})...)
-	for _, apiInfo := range base.apis {
-		if baseApis.Has(apiInfo.UUID) {
+	for _, rc := range base.apiRequestCommits {
+		apiInfo := rc.Data
+		if baseApis.Has(rc.Target) {
 			out.Apis = append(out.Apis, &service_diff.ApiDiff{
-				APi:  apiInfo.UUID,
-				Name: apiInfo.Name,
-				//Methods: apiInfo.Methods,
-				Path:   apiInfo.Path,
-				Status: service_diff.Status{},
-				Change: service_diff.ChangeTypeDelete,
+				APi:      rc.Target,
+				Method:   apiInfo.Methods,
+				Protocol: apiInfo.Protocols,
+				Disable:  apiInfo.Disable,
+				Path:     apiInfo.Path,
+				Change:   service_diff.ChangeTypeDelete,
+				Status:   service_diff.Status{},
 			})
 		}
 
@@ -262,10 +289,9 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 		key := fmt.Sprintf("%s-%s", target.id, partitionId)
 		o := &service_diff.UpstreamDiff{
 			Upstream: target.id,
-			//Cluster: partitionId,
-			Data:   nil,
-			Change: service_diff.ChangeTypeNone,
-			Status: 0,
+			Data:     nil,
+			Change:   service_diff.ChangeTypeNone,
+			Status:   0,
 		}
 		out.Upstreams = append(out.Upstreams, o)
 		bu, hasBu := baseUpstreamMap[key]
@@ -300,14 +326,14 @@ func (m *imlServiceDiff) Out(ctx context.Context, diff *service_diff.Diff) (*Dif
 	}
 
 	out := &DiffOut{}
-	out.Apis = utils.SliceToSlice(diff.Apis, func(i *service_diff.ApiDiff) *ApiDiffOut {
-		return &ApiDiffOut{
-			Api:    auto.UUID(i.APi),
-			Name:   i.Name,
-			Method: i.Method,
-			Path:   i.Path,
-			Change: i.Change,
-			Status: i.Status,
+	out.Routers = utils.SliceToSlice(diff.Apis, func(i *service_diff.ApiDiff) *RouterDiffOut {
+		return &RouterDiffOut{
+			Methods:   i.Method,
+			Path:      i.Path,
+			Change:    i.Change,
+			Status:    i.Status,
+			Protocols: i.Protocol,
+			Disable:   i.Disable,
 		}
 	})
 

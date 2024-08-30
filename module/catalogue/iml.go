@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	"math"
 	"sort"
 
@@ -43,6 +44,7 @@ var (
 type imlCatalogueModule struct {
 	catalogueService      catalogue.ICatalogueService      `autowired:""`
 	apiService            api.IAPIService                  `autowired:""`
+	apiDocService         api_doc.IAPIDocService           `autowired:""`
 	serviceService        service.IServiceService          `autowired:""`
 	serviceTagService     service_tag.ITagService          `autowired:""`
 	serviceDocService     service_doc.IDocService          `autowired:""`
@@ -237,46 +239,14 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 		apiIds = append(apiIds, v.API)
 		apiMap[v.API] = v
 	}
-	apiList, err := i.apiService.ListInfo(ctx, apiIds...)
-	if err != nil {
-		return nil, err
-	}
-
-	apis := make([]*catalogue_dto.ServiceApi, 0, len(apiList))
-	// TODO：此处载入API文档
-	for _, info := range apiList {
-		basicApi := &catalogue_dto.ServiceApiBasic{
-			Id:          info.UUID,
-			Name:        info.Name,
-			Description: info.Description,
-			//Methods:     info.Methods,
-			Path:       info.Path,
-			Creator:    auto.UUID(info.Creator),
-			Updater:    auto.UUID(info.Updater),
-			CreateTime: auto.TimeLabel(info.CreateAt),
-			UpdateTime: auto.TimeLabel(info.UpdateAt),
-		}
-		//v, ok := apiMap[info.UUID]
-		//if !ok {
-		//	continue
-		//}
-		//commit, err := i.apiService.GetDocumentCommit(ctx, v.Commit)
-		//if err != nil {
-		//	return nil, err
-		//}
-		//tmp := make(map[string]interface{})
-		//if commit.Data != nil {
-		//	err = json.Unmarshal([]byte(commit.Data.Content), &tmp)
-		//	if err != nil {
-		//		return nil, err
-		//	}
-		//}
-
-		apis = append(apis, &catalogue_dto.ServiceApi{
-			ServiceApiBasic: basicApi,
-			//Doc:             tmp,
-		})
-	}
+	//apiList, err := i.apiService.ListInfo(ctx, apiIds...)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//apiNum := 0
+	//if len(docCommits) > 0 {
+	//	i.apiDocService.ListDocCommit(ctx,docCommits[0].Commit)
+	//}
 	countMap, err := i.subscribeService.CountMapByService(ctx, subscribe.ApplyStatusSubscribe, sid)
 	if err != nil {
 		return nil, err
@@ -295,8 +265,8 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 		Description: s.Description,
 		Document:    docStr,
 		Basic: &catalogue_dto.ServiceBasic{
-			Team:       auto.UUID(s.Team),
-			ApiNum:     len(apis),
+			Team: auto.UUID(s.Team),
+			//ApiNum:     len(apis),
 			AppNum:     int(countMap[s.Id]),
 			Tags:       auto.List(tagIds),
 			Catalogue:  auto.UUID(s.Catalogue),
@@ -304,7 +274,6 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 			UpdateTime: auto.TimeLabel(r.CreateAt),
 			Logo:       s.Logo,
 		},
-		Apis: apis,
 	}, nil
 }
 
@@ -334,7 +303,7 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 	}
 
 	// 获取服务API数量
-	apiCountMap, err := i.apiService.CountMapByService(ctx, serviceIds...)
+	apiCountMap, err := i.apiDocService.LatestAPICountByServices(ctx, serviceIds...)
 	if err != nil {
 		return nil, err
 	}

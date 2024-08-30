@@ -27,15 +27,37 @@ var (
 type HistoryType string
 
 const (
-	HistoryProxy HistoryType = "proxy"
+	HistoryRequest HistoryType = "request"
+	HistoryProxy   HistoryType = "proxy"
 )
 
 type imlAPIService struct {
-	store              api.IApiBaseStore                   `autowired:""`
-	apiInfoStore       api.IAPIInfoStore                   `autowired:""`
-	proxyCommitService commit.ICommitWithKeyService[Proxy] `autowired:""`
+	store                api.IApiBaseStore                     `autowired:""`
+	apiInfoStore         api.IAPIInfoStore                     `autowired:""`
+	requestCommitService commit.ICommitWithKeyService[Request] `autowired:""`
+	proxyCommitService   commit.ICommitWithKeyService[Proxy]   `autowired:""`
 	universally.IServiceGet[API]
 	universally.IServiceDelete
+}
+
+func (i *imlAPIService) ListLatestCommitRequest(ctx context.Context, aid ...string) ([]*commit.Commit[Request], error) {
+	return i.requestCommitService.ListLatest(ctx, aid...)
+}
+
+func (i *imlAPIService) LatestRequest(ctx context.Context, aid string) (*commit.Commit[Request], error) {
+	return i.requestCommitService.Latest(ctx, aid)
+}
+
+func (i *imlAPIService) GetRequestCommit(ctx context.Context, commitId string) (*commit.Commit[Request], error) {
+	return i.requestCommitService.Get(ctx, commitId)
+}
+
+func (i *imlAPIService) ListRequestCommit(ctx context.Context, commitId ...string) ([]*commit.Commit[Request], error) {
+	return i.requestCommitService.List(ctx, commitId...)
+}
+
+func (i *imlAPIService) SaveRequest(ctx context.Context, aid string, data *Request) error {
+	return i.requestCommitService.Save(ctx, aid, data)
 }
 
 func (i *imlAPIService) CountMapByService(ctx context.Context, service ...string) (map[string]int64, error) {

@@ -19,10 +19,12 @@ type Status struct {
 }
 
 type ApiDiff struct {
-	APi      string     `json:"api,omitempty"`
-	Upstream string     `json:"upstream,omitempty"`
-	Name     string     `json:"name,omitempty"`
-	Method   string     `json:"method,omitempty"`
+	APi string `json:"api,omitempty"`
+	//Upstream string     `json:"upstream,omitempty"`
+	//Name     string     `json:"name,omitempty"`
+	Method   []string   `json:"method,omitempty"`
+	Protocol []string   `json:"protocol,omitempty"`
+	Disable  bool       `json:"disable,omitempty"`
 	Path     string     `json:"path,omitempty"`
 	Change   ChangeType `json:"change,omitempty"`
 	Status   Status     `json:"status,omitempty"`
