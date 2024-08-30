@@ -2,10 +2,11 @@ package api
 
 import (
 	"context"
+	"github.com/APIParkLab/APIPark/module/system"
 	"reflect"
-	
+
 	"github.com/eolinker/go-common/autowire"
-	
+
 	api_dto "github.com/APIParkLab/APIPark/module/api/dto"
 )
 
@@ -27,16 +28,23 @@ type IApiModule interface {
 	Delete(ctx context.Context, serviceId string, apiId string) error
 	// Copy 复制API
 	Copy(ctx context.Context, serviceId string, apiId string, dto *api_dto.CreateApi) (*api_dto.ApiSimpleDetail, error)
-	// ApiDocDetail 获取API文档详情
-	ApiDocDetail(ctx context.Context, serviceId string, apiId string) (*api_dto.ApiDocDetail, error)
-	// ApiProxyDetail 获取API代理详情
-	ApiProxyDetail(ctx context.Context, serviceId string, apiId string) (*api_dto.ApiProxyDetail, error)
 	// Prefix 获取API前缀
 	Prefix(ctx context.Context, serviceId string) (string, error)
+
+	//ExportAll(ctx context.Context) ([]*api_dto.ExportAPI, error)
+}
+
+type IExportApiModule interface {
+	system.IExportModule[api_dto.ExportAPI]
 }
 
 func init() {
+	apiModule := new(imlApiModule)
 	autowire.Auto[IApiModule](func() reflect.Value {
-		return reflect.ValueOf(new(imlApiModule))
+		return reflect.ValueOf(apiModule)
+	})
+
+	autowire.Auto[IExportApiModule](func() reflect.Value {
+		return reflect.ValueOf(apiModule)
 	})
 }

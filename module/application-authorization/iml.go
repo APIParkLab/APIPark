@@ -6,36 +6,62 @@ import (
 	"errors"
 	"fmt"
 	"time"
-	
+
 	application_authorization "github.com/APIParkLab/APIPark/service/application-authorization"
-	
+
 	"github.com/eolinker/eosc/log"
-	
+
 	authDriver "github.com/APIParkLab/APIPark/module/application-authorization/auth-driver"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
-	
+
 	"github.com/APIParkLab/APIPark/service/cluster"
 	"github.com/APIParkLab/APIPark/service/service"
-	
+
 	"github.com/eolinker/go-common/auto"
-	
+
 	"github.com/google/uuid"
-	
+
 	"github.com/eolinker/go-common/store"
-	
+
 	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
 )
 
-var _ IAuthorizationModule = (*imlAuthorizationModule)(nil)
+var (
+	_ IAuthorizationModule       = (*imlAuthorizationModule)(nil)
+	_ IExportAuthorizationModule = (*imlAuthorizationModule)(nil)
+)
 
 type imlAuthorizationModule struct {
 	serviceService       service.IServiceService                         `autowired:""`
 	authorizationService application_authorization.IAuthorizationService `autowired:""`
 	clusterService       cluster.IClusterService                         `autowired:""`
 	transaction          store.ITransaction                              `autowired:""`
+}
+
+func (i *imlAuthorizationModule) ExportAll(ctx context.Context) ([]*application_authorization_dto.ExportAuthorization, error) {
+	list, err := i.authorizationService.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return utils.SliceToSlice(list, func(a *application_authorization.Authorization) *application_authorization_dto.ExportAuthorization {
+		cfg := make(map[string]interface{})
+		json.Unmarshal([]byte(a.Config), &cfg)
+		return &application_authorization_dto.ExportAuthorization{
+			Application:    a.Application,
+			UUID:           a.UUID,
+			Name:           a.Name,
+			Driver:         a.Type,
+			Position:       a.Position,
+			TokenName:      a.TokenName,
+			Config:         cfg,
+			ExpireTime:     a.ExpireTime,
+			HideCredential: a.HideCredential,
+		}
+	}), nil
 }
 
 func (i *imlAuthorizationModule) getApplications(ctx context.Context, appIds []string, appMap map[string]*service.Service) ([]*gateway.ApplicationRelease, error) {
@@ -62,7 +88,7 @@ func (i *imlAuthorizationModule) getApplications(ctx context.Context, appIds []s
 					"service": id,
 				},
 			},
-			
+
 			Authorizations: utils.SliceToSlice(auths, func(a *application_authorization.Authorization) *gateway.Authorization {
 				authCfg := make(map[string]interface{})
 				_ = json.Unmarshal([]byte(a.Config), &authCfg)
@@ -90,7 +116,7 @@ func (i *imlAuthorizationModule) initGateway(ctx context.Context, partitionId st
 		serviceIds = append(serviceIds, p.Id)
 		serviceMap[p.Id] = p
 	}
-	
+
 	applications, err := i.getApplications(ctx, serviceIds, serviceMap)
 	if err != nil {
 		return err
@@ -99,7 +125,7 @@ func (i *imlAuthorizationModule) initGateway(ctx context.Context, partitionId st
 }
 
 func (i *imlAuthorizationModule) online(ctx context.Context, s *service.Service) error {
-	
+
 	clusters, err := i.clusterService.List(ctx)
 	if err != nil {
 		return err
@@ -130,7 +156,7 @@ func (i *imlAuthorizationModule) online(ctx context.Context, s *service.Service)
 			}
 		}),
 	}
-	
+
 	for _, c := range clusters {
 		err := i.doOnline(ctx, c.Uuid, app)
 		if err != nil {
@@ -148,7 +174,7 @@ func (i *imlAuthorizationModule) doOnline(ctx context.Context, clusterId string,
 		_ = client.Close(ctx)
 	}()
 	return client.Application().Online(ctx, app)
-	
+
 }
 func (i *imlAuthorizationModule) AddAuthorization(ctx context.Context, appId string, info *application_authorization_dto.CreateAuthorization) (*application_authorization_dto.Authorization, error) {
 	authFactory, has := authDriver.GetAuthFactory(info.Driver)
@@ -163,16 +189,16 @@ func (i *imlAuthorizationModule) AddAuthorization(ctx context.Context, appId str
 	if err != nil {
 		return nil, err
 	}
-	
+
 	s, err := i.serviceService.Get(ctx, appId)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if info.UUID == "" {
 		info.UUID = uuid.New().String()
 	}
-	
+
 	// 缺少配置查重操作
 	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		err = i.authorizationService.Create(ctx, &application_authorization.Create{
@@ -190,13 +216,13 @@ func (i *imlAuthorizationModule) AddAuthorization(ctx context.Context, appId str
 		if err != nil {
 			return err
 		}
-		
+
 		return i.online(ctx, s)
 	})
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return i.Info(ctx, appId, info.UUID)
 }
 
@@ -217,12 +243,12 @@ func (i *imlAuthorizationModule) EditAuthorization(ctx context.Context, appId st
 	if err != nil {
 		return nil, err
 	}
-	
+
 	appInfo, err := i.serviceService.Get(ctx, appId)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		authId := auth.GenerateID(authInfo.Position, authInfo.TokenName)
 		cfgStr := string(cfg)
@@ -240,7 +266,7 @@ func (i *imlAuthorizationModule) EditAuthorization(ctx context.Context, appId st
 		}
 		return i.online(ctx, appInfo)
 	})
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -252,7 +278,7 @@ func (i *imlAuthorizationModule) DeleteAuthorization(ctx context.Context, pid st
 	if err != nil {
 		return err
 	}
-	
+
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		err = i.authorizationService.Delete(ctx, aid)
 		if err != nil {
@@ -285,7 +311,7 @@ func (i *imlAuthorizationModule) doOffline(ctx context.Context, clusterId string
 		_ = client.Close(ctx)
 	}()
 	return client.Application().Offline(ctx, app)
-	
+
 }
 func (i *imlAuthorizationModule) Authorizations(ctx context.Context, pid string) ([]*application_authorization_dto.AuthorizationItem, error) {
 	_, err := i.serviceService.Get(ctx, pid)
@@ -349,7 +375,7 @@ func (i *imlAuthorizationModule) Detail(ctx context.Context, pid string, aid str
 		hideAuthStr = "否"
 	}
 	details = append(details, application_authorization_dto.DetailItem{Key: "隐藏鉴权信息", Value: hideAuthStr})
-	
+
 	return details, nil
 }
 
@@ -366,7 +392,7 @@ func (i *imlAuthorizationModule) Info(ctx context.Context, pid string, aid strin
 	if auth.Config != "" {
 		_ = json.Unmarshal([]byte(auth.Config), &cfg)
 	}
-	
+
 	return &application_authorization_dto.Authorization{
 		UUID:           auth.UUID,
 		Name:           auth.Name,

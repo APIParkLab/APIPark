@@ -5,18 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"time"
-	
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	
+
 	"github.com/APIParkLab/APIPark/service/universally/commit"
-	
+
 	"github.com/APIParkLab/APIPark/stores/api"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/eolinker/go-common/auto"
-	
+
 	"github.com/APIParkLab/APIPark/service/universally"
 )
 
@@ -27,15 +27,13 @@ var (
 type HistoryType string
 
 const (
-	HistoryDocument HistoryType = "doc"
-	HistoryProxy    HistoryType = "proxy"
+	HistoryProxy HistoryType = "proxy"
 )
 
 type imlAPIService struct {
-	store                 api.IApiBaseStore                      `autowired:""`
-	apiInfoStore          api.IAPIInfoStore                      `autowired:""`
-	proxyCommitService    commit.ICommitWithKeyService[Proxy]    `autowired:""`
-	documentCommitService commit.ICommitWithKeyService[Document] `autowired:""`
+	store              api.IApiBaseStore                   `autowired:""`
+	apiInfoStore       api.IAPIInfoStore                   `autowired:""`
+	proxyCommitService commit.ICommitWithKeyService[Proxy] `autowired:""`
 	universally.IServiceGet[API]
 	universally.IServiceDelete
 }
@@ -62,69 +60,28 @@ func (i *imlAPIService) ListInfoForService(ctx context.Context, serviceId string
 	if err != nil {
 		return nil, err
 	}
-	return utils.SliceToSlice(list, func(info *api.Info) *Info {
-		return &Info{
-			UUID:        info.UUID,
-			Name:        info.Name,
-			Description: info.Description,
-			CreateAt:    info.CreateAt,
-			UpdateAt:    info.UpdateAt,
-			Service:     info.Service,
-			Team:        info.Team,
-			Creator:     info.Creator,
-			Updater:     info.Updater,
-			Method:      info.Method,
-			Path:        info.Path,
-			Match:       info.Match,
-		}
-	}), nil
+	return utils.SliceToSlice(list, FromEntityInfo), nil
 }
 
 func (i *imlAPIService) ListInfo(ctx context.Context, aids ...string) ([]*Info, error) {
-	list, err := i.apiInfoStore.List(ctx, map[string]interface{}{
-		"uuid": aids,
-	})
+	w := map[string]interface{}{}
+	if len(aids) > 0 {
+		w["uuid"] = aids
+	}
+	list, err := i.apiInfoStore.List(ctx, w)
 	if err != nil {
 		return nil, err
 	}
-	return utils.SliceToSlice(list, func(info *api.Info) *Info {
-		return &Info{
-			UUID:        info.UUID,
-			Name:        info.Name,
-			Description: info.Description,
-			CreateAt:    info.CreateAt,
-			UpdateAt:    info.UpdateAt,
-			Service:     info.Service,
-			Team:        info.Team,
-			Creator:     info.Creator,
-			Updater:     info.Updater,
-			Method:      info.Method,
-			Path:        info.Path,
-			Match:       info.Match,
-		}
-	}), nil
+	return utils.SliceToSlice(list, FromEntityInfo), nil
 }
 
 func (i *imlAPIService) GetInfo(ctx context.Context, aid string) (*Info, error) {
-	
+
 	info, err := i.apiInfoStore.GetByUUID(ctx, aid)
 	if err != nil {
 		return nil, err
 	}
-	return &Info{
-		UUID:        info.UUID,
-		Name:        info.Name,
-		Description: info.Description,
-		CreateAt:    info.CreateAt,
-		UpdateAt:    info.UpdateAt,
-		Service:     info.Service,
-		Team:        info.Team,
-		Creator:     info.Creator,
-		Updater:     info.Updater,
-		Method:      info.Method,
-		Path:        info.Path,
-		Match:       info.Match,
-	}, nil
+	return FromEntityInfo(info), nil
 }
 
 func (i *imlAPIService) Save(ctx context.Context, id string, model *EditAPI) error {
@@ -139,9 +96,6 @@ func (i *imlAPIService) Save(ctx context.Context, id string, model *EditAPI) err
 		if model.Name != nil {
 			ev.Name = *model.Name
 		}
-		//if model.Upstream != nil {
-		//	ev.Upstream = *model.Upstream
-		//}
 		if model.Description != nil {
 			ev.Description = *model.Description
 		}
@@ -150,7 +104,7 @@ func (i *imlAPIService) Save(ctx context.Context, id string, model *EditAPI) err
 			return e
 		}
 		return i.store.SetLabels(ctx, ev.Id, getLabels(ev)...)
-		
+
 	})
 }
 func getLabels(input *api.Info, appends ...string) []string {
@@ -171,7 +125,7 @@ func (i *imlAPIService) Create(ctx context.Context, input *CreateAPI) (err error
 				return err
 			}
 		}
-		
+
 		if t != nil {
 			return fmt.Errorf("method(%s),path(%s) is exist", input.Method, input.Path)
 		}
@@ -183,11 +137,11 @@ func (i *imlAPIService) Create(ctx context.Context, input *CreateAPI) (err error
 			if a != nil {
 				return fmt.Errorf("api(%s) is exist", input.UUID)
 			}
-			
+
 		} else {
 			input.UUID = uuid.NewString()
 		}
-		
+
 		ne := api.Api{
 			Id:       0,
 			UUID:     input.UUID,
@@ -235,10 +189,6 @@ func (i *imlAPIService) ListProxyCommit(ctx context.Context, commitId ...string)
 	return i.proxyCommitService.List(ctx, commitId...)
 }
 
-func (i *imlAPIService) ListDocumentCommit(ctx context.Context, commitId ...string) ([]*commit.Commit[Document], error) {
-	return i.documentCommitService.List(ctx, commitId...)
-}
-
 func (i *imlAPIService) CountByService(ctx context.Context, service string) (int64, error) {
 	return i.store.CountWhere(ctx, map[string]interface{}{
 		"service": service,
@@ -273,41 +223,23 @@ func (i *imlAPIService) listForService(ctx context.Context, serviceId string, is
 	return i.store.ListQuery(ctx, "service=? and is_delete=?", []interface{}{serviceId, isDelete}, "id")
 }
 func (i *imlAPIService) ListLatestCommitProxy(ctx context.Context, apiUUID ...string) ([]*commit.Commit[Proxy], error) {
-	
+
 	return i.proxyCommitService.ListLatest(ctx, apiUUID...)
-	
-}
-func (i *imlAPIService) ListLatestCommitDocument(ctx context.Context, apiUUID ...string) ([]*commit.Commit[Document], error) {
-	
-	return i.documentCommitService.ListLatest(ctx, apiUUID...)
+
 }
 
 func (i *imlAPIService) LatestProxy(ctx context.Context, aid string) (*commit.Commit[Proxy], error) {
-	
-	return i.proxyCommitService.Latest(ctx, aid)
-}
 
-func (i *imlAPIService) LatestDocument(ctx context.Context, aid string) (*commit.Commit[Document], error) {
-	
-	return i.documentCommitService.Latest(ctx, aid)
+	return i.proxyCommitService.Latest(ctx, aid)
 }
 
 func (i *imlAPIService) GetProxyCommit(ctx context.Context, commitId string) (*commit.Commit[Proxy], error) {
 	return i.proxyCommitService.Get(ctx, commitId)
 }
 
-func (i *imlAPIService) GetDocumentCommit(ctx context.Context, commitId string) (*commit.Commit[Document], error) {
-	return i.documentCommitService.Get(ctx, commitId)
-}
-
 func (i *imlAPIService) SaveProxy(ctx context.Context, aid string, data *Proxy) error {
-	
-	return i.proxyCommitService.Save(ctx, aid, data)
-}
 
-func (i *imlAPIService) SaveDocument(ctx context.Context, aid string, data *Document) error {
-	
-	return i.documentCommitService.Save(ctx, aid, data)
+	return i.proxyCommitService.Save(ctx, aid, data)
 }
 
 func (i *imlAPIService) GetLabels(ctx context.Context, ids ...string) map[string]string {
@@ -325,8 +257,8 @@ func (i *imlAPIService) GetLabels(ctx context.Context, ids ...string) map[string
 
 func (i *imlAPIService) OnComplete() {
 	i.IServiceGet = universally.NewGetSoftDelete[API, api.Api](i.store, FromEntity)
-	
+
 	i.IServiceDelete = universally.NewSoftDelete[api.Api](i.store)
-	
+
 	auto.RegisterService("api", i)
 }

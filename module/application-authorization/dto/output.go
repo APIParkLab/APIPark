@@ -31,3 +31,15 @@ type DetailItem struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
+
+type ExportAuthorization struct {
+	Application    string                 `json:"application"`
+	UUID           string                 `json:"id"`
+	Name           string                 `json:"name"`
+	Driver         string                 `json:"driver"`
+	Position       string                 `json:"position"`
+	TokenName      string                 `json:"token_name"`
+	Config         map[string]interface{} `json:"config"`
+	ExpireTime     int64                  `json:"expire_time"`
+	HideCredential bool                   `json:"hide_credential"`
+}

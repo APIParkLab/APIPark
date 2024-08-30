@@ -45,7 +45,7 @@ func (s *imlServiceGet[T, E]) Get(ctx context.Context, uuid string) (*T, error) 
 		return nil, err
 	}
 	if v == nil || errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, errors.New("not found")
+		return nil, gorm.ErrRecordNotFound
 	}
 
 	return s.toModelHandler(v), nil

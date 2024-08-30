@@ -2,6 +2,7 @@ package service_doc
 
 import (
 	"context"
+	"github.com/APIParkLab/APIPark/service/universally/commit"
 	"reflect"
 
 	"github.com/eolinker/go-common/autowire"
@@ -10,10 +11,20 @@ import (
 type IDocService interface {
 	Get(ctx context.Context, sid string) (*Doc, error)
 	Save(ctx context.Context, input *SaveDoc) error
+	List(ctx context.Context, sids ...string) ([]*Doc, error)
+	Map(ctx context.Context, sids ...string) (map[string]*Doc, error)
+	IDocCommitService
+}
+
+type IDocCommitService interface {
+	LatestDocCommit(ctx context.Context, serviceId string) (*commit.Commit[DocCommit], error)
+	CommitDoc(ctx context.Context, serviceId string, data *DocCommit) error
 }
 
 func init() {
 	autowire.Auto[IDocService](func() reflect.Value {
 		return reflect.ValueOf(new(imlDocService))
 	})
+
+	commit.InitCommitWithKeyService[DocCommit]("service", "service_doc")
 }

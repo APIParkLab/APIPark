@@ -15,6 +15,14 @@ type imlApiBaseStore struct {
 	store.SearchStoreSoftDelete[Api]
 }
 
+type imlAPIDocStore struct {
+	store.Store[Doc]
+}
+
+type IAPIDocStore interface {
+	store.IBaseStore[Doc]
+}
+
 func init() {
 
 	autowire.Auto[IApiBaseStore](func() reflect.Value {
@@ -22,5 +30,8 @@ func init() {
 	})
 	autowire.Auto[IAPIInfoStore](func() reflect.Value {
 		return reflect.ValueOf(new(store.Store[Info]))
+	})
+	autowire.Auto[IAPIDocStore](func() reflect.Value {
+		return reflect.ValueOf(new(imlAPIDocStore))
 	})
 }
