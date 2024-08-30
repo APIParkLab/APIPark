@@ -11,8 +11,8 @@ system:
       - system.devops.log_configuration.view
       - system.devops.ssl_certificate.manager
       - system.devops.ssl_certificate.view
-      - system.devops.monitor.manager
-      - system.devops.monitor.view
+      - system.devops.data_source.manager
+      - system.devops.data_source.view
       - system.organization.member.manager
       - system.organization.member.view
       - system.organization.role.view_system_role
@@ -46,8 +46,8 @@ system:
       - system.devops.log_configuration.view
       - system.devops.ssl_certificate.manager
       - system.devops.ssl_certificate.view
-      - system.devops.monitor.manager
-      - system.devops.monitor.view
+      - system.devops.data_source.manager
+      - system.devops.data_source.view
       - system.workspace.api_market.view
       - system.workspace.application.view_all
       - system.workspace.service.view_all

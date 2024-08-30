@@ -26,16 +26,12 @@ func FromEntity(e *release.Release) *Release {
 	}
 }
 
-type APIProxyCommit struct {
+type APICommit struct {
 	Release string
 	API     string
 	Commit  string
 }
-type APIDocumentCommit struct {
-	Release string
-	API     string
-	Commit  string
-}
+
 type UpstreamCommit struct {
 	Release   string
 	Upstream  string

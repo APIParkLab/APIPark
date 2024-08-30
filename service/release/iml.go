@@ -28,22 +28,21 @@ type imlReleaseService struct {
 	releaseRuntime release.IReleaseRuntime     `autowired:""`
 }
 
-func (s *imlReleaseService) Completeness(partitions []string, apis []string, proxyCommits []*commit.Commit[api.Proxy], documentCommits []*commit.Commit[api.Document], upstreamCommits []*commit.Commit[upstream.Config]) bool {
+func (s *imlReleaseService) Completeness(partitions []string, apis []string, apiRequestCommits []*commit.Commit[api.Request], proxyCommits []*commit.Commit[api.Proxy], upstreamCommits []*commit.Commit[upstream.Config]) bool {
 
+	requests := utils.SliceToMap(apiRequestCommits, func(o *commit.Commit[api.Request]) string {
+		return o.Target
+	})
 	proxys := utils.SliceToMap(proxyCommits, func(o *commit.Commit[api.Proxy]) string {
 		return o.Target
 	})
 
-	documents := utils.SliceToMap(documentCommits, func(o *commit.Commit[api.Document]) string {
-		return o.Target
-	})
 	for _, aid := range apis {
-		_, has := proxys[aid]
+		_, has := requests[aid]
 		if !has {
 			return false
 		}
-
-		_, has = documents[aid]
+		_, has = proxys[aid]
 		if !has {
 			return false
 		}
@@ -267,10 +266,19 @@ func (s *imlReleaseService) SetRunning(ctx context.Context, service string, id s
 
 }
 
-func (s *imlReleaseService) CreateRelease(ctx context.Context, service string, version string, remark string, apisProxyCommits, apiDocCommits map[string]string, upstreams map[string]map[string]string) (*Release, error) {
+func (s *imlReleaseService) CreateRelease(ctx context.Context, service string, version string, remark string, apiRequestCommit, apisProxyCommits, apiDocCommits, serviceDocCommits map[string]string, upstreams map[string]map[string]string) (*Release, error) {
 	operator := utils.UserId(ctx)
 	releaseId := uuid.NewString()
 	commits := make([]*release.Commit, 0, len(apisProxyCommits)+len(apiDocCommits)+len(upstreams))
+	for apiId, commitUUID := range apiRequestCommit {
+		commits = append(commits, &release.Commit{
+			Type:    CommitApiRequest,
+			Target:  apiId,
+			Release: releaseId,
+			Key:     CommitApiRequest,
+			Commit:  commitUUID,
+		})
+	}
 	for aid, commitUUID := range apisProxyCommits {
 		commits = append(commits, &release.Commit{
 			Type:    CommitApiProxy,
@@ -408,28 +416,35 @@ func (s *imlReleaseService) List(ctx context.Context, service string) ([]*Releas
 	return utils.SliceToSlice(list, FromEntity), nil
 }
 
-func (s *imlReleaseService) GetReleaseInfos(ctx context.Context, id string) ([]*APIProxyCommit, []*APIDocumentCommit, []*UpstreamCommit, error) {
+func (s *imlReleaseService) GetReleaseInfos(ctx context.Context, id string) ([]*APICommit, []*APICommit, []*APICommit, []*UpstreamCommit, error) {
 	commits, err := s.commitStore.List(ctx, map[string]interface{}{
 		"release": id,
 	})
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
-	apiProxyCommits := make([]*APIProxyCommit, 0, len(commits))
-	apiDocumentCommits := make([]*APIDocumentCommit, 0, len(commits))
+	apiRequestCommits := make([]*APICommit, 0, len(commits))
+	apiProxyCommits := make([]*APICommit, 0, len(commits))
+	apiDocumentCommits := make([]*APICommit, 0, len(commits))
 	upstreamCommits := make([]*UpstreamCommit, 0, len(commits))
 
 	for _, v := range commits {
 		switch v.Type {
+		case CommitApiRequest:
+			apiRequestCommits = append(apiRequestCommits, &APICommit{
+				Release: v.Release,
+				API:     v.Target,
+				Commit:  v.Commit,
+			})
 		case CommitApiProxy:
-			apiProxyCommits = append(apiProxyCommits, &APIProxyCommit{
+			apiProxyCommits = append(apiProxyCommits, &APICommit{
 				Release: v.Release,
 				API:     v.Target,
 				Commit:  v.Commit,
 			})
 
 		case CommitApiDocument:
-			apiDocumentCommits = append(apiDocumentCommits, &APIDocumentCommit{
+			apiDocumentCommits = append(apiDocumentCommits, &APICommit{
 				Release: v.Release,
 				API:     v.Target,
 				Commit:  v.Commit,
@@ -446,7 +461,7 @@ func (s *imlReleaseService) GetReleaseInfos(ctx context.Context, id string) ([]*
 
 	}
 
-	return apiProxyCommits, apiDocumentCommits, upstreamCommits, nil
+	return apiRequestCommits, apiProxyCommits, apiDocumentCommits, upstreamCommits, nil
 }
 
 func (s *imlReleaseService) GetRunning(ctx context.Context, service string) (*Release, error) {
