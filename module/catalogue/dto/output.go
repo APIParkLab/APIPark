@@ -25,7 +25,8 @@ type ServiceDetail struct {
 	Description string        `json:"description"`
 	Document    string        `json:"document"`
 	Basic       *ServiceBasic `json:"basic"`
-	Apis        []*ServiceApi `json:"apis"`
+	//Apis        []*ServiceApi `json:"apis"`
+	APIDoc string `json:"api_doc"`
 }
 
 type ServiceBasic struct {

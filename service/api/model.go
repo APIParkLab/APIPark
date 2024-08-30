@@ -104,6 +104,16 @@ type PluginSetting struct {
 	Disable bool                    `json:"disable"`
 	Config  plugin_model.ConfigType `json:"config"`
 }
+
+type Request struct {
+	//ID        string   `json:"id"`
+	Path      string   `json:"path"`
+	Methods   []string `json:"methods"`
+	Protocols []string `json:"protocols"`
+	Match     string   `json:"match"`
+	Disable   bool     `json:"disable"`
+}
+
 type Proxy struct {
 	Path    string                   `json:"path"`
 	Timeout int                      `json:"timeout"`

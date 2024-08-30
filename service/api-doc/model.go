@@ -17,5 +17,6 @@ type Doc struct {
 }
 
 type DocCommit struct {
-	Content string `json:"content"`
+	Content  string `json:"content"`
+	APICount int64  `json:"api_count"`
 }

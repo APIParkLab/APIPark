@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	"sort"
 	"strings"
 
@@ -50,6 +51,7 @@ type imlServiceModule struct {
 	serviceDocService service_doc.IDocService        `autowired:""`
 	serviceTagService service_tag.ITagService        `autowired:""`
 	apiService        api.IAPIService                `autowired:""`
+	apiDocService     api_doc.IAPIDocService         `autowired:""`
 	transaction       store.ITransaction             `autowired:""`
 }
 
@@ -141,7 +143,7 @@ func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, 
 	serviceIds := utils.SliceToSlice(services, func(p *service.Service) string {
 		return p.Id
 	})
-	apiCountMap, err := i.apiService.CountByGroup(ctx, "", map[string]interface{}{"service": serviceIds}, "service")
+	apiCountMap, err := i.apiDocService.APICountByServices(ctx, serviceIds...)
 	if err != nil {
 		return nil, err
 	}
@@ -263,7 +265,7 @@ func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword st
 		return s.Id
 	})
 
-	apiCountMap, err := i.apiService.CountByGroup(ctx, "", map[string]interface{}{"service": serviceIds}, "service")
+	apiCountMap, err := i.apiDocService.APICountByServices(ctx, serviceIds...)
 	if err != nil {
 		return nil, err
 	}

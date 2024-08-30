@@ -20,11 +20,18 @@ type IAPIService interface {
 	GetInfo(ctx context.Context, aid string) (*Info, error)
 	ListInfo(ctx context.Context, aids ...string) ([]*Info, error)
 	ListInfoForService(ctx context.Context, serviceId string) ([]*Info, error)
+	ListLatestCommitRequest(ctx context.Context, aid ...string) ([]*commit.Commit[Request], error)
 	ListLatestCommitProxy(ctx context.Context, aid ...string) ([]*commit.Commit[Proxy], error)
+	LatestRequest(ctx context.Context, aid string) (*commit.Commit[Request], error)
 	LatestProxy(ctx context.Context, aid string) (*commit.Commit[Proxy], error)
 	GetProxyCommit(ctx context.Context, commitId string) (*commit.Commit[Proxy], error)
 	ListProxyCommit(ctx context.Context, commitId ...string) ([]*commit.Commit[Proxy], error)
 	SaveProxy(ctx context.Context, aid string, data *Proxy) error
+
+	GetRequestCommit(ctx context.Context, commitId string) (*commit.Commit[Request], error)
+	ListRequestCommit(ctx context.Context, commitId ...string) ([]*commit.Commit[Request], error)
+	SaveRequest(ctx context.Context, aid string, data *Request) error
+
 	Save(ctx context.Context, id string, model *Edit) error
 	Create(ctx context.Context, input *Create) (err error)
 }
@@ -39,5 +46,6 @@ func init() {
 	})
 
 	commit.InitCommitWithKeyService[Proxy]("api", string(HistoryProxy))
+	commit.InitCommitWithKeyService[Request]("api", string(HistoryRequest))
 
 }

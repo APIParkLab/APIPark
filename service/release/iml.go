@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"time"
-	
+
 	"github.com/APIParkLab/APIPark/service/api"
 	"github.com/APIParkLab/APIPark/service/universally/commit"
 	"github.com/APIParkLab/APIPark/service/upstream"
@@ -29,11 +29,11 @@ type imlReleaseService struct {
 }
 
 func (s *imlReleaseService) Completeness(partitions []string, apis []string, proxyCommits []*commit.Commit[api.Proxy], documentCommits []*commit.Commit[api.Document], upstreamCommits []*commit.Commit[upstream.Config]) bool {
-	
+
 	proxys := utils.SliceToMap(proxyCommits, func(o *commit.Commit[api.Proxy]) string {
 		return o.Target
 	})
-	
+
 	documents := utils.SliceToMap(documentCommits, func(o *commit.Commit[api.Document]) string {
 		return o.Target
 	})
@@ -42,12 +42,12 @@ func (s *imlReleaseService) Completeness(partitions []string, apis []string, pro
 		if !has {
 			return false
 		}
-		
+
 		_, has = documents[aid]
 		if !has {
 			return false
 		}
-		
+
 	}
 	upstreamMap := make(map[string]map[string]struct{})
 	for _, upstreamCommit := range upstreamCommits {
@@ -56,7 +56,7 @@ func (s *imlReleaseService) Completeness(partitions []string, apis []string, pro
 		}
 		upstreamMap[upstreamCommit.Target][upstreamCommit.Key] = struct{}{}
 	}
-	
+
 	for _, partition := range partitions {
 		for _, u := range upstreamMap {
 			if _, has := u[partition]; !has {
@@ -64,7 +64,7 @@ func (s *imlReleaseService) Completeness(partitions []string, apis []string, pro
 			}
 		}
 	}
-	
+
 	return true
 }
 
@@ -75,7 +75,7 @@ func (s *imlReleaseService) GetCommits(ctx context.Context, id string) ([]*Proje
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return utils.SliceToSlice(list, func(o *release.Commit) *ProjectCommits {
 		return &ProjectCommits{
 			Release: o.Release,
@@ -119,7 +119,7 @@ func (s *imlReleaseService) GetApiProxyCommit(ctx context.Context, id string, ap
 	if len(commits) == 0 {
 		return "", errors.New("not found")
 	}
-	
+
 	return commits[0].Commit, nil
 }
 
@@ -136,7 +136,7 @@ func (s *imlReleaseService) getCommitByType(ctx context.Context, releaseId, t Co
 		}
 	}
 	return s.commitStore.ListQuery(ctx, where, args, "")
-	
+
 }
 func (s *imlReleaseService) GetApiDocCommit(ctx context.Context, id string, apiUUID string) (string, error) {
 	commits, err := s.getCommitByType(ctx, id, CommitApiDocument, apiUUID, CommitApiDocument)
@@ -146,7 +146,7 @@ func (s *imlReleaseService) GetApiDocCommit(ctx context.Context, id string, apiU
 	if len(commits) == 0 {
 		return "", errors.New("not found")
 	}
-	
+
 	return commits[0].Commit, nil
 }
 
@@ -158,7 +158,7 @@ func (s *imlReleaseService) GetRunningApiDocCommit(ctx context.Context, service 
 		return "", err
 	}
 	return s.GetApiDocCommit(ctx, running.Release, apiUUID)
-	
+
 }
 
 func (s *imlReleaseService) GetRunningApiProxyCommit(ctx context.Context, service string, apiUUID string) (string, error) {
@@ -264,7 +264,7 @@ func (s *imlReleaseService) SetRunning(ctx context.Context, service string, id s
 		UpdateTime: time.Now(),
 		Operator:   operator,
 	})
-	
+
 }
 
 func (s *imlReleaseService) CreateRelease(ctx context.Context, service string, version string, remark string, apisProxyCommits, apiDocCommits map[string]string, upstreams map[string]map[string]string) (*Release, error) {
@@ -317,7 +317,7 @@ func (s *imlReleaseService) CreateRelease(ctx context.Context, service string, v
 		if !ok {
 			return errors.New("version already exists")
 		}
-		
+
 		err := s.releaseStore.Insert(ctx, ev)
 		if err != nil {
 			return err
@@ -367,14 +367,14 @@ func (s *imlReleaseService) GetRelease(ctx context.Context, id string) (*Release
 //	}
 //
 //	df := new(Diff)
-//	df.Apis = s.DiffApis(ctx, baseApis, targetApis)
+//	df.Routers = s.DiffApis(ctx, baseApis, targetApis)
 //	df.Upstreams = s.DiffUpstreams(ctx, baseUpstreams, targetUpstreams)
 //	return df, nil
 //}
 
 func (s *imlReleaseService) DeleteRelease(ctx context.Context, id string) error {
 	//todo 判断版本是否有使用中的未完结流程
-	
+
 	return s.releaseStore.Transaction(ctx, func(ctx context.Context) error {
 		first, err := s.releaseRuntime.First(ctx, map[string]interface{}{
 			"release": id,
@@ -397,7 +397,7 @@ func (s *imlReleaseService) DeleteRelease(ctx context.Context, id string) error 
 		}
 		return nil
 	})
-	
+
 }
 
 func (s *imlReleaseService) List(ctx context.Context, service string) ([]*Release, error) {
@@ -418,7 +418,7 @@ func (s *imlReleaseService) GetReleaseInfos(ctx context.Context, id string) ([]*
 	apiProxyCommits := make([]*APIProxyCommit, 0, len(commits))
 	apiDocumentCommits := make([]*APIDocumentCommit, 0, len(commits))
 	upstreamCommits := make([]*UpstreamCommit, 0, len(commits))
-	
+
 	for _, v := range commits {
 		switch v.Type {
 		case CommitApiProxy:
@@ -427,14 +427,14 @@ func (s *imlReleaseService) GetReleaseInfos(ctx context.Context, id string) ([]*
 				API:     v.Target,
 				Commit:  v.Commit,
 			})
-		
+
 		case CommitApiDocument:
 			apiDocumentCommits = append(apiDocumentCommits, &APIDocumentCommit{
 				Release: v.Release,
 				API:     v.Target,
 				Commit:  v.Commit,
 			})
-		
+
 		case CommitUpstream:
 			upstreamCommits = append(upstreamCommits, &UpstreamCommit{
 				Release:   v.Release,
@@ -443,9 +443,9 @@ func (s *imlReleaseService) GetReleaseInfos(ctx context.Context, id string) ([]*
 				Commit:    v.Commit,
 			})
 		}
-		
+
 	}
-	
+
 	return apiProxyCommits, apiDocumentCommits, upstreamCommits, nil
 }
 
