@@ -49,9 +49,7 @@ func getFileSystem(dir string) http.FileSystem {
 	if err != nil {
 		panic(err)
 	}
-
 	return http.FS(fDir)
-
 }
 
 type Frontend struct {

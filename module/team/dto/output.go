@@ -52,3 +52,9 @@ func ToTeam(model *team.Team, serviceNum int64, appNum int64) *Team {
 		CanDelete:   serviceNum == 0 && appNum == 0,
 	}
 }
+
+type ExportTeam struct {
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}

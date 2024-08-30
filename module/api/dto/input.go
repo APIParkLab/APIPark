@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/eolinker/go-common/utils"
 	"strings"
-	
+
 	"github.com/APIParkLab/APIPark/service/api"
 )
 
@@ -31,8 +31,7 @@ type CreateApi struct {
 }
 
 type InputProxy struct {
-	Path string `json:"path"`
-	//Upstream string    `json:"upstream" aocheck:"upstream"`
+	Path    string                       `json:"path"`
 	Timeout int                          `json:"timeout"`
 	Retry   int                          `json:"retry"`
 	Headers []*Header                    `json:"headers"`
@@ -78,12 +77,14 @@ func (a *CreateApi) ToServiceRouter() *api.Router {
 }
 
 type EditApi struct {
-	Info struct {
-		Name        *string `json:"name"`
-		Description *string `json:"description"`
-	} `json:"info"`
-	Proxy *InputProxy             `json:"proxy"`
-	Doc   *map[string]interface{} `json:"doc"`
+	Info  EditInfo    `json:"info"`
+	Proxy *InputProxy `json:"proxy"`
+	//Doc   *map[string]interface{} `json:"doc"`
+}
+
+type EditInfo struct {
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
 }
 
 func ToServiceProxy(proxy *InputProxy) *api.Proxy {
@@ -97,7 +98,7 @@ func ToServiceProxy(proxy *InputProxy) *api.Proxy {
 			Opt:   h.Opt,
 		}
 	})
-	
+
 	return &api.Proxy{
 		Path: proxy.Path,
 		//Upstream: proxy.Upstream,
@@ -116,7 +117,7 @@ func ToServiceDocument(doc map[string]interface{}) *api.Document {
 		}
 	}
 	content, _ := json.Marshal(doc)
-	
+
 	return &api.Document{
 		Content: string(content),
 	}
@@ -124,4 +125,8 @@ func ToServiceDocument(doc map[string]interface{}) *api.Document {
 
 type ListInput struct {
 	Projects []string `json:"projects"`
+}
+
+type UpdateDoc struct {
+	Content string `json:"content"`
 }

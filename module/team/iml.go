@@ -3,26 +3,26 @@ package team
 import (
 	"context"
 	"fmt"
-	
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/eolinker/ap-account/service/role"
-	
+
 	"github.com/eolinker/go-common/store"
-	
+
 	"github.com/eolinker/ap-account/service/user"
-	
+
 	"github.com/APIParkLab/APIPark/service/service"
 	team_member "github.com/APIParkLab/APIPark/service/team-member"
-	
+
 	"github.com/google/uuid"
-	
+
 	team_dto "github.com/APIParkLab/APIPark/module/team/dto"
 	"github.com/APIParkLab/APIPark/service/team"
 )
 
 var (
-	_ ITeamModule = (*imlTeamModule)(nil)
+	_ ITeamModule       = (*imlTeamModule)(nil)
+	_ ITeamExportModule = (*imlTeamModule)(nil)
 )
 
 type imlTeamModule struct {
@@ -33,6 +33,20 @@ type imlTeamModule struct {
 	roleService       role.IRoleService              `autowired:""`
 	roleMemberService role.IRoleMemberService        `autowired:""`
 	transaction       store.ITransaction             `autowired:""`
+}
+
+func (m *imlTeamModule) ExportAll(ctx context.Context) ([]*team_dto.ExportTeam, error) {
+	teams, err := m.service.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(teams, func(t *team.Team) *team_dto.ExportTeam {
+		return &team_dto.ExportTeam{
+			Id:          t.Id,
+			Name:        t.Name,
+			Description: t.Description,
+		}
+	}), nil
 }
 
 func (m *imlTeamModule) GetTeam(ctx context.Context, id string) (*team_dto.Team, error) {
@@ -48,9 +62,9 @@ func (m *imlTeamModule) GetTeam(ctx context.Context, id string) (*team_dto.Team,
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return team_dto.ToTeam(tv, serviceCountMap[id], appCountMap[id]), nil
-	
+
 }
 
 func (m *imlTeamModule) Search(ctx context.Context, keyword string) ([]*team_dto.Item, error) {
@@ -58,7 +72,7 @@ func (m *imlTeamModule) Search(ctx context.Context, keyword string) ([]*team_dto
 	if err != nil {
 		return nil, err
 	}
-	
+
 	serviceCountMap, err := m.serviceService.ServiceCountByTeam(ctx)
 	if err != nil {
 		return nil, err
@@ -78,7 +92,7 @@ func (m *imlTeamModule) Create(ctx context.Context, input *team_dto.CreateTeam) 
 	if input.Id == "" {
 		input.Id = uuid.New().String()
 	}
-	
+
 	err := m.transaction.Transaction(ctx, func(ctx context.Context) error {
 		if input.Master == "" {
 			input.Master = utils.UserId(ctx)
@@ -91,7 +105,7 @@ func (m *imlTeamModule) Create(ctx context.Context, input *team_dto.CreateTeam) 
 		if err != nil {
 			return err
 		}
-		
+
 		err = m.memberService.AddMemberTo(ctx, input.Id, input.Master)
 		if err != nil {
 			return err
@@ -100,7 +114,7 @@ func (m *imlTeamModule) Create(ctx context.Context, input *team_dto.CreateTeam) 
 		if err != nil {
 			return err
 		}
-		
+
 		return m.roleMemberService.Add(ctx, &role.AddMember{
 			Role:   supperRole.Id,
 			User:   input.Master,
@@ -120,7 +134,7 @@ func (m *imlTeamModule) Edit(ctx context.Context, id string, input *team_dto.Edi
 			Description: input.Description,
 		})
 	})
-	
+
 	if err != nil {
 		return nil, err
 	}

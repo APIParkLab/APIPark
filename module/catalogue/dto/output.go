@@ -61,3 +61,17 @@ type Partition struct {
 	Name   string `json:"name"`
 	Prefix string `json:"prefix"`
 }
+
+type Catalogue struct {
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Parent string `json:"parent"`
+	Sort   int    `json:"sort"`
+}
+
+type ExportCatalogue struct {
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Parent string `json:"parent"`
+	Sort   int    `json:"sort"`
+}

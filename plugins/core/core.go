@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/APIParkLab/APIPark/controller/monitor"
+	"github.com/APIParkLab/APIPark/controller/system"
 	"net/http"
 
 	plugin_cluster "github.com/APIParkLab/APIPark/controller/plugin-cluster"
@@ -66,6 +67,7 @@ type plugin struct {
 	catalogueController         catalogue.ICatalogueController                     `autowired:""`
 	upstreamController          upstream.IUpstreamController                       `autowired:""`
 	apiController               api.IAPIController                                 `autowired:""`
+	apiDocController            api.IAPIDocController                              `autowired:""`
 	subscribeController         subscribe.ISubscribeController                     `autowired:""`
 	appAuthorizationController  application_authorization.IAuthorizationController `autowired:""`
 	releaseController           release.IReleaseController                         `autowired:""`
@@ -74,6 +76,8 @@ type plugin struct {
 	dynamicModuleController     dynamic_module.IDynamicModuleController            `autowired:""`
 	pluginClusterController     plugin_cluster.IPluginClusterController            `autowired:""`
 	commonController            common.ICommonController                           `autowired:""`
+	exportConfigController      system.IExportConfigController                     `autowired:""`
+	importConfigController      system.IImportConfigController                     `autowired:""`
 	apis                        []pm3.Api
 }
 
@@ -93,6 +97,7 @@ func (p *plugin) OnComplete() {
 	p.apis = append(p.apis, p.monitorStatisticApis()...)
 	p.apis = append(p.apis, p.PartitionPluginApi()...)
 	p.apis = append(p.apis, p.commonApis()...)
+	p.apis = append(p.apis, p.systemApis()...)
 }
 
 func (p *plugin) Name() string {

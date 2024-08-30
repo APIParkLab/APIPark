@@ -132,7 +132,6 @@ system:
               - "POST:/api/v1/certificate"
               - "PUT:/api/v1/certificate"
               - "DELETE:/api/v1/certificate"
-
       - name: log configuration
         cname: 日志
         value: 'log_configuration'
@@ -154,6 +153,38 @@ system:
               - "DELETE:/api/v1/dynamic/{name}/batch"
               - "PUT:/api/v1/dynamic/{name}/online"
               - "PUT:/api/v1/dynamic/{name}/offline"
+      - name: monitor
+        cname: 监控
+        value: 'monitor'
+        children:
+          - name: view
+            cname: 查看
+            value: 'view'
+            guest_allow: true
+            apis:
+              - "GET:/api/v1/monitor/config"
+          - name: manager
+            cname: 管理
+            value: 'manager'
+            apis:
+              - "POST:/api/v1/monitor/config"
+  - name: dashboard
+    cname: 仪表盘
+    value: 'dashboard'
+    children:
+      - name: run view
+        cname: 运行视图
+        value: 'run_view'
+        children:
+          - name: view
+            cname: 查看
+            value: 'view'
+            guest_allow: true
+            apis:
+              - "GET:/api/v1/monitor/overview/invoke"
+              - "GET:/api/v1/monitor/overview/message"
+              - "GET:/api/v1/monitor/overview/top10"
+              - "GET:/api/v1/monitor/overview/summary"
   - name: workspace
     cname: 工作空间
     value: 'workspace'

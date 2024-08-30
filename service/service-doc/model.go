@@ -3,9 +3,7 @@ package service_doc
 import "time"
 
 type Doc struct {
-	ID         int64
-	DocID      string
-	Name       string
+	ID         string
 	Creator    string
 	Updater    string
 	Doc        string
@@ -16,4 +14,8 @@ type Doc struct {
 type SaveDoc struct {
 	Sid string
 	Doc string
+}
+
+type DocCommit struct {
+	Content string `json:"content"`
 }

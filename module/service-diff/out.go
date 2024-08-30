@@ -38,7 +38,7 @@ type UpstreamDiffOut struct {
 //		Apis: utils.SliceToSlice(d.Apis, func(s *project_diff.ApiDiff) *ApiDiffOut {
 //			return &ApiDiffOut{
 //				Name:     s.Name,
-//				Method:   s.Method,
+//				Methods:   s.Methods,
 //				Path:     s.Path,
 //				Upstream: s.Upstream,
 //				Change:   s.Change,
