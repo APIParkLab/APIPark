@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
+	service_doc "github.com/APIParkLab/APIPark/service/service-doc"
 
 	"github.com/APIParkLab/APIPark/service/cluster"
 	"github.com/APIParkLab/APIPark/service/service"
@@ -35,6 +36,7 @@ type imlReleaseModule struct {
 	releaseService    release.IReleaseService        `autowired:""`
 	apiService        api.IAPIService                `autowired:""`
 	apiDocService     api_doc.IAPIDocService         `autowired:""`
+	serviceDocService service_doc.IDocService        `autowired:""`
 	upstreamService   upstream.IUpstreamService      `autowired:""`
 	publishService    publish.IPublishService        `autowired:""`
 	transaction       store.ITransaction             `autowired:""`
@@ -132,9 +134,15 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 		if err != nil {
 			return err
 		}
-		docCommitMap := map[string]string{
-			docCommit.Target: docCommit.UUID,
+		serviceDoc, err := m.serviceDocService.Get(ctx, serviceId)
+		if err != nil {
+			return err
 		}
+		err = m.serviceDocService.CommitDoc(ctx, serviceId, serviceDoc)
+		if err != nil {
+			return err
+		}
+		serviceDocCommit, err := m.serviceDocService.LatestDocCommit(ctx, serviceId)
 		if !m.releaseService.Completeness(utils.SliceToSlice(clusters, func(s *cluster.Cluster) string {
 			return s.Uuid
 		}), apiUUIDS, requestCommits, apiProxy, upstreams) {
@@ -143,7 +151,7 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 		requestCommitMap := utils.SliceToMapO(requestCommits, func(c *commit.Commit[api.Request]) (string, string) {
 			return c.Target, c.UUID
 		})
-		newRelease, err = m.releaseService.CreateRelease(ctx, serviceId, input.Version, input.Remark, requestCommitMap, apiProxyCommits, docCommitMap, nil, upstreamCommitsForUKC)
+		newRelease, err = m.releaseService.CreateRelease(ctx, serviceId, input.Version, input.Remark, requestCommitMap, apiProxyCommits, docCommit.UUID, serviceDocCommit.UUID, upstreamCommitsForUKC)
 		return err
 	})
 	if err != nil {

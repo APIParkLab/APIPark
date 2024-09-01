@@ -19,6 +19,22 @@ type imlAPIDocService struct {
 	commitService commit.ICommitWithKeyService[DocCommit] `autowired:""`
 }
 
+func (i *imlAPIDocService) LatestAPICountByCommits(ctx context.Context, commitIds ...string) (map[string]int64, error) {
+	commits, err := i.commitService.List(ctx, commitIds...)
+	if err != nil {
+		return nil, err
+	}
+	countMap := make(map[string]int64)
+	for _, c := range commits {
+		doc, err := NewDocLoader(c.Data.Content)
+		if err != nil {
+			return nil, err
+		}
+		countMap[c.Target] = doc.APICount()
+	}
+	return countMap, nil
+}
+
 func (i *imlAPIDocService) GetDocCommit(ctx context.Context, commitId string) (*commit.Commit[DocCommit], error) {
 	return i.commitService.Get(ctx, commitId)
 }

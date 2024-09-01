@@ -25,6 +25,7 @@ type IAPIDocService interface {
 	ListLatestDocCommit(ctx context.Context, serviceIds ...string) ([]*commit.Commit[DocCommit], error)
 	ListDocCommit(ctx context.Context, commitIds ...string) ([]*commit.Commit[DocCommit], error)
 	LatestAPICountByServices(ctx context.Context, serviceIds ...string) (map[string]int64, error)
+	LatestAPICountByCommits(ctx context.Context, commitIds ...string) (map[string]int64, error)
 }
 
 func init() {

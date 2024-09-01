@@ -19,12 +19,24 @@ type imlDocService struct {
 	commitService commit.ICommitWithKeyService[DocCommit] `autowired:""`
 }
 
+func (i *imlDocService) GetDocCommit(ctx context.Context, commitId string) (*commit.Commit[DocCommit], error) {
+	return i.commitService.Get(ctx, commitId)
+}
+
+func (i *imlDocService) ListLatestDocCommit(ctx context.Context, serviceIds ...string) ([]*commit.Commit[DocCommit], error) {
+	return i.commitService.ListLatest(ctx, serviceIds...)
+}
+
+func (i *imlDocService) ListDocCommit(ctx context.Context, commitIds ...string) ([]*commit.Commit[DocCommit], error) {
+	return i.commitService.List(ctx, commitIds...)
+}
+
 func (i *imlDocService) LatestDocCommit(ctx context.Context, serviceId string) (*commit.Commit[DocCommit], error) {
 	return i.commitService.Latest(ctx, serviceId)
 }
 
-func (i *imlDocService) CommitDoc(ctx context.Context, serviceId string, data *DocCommit) error {
-	return i.commitService.Save(ctx, serviceId, data)
+func (i *imlDocService) CommitDoc(ctx context.Context, serviceId string, data *Doc) error {
+	return i.commitService.Save(ctx, serviceId, &DocCommit{Content: data.Doc})
 }
 
 func (i *imlDocService) List(ctx context.Context, sids ...string) ([]*Doc, error) {

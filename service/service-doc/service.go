@@ -17,8 +17,12 @@ type IDocService interface {
 }
 
 type IDocCommitService interface {
+	CommitDoc(ctx context.Context, serviceId string, data *Doc) error
+	GetDocCommit(ctx context.Context, commitId string) (*commit.Commit[DocCommit], error)
+	// LatestDocCommit 获取最新文档
 	LatestDocCommit(ctx context.Context, serviceId string) (*commit.Commit[DocCommit], error)
-	CommitDoc(ctx context.Context, serviceId string, data *DocCommit) error
+	ListLatestDocCommit(ctx context.Context, serviceIds ...string) ([]*commit.Commit[DocCommit], error)
+	ListDocCommit(ctx context.Context, commitIds ...string) ([]*commit.Commit[DocCommit], error)
 }
 
 func init() {
