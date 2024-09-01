@@ -118,11 +118,7 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 				// 当系统不可作为订阅方时，不可订阅
 				continue
 			}
-			//info, err := i.subscribeApplyService.GetApply(ctx, subscribeInfo.Service, appId)
-			//if err != nil {
-			//	if !errors.Is(err, gorm.ErrRecordNotFound) {
-			//		return err
-			//	}
+
 			err = i.subscribeApplyService.Create(ctx, &subscribe.CreateApply{
 				Uuid:        uuid.New().String(),
 				Service:     subscribeInfo.Service,
@@ -134,13 +130,6 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 				Applier:     userId,
 			})
 
-			//} else {
-			//	status := subscribe.ApplyStatusReview
-			//	err = i.subscribeApplyService.Save(ctx, info.Id, &subscribe.EditApply{
-			//		Status:  &status,
-			//		Applier: &userId,
-			//	})
-			//}
 			if err != nil {
 				return err
 			}
@@ -203,23 +192,13 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 	if err != nil {
 		return nil, fmt.Errorf("get service failed: %w", err)
 	}
-	docStr := ""
-	doc, err := i.serviceDocService.Get(ctx, sid)
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("get service doc failed: %w", err)
-		}
-	} else {
-		docStr = doc.Doc
-	}
-
 	r, err := i.releaseService.GetRunning(ctx, s.Id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &catalogue_dto.ServiceDetail{
 				Name:        s.Name,
 				Description: s.Description,
-				Document:    docStr,
+				Document:    "",
 				Basic: &catalogue_dto.ServiceBasic{
 					Team:   auto.UUID(s.Team),
 					ApiNum: 0,
@@ -243,24 +222,33 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 	}, func(t *service_tag.Tag) bool {
 		return t.Sid == sid
 	})
-	_, _, docCommits, _, err := i.releaseService.GetReleaseInfos(ctx, r.UUID)
+	_, _, apiDocCommit, _, serviceDocCommit, err := i.releaseService.GetReleaseInfos(ctx, r.UUID)
 	if err != nil {
 		return nil, fmt.Errorf("get release apis failed: %w", err)
 	}
 	var apiDoc string
 	var apiNum int
-	if len(docCommits) > 0 {
-		commit, err := i.apiDocService.GetDocCommit(ctx, docCommits[0].Commit)
+	if apiDocCommit != nil {
+		commit, err := i.apiDocService.GetDocCommit(ctx, apiDocCommit.Commit)
 		if err != nil {
 			return nil, err
 		}
 		apiDoc = commit.Data.Content
 		apiNum = int(commit.Data.APICount)
 	}
+
+	var serviceDoc string
+	if serviceDocCommit != nil {
+		commit, err := i.serviceDocService.GetDocCommit(ctx, serviceDocCommit.Commit)
+		if err != nil {
+			return nil, err
+		}
+		serviceDoc = commit.Data.Content
+	}
 	return &catalogue_dto.ServiceDetail{
 		Name:        s.Name,
 		Description: s.Description,
-		Document:    docStr,
+		Document:    serviceDoc,
 		Basic: &catalogue_dto.ServiceBasic{
 			Team:       auto.UUID(s.Team),
 			ApiNum:     apiNum,
@@ -299,12 +287,20 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 	if len(serviceIds) < 1 {
 		return nil, nil
 	}
-
-	// 获取服务API数量
-	apiCountMap, err := i.apiDocService.LatestAPICountByServices(ctx, serviceIds...)
+	commits, err := i.releaseService.GetRunningApiDocCommits(ctx, serviceIds...)
 	if err != nil {
 		return nil, err
 	}
+	apiCountMap, err := i.apiDocService.LatestAPICountByCommits(ctx, commits...)
+	if err != nil {
+		return nil, err
+	}
+
+	//// 获取服务API数量
+	//apiCountMap, err := i.apiDocService.LatestAPICountByServices(ctx, serviceIds...)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	subscriberCountMap, err := i.subscribeService.CountMapByService(ctx, subscribe.ApplyStatusSubscribe, serviceIds...)
 	if err != nil {

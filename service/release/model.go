@@ -32,6 +32,12 @@ type APICommit struct {
 	Commit  string
 }
 
+type ServiceCommit struct {
+	Release string
+	Service string
+	Commit  string
+}
+
 type UpstreamCommit struct {
 	Release   string
 	Upstream  string
