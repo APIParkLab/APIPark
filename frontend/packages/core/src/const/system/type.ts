@@ -95,7 +95,7 @@ export type SystemApiProxyFieldType = {
     id:string;
     description?:string;
     path:string;
-    method:string[];
+    methods:string[];
     match:MatchItem[]
     isDisable?: boolean;
     service?:string;
@@ -295,6 +295,7 @@ export type SystemInsideApiProxyProps = {
     teamId:string
     initProxyValue?:SystemApiProxyType
     value?:SystemApiProxyType
+    type:'add'|'edit'
     onChange?: (newConfigItems: SystemApiProxyType) => void; // 当配置项变化时，外部传入的回调函数
 }
 

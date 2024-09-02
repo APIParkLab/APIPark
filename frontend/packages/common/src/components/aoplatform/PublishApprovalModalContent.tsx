@@ -195,7 +195,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                         </Form.Item>
                     </>
                 }
-                    <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('API 列表')}：</span></Row>
+                    <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('路由列表')}：</span></Row>
                     <Row  className="mb-mbase ">
                         <Table
                             columns={translatedRouteColumns}
