@@ -43,7 +43,7 @@ export default function DashboardTabPage(){
     return (<>
         {APP_MODE === 'pro' ? <Tabs activeKey={activeKey} onChange={(val)=>{
             setActiveKey(val);
-            navigateTo(`/dashboard/${val === 'total' ? val :`${val}/list`}`)
+            navigateTo(`/analytics/${val === 'total' ? val :`${val}/list`}`)
             }} 
             items={monitorTabItems}  className="h-auto mt-[6px]" size="small"  tabBarStyle={{paddingLeft:'10px',marginTop:'0px',marginBottom:'0px'}} />
    :  <Outlet />} </>)

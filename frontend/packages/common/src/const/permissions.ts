@@ -145,12 +145,12 @@ export const PERMISSION_DEFINITION = [
         }
       },
       "system.devops.data_source.view":{
-        "grented":{
+        "granted":{
           "anyOf":[{"backend":['system.devops.data_source.view']}]
         }
       },
       "system.devops.data_source.edit":{
-        "grented":{
+        "granted":{
           "anyOf":[{"backend":['system.devops.data_source.manager']}]
         }
       },

@@ -357,7 +357,7 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                 key:uuidv4()
             },
             APP_MODE === 'pro' &&{
-                path:'dashboard',
+                path:'analytics',
                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */  '@dashboard/pages/Dashboard.tsx')),
                 key:uuidv4(),
                 children:[
