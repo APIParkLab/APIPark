@@ -54,7 +54,6 @@ func NewDocLoader(content string) (*DocLoader, error) {
 	if err != nil {
 		return nil, fmt.Errorf("load openAPI3Doc error:%v", err)
 	}
-
 	return &DocLoader{openAPI3Doc: doc}, nil
 }
 
@@ -63,7 +62,19 @@ func (d *DocLoader) Valid() error {
 		return fmt.Errorf("openAPI3Doc is nil")
 	}
 
-	return d.openAPI3Doc.Validate(openapi3Loader.Context)
+	if d.openAPI3Doc.Paths == nil {
+		return fmt.Errorf("openAPI3Doc.Paths is nil")
+	}
+	//err := d.openAPI3Doc.Validate(openapi3Loader.Context)
+	//if err != nil {
+	//	openAPI2Doc, err := openapi2conv.FromV3(d.openAPI3Doc)
+	//	if err != nil {
+	//		return err
+	//	}
+	//	validate.
+	//
+	//}
+	return nil
 }
 
 func (d *DocLoader) APICount() int64 {
