@@ -99,6 +99,7 @@ func (i *imlAPIDocService) UpdateDoc(ctx context.Context, serviceId string, inpu
 	}
 	info.Updater = operator
 	info.UpdateAt = time.Now()
+	info.Content = input.Content
 	info.APICount = doc.APICount()
 	return i.store.Save(ctx, info)
 }

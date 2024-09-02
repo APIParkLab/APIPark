@@ -98,7 +98,6 @@ func (i *imlRouterModule) SimpleList(ctx context.Context, serviceId string) ([]*
 	out := utils.SliceToSlice(apiInfos, func(item *api.Info) *router_dto.SimpleItem {
 		return &router_dto.SimpleItem{
 			Id:   item.UUID,
-			Name: item.Name,
 			Path: item.Path,
 		}
 	})
@@ -115,9 +114,15 @@ func (i *imlRouterModule) Detail(ctx context.Context, serviceId string, apiId st
 	if err != nil {
 		return nil, err
 	}
+	protocols := []string{"HTTP", "HTTPS"}
+	if len(detail.Protocols) > 0 {
+		protocols = detail.Protocols
+	}
 
 	apiDetail := &router_dto.Detail{
 		SimpleDetail: *router_dto.GenSimpleDetail(detail),
+		Protocols:    protocols,
+		Disable:      detail.Disable,
 	}
 	proxy, err := i.apiService.LatestProxy(ctx, apiId)
 	if err != nil {
@@ -168,17 +173,22 @@ func (i *imlRouterModule) Search(ctx context.Context, keyword string, serviceId 
 		return a.UpdateAt.After(b.UpdateAt)
 	})
 	out := utils.SliceToSlice(apiInfos, func(item *api.Info) *router_dto.Item {
+		protocols := []string{"HTTP", "HTTPS"}
+		if len(item.Protocols) > 0 {
+			protocols = item.Protocols
+		}
 		return &router_dto.Item{
-			Id:         item.UUID,
-			Name:       item.Name,
-			Methods:    item.Methods,
-			Protocols:  item.Protocols,
-			Path:       item.Path,
-			Creator:    auto.UUID(item.Creator),
-			Updater:    auto.UUID(item.Updater),
-			CreateTime: auto.TimeLabel(item.CreateAt),
-			UpdateTime: auto.TimeLabel(item.UpdateAt),
-			CanDelete:  true,
+			Id:          item.UUID,
+			Methods:     item.Methods,
+			Protocols:   protocols,
+			Path:        item.Path,
+			Description: item.Description,
+			Disable:     item.Disable,
+			Creator:     auto.UUID(item.Creator),
+			Updater:     auto.UUID(item.Updater),
+			CreateTime:  auto.TimeLabel(item.CreateAt),
+			UpdateTime:  auto.TimeLabel(item.UpdateAt),
+			CanDelete:   true,
 		}
 	})
 
@@ -205,10 +215,9 @@ func (i *imlRouterModule) SimpleSearch(ctx context.Context, keyword string, serv
 	}
 	out := utils.SliceToSlice(apiInfos, func(item *api.Info) *router_dto.SimpleItem {
 		return &router_dto.SimpleItem{
-			Id:   item.UUID,
-			Name: item.Name,
-			//Methods: item.Methods,
-			Path: item.Path,
+			Id:      item.UUID,
+			Methods: item.Methods,
+			Path:    item.Path,
 		}
 	})
 	return out, nil

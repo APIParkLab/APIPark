@@ -10,28 +10,30 @@ import (
 )
 
 type Item struct {
-	Id         string         `json:"id"`
-	Name       string         `json:"name"`
-	Methods    []string       `json:"methods"`
-	Protocols  []string       `json:"protocols"`
-	Path       string         `json:"request_path"`
-	Creator    auto.Label     `json:"creator" aolabel:"user"`
-	Updater    auto.Label     `json:"updater" aolabel:"user"`
-	CreateTime auto.TimeLabel `json:"create_time"`
-	UpdateTime auto.TimeLabel `json:"update_time"`
-	CanDelete  bool           `json:"can_delete"`
+	Id          string         `json:"id"`
+	Methods     []string       `json:"methods"`
+	Protocols   []string       `json:"protocols"`
+	Path        string         `json:"request_path"`
+	Description string         `json:"description"`
+	Disable     bool           `json:"disable"`
+	Creator     auto.Label     `json:"creator" aolabel:"user"`
+	Updater     auto.Label     `json:"updater" aolabel:"user"`
+	CreateTime  auto.TimeLabel `json:"create_time"`
+	UpdateTime  auto.TimeLabel `json:"update_time"`
+	CanDelete   bool           `json:"can_delete"`
 }
 
 type SimpleItem struct {
-	Id     string `json:"id"`
-	Name   string `json:"name"`
-	Method string `json:"method"`
-	Path   string `json:"request_path"`
+	Id      string   `json:"id"`
+	Methods []string `json:"methods"`
+	Path    string   `json:"request_path"`
 }
 
 type Detail struct {
 	SimpleDetail
-	Proxy *Proxy `json:"proxy"`
+	Proxy     *Proxy   `json:"proxy"`
+	Protocols []string `json:"protocols"`
+	Disable   bool     `json:"disable"`
 	//Doc   map[string]interface{} `json:"doc"`
 }
 
