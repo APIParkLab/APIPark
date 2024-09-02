@@ -1,51 +1,54 @@
-package api_dto
+package router_dto
 
 import (
 	"encoding/json"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/APIParkLab/APIPark/service/api"
 	"github.com/eolinker/go-common/auto"
 )
 
-type ApiItem struct {
-	Id         string         `json:"id"`
-	Name       string         `json:"name"`
-	Method     string         `json:"method"`
-	Path       string         `json:"request_path"`
-	Creator    auto.Label     `json:"creator" aolabel:"user"`
-	Updater    auto.Label     `json:"updater" aolabel:"user"`
-	CreateTime auto.TimeLabel `json:"create_time"`
-	UpdateTime auto.TimeLabel `json:"update_time"`
-	CanDelete  bool           `json:"can_delete"`
+type Item struct {
+	Id          string         `json:"id"`
+	Methods     []string       `json:"methods"`
+	Protocols   []string       `json:"protocols"`
+	Path        string         `json:"request_path"`
+	Description string         `json:"description"`
+	Disable     bool           `json:"disable"`
+	Creator     auto.Label     `json:"creator" aolabel:"user"`
+	Updater     auto.Label     `json:"updater" aolabel:"user"`
+	CreateTime  auto.TimeLabel `json:"create_time"`
+	UpdateTime  auto.TimeLabel `json:"update_time"`
+	CanDelete   bool           `json:"can_delete"`
 }
 
-type ApiSimpleItem struct {
-	Id     string `json:"id"`
-	Name   string `json:"name"`
-	Method string `json:"method"`
-	Path   string `json:"request_path"`
+type SimpleItem struct {
+	Id      string   `json:"id"`
+	Methods []string `json:"methods"`
+	Path    string   `json:"request_path"`
 }
 
-type ApiDetail struct {
-	ApiSimpleDetail
-	Proxy *Proxy                 `json:"proxy"`
-	Doc   map[string]interface{} `json:"doc"`
+type Detail struct {
+	SimpleDetail
+	Proxy     *Proxy   `json:"proxy"`
+	Protocols []string `json:"protocols"`
+	Disable   bool     `json:"disable"`
+	//Doc   map[string]interface{} `json:"doc"`
 }
 
-func GenApiSimpleDetail(api *api.Info) *ApiSimpleDetail {
+func GenSimpleDetail(api *api.Info) *SimpleDetail {
 	match := make([]Match, 0)
 	if api.Match == "" {
 		api.Match = "[]"
 	}
 	json.Unmarshal([]byte(api.Match), &match)
-	
-	return &ApiSimpleDetail{
+
+	return &SimpleDetail{
 		Id:          api.UUID,
 		Name:        api.Name,
 		Description: api.Description,
-		Method:      api.Method,
+		Methods:     api.Methods,
 		Path:        api.Path,
 		MatchRules:  match,
 		Creator:     auto.UUID(api.Creator),
@@ -55,12 +58,13 @@ func GenApiSimpleDetail(api *api.Info) *ApiSimpleDetail {
 	}
 }
 
-type ApiSimpleDetail struct {
+type SimpleDetail struct {
 	Id          string         `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
-	Method      string         `json:"method"`
+	Methods     []string       `json:"methods"`
 	Path        string         `json:"path"`
+	Protocols   []string       `json:"protocols"`
 	MatchRules  []Match        `json:"match"`
 	Creator     auto.Label     `json:"creator" aolabel:"user"`
 	Updater     auto.Label     `json:"updater" aolabel:"user"`
@@ -68,21 +72,11 @@ type ApiSimpleDetail struct {
 	UpdateTime  auto.TimeLabel `json:"update_time"`
 }
 
-type ApiDocDetail struct {
-	ApiSimpleDetail
-	Doc map[string]interface{} `json:"doc"`
-}
-
-type ApiProxyDetail struct {
-	ApiSimpleDetail
-	Proxy *Proxy `json:"proxy"`
-}
-
 func FromServiceProxy(proxy *api.Proxy) *Proxy {
 	if proxy == nil {
 		return nil
 	}
-	
+
 	return &Proxy{
 		Path:    proxy.Path,
 		Timeout: proxy.Timeout,
@@ -112,4 +106,17 @@ type Header struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 	Opt   string `json:"opt"`
+}
+
+type Export struct {
+	Id          string                 `json:"id"`
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	Method      []string               `json:"method"`
+	Path        string                 `json:"path"`
+	MatchRules  []Match                `json:"match"`
+	Service     string                 `json:"service"`
+	Team        string                 `json:"team"`
+	Proxy       *Proxy                 `json:"proxy"`
+	Doc         map[string]interface{} `json:"doc"`
 }

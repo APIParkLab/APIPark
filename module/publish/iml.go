@@ -5,20 +5,20 @@ import (
 	"errors"
 	"fmt"
 	"time"
-	
+
 	"github.com/eolinker/go-common/store"
-	
+
 	"github.com/APIParkLab/APIPark/service/service"
-	
+
 	"github.com/APIParkLab/APIPark/service/universally/commit"
-	
+
 	"github.com/APIParkLab/APIPark/service/api"
 	"github.com/APIParkLab/APIPark/service/upstream"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
-	
+
 	"github.com/eolinker/eosc/log"
-	
+
 	"github.com/APIParkLab/APIPark/module/publish/dto"
 	releaseModule "github.com/APIParkLab/APIPark/module/release"
 	serviceDiff "github.com/APIParkLab/APIPark/module/service-diff"
@@ -50,7 +50,7 @@ type imlPublishModule struct {
 }
 
 func (m *imlPublishModule) initGateway(ctx context.Context, partitionId string, clientDriver gateway.IClientDriver) error {
-	
+
 	projects, err := m.serviceService.List(ctx)
 	if err != nil {
 		return err
@@ -66,17 +66,25 @@ func (m *imlPublishModule) initGateway(ctx context.Context, partitionId string, 
 		if releaseInfo == nil {
 			continue
 		}
-		
+
 		err = clientDriver.Project().Online(ctx, releaseInfo)
 		if err != nil {
 			return err
 		}
+		apiIds := utils.SliceToSlice(releaseInfo.Apis, func(api *gateway.ApiRelease) string {
+			return api.ID
+		})
+		clientDriver.Service().Online(ctx, &gateway.ServiceRelease{
+			ID:   releaseInfo.Id,
+			Apis: apiIds,
+		})
 	}
+
 	return nil
 }
 
 func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID string, partitionId string) (*gateway.ProjectRelease, error) {
-	
+
 	releaseInfo, err := m.releaseService.GetRunning(ctx, projectID)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -100,12 +108,12 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 			upstreamCommitIds = append(upstreamCommitIds, c.Commit)
 		}
 	}
-	
+
 	apiInfos, err := m.apiService.ListInfo(ctx, apiIds...)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	proxyCommits, err := m.apiService.ListProxyCommit(ctx, apiProxyCommitIds...)
 	if err != nil {
 		return nil, err
@@ -113,7 +121,7 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 	proxyCommitMap := utils.SliceToMapO(proxyCommits, func(c *commit.Commit[api.Proxy]) (string, *api.Proxy) {
 		return c.Target, c.Data
 	})
-	
+
 	upstreamCommits, err := m.upstreamService.ListCommit(ctx, upstreamCommitIds...)
 	if err != nil {
 		return nil, err
@@ -127,9 +135,11 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 				Description: a.Description,
 				Version:     version,
 			},
-			Path:    a.Path,
-			Method:  []string{a.Method},
-			Service: a.Upstream,
+			Path:      a.Path,
+			Methods:   a.Methods,
+			Service:   a.Service,
+			Protocols: a.Protocols,
+			Disable:   a.Disable,
 		}
 		proxy, ok := proxyCommitMap[a.UUID]
 		if ok {
@@ -167,7 +177,7 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 			}),
 		}
 	}
-	
+
 	return &gateway.ProjectRelease{
 		Id:       projectID,
 		Version:  version,
@@ -193,12 +203,12 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 			upstreamCommitIds = append(upstreamCommitIds, c.Commit)
 		}
 	}
-	
+
 	apiInfos, err := m.apiService.ListInfo(ctx, apiIds...)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	proxyCommits, err := m.apiService.ListProxyCommit(ctx, apiProxyCommitIds...)
 	if err != nil {
 		return nil, err
@@ -206,7 +216,7 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 	proxyCommitMap := utils.SliceToMapO(proxyCommits, func(c *commit.Commit[api.Proxy]) (string, *api.Proxy) {
 		return c.Target, c.Data
 	})
-	
+
 	upstreamCommits, err := m.upstreamService.ListCommit(ctx, upstreamCommitIds...)
 	if err != nil {
 		return nil, err
@@ -220,8 +230,8 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 				Version:     version,
 			},
 			Path:    a.Path,
-			Method:  []string{a.Method},
-			Service: a.Upstream,
+			Methods: a.Methods,
+			Service: a.Service,
 		}
 		proxy, ok := proxyCommitMap[a.UUID]
 		if ok {
@@ -246,7 +256,7 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 	}
 	projectReleaseMap := make(map[string]*gateway.ProjectRelease)
 	upstreamReleaseMap := make(map[string]*gateway.UpstreamRelease)
-	
+
 	for _, c := range upstreamCommits {
 		for _, partitionId := range clusterIds {
 			upstreamRelease := &gateway.UpstreamRelease{
@@ -265,11 +275,11 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 					return fmt.Sprintf("%s weight=%d", n.Address, n.Weight)
 				}),
 			}
-			
+
 			upstreamReleaseMap[partitionId] = upstreamRelease
 		}
 	}
-	
+
 	for _, clusterId := range clusterIds {
 		projectReleaseMap[clusterId] = &gateway.ProjectRelease{
 			Id:       projectID,
@@ -309,7 +319,7 @@ func (m *imlPublishModule) PublishStatuses(ctx context.Context, serviceId string
 			Status: status.String(),
 			Error:  errMsg,
 		}
-		
+
 	}), nil
 }
 
@@ -326,23 +336,23 @@ func (m *imlPublishModule) Apply(ctx context.Context, serviceId string, input *d
 	if err != nil {
 		return nil, err
 	}
-	
+
 	previous := ""
 	running, err := m.releaseService.GetRunning(ctx, serviceId)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		
+
 		return nil, err
 	}
 	if running != nil {
 		previous = running.UUID
 	}
-	
+
 	releaseToPublish, err := m.releaseService.GetRelease(ctx, input.Release)
 	if err != nil {
 		// 目标版本不存在
 		return nil, err
 	}
-	
+
 	newPublishId := uuid.NewString()
 	diff, ok, err := m.projectDiffModule.DiffForLatest(ctx, serviceId, previous)
 	if err != nil {
@@ -371,7 +381,7 @@ func (m *imlPublishModule) CheckPublish(ctx context.Context, serviceId string, r
 	if err != nil {
 		return nil, err
 	}
-	
+
 	running, err := m.releaseService.GetRunning(ctx, serviceId)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
@@ -395,7 +405,7 @@ func (m *imlPublishModule) CheckPublish(ctx context.Context, serviceId string, r
 		}
 		return m.projectDiffModule.Out(ctx, diff)
 	}
-	
+
 }
 func (m *imlPublishModule) checkPublish(ctx context.Context, serviceId string, releaseId string) error {
 	flows, err := m.publishService.ListForStatus(ctx, serviceId, publish.StatusApply, publish.StatusAccept)
@@ -409,7 +419,7 @@ func (m *imlPublishModule) checkPublish(ctx context.Context, serviceId string, r
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
-	
+
 	if running == nil {
 		return nil
 	}
@@ -423,7 +433,7 @@ func (m *imlPublishModule) Close(ctx context.Context, serviceId, id string) erro
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -439,7 +449,7 @@ func (m *imlPublishModule) Stop(ctx context.Context, serviceId string, id string
 	if flow.Service != serviceId {
 		return errors.New("项目不一致")
 	}
-	
+
 	if flow.Status != publish.StatusApply && flow.Status != publish.StatusAccept {
 		return errors.New("只有发布中状态才能停止")
 	}
@@ -467,7 +477,7 @@ func (m *imlPublishModule) Accept(ctx context.Context, serviceId string, id stri
 }
 
 func (m *imlPublishModule) publish(ctx context.Context, id string, clusterId string, projectRelease *gateway.ProjectRelease) error {
-	
+
 	publishStatus := &publish.Status{
 		Publish:  id,
 		Status:   publish.StatusPublishing,
@@ -483,7 +493,7 @@ func (m *imlPublishModule) publish(ctx context.Context, id string, clusterId str
 			log.Errorf("set publishing publishStatus error: %v", err)
 		}
 	}()
-	
+
 	client, err := m.clusterService.GatewayClient(ctx, clusterId)
 	if err != nil {
 		publishStatus.Status = publish.StatusPublishError
@@ -538,13 +548,13 @@ func (m *imlPublishModule) Publish(ctx context.Context, serviceId string, id str
 	clusterIds := utils.SliceToSlice(clusters, func(i *cluster.Cluster) string {
 		return i.Uuid
 	})
-	
+
 	projectReleaseMap, err := m.getReleaseInfo(ctx, serviceId, flow.Release, flow.Release, clusterIds)
 	if err != nil {
 		return err
 	}
 	hasError := false
-	
+
 	for _, c := range clusters {
 		err = m.publish(ctx, flow.Id, c.Uuid, projectReleaseMap[c.Uuid])
 		if err != nil {
@@ -573,7 +583,7 @@ func (m *imlPublishModule) List(ctx context.Context, serviceId string, page, pag
 	if err != nil {
 		return nil, 0, err
 	}
-	
+
 	return utils.SliceToSlice(list, func(s *publish.Publish) *dto.Publish {
 		return dto.FromModel(s, "")
 	}), total, nil
@@ -612,5 +622,5 @@ func (m *imlPublishModule) Detail(ctx context.Context, serviceId string, id stri
 		Diffs:           out,
 		PublishStatuses: publishStatuses,
 	}, nil
-	
+
 }

@@ -1,0 +1,1 @@
+[{"application":"358caa9f-a079-44dd-8b28-c1d065777b6c","id":"9179f789-869b-40a5-8e45-d0c85c640f29","name":"Demo Auth Key","driver":"apikey","position":"Header","token_name":"Authorization","config":{"apikey":"da66c011-39ba-44eb-a318-3f1407644543","label":null},"expire_time":0,"hide_credential":false}]

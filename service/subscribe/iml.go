@@ -186,6 +186,7 @@ func (i *imlSubscribeService) uniquestHandler(t *CreateSubscribe) []map[string]i
 func (i *imlSubscribeService) createEntityHandler(t *CreateSubscribe) *subscribe.Subscribe {
 	return &subscribe.Subscribe{
 		UUID:        t.Uuid,
+		Name:        t.Uuid,
 		Application: t.Application,
 		Service:     t.Service,
 		From:        t.From,
@@ -196,16 +197,9 @@ func (i *imlSubscribeService) createEntityHandler(t *CreateSubscribe) *subscribe
 }
 
 func (i *imlSubscribeService) updateHandler(e *subscribe.Subscribe, t *UpdateSubscribe) {
-	//if t.Approver != nil {
-	//	e.Approver = *t.Approver
-	//}
 	if t.ApplyStatus != nil {
 		e.ApplyStatus = *t.ApplyStatus
 	}
-
-	//if t.ApplyID != nil {
-	//	e.ApplyID = *t.ApplyID
-	//}
 }
 
 var (
@@ -274,6 +268,7 @@ func (i *imlSubscribeApplyService) createEntityHandler(t *CreateApply) *subscrib
 	now := time.Now()
 	return &subscribe.Apply{
 		Uuid:        t.Uuid,
+		Name:        t.Uuid,
 		Service:     t.Service,
 		Team:        t.Team,
 		Application: t.Application,

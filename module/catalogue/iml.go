@@ -2,37 +2,37 @@ package catalogue
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
+	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	"math"
 	"sort"
-	
+
 	service_doc "github.com/APIParkLab/APIPark/service/service-doc"
-	
+
 	service_tag "github.com/APIParkLab/APIPark/service/service-tag"
-	
+
 	"github.com/APIParkLab/APIPark/service/subscribe"
-	
+
 	"github.com/eolinker/go-common/store"
-	
+
 	"gorm.io/gorm"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/APIParkLab/APIPark/service/release"
-	
+
 	"github.com/APIParkLab/APIPark/service/api"
 	"github.com/eolinker/go-common/auto"
-	
+
 	"github.com/APIParkLab/APIPark/service/tag"
-	
+
 	"github.com/APIParkLab/APIPark/service/service"
-	
+
 	"github.com/google/uuid"
-	
+
 	"github.com/APIParkLab/APIPark/service/catalogue"
-	
+
 	catalogue_dto "github.com/APIParkLab/APIPark/module/catalogue/dto"
 )
 
@@ -44,6 +44,7 @@ var (
 type imlCatalogueModule struct {
 	catalogueService      catalogue.ICatalogueService      `autowired:""`
 	apiService            api.IAPIService                  `autowired:""`
+	apiDocService         api_doc.IAPIDocService           `autowired:""`
 	serviceService        service.IServiceService          `autowired:""`
 	serviceTagService     service_tag.ITagService          `autowired:""`
 	serviceDocService     service_doc.IDocService          `autowired:""`
@@ -52,8 +53,37 @@ type imlCatalogueModule struct {
 	subscribeService      subscribe.ISubscribeService      `autowired:""`
 	subscribeApplyService subscribe.ISubscribeApplyService `autowired:""`
 	transaction           store.ITransaction               `autowired:""`
-	
+
 	root *Root
+}
+
+func (i *imlCatalogueModule) Get(ctx context.Context, id string) (*catalogue_dto.Catalogue, error) {
+	info, err := i.catalogueService.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &catalogue_dto.Catalogue{
+		Id:     info.Id,
+		Name:   info.Name,
+		Parent: info.Parent,
+		Sort:   info.Sort,
+	}, nil
+}
+
+func (i *imlCatalogueModule) ExportAll(ctx context.Context) ([]*catalogue_dto.ExportCatalogue, error) {
+	list, err := i.catalogueService.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return utils.SliceToSlice(list, func(c *catalogue.Catalogue) *catalogue_dto.ExportCatalogue {
+		return &catalogue_dto.ExportCatalogue{
+			Id:     c.Id,
+			Name:   c.Name,
+			Parent: c.Parent,
+			Sort:   c.Sort,
+		}
+	}), nil
 }
 
 func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catalogue_dto.SubscribeService) error {
@@ -68,18 +98,18 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 	if !s.AsServer {
 		return fmt.Errorf("service does not support subscribe")
 	}
-	
+
 	userId := utils.UserId(ctx)
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
-		
+
 		apps := make([]string, 0, len(subscribeInfo.Applications))
-		
+
 		for _, appId := range subscribeInfo.Applications {
 			if appId == s.Id {
 				// 不能订阅自己
 				continue
 			}
-			
+
 			appInfo, err := i.serviceService.Get(ctx, appId)
 			if err != nil {
 				return err
@@ -88,11 +118,7 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 				// 当系统不可作为订阅方时，不可订阅
 				continue
 			}
-			//info, err := i.subscribeApplyService.GetApply(ctx, subscribeInfo.Service, appId)
-			//if err != nil {
-			//	if !errors.Is(err, gorm.ErrRecordNotFound) {
-			//		return err
-			//	}
+
 			err = i.subscribeApplyService.Create(ctx, &subscribe.CreateApply{
 				Uuid:        uuid.New().String(),
 				Service:     subscribeInfo.Service,
@@ -103,18 +129,11 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 				Status:      subscribe.ApplyStatusReview,
 				Applier:     userId,
 			})
-			
-			//} else {
-			//	status := subscribe.ApplyStatusReview
-			//	err = i.subscribeApplyService.Save(ctx, info.Id, &subscribe.EditApply{
-			//		Status:  &status,
-			//		Applier: &userId,
-			//	})
-			//}
+
 			if err != nil {
 				return err
 			}
-			
+
 			// 修改订阅表状态
 			subscribers, err := i.subscribeService.ListByApplication(ctx, subscribeInfo.Service, appId)
 			if err != nil {
@@ -131,7 +150,7 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 				if err != nil {
 					return err
 				}
-				
+
 			} else {
 				subscriberMap := utils.SliceToMap(subscribers, func(t *subscribe.Subscribe) string {
 					return t.Application
@@ -154,9 +173,9 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 						ApplyStatus: &status,
 					})
 				}
-				
+
 			}
-			
+
 			apps = append(apps, appId)
 		}
 		if len(apps) == 0 {
@@ -164,7 +183,7 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 		}
 		return nil
 	})
-	
+
 }
 
 func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*catalogue_dto.ServiceDetail, error) {
@@ -173,81 +192,23 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 	if err != nil {
 		return nil, fmt.Errorf("get service failed: %w", err)
 	}
-	docStr := ""
-	doc, err := i.serviceDocService.Get(ctx, sid)
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("get service doc failed: %w", err)
-		}
-	} else {
-		docStr = doc.Doc
-	}
-	
 	r, err := i.releaseService.GetRunning(ctx, s.Id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &catalogue_dto.ServiceDetail{
 				Name:        s.Name,
 				Description: s.Description,
-				Document:    docStr,
+				Document:    "",
 				Basic: &catalogue_dto.ServiceBasic{
 					Team:   auto.UUID(s.Team),
 					ApiNum: 0,
 				},
 			}, nil
 		}
-		
+
 		return nil, fmt.Errorf("get running release failed: %w", err)
 	}
-	_, docCommits, _, err := i.releaseService.GetReleaseInfos(ctx, r.UUID)
-	if err != nil {
-		return nil, fmt.Errorf("get release apis failed: %w", err)
-	}
-	apiMap := make(map[string]*release.APIDocumentCommit)
-	apiIds := make([]string, 0, len(docCommits))
-	for _, v := range docCommits {
-		apiIds = append(apiIds, v.API)
-		apiMap[v.API] = v
-	}
-	apiList, err := i.apiService.ListInfo(ctx, apiIds...)
-	if err != nil {
-		return nil, err
-	}
-	
-	apis := make([]*catalogue_dto.ServiceApi, 0, len(apiList))
-	for _, info := range apiList {
-		basicApi := &catalogue_dto.ServiceApiBasic{
-			Id:          info.UUID,
-			Name:        info.Name,
-			Description: info.Description,
-			Method:      info.Method,
-			Path:        info.Path,
-			Creator:     auto.UUID(info.Creator),
-			Updater:     auto.UUID(info.Updater),
-			CreateTime:  auto.TimeLabel(info.CreateAt),
-			UpdateTime:  auto.TimeLabel(info.UpdateAt),
-		}
-		v, ok := apiMap[info.UUID]
-		if !ok {
-			continue
-		}
-		commit, err := i.apiService.GetDocumentCommit(ctx, v.Commit)
-		if err != nil {
-			return nil, err
-		}
-		tmp := make(map[string]interface{})
-		if commit.Data != nil {
-			err = json.Unmarshal([]byte(commit.Data.Content), &tmp)
-			if err != nil {
-				return nil, err
-			}
-		}
-		
-		apis = append(apis, &catalogue_dto.ServiceApi{
-			ServiceApiBasic: basicApi,
-			Doc:             tmp,
-		})
-	}
+
 	countMap, err := i.subscribeService.CountMapByService(ctx, subscribe.ApplyStatusSubscribe, sid)
 	if err != nil {
 		return nil, err
@@ -261,13 +222,36 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 	}, func(t *service_tag.Tag) bool {
 		return t.Sid == sid
 	})
+	_, _, apiDocCommit, _, serviceDocCommit, err := i.releaseService.GetReleaseInfos(ctx, r.UUID)
+	if err != nil {
+		return nil, fmt.Errorf("get release apis failed: %w", err)
+	}
+	var apiDoc string
+	var apiNum int
+	if apiDocCommit != nil {
+		commit, err := i.apiDocService.GetDocCommit(ctx, apiDocCommit.Commit)
+		if err != nil {
+			return nil, err
+		}
+		apiDoc = commit.Data.Content
+		apiNum = int(commit.Data.APICount)
+	}
+
+	var serviceDoc string
+	if serviceDocCommit != nil {
+		commit, err := i.serviceDocService.GetDocCommit(ctx, serviceDocCommit.Commit)
+		if err != nil {
+			return nil, err
+		}
+		serviceDoc = commit.Data.Content
+	}
 	return &catalogue_dto.ServiceDetail{
 		Name:        s.Name,
 		Description: s.Description,
-		Document:    docStr,
+		Document:    serviceDoc,
 		Basic: &catalogue_dto.ServiceBasic{
 			Team:       auto.UUID(s.Team),
-			ApiNum:     len(apis),
+			ApiNum:     apiNum,
 			AppNum:     int(countMap[s.Id]),
 			Tags:       auto.List(tagIds),
 			Catalogue:  auto.UUID(s.Catalogue),
@@ -275,12 +259,12 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 			UpdateTime: auto.TimeLabel(r.CreateAt),
 			Logo:       s.Logo,
 		},
-		Apis: apis,
+		APIDoc: apiDoc,
 	}, nil
 }
 
 func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*catalogue_dto.ServiceItem, error) {
-	
+
 	serviceTags, err := i.serviceTagService.List(ctx, nil, nil)
 	if err != nil {
 		return nil, err
@@ -288,7 +272,7 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 	serviceTagMap := utils.SliceToMapArrayO(serviceTags, func(t *service_tag.Tag) (string, string) {
 		return t.Sid, t.Tid
 	})
-	
+
 	items, err := i.serviceService.SearchPublicServices(ctx, keyword)
 	if err != nil {
 		return nil, err
@@ -303,25 +287,33 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 	if len(serviceIds) < 1 {
 		return nil, nil
 	}
-	
-	// 获取服务API数量
-	apiCountMap, err := i.apiService.CountMapByService(ctx, serviceIds...)
+	commits, err := i.releaseService.GetRunningApiDocCommits(ctx, serviceIds...)
 	if err != nil {
 		return nil, err
 	}
-	
+	apiCountMap, err := i.apiDocService.LatestAPICountByCommits(ctx, commits...)
+	if err != nil {
+		return nil, err
+	}
+
+	//// 获取服务API数量
+	//apiCountMap, err := i.apiDocService.LatestAPICountByServices(ctx, serviceIds...)
+	//if err != nil {
+	//	return nil, err
+	//}
+
 	subscriberCountMap, err := i.subscribeService.CountMapByService(ctx, subscribe.ApplyStatusSubscribe, serviceIds...)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	result := make([]*catalogue_dto.ServiceItem, 0, len(items))
 	for _, v := range items {
 		apiNum, ok := apiCountMap[v.Id]
 		if !ok || apiNum < 1 {
 			continue
 		}
-		
+
 		result = append(result, &catalogue_dto.ServiceItem{
 			Id:            v.Id,
 			Name:          v.Name,
@@ -376,7 +368,7 @@ func (i *imlCatalogueModule) Sort(ctx context.Context, sorts []*catalogue_dto.So
 		i.root = NewRoot(all)
 		return nil
 	})
-	
+
 }
 
 func (i *imlCatalogueModule) Search(ctx context.Context, keyword string) ([]*catalogue_dto.Item, error) {
@@ -396,7 +388,7 @@ func (i *imlCatalogueModule) Search(ctx context.Context, keyword string) ([]*cat
 		}
 		return treeItems("", parentMap), nil
 	}
-	
+
 	catalogues, err := i.catalogueService.Search(ctx, keyword, nil)
 	if err != nil {
 		return nil, err
@@ -406,7 +398,7 @@ func (i *imlCatalogueModule) Search(ctx context.Context, keyword string) ([]*cat
 		i.root = NewRoot(all)
 	}
 	items := make([]*catalogue_dto.Item, 0, len(catalogues))
-	
+
 	return items, nil
 }
 
@@ -418,11 +410,15 @@ func (i *imlCatalogueModule) Create(ctx context.Context, input *catalogue_dto.Cr
 	if input.Id == "" {
 		input.Id = uuid.New().String()
 	}
+	index := _sortMax
+	if input.Sort != nil {
+		index = *input.Sort
+	}
 	err := i.catalogueService.Create(ctx, &catalogue.CreateCatalogue{
 		Id:     input.Id,
 		Name:   input.Name,
 		Parent: parent,
-		Sort:   _sortMax,
+		Sort:   index,
 	})
 	if err != nil {
 		return err
@@ -440,6 +436,7 @@ func (i *imlCatalogueModule) Edit(ctx context.Context, id string, input *catalog
 	err := i.catalogueService.Save(ctx, id, &catalogue.EditCatalogue{
 		Name:   input.Name,
 		Parent: input.Parent,
+		Sort:   input.Sort,
 	})
 	if err != nil {
 		return err

@@ -22,7 +22,7 @@ func (r *Release) TableName() string {
 type Commit struct {
 	Id      int64  `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
 	Release string `gorm:"type:varchar(36);not null;column:release;comment:release id; index:release; uniqueIndex:type_release_type_key"`
-	Type    string `gorm:"type:varchar(10);not null;column:type;comment:类型;index:type;uniqueIndex:type_release_type_key"`
+	Type    string `gorm:"type:varchar(30);not null;column:type;comment:类型;index:type;uniqueIndex:type_release_type_key"`
 	Target  string `gorm:"type:varchar(36);not null;column:target;comment:目标;index:target;uniqueIndex:type_release_type_key"`
 	Key     string `gorm:"type:varchar(36);not null;column:api;comment:api id;uniqueIndex:type_release_type_key"`
 	Commit  string `gorm:"type:varchar(36);not null;column:commit;comment:commit;"`

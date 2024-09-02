@@ -26,7 +26,8 @@ import (
 )
 
 var (
-	_ ISubscribeModule = (*imlSubscribeModule)(nil)
+	_ ISubscribeModule       = (*imlSubscribeModule)(nil)
+	_ IExportSubscribeModule = (*imlSubscribeModule)(nil)
 )
 
 type imlSubscribeModule struct {
@@ -35,6 +36,31 @@ type imlSubscribeModule struct {
 	subscribeApplyService subscribe.ISubscribeApplyService `autowired:""`
 	clusterService        cluster.IClusterService          `autowired:""`
 	transaction           store.ITransaction               `autowired:""`
+}
+
+func (i *imlSubscribeModule) ExistSubscriber(ctx context.Context, serviceId string, app string) error {
+	_, err := i.subscribeService.GetByServiceAndApplication(ctx, serviceId, app)
+	if err == nil {
+		return nil
+	}
+	return err
+}
+
+func (i *imlSubscribeModule) ExportAll(ctx context.Context) ([]*subscribe_dto.ExportSubscriber, error) {
+	list, err := i.subscribeService.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return utils.SliceToSlice(list, func(s *subscribe.Subscribe) *subscribe_dto.ExportSubscriber {
+		return &subscribe_dto.ExportSubscriber{
+			Id:         s.Id,
+			Service:    s.Service,
+			Subscriber: s.Application,
+			Applier:    s.Applier,
+			From:       s.From,
+		}
+	}), nil
 }
 
 func (i *imlSubscribeModule) getSubscribers(ctx context.Context, serviceIds []string) ([]*gateway.SubscribeRelease, error) {
@@ -51,7 +77,7 @@ func (i *imlSubscribeModule) getSubscribers(ctx context.Context, serviceIds []st
 	}), nil
 }
 
-func (i *imlSubscribeModule) initGateway(ctx context.Context, clientDriver gateway.IClientDriver) error {
+func (i *imlSubscribeModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
 
 	projects, err := i.serviceService.List(ctx)
 	if err != nil {
@@ -343,7 +369,10 @@ func (i *imlSubscribeModule) SearchSubscribers(ctx context.Context, serviceId st
 	return items, nil
 }
 
-var _ ISubscribeApprovalModule = (*imlSubscribeApprovalModule)(nil)
+var (
+	_ ISubscribeApprovalModule = (*imlSubscribeApprovalModule)(nil)
+	_ ISubscribeApprovalModule = (*imlSubscribeApprovalModule)(nil)
+)
 
 type imlSubscribeApprovalModule struct {
 	subscribeService      subscribe.ISubscribeService      `autowired:""`
@@ -351,6 +380,21 @@ type imlSubscribeApprovalModule struct {
 	projectService        service.IServiceService          `autowired:""`
 	clusterService        cluster.IClusterService          `autowired:""`
 	transaction           store.ITransaction               `autowired:""`
+}
+
+func (i *imlSubscribeApprovalModule) ExportAll(ctx context.Context) ([]*subscribe_dto.ExportApproval, error) {
+
+	list, err := i.subscribeApplyService.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(list, func(s *subscribe.Apply) *subscribe_dto.ExportApproval {
+		return &subscribe_dto.ExportApproval{
+			Service:     s.Service,
+			Application: s.Application,
+			Reason:      s.Reason,
+		}
+	}), nil
 }
 
 func (i *imlSubscribeApprovalModule) Pass(ctx context.Context, pid string, id string, approveInfo *subscribe_dto.Approve) error {

@@ -2,7 +2,7 @@ package publish
 
 import (
 	"strconv"
-	
+
 	"github.com/APIParkLab/APIPark/module/publish"
 	"github.com/APIParkLab/APIPark/module/publish/dto"
 	"github.com/APIParkLab/APIPark/module/release"
@@ -39,11 +39,11 @@ func (c *imlPublishController) ReleaseDo(ctx *gin.Context, serviceId string, inp
 		c.releaseModule.Delete(ctx, serviceId, newReleaseId)
 		return nil, err
 	}
-	err = c.publishModule.Publish(ctx, serviceId, apply.Id)
-	if err != nil {
-		c.releaseModule.Delete(ctx, serviceId, newReleaseId)
-		return nil, err
-	}
+	//err = c.publishModule.Publish(ctx, serviceId, apply.Id)
+	//if err != nil {
+	//	c.releaseModule.Delete(ctx, serviceId, newReleaseId)
+	//	return nil, err
+	//}
 	err = c.publishModule.Publish(ctx, serviceId, apply.Id)
 	if err != nil {
 		c.releaseModule.Delete(ctx, serviceId, newReleaseId)
@@ -123,7 +123,7 @@ func (c *imlPublishController) ListPage(ctx *gin.Context, serviceId string, page
 	if err != nil {
 		return nil, 0, 0, 0, err
 	}
-	
+
 	return list, pageNum, pageSizeNum, total, nil
 }
 

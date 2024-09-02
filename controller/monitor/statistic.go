@@ -22,6 +22,7 @@ type IMonitorStatisticController interface {
 type IMonitorConfigController interface {
 	SaveMonitorConfig(ctx *gin.Context, cfg *monitor_dto.SaveMonitorConfig) (*monitor_dto.MonitorConfig, error)
 	GetMonitorConfig(ctx *gin.Context) (*monitor_dto.MonitorConfig, error)
+	GetMonitorCluster(ctx *gin.Context) ([]*monitor_dto.MonitorCluster, error)
 }
 
 func init() {
