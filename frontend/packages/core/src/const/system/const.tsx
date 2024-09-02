@@ -72,8 +72,8 @@ export const SYSTEM_I18NEXT_FOR_ENUM = {
 
 export const HTTP_METHOD = ['GET','POST','PUT','DELETE','PATCH','HEAD']
 export const API_PROTOCOL = [
-    {label:'HTTP',value:'http'},
-    {label:'HTTPS',value:'https'}
+    {label:'HTTP',value:'HTTP'},
+    {label:'HTTPS',value:'HTTPS'}
 ]
 
 
@@ -259,6 +259,7 @@ export const MATCH_CONFIG:ConfigField<MatchItem>[] = [
     }, {
         title:('参数值'),
         key: 'pattern',
+        unRender:(formValue)=>{return formValue?.matchType === 'NULL' || formValue?.matchType==='EXIST' || formValue?.matchType === 'UNEXIST'},
         component: <Input className="w-INPUT_NORMAL"/>,
         renderText: (value: string) => {
             return value
@@ -278,17 +279,17 @@ export const SYSTEM_API_TABLE_COLUMNS: PageProColumns<SystemApiTableListItem>[] 
         title:('协议'),
         dataIndex: 'protocols',
         ellipsis:true,
-        renderText:(value)=>value?.join(',')
+        renderText:(value)=>value?.join(', ')
     },
     {
         title:('方法'),
-        dataIndex: 'method',
+        dataIndex: 'methods',
         ellipsis:true,
-        renderText:(value)=>value?.join(',')
+        renderText:(value)=>value?.join(', ')
     },
     {
         title:'是否放行',
-        dataIndex:'isDisabled',
+        dataIndex:'disable',
         ellipsis:true,
         filters: true,
         onFilter: true,
