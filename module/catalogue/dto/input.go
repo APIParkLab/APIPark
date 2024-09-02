@@ -4,11 +4,13 @@ type CreateCatalogue struct {
 	Id     string  `json:"id"`
 	Name   string  `json:"name"`
 	Parent *string `json:"parent" aocheck:"catalogue"`
+	Sort   *int    `json:"sort"`
 }
 
 type EditCatalogue struct {
 	Name   *string `json:"name"`
 	Parent *string `json:"parent" aocheck:"catalogue"`
+	Sort   *int    `json:"sort"`
 }
 
 type SubscribeService struct {

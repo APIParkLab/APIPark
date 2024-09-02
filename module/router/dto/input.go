@@ -1,12 +1,11 @@
-package api_dto
+package router_dto
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/eolinker/go-common/utils"
 	"strings"
-	
+
 	"github.com/APIParkLab/APIPark/service/api"
 )
 
@@ -20,19 +19,19 @@ var validMethods = map[string]struct{}{
 	"OPTIONS": {},
 }
 
-type CreateApi struct {
+type Create struct {
 	Id          string      `json:"id"`
-	Name        string      `json:"name"`
 	Path        string      `json:"path"`
-	Method      string      `json:"method"`
+	Methods     []string    `json:"methods"`
 	Description string      `json:"description"`
+	Protocols   []string    `json:"protocols"`
 	MatchRules  []Match     `json:"match"`
 	Proxy       *InputProxy `json:"proxy"`
+	Disable     bool        `json:"disable"`
 }
 
 type InputProxy struct {
-	Path string `json:"path"`
-	//Upstream string    `json:"upstream" aocheck:"upstream"`
+	Path    string                       `json:"path"`
 	Timeout int                          `json:"timeout"`
 	Retry   int                          `json:"retry"`
 	Headers []*Header                    `json:"headers"`
@@ -46,44 +45,28 @@ type Match struct {
 	Pattern   string `json:"pattern"`
 }
 
-func (a *CreateApi) Validate() error {
+func (a *Create) Validate() error {
 	if a.Id == "" {
 		return errors.New("id is null")
 	}
-	if a.Name == "" {
-		return errors.New("name is null")
-	}
 	a.Path = fmt.Sprintf("/%s", strings.TrimPrefix(a.Path, "/"))
-	a.Method = strings.ToUpper(a.Method)
-	if _, ok := validMethods[a.Method]; !ok {
-		return fmt.Errorf("method(%s) is invalid", a.Method)
+	for _, method := range a.Methods {
+		if _, ok := validMethods[method]; !ok {
+			return fmt.Errorf("method(%s) is invalid", method)
+		}
 	}
+
 	return nil
 }
 
-func (a *CreateApi) ToServiceRouter() *api.Router {
-	router := &api.Router{
-		Method: a.Method,
-		Path:   a.Path,
-	}
-	for _, match := range a.MatchRules {
-		router.MatchRules = append(router.MatchRules, &api.Match{
-			Position:  match.Position,
-			MatchType: match.MatchType,
-			Key:       match.Key,
-			Pattern:   match.Pattern,
-		})
-	}
-	return router
-}
-
-type EditApi struct {
-	Info struct {
-		Name        *string `json:"name"`
-		Description *string `json:"description"`
-	} `json:"info"`
-	Proxy *InputProxy             `json:"proxy"`
-	Doc   *map[string]interface{} `json:"doc"`
+type Edit struct {
+	Description *string     `json:"description"`
+	Proxy       *InputProxy `json:"proxy"`
+	Path        *string     `json:"path"`
+	Methods     *[]string   `json:"methods"`
+	Protocols   *[]string   `json:"protocols"`
+	MatchRules  *[]Match    `json:"match"`
+	Disable     *bool       `json:"disable"`
 }
 
 func ToServiceProxy(proxy *InputProxy) *api.Proxy {
@@ -97,10 +80,9 @@ func ToServiceProxy(proxy *InputProxy) *api.Proxy {
 			Opt:   h.Opt,
 		}
 	})
-	
+
 	return &api.Proxy{
-		Path: proxy.Path,
-		//Upstream: proxy.Upstream,
+		Path:    proxy.Path,
 		Timeout: proxy.Timeout,
 		Retry:   proxy.Retry,
 		Extends: proxy.Extends,
@@ -109,19 +91,10 @@ func ToServiceProxy(proxy *InputProxy) *api.Proxy {
 	}
 }
 
-func ToServiceDocument(doc map[string]interface{}) *api.Document {
-	if doc == nil {
-		return &api.Document{
-			Content: "{}",
-		}
-	}
-	content, _ := json.Marshal(doc)
-	
-	return &api.Document{
-		Content: string(content),
-	}
-}
-
 type ListInput struct {
 	Projects []string `json:"projects"`
+}
+
+type UpdateDoc struct {
+	Content string `json:"content"`
 }

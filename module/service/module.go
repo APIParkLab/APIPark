@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
+	"github.com/APIParkLab/APIPark/module/system"
 	"reflect"
-	
+
 	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
-	
+
 	"github.com/eolinker/go-common/autowire"
 )
 
@@ -24,13 +25,17 @@ type IServiceModule interface {
 	Delete(ctx context.Context, id string) error
 	// Simple 获取简易项目列表
 	Simple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
-	
+
 	// MySimple 获取我的简易项目列表
 	MySimple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
-	
+
 	ServiceDoc(ctx context.Context, pid string) (*service_dto.ServiceDoc, error)
 	// SaveServiceDoc 保存服务文档
 	SaveServiceDoc(ctx context.Context, pid string, input *service_dto.SaveServiceDoc) error
+}
+
+type IExportServiceModule interface {
+	system.IExportModule[service_dto.ExportService]
 }
 
 type IAppModule interface {
@@ -45,13 +50,27 @@ type IAppModule interface {
 	DeleteApp(ctx context.Context, appId string) error
 }
 
+type IExportAppModule interface {
+	system.IExportModule[service_dto.ExportApp]
+}
+
 func init() {
+	serviceModule := new(imlServiceModule)
 	autowire.Auto[IServiceModule](func() reflect.Value {
-		m := new(imlServiceModule)
-		return reflect.ValueOf(m)
+		return reflect.ValueOf(serviceModule)
 	})
+
+	autowire.Auto[IExportServiceModule](func() reflect.Value {
+		return reflect.ValueOf(serviceModule)
+	})
+
+	appModule := new(imlAppModule)
 	autowire.Auto[IAppModule](func() reflect.Value {
-		return reflect.ValueOf(new(imlAppModule))
+		return reflect.ValueOf(appModule)
 	})
-	
+
+	autowire.Auto[IExportAppModule](func() reflect.Value {
+		return reflect.ValueOf(appModule)
+	})
+
 }

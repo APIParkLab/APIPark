@@ -3,12 +3,12 @@ package tag
 import (
 	"context"
 	"time"
-	
+
 	"github.com/eolinker/go-common/auto"
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/APIParkLab/APIPark/stores/tag"
-	
+
 	"github.com/APIParkLab/APIPark/service/universally"
 )
 
@@ -21,6 +21,26 @@ type imlTagService struct {
 	universally.IServiceGet[Tag]
 	universally.IServiceDelete
 	universally.IServiceCreate[CreateTag]
+}
+
+func (i *imlTagService) Map(ctx context.Context, ids ...string) (map[string]*Tag, error) {
+	w := make(map[string]interface{})
+	if len(ids) > 0 {
+		w["uuid"] = ids
+	}
+
+	list, err := i.store.List(ctx, w)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToMapO(list, func(i *tag.Tag) (string, *Tag) {
+		return i.UUID, &Tag{
+			Id:         i.UUID,
+			Name:       i.Name,
+			CreateTime: i.CreateAt,
+			UpdateTime: i.UpdateAt,
+		}
+	}), nil
 }
 
 func (i *imlTagService) GetLabels(ctx context.Context, ids ...string) map[string]string {

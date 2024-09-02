@@ -2,6 +2,14 @@ package upstream_dto
 
 type UpstreamConfig *Upstream
 
+type ExportUpstream struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Service string `json:"service"`
+
+	*Upstream
+}
+
 type Upstream struct {
 	Type            string          `json:"driver"`
 	Balance         string          `json:"balance"`

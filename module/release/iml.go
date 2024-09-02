@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	
+	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
+	service_doc "github.com/APIParkLab/APIPark/service/service-doc"
+
 	"github.com/APIParkLab/APIPark/service/cluster"
 	"github.com/APIParkLab/APIPark/service/service"
 	"github.com/APIParkLab/APIPark/service/service_diff"
-	
+
 	"github.com/APIParkLab/APIPark/module/release/dto"
 	serviceDiff "github.com/APIParkLab/APIPark/module/service-diff"
 	"github.com/APIParkLab/APIPark/service/api"
@@ -33,6 +35,8 @@ type imlReleaseModule struct {
 	projectDiffModule serviceDiff.IServiceDiffModule `autowired:""`
 	releaseService    release.IReleaseService        `autowired:""`
 	apiService        api.IAPIService                `autowired:""`
+	apiDocService     api_doc.IAPIDocService         `autowired:""`
+	serviceDocService service_doc.IDocService        `autowired:""`
 	upstreamService   upstream.IUpstreamService      `autowired:""`
 	publishService    publish.IPublishService        `autowired:""`
 	transaction       store.ITransaction             `autowired:""`
@@ -41,7 +45,7 @@ type imlReleaseModule struct {
 }
 
 func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *dto.CreateInput) (string, error) {
-	
+
 	proInfo, err := m.projectService.Check(ctx, serviceId, projectRuleMustServer)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -53,8 +57,8 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 	if err != nil || len(clusters) == 0 {
 		return "", fmt.Errorf("cluster not set:%w", err)
 	}
-	
-	apis, err := m.apiService.ListForService(ctx, proInfo.Id)
+
+	apis, err := m.apiService.ListInfoForService(ctx, proInfo.Id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", errors.New("api not found")
@@ -64,7 +68,7 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 	if len(apis) == 0 {
 		return "", errors.New("api not found")
 	}
-	apiUUIDS := utils.SliceToSlice(apis, func(a *api.API) string {
+	apiUUIDS := utils.SliceToSlice(apis, func(a *api.Info) string {
 		return a.UUID
 	})
 	apiProxy, err := m.apiService.ListLatestCommitProxy(ctx, apiUUIDS...)
@@ -77,16 +81,7 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 	if len(apis) != len(apiProxy) {
 		return "", errors.New("api or document not found")
 	}
-	apiDocs, err := m.apiService.ListLatestCommitDocument(ctx, apiUUIDS...)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return "", errors.New("api  config or  document not found")
-		}
-		return "", err
-	}
-	if len(apis) != len(apiDocs) {
-		return "", errors.New("api or document not found")
-	}
+
 	upstreams, err := m.upstreamService.ListLatestCommit(ctx, serviceId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -94,13 +89,11 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 		}
 		return "", err
 	}
-	
+
 	apiProxyCommits := utils.SliceToMapO(apiProxy, func(c *commit.Commit[api.Proxy]) (string, string) {
 		return c.Target, c.UUID
 	})
-	apiDocumentCommits := utils.SliceToMapO(apiDocs, func(c *commit.Commit[api.Document]) (string, string) {
-		return c.Target, c.UUID
-	})
+
 	upstreamCommits := utils.SliceToMapArray(upstreams, func(c *commit.Commit[upstream.Config]) string {
 		return c.Target
 	})
@@ -109,15 +102,62 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 			return c.Key, c.UUID
 		})
 	})
-	if !m.releaseService.Completeness(utils.SliceToSlice(clusters, func(s *cluster.Cluster) string {
-		return s.Uuid
-	}), apiUUIDS, apiProxy, apiDocs, upstreams) {
-		return "", errors.New("completeness check failed")
-	}
-	newRelease, err := m.releaseService.CreateRelease(ctx, serviceId, input.Version, input.Remark, apiProxyCommits, apiDocumentCommits, upstreamCommitsForUKC)
+
+	var newRelease *release.Release
+	err = m.transaction.Transaction(ctx, func(ctx context.Context) error {
+		for _, a := range apis {
+			err = m.apiService.SaveRequest(ctx, a.UUID, &api.Request{
+				Path:      a.Path,
+				Methods:   a.Methods,
+				Protocols: a.Protocols,
+				Match:     a.Match,
+				Disable:   a.Disable,
+			})
+			if err != nil {
+				return err
+			}
+		}
+		requestCommits, err := m.apiService.ListLatestCommitRequest(ctx, apiUUIDS...)
+		if err != nil {
+			return err
+		}
+
+		doc, err := m.apiDocService.GetDoc(ctx, serviceId)
+		if err != nil {
+			return err
+		}
+		err = m.apiDocService.CommitDoc(ctx, serviceId, doc)
+		if err != nil {
+			return err
+		}
+		docCommit, err := m.apiDocService.LatestDocCommit(ctx, serviceId)
+		if err != nil {
+			return err
+		}
+		serviceDoc, err := m.serviceDocService.Get(ctx, serviceId)
+		if err != nil {
+			return err
+		}
+		err = m.serviceDocService.CommitDoc(ctx, serviceId, serviceDoc)
+		if err != nil {
+			return err
+		}
+		serviceDocCommit, err := m.serviceDocService.LatestDocCommit(ctx, serviceId)
+		if !m.releaseService.Completeness(utils.SliceToSlice(clusters, func(s *cluster.Cluster) string {
+			return s.Uuid
+		}), apiUUIDS, requestCommits, apiProxy, upstreams) {
+			return errors.New("completeness check failed")
+		}
+		requestCommitMap := utils.SliceToMapO(requestCommits, func(c *commit.Commit[api.Request]) (string, string) {
+			return c.Target, c.UUID
+		})
+		newRelease, err = m.releaseService.CreateRelease(ctx, serviceId, input.Version, input.Remark, requestCommitMap, apiProxyCommits, docCommit.UUID, serviceDocCommit.UUID, upstreamCommitsForUKC)
+		return err
+	})
 	if err != nil {
 		return "", err
 	}
+
 	return newRelease.UUID, err
 }
 
@@ -169,7 +209,7 @@ func (m *imlReleaseModule) List(ctx context.Context, project string) ([]*dto.Rel
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
-	
+
 	releaseIds := utils.SliceToSlice(list, func(s *release.Release) string {
 		return s.UUID
 	})
@@ -180,9 +220,9 @@ func (m *imlReleaseModule) List(ctx context.Context, project string) ([]*dto.Rel
 	flowMap := utils.SliceToMap(flows, func(s *publish.Publish) string {
 		return s.Release
 	})
-	
+
 	return utils.SliceToSlice(list, func(s *release.Release) *dto.Release {
-		
+
 		r := &dto.Release{
 			Id:          s.UUID,
 			Service:     auto.UUID(s.Service),
@@ -194,7 +234,7 @@ func (m *imlReleaseModule) List(ctx context.Context, project string) ([]*dto.Rel
 			Creator:     auto.UUID(s.Creator),
 			CreateTime:  auto.TimeLabel(s.CreateAt),
 		}
-		
+
 		if running != nil && running.UUID == s.UUID {
 			r.Status = dto.StatusRunning
 			r.CanRollback = true
@@ -203,12 +243,12 @@ func (m *imlReleaseModule) List(ctx context.Context, project string) ([]*dto.Rel
 		flow, has := flowMap[s.UUID]
 		if has {
 			r.FlowId = flow.Id
-			
+
 			if flow.Status == publish.StatusApply {
 				r.Status = dto.StatusApply
 				r.CanDelete = false
 			} else if flow.Status == publish.StatusAccept {
-				
+
 				r.Status = dto.StatusAccept
 				r.CanDelete = false
 			} else if flow.Status == publish.StatusPublishError {
@@ -254,7 +294,7 @@ func (m *imlReleaseModule) Delete(ctx context.Context, project string, id string
 		}
 		return m.releaseService.DeleteRelease(ctx, id)
 	})
-	
+
 }
 
 func (m *imlReleaseModule) Preview(ctx context.Context, project string) (*dto.Release, *service_diff.Diff, bool, error) {
@@ -266,11 +306,11 @@ func (m *imlReleaseModule) Preview(ctx context.Context, project string) (*dto.Re
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil, false, err
 	}
-	
+
 	if running == nil {
 		running = new(release.Release)
 	}
-	
+
 	diff, completeness, err := m.projectDiffModule.DiffForLatest(ctx, project, running.UUID)
 	if err != nil {
 		return nil, nil, false, err
@@ -286,5 +326,5 @@ func (m *imlReleaseModule) Preview(ctx context.Context, project string) (*dto.Re
 		CanDelete:   false,
 		CanRollback: false,
 	}, diff, completeness, nil
-	
+
 }

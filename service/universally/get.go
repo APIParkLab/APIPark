@@ -21,7 +21,7 @@ type IServiceGet[T any] interface {
 
 	Search(ctx context.Context, keyword string, condition map[string]interface{}, sortRule ...string) ([]*T, error)
 	Count(ctx context.Context, keyword string, condition map[string]interface{}) (int64, error)
-	CountByGroup(ctx context.Context, keyword string, condition map[string]interface{}, groupBy string) (map[string]int64, error)
+	//CountByGroup(ctx context.Context, keyword string, condition map[string]interface{}, groupBy string) (map[string]int64, error)
 	SearchByPage(ctx context.Context, keyword string, condition map[string]interface{}, page int, pageSize int, sortRule ...string) ([]*T, int64, error)
 }
 
@@ -45,7 +45,7 @@ func (s *imlServiceGet[T, E]) Get(ctx context.Context, uuid string) (*T, error) 
 		return nil, err
 	}
 	if v == nil || errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, errors.New("not found")
+		return nil, gorm.ErrRecordNotFound
 	}
 
 	return s.toModelHandler(v), nil

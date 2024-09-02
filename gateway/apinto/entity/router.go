@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/textproto"
 	"strings"
-	
+
 	"github.com/APIParkLab/APIPark/common"
-	
+
 	"github.com/APIParkLab/APIPark/common/enum"
 	"github.com/APIParkLab/APIPark/gateway"
 )
@@ -26,6 +26,7 @@ type Router struct {
 	Retry     int                `json:"retry"`
 	TimeOut   int                `json:"time_out"`
 	Labels    map[string]string  `json:"labels"`
+	Disable   bool               `json:"disable"`
 }
 
 type Rule struct {
@@ -79,7 +80,7 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 	//若请求路径包含restful参数
 	if common.IsRestfulPath(r.Path) {
 		rewritePlugin.PathType = "regex" //正则替换
-		
+
 		//如果转发路径包含restful参数
 		if common.IsRestfulPath(r.ProxyPath) {
 			r.ProxyPath = formatProxyPath(r.Path, r.ProxyPath)
@@ -100,7 +101,7 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 			},
 		}
 	}
-	
+
 	rules := make([]*Rule, 0, len(r.Rules))
 	for _, m := range r.Rules {
 		rule := &Rule{
@@ -108,11 +109,11 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 			Name:  m.Key,
 			Value: "",
 		}
-		
+
 		if m.Position == enum.MatchPositionHeader {
 			rule.Name = textproto.CanonicalMIMEHeaderKey(rule.Name)
 		}
-		
+
 		switch m.MatchType {
 		case enum.MatchTypeEqual:
 			rule.Value = m.Pattern
@@ -137,7 +138,7 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 		case enum.MatchTypeAny:
 			rule.Value = "*"
 		}
-		
+
 		rules = append(rules, rule)
 	}
 	plugin := map[string]*Plugin{
@@ -160,7 +161,11 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 	if r.Labels != nil {
 		labels = r.Labels
 	}
-	
+	protocols := []string{"http", "https"}
+	if len(r.Protocols) > 0 {
+		protocols = r.Protocols
+	}
+
 	return &Router{
 		BasicInfo: &BasicInfo{
 			ID:          fmt.Sprintf("%s@router", r.ID),
@@ -170,8 +175,9 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 			Version:     version,
 			Matches:     matches,
 		},
-		Host:      hosts,
-		Method:    r.Method,
+		Host:   hosts,
+		Method: r.Methods,
+
 		Location:  r.Path,
 		Rules:     rules,
 		Service:   r.Service,
@@ -179,7 +185,8 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 		Retry:     r.Retry,
 		TimeOut:   r.Timeout,
 		Labels:    labels,
-		Protocols: []string{"http", "https"},
+		Protocols: protocols,
+		Disable:   r.Disable,
 	}
 }
 
@@ -195,7 +202,7 @@ func formatProxyPath(requestPath, proxyPath string) string {
 			i += 1
 		}
 	}
-	
+
 	for param, order := range restfulSet {
 		newProxyPath = strings.ReplaceAll(newProxyPath, param, order)
 	}

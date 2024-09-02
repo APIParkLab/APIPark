@@ -9,10 +9,13 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 )
 
 var (
-	httpClient               = &http.Client{}
+	httpClient = &http.Client{
+		Timeout: 5 * time.Second,
+	}
 	ErrorInvalidAdminAddress = errors.New("invalid address")
 )
 

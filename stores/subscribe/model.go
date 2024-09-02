@@ -5,6 +5,7 @@ import "time"
 type Subscribe struct {
 	Id          int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
 	UUID        string    `gorm:"size:36;not null;column:uuid;comment:uuid;uniqueIndex:uuid;"`
+	Name        string    `gorm:"size:36;not null;column:name;comment:名称"`
 	Service     string    `gorm:"size:36;not null;column:service;comment:服务id;uniqueIndex:unique_subscribe"`
 	Application string    `gorm:"size:36;not null;column:application;comment:应用id,项目id,系统id;uniqueIndex:unique_subscribe"`
 	ApplyStatus int       `gorm:"type:tinyint(1);not null;column:apply_status;comment:申请状态;index:status;"`
@@ -24,7 +25,8 @@ func (s *Subscribe) TableName() string {
 
 type Apply struct {
 	Id          int64     `gorm:"column:id;type:BIGINT(20);NOT NULL;comment:id;primary_key;comment:主键ID;"`
-	Uuid        string    `gorm:"size:36;not null;column:uuid;comment:uuid;uniqueIndex:uuid;"`                  // uuid
+	Uuid        string    `gorm:"size:36;not null;column:uuid;comment:uuid;uniqueIndex:uuid;"` // uuid
+	Name        string    `gorm:"size:36;not null;column:name;comment:名称"`
 	Service     string    `gorm:"size:36;not null;column:service;comment:服务id;index:service"`                   // 服务id
 	Team        string    `gorm:"size:36;not null;column:team;comment:团队id;index:team;"`                        // 团队id
 	Application string    `gorm:"size:36;not null;column:application;comment:应用id,项目id,系统id;index:application"` // 订阅应用id

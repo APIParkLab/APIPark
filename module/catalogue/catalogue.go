@@ -2,10 +2,11 @@ package catalogue
 
 import (
 	"context"
+	"github.com/APIParkLab/APIPark/module/system"
 	"reflect"
-	
+
 	"github.com/eolinker/go-common/autowire"
-	
+
 	catalogue_dto "github.com/APIParkLab/APIPark/module/catalogue/dto"
 )
 
@@ -16,6 +17,8 @@ type ICatalogueModule interface {
 	Create(ctx context.Context, input *catalogue_dto.CreateCatalogue) error
 	// Edit 编辑目录
 	Edit(ctx context.Context, id string, input *catalogue_dto.EditCatalogue) error
+
+	Get(ctx context.Context, id string) (*catalogue_dto.Catalogue, error)
 	// Delete 删除目录
 	Delete(ctx context.Context, id string) error
 	// Services 关键字筛选服务列表
@@ -25,10 +28,20 @@ type ICatalogueModule interface {
 	// Subscribe 订阅服务
 	Subscribe(ctx context.Context, subscribeInfo *catalogue_dto.SubscribeService) error
 	Sort(ctx context.Context, sorts []*catalogue_dto.SortItem) error
+	//ExportAll(ctx context.Context) ([]*catalogue_dto.ExportCatalogue, error)
+}
+
+type IExportCatalogueModule interface {
+	system.IExportModule[catalogue_dto.ExportCatalogue]
 }
 
 func init() {
+	catalogueModule := new(imlCatalogueModule)
 	autowire.Auto[ICatalogueModule](func() reflect.Value {
-		return reflect.ValueOf(new(imlCatalogueModule))
+		return reflect.ValueOf(catalogueModule)
+	})
+
+	autowire.Auto[IExportCatalogueModule](func() reflect.Value {
+		return reflect.ValueOf(catalogueModule)
 	})
 }

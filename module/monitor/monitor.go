@@ -30,6 +30,7 @@ type IMonitorStatisticModule interface {
 type IMonitorConfigModule interface {
 	SaveMonitorConfig(ctx context.Context, cfg *monitor_dto.SaveMonitorConfig) (*monitor_dto.MonitorConfig, error)
 	GetMonitorConfig(ctx context.Context) (*monitor_dto.MonitorConfig, error)
+	GetMonitorCluster(ctx context.Context) ([]*monitor_dto.MonitorCluster, error)
 }
 
 func init() {
