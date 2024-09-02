@@ -77,7 +77,7 @@ func (i *imlSubscribeModule) getSubscribers(ctx context.Context, serviceIds []st
 	}), nil
 }
 
-func (i *imlSubscribeModule) initGateway(ctx context.Context, clientDriver gateway.IClientDriver) error {
+func (i *imlSubscribeModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
 
 	projects, err := i.serviceService.List(ctx)
 	if err != nil {

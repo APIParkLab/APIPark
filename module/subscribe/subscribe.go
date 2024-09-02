@@ -2,6 +2,7 @@ package subscribe
 
 import (
 	"context"
+	"github.com/APIParkLab/APIPark/gateway"
 	"github.com/APIParkLab/APIPark/module/system"
 	"reflect"
 
@@ -54,6 +55,8 @@ type IExportSubscribeApprovalModule interface {
 func init() {
 	subscribeModule := new(imlSubscribeModule)
 	autowire.Auto[ISubscribeModule](func() reflect.Value {
+
+		gateway.RegisterInitHandleFunc(subscribeModule.initGateway)
 		return reflect.ValueOf(subscribeModule)
 	})
 

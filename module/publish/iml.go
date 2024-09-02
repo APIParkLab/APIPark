@@ -71,7 +71,15 @@ func (m *imlPublishModule) initGateway(ctx context.Context, partitionId string, 
 		if err != nil {
 			return err
 		}
+		apiIds := utils.SliceToSlice(releaseInfo.Apis, func(api *gateway.ApiRelease) string {
+			return api.ID
+		})
+		clientDriver.Service().Online(ctx, &gateway.ServiceRelease{
+			ID:   releaseInfo.Id,
+			Apis: apiIds,
+		})
 	}
+
 	return nil
 }
 
@@ -127,9 +135,11 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 				Description: a.Description,
 				Version:     version,
 			},
-			Path:    a.Path,
-			Method:  a.Methods,
-			Service: a.Service,
+			Path:      a.Path,
+			Methods:   a.Methods,
+			Service:   a.Service,
+			Protocols: a.Protocols,
+			Disable:   a.Disable,
 		}
 		proxy, ok := proxyCommitMap[a.UUID]
 		if ok {
@@ -220,7 +230,7 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 				Version:     version,
 			},
 			Path:    a.Path,
-			Method:  a.Methods,
+			Methods: a.Methods,
 			Service: a.Service,
 		}
 		proxy, ok := proxyCommitMap[a.UUID]
