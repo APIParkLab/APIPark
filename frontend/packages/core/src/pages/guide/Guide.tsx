@@ -90,7 +90,7 @@ const QuickGuideContent = ({changeGuideShow}:{changeGuideShow:Dispatch<SetStateA
                                 gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 0fr))',
                                 gridAutoRows: '1fr'
                                 }}>
-                            <Card title={$t("运行视图")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px] pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/quick/','_blank')}}>
+                            <Card title={$t("运行视图")} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer w-[300px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] pb-[10px]  text-[14px] font-normal', body:"p-[20px] pt-0 text-[12px] text-[#666]"}} onClick={()=>{window.open('https://docs.apipark.com/docs/quick/pre-work/monitor','_blank')}}>
                                 <span className="">{$t('仪表盘中提供了多种统计图表，帮助我们了解 API 的运行情况。')}</span> 
                             </Card>
                         </div>

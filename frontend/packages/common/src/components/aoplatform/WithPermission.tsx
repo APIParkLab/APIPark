@@ -1,5 +1,5 @@
 
-import {  Tooltip } from "antd";
+import {  Button, Tooltip, Upload } from "antd";
 import  {  ReactElement, cloneElement, useEffect, useMemo, useState } from "react";
 import { useGlobalContext } from "../../contexts/GlobalStateContext";
 import { PERMISSION_DEFINITION } from "@common/const/permissions";
@@ -37,7 +37,7 @@ const WithPermission = ({access, tooltip, children,disabled, showDisabled = true
         {editAccess && disabled  && <Tooltip  title={tooltip}> 
             { cloneElement(children, {disabled:true})}
              </Tooltip>}
-        {!editAccess && (children?.type?.displayName !== 'Button' && children?.type?.displayName !== 'Upload' && showDisabled ) && <Tooltip  title={tooltip ?? $t("暂无操作权限，请联系管理员分配。")}> 
+        {!editAccess && (children?.type !== Button && children?.type !== Upload && showDisabled ) && <Tooltip  title={tooltip ?? $t("暂无操作权限，请联系管理员分配。")}> 
             { cloneElement(children, {disabled:true})}
              </Tooltip>}
         
