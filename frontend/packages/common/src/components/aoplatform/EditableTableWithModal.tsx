@@ -15,6 +15,7 @@ export interface ConfigField<T> {
     renderText?: (value: unknown, record: T) => string;
     required?: boolean;
     ellipsis?:boolean
+    unRender?:(form:FormInstance)=>boolean
 }
 
 interface EditableTableWithModalProps<T> {
@@ -39,6 +40,7 @@ const EditableTableWithModal = <T extends { _id?: string }>({
     const [configurations, setConfigurations] = useState<T[]>(value ||[]);
     const [editingConfig, setEditingConfig] = useState<T | null>(null);
     const {state} = useGlobalContext()
+    const [formsValue, setFormsValue] = useState<FormInstance<unknown>>()
 
     const showModal = (config?: T) => {
         if (config) {
@@ -111,18 +113,23 @@ const EditableTableWithModal = <T extends { _id?: string }>({
     ],[state.language, disabled, configFields])
 
     
-    const formItems = configFields.map(({ title,key, component, required }) => {
-        return (
-                <Form.Item
-                    label={$t(title as string)}
-                    name={key as string}
-                    rules={[{ required}]}
-                >
-                    {component}
-                </Form.Item>
-            )
+    const formItems = useMemo(()=>{
+        return configFields.map(({ title,key, component, required,unRender }) => {
+            return (
+                unRender && unRender(formsValue) ? null :
+                    <Form.Item
+                        label={$t(title as string)}
+                        name={key as string}
+                        rules={[{ required}]}
+                    >
+                        {component}
+                    </Form.Item>
+                )
+            })
         }
-    );
+    ,[formsValue])
+
+
 
     return (
         <>
@@ -142,6 +149,9 @@ const EditableTableWithModal = <T extends { _id?: string }>({
                 <WithPermission access=""><Form form={form}  name="editableTableWithModal"
                     layout="vertical"
                     scrollToFirstError
+                    onFieldsChange={(()=>{
+                        setFormsValue(form.getFieldsValue())
+                    })}
                     //   labelCol={{ span: 7 }}
                     //   wrapperCol={{ span: 17}}
                       autoComplete="off">
