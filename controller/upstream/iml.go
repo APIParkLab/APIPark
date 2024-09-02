@@ -22,6 +22,6 @@ func (i *imlUpstreamController) Get(ctx *gin.Context, serviceId string) (upstrea
 	return i.upstreamModule.Get(ctx, serviceId)
 }
 
-func (i *imlUpstreamController) Save(ctx *gin.Context, serviceId string, upstream *upstream_dto.UpstreamConfig) (upstream_dto.UpstreamConfig, error) {
-	return i.upstreamModule.Save(ctx, serviceId, *upstream)
+func (i *imlUpstreamController) Save(ctx *gin.Context, serviceId string, upstream *upstream_dto.Upstream) (upstream_dto.UpstreamConfig, error) {
+	return i.upstreamModule.Save(ctx, serviceId, upstream)
 }
