@@ -1,0 +1,1 @@
+[{"id":"2d8beb9c-121f-4f6c-b860-50c02520e6f3","name":"","service":"2d8beb9c-121f-4f6c-b860-50c02520e6f3","driver":"static","balance":"round-robin","timeout":3,"retry":3,"remark":"","limit_peer_second":10000,"proxy_headers":[],"scheme":"HTTPS","pass_host":"pass","upstream_host":"","nodes":[{"address":"demoapi.apipark.com","weight":999}],"discover":{"discover":"","service":""}}]

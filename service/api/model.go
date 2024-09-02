@@ -2,21 +2,22 @@ package api
 
 import (
 	"time"
-	
+
 	"github.com/APIParkLab/APIPark/model/plugin_model"
-	
+
 	"github.com/APIParkLab/APIPark/stores/api"
 )
 
 type API struct {
-	UUID     string
-	Service  string
-	Team     string
-	Creator  string
-	Method   string
-	Path     string
-	CreateAt time.Time
-	IsDelete bool
+	UUID      string
+	Service   string
+	Team      string
+	Creator   string
+	Method    []string
+	Path      string
+	Protocols []string
+	CreateAt  time.Time
+	IsDelete  bool
 }
 
 type Info struct {
@@ -29,45 +30,71 @@ type Info struct {
 	Team        string
 	Creator     string
 	Updater     string
-	Upstream    string
-	Method      string
+	Methods     []string
+	Protocols   []string
 	Path        string
 	Match       string
+	Disable     bool
 }
 
-func FromEntity(e *api.Api) *API {
+func FromEntity(e *api.API) *API {
+
 	return &API{
-		UUID:     e.UUID,
-		CreateAt: e.CreateAt,
-		IsDelete: e.IsDelete != 0,
-		Service:  e.Service,
-		Team:     e.Team,
-		Creator:  e.Creator,
-		Method:   e.Method,
-		Path:     e.Path,
+		UUID:      e.UUID,
+		CreateAt:  e.CreateAt,
+		IsDelete:  e.IsDelete != 0,
+		Service:   e.Service,
+		Team:      e.Team,
+		Creator:   e.Creator,
+		Method:    e.Method,
+		Path:      e.Path,
+		Protocols: e.Protocol,
 	}
 }
 
-type CreateAPI struct {
+func FromEntityInfo(e *api.Info) *Info {
+	return &Info{
+		UUID:        e.UUID,
+		Name:        e.Name,
+		Description: e.Description,
+		CreateAt:    e.CreateAt,
+		UpdateAt:    e.UpdateAt,
+		Service:     e.Service,
+		Team:        e.Team,
+		Creator:     e.Creator,
+		Updater:     e.Updater,
+		Methods:     e.Method,
+		Protocols:   e.Protocol,
+		Path:        e.Path,
+		Match:       e.Match,
+		Disable:     e.Disable,
+	}
+}
+
+type Create struct {
 	UUID        string
-	Name        string
 	Description string
 	Service     string
 	Team        string
-	Method      string
+	Methods     []string
+	Protocols   []string
+	Disable     bool
 	Path        string
 	Match       string
 }
 
-type EditAPI struct {
-	Name        *string
-	Upstream    *string
+type Edit struct {
 	Description *string
+	Methods     *[]string
+	Protocols   *[]string
+	Disable     *bool
+	Path        *string
+	Match       *string
 }
 
-type ExistAPI struct {
-	Path   string
-	Method string
+type Exist struct {
+	Path    string
+	Methods []string
 }
 
 type Document struct {
@@ -77,6 +104,16 @@ type PluginSetting struct {
 	Disable bool                    `json:"disable"`
 	Config  plugin_model.ConfigType `json:"config"`
 }
+
+type Request struct {
+	//ID        string   `json:"id"`
+	Path      string   `json:"path"`
+	Methods   []string `json:"methods"`
+	Protocols []string `json:"protocols"`
+	Match     string   `json:"match"`
+	Disable   bool     `json:"disable"`
+}
+
 type Proxy struct {
 	Path    string                   `json:"path"`
 	Timeout int                      `json:"timeout"`

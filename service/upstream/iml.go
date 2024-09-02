@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"time"
-	
+
 	"github.com/APIParkLab/APIPark/service/universally/commit"
 	"github.com/APIParkLab/APIPark/stores/upstream"
 	"github.com/eolinker/go-common/autowire"
@@ -21,14 +21,43 @@ type imlUpstreamService struct {
 	commitService commit.ICommitService[Config] `autowired:""`
 }
 
+func (i *imlUpstreamService) List(ctx context.Context, serviceIds ...string) ([]*Upstream, error) {
+	w := make(map[string]interface{})
+	if len(serviceIds) > 0 {
+		w["service"] = serviceIds
+	}
+
+	upstreams, err := i.store.List(ctx, w)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(upstreams, func(u *upstream.Upstream) *Upstream {
+		return &Upstream{
+			Item: &Item{
+				UUID:       u.UUID,
+				Service:    u.Service,
+				Team:       u.Team,
+				Remark:     u.Remark,
+				Creator:    u.Creator,
+				Updater:    u.Updater,
+				CreateTime: u.CreateAt,
+				UpdateTime: u.UpdateAt,
+			},
+		}
+	}), nil
+}
+
 func (i *imlUpstreamService) ListCommit(ctx context.Context, uuid ...string) ([]*commit.Commit[Config], error) {
 	return i.commitService.List(ctx, uuid...)
 }
 
-func (i *imlUpstreamService) ListLatestCommit(ctx context.Context, project string) ([]*commit.Commit[Config], error) {
-	upstreams, err := i.store.List(ctx, map[string]interface{}{
-		"project": project,
-	})
+func (i *imlUpstreamService) ListLatestCommit(ctx context.Context, serviceIds ...string) ([]*commit.Commit[Config], error) {
+	w := make(map[string]interface{})
+	if len(serviceIds) > 0 {
+		w["service"] = serviceIds
+	}
+
+	upstreams, err := i.store.List(ctx, w)
 	if err != nil {
 		return nil, err
 	}
@@ -39,16 +68,16 @@ func (i *imlUpstreamService) ListLatestCommit(ctx context.Context, project strin
 		return u.UUID
 	})
 	return i.commitService.ListLatest(ctx, targetId...)
-	
+
 }
 
 func (i *imlUpstreamService) GetCommit(ctx context.Context, uuid string) (*commit.Commit[Config], error) {
 	return i.commitService.Get(ctx, uuid)
 }
 
-func (i *imlUpstreamService) LatestCommit(ctx context.Context, uid string, partition string) (*commit.Commit[Config], error) {
-	
-	return i.commitService.Latest(ctx, uid, partition)
+func (i *imlUpstreamService) LatestCommit(ctx context.Context, uid string, clusterId string) (*commit.Commit[Config], error) {
+
+	return i.commitService.Latest(ctx, uid, clusterId)
 }
 
 func (i *imlUpstreamService) SaveCommit(ctx context.Context, uid string, partition string, cfg *Config) error {
@@ -64,11 +93,11 @@ func (i *imlUpstreamService) Get(ctx context.Context, id string) (*Upstream, err
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &Upstream{
 		Item: &Item{
 			UUID:       t.UUID,
-			Project:    t.Project,
+			Service:    t.Service,
 			Team:       t.Team,
 			Remark:     t.Remark,
 			Creator:    t.Creator,
@@ -85,7 +114,7 @@ func (i *imlUpstreamService) Save(ctx context.Context, u *SaveUpstream) error {
 	return i.store.Save(ctx, &upstream.Upstream{
 		UUID:     u.UUID,
 		Name:     u.Name,
-		Project:  u.Project,
+		Service:  u.Service,
 		Team:     u.Team,
 		Remark:   u.Remark,
 		Creator:  userId,

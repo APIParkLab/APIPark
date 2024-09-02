@@ -2,7 +2,7 @@ package release
 
 import (
 	"time"
-	
+
 	"github.com/APIParkLab/APIPark/stores/release"
 )
 
@@ -26,16 +26,18 @@ func FromEntity(e *release.Release) *Release {
 	}
 }
 
-type APIProxyCommit struct {
+type APICommit struct {
 	Release string
 	API     string
 	Commit  string
 }
-type APIDocumentCommit struct {
+
+type ServiceCommit struct {
 	Release string
-	API     string
+	Service string
 	Commit  string
 }
+
 type UpstreamCommit struct {
 	Release   string
 	Upstream  string
@@ -52,7 +54,7 @@ type ProjectCommits struct {
 }
 
 //type Diff struct {
-//	Apis      []*APiDiff      `json:"apis"`
+//	Routers      []*APiDiff      `json:"apis"`
 //	Upstreams []*UpstreamDiff `json:"upstream"`
 //}
 

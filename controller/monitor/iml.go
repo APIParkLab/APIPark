@@ -75,3 +75,7 @@ func (p *imlMonitorConfig) SaveMonitorConfig(ctx *gin.Context, cfg *monitor_dto.
 func (p *imlMonitorConfig) GetMonitorConfig(ctx *gin.Context) (*monitor_dto.MonitorConfig, error) {
 	return p.module.GetMonitorConfig(ctx)
 }
+
+func (p *imlMonitorConfig) GetMonitorCluster(ctx *gin.Context) ([]*monitor_dto.MonitorCluster, error) {
+	return p.module.GetMonitorCluster(ctx)
+}
