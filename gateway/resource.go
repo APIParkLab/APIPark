@@ -34,9 +34,11 @@ type ProjectRelease struct {
 
 type ApiRelease struct {
 	*BasicItem
-	Path         string
-	Method       []string
-	Host         []string
+	Path      string
+	Methods   []string
+	Host      []string
+	Protocols []string
+
 	Plugins      map[string]*Plugin
 	Service      string
 	Rules        []*MatchRule
@@ -45,7 +47,9 @@ type ApiRelease struct {
 	ProxyHeaders []*ProxyHeader
 	Retry        int
 	Timeout      int
-	Labels       map[string]string
+
+	Labels  map[string]string
+	Disable bool
 }
 
 type ProxyHeader struct {
