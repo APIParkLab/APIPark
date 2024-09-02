@@ -68,11 +68,11 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
               const { timeInterval, tendency } = data
               setInvokeStatic(tendency)
               setInvokeStaticError(false)
-              setTimeUnit(getTimeUnit(timeInterval!))
+              setTimeUnit((getTimeUnit(timeInterval!)))
               // this.invokeLineRef?.changeLineChart()
             }else{
               setInvokeStaticError(true)
-              message.error(msg || RESPONSE_TIPS.dataError)
+              message.error(msg || $t(RESPONSE_TIPS.dataError))
             }
     }).catch(()=>{setQueryBtnLoading(false)})
   };
@@ -84,7 +84,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
           if(code === STATUS_CODE.SUCCESS){
             return  {data:data.statistics?.map((x:(MonitorApiData|MonitorSubscriberData))=>{x.proxyRate = Number((x.proxyRate*100).toFixed(2));x.requestRate = Number((x.requestRate*100).toFixed(2));return x}), success: true}
         }else{
-            message.error(msg || RESPONSE_TIPS.dataError)
+            message.error(msg || $t(RESPONSE_TIPS.dataError))
             return {data:[], success:false}
         }
       }).catch(() => {
@@ -108,12 +108,12 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
           const { timeInterval, tendency } = data
           setDetailInvokeStatic(tendency)
           setDetailInvokeError(false)
-          setTimeUnit(getTimeUnit(timeInterval!))
+          setTimeUnit((getTimeUnit(timeInterval!)))
           setModalTitle($t('(0)-(1)调用趋势', [entity.name, detailName]))
           setModalVisible(true);
         }else{
           setInvokeStaticError(true)
-          message.error(msg || RESPONSE_TIPS.dataError)
+          message.error(msg || $t(RESPONSE_TIPS.dataError))
         }
         })
     };
@@ -153,7 +153,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
           {invokeStaticError ? <Empty className="mt-[20%]" image={Empty.PRESENTED_IMAGE_SIMPLE}/>: <MonitorLineGraph
               lineData={invokeStatic}
               titles={[$t('调用量统计')]}
-              yAxisTitle={timeUnit || '-'}
+              yAxisTitle={$t(timeUnit || '-')}
               type="invoke"
             />}
         </div>
@@ -176,7 +176,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
           className="w-[calc(100%-22px)] w-min-[300px]"
               lineData={detailInvokeStatic!}
               titles={[$t('调用量统计')]}
-              yAxisTitle={timeUnit || '-'}
+              yAxisTitle={$t(timeUnit || '-')}
               type="invoke"
             />}
           {/* 这里应该添加图表组件 */}
@@ -185,7 +185,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
             className="w-[calc(100%-20px)]"
             lineData={invokeStatic}
             titles={[$t('调用量统计')]}
-            yAxisTitle={timeUnit || '-'}
+            yAxisTitle={$t(timeUnit || '-')}
             type="invoke"
           />
           }</>}

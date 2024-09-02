@@ -38,11 +38,11 @@ const SystemInsideApprovalList:FC = ()=>{
     const [pageStatus,setPageStatus] = useState<0|1>(Number(query.get('status') ||0) as 0|1)
     const subscribeRef = useRef<SubscribeApprovalModalHandle>(null)
     const [approvalBtnLoading,setApprovalBtnLoading] = useState<boolean>(false)
-    const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
+    const [memberValueEnum, setMemberValueEnum] = useState<SimpleMemberItem[]>([])
     const {accessData,state} = useGlobalContext()
 
     const openModal = async (type:'approval'|'view',entity:SubscribeApprovalTableListItem)=>{
-        message.loading(RESPONSE_TIPS.loading)
+        message.loading($t(RESPONSE_TIPS.loading))
         const {code,data,msg} = await fetchData<BasicResponse<{approval:SubscribeApprovalInfoType}>>('service/approval/subscribe',{method:'GET',eoParams:{apply:entity!.id, service:serviceId,team:teamId},eoTransformKeys:['apply_project','apply_team','apply_time','approval_time']})
         message.destroy()
         if(code === STATUS_CODE.SUCCESS){
@@ -78,7 +78,7 @@ const SystemInsideApprovalList:FC = ()=>{
                 },
             })
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
             return
         }
     }
@@ -113,7 +113,7 @@ const SystemInsideApprovalList:FC = ()=>{
                 setInit((prev)=>prev ? false : prev)
                 return  {data:data.approvals, success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -122,16 +122,12 @@ const SystemInsideApprovalList:FC = ()=>{
     }
 
     const getMemberList = async ()=>{
-        setMemberValueEnum({})
+        setMemberValueEnum([])
         const {code,data,msg}  = await fetchData<BasicResponse<{ members: SimpleMemberItem[] }>>('simple/member',{method:'GET'})
         if(code === STATUS_CODE.SUCCESS){
-            const tmpValueEnum:{[k:string]:{text:string}} = {}
-            data.members?.forEach((x:SimpleMemberItem)=>{
-                tmpValueEnum[x.name] = {text:x.name}
-            })
-            setMemberValueEnum(tmpValueEnum)
+            setMemberValueEnum(data.members)
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }
 
@@ -164,9 +160,24 @@ const SystemInsideApprovalList:FC = ()=>{
 
 
     const columns = useMemo(()=>{
-        const newCol = [...(!(query.get('status'))? SUBSCRIBE_APPROVAL_INNER_TODO_TABLE_COLUMN:SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN)]
-        const filteredCol = pageStatus === 0 ? newCol.filter((x)=>TODO_LIST_COLUMN_NOT_INCLUDE_KEY.indexOf(x.dataIndex as string) === -1): newCol
-        return filteredCol.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){x.valueEnum = memberValueEnum} return {...x,title: typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+        const newColumns = [...(!(query.get('status'))? SUBSCRIBE_APPROVAL_INNER_TODO_TABLE_COLUMN:SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN)]
+        const filteredCol = pageStatus === 0 ? newColumns.filter((x)=>TODO_LIST_COLUMN_NOT_INCLUDE_KEY.indexOf(x.dataIndex as string) === -1): newColumns
+        return filteredCol.map(x=>{
+            if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){
+                const tmpValueEnum :Record<string,{text:string}>= {}
+                memberValueEnum?.forEach((x:SimpleMemberItem)=>{
+                    tmpValueEnum[x.name] = {text:$t(x.name)}
+                })
+                x.valueEnum = tmpValueEnum
+            }
+            if(x.dataIndex === 'status'){
+                x.valueEnum =  new Map([
+                    [0, <span className="text-status_fail">{$t('拒绝')}</span>],
+                    [2,<span className="text-status_success">{$t('通过')}</span>],
+                  ])
+            }
+
+            return {...x,title: typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
     },[pageStatus,memberValueEnum,state.language])
 
     return (

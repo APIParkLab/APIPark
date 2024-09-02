@@ -97,7 +97,7 @@ export default function IntelligentPluginList(){
     const [tableListDataSource, setTableListDataSource] = useState<DynamicTableItem[]>([]);
 
     const [tableHttpReload, setTableHttpReload] = useState(true);
-    const [columns,setColumns] = useState<PageProColumns<DynamicTableItem>[] >([])
+    const [columns,setColumns] = useState<DynamicTableField[] >([])
     const {fetchData} = useFetch()
     const pageListRef = useRef<ActionType>(null);
     const [publishBtnLoading, setPublishBtnLoading] = useState<boolean>(false)
@@ -133,20 +133,7 @@ export default function IntelligentPluginList(){
                 message.destroy(); 
                 if(res.code === STATUS_CODE.SUCCESS){
                     getConfig(res.data) 
-                    setColumns(res.data.basic.fields.map((field:DynamicTableField, index:number)=>({
-                            title:field.title,
-                            dataIndex:field.name,
-                            fixed:field.name === 'title' ? 'left' : undefined,
-                            ellipsis:true,
-                            width:field.name === 'title' ? 150 : undefined, 
-                            ...(field.enum?.length > 0 ?{
-                                onFilter: (value: string, record: { [x: string]: string | string[]; }) => record[field.name].indexOf(value) === 0,
-                                filters:field.enum?.map((x:string)=>{return {text:x, value:x}}),
-                                render:(_: unknown, entity: { [x: string]: string; })=> {
-                                    return <span className={StatusColorClass[entity[field.name] as keyof typeof StatusColorClass]}>{(entity[field.name] as string)}</span>                        
-                                },
-                            }:{}),
-                    })))
+                    setColumns(res.data.basic.fields)
                     setTableListDataSource(res.data.list);
                     return ({ data: res.data.list, success: true,total:res.data.total });
                 }else{
@@ -157,7 +144,22 @@ export default function IntelligentPluginList(){
                 return ({ data: [], success: false });})
     }
 
-    const translatedCol = useMemo(()=>columns.map(x=>({...x, title:typeof x.title  === 'string' ? $t(x.title as string) : x.title})),[columns,state.language])
+    const translatedCol = useMemo(()=>columns.map((field:DynamicTableField, index:number)=>({
+        title: typeof field.title === 'string' ? $t(field.title as string): field.title,
+        dataIndex:field.name,
+        fixed:field.name === 'title' ? 'left' : undefined,
+        ellipsis:true,
+        width:field.name === 'title' ? 150 : undefined, 
+        ...(field.enum?.length > 0 ?{
+            onFilter: (value: string, record: { [x: string]: string | string[]; }) => record[field.name].indexOf(value) === 0,
+            filters:field.enum?.map((x:string)=>{return {text:$t(x), value:x}}),
+            render:(_: unknown, entity: { [x: string]: string; })=> {
+                return <span className={StatusColorClass[entity[field.name] as keyof typeof StatusColorClass]}>{$t(entity[field.name] as string)}</span>                        
+            },
+        }:{}),
+    })),[state.language,columns])
+
+
 
     const getConfig = (data:DynamicTableConfig)=>{
         const {basic,list } = data
@@ -183,7 +185,7 @@ export default function IntelligentPluginList(){
                 setRenderSchema(resp.data.render)
                 return Promise.resolve(resp.data.render)
             }
-            return Promise.reject(resp.msg || RESPONSE_TIPS.error)
+            return Promise.reject(resp.msg || $t(RESPONSE_TIPS.error))
         })
     }
 
@@ -218,11 +220,11 @@ export default function IntelligentPluginList(){
             fetchData<BasicResponse<null>>(`dynamic/${moduleId}/batch`,{method:'DELETE',eoParams:{ids:JSON.stringify([entity!.id])}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             })
         })
@@ -244,7 +246,7 @@ export default function IntelligentPluginList(){
                             }
                             setCurDetail(data.info)
                         }else{
-                            message.error(msg || RESPONSE_TIPS.error)
+                            message.error(msg || $t(RESPONSE_TIPS.error))
                         }
                     }).finally(()=>setDrawerLoading(false))
                 break;
@@ -259,25 +261,25 @@ export default function IntelligentPluginList(){
         let content:string|React.ReactNode = ''
         switch (type){
             case 'publish':{
-                message.loading(RESPONSE_TIPS.operating)
+                message.loading($t(RESPONSE_TIPS.operating))
                 await fetchData<BasicResponse<DynamicPublish>>(`dynamic/${moduleId}/${entity!.status === $t('已发布') ? 'offline':'online'}`, {
                     method: 'PUT',
                     eoParams:{id:entity!.id},
                 }).then(response => {
                     const {code, msg} = response
                     if (code === STATUS_CODE.SUCCESS) {
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         return Promise.resolve(true)
                     } else {
-                        message.error(msg || RESPONSE_TIPS.error)
-                        return Promise.reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        return Promise.reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> Promise.reject(errorInfo))
                 message.destroy()
                 return;}
             case 'delete':
                 title='删除'
-                content=<span>{DELETE_TIPS.default}</span>
+                content=<span>{$t(DELETE_TIPS.default)}</span>
                 break;
         }
 
@@ -331,7 +333,7 @@ export default function IntelligentPluginList(){
             onSearchWordChange={(e)=>{setSearchWord(e.target.value);setTableHttpReload(true);setTableHttpReload(true)}}
         />
         
-        <DrawerWithFooter title={`${drawerType === 'add' ? $t('添加') : $t('编辑')}${pluginName }`} open={drawerOpen} onClose={()=>{setCurDetail(undefined);setDrawerOpen(false)}} onSubmit={()=>drawerFormRef.current?.save()?.then((res)=>{res && manualReloadTable();return res})}  submitAccess=''>
+        <DrawerWithFooter title={`${drawerType === 'add' ? $t('添加(0)',[$t(pluginName)]) : $t('编辑(0)',[$t(pluginName)])}`} open={drawerOpen} onClose={()=>{setCurDetail(undefined);setDrawerOpen(false)}} onSubmit={()=>drawerFormRef.current?.save()?.then((res)=>{res && manualReloadTable();return res})}  submitAccess=''>
             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin/>} spinning={drawerLoading}>
                 <IntelligentPluginConfig 
                     ref={drawerFormRef!} 

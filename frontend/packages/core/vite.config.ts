@@ -11,21 +11,13 @@ export default defineConfig({
   build:{
     outDir:'../../dist',
     sourcemap: false,
-    chunkSizeWarningLimit: 50000,
-    cacheDir: './node_modules/.vite', 
+    chunkSizeWarningLimit: 50,
+    cacheDir: './node_modules/.vite',
+    rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return id.toString().split('node_modules/')[1].split('/')[0].toString();
-          }
-          // 针对 pnpm 和 Monorepo 特殊处理
-          if (id.includes('.pnpm')) {
-            const segments = id.split(path.sep);
-            const packageName = segments[segments.indexOf('.pnpm') + 1].split('@')[0];
-            return packageName;
-          }
-        }
+        chunkFileNames: 'assets/eo-[name]-[hash].js',
       },
+    },
     },
   css: {
     postcss: {

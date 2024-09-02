@@ -202,7 +202,7 @@ export default function ApiEdit({apiInfo,editorRef,loaded,serviceId, teamId}:{ap
             getData:()=>description
         }))
         return (
-                <Input.TextArea className="w-full border-none" value={description} onChange={(e)=>setDescription(e.target.value)} placeholder={PLACEHOLDER.input}/>
+                <Input.TextArea className="w-full border-none" value={description} onChange={(e)=>setDescription(e.target.value)} placeholder={$t(PLACEHOLDER.input)}/>
         )
     })
 

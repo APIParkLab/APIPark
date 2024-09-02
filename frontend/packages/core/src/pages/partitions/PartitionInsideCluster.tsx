@@ -27,7 +27,7 @@ const PartitionInsideCluster:FC = ()=> {
                 data.nodes && data.nodes.length > 0 && setNodeData(data.nodes[0])
                 setShowStatus('view')
             } else {
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         }).catch(() => {
             return {data: [], success: false}
@@ -88,9 +88,9 @@ const PartitionInsideCluster:FC = ()=> {
 
 export function ClusterConfigPreview (x:PartitionClusterNodeTableListItem){
     return <div className="flex flex-col gap-[4px] ">
-        <Row className=""><Col className="font-bold text-right pr-[4px]">管理地址：</Col><Col>{x.managerAddress.map(m=>(<p className="leading-[22px]">{m}</p>))}</Col></Row>
-        <Row className=""><Col className="font-bold text-right pr-[4px]">服务地址：</Col><Col>{x.serviceAddress.map(m=>(<p className="leading-[22px]">{m}</p>))}</Col></Row>
-        <Row className=""><Col className="font-bold text-right pr-[4px]">同步地址：</Col><Col><p className="leading-[22px]">{x.peerAddress}</p></Col></Row>
+        <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('管理地址')}：</Col><Col>{x.managerAddress.map(m=>(<p className="leading-[22px]">{m}</p>))}</Col></Row>
+        <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('服务地址')}：</Col><Col>{x.serviceAddress.map(m=>(<p className="leading-[22px]">{m}</p>))}</Col></Row>
+        <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('同步地址')}：</Col><Col><p className="leading-[22px]">{x.peerAddress}</p></Col></Row>
 </div>}
 
 export default PartitionInsideCluster

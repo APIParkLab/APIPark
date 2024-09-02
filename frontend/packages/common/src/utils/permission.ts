@@ -17,8 +17,6 @@ export const checkAccess:(access:AccessDataType, accessData:Map<string,string[]>
 }
 
 const hasIntersection = (arr1:string[], arr2:string[])=> {
-  // 当没有对应后端权限字段时，默认有权限
-    if(arr1.length === 0) return true
     const set = new Set(arr1.length > arr2.length ? arr2:arr1) 
     const arr = arr1.length > arr2.length ? arr1:arr2
     for (const item of arr) {

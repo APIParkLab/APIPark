@@ -1,14 +1,14 @@
 import { MonitorApiData, MonitorData } from "./type"
 import { EChartsOption } from "echarts-for-react"
 import { Tooltip } from "antd"
-import { $t } from "@common/locales"
+import {  } from "@common/locales"
 import { PageProColumns } from "@common/components/aoplatform/PageList"
 
 // 监控表格参数
 export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle:string})[] = [
     {
-        title:$t('请求总数'),
-        eoTitle:$t('请求总数'),
+        title:('请求总数'),
+        eoTitle:('请求总数'),
         dataIndex: 'requestTotal',
         sorter: (a,b)=> {
             return a.requestTotal - b.requestTotal
@@ -17,8 +17,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
         width: 96
       },
       {
-        title: <Tooltip title={$t("请求成功数")} >{$t('请求成功数')}</Tooltip>,
-        eoTitle:$t('请求成功数'),
+        title: '请求成功数',
+        eoTitle:('请求成功数'),
         dataIndex: 'requestSuccess',
         width: 106,
         ellipsis:true,
@@ -27,9 +27,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
         },
       },
       {
-        // title:$t('请求成功率',
-        title: <Tooltip title={$t('请求成功率')} >{$t('请求成功率')}</Tooltip>,
-        eoTitle:$t('请求成功率'),
+        title: '请求成功率',
+        eoTitle:('请求成功率'),
         dataIndex: 'requestRate',
         valueType:'percent',
         ellipsis:true,
@@ -39,8 +38,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
         width: 106
       },
     {
-      title:$t('转发总数'),
-      eoTitle:$t('转发总数'),
+      title:('转发总数'),
+      eoTitle:('转发总数'),
       width: 96,
       dataIndex: 'proxyTotal',
       ellipsis:true,
@@ -49,9 +48,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
       },
     },
     {
-      // title:$t('转发成功数',
-      title: <Tooltip title={$t("转发成功数")} >{$t('转发成功数')}</Tooltip>,
-      eoTitle:$t('转发成功数'),
+      title: '转发成功数',
+      eoTitle:('转发成功数'),
       width: 106,
       dataIndex: 'proxySuccess',
       ellipsis:true,
@@ -60,9 +58,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
       },
     },
     {
-      // title:$t('转发成功率',
-      title: <Tooltip title={$t("转发成功率")} >{$t('转发成功率')}</Tooltip>,
-      eoTitle:$t('转发成功率'),
+      title: '转发成功率',
+      eoTitle:('转发成功率'),
       width: 106,
       dataIndex: 'proxyRate',
       valueType:'percent',
@@ -72,9 +69,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
       },
     },
     {
-      // title:$t('失败状态码数',
-      title: <Tooltip title={$t("失败状态码数")} >{$t('失败状态码数')}</Tooltip>,
-      eoTitle:$t('失败状态码数'),
+      title: '失败状态码数',
+      eoTitle:('失败状态码数'),
       width: 120,
       dataIndex: 'statusFail',
       ellipsis:true,
@@ -83,10 +79,9 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
       },
     },
     {
-      // title:$t('平均响应时间(ms)',
-      title: <Tooltip title={$t("平均响应时间(ms)")} >{$t('平均响应时间(ms)')}</Tooltip>,
-        eoTitle:$t('平均响应时间(ms)'),
-        width: 148,
+      title:'平均响应时间(ms)',
+      eoTitle:('平均响应时间(ms)'),
+      width: 148,
       dataIndex: 'avgResp',
       valueType:'digit',
       ellipsis:true,
@@ -95,10 +90,9 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
       },
     },
     {
-      // title:$t('最大响应时间(ms)',
-      title: <Tooltip title={$t("最大响应时间(ms)")} >{$t('最大响应时间(ms)')}</Tooltip>,
-        eoTitle:$t('最大响应时间(ms)'),
-        width: 148,
+      title:('最大响应时间(ms)'),
+      eoTitle:('最大响应时间(ms)'),
+      width: 148,
       dataIndex: 'maxResp',
       valueType:'digit',
       ellipsis:true,
@@ -107,10 +101,10 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
       },
     },
     {
-      // title:$t('最小响应时间(ms)',
-      title: <Tooltip title={$t("最小响应时间(ms)")} >{$t('最小响应时间(ms)')}</Tooltip>,
-        eoTitle:$t('最小响应时间(ms)'),
-        width: 148,
+      // title:('最小响应时间(ms)',
+      title: ('最小响应时间(ms)'),
+      eoTitle:('最小响应时间(ms)'),
+      width: 148,
       dataIndex: 'minResp',
       valueType:'digit',
       ellipsis:true,
@@ -119,10 +113,10 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
       },
     },
     {
-      // title:$t('平均请求流量(KB)',
-      title: <Tooltip title={$t("平均请求流量(KB)")} >{$t('平均请求流量(KB)')}</Tooltip>,
-        eoTitle:$t('平均请求流量(KB)'),
-        width: 148,
+      // title:('平均请求流量(KB)',
+      title: '平均请求流量(KB)',
+      eoTitle:('平均请求流量(KB)'),
+      width: 148,
       dataIndex: 'avgTraffic',
       valueType:'digit',
       ellipsis:true,
@@ -131,9 +125,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
       },
     },
     {
-      // title:$t('最大请求流量(KB)',
-      title: <Tooltip title={$t("最大请求流量(KB)")} >{$t('最大请求流量(KB)')}</Tooltip>,
-        eoTitle:$t('最大请求流量(KB)'),
+      title:('最大请求流量(KB)'),
+        eoTitle:('最大请求流量(KB)'),
         width: 148,
       dataIndex: 'maxTraffic',
       valueType:'digit',
@@ -143,9 +136,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
       },
     },
     {
-      // title:$t('最小请求流量(KB)',
-      title: <Tooltip title={$t("最小请求流量(KB)")} >{$t('最小请求流量(KB)')}</Tooltip>,
-        eoTitle:$t('最小请求流量(KB)'),
+      title:'最小请求流量(KB)',
+        eoTitle:('最小请求流量(KB)'),
         width: 148,
       dataIndex: 'minTraffic',
       valueType:'digit',
@@ -159,24 +151,24 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
   export const API_TABLE_GLOBAL_COLUMNS_CONFIG:(PageProColumns<MonitorApiData>&{eoTitle:string})[] = [
   
     {
-      title:$t('API 名称'),
-        eoTitle:$t('API 名称'),
-        dataIndex: 'name',
+      title:('API 名称'),
+      eoTitle:('API 名称'),
+      dataIndex: 'name',
       width:120,
       ellipsis:true,
       fixed: 'left',
       disable:true
     },
     {
-      title:$t('请求路径'),
-        eoTitle:$t('请求路径'),
-        dataIndex: 'path',
+      title:('请求路径'),
+      eoTitle:('请求路径'),
+      dataIndex: 'path',
       ellipsis:true,
       width: 80
     },
     {
-        title:$t('所属服务'),
-        eoTitle:$t('所属服务'),
+        title:('所属服务'),
+        eoTitle:('所属服务'),
         dataIndex: ['project','name'],
         ellipsis:true,
         width: 80
@@ -189,17 +181,17 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
   export const APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG:(PageProColumns<MonitorApiData>&{eoTitle:string})[] = [
   
     {
-      title:$t('应用名称'),
-        eoTitle:$t('应用名称'),
-        dataIndex: 'name',
+      title:('应用名称'),
+      eoTitle:('应用名称'),
+      dataIndex: 'name',
       width:160,
       ellipsis:true,
       fixed: 'left',
       disable:true
     },
     {
-      title:$t('应用 ID'),
-      eoTitle:$t('应用 ID'),
+      title:('应用 ID'),
+      eoTitle:('应用 ID'),
       dataIndex: 'id',
       width: 140,
       ellipsis:true,
@@ -211,8 +203,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
   export const SERVICE_TABLE_GLOBAL_COLUMNS_CONFIG:(PageProColumns<MonitorApiData>&{eoTitle:string})[] = [
   
     {
-      title:$t('服务名称'),
-      eoTitle:$t('服务名称'),
+      title:('服务名称'),
+      eoTitle:('服务名称'),
       dataIndex: 'name',
       width:160,
       ellipsis:true,
@@ -220,8 +212,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
       disable:true
     },
     {
-      title:$t('服务 ID'),
-      eoTitle:$t('服务 ID'),
+      title:('服务 ID'),
+      eoTitle:('服务 ID'),
       dataIndex: 'id',
       width: 140,
       ellipsis:true,

@@ -1,11 +1,15 @@
 
 import { ActionType } from "@ant-design/pro-components"
-import { useImperativeHandle, useRef, useState } from "react"
+import { useImperativeHandle, useMemo, useRef, useState } from "react"
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList"
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission"
 import { API_TABLE_GLOBAL_COLUMNS_CONFIG,SERVICE_TABLE_GLOBAL_COLUMNS_CONFIG, APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG } from "@dashboard/const/const"
 import {forwardRef} from "react"
 import { COLUMNS_TITLE } from "@common/const/const"
+import { Tooltip } from "antd"
+import { $t } from "@common/locales"
+import { useGlobalContext } from "@common/contexts/GlobalStateContext"
+import { StringifyOptions } from "querystring"
 
 const  TableType = {
     api :API_TABLE_GLOBAL_COLUMNS_CONFIG,
@@ -41,6 +45,7 @@ const MonitorTable = forwardRef<MonitorTableHandler, MonitorTableProps<unknown>>
     const tableRef = useRef<ActionType>(null)
     const [tableHttpReload, setTableHttpReload] = useState(true);
     const [tableListDataSource, setTableListDataSource] = useState<unknown[]>([]);
+    const {state} = useGlobalContext()
 
     useImperativeHandle(ref,()=>({
         reload: ()=>{tableRef.current?.reload()}
@@ -62,6 +67,11 @@ const MonitorTable = forwardRef<MonitorTableHandler, MonitorTableProps<unknown>>
             return {data:[], success:false}
         })
     }
+
+    const columns = useMemo(()=>[...TableType[type]].map((x)=>({
+        ...x,
+        title:<Tooltip title={$t(x.title as string)}>{$t(x.title as StringifyOptions)}</Tooltip>
+    })),[type, state])
 
     const operation:PageProColumns<unknown>[] =[
         {
@@ -86,7 +96,7 @@ const MonitorTable = forwardRef<MonitorTableHandler, MonitorTableProps<unknown>>
             besidesTableHeight={inModal ? 64+56+258: undefined}
             ref={tableRef}
             showPagination={showPagination}
-            columns = {[...(TableType[type] || []),...operation]}
+            columns = {[...columns,...operation]}
             request={getTableDataSource}
             dataSource={tableListDataSource}
             // tableClickAccess="system.dashboard.self.view"

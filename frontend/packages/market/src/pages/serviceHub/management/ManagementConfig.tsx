@@ -42,13 +42,13 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
                 fetchData<BasicResponse<{apps:ManagementConfigFieldType}>>(type === 'add'? 'team/app' : 'app/info',{method:type === 'add'? 'POST' : 'PUT',eoBody:(value), eoParams:type === 'add' ? {team:teamId}:{app:appId,team:teamId}}).then(response=>{
                     const {code,data,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         form.setFieldsValue(data.apps)
                         type === 'edit' && setAppName(data.apps.name)
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -63,7 +63,7 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
                 setAppName(data.app.name)
                 setTimeout(()=>{form.setFieldsValue({...data.app})},0)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     };
@@ -72,7 +72,7 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
         setDelBtnLoading(true)
         modal.confirm({
             title:$t('删除'),
-            content:DELETE_TIPS.default,
+            content:$t(DELETE_TIPS.default),
             onOk:()=> {
                 return deleteApplication()
             },
@@ -95,10 +95,10 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
         fetchData<BasicResponse<null>>('app',{method:'DELETE',eoParams:{app:appId,team:teamId}}).then(response=>{
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                message.success(msg || RESPONSE_TIPS.success)
+                message.success(msg || $t(RESPONSE_TIPS.success))
                 navigate(`/tenantManagement/list`)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -133,24 +133,24 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
             <Form.Item<ManagementConfigFieldType>
                 label={$t("应用名称")}
                 name="name"
-                rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                rules={[{ required: true,whitespace:true  }]}
             >
-                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
             </Form.Item>
 
             <Form.Item<ManagementConfigFieldType>
                 label={$t("应用 ID")}
                 name="id"
-                rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
+                rules={[{ required: true ,whitespace:true }]}
             >
-                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input} disabled={type === 'edit'}/>
+                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} disabled={type === 'edit'}/>
             </Form.Item>
 
             <Form.Item
                 label={$t("描述")}
                 name="description"
             >
-                <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
             </Form.Item>
             {type === 'edit' && <>
                         <Row className="mb-[10px]"

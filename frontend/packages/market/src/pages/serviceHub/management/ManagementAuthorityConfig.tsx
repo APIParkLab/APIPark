@@ -35,11 +35,11 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
                 fetchData<BasicResponse<null>>('app/authorization',{method:type === 'add'? 'POST' : 'PUT',eoBody:({...value,expireTime:value.expireTime ? value.expireTime.unix() : 0}), eoParams:type === 'add' ? {app:appId,team:teamId}:{authorization:data!.id,app:appId,team:teamId},eoTransformKeys:['hideCredential','expireTime','tokenName','userName']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -107,27 +107,27 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
             <Form.Item<EditAuthFieldType>
                 label={$t("名称")}
                 name="name"
-                rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true }]}
+                rules={[{required: true,whitespace:true }]}
             >
-                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
             </Form.Item>
 
             <Form.Item<EditAuthFieldType>
                 label={$t("鉴权类型")}
                 name="driver"
-                rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
+                rules={[{required: true}]}
             >
                 <Select disabled={type === 'edit'} className="w-INPUT_NORMAL" options={[
                     {label:'Basic',value:'basic'},
                     {label:'Jwt',value:'jwt'},
                     {label:'AkSk',value:'aksk'},
-                    {label:'Apikey',value:'apikey'}]}  onChange={(e)=>onDriverChange(e)} placeholder={PLACEHOLDER.input}/>
+                    {label:'Apikey',value:'apikey'}]}  onChange={(e)=>onDriverChange(e)} placeholder={$t(PLACEHOLDER.input)}/>
             </Form.Item>
 
             <Form.Item
                 name="tokenName"
                 label={$t("参数位置")}
-                rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true }]}
+                rules={[{required: true,whitespace:true }]}
             >
                 <Input className="w-INPUT_NORMAL" addonBefore={prefixSelector} style={{width: '100%'}}/>
             </Form.Item>
@@ -139,17 +139,17 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
                             <Form.Item<EditAuthFieldType>
                                 label={$t("用户名")}
                                 name={['config','userName']}
-                                rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true }]}
+                                rules={[{required: true,whitespace:true }]}
                             >
-                                <Input  className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.startWithAlphabet}/>
+                                <Input  className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.startWithAlphabet)}/>
                             </Form.Item>
 
                             <Form.Item<EditAuthFieldType>
                                 label={$t("密码")}
                                 name={['config','password']}
-                                rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true }]}
+                                rules={[{required: true,whitespace:true }]}
                             >
-                                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
                         </>
                     case 'jwt':
@@ -157,15 +157,15 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
                             <Form.Item<EditAuthFieldType>
                                 label={$t("Iss")}
                                 name={['config','iss']}
-                                rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
+                                rules={[{required: true}]}
                             >
-                                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
 
                             <Form.Item<EditAuthFieldType>
                                 label={$t("签名算法")}
                                 name={['config','algorithm']}
-                                rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
+                                rules={[{required: true}]}
                             >
                                 <Select  className="w-INPUT_NORMAL" options={ALGORITHM_ITEM} onChange={(value)=>{onAlgorithmChange(value)}}/>
                             </Form.Item>
@@ -173,30 +173,30 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
                             <Form.Item<EditAuthFieldType>
                                 label={ algorithm.includes('HS') ? $t('Secret'):$t('RSA 公钥')}
                                 name={algorithm.includes('HS') ? ['config','secret']:['config','publicKey']}
-                                rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
+                                rules={[{required: true}]}
                             >
-                                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
 
                             <Form.Item<EditAuthFieldType>
                                 label={$t("用户名")}
                                 name={['config','user']}
                             >
-                                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
 
                             <Form.Item<EditAuthFieldType>
                                 label={$t("用户名 JsonPath")}
                                 name={['config','userPath']}
                             >
-                                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
 
                             <Form.Item<EditAuthFieldType>
                                 label={$t("校验字段")}
                                 name={['config','claimsToVerify']}
                             >
-                                <Select className="w-INPUT_NORMAL" mode="multiple" options={[{label:'exp',value:'exp'},{label:'nbf',value:'nbf'}]} placeholder={PLACEHOLDER.input}/>
+                                <Select className="w-INPUT_NORMAL" mode="multiple" options={[{label:'exp',value:'exp'},{label:'nbf',value:'nbf'}]} placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
 
                             {algorithm.includes('HS') && <Form.Item<EditAuthFieldType>
@@ -211,17 +211,17 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
                             <Form.Item<EditAuthFieldType>
                                 label={$t("AK")}
                                 name={['config','ak']}
-                                rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
+                                rules={[{required: true}]}
                             >
-                                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
 
                             <Form.Item<EditAuthFieldType>
                                 label={$t("SK")}
                                 name={['config','sk']}
-                                rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
+                                rules={[{required: true}]}
                             >
-                                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
                         </>
                     case 'apikey':
@@ -229,9 +229,9 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
                             <Form.Item<EditAuthFieldType>
                                 label={$t("Apikey")}
                                 name={['config','apikey']}
-                                rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true }]}
+                                rules={[{required: true,whitespace:true }]}
                             >
-                                <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
                         </>
                 }

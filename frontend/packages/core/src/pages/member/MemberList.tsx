@@ -22,6 +22,7 @@ import { checkAccess } from "@common/utils/permission.ts";
 import { PERMISSION_DEFINITION } from "@common/const/permissions.ts";
 import { EntityItem } from "@common/const/type.ts";
 import { $t } from "@common/locales/index.ts";
+import { DefaultOptionType } from "antd/es/cascader/index";
 
 const AddToDepartment = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((props,ref)=>{
     const {selectedUserIds} = props
@@ -35,11 +36,11 @@ const AddToDepartment = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((
                 fetchData<BasicResponse<null>>('user/department/member',{method:'POST',eoBody:({userIds:selectedUserIds,departmentIds:selectedKeys}),eoTransformKeys:['departmentIds','userIds']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -64,7 +65,7 @@ const AddToDepartment = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((
                     children:data.departments.children.filter((x)=>x.id !== 'unknown' && x.id !== 'disable')}])
                 setExpandedKeys([newId])
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         })
@@ -120,7 +121,7 @@ const MemberList = ()=>{
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [departmentValueEnum,setDepartmentValueEnum] = useState<ColumnFilterItem[] >([])
     const {accessData,state} = useGlobalContext()
-    const [columns,setColumns] = useState<PageProColumns<MemberTableListItem>[]>([])
+    const [roleSelectableList, setRoleSelectableList] = useState<DefaultOptionType[]>([])
 
     const operation:PageProColumns<MemberTableListItem>[] =[
         {
@@ -151,7 +152,7 @@ const MemberList = ()=>{
                 setInit((prev)=>prev ? false : prev)
                 return  {data:data.members, success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -207,11 +208,11 @@ const MemberList = ()=>{
             fetchData<BasicResponse<null>>(url,{method,eoTransformKeys:['user_ids','userIds'],eoParams:params,eoBody:(body)}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })}
@@ -299,21 +300,20 @@ const MemberList = ()=>{
             const tmpValueEnum:ColumnFilterItem[]   = [{text:data.department.name, value:data.department.id,children:handleDepartmentListToFilter(data.department.children)}]
             setDepartmentValueEnum(tmpValueEnum)
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }
     
     const changeMemberInfo = (value:string[],entity:MemberTableListItem )=>{
-        //console.log(value)
         return new Promise((resolve, reject) => {
             fetchData<BasicResponse<null>>(`account/role`, {method: 'PUT',eoBody:({roles:value, users:[entity.id]})}).then(response => {
                 const {code, msg} = response
                 if (code === STATUS_CODE.SUCCESS) {
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 } else {
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -323,38 +323,42 @@ const MemberList = ()=>{
         fetchData<BasicResponse<{roles:Array<{id:string,name:string}>}>>('simple/roles', {method: 'GET', eoParams: {group:'system'}}).then(response => {
             const {code, data,msg} = response
             if (code === STATUS_CODE.SUCCESS) {
-                const newCol = [...MEMBER_TABLE_COLUMNS]
-                for(const col of newCol){
-                    if(col.dataIndex === 'roles'){
-                        col.render = (_,entity)=>(
-                            <WithPermission access="system.organization.member.edit">
-                                <Select
-                                    className="w-full"
-                                    mode="multiple"
-                                    value={entity.roles?.map((x:EntityItem)=>x.id)}
-                                    options={data.roles?.map((x:{id:string,name:string})=>({label:$t(x.name), value:x.id}))}
-                                    onChange={(value)=>{
-                                        changeMemberInfo(value,entity ).then((res)=>{
-                                            if(res) manualReloadTable()
-                                        })
-                                    }}
-                                />
-                            </WithPermission>
-                        )
-                        col.filters = data.roles?.map((x:{id:string,name:string})=>({text:x.name, value:x.id}))
-                        col.onFilter = (value: unknown, record:MemberTableListItem) =>{
-                            return record.roles ? record.roles?.map((x)=>x.id).indexOf(value as string) !== -1 : false;}
-                    }
-                }
-                setColumns(newCol)
+                setRoleSelectableList(data.roles)
+              
                 return
             } else {
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
-
-    const translatedCol = useMemo(()=>columns?.map(x=>({...x, title:typeof x.title  === 'string' ? $t(x.title as string) : x.title})), [columns, state.language])
+    
+    const translatedCol = useMemo(
+        ()=> MEMBER_TABLE_COLUMNS.map((x)=>({...x, ...(x.dataIndex === 'roles' ? {
+                    render:(_,entity)=>(
+                        <WithPermission access="system.organization.member.edit">
+                            <Select
+                                className="w-full"
+                                mode="multiple"
+                                value={entity.roles?.map((x:EntityItem)=>x.id)}
+                                options={roleSelectableList?.map((x:{id:string,name:string})=>({label:$t(x.name), value:x.id}))}
+                                onChange={(value)=>{
+                                    changeMemberInfo(value,entity ).then((res)=>{
+                                        if(res) manualReloadTable()
+                                    })
+                                }}
+                            />
+                        </WithPermission>
+                    ),
+                    filters : roleSelectableList?.map((x:{id:string,name:string})=>({text:$t(x.name), value:x.id})),
+                    onFilter : (value: unknown, record:MemberTableListItem) =>{
+                        return record.roles ? record.roles?.map((x)=>x.id).indexOf(value as string) !== -1 : false;}
+                }:{}),  ...(typeof x.title  === 'string' ? { title:$t(x.title as string) } : {}),
+            ...(x.dataIndex === 'enable' ? {
+                valueEnum:new Map([
+                    [true,<span className="text-status_success">{$t('启用')}</span>],
+                    [false,<span className="text-status_fail">{$t('禁用')}</span>],
+                ])} : {})}))
+        , [ state.language,roleSelectableList])
 
     return (
         <>

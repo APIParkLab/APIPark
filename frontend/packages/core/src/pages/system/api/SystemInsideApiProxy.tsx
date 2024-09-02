@@ -1,15 +1,16 @@
 
-import { Form, Input, InputNumber } from "antd";
-import { forwardRef, useEffect, useImperativeHandle } from "react"
+import { Form, Input, InputNumber, Select } from "antd";
+import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react"
 import EditableTableWithModal from "@common/components/aoplatform/EditableTableWithModal";
-import { PROXY_HEADER_CONFIG } from "../../../const/system/const";
+import { PROXY_HEADER_CONFIG, UPSTREAM_PROXY_HEADER_TYPE_OPTIONS } from "../../../const/system/const";
 import { SystemApiProxyType, ProxyHeaderItem, SystemInsideApiProxyHandle, SystemInsideApiProxyProps } from "../../../const/system/type";
 import { PLACEHOLDER, VALIDATE_MESSAGE } from "@common/const/const";
 import { $t } from "@common/locales";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 const SystemInsideApiProxy = forwardRef<SystemInsideApiProxyHandle,SystemInsideApiProxyProps>((props,ref)=>{
-    const {value, onChange, className,initProxyValue} = props
-
+    const {value, onChange, className,initProxyValue,type} = props
+    const {state} = useGlobalContext()
     const [form] = Form.useForm();
     
     useEffect(()=>{
@@ -26,6 +27,14 @@ const SystemInsideApiProxy = forwardRef<SystemInsideApiProxyHandle,SystemInsideA
         form.setFieldsValue(value)
     }, [value,form]);
 
+    const ProxyHeadeerConfig = useMemo(()=>PROXY_HEADER_CONFIG.map((x)=>({
+            ...x, 
+            ...(x.key === 'optType' ? {
+                component: <Select className="w-INPUT_NORMAL" options={UPSTREAM_PROXY_HEADER_TYPE_OPTIONS.map((x)=>({...x, label:$t(x.label)}))}/>
+            } : {})
+        }))
+    ,[state.language])
+
     return (
         <>
         <Form
@@ -34,7 +43,7 @@ const SystemInsideApiProxy = forwardRef<SystemInsideApiProxyHandle,SystemInsideA
             scrollToFirstError
             form={form}
             className={`mx-auto  flex flex-col overflow-hidden h-full ${className}`}
-            name="systemInsideApiProxy"
+            name="SystemInsideApiProxy"
             onValuesChange={(_,allValues)=>{onChange?.(allValues)}}
             autoComplete="off">
 
@@ -42,24 +51,24 @@ const SystemInsideApiProxy = forwardRef<SystemInsideApiProxyHandle,SystemInsideA
                 label={$t("转发上游路径")}
                 name={'path'}
             >
-                <Input  prefix="/" className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                <Input  prefix={type === 'edit' ? null :"/"} className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
             </Form.Item>
 
             <Form.Item<SystemApiProxyType>
                 label={$t("请求超时时间")}
                 name={'timeout'}
                 extra={$t("单位：ms，最小值：1")}
-                rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
+                rules={[{required: true}]}
             >
-                <InputNumber className="w-INPUT_NORMAL"min={1} placeholder={PLACEHOLDER.input} />
+                <InputNumber className="w-INPUT_NORMAL"min={1} placeholder={$t(PLACEHOLDER.input)} />
             </Form.Item>
 
             <Form.Item<SystemApiProxyType>
                 label={$t("重试次数")}
                 name={'retry'}
-                rules={[{required: true, message: VALIDATE_MESSAGE.required}]}
+                rules={[{required: true}]}
             >
-                <InputNumber className="w-INPUT_NORMAL" min={0}  placeholder={PLACEHOLDER.input} />
+                <InputNumber className="w-INPUT_NORMAL" min={0}  placeholder={$t(PLACEHOLDER.input)} />
             </Form.Item>
 
             <Form.Item<SystemApiProxyType>
@@ -67,7 +76,7 @@ const SystemInsideApiProxy = forwardRef<SystemInsideApiProxyHandle,SystemInsideA
                 name={'headers'}
             >
                 <EditableTableWithModal<ProxyHeaderItem & {_id:string}>
-                    configFields={PROXY_HEADER_CONFIG}
+                    configFields={ProxyHeadeerConfig}
                 />
             </Form.Item>
         </Form>

@@ -23,10 +23,8 @@ import { $t } from "@common/locales/index.ts";
 const MemberPage = ()=>{
         const [searchWord, setSearchWord] = useState<string>('')
         const { modal,message } = App.useApp()
-        // const [confirmLoading, setConfirmLoading] = useState(false);
         const navigate = useNavigate()
         const [departmentList, setDepartmentList] = useState<DepartmentListItem[]>([])
-        // const [modalDepartmentList, setModalDepartmentList] = useState<DepartmentListItem[]>([])
         const {fetchData} = useFetch()
         const AddDepRef = useRef<MemberDropdownModalHandle>(null)
         const AddChildRef = useRef<MemberDropdownModalHandle>(null)
@@ -36,7 +34,7 @@ const MemberPage = ()=>{
         const [expandedKeys, setExpandedKeys] = useState<string[]>([])
         const { memberGroupId } = useParams<RouterParams>();
         const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>('-1')
-        const {accessData} = useGlobalContext()
+        const {accessData,state} = useGlobalContext()
         const [refreshMemberCount, setRefreshMemberCount] = useState<number>(0)
     const onSearchWordChange = (e:string)=>{
             setSearchWord(e || '')
@@ -47,11 +45,11 @@ const MemberPage = ()=>{
                 fetchData<BasicResponse<null>>('user/department',{method:'DELETE',eoParams:{id}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             })
@@ -209,7 +207,7 @@ const MemberPage = ()=>{
                     };
                 });
             return loop(departmentList);
-        }, [departmentList,searchWord]);
+        }, [departmentList,searchWord,state.language]);
 
         const getDepartmentList = ()=>{
             fetchData<BasicResponse<{departments:DepartmentListItem[]}>>('user/departments',{method:'GET'}).then(response=>{
@@ -217,7 +215,7 @@ const MemberPage = ()=>{
                 if(code === STATUS_CODE.SUCCESS){
                     setDepartmentList([data.departments])
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
                     return {data:[], success:false}
                 }
             })

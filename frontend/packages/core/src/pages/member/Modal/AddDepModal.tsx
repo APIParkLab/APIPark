@@ -24,11 +24,11 @@ export const AddDepModal = forwardRef<MemberDropdownModalHandle,MemberDropdownMo
                     }),eoTransformKeys:['departmentIds']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -60,17 +60,17 @@ export const AddDepModal = forwardRef<MemberDropdownModalHandle,MemberDropdownMo
                     label={$t("父部门 ID")}
                     name="parent"
                     hidden
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                    rules={[{ required: true,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>}
 
                 <Form.Item<MemberDropdownModalFieldType>
                     label={[type === 'addChild' ? $t('子部门名称') : $t('部门名称')]}
                     name="name"
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                    rules={[{ required: true,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
 
         </Form>

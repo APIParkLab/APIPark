@@ -32,7 +32,7 @@ const LogSettings = ()=>{
                         navigateTo(`/resourcesettings/template/${data.dynamics[0].name}`)
                     }
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         }).finally(()=>setLoading(false))
     }
@@ -49,7 +49,6 @@ const LogSettings = ()=>{
                 undefined,
                 'system.devops.log_configuration.view')
         })
-            console.log(newMenu)
         return newMenu
     },[state.language,menuItems])
 

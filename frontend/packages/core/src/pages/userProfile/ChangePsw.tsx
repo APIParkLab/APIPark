@@ -21,9 +21,9 @@ const ChangePsw= () => {
                 }).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
                     }
                     form.resetFields()
                 }).catch((errorInfo)=> {console.warn(errorInfo)})
@@ -51,7 +51,7 @@ const ChangePsw= () => {
                                     rules={[
                                     {
                                         required: true,
-                                        message: VALIDATE_MESSAGE.required,
+                                        
                                     },
                                     ]}
                                 >
@@ -63,7 +63,7 @@ const ChangePsw= () => {
                                     rules={[
                                     {
                                         required: true,
-                                        message: VALIDATE_MESSAGE.required,
+                                        
                                     },
                                     ]}
                                 >
@@ -77,7 +77,7 @@ const ChangePsw= () => {
                                     rules={[
                                     {
                                         required: true,
-                                        message: VALIDATE_MESSAGE.required,
+                                        
                                     },
                                     ({ getFieldValue }) => ({
                                         validator(_, value) {

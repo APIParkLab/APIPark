@@ -47,7 +47,7 @@ const RoleList = ()=>{
                 if(code === STATUS_CODE.SUCCESS){
                 return  {data:data.roles?.map((x:RoleTableListItem)=>({...x,name:$t(x.name)})), success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -60,11 +60,11 @@ const RoleList = ()=>{
             fetchData<BasicResponse<null>>(`manage/role`,{method:'DELETE',eoParams:{id:entity.id}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -87,7 +87,7 @@ const RoleList = ()=>{
         switch (type){
             case 'delete':
                 title=$t('删除')
-                content=DELETE_TIPS.default
+                content=$t(DELETE_TIPS.default)
                 break;
         }
 
@@ -150,7 +150,7 @@ const RoleList = ()=>{
                     id="global_role"
                     ref={pageListRef}
                     tableClass="role_table "
-                    columns={[...ROLE_TABLE_COLUMNS as PageProColumns<RoleTableListItem, "text">[], ...operation('team')]}
+                    columns={[...columns as PageProColumns<RoleTableListItem, "text">[], ...operation('team')]}
                     request={()=>getRoleList('team')}
                     showPagination={false}
                     addNewBtnTitle={$t("添加角色")}

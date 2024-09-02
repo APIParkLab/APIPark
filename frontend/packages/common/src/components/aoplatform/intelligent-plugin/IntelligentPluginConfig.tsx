@@ -1,4 +1,4 @@
-import {forwardRef, useEffect, useImperativeHandle, useState} from "react";
+import {forwardRef, useEffect, useImperativeHandle, useMemo, useState} from "react";
 import { action } from '@formily/reactive'
 import {
     FormItem,
@@ -45,14 +45,17 @@ import {DefaultOptionType} from "antd/es/cascader";
 import {createSchemaField, FormProvider, RecursionField, useField, useForm} from "@formily/react";
 import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
-import {App} from "antd";
+import {App, Descriptions} from "antd";
 import { $t } from "@common/locales";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
+import { setValidateLanguage } from '@formily/core'
 
 export const DynamicRender = (props) => {
     const {schema} = props
     const field = useField()
     const form = useForm()
     const [renderSchema, setRenderSchema] = useState({})
+    const {state} = useGlobalContext()
    
     useEffect(() => {
         form.clearFormGraph(`${field.address}.*`)
@@ -64,10 +67,39 @@ export const DynamicRender = (props) => {
         }
     }, [form.values.driver])
 
+
+    const  translateSchema = (render) =>{
+        const res1 = {
+            ...render,
+            ...(render.title ? {title:$t(render.title)} : {}),
+            ...(render.description) ? {description:$t(render.description)} : {},
+            ...(render.label ? {label:$t(render.label)} : {}),
+            ...(render.properties ? {properties: Object.keys(render.properties).reduce((total, cur) => {
+                try {
+                    total[cur] = translateSchema(render.properties[cur]);
+                } catch (error) {
+                    console.error(`Error translating schema for property ${cur}:`, error);
+                }
+                return total;
+            }, {})} : {}),
+            ...(render.items && Array.isArray(render.items) ? {items:render.items.map(x=>translateSchema(x))} : {}),
+            ...(render.items && !Array.isArray(render.items) ? {items:translateSchema(render.items)} : {}),
+            ...(render.additionalProperties ? {additionalProperties: translateSchema(render.additionalProperties)} : {}),
+            ...(render.enum ? {enum: render.enum.map(x=>({...x, label:$t(x.label)}))} : {}),
+
+        }
+        return res1
+    }
+
+    const translatedRenderSchema = useMemo(()=>{
+        const res =  renderSchema && translateSchema(renderSchema)
+        return res
+    },[state.language,renderSchema])
+
     return (
         <RecursionField
             basePath={field.address}
-            schema={renderSchema}
+            schema={translatedRenderSchema}
             onlyRenderProperties
         />
     )
@@ -141,6 +173,11 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
     const {fetchData} = useFetch()
     const form = createForm({ validateFirst: type === 'edit' })
     form.setInitialValues(initFormValue || {})
+    const { state } = useGlobalContext()
+
+    useEffect(()=>{
+        setValidateLanguage(state.language === 'cn' ? 'zh-CN' : 'en-US')
+    },[state.language])
 
     const pluginEditSchema = {
         type: 'object',
@@ -167,7 +204,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                     },
                     'x-component': 'Input',
                     'x-component-props': {
-                        placeholder: PLACEHOLDER.specialStartWithAlphabet,
+                        placeholder: $t(PLACEHOLDER.specialStartWithAlphabet),
                     },
                     'x-disabled': type === 'edit'
                 },
@@ -183,7 +220,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                     },
                     'x-component': 'Input',
                     'x-component-props': {
-                        placeholder: PLACEHOLDER.input,
+                        placeholder: $t(PLACEHOLDER.input),
                     }
                 },
                 driver: {
@@ -214,7 +251,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                     },
                     'x-component': 'Input.TextArea',
                     'x-component-props': {
-                        placeholder: PLACEHOLDER.input,
+                        placeholder: $t(PLACEHOLDER.input),
                     }
                 },
                 config: {
@@ -236,11 +273,11 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                 fetchData<BasicResponse<null>>(type === 'add'?`dynamic/${moduleId}`:`dynamic/${moduleId}/config`,{method:type === 'add'? 'POST' : 'PUT',eoBody:form.values, eoParams:{...(type !== 'add' && {id:initFormValue.id})}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo:unknown)=> reject(errorInfo))
@@ -260,8 +297,8 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
                 if(code === STATUS_CODE.SUCCESS){
                     resolve(data[skill]?.map((x:{name:string,title:string})=>{return{label:x.title, value:x.name}}) || [])
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             })
         })
@@ -280,7 +317,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
         }
     return (
         <div  className="pl-[12px]">
-            <FormProvider form={form}>
+            <FormProvider form={form} >
                 <SchemaField
                     schema={pluginEditSchema}
                     scope={{ useAsyncDataSource, getSkillData, form }}
