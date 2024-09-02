@@ -35,36 +35,43 @@ func init() {
 	commit.InitCommitWithKeyService[DocCommit]("service", "api_doc")
 }
 
+const (
+	openAPIv3 = "v3"
+	openAPIv2 = "v2"
+)
+
 var (
-	loader = openapi3.NewLoader()
+	openapi3Loader = openapi3.NewLoader()
 )
 
 type DocLoader struct {
-	doc *openapi3.T
+	openAPI3Doc *openapi3.T
+	version     string
 }
 
 func NewDocLoader(content string) (*DocLoader, error) {
-	doc, err := loader.LoadFromData([]byte(content))
+	doc, err := openapi3Loader.LoadFromData([]byte(content))
 	if err != nil {
-		return nil, fmt.Errorf("load doc error:%v", err)
+		return nil, fmt.Errorf("load openAPI3Doc error:%v", err)
 	}
-	return &DocLoader{doc: doc}, nil
+
+	return &DocLoader{openAPI3Doc: doc}, nil
 }
 
 func (d *DocLoader) Valid() error {
-	if d.doc == nil {
-		return fmt.Errorf("doc is nil")
+	if d.openAPI3Doc == nil {
+		return fmt.Errorf("openAPI3Doc is nil")
 	}
 
-	return d.doc.Validate(loader.Context)
+	return d.openAPI3Doc.Validate(openapi3Loader.Context)
 }
 
 func (d *DocLoader) APICount() int64 {
-	if d.doc == nil || d.doc.Paths == nil {
+	if d.openAPI3Doc == nil || d.openAPI3Doc.Paths == nil {
 		return 0
 	}
 	var count int64
-	for _, item := range d.doc.Paths.Map() {
+	for _, item := range d.openAPI3Doc.Paths.Map() {
 		if item.Get != nil {
 			count++
 		}
