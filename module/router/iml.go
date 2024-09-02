@@ -163,6 +163,9 @@ func (i *imlRouterModule) Search(ctx context.Context, keyword string, serviceId 
 	if err != nil {
 		return nil, err
 	}
+	if len(list) == 0 {
+		return []*router_dto.Item{}, nil
+	}
 	apiInfos, err := i.apiService.ListInfo(ctx, utils.SliceToSlice(list, func(s *api.API) string {
 		return s.UUID
 	})...)
