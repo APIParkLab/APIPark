@@ -215,9 +215,9 @@ export const ApprovalStatusColorClass = {
 export const ApprovalRouteColumns = [
     {
         title:('请求方式'),
-        dataIndex:'method',
+        dataIndex:'methods',
         ellipsis:true,
-        renderText:(value)=>value.join(',')
+        render:(value)=>value?.join(', ')
     },
     {
         title:('路径'),

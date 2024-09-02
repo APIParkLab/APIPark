@@ -25,7 +25,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
     const onFinish = ()=>{
         return Promise.all([proxyRef.current?.validate?.(), form.validateFields()]).then(([,formValue])=>{
             const body = {...formValue,path:formValue.path.trim(),proxy:{...formValue.proxy,path:formValue.proxy.path ? (formValue.proxy.path.startsWith('/')? formValue.proxy.path: '/'+ formValue.proxy.path) : undefined}}
-            return fetchData<BasicResponse<null>>('service/router',{method: type === 'add' ? 'POST' : 'PUT',eoBody:(body), eoParams: {service:serviceId,team:teamId, ...(type === 'edit' ? {router:entity?.id}: {})},eoTransformKeys:['matchType','isDisable']}).then(response=>{
+            return fetchData<BasicResponse<null>>('service/router',{method: type === 'add' ? 'POST' : 'PUT',eoBody:(body), eoParams: {service:serviceId,team:teamId, ...(type === 'edit' ? {router:entity?.id}: {})},eoTransformKeys:['matchType','disable']}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
                     message.success(msg || $t(RESPONSE_TIPS.success))
@@ -63,11 +63,11 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
 
     const getRouterConfig = ()=>{
         setLoading(true)
-        fetchData<BasicResponse<{router:SystemApiProxyFieldType}>>('service/router/detail',{method:'GET',eoParams:{service:serviceId,team:teamId, router:entity!.id}}).then(response=>{
+        fetchData<BasicResponse<{router:SystemApiProxyFieldType}>>('service/router/detail',{method:'GET',eoParams:{service:serviceId,team:teamId, router:entity!.id}, eoTransformKeys:['create_time','update_time','match_type','upstream_id','opt_type']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                const {isDisable, protocols, path, method, description, match, proxy} = data.router
-                form.setFieldsValue({isDisable, protocols, path, method, description, match,proxy
+                const {disable, protocols, path, methods, description, match, proxy} = data.router
+                form.setFieldsValue({disable, protocols, path, methods, description, match,proxy
                 })
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
@@ -85,7 +85,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
                 form.setFieldValue('prefix',apiPrefix)
                 form.setFieldValue(['proxy','timeout'],10000)
                 form.setFieldValue(['proxy','retry'],0)
-                form.setFieldValue('protocols',['http','https'])
+                form.setFieldValue('protocols',['HTTP','HTTPS'])
                 break;
             case 'copy':
                 // form.setFieldsValue({
@@ -134,7 +134,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
                         <Row className="mb-btnybase" > <Col  ><span className="font-bold mr-[13px]">{$t('API 基础信息')}</span></Col></Row>
                         <Form.Item<SystemApiProxyFieldType>
                             label={$t("拦截该接口的请求")}
-                            name="isDisable"
+                            name="disable"
                             extra={$t('开启拦截后，网关会拦截所有该路径的请求，相当于防火墙禁用了特定路径的访问。')}
                         >
                             <Switch  />
@@ -158,13 +158,13 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
                             }]}
                             className={styles['form-input-group']}
                         >
-                            <Input  prefix={(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
+                            <Input  prefix={type === 'edit' ? null :(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
                                 placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
 
                         <Form.Item<SystemApiProxyFieldType>
                             label={$t("请求方式")}
-                            name="method"
+                            name="methods"
                             rules={[{ required: true }]}
                         >
                             <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} mode="multiple" options={HTTP_METHOD.map((method:string)=>{
@@ -197,7 +197,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
                             className="mb-0 bg-transparent border-none p-0"
                             name="proxy"
                         >
-                            <SystemInsideApiProxy serviceId={serviceId!} teamId={teamId!} ref={proxyRef} />
+                            <SystemInsideApiProxy type={type} serviceId={serviceId!} teamId={teamId!} ref={proxyRef} />
                         </Form.Item>
                         </>}
                         </div>
