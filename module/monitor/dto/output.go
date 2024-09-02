@@ -132,3 +132,9 @@ type MonitorConfig struct {
 	Driver string                 `json:"driver"`
 	Config map[string]interface{} `json:"config"`
 }
+
+type MonitorCluster struct {
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Enable bool   `json:"enable"`
+}

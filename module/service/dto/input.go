@@ -8,7 +8,7 @@ type CreateService struct {
 	ServiceType string   `json:"service_type"`
 	Logo        string   `json:"logo"`
 	Tags        []string `json:"tags"`
-	Catalogue   string   `json:"catalogue" aocheck:"catalogue"`
+	Catalogue   string   `json:"catalogue"`
 	AsApp       *bool    `json:"as_app"`
 	AsServer    *bool    `json:"as_server"`
 }
@@ -17,7 +17,7 @@ type EditService struct {
 	Name        *string   `json:"name"`
 	Description *string   `json:"description"`
 	ServiceType *string   `json:"service_type"`
-	Catalogue   *string   `json:"catalogue" aocheck:"catalogue"`
+	Catalogue   *string   `json:"catalogue"`
 	Logo        *string   `json:"logo"`
 	Tags        *[]string `json:"tags"`
 }

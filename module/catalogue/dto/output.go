@@ -25,7 +25,8 @@ type ServiceDetail struct {
 	Description string        `json:"description"`
 	Document    string        `json:"document"`
 	Basic       *ServiceBasic `json:"basic"`
-	Apis        []*ServiceApi `json:"apis"`
+	//Apis        []*ServiceApi `json:"apis"`
+	APIDoc string `json:"api_doc"`
 }
 
 type ServiceBasic struct {
@@ -60,4 +61,18 @@ type Partition struct {
 	Id     string `json:"id"`
 	Name   string `json:"name"`
 	Prefix string `json:"prefix"`
+}
+
+type Catalogue struct {
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Parent string `json:"parent"`
+	Sort   int    `json:"sort"`
+}
+
+type ExportCatalogue struct {
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Parent string `json:"parent"`
+	Sort   int    `json:"sort"`
 }

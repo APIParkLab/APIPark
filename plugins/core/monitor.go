@@ -15,5 +15,6 @@ func (p *plugin) monitorStatisticApis() []pm3.Api {
 
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/monitor/config", []string{"context", "body"}, []string{"info"}, p.monitorConfigController.SaveMonitorConfig),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/monitor/config", []string{"context"}, []string{"info"}, p.monitorConfigController.GetMonitorConfig),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/monitor/clusters", []string{"context"}, []string{"clusters"}, p.monitorConfigController.GetMonitorCluster),
 	}
 }

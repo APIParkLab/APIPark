@@ -2,14 +2,15 @@ package application_authorization
 
 import (
 	"context"
+	"github.com/APIParkLab/APIPark/module/system"
 	"reflect"
-	
+
 	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
-	
+
 	"github.com/eolinker/go-common/autowire"
-	
+
 	_ "github.com/APIParkLab/APIPark/module/application-authorization/auth-driver/aksk"
 	_ "github.com/APIParkLab/APIPark/module/application-authorization/auth-driver/apikey"
 	_ "github.com/APIParkLab/APIPark/module/application-authorization/auth-driver/basic"
@@ -30,12 +31,21 @@ type IAuthorizationModule interface {
 	Detail(ctx context.Context, appId string, aid string) ([]application_authorization_dto.DetailItem, error)
 	// Info 获取项目鉴权详情
 	Info(ctx context.Context, appId string, aid string) (*application_authorization_dto.Authorization, error)
+	//ExportAll(ctx context.Context) ([]*application_authorization_dto.ExportAuthorization, error)
+}
+
+type IExportAuthorizationModule interface {
+	system.IExportModule[application_authorization_dto.ExportAuthorization]
 }
 
 func init() {
+	authModule := new(imlAuthorizationModule)
 	autowire.Auto[IAuthorizationModule](func() reflect.Value {
-		m := new(imlAuthorizationModule)
-		gateway.RegisterInitHandleFunc(m.initGateway)
-		return reflect.ValueOf(m)
+		gateway.RegisterInitHandleFunc(authModule.initGateway)
+		return reflect.ValueOf(authModule)
+	})
+
+	autowire.Auto[IExportAuthorizationModule](func() reflect.Value {
+		return reflect.ValueOf(authModule)
 	})
 }

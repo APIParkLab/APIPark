@@ -409,3 +409,31 @@ func (m *imlMonitorConfig) GetMonitorConfig(ctx context.Context) (*monitor_dto.M
 	}, nil
 	return nil, nil
 }
+
+func (m *imlMonitorConfig) GetMonitorCluster(ctx context.Context) ([]*monitor_dto.MonitorCluster, error) {
+	clusters, err := m.clusterService.ListByClusters(ctx)
+	if err != nil {
+		return nil, err
+	}
+	clusterIds := utils.SliceToSlice(clusters, func(i *cluster.Cluster) string {
+		return i.Uuid
+	})
+	monitorMap, err := m.monitorService.MapByCluster(ctx, clusterIds...)
+	if err != nil {
+		return nil, err
+	}
+
+	monitorClusters := make([]*monitor_dto.MonitorCluster, 0, len(clusters))
+	for _, c := range clusters {
+		mc := &monitor_dto.MonitorCluster{
+			Id:   c.Uuid,
+			Name: c.Name,
+		}
+		_, ok := monitorMap[c.Uuid]
+		if ok {
+			mc.Enable = true
+		}
+		monitorClusters = append(monitorClusters, mc)
+	}
+	return monitorClusters, nil
+}

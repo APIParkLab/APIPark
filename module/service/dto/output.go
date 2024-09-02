@@ -113,3 +113,23 @@ type ServiceDoc struct {
 	Updater    auto.Label     `json:"updater" aolabel:"user"`
 	UpdateTime auto.TimeLabel `json:"update_time"`
 }
+
+type ExportService struct {
+	Id          string   `json:"id"`
+	Name        string   `json:"name"`
+	Prefix      string   `json:"prefix,omitempty"`
+	Description string   `json:"description"`
+	Team        string   `json:"team"`
+	ServiceType string   `json:"service_type"`
+	Catalogue   string   `json:"catalogue"`
+	Tags        []string `json:"tags"`
+	Logo        string   `json:"logo"`
+	Doc         string   `json:"doc"`
+}
+
+type ExportApp struct {
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Team        string `json:"team"`
+}

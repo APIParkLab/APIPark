@@ -8,7 +8,7 @@ type Item struct {
 	UUID       string
 	Name       string
 	Type       string
-	Project    string
+	Service    string
 	Team       string
 	Creator    string
 	Updater    string
@@ -24,10 +24,9 @@ type Upstream struct {
 type SaveUpstream struct {
 	UUID    string
 	Name    string
-	Project string
+	Service string
 	Team    string
-	//Type       string
-	Remark string
+	Remark  string
 }
 
 type ProxyHeader struct {
