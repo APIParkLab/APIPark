@@ -672,5 +672,6 @@
     "K6d9dd1f5": "Replace File",
     "K71753476": "Allow Access",
     "K597435c5": "Runtime",
-    "Kde9d6e8e": "When interception is enabled, the gateway will block all traffic of this API path."
+    "Kde9d6e8e": "When interception is enabled, the gateway will block all traffic of this API path.",
+    "K4758140d": "Routes"
   }
