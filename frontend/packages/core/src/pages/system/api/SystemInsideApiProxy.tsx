@@ -9,7 +9,7 @@ import { $t } from "@common/locales";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 const SystemInsideApiProxy = forwardRef<SystemInsideApiProxyHandle,SystemInsideApiProxyProps>((props,ref)=>{
-    const {value, onChange, className,initProxyValue} = props
+    const {value, onChange, className,initProxyValue,type} = props
     const {state} = useGlobalContext()
     const [form] = Form.useForm();
     
@@ -51,7 +51,7 @@ const SystemInsideApiProxy = forwardRef<SystemInsideApiProxyHandle,SystemInsideA
                 label={$t("转发上游路径")}
                 name={'path'}
             >
-                <Input  prefix="/" className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
+                <Input  prefix={type === 'edit' ? null :"/"} className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
             </Form.Item>
 
             <Form.Item<SystemApiProxyType>

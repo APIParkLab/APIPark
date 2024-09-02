@@ -46,7 +46,7 @@ const SystemInsideRouterList:FC = ()=>{
             });
         }
 
-        return fetchData<BasicResponse<{routers:SystemApiTableListItem}>>('service/routers',{method:'GET',eoParams:{service:serviceId,team:teamId, keyword:searchWord},eoTransformKeys:['request_path','create_time','update_time','is_disable']}).then(response=>{
+        return fetchData<BasicResponse<{routers:SystemApiTableListItem}>>('service/routers',{method:'GET',eoParams:{service:serviceId,team:teamId, keyword:searchWord},eoTransformKeys:['request_path','create_time','update_time','disable']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setTableListDataSource(data.routers)
@@ -171,7 +171,7 @@ const SystemInsideRouterList:FC = ()=>{
                 x.valueEnum = tmpValueEnum
             }
             
-            if(x.filters &&((x.dataIndex as string[])?.indexOf('isDisabled') !== -1) ){
+            if(x.filters &&((x.dataIndex as string[])?.indexOf('disable') !== -1) ){
                 x.valueEnum = {
                     true:{text:<span className="text-status_fail">{$t('拦截')}</span>},
                     false:{text:<span className="text-status_success">{$t('放行')}</span>}
@@ -201,7 +201,7 @@ const SystemInsideRouterList:FC = ()=>{
                 request={()=>getRoutesList()}
                 dataSource={tableListDataSource}
                 addNewBtnTitle={$t('添加路由')}
-                searchPlaceholder={$t('输入名称、URL 查找路由')}
+                searchPlaceholder={$t('输入 URL 查找路由')}
                 onAddNewBtnClick={()=>{openDrawer('add')}}
                 addNewBtnAccess="team.service.router.add"
                 tableClickAccess="team.service.router.view"
