@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { $t } from "@common/locales";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 type PermissionItem = {
     name:string 
@@ -40,6 +41,7 @@ type PermissionInfo = {
 
 const PermissionContent = ({permits,onChange,value=[],id,dependenciesMap}:{permits:PermissionClassify[],dependenciesMap:DependenciesMapType,value:string[],id:string, onChange?: (value:string[]) => void;})=>{
             
+    
     const onSingleCheckboxChange: GetProp<typeof Checkbox, 'onChange'> = (e) => {
         if(e.target.checked){
             onChange?.(Array.from(new Set([...value, e.target.id, ...(dependenciesMap?.get(e.target.id!)?.dependents || [])] as string[])))
@@ -55,9 +57,9 @@ const PermissionContent = ({permits,onChange,value=[],id,dependenciesMap}:{permi
             permits.map((item:PermissionClassify)=>(
                 <>
                     <div className="flex flex-col gap-btnbase" key={`group-${item.name}`}>
-                        {item.cname !== '' && <p className="">{item.cname}</p>}
+                        {item.cname !== '' && <p className="">{$t(item.cname)}</p>}
                         <div className=" pl-[20px]">
-                            {item.children.map(x=><Checkbox id={x.value} key={x.value} checked={value && value.length > 0 && value.indexOf(x.value)>-1} onChange={onSingleCheckboxChange}>{x.cname}</Checkbox>)}
+                            {item.children.map(x=><Checkbox id={x.value} key={x.value} checked={value && value.length > 0 && value.indexOf(x.value)>-1} onChange={onSingleCheckboxChange}>{$t(x.cname)}</Checkbox>)}
                         </div>
                     </div>
                 </>
@@ -69,15 +71,16 @@ const PermissionContent = ({permits,onChange,value=[],id,dependenciesMap}:{permi
     const PermissionCollapse:React.FC<PermissionCollapseProps>  = (props)=>{
         const { id, value = [], onChange,permissionTemplate ,dependenciesMap} = props;
         const [openCollapses, setOpenCollapses] = useState<string[]>([])
+        const {state} = useGlobalContext()
         
         const items = useMemo(()=>{
             const generatePermissionItem = (permissionItem:RolePermissionItem[])=> permissionItem.map((item:RolePermissionItem)=>({
                         key:item.name,
-                        label:item.cname,
+                        label:$t(item.cname),
                         children:<PermissionContent value={value} permits={item.children} onChange={(e)=>onChange?.(e)} id={id!} dependenciesMap={dependenciesMap!}/>
                     }))
             return  permissionTemplate && permissionTemplate.length > 0 ? generatePermissionItem(permissionTemplate) : []
-        },[permissionTemplate,value])
+        },[permissionTemplate,value,state.language])
 
         useEffect(()=>{
             permissionTemplate && setOpenCollapses(permissionTemplate?.map(x=>x.name))
@@ -100,7 +103,8 @@ const RoleConfig = ()=>{
     const [permissionTemplate, setPermissionTemplate] = useState<RolePermissionItem[]>()
     const [dependenciesMap, setDependenciesMap] = useState<DependenciesMapType>()
     const APP_MODE = import.meta.env.VITE_APP_MODE;
-
+    const [permissionInfo, setPermissionInfo] = useState<PermissionInfo>()
+    const { state } = useGlobalContext()
 
     const generateDependenciesMap = (data:RolePermissionItem[])=>{
         const map = new Map<string, {dependents:string[], control:string[]}>()
@@ -152,7 +156,7 @@ const RoleConfig = ()=>{
                 generateDependenciesMap(newPermits)
                 setPermissionTemplate(newPermits)
             }else{
-                message.error(msg || RESPONSE_TIPS.dataError)
+                message.error(msg || $t(RESPONSE_TIPS.dataError))
             }
         })
     }
@@ -161,14 +165,16 @@ const RoleConfig = ()=>{
         fetchData<BasicResponse<{role:PermissionInfo}>>(`${roleType}/role`,{method:'GET',eoParams:{role:roleId}}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                form.setFieldsValue({name:data.role.name,permits:data.role.permit})
-                return Promise.resolve(true)
+                setPermissionInfo(data.role)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
-                return Promise.reject(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
-        }).catch((errInfo)=>Promise.reject(errInfo))
+        }).catch((errInfo)=>console.error(errInfo))
     }
+
+    useEffect(()=>{
+        form.setFieldsValue({name:$t(permissionInfo?.name || ''),permits:permissionInfo?.permit})
+    },[permissionInfo, state.language])
 
     useEffect(() => {
         getPermissionTemplate()
@@ -184,18 +190,18 @@ const RoleConfig = ()=>{
             return fetchData<BasicResponse<null>>(`${roleType}/role`,{method:roleId === undefined? 'POST' : 'PUT',eoBody:({...body}),...(roleId !== undefined?{eoParams:{role:roleId}}:{})}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     return Promise.resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    return Promise.reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    return Promise.reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errInfo)=>Promise.reject(errInfo))
     };
 
     return  (<div className="h-full flex flex-col overflow-hidden ">
                 <div className="text-[18px] leading-[25px] pb-[12px]">
-                        <Button className="flex items-center" type="text" onClick={()=>navigateTo(-1)}><ArrowLeftOutlined className="max-h-[14px]" /><span>返回</span></Button>
+                        <Button className="flex items-center" type="text" onClick={()=>navigateTo(-1)}><ArrowLeftOutlined className="max-h-[14px]" /><span>{$t('返回')}</span></Button>
                 </div>
             <WithPermission access={roleId !== undefined  ? `system.organization.role.${roleType}.edit`: `system.organization.role.${roleType}.add`}>
                 <Form
@@ -213,9 +219,9 @@ const RoleConfig = ()=>{
                     <Form.Item
                         className=" m-btnbase  mr-PAGE_INSIDE_X"
                         name="name"
-                        rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                        rules={[{ required: true,whitespace:true  }]}
                     >
-                        <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                        <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                     </Form.Item>
                     <Form.Item
                         name="permits"

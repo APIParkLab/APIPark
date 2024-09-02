@@ -24,7 +24,7 @@ const SystemInsideSubscriber:FC = ()=>{
     const {serviceId, teamId} = useParams<RouterParams>()
     const addRef = useRef<SystemSubscriberConfigHandle>(null)
     const pageListRef = useRef<ActionType>(null);
-    const [memberValueEnum, setMemberValueEnum] = useState<{[k:string]:{text:string}}>({})
+    const [memberValueEnum, setMemberValueEnum] = useState<SimpleMemberItem[]>([])
     const {accessData,state} = useGlobalContext()
     const getSystemSubscriber = ()=>{
         return fetchData<BasicResponse<{subscribers:SystemSubscriberTableListItem[]}>>('service/subscribers',{method:'GET',eoParams:{service:serviceId,team:teamId},eoTransformKeys:['apply_time']}).then(response=>{
@@ -32,7 +32,7 @@ const SystemInsideSubscriber:FC = ()=>{
             if(code === STATUS_CODE.SUCCESS){
                 return  {data:data.subscribers, success: true}
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}
             }
         }).catch(() => {
@@ -41,16 +41,12 @@ const SystemInsideSubscriber:FC = ()=>{
     }
 
     const getMemberList = async ()=>{
-        setMemberValueEnum({})
+        setMemberValueEnum([])
         const {code,data,msg}  = await fetchData<BasicResponse<{ members: SimpleMemberItem[] }>>('simple/member',{method:'GET'})
         if(code === STATUS_CODE.SUCCESS){
-            const tmpValueEnum:{[k:string]:{text:string}} = {}
-            data.members?.forEach((x:SimpleMemberItem)=>{
-                tmpValueEnum[x.name] = {text:x.name}
-            })
-            setMemberValueEnum(tmpValueEnum)
+            setMemberValueEnum(data.members)
         }else{
-            message.error(msg || RESPONSE_TIPS.error)
+            message.error(msg || $t(RESPONSE_TIPS.error))
         }
     }
 
@@ -63,11 +59,11 @@ const SystemInsideSubscriber:FC = ()=>{
             fetchData<BasicResponse<null>>('service/subscriber',{method:'DELETE',eoParams:{application:entity!.id,service:entity!.service.id,team:teamId}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -83,7 +79,7 @@ const SystemInsideSubscriber:FC = ()=>{
                 break;
             case 'delete':
                 title=$t('删除')
-                content=DELETE_TIPS.default
+                content=$t(DELETE_TIPS.default)
                 break;
         }
 
@@ -136,7 +132,24 @@ const SystemInsideSubscriber:FC = ()=>{
     }, [serviceId]);
 
     const columns = useMemo(()=>{
-        return SYSTEM_SUBSCRIBER_TABLE_COLUMNS.map(x=>{if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){x.valueEnum = memberValueEnum} return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+        return [...SYSTEM_SUBSCRIBER_TABLE_COLUMNS].map(x=>{
+            if(x.filters &&((x.dataIndex as string[])?.indexOf('applier') !== -1 || (x.dataIndex as string[])?.indexOf('approver') !== -1) ){
+                const tmpValueEnum:{[k:string]:{text:string}} = {}
+                memberValueEnum?.forEach((x:SimpleMemberItem)=>{
+                    tmpValueEnum[x.name] = {text:x.name}
+                })
+                x.valueEnum = tmpValueEnum
+            }
+            if(x.dataIndex === 'from'){
+                x.valueEnum = new Map([
+                    [0,<span>{$t('手动添加')}</span>],
+                    [1,<span>{$t('订阅申请')}</span>],
+                ])
+            }
+            return {
+                ...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}
+            }
+        )
     },[memberValueEnum,state.language])
 
     return (
@@ -169,11 +182,11 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
                 fetchData<BasicResponse<null>>('service/subscriber',{method:'POST',eoBody:({...value}), eoParams:{service:serviceId,team:teamId}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 })
             }).catch((errorInfo)=> reject(errorInfo))
@@ -216,7 +229,7 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
                 });
                 setSystemOptionList(Array.from(teamMap.values()))
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -239,13 +252,13 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
             <Form.Item<SystemSubscriberConfigFieldType>
                 label={$t("订阅方")}
                 name="application"
-                rules={[{ required: true, message: VALIDATE_MESSAGE.required }]}
+                rules={[{ required: true }]}
             >
                 <TreeSelect
                     className="w-INPUT_NORMAL" 
                     dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                     treeData={systemOptionList}
-                    placeholder={PLACEHOLDER.input}
+                    placeholder={$t(PLACEHOLDER.input)}
                     treeDefaultExpandAll
                 />
             </Form.Item>

@@ -1,4 +1,3 @@
-import { $t } from "@common/locales"
 
 const CODE_LANG =  [
   {
@@ -70,7 +69,7 @@ const CODE_LANG =  [
     ]
   },
   {
-    label: $t('微信小程序'),
+    label: '微信小程序',
     value: 21
   },
   // {

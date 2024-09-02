@@ -70,7 +70,7 @@ const TeamInsidePage:FC = ()=> {
             if(code === STATUS_CODE.SUCCESS){
                 setTeamInfo?.(data.team)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }

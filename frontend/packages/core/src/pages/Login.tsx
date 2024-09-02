@@ -65,7 +65,7 @@ const Login:FC = ()=> {
 
             if (code === STATUS_CODE.SUCCESS) {
                 dispatch({type:'LOGIN'})
-                // message.success(RESPONSE_TIPS.loginSuccess);
+                // message.success($t(RESPONSE_TIPS.loginSuccess));
                 const callbackUrl = new URLSearchParams(window.location.search).get('callbackUrl');
                 if (callbackUrl && callbackUrl !== 'null') {
                     navigate(callbackUrl);
@@ -102,7 +102,7 @@ const Login:FC = ()=> {
      return (
          <div className="h-full w-full flex flex-col bg-[#f5f7fa] items-center overflow-auto min-h-[490px]">
             <div className="w-full text-right pr-[40px]"><LanguageSetting mode="dark"/></div>
-             <div className="w-[410px] mx-auto">
+             <div className="w-[410px] mx-auto flex-1 flex flex-col items-center justify-center" >
                  <div className="mx-auto">
                     <span className="flex items-center justify-center">
                       <img

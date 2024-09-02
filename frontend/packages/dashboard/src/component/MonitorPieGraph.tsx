@@ -30,6 +30,10 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
   const option: EChartsOption = useMemo(()=>({
     tooltip: {
       trigger: 'item',
+      formatter: (params:Array<Record<string,unknown>>) => {
+        const startHtml = '<div><section style="align-items: center;display:flex; justify-content: space-between;flex-wrap: nowrap;"><span> ' + $t(title) + '</span></div>'
+        return startHtml + ($t(params.name || '-')  + '&nbsp&nbsp&nbsp </span><span style="font-weight:bold"> ' + params.value + '</span></section></div>')
+      }
     },
     title: [
       {
@@ -54,7 +58,7 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
         right: '10',
         orient: 'vertical',
         formatter: (name) => {
-          return `{title|${$t(name)}}{percent|${changeNumberUnit(pieData[name]) || '0'}}`;
+          return `{title|${$t(name)}}{percent|${changeNumberUnit(pieData[name]).value ? (changeNumberUnit(pieData[name]).value + $t(changeNumberUnit(pieData[name]).unit)) : '0'}}`;
         },
         textStyle: {
           rich: {
@@ -102,13 +106,13 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
               <li className="text-[#999999] mt-[16px]">
                 {$t('状态码4XX数')}
                 <span className="text-[#999999] inline-block w-[50px] ml-[10px] text-right">
-                  {changeNumberUnit(status4xxCount)}
-                </span>
+                  {changeNumberUnit(status4xxCount).value + $t(changeNumberUnit(status4xxCount).unit)}
+                  </span>
               </li>
               <li className="text-[#999999]  mt-[18px]">
                 {$t('状态码5XX数')}
                 <span className="text-[#999999] inline-block w-[50px] ml-[10px] text-right">
-                  {changeNumberUnit(status5xxCount)}
+                  {changeNumberUnit(status5xxCount).value + $t(changeNumberUnit(status5xxCount).unit)}
                 </span>
               </li>
             </ul>

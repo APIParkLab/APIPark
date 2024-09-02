@@ -1,12 +1,15 @@
-import {App, Col, Form, Input, Row, Table} from "antd";
-import {forwardRef, useEffect, useImperativeHandle} from "react";
+import {App, Col, Form, Input, Row, Table, Tooltip} from "antd";
+import {forwardRef, useEffect, useImperativeHandle, useMemo} from "react";
 import {PublishApprovalInfoType, PublishApprovalModalHandle, PublishApprovalModalProps, PublishVersionTableListItem} from "@common/const/approval/type.tsx";
 import {useFetch} from "@common/hooks/http.ts";
-import {BasicResponse, FORM_ERROR_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
+import {BasicResponse, FORM_ERROR_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, STATUS_COLOR, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { SYSTEM_PUBLISH_ONLINE_COLUMNS } from "@core/const/system/const.tsx";
 import { $t } from "@common/locales";
-import { ApprovalApiColumns, ApprovalUpstreamColumns } from "@common/const/approval/const";
+import { ApprovalRouteColumns, ApprovalStatusColorClass, ApprovalUpstreamColumns, ChangeTypeEnum } from "@common/const/approval/const";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
+import { LoadingOutlined } from "@ant-design/icons";
+import { SystemInsidePublishOnlineItems } from "@core/pages/system/publish/SystemInsidePublishOnline";
 
 
 export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle,PublishApprovalModalProps>((props, ref) => {
@@ -14,6 +17,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
     const { type,data,insideSystem = false,serviceId, teamId} = props
     const [form] = Form.useForm();
     const {fetchData} = useFetch()
+    const {state} = useGlobalContext()
 
     const save:(operate:'pass'|'refuse')=>Promise<boolean | string> =  (operate)=>{
             if(type === 'view'){
@@ -22,19 +26,19 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
             return form.validateFields().then((value)=>{
                 if(operate === 'refuse' && form.getFieldValue('opinion') === '' ){
                     form.setFields([{
-                        name:'opinion',errors:[FORM_ERROR_TIPS.refuseOpinion]
+                        name:'opinion',errors:[$t(FORM_ERROR_TIPS.refuseOpinion)]
                     }])
                     form.scrollToField('opinion')
-                    return Promise.reject(RESPONSE_TIPS.refuseOpinion)
+                    return Promise.reject($t(RESPONSE_TIPS.refuseOpinion))
                 }
                 return fetchData<BasicResponse<null>>(`service/publish/${operate === 'pass' ? 'accept' : 'refuse'}`,{method: 'PUT',eoBody:({comments:value.opinion}), eoParams:{id:data!.id, project:serviceId},eoTransformKeys:['versionRemark']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         return Promise.resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        return Promise.reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        return Promise.reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> Promise.reject(errorInfo))
             }).catch((err)=> {form.scrollToField(err.errorFields[0].name[0]); return Promise.reject(err)})
@@ -48,11 +52,11 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                     notSave ? 'service/publish/apply' : 'service/publish/release/do',{method: 'POST',eoBody:body, eoParams:{service:serviceId, team:teamId},eoTransformKeys:['versionRemark']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(response)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
             }).catch((errorInfo)=> reject(errorInfo))
         }).catch((errorInfo)=> reject(errorInfo))
@@ -65,11 +69,11 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                 fetchData<BasicResponse<null>>('service/publish/execute',{method: 'PUT', eoParams:{project:serviceId,id:(data as PublishVersionTableListItem).flowId},eoTransformKeys:['versionRemark']}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         }).catch((errorInfo)=> reject(errorInfo))
@@ -86,6 +90,55 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
     useEffect(()=>{
         form.setFieldsValue({ opinion:'',...data})
     },[])
+
+    const translatedUpstreamColumns = useMemo(()=>ApprovalUpstreamColumns.map((x)=>({
+        ...x, 
+        ...(x.dataIndex  === 'type' ? {valueEnum:{
+            'static':{
+                text:$t('静态上游')
+            }
+        }}:{}),
+        ...(x.dataIndex === 'change' ? {
+            render:(_,entity)=>(
+                <Tooltip placement="top" title={entity.change === 'error' ? $t('该 API 缺失(0)(1)(2)请先补充',[entity.proxyStatus == 1 && $t('转发信息,'),entity.docStatus == 1 && $t('文档信息,'),entity.upstreamStatus == 1 && $t('上游信息,')]):''}>
+                    <span className={`${ApprovalStatusColorClass[entity.change as keyof typeof ApprovalStatusColorClass]} truncate block`}>{$t(ChangeTypeEnum[entity.change as (keyof typeof ChangeTypeEnum)] || '-')}
+                    {entity.change === 'error' ?$t('该 API 缺失(0)(1)(2)请先补充',[entity.proxyStatus == 1 && $t('转发信息,'),entity.docStatus == 1 && $t('文档信息,'),entity.upstreamStatus == 1 && $t('上游信息,')]):''}</span>
+              </Tooltip>)
+        }:{}),
+        title: typeof x.title === 'string' ? $t(x.title) : x.title,
+    })),[state.language])
+
+    
+    const translatedRouteColumns = useMemo(()=>ApprovalRouteColumns.map((x)=>({
+        ...x, 
+        ...(x.dataIndex === 'change' ? {
+            render:(_,entity)=>(
+                <Tooltip placement="top" title={entity.change === 'error' ?$t('该 API 缺失(0)(1)(2)请先补充',[entity.proxyStatus == 1 && $t('转发信息,'),entity.docStatus == 1 && $t('文档信息,'),entity.upstreamStatus == 1 && $t('上游信息,')]):''}>
+                    <span className={`${ApprovalStatusColorClass[entity.change as keyof typeof ApprovalStatusColorClass]} truncate block`}>
+                        {$t(ChangeTypeEnum[entity.change as (keyof typeof ChangeTypeEnum)] || '-')}
+                        {entity.change === 'error' ?$t('该 API 缺失(0)(1)(2)请先补充',[entity.proxyStatus == 1 && $t('转发信息,'),entity.docStatus == 1 && $t('文档信息,'),entity.upstreamStatus == 1 && $t('上游信息,')]):''}
+                        </span>
+              </Tooltip>)
+        }:{}
+    ),
+    title: typeof x.title === 'string' ? $t(x.title) : x.title,
+})),[state.language])
+
+    const translatedPublishColumns = useMemo(()=>SYSTEM_PUBLISH_ONLINE_COLUMNS.map((x)=>{
+        if(x.dataIndex === 'status'){
+            return {...x,title:$t(x.title),
+                render:(_:unknown,entity:SystemInsidePublishOnlineItems)=>{
+                    switch(entity.status){
+                        case 'done':
+                            return <span className={STATUS_COLOR[entity.status as keyof typeof STATUS_COLOR]}>{$t('成功')}</span>
+                        case 'error':
+                            return  <Tooltip title={entity.error || $t('上线失败')}><span className={`${STATUS_COLOR[entity.status  as keyof typeof STATUS_COLOR]} truncate block`}>{$t('失败')} {entity.error}</span></Tooltip>
+                        default:
+                            return <LoadingOutlined className="text-theme" spin />
+                    }
+                }}
+        }
+    }),[state.language])
 
     return (
         <>
@@ -129,34 +182,34 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                         <Form.Item
                             label={$t("版本号")}
                             name="version"
-                            rules={[{required: true, message: VALIDATE_MESSAGE.required,whitespace:true }]}
+                            rules={[{required: true,whitespace:true }]}
                         >
-                            <Input className="w-INPUT_NORMAL" disabled={type !== 'add'} placeholder={PLACEHOLDER.input} />
+                            <Input className="w-INPUT_NORMAL" disabled={type !== 'add'} placeholder={$t(PLACEHOLDER.input)} />
                         </Form.Item>
 
                         <Form.Item
                             label={$t("版本说明")}
                             name="versionRemark"
                         >
-                            <Input.TextArea className="w-INPUT_NORMAL" disabled={type !== 'add' && type !== 'publish'} placeholder={PLACEHOLDER.input} />
+                            <Input.TextArea className="w-INPUT_NORMAL" disabled={type !== 'add' && type !== 'publish'} placeholder={$t(PLACEHOLDER.input)} />
                         </Form.Item>
                     </>
                 }
-                    <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('API 列表')}：</span></Row>
+                    <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('路由列表')}：</span></Row>
                     <Row  className="mb-mbase ">
                         <Table
-                            columns={ApprovalApiColumns}
+                            columns={translatedRouteColumns}
                             bordered={true}
                             rowKey="id"
                             size="small"
-                            dataSource={data.diffs?.apis || []}
+                            dataSource={data.diffs?.routers || []}
                             pagination={false}
                         /></Row>
                     <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('上游列表')}：</span></Row>
                     <Row  className="mb-mbase ">
                         <Table
                             bordered={true}
-                            columns={ApprovalUpstreamColumns}
+                            columns={translatedUpstreamColumns}
                             size="small"
                             rowKey="id"
                             dataSource={data.diffs?.upstreams || []}
@@ -166,7 +219,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                     label={$t("备注")}
                     name="remark"
                 >
-                    <Input.TextArea className="w-INPUT_NORMAL" disabled={type !== 'add' && type !== 'publish'} placeholder={PLACEHOLDER.input} />
+                    <Input.TextArea className="w-INPUT_NORMAL" disabled={type !== 'add' && type !== 'publish'} placeholder={$t(PLACEHOLDER.input)} />
                 </Form.Item>
 {/* 
                 {type !== 'add' && type !== 'publish' && <Form.Item
@@ -174,7 +227,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                     name="opinion"
                     extra="选择拒绝时，审批意见为必填"
                 >
-                    <Input.TextArea className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input} onChange={()=>{  form.setFields([
+                    <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} onChange={()=>{  form.setFields([
                         {
                             name: 'opinion',
                             errors: [], // 设置为空数组来移除错误信息
@@ -182,11 +235,12 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                     ]);}}/>
                 </Form.Item>} */}
                 
-                {['error','done'].indexOf(data.status) !== -1 && data.clusterPublishStatus &&data.clusterPublishStatus.length > 0 && <>                    <Row className="text-left h-[32px] mb-8px]" span={3}><span>上线情况：</span></Row>
+                {['error','done'].indexOf(data.status) !== -1 && data.clusterPublishStatus &&data.clusterPublishStatus.length > 0 && <>                    
+                <Row className="text-left h-[32px] mb-8px]" span={3}><span>{$t('上线情况')}：</span></Row>
                     <Row span={24} className="mb-mbase">
                         <Table
                             bordered={true}
-                            columns={[...SYSTEM_PUBLISH_ONLINE_COLUMNS]}
+                            columns={[...translatedPublishColumns]}
                             size="small"
                             rowKey="id"
                             dataSource={data.clusterPublishStatus || []}

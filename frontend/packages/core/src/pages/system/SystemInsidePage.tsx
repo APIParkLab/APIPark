@@ -34,7 +34,7 @@ const SystemInsidePage:FC = ()=> {
             if(code === STATUS_CODE.SUCCESS){
                 setSystemInfo(data.service)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -42,13 +42,13 @@ const SystemInsidePage:FC = ()=> {
     const getApiDefine = ()=>{
         setApiPrefix('')
         setPrefixForce(false)
-        fetchData<BasicResponse<{ prefix:string, force:boolean }>>('service/api/define',{method:'GET',eoParams:{service:serviceId,team:teamId}}).then(response=>{
+        fetchData<BasicResponse<{ prefix:string, force:boolean }>>('service/router/define',{method:'GET',eoParams:{service:serviceId,team:teamId}}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setApiPrefix(data.prefix)
                 setPrefixForce(data.force)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -58,7 +58,8 @@ const SystemInsidePage:FC = ()=> {
    const SYSTEM_PAGE_MENU_ITEMS = useMemo(()=>[
     getItem($t('服务'), 'assets', null,
         [
-            getItem(<Link to="./api">{$t('API')}</Link>, 'api',undefined,undefined,undefined,'team.service.api.view'),
+            getItem(<Link to="./api">{$t('API')}</Link>, 'api',undefined,undefined,undefined,'team.service.api_doc.view'),
+            getItem(<Link to="./route">{$t('路由')}</Link>, 'route',undefined,undefined,undefined,'team.service.router.view'),
             getItem(<Link to="./upstream">{$t('上游')}</Link>, 'upstream',undefined,undefined,undefined,'team.service.upstream.view'),
             getItem(<Link to="./document">{$t('使用说明')}</Link>, 'document',undefined,undefined,undefined,''),
             getItem(<Link to="./publish">{$t('发布')}</Link>, 'publish',undefined,undefined,undefined,'team.service.release.view'),
@@ -113,7 +114,7 @@ const SystemInsidePage:FC = ()=> {
     }, [currentUrl]);
 
     useEffect(()=>{
-        if(accessData && accessData.get('team') && accessData.get('team')?.indexOf('team.service.api.view') !== -1){
+        if(accessData && accessData.get('team') && accessData.get('team')?.indexOf('team.service.router.view') !== -1){
             getApiDefine()
         }
     },[accessData])

@@ -26,18 +26,18 @@ export const ServiceHubCategoryConfig = forwardRef<ServiceHubCategoryConfigHandl
         }
         return new Promise((resolve, reject)=>{
             if(!url || !method){
-                reject(RESPONSE_TIPS.error)
+                reject($t(RESPONSE_TIPS.error))
                 return
             }
             form.validateFields().then((value)=>{
                 fetchData<BasicResponse<null>>(url,{method,eoBody:(value), eoParams:{ ...(type === 'renameCate' ? {catalogue:value.id} :undefined)}}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
-                        message.success(msg || RESPONSE_TIPS.success)
+                        message.success(msg || $t(RESPONSE_TIPS.success))
                         resolve(true)
                     }else{
-                        message.error(msg || RESPONSE_TIPS.error)
-                        reject(msg || RESPONSE_TIPS.error)
+                        message.error(msg || $t(RESPONSE_TIPS.error))
+                        reject(msg || $t(RESPONSE_TIPS.error))
                     }
                 }).catch((errorInfo)=> reject(errorInfo))
             }).catch((errorInfo)=> reject(errorInfo))
@@ -83,18 +83,18 @@ export const ServiceHubCategoryConfig = forwardRef<ServiceHubCategoryConfigHandl
                     label={$t("ID")}
                     name="id"
                     hidden
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                    rules={[{ required: true,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
             }
             {(type === 'addCate' || type === 'renameCate') &&
                 <Form.Item<ServiceHubCategoryConfigFieldType>
                     label={$t("分类名称")}
                     name="name"
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
+                    rules={[{ required: true ,whitespace:true }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>}
 
             {type === 'addChildCate' &&<>
@@ -102,17 +102,17 @@ export const ServiceHubCategoryConfig = forwardRef<ServiceHubCategoryConfigHandl
                     label={$t("父分类 ID")}
                     name="parent"
                     hidden
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required,whitespace:true  }]}
+                    rules={[{ required: true,whitespace:true  }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
 
                 <Form.Item<ServiceHubCategoryConfigFieldType>
                     label={$t("子分类名称")}
                     name="name"
-                    rules={[{ required: true, message: VALIDATE_MESSAGE.required ,whitespace:true }]}
+                    rules={[{ required: true ,whitespace:true }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={PLACEHOLDER.input}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
             </>
             }

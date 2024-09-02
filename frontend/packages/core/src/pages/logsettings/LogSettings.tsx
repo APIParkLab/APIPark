@@ -31,16 +31,14 @@ const LogSettings = ()=>{
                     }
                     return Promise.resolve(data.dynamics)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
-                return Promise.reject(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
+                return Promise.reject(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
 
     const menuData = useMemo(()=>{
         const newMenu =  menuItems?.map((x:DynamicMenuItem)=>{
-            console.log(state.language, $t(x.title))
-            
             return getItem(
                 <Link to={`template/${x.name}`}>{$t(x.title)}</Link>, 
                 x.name,
@@ -49,7 +47,6 @@ const LogSettings = ()=>{
                 undefined,
                 'system.devops.log_configuration.view')
         })
-            console.log(newMenu)
         return newMenu
     },[state.language,menuItems])
 

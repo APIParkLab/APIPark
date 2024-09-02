@@ -40,7 +40,7 @@ export const ServiceHubGroup = ({children,filterOption,dispatch}:ServiceHubGroup
                 dispatch({type:SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_CATE,payload:[...data.catalogues.map((x:CategorizesType)=>x.id)]})
                 dispatch({type:SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_TAG,payload:[...data.tags.map((x:EntityItem)=>x.id),'empty']})
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }

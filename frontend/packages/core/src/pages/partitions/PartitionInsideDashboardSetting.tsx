@@ -26,7 +26,7 @@ const PartitionInsideDashboardSetting:FC = ()=> {
                 data?.info?.driver && setData(data.info)
                 setShowStatus('view')
             } else {
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         }).catch(() => {
             return {data: [], success: false}
@@ -38,14 +38,14 @@ const PartitionInsideDashboardSetting:FC = ()=> {
 
     useEffect(() => {
         setBreadcrumb([
-            {title: $t('监控报表')}
+            {title: $t('数据源')}
         ])
         getDashboardSettingInfo()
     }, []);
 
     const setDashboardSettingBtn = ()=>{
             return (<>
-                    {showStatus === 'view' && <WithPermission access="" key="changeClusterConfig">
+                    {showStatus === 'view' && <WithPermission access="system.devops.data_source.edit" key="changeClusterConfig">
                         <Button type="primary" onClick={() => setShowStatus('edit')}>{$t('修改配置')}</Button>
                     </WithPermission> }</>
             )
@@ -54,7 +54,7 @@ const PartitionInsideDashboardSetting:FC = ()=> {
     return (
         <>
             <InsidePage 
-                pageTitle={$t('监控报表')} 
+                pageTitle={$t('数据源')} 
                 description={$t("设置监控报表的数据来源，设置完成之后即可获得详细的API调用统计图表。")}
                 showBorder={false}
                 scrollPage={true}

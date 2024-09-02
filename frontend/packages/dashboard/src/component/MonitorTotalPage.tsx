@@ -129,7 +129,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   setTotalEmpty(data.requestSummary.total === 0 && data.proxySummary.total === 0)
                 }else{
                   setPieError(true)
-                  message.error(msg || RESPONSE_TIPS.dataError)
+                  message.error(msg || $t(RESPONSE_TIPS.dataError))
                 }
         }).finally(()=>{
           dispatch({ type: ACTIONS.REQUEST_COMPLETE, payload: 'getPieData' });
@@ -144,11 +144,11 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   const { timeInterval, ...arr } = data
                   setInvokeStatic(arr as InvokeData)
                   setInvokeStaticError(false)
-                  setTimeUnit(getTimeUnit(timeInterval!))
+                  setTimeUnit((getTimeUnit(timeInterval!)))
                   // this.invokeLineRef?.changeLineChart()
                 }else{
                   setInvokeStaticError(true)
-                  message.error(msg || RESPONSE_TIPS.dataError)
+                  message.error(msg || $t(RESPONSE_TIPS.dataError))
                 }
         }).finally(()=>{
           dispatch({ type: ACTIONS.REQUEST_COMPLETE, payload: 'getInvokeData' });
@@ -165,7 +165,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   // this.trafficLineRef?.changeLineChart()
                 }else{
                   setTrafficStaticError(true)
-                  message.error(msg || RESPONSE_TIPS.dataError)
+                  message.error(msg || $t(RESPONSE_TIPS.dataError))
                 }
         }).finally(()=>{
           dispatch({ type: ACTIONS.REQUEST_COMPLETE, payload: 'getMessageData' });
@@ -180,7 +180,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                 if(code === STATUS_CODE.SUCCESS){
               return  {data:data.top10.map((x:MonitorApiData | MonitorSubscriberData)=>{x.proxyRate = Number((x.proxyRate*100).toFixed(2));x.requestRate = Number((x.requestRate*100).toFixed(2));return x}), success: true}
           }else{
-              message.error(msg || RESPONSE_TIPS.dataError)
+              message.error(msg || $t(RESPONSE_TIPS.dataError))
               return {data:[], success:false}
           }
         }).catch(() => {
@@ -258,7 +258,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   labelName={$t("请求成功率")}
                   labelValue={requestSucRate}
                   subText={$t("请求总数")}
-                  subValue={changeNumberUnit(requestStatic?.total)}
+                  subValue={changeNumberUnit(requestStatic?.total).value + $t(changeNumberUnit(requestStatic?.total).unit)}
                   status4xxCount={requestStatic?.status_4xx}
                   status5xxCount={requestStatic?.status_5xx}
                 />}
@@ -270,7 +270,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   labelName={$t("转发成功率")}
                   labelValue={proxySucRate}
                   subText={$t("转发总数")}
-                  subValue={changeNumberUnit(proxyStatic?.total)}
+                  subValue={`${changeNumberUnit(proxyStatic?.total).value}  ${$t(changeNumberUnit(proxyStatic?.total).unit)}`}
                   status4xxCount={proxyStatic?.status_4xx}
                   status5xxCount={proxyStatic?.status_5xx}
                 />}
@@ -282,7 +282,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                 className=" bg-MAIN_BG pt-[16px] border-[1px] border-solid border-BORDER rounded-[10px]"
                   lineData={invokeStatic}
                   titles={[$t('调用量统计')]}
-                  yAxisTitle={timeUnit || '-'}
+                  yAxisTitle={$t(timeUnit || '-')}
                   type="invoke"
                 />}
                 {/* 报文量统计折线图 */}
@@ -290,7 +290,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                 className=" bg-MAIN_BG pt-[16px] border-[1px] border-solid border-BORDER rounded-[10px]"
                 lineData={trafficStatic}
                   titles={[$t('报文量统计')]}
-                  yAxisTitle={timeUnit || '-'}
+                  yAxisTitle={$t(timeUnit || '-')}
                   type="traffic"
                 />}
                 </div>

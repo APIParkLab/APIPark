@@ -28,24 +28,24 @@ const ServiceHubDetail = ()=>{
     const applyRef = useRef<ApplyServiceHandle>(null)
     const { modal,message } = App.useApp()
     const [mySystemOptionList, setMySystemOptionList] = useState<DefaultOptionType[]>()
-    const [applied,setApplied] = useState<boolean>(false)
-    const [activeKey, setActiveKey] = useState<string[]>([])
+    // const [applied,setApplied] = useState<boolean>(false)
+    // const [activeKey, setActiveKey] = useState<string[]>([])
     const [service, setService] = useState<ServiceDetailType>()
     const navigate = useNavigate();
 
     const getServiceBasicInfo = ()=>{
-        fetchData<BasicResponse<{service:ServiceDetailType}>>('catalogue/service',{method:'GET',eoParams:{service:serviceId}, eoTransformKeys:['app_num','api_num','update_time']}).then(response=>{
+        fetchData<BasicResponse<{service:ServiceDetailType}>>('catalogue/service',{method:'GET',eoParams:{service:serviceId}, eoTransformKeys:['app_num','api_num','update_time','api_doc']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setService(data.service)
                 setServiceBasicInfo(data.service.basic)
                 setServiceName(data.service.name)
                 setServiceDesc(data.service.description)
-                setApplied(data.service.applied)
+                // setApplied(data.service.applied)
                 setServiceDoc(DOMPurify.sanitize(data.service.document))
-                setActiveKey(data.service.apis.map((x)=>x.id))
+                // setActiveKey(data.service.apis.map((x)=>x.id))
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -79,7 +79,7 @@ const ServiceHubDetail = ()=>{
                     label:x.name, value:x.id
                 }}))
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -91,7 +91,7 @@ const ServiceHubDetail = ()=>{
             content:<ApplyServiceModal ref={applyRef} entity={{...serviceBasicInfo!, name:serviceName!, id:serviceId!}}  mySystemOptionList={mySystemOptionList!}/>,
             onOk:()=>{
                 return applyRef.current?.apply().then((res)=>{
-                    if(res === true) setApplied(true)
+                    // if(res === true) setApplied(true)
                 })
             },
             okText:$t('确认'),
@@ -106,7 +106,7 @@ const ServiceHubDetail = ()=>{
         {
             key: 'introduction',
             label: $t('介绍'),
-            children: <><div className="p-btnbase preview-document" dangerouslySetInnerHTML={{__html: serviceDoc || ''}}></div></>,
+            children: <><div className="p-btnbase preview-document mb-PAGE_INSIDE_B" dangerouslySetInnerHTML={{__html: serviceDoc || ''}}></div></>,
             icon: <Icon icon="ic:baseline-space-dashboard" width="14" height="14"/>,
         },
         {

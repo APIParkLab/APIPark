@@ -171,7 +171,7 @@ export default function ServiceCategory(){
                 break;
             case 'delete':
                 title=$t('删除')
-                content=DELETE_TIPS.default
+                content=$t(DELETE_TIPS.default)
                 break;
         }
         modal.confirm({
@@ -205,11 +205,11 @@ export default function ServiceCategory(){
             fetchData<BasicResponse<null>>('catalogue',{method:'DELETE',eoParams:{catalogue:entity.id},}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -223,7 +223,7 @@ export default function ServiceCategory(){
                 getCategoryList()
             }else{
                 setGData(cateData)
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         }).catch(()=>{setGData(cateData)}).finally(()=>{setLoading(false)})
     }
@@ -236,7 +236,7 @@ export default function ServiceCategory(){
                 setGData(data.catalogues)
                 setCateData(data.catalogues)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         }).finally(()=>{setLoading(false)})
     }

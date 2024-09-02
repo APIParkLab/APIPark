@@ -31,7 +31,7 @@ export default function ManagementInsideAuth(){
             if(code === STATUS_CODE.SUCCESS){
                 setAuthList(data.authorizations)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         }).catch(() => {
             return {data:[], success:false}
@@ -48,11 +48,11 @@ export default function ManagementInsideAuth(){
             fetchData<BasicResponse<null>>('app/authorization',{method:'DELETE',eoParams:{authorization:entity!.id,app:appId, team:teamId}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || RESPONSE_TIPS.success)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
                     resolve(true)
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
-                    reject(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
                 }
             }).catch((errorInfo)=> reject(errorInfo))
         })
@@ -65,13 +65,13 @@ export default function ManagementInsideAuth(){
         switch (type){
             case 'view':{
                 title=$t('鉴权详情')
-                message.loading(RESPONSE_TIPS.loading)
+                message.loading($t(RESPONSE_TIPS.loading))
                 const {code,data,msg} = await fetchData<BasicResponse<{details:{[k:string]:string}}>>('app/authorization/details',{method:'GET',eoParams:{authorization:entity!.id,app:appId, team:teamId}})
                 message.destroy()
                 if(code === STATUS_CODE.SUCCESS){
                     content=<ManagementAuthorityView entity={data.details}/>
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
                     return
                 }}
                 break;
@@ -81,19 +81,19 @@ export default function ManagementInsideAuth(){
                 break;
             case 'edit':{
                 title=$t('编辑鉴权')
-                message.loading(RESPONSE_TIPS.loading)
+                message.loading($t(RESPONSE_TIPS.loading))
                 const {code,data,msg} = await fetchData<BasicResponse<{authorization:EditAuthFieldType}>>('app/authorization',{method:'GET',eoParams:{authorization:entity!.id,app:appId, team:teamId},eoTransformKeys:['hide_credential','token_name','expire_time','user_name','public_key','user_path','claims_to_verify','signature_is_base64']})
                 message.destroy()
                 if(code === STATUS_CODE.SUCCESS){
                     content=<ManagementAuthorityConfig ref={editRef} type={type} data={data.authorization} appId={appId!} teamId={teamId!}/>
                 }else{
-                    message.error(msg || RESPONSE_TIPS.error)
+                    message.error(msg || $t(RESPONSE_TIPS.error))
                     return
                 }}
                 break;
             case 'delete':
                 title=$t('删除')
-                content=DELETE_TIPS.default
+                content=$t(DELETE_TIPS.default)
                 break;
         }
 

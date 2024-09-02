@@ -56,10 +56,10 @@ const themeToken = {
     ]),
     getNavItem(<a>{$t('API 市场')}</a>, 'serviceHub','/serviceHub',<Icon icon="ic:baseline-hub" width="18" height="18"/>,undefined,undefined,'system.workspace.api_market.view'),
 
-     getNavItem($t('仪表盘'), 'mainPage', APP_MODE === 'pro' ? '/dashboard' : '/dashboard/total',<Icon icon="ic:baseline-bar-chart" width="18" height="18"/>,[
-      getNavItem(<a >{$t('运行视图')}</a>, 'dashboard',APP_MODE === 'pro' ? '/dashboard' : '/dashboard/total' ,<ProjectFilled />,undefined,undefined,'system.dashboard.dashboard.view'),
+     getNavItem($t('仪表盘'), 'mainPage', APP_MODE === 'pro' ? '/analytics' : '/analytics/total',<Icon icon="ic:baseline-bar-chart" width="18" height="18"/>,[
+      getNavItem(<a >{$t('运行视图')}</a>, 'analytics',APP_MODE === 'pro' ? '/analytics' : '/analytics/total' ,<ProjectFilled />,undefined,undefined,'system.dashboard.run_view.view'),
       APP_MODE === 'pro' ? getNavItem(<a >{$t('系统拓扑图')}</a>, 'systemrunning','/systemrunning',<ProjectFilled />,undefined,undefined,'system.dashboard.systemrunning.view') : null,
-    ]),
+    ],undefined,'system.dashboard.run_view.view'),
   
     getNavItem($t('系统设置'), 'operationCenter','/member',<Icon icon="ic:baseline-settings" width="18" height="18"/>, [
       getNavItem($t('组织'), 'organization','/member',null,[
@@ -72,7 +72,7 @@ const themeToken = {
   
       getNavItem($t('运维与集成'), 'maintenanceCenter','/cluster', null, [
         getNavItem(<a>{$t('集群')}</a>, 'cluster','/cluster',<Icon icon="ic:baseline-device-hub" width="18" height="18"/>,undefined,undefined,'system.devops.cluster.view'),
-        getNavItem(<a>{$t('监控报表')}</a>, 'dashboardsetting','/dashboardsetting',<Icon icon="ic:baseline-monitor-heart" width="18" height="18"/>,undefined,undefined,'system.devops.dashboardsetting.view'),
+        getNavItem(<a>{$t('数据源')}</a>, 'datasourcing','/datasourcing',<Icon icon="ic:baseline-monitor-heart" width="18" height="18"/>,undefined,undefined,'system.devops.data_source.view'),
         getNavItem(<a>{$t('证书')}</a>, 'cert','/cert',<Icon icon="ic:baseline-security" width="18" height="18"/>,undefined,undefined,'system.devops.ssl_certificate.view'),
         getNavItem(<a>{$t('日志')}</a>, 'logsettings','/logsettings',<Icon icon="ic:baseline-sticky-note-2" width="18" height="18"/>,undefined,undefined,'system.devops.log_configuration.view'),
         APP_MODE === 'pro' ? getNavItem(<a>{$t('资源')}</a>, 'resourcesettings','/resourcesettings',null,undefined,undefined,'system.partition.self.view'):null,
@@ -141,7 +141,7 @@ const themeToken = {
                 setUserInfo(data.profile)
                 dispatch({type:'UPDATE_USERDATA',userData:data.profile})
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -157,10 +157,10 @@ const themeToken = {
             if(code === STATUS_CODE.SUCCESS){
                 dispatch({type:'LOGOUT'})
                 resetAccess()
-                // message.success(msg || RESPONSE_TIPS.logoutSuccess)
+                // message.success(msg || $t(RESPONSE_TIPS.logoutSuccess))
                 navigate('/login')
             }else{
-                message.error(msg ||RESPONSE_TIPS.error)
+                message.error(msg ||$t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -242,13 +242,13 @@ const themeToken = {
                           ];
                         }}
                         headerTitleRender={() => (
-                        <div className="w-[192px]  flex items-center">
-                        <img
-                            className="h-[20px] cursor-pointer "
-                            src={Logo}
-                            onClick={()=> navigator(mainPage)}
-                        />
-                        </div>
+                            <div className="w-[192px]  flex items-center">
+                            <img
+                                className="h-[20px] cursor-pointer "
+                                src={Logo}
+                                onClick={()=> navigator(mainPage)}
+                            />
+                            </div>
                         )}
                         logo={Logo}
                         pageTitleRender={()=>$t('APIPark - 企业API数据开放平台')}

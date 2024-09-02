@@ -1,9 +1,10 @@
 
-import {  Tooltip } from "antd";
+import {  Button, Tooltip, Upload } from "antd";
 import  {  ReactElement, cloneElement, useEffect, useMemo, useState } from "react";
 import { useGlobalContext } from "../../contexts/GlobalStateContext";
 import { PERMISSION_DEFINITION } from "@common/const/permissions";
 import { $t } from "@common/locales";
+import { last } from "lodash-es";
 
 type WithPermissionProps = {
     access?:string | string[]
@@ -26,7 +27,6 @@ const WithPermission = ({access, tooltip, children,disabled, showDisabled = true
     useEffect(()=>{
       // 先判断权限，无论权限是否为true，如果disabled为true时则必须为ture
       access && setEditAccess(lastAccess) 
-      console.log('editAccess',editAccess, children,children?.type?.displayName,showDisabled, children?.type?.displayName !== 'Button' && showDisabled)
     },[lastAccess,disabled])
 
 
@@ -37,7 +37,7 @@ const WithPermission = ({access, tooltip, children,disabled, showDisabled = true
         {editAccess && disabled  && <Tooltip  title={tooltip}> 
             { cloneElement(children, {disabled:true})}
              </Tooltip>}
-        {!editAccess && (children?.type?.displayName !== 'Button' && showDisabled ) && <Tooltip  title={tooltip ?? $t("暂无操作权限，请联系管理员分配。")}> 
+        {!editAccess && (children?.type !== Button && children?.type !== Upload && showDisabled ) && <Tooltip  title={tooltip ?? $t("暂无操作权限，请联系管理员分配。")}> 
             { cloneElement(children, {disabled:true})}
              </Tooltip>}
         

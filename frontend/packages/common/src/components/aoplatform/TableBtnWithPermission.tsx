@@ -56,7 +56,7 @@ const TableBtnWithPermission = ({btnTitle, access, tooltip, disabled, navigateTo
     
     return (<>{
          !btnAccess || (disabled&&tooltip) ? 
-        <Tooltip  placement="top" title={tooltip ?? $t('暂无(0)权限，请联系管理员分配。',[btnTitle])}> 
+        <Tooltip  placement="top" title={tooltip ?? $t('暂无(0)权限，请联系管理员分配。',[$t(btnTitle).toLowerCase()])}> 
             <Button type="text" disabled={true} className={`h-[22px] border-none p-0 flex items-center bg-transparent ${className}`} key={btnType} icon={<Icon icon={TableIconName[btnType as keyof typeof TableIconName]} width="18" height="18"/>} >{}</Button>
          </Tooltip>
         :

@@ -23,10 +23,10 @@ const ServiceInsideDocument = ()=>{
         fetchData<BasicResponse<{service:{ id:string,name:string,updater:string,updateTime:string, doc:string} }>>('service/doc',{method:'PUT',eoBody:({doc:doc}) ,eoParams:{service:serviceId,team:teamId},eoTransformKeys:['update_time']}).then(response=>{
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                message.success(msg || RESPONSE_TIPS.success)
+                message.success(msg || $t(RESPONSE_TIPS.success))
                 getServiceDoc()
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }
@@ -56,7 +56,7 @@ const ServiceInsideDocument = ()=>{
                 setUpdateTime(data.doc.updater.id === '' ? '-' : data.doc.updateTime)
                 setInitDoc(data.doc.doc)
             }else{
-                message.error(msg || RESPONSE_TIPS.error)
+                message.error(msg || $t(RESPONSE_TIPS.error))
             }
         })
     }

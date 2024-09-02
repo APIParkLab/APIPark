@@ -109,12 +109,17 @@ team:
         cname: API
         value: 'api'
         children:
-          - team.service.api.view
-          - team.service.api.add
-          - team.service.api.edit
-          - team.service.api.copy
-          - team.service.api.delete
-          - team.service.api.import
+          - team.service.api_doc.view
+          - team.service.api_doc.add
+          - team.service.api_doc.edit
+      - name: route
+        cname: route
+        value: 'route'
+        children:
+          - team.service.router.view
+          - team.service.router.add
+          - team.service.router.edit
+          - team.service.router.delete
       - name: upstream
         cname: 上游
         value: 'upstream'

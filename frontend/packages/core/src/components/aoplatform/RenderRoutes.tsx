@@ -139,7 +139,12 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                                     {
                                         path:'api',
                                         key: uuidv4(),
-                                        lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideApiList.tsx')),
+                                        lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideApiDocument.tsx')),
+                                    },
+                                    {
+                                        path:'route',
+                                        key: uuidv4(),
+                                        lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideRouterList')),
                                     },
                                     {
                                         path:'upstream',
@@ -215,7 +220,7 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                 ]
             },
             {
-                path:'dashboardsetting',
+                path:'datasourcing',
                 key: uuidv4(),
                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/partitions/PartitionInsideDashboardSetting.tsx')),
             },
@@ -353,7 +358,7 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                 key:uuidv4()
             },
             {
-                path:'dashboard',
+                path:'analytics',
                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */  '@dashboard/pages/Dashboard.tsx')),
                 key:uuidv4(),
                 children:[
