@@ -56,8 +56,8 @@ const themeToken = {
     ]),
     getNavItem(<a>{$t('API 市场')}</a>, 'serviceHub','/serviceHub',<Icon icon="ic:baseline-hub" width="18" height="18"/>,undefined,undefined,'system.workspace.api_market.view'),
 
-     getNavItem($t('仪表盘'), 'mainPage', APP_MODE === 'pro' ? '/dashboard' : '/dashboard/total',<Icon icon="ic:baseline-bar-chart" width="18" height="18"/>,[
-      getNavItem(<a >{$t('运行视图')}</a>, 'dashboard',APP_MODE === 'pro' ? '/dashboard' : '/dashboard/total' ,<ProjectFilled />,undefined,undefined,'system.dashboard.run_view.view'),
+     getNavItem($t('仪表盘'), 'mainPage', APP_MODE === 'pro' ? '/analytics' : '/analytics/total',<Icon icon="ic:baseline-bar-chart" width="18" height="18"/>,[
+      getNavItem(<a >{$t('运行视图')}</a>, 'analytics',APP_MODE === 'pro' ? '/analytics' : '/analytics/total' ,<ProjectFilled />,undefined,undefined,'system.dashboard.run_view.view'),
       APP_MODE === 'pro' ? getNavItem(<a >{$t('系统拓扑图')}</a>, 'systemrunning','/systemrunning',<ProjectFilled />,undefined,undefined,'system.dashboard.systemrunning.view') : null,
     ],undefined,'system.dashboard.run_view.view'),
   

@@ -37,7 +37,6 @@ const SystemInsideRouterList:FC = ()=>{
     const [curApi, setCurApi] = useState<SystemApiTableListItem>()
 
     const getRoutesList = (): Promise<{ data: SystemApiTableListItem[], success: boolean }>=> {
-        //console.log(sorter, filter)
         if(!tableHttpReload){
             setTableHttpReload(true)
             return Promise.resolve({

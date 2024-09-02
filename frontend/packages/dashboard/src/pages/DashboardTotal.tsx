@@ -28,7 +28,7 @@ export default function DashboardTotal() {
           // ...跳转到详情页...
           const { start:startTime, end:endTime, clusters} = body
           navigateTo(
-            `/dashboard/${type}/list?${objectToSearchParameters({id:val.id,clusters:clusters || undefined, start: startTime?.toString(), end: endTime?.toString(), name:val.name}).toString()}`)        
+            `/analytics/${type}/list?${objectToSearchParameters({id:val.id,clusters:clusters || undefined, start: startTime?.toString(), end: endTime?.toString(), name:val.name}).toString()}`)        
         };
 
     return <MonitorTotalPage  fetchPieData={fetchPieData} fetchInvokeData={fetchInvokeData} fetchMessageData={fetchMessageData} fetchTableData={fetchTableData} goToDetail={goToDetail}/>
