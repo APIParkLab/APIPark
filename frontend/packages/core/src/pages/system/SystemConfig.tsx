@@ -52,22 +52,22 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
             return false;
           }
       
-          if (file.size > MAX_SIZE) {
-            try {
-              const compressedBase64 = await compressImage(file, MAX_SIZE);
-              setImageBase64(`data:${file.type};base64,${compressedBase64}`);
-              form.setFieldValue('logo', `data:${file.type};base64,${compressedBase64}`);
-            } catch (error) {
-              console.error('压缩图片时出错', error);
-            }
-          } else {
+        //   if (file.size > MAX_SIZE) {
+        //     try {
+        //       const compressedBase64 = await compressImage(file, MAX_SIZE);
+        //       setImageBase64(`data:${file.type};base64,${compressedBase64}`);
+        //       form.setFieldValue('logo', `data:${file.type};base64,${compressedBase64}`);
+        //     } catch (error) {
+        //       console.error('压缩图片时出错', error);
+        //     }
+        //   } else {
             const reader = new FileReader();
             reader.onload = (e: ProgressEvent<FileReader>) => {
               setImageBase64(e.target?.result as string);
               form.setFieldValue('logo', e.target?.result);
             };
             reader.readAsDataURL(file);
-          }
+        //   }
             return false;
         };
     
