@@ -209,7 +209,7 @@ const SystemInsideRouterList:FC = ()=>{
                 onChange={() => {
                     setTableHttpReload(false)
                 }}
-                onRowClick={(row:SystemApiTableListItem)=>openDrawer('view',row)}
+                onRowClick={(row:SystemApiTableListItem)=>openDrawer('edit',row)}
                 tableClass="mr-PAGE_INSIDE_X "
                 />
                 <DrawerWithFooter 
