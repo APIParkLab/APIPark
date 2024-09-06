@@ -22,6 +22,7 @@ type StoreWidthType[H any] struct {
 func NewCommitWithKey[H any](name, key string) *StoreWidthType[H] {
 	return &StoreWidthType[H]{
 		Store: Store[H]{
+			name:            name,
 			latestTableName: name + "_latest",
 			commitTableName: name + "_commit",
 		},
