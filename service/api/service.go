@@ -47,5 +47,4 @@ func init() {
 
 	commit.InitCommitWithKeyService[Proxy]("api", string(HistoryProxy))
 	commit.InitCommitWithKeyService[Request]("api", string(HistoryRequest))
-
 }
