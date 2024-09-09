@@ -52,7 +52,7 @@ const TeamInsideMember:FC = ()=>{
     const [modalVisible, setModalVisible] = useState<boolean>(false)
     const [addMemberBtnDisabled, setAddMemberBtnDisabled] = useState<boolean>(true)
     const [allMemberSelectedDepartIds, setAllMemberSelectedDepartIds] = useState<string[]>([])
-    const [columns,setColumns] = useState<PageProColumns<TeamMemberTableListItem>[]>([])
+    const [roleList, setRoleList] = useState<EntityItem[]>([])
 
     const operation:PageProColumns<TeamMemberTableListItem>[] =[
         {
@@ -230,36 +230,10 @@ const TeamInsideMember:FC = ()=>{
     }
     
     const getRoleList = ()=>{
-        fetchData<BasicResponse<{roles:Array<{id:string,name:string}>}>>('simple/roles', {method: 'GET', eoParams: {group:'team'}}).then(response => {
+        fetchData<BasicResponse<{roles:EntityItem[]}>>('simple/roles', {method: 'GET', eoParams: {group:'team'}}).then(response => {
             const {code, data,msg} = response
             if (code === STATUS_CODE.SUCCESS) {
-
-                const newCol = [...TEAM_MEMBER_TABLE_COLUMNS]
-                for(const col of newCol){
-                    //console.log(col)
-                    if(col.dataIndex === 'roles'){
-                        col.render = (_,entity)=>(
-                            <WithPermission access="team.team.member.edit">
-                                <Select
-                                    className="w-full"
-                                    mode="multiple"
-                                    value={entity.roles?.map((x:EntityItem)=>x.id)}
-                                    options={data.roles?.map((x:{id:string,name:string})=>({label:x.name, value:x.id}))}
-                                    onChange={(value)=>{
-                                        changeMemberInfo(value,entity ).then((res)=>{
-                                            if(res) manualReloadTable()
-                                        })
-                                    }}
-                                />
-                            </WithPermission>
-                        )
-                        col.filters = data.roles?.map((x:{id:string,name:string})=>({text:x.name, value:x.id}))
-                        col.onFilter = (value: unknown, record:TeamMemberTableListItem) =>{
-                            return record.roles ? record.roles?.map((x)=>x.id).indexOf(value as string) !== -1 : false;}
-                    
-                    }
-                }
-                setColumns(newCol)
+                setRoleList(data.roles)
                 return
             } else {
                 message.error(msg || $t(RESPONSE_TIPS.error))
@@ -268,10 +242,34 @@ const TeamInsideMember:FC = ()=>{
     }
 
     const translatedCol = useMemo(()=>{
-        const res = columns?.map(x=>{
+        const res = TEAM_MEMBER_TABLE_COLUMNS?.map(x=>{
+            if(x.dataIndex === 'roles'){
+                return {
+                    ...x,
+                    title: typeof x.title  === 'string' ? $t(x.title as string) : x.title,
+                    render: (_,entity)=>(
+                        <WithPermission access="team.team.member.edit">
+                            <Select
+                                className="w-full"
+                                mode="multiple"
+                                value={entity.roles?.map((x:EntityItem)=>x.id)}
+                                options={roleList?.map((x:{id:string,name:string})=>({label:$t(x.name), value:x.id}))}
+                                onChange={(value)=>{
+                                    changeMemberInfo(value,entity ).then((res)=>{
+                                        if(res) manualReloadTable()
+                                    })
+                                }}
+                            />
+                        </WithPermission>
+                    ),
+                    filters:roleList?.map((x:{id:string,name:string})=>({text:x.name, value:x.id})),
+                    onFilter:(value: unknown, record:TeamMemberTableListItem) =>{
+                        return record.roles ? record.roles?.map((x)=>x.id).indexOf(value as string) !== -1 : false;}
+                }
+                }
             return({...x, title: typeof x.title  === 'string' ? $t(x.title as string) : x.title}) })
         return res
-    },[columns, state.language])
+    },[ state.language,roleList])
 
     useEffect(() => {
         getRoleList()
