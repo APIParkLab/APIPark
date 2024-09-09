@@ -62,8 +62,8 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
         },
         textStyle: {
           rich: {
-            title: { fontSize: 14, color: '#666666', lineHeight: 22, padding: [8, 0, 8, 0] },
-            percent: { fontSize: 14, color: '#666666', width: 60, lineHeight: 22, align: 'right', padding: [8, 0, 8, 8] }
+            title: { fontSize: 14, color: '#666666',lineHeight: 22, width:state.language === 'en' ? 134 :70,padding: [8, 0, 8, 0] },
+            percent: { fontSize: 14, color: '#666666', width: 60, lineHeight: 22, align:'right', padding: [8, 0, 8, 8] }
           }
         }
       },
@@ -79,7 +79,7 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
         label: {
           show: true,
           position: 'center',
-          formatter: '{text|' + $t(labelName) + '}\n{value|' + labelValue + '}',
+          formatter: '{text|' + $t(labelName) + '}{value|' + labelValue + '}',
           rich: {
             text: { fontSize: 14, color: '#666666', lineHeight: 22, padding: [0, 0, 6, 0] },
             value: { fontSize: 20, color: '#333333', lineHeight: 32, padding: [0, 0, 6, 0] },

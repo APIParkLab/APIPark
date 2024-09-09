@@ -29,7 +29,7 @@ export const PARTITION_CERT_TABLE_COLUMNS: PageProColumns<PartitionCertTableList
         title:('过期日期'),
         ellipsis: true,
         dataIndex: 'notAfter',
-        width:100,
+        width:140,
         renderText: (value: string) => value ? value.split(' ')?.[0] : '-',
         sorter: (a,b)=> {
             return a.notAfter.localeCompare(b.notAfter)

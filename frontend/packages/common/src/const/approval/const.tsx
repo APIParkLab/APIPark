@@ -276,7 +276,8 @@ export const PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN : PageProColumns<Publis
     {
         title:('版本说明'),
         dataIndex: 'remark',
-        ellipsis:true
+        ellipsis:true,
+        width:160,
     },
     {
         title:('创建版本时间'),
@@ -298,7 +299,7 @@ export const PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN : PageProColumns<Publis
         title:('创建人'),
         dataIndex: ['creator','name'],
         ellipsis: true,
-        width:88,
+        width:120,
         filters: true,
         onFilter: true,
         valueType: 'select',
@@ -323,17 +324,19 @@ export const PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN : PageProColumns<Publish
     {
         title:('版本号'),
         dataIndex: 'version',
-        ellipsis:true
+        ellipsis:true,
+        width:130,
     },
     {
         title:('版本说明'),
         dataIndex: 'remark',
-        ellipsis:true
+        ellipsis:true,
+        width:160,
     },
     {
         title:('发布状态'),
         dataIndex: 'status',
-        ellipsis:true
+        ellipsis:true,
     },
     {
         title:('备注'),

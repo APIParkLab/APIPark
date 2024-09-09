@@ -673,5 +673,10 @@
     "K71753476": "Allow Access",
     "K597435c5": "Runtime",
     "Kde9d6e8e": "When interception is enabled, the gateway will block all traffic of this API path.",
-    "K4758140d": "Routes"
+    "K4758140d": "Routes",
+    "K7c97c5df": "Unassign Department",
+    "K1362a512": "Disable Member",
+    "K6e1289b1": "Enable Member",
+    "K1f4b5385": "Delete Member",
+    "Kf85b83a0": "Enter URL to Search Route"
   }

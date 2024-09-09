@@ -1,19 +1,22 @@
 import { FolderOpenOutlined, FolderOutlined } from "@ant-design/icons"
 import { App, TreeProps, Alert, Tree } from "antd"
-import { forwardRef, useState, useImperativeHandle, useEffect } from "react"
+import { forwardRef, useState, useImperativeHandle, useEffect, useMemo } from "react"
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const"
 import { AddToDepartmentHandle, AddToDepartmentProps, DepartmentListItem } from "../../../const/member/type"
 import { useFetch } from "@common/hooks/http"
 import {v4 as uuidv4} from 'uuid'
 import { $t } from "@common/locales"
+import { useGlobalContext } from "@common/contexts/GlobalStateContext"
+import { DataNode } from "antd/es/tree"
 
 const AddToDepartmentModal = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((props,ref)=>{
     const {selectedUserIds} = props
     const [selectedKeys, setSelectedKeys] = useState<string[]>([])
-    const [treeData,setTreeData] = useState<unknown[]>()
+    const [treeData,setTreeData] = useState<DataNode[]>()
     const { message } = App.useApp()
     const [expandedKeys, setExpandedKeys] = useState<string[]>([])
     const {fetchData} = useFetch()
+    const {state} = useGlobalContext()
     const save:()=>Promise<boolean | string> =  ()=>{
         return new Promise((resolve, reject)=>{
                 fetchData<BasicResponse<null>>('user/department/member',{method:'POST',eoBody:({userIds:selectedUserIds,departmentIds:selectedKeys}),eoTransformKeys:['departmentIds','userIds']}).then(response=>{
@@ -54,6 +57,13 @@ const AddToDepartmentModal = forwardRef<AddToDepartmentHandle,AddToDepartmentPro
         })
     }
 
+    const translatedTreeData = useMemo(()=>
+        treeData?.map((x:DataNode)=>({...x,
+            name:$t((x as unknown as {name:string}).name),
+            checkable:false,
+            children:x.children?.map((y)=>({...y,checkable:false}))
+        })),[state.language,treeData])
+
 
     const onCheck: TreeProps['onCheck'] = (checkedKeys:string[]) => {
         setSelectedKeys(checkedKeys.checked)
@@ -77,10 +87,10 @@ const AddToDepartmentModal = forwardRef<AddToDepartmentHandle,AddToDepartmentPro
                     selectable={false}
                     onCheck={onCheck}
                     onExpand={(expandedKeys:string[])=>{setExpandedKeys(expandedKeys)}}
-                    treeData={treeData}
+                    treeData={translatedTreeData}
                     selectedKeys={[selectedKeys]}
                     expandedKeys={expandedKeys}
-                    fieldNames={{title:$t('name'),key:'id',children:'children'}}
+                    fieldNames={{title:'name',key:'id',children:'children'}}
                 />
             </div>
         </div>)
