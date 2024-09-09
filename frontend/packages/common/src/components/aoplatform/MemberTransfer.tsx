@@ -3,8 +3,10 @@ import { GetProp, TransferProps, TreeDataNode, theme, Transfer, Tree, Spin } fro
 import { DataNode, TreeProps } from "antd/es/tree";
 import {  Ref, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { ApartmentOutlined, LoadingOutlined, UserOutlined } from "@ant-design/icons";
-import { debounce } from "lodash-es";
+import { cloneDeep, debounce } from "lodash-es";
 import { ColumnsType } from "antd/es/table";
+import { $t } from "@common/locales";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 type TransferItem = GetProp<TransferProps, 'dataSource'>[number];
 
@@ -138,7 +140,7 @@ const TransferTree = (props)=>{
     const [dataSource, setDataSource] = useState<DataNode[] >([])
     const parentRef = useRef<HTMLDivElement>(null);
     const [loading, setLoading] = useState<boolean>(false)
-
+    const {state} = useGlobalContext()
     
     useEffect(()=>{
       setTargetKeys(disabledData)
@@ -158,7 +160,7 @@ const TransferTree = (props)=>{
   const transferDataSource: TransferItem[] = useMemo(()=>{
       function flatten(list: TreeDataNode[] = [], res:TransferItem[]) {
         list.forEach((item) => {
-          res.push(item as TransferItem);
+          res.push({...item, title:item.title === '所有成员' ? $t((item as unknown as {title:string}).title):item.title }as TransferItem);
           flatten(item.children,res);
         });
       }
@@ -166,8 +168,16 @@ const TransferTree = (props)=>{
       flatten(dataSource,res);
       return res
   },[
-    dataSource
+    dataSource, state.language
   ])
+
+
+  const translatedDataSource = useMemo(()=>dataSource.map((item)=>({
+    ...item, 
+    name:item.name === '所有成员' ? $t((item as unknown as {name:string}).name):item.name,
+  })),[dataSource, state.language])
+
+
 
   let memo: Record<string, boolean> = {};
 
@@ -241,7 +251,7 @@ useEffect(() => {
             >
             {({ direction, onItemSelect, selectedKeys,onItemSelectAll ,filteredItems}) => {
               const treeProps = {
-                dataSource, direction, onItemSelect, selectedKeys,onItemSelectAll ,filteredItems,token,tableHeight,targetKeys,disabledData
+                dataSource:translatedDataSource, direction, onItemSelect, selectedKeys,onItemSelectAll ,filteredItems,token,tableHeight,targetKeys,disabledData
               }
                 if (direction === 'left') {
                     const checkedKey = [...selectedKeys, ...targetKeys as string[]];
