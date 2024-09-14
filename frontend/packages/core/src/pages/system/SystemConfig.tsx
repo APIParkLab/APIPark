@@ -100,7 +100,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setTagOptionList(data.tags?.map((x:EntityItem)=>{return {
-                    label:x.name, value:x.id
+                    label:x.name, value:x.name
                 }})||[])
                 setServiceClassifyOptionList(data.catalogues)
 
@@ -121,7 +121,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         ...data.service,
                         team:data.service.team.id,
                         catalogue:data.service.catalogue?.id,
-                        tags:data.service.tags?.map((x:EntityItem)=>x.id),
+                        tags:data.service.tags?.map((x:EntityItem)=>x.name),
                          logoFile:[
                             {
                                 uid: '-1', // 文件唯一标识

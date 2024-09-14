@@ -85,7 +85,6 @@ const TeamList:FC = ()=>{
     };
 
     const openModal = async (type:'add'|'edit'|'delete',entity?:TeamTableListItem)=>{
-        //console.log(type,entity)
         let title:string = ''
         let content:string | React.ReactNode= ''
         switch (type){
