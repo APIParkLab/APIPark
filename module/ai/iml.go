@@ -107,10 +107,10 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 	}, nil
 }
 
-func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.LLMItem, error) {
+func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.LLMItem, *ai_dto.ProviderItem, error) {
 	p, has := provider.GetProvider(driver)
 	if !has {
-		return nil, fmt.Errorf("ai provider not found")
+		return nil, nil, fmt.Errorf("ai provider not found")
 	}
 
 	llms := p.LLMs()
@@ -123,7 +123,12 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 			Scopes: v.Scopes,
 		})
 	}
-	return items, nil
+	info, err := i.providerService.Get(ctx, driver)
+	if err != nil {
+		return items, nil, err
+	}
+
+	return items, &ai_dto.ProviderItem{Id: info.Id, Name: info.Name, Logo: p.Info().Logo, Configured: true}, nil
 }
 
 func (i *imlProviderModule) UpdateProviderStatus(ctx context.Context, id string, enable bool) error {

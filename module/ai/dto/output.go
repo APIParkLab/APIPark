@@ -12,8 +12,7 @@ type ProviderItem struct {
 	Name       string `json:"name"`
 	DefaultLLM string `json:"default_llm"`
 	Logo       string `json:"logo"`
-	//Enable     bool   `json:"enable"`
-	Configured bool `json:"configured"`
+	Configured bool   `json:"configured"`
 }
 
 type SimpleProviderItem struct {
