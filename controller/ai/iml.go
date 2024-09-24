@@ -26,7 +26,7 @@ func (i *imlProviderController) Provider(ctx *gin.Context, id string) (*ai_dto.P
 	return i.module.Provider(ctx, id)
 }
 
-func (i *imlProviderController) LLMs(ctx *gin.Context, driver string) ([]*ai_dto.LLMItem, error) {
+func (i *imlProviderController) LLMs(ctx *gin.Context, driver string) ([]*ai_dto.LLMItem, *ai_dto.ProviderItem, error) {
 	return i.module.LLMs(ctx, driver)
 }
 
