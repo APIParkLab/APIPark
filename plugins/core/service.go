@@ -23,7 +23,7 @@ func (p *plugin) ServiceApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/ai-services", []string{"context", "query:service", "query:keyword"}, []string{"service"}, p.serviceController.SearchAIServices),
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/team/ai-service", []string{"context", "query:team", "body"}, []string{"service"}, p.serviceController.CreateAIService),
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/ai-service/info", []string{"context", "query:service", "body"}, []string{"service"}, p.serviceController.Edit),
-		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/ai-service", []string{"context", "query:service"}, nil, p.serviceController.DeleteAIService),
+		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/team/ai-service", []string{"context", "query:service"}, nil, p.serviceController.DeleteAIService),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/my_ai_services", []string{"context", "query:team", "query:keyword"}, []string{"services"}, p.serviceController.SearchMyAIServices),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/ai-service/info", []string{"context", "query:service"}, []string{"services"}, p.serviceController.Get),
 
