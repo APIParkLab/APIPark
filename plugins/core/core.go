@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/APIParkLab/APIPark/controller/ai"
+	ai_api "github.com/APIParkLab/APIPark/controller/ai-api"
 	"github.com/APIParkLab/APIPark/controller/monitor"
 	"github.com/APIParkLab/APIPark/controller/router"
 	"github.com/APIParkLab/APIPark/controller/system"
@@ -67,6 +68,7 @@ type plugin struct {
 	catalogueController         catalogue.ICatalogueController                     `autowired:""`
 	upstreamController          upstream.IUpstreamController                       `autowired:""`
 	routerController            router.IRouterController                           `autowired:""`
+	aiAPIController             ai_api.IAPIController                              `autowired:""`
 	apiDocController            router.IAPIDocController                           `autowired:""`
 	subscribeController         subscribe.ISubscribeController                     `autowired:""`
 	appAuthorizationController  application_authorization.IAuthorizationController `autowired:""`

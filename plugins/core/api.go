@@ -19,5 +19,11 @@ func (p *plugin) apiApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/service/api_doc", []string{"context", "query:service"}, []string{"doc"}, p.apiDocController.GetDoc),
 
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/service/api_doc/upload", []string{"context", "query:service"}, []string{"doc"}, p.apiDocController.UploadDoc),
+
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/service/ai-router", []string{"context", "query:service", "query:router"}, []string{"api"}, p.aiAPIController.Get),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/service/ai-routers", []string{"context", "query:keyword", "query:service"}, []string{"apis"}, p.aiAPIController.List),
+		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/service/ai-router", []string{"context", "query:service", "query:router", "body"}, []string{"api"}, p.aiAPIController.Edit),
+		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/service/ai-router", []string{"context", "query:service", "body"}, []string{"api"}, p.aiAPIController.Create),
+		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/service/ai-router", []string{"context", "query:service", "query:router"}, nil, p.aiAPIController.Delete),
 	}
 }

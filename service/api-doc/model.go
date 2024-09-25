@@ -4,7 +4,6 @@ import "time"
 
 type UpdateDoc struct {
 	ID      string
-	Service string
 	Content string
 }
 

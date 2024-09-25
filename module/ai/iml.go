@@ -69,11 +69,16 @@ func (i *imlProviderModule) Providers(ctx context.Context) ([]*ai_dto.ProviderIt
 			DefaultLLM: v.Info().DefaultLLM,
 		}
 		if info, has := providerMap[v.Info().Id]; has {
+			llm, has := v.LLM(info.DefaultLLM)
+			if !has {
+				continue
+			}
 			err = v.GlobalConfig().CheckConfig(info.Config)
 			if err == nil {
 				item.Configured = true
 			}
 			item.DefaultLLM = info.DefaultLLM
+			item.DefaultLLMLogo = llm.Logo
 		}
 		items = append(items, item)
 	}

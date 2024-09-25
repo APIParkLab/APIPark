@@ -19,6 +19,7 @@ type IAIProvider interface {
 	InvokeConfig() IAIConfig
 	UpdateLLMs() error
 	LLMs() []*LLM
+	LLM(id string) (*LLM, bool)
 }
 
 type IAIConfig interface {
