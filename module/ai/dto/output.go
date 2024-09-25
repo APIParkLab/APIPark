@@ -8,11 +8,12 @@ type Provider struct {
 }
 
 type ProviderItem struct {
-	Id         string `json:"id"`
-	Name       string `json:"name"`
-	DefaultLLM string `json:"default_llm"`
-	Logo       string `json:"logo"`
-	Configured bool   `json:"configured"`
+	Id             string `json:"id"`
+	Name           string `json:"name"`
+	DefaultLLM     string `json:"default_llm"`
+	DefaultLLMLogo string `json:"default_llm_logo"`
+	Logo           string `json:"logo"`
+	Configured     bool   `json:"configured"`
 }
 
 type SimpleProviderItem struct {

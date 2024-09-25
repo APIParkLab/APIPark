@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"github.com/APIParkLab/APIPark/module/ai/provider"
+	"github.com/eolinker/eosc"
 	"sync"
 )
 
@@ -27,19 +28,23 @@ type ModelData struct {
 type Model struct {
 	globalConfig provider.IAIConfig
 	invokeConfig provider.IAIConfig
-	models       []*ModelData
+	models       eosc.Untyped[string, *ModelData]
 	locker       sync.RWMutex
 }
 
 func NewModel() provider.IAIProvider {
 	modelData := make([]*ModelData, 0)
 	json.Unmarshal(modelJson, &modelData)
-	return &Model{
+	m := &Model{
 		globalConfig: NewGlobalConfigDriver(),
 		invokeConfig: NewInvokeConfigDriver(),
-		models:       modelData,
+		models:       eosc.BuildUntyped[string, *ModelData](),
 		locker:       sync.RWMutex{},
 	}
+	for _, v := range modelData {
+		m.models.Set(v.Id, v)
+	}
+	return m
 }
 
 func (m *Model) Index() int {
@@ -83,11 +88,9 @@ func (m *Model) UpdateLLMs() error {
 }
 
 func (m *Model) LLMs() []*provider.LLM {
-	m.locker.RLock()
 	models := m.models
-	m.locker.RUnlock()
-	result := make([]*provider.LLM, 0, len(models))
-	for _, model := range models {
+	result := make([]*provider.LLM, 0, models.Count())
+	for _, model := range models.List() {
 		llm := &provider.LLM{
 			Id:     model.Id,
 			Logo:   model.Logo,
@@ -96,4 +99,16 @@ func (m *Model) LLMs() []*provider.LLM {
 		result = append(result, llm)
 	}
 	return result
+}
+
+func (m *Model) LLM(id string) (*provider.LLM, bool) {
+	model, has := m.models.Get(id)
+	if !has {
+		return nil, false
+	}
+	return &provider.LLM{
+		Id:     model.Id,
+		Logo:   model.Logo,
+		Scopes: model.Scopes,
+	}, true
 }
