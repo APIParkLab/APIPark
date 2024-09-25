@@ -69,12 +69,11 @@ func (i *imlProviderModule) Providers(ctx context.Context) ([]*ai_dto.ProviderIt
 			DefaultLLM: v.Info().DefaultLLM,
 		}
 		if info, has := providerMap[v.Info().Id]; has {
-			//item.Enable = info.Status
 			err = v.GlobalConfig().CheckConfig(info.Config)
 			if err == nil {
 				item.Configured = true
 			}
-
+			item.DefaultLLM = info.DefaultLLM
 		}
 		items = append(items, item)
 	}
@@ -126,10 +125,20 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 	}
 	info, err := i.providerService.Get(ctx, driver)
 	if err != nil {
-		return items, nil, err
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil, err
+		}
+
+		return items, &ai_dto.ProviderItem{
+			Id:         p.Info().Id,
+			Name:       p.Info().Name,
+			DefaultLLM: p.Info().DefaultLLM,
+			Logo:       p.Info().Logo,
+			Configured: false,
+		}, err
 	}
 
-	return items, &ai_dto.ProviderItem{Id: info.Id, Name: info.Name, Logo: p.Info().Logo, Configured: true}, nil
+	return items, &ai_dto.ProviderItem{Id: info.Id, Name: info.Name, DefaultLLM: info.DefaultLLM, Logo: p.Info().Logo, Configured: true}, nil
 }
 
 func (i *imlProviderModule) UpdateProviderStatus(ctx context.Context, id string, enable bool) error {
