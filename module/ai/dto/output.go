@@ -25,5 +25,6 @@ type SimpleProviderItem struct {
 type LLMItem struct {
 	Id     string   `json:"id"`
 	Logo   string   `json:"logo"`
+	Config string   `json:"config"`
 	Scopes []string `json:"scopes"`
 }

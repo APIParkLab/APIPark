@@ -7,17 +7,19 @@ type Service struct {
 	UUID string `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
 	Name string `gorm:"type:varchar(100);not null;column:name;comment:name"`
 
-	Description string    `gorm:"size:255;not null;column:description;comment:description"`
-	Prefix      string    `gorm:"size:255;not null;column:prefix;comment:前缀"`
-	Team        string    `gorm:"size:36;not null;column:team;comment:团队id;index:team"` // 团队id
-	Logo        string    `gorm:"type:text;not null;column:logo;comment:logo"`
-	ServiceType int       `gorm:"type:int(11);not null;column:service_type;comment:服务类型"`
-	Catalogue   string    `gorm:"type:text;not null;column:catalogue;comment:目录"`
-	CreateAt    time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
-	UpdateAt    time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;column:update_at;comment:修改时间"`
-	IsDelete    int       `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除"`
-	AsServer    bool      `gorm:"type:tinyint(1);not null;column:as_server;comment:是否为服务端项目"`
-	AsApp       bool      `gorm:"type:tinyint(1);not null;column:as_app;comment:是否为应用项目"`
+	Description      string    `gorm:"size:255;not null;column:description;comment:description"`
+	Prefix           string    `gorm:"size:255;not null;column:prefix;comment:前缀"`
+	Team             string    `gorm:"size:36;not null;column:team;comment:团队id;index:team"` // 团队id
+	Logo             string    `gorm:"type:text;not null;column:logo;comment:logo"`
+	ServiceType      int       `gorm:"type:int(11);not null;column:service_type;comment:服务类型"`
+	Catalogue        string    `gorm:"type:text;not null;column:catalogue;comment:目录"`
+	CreateAt         time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
+	UpdateAt         time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;column:update_at;comment:修改时间"`
+	IsDelete         int       `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除"`
+	Kind             int       `gorm:"type:tinyint(4);not null;column:kind;comment:服务种类，0:Rest服务，1:AI服务"`
+	AdditionalConfig string    `gorm:"type:text;not null;column:additional_config;comment:额外配置"`
+	AsServer         bool      `gorm:"type:tinyint(1);not null;column:as_server;comment:是否为服务端项目"`
+	AsApp            bool      `gorm:"type:tinyint(1);not null;column:as_app;comment:是否为应用项目"`
 }
 
 func (p *Service) IdValue() int64 {

@@ -14,21 +14,23 @@ type IServiceModule interface {
 	// Get 获取项目信息
 	Get(ctx context.Context, id string) (*service_dto.Service, error)
 	// Search 搜索项目
-	Search(ctx context.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error)
-	// SearchMyServices 搜索
-	SearchMyServices(ctx context.Context, teamId string, keyword string) ([]*service_dto.ServiceItem, error)
+	Search(ctx context.Context, teamID string, keyword string, kind string) ([]*service_dto.ServiceItem, error)
+	// SearchMyServicesByKind 搜索
+	SearchMyServicesByKind(ctx context.Context, teamId string, keyword string, kind string) ([]*service_dto.ServiceItem, error)
 	// Create 创建
 	Create(ctx context.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error)
 	// Edit 编辑
 	Edit(ctx context.Context, id string, input *service_dto.EditService) (*service_dto.Service, error)
 	// Delete 删除项目
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id string, kind string) error
 	// Simple 获取简易项目列表
-	Simple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
+	//Simple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
 
 	// MySimple 获取我的简易项目列表
-	MySimple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
+	//MySimple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
+}
 
+type IServiceDocModule interface {
 	ServiceDoc(ctx context.Context, pid string) (*service_dto.ServiceDoc, error)
 	// SaveServiceDoc 保存服务文档
 	SaveServiceDoc(ctx context.Context, pid string, input *service_dto.SaveServiceDoc) error
@@ -71,6 +73,11 @@ func init() {
 
 	autowire.Auto[IExportAppModule](func() reflect.Value {
 		return reflect.ValueOf(appModule)
+	})
+
+	serviceDocModule := new(imlServiceDocModule)
+	autowire.Auto[IServiceDocModule](func() reflect.Value {
+		return reflect.ValueOf(serviceDocModule)
 	})
 
 }
