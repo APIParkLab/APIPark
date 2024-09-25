@@ -120,6 +120,7 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 		items = append(items, &ai_dto.LLMItem{
 			Id:     v.Id,
 			Logo:   v.Logo,
+			Config: p.InvokeConfig().DefaultConfig(),
 			Scopes: v.Scopes,
 		})
 	}

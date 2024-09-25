@@ -13,6 +13,7 @@ type ServiceItem struct {
 	Description string         `json:"description"`
 	CreateTime  auto.TimeLabel `json:"create_time"`
 	UpdateTime  auto.TimeLabel `json:"update_time"`
+	Provider    *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
 	CanDelete   bool           `json:"can_delete"`
 }
 
@@ -54,6 +55,7 @@ type Service struct {
 	Catalogue   auto.Label     `json:"catalogue" aolabel:"catalogue"`
 	Tags        []auto.Label   `json:"tags" aolabel:"tag"`
 	Logo        string         `json:"logo"`
+	Provider    *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
 	AsServer    bool           `json:"as_server"`
 	AsApp       bool           `json:"as_app"`
 }
@@ -69,7 +71,8 @@ type App struct {
 }
 
 func ToService(model *service.Service) *Service {
-	return &Service{
+
+	s := &Service{
 		Id:          model.Id,
 		Name:        model.Name,
 		Prefix:      model.Prefix,
@@ -83,6 +86,12 @@ func ToService(model *service.Service) *Service {
 		AsServer:    model.AsServer,
 		AsApp:       model.AsApp,
 	}
+	switch model.Kind {
+	case service.AIService:
+		provider := auto.UUID(model.AdditionalConfig["provider"])
+		s.Provider = &provider
+	}
+	return s
 }
 
 type MemberItem struct {

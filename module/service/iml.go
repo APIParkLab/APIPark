@@ -48,11 +48,11 @@ type imlServiceModule struct {
 	teamService       team.ITeamService              `autowired:""`
 	teamMemberService team_member.ITeamMemberService `autowired:""`
 	tagService        tag.ITagService                `autowired:""`
-	serviceDocService service_doc.IDocService        `autowired:""`
-	serviceTagService service_tag.ITagService        `autowired:""`
-	apiService        api.IAPIService                `autowired:""`
-	apiDocService     api_doc.IAPIDocService         `autowired:""`
-	transaction       store.ITransaction             `autowired:""`
+
+	serviceTagService service_tag.ITagService `autowired:""`
+	apiService        api.IAPIService         `autowired:""`
+	apiDocService     api_doc.IAPIDocService  `autowired:""`
+	transaction       store.ITransaction      `autowired:""`
 }
 
 func (i *imlServiceModule) ExportAll(ctx context.Context) ([]*service_dto.ExportService, error) {
@@ -82,10 +82,10 @@ func (i *imlServiceModule) ExportAll(ctx context.Context) ([]*service_dto.Export
 		serviceTagMap[st.Sid] = append(serviceTagMap[st.Sid], tagMap[st.Tid].Name)
 	}
 
-	docMap, err := i.serviceDocService.Map(ctx, serviceIds...)
-	if err != nil {
-		return nil, err
-	}
+	//docMap, err := i.serviceDocService.Map(ctx, serviceIds...)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	items := make([]*service_dto.ExportService, 0, len(services))
 	for _, s := range services {
@@ -99,9 +99,9 @@ func (i *imlServiceModule) ExportAll(ctx context.Context) ([]*service_dto.Export
 			Catalogue:   s.Catalogue,
 			Logo:        s.Logo,
 		}
-		if v, ok := docMap[s.Id]; ok {
-			info.Doc = v.Doc
-		}
+		//if v, ok := docMap[s.Id]; ok {
+		//	info.Doc = v.Doc
+		//}
 		if tags, ok := serviceTagMap[s.Id]; ok {
 			info.Tags = tags
 		}
@@ -111,11 +111,12 @@ func (i *imlServiceModule) ExportAll(ctx context.Context) ([]*service_dto.Export
 
 }
 
-func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, keyword string) ([]*service.Service, error) {
+func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, keyword string, kind service.Kind) ([]*service.Service, error) {
 
 	userID := utils.UserId(ctx)
 	condition := make(map[string]interface{})
 	condition["as_server"] = true
+	condition["kind"] = kind.Int()
 	if teamId != "" {
 		_, err := i.teamService.Get(ctx, teamId)
 		if err != nil {
@@ -135,8 +136,8 @@ func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, 
 
 }
 
-func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, keyword string) ([]*service_dto.ServiceItem, error) {
-	services, err := i.searchMyServices(ctx, teamId, keyword)
+func (i *imlServiceModule) SearchMyServicesByKind(ctx context.Context, teamId string, keyword string, kind string) ([]*service_dto.ServiceItem, error) {
+	services, err := i.searchMyServices(ctx, teamId, keyword, service.Kind(kind))
 	if err != nil {
 		return nil, err
 	}
@@ -154,79 +155,74 @@ func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, 
 			continue
 		}
 		apiCount := apiCountMap[model.Id]
-		items = append(items, &service_dto.ServiceItem{
-			Id:          model.Id,
-			Name:        model.Name,
-			Description: model.Description,
-			CreateTime:  auto.TimeLabel(model.CreateTime),
-			UpdateTime:  auto.TimeLabel(model.UpdateTime),
-			Team:        auto.UUID(model.Team),
-			ApiNum:      apiCount,
-			CanDelete:   apiCount == 0,
-		})
+		item := toServiceItem(service.Kind(kind), model)
+		item.ApiNum = apiCount
+		item.CanDelete = apiCount == 0
+		items = append(items, item)
+
 	}
 	return items, nil
 }
 
-func (i *imlServiceModule) SimpleAPPS(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
-	w := make(map[string]interface{})
-	w["as_app"] = true
-	services, err := i.serviceService.Search(ctx, keyword, w)
-	if err != nil {
-		return nil, err
-	}
-	return utils.SliceToSlice(services, func(p *service.Service) *service_dto.SimpleServiceItem {
-		return &service_dto.SimpleServiceItem{
-			Id:          p.Id,
-			Name:        p.Name,
-			Description: p.Description,
+//func (i *imlServiceModule) SimpleAPPS(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
+//	w := make(map[string]interface{})
+//	w["as_app"] = true
+//	services, err := i.serviceService.Search(ctx, keyword, w)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return utils.SliceToSlice(services, func(p *service.Service) *service_dto.SimpleServiceItem {
+//		return &service_dto.SimpleServiceItem{
+//			Id:          p.Id,
+//			Name:        p.Name,
+//			Description: p.Description,
+//
+//			Team: auto.UUID(p.Team),
+//		}
+//	}), nil
+//}
 
-			Team: auto.UUID(p.Team),
-		}
-	}), nil
-}
-
-func (i *imlServiceModule) Simple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
-	w := make(map[string]interface{})
-	w["as_server"] = true
-
-	services, err := i.serviceService.Search(ctx, keyword, w)
-	if err != nil {
-		return nil, err
-	}
-
-	items := make([]*service_dto.SimpleServiceItem, 0, len(services))
-	for _, p := range services {
-
-		items = append(items, &service_dto.SimpleServiceItem{
-			Id:          p.Id,
-			Name:        p.Name,
-			Description: p.Description,
-			Team:        auto.UUID(p.Team),
-		})
-	}
-	return items, nil
-}
-
-func (i *imlServiceModule) MySimple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
-	services, err := i.searchMyServices(ctx, "", keyword)
-
-	if err != nil {
-		return nil, err
-	}
-
-	items := make([]*service_dto.SimpleServiceItem, 0, len(services))
-	for _, p := range services {
-
-		items = append(items, &service_dto.SimpleServiceItem{
-			Id:          p.Id,
-			Name:        p.Name,
-			Description: p.Description,
-			Team:        auto.UUID(p.Team),
-		})
-	}
-	return items, nil
-}
+//func (i *imlServiceModule) Simple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
+//	w := make(map[string]interface{})
+//	w["as_server"] = true
+//
+//	services, err := i.serviceService.Search(ctx, keyword, w)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	items := make([]*service_dto.SimpleServiceItem, 0, len(services))
+//	for _, p := range services {
+//
+//		items = append(items, &service_dto.SimpleServiceItem{
+//			Id:          p.Id,
+//			Name:        p.Name,
+//			Description: p.Description,
+//			Team:        auto.UUID(p.Team),
+//		})
+//	}
+//	return items, nil
+//}
+//
+//func (i *imlServiceModule) MySimple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
+//	services, err := i.searchMyServices(ctx, "", keyword)
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	items := make([]*service_dto.SimpleServiceItem, 0, len(services))
+//	for _, p := range services {
+//
+//		items = append(items, &service_dto.SimpleServiceItem{
+//			Id:          p.Id,
+//			Name:        p.Name,
+//			Description: p.Description,
+//			Team:        auto.UUID(p.Team),
+//		})
+//	}
+//	return items, nil
+//}
 
 func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Service, error) {
 	serviceInfo, err := i.serviceService.Get(ctx, id)
@@ -245,7 +241,7 @@ func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Ser
 	return s, nil
 }
 
-func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {
+func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword string, kind string) ([]*service_dto.ServiceItem, error) {
 	var list []*service.Service
 	var err error
 	if teamID != "" {
@@ -253,9 +249,9 @@ func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword st
 		if err != nil {
 			return nil, err
 		}
-		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"team": teamID, "as_server": true}, "update_at desc")
+		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"team": teamID, "as_server": true, "kind": service.Kind(kind).Int()}, "update_at desc")
 	} else {
-		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"as_server": true}, "update_at desc")
+		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"as_server": true, "kind": service.Kind(kind).Int()}, "update_at desc")
 	}
 	if err != nil {
 		return nil, err
@@ -273,18 +269,33 @@ func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword st
 	items := make([]*service_dto.ServiceItem, 0, len(list))
 	for _, model := range list {
 		apiCount := apiCountMap[model.Id]
-		items = append(items, &service_dto.ServiceItem{
-			Id:          model.Id,
-			Name:        model.Name,
-			Description: model.Description,
-			CreateTime:  auto.TimeLabel(model.CreateTime),
-			UpdateTime:  auto.TimeLabel(model.UpdateTime),
-			Team:        auto.UUID(model.Team),
-			ApiNum:      apiCount,
-			CanDelete:   apiCount == 0,
-		})
+		item := toServiceItem(service.Kind(kind), model)
+		item.ApiNum = apiCount
+		item.CanDelete = apiCount == 0
+		items = append(items, item)
 	}
 	return items, nil
+}
+
+func toServiceItem(kind service.Kind, model *service.Service) *service_dto.ServiceItem {
+	item := &service_dto.ServiceItem{
+		Id:          model.Id,
+		Name:        model.Name,
+		Description: model.Description,
+		CreateTime:  auto.TimeLabel(model.CreateTime),
+		UpdateTime:  auto.TimeLabel(model.UpdateTime),
+		Team:        auto.UUID(model.Team),
+	}
+	switch kind {
+	case service.RestService:
+		return item
+	case service.AIService:
+		provider := auto.UUID(model.AdditionalConfig["provider"])
+		item.Provider = &provider
+		return item
+	default:
+		return item
+	}
 }
 
 func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error) {
@@ -293,17 +304,28 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 		input.Id = uuid.New().String()
 	}
 	mo := &service.Create{
-		Id:          input.Id,
-		Name:        input.Name,
-		Description: input.Description,
-		Team:        teamID,
-		ServiceType: service.ServiceType(input.ServiceType),
-		Catalogue:   input.Catalogue,
-		Prefix:      input.Prefix,
-		Logo:        input.Logo,
+		Id:               input.Id,
+		Name:             input.Name,
+		Description:      input.Description,
+		Team:             teamID,
+		ServiceType:      service.ServiceType(input.ServiceType),
+		Catalogue:        input.Catalogue,
+		Prefix:           input.Prefix,
+		Logo:             input.Logo,
+		AdditionalConfig: make(map[string]string),
 	}
 	if mo.ServiceType == service.PublicService && mo.Catalogue == "" {
 		return nil, fmt.Errorf("catalogue can not be empty")
+	}
+	if input.Kind != nil {
+		mo.Kind = service.Kind(*input.Kind)
+		switch mo.Kind {
+		case service.AIService:
+			if input.Provider == nil {
+				return nil, fmt.Errorf("ai service: provider can not be empty")
+			}
+			mo.AdditionalConfig["provider"] = *input.Provider
+		}
 	}
 	if input.AsApp == nil {
 		// 默认值为false
@@ -343,9 +365,17 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 }
 
 func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_dto.EditService) (*service_dto.Service, error) {
-	_, err := i.serviceService.Get(ctx, id)
+	info, err := i.serviceService.Get(ctx, id)
 	if err != nil {
 		return nil, err
+	}
+
+	switch info.Kind {
+	case service.AIService:
+		if input.Provider != nil {
+			info.AdditionalConfig["provider"] = *input.Provider
+		}
+
 	}
 	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		serviceType := (*service.ServiceType)(input.ServiceType)
@@ -356,11 +386,12 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 		}
 
 		err = i.serviceService.Save(ctx, id, &service.Edit{
-			Name:        input.Name,
-			Description: input.Description,
-			Logo:        input.Logo,
-			ServiceType: serviceType,
-			Catalogue:   input.Catalogue,
+			Name:             input.Name,
+			Description:      input.Description,
+			Logo:             input.Logo,
+			ServiceType:      serviceType,
+			Catalogue:        input.Catalogue,
+			AdditionalConfig: &info.AdditionalConfig,
 		})
 		if err != nil {
 			return err
@@ -390,9 +421,18 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 	return i.Get(ctx, id)
 }
 
-func (i *imlServiceModule) Delete(ctx context.Context, id string) error {
-
-	err := i.transaction.Transaction(ctx, func(ctx context.Context) error {
+func (i *imlServiceModule) Delete(ctx context.Context, id string, kind string) error {
+	info, err := i.serviceService.Get(ctx, id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
+		return err
+	}
+	if info.Kind.Int() != service.Kind(kind).Int() {
+		return fmt.Errorf("kind is not match")
+	}
+	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		count, err := i.apiService.CountByService(ctx, id)
 		if err != nil {
 			return err
@@ -441,7 +481,12 @@ func (i *imlServiceModule) getTagUuids(ctx context.Context, tags []string) ([]st
 	return tagList, nil
 }
 
-func (i *imlServiceModule) ServiceDoc(ctx context.Context, pid string) (*serviceDto.ServiceDoc, error) {
+type imlServiceDocModule struct {
+	serviceService    service.IServiceService `autowired:""`
+	serviceDocService service_doc.IDocService `autowired:""`
+}
+
+func (i *imlServiceDocModule) ServiceDoc(ctx context.Context, pid string) (*serviceDto.ServiceDoc, error) {
 	_, err := i.serviceService.Check(ctx, pid, map[string]bool{"as_server": true})
 
 	if err != nil {
@@ -473,7 +518,7 @@ func (i *imlServiceModule) ServiceDoc(ctx context.Context, pid string) (*service
 	}, nil
 }
 
-func (i *imlServiceModule) SaveServiceDoc(ctx context.Context, pid string, input *serviceDto.SaveServiceDoc) error {
+func (i *imlServiceDocModule) SaveServiceDoc(ctx context.Context, pid string, input *serviceDto.SaveServiceDoc) error {
 	_, err := i.serviceService.Check(ctx, pid, map[string]bool{"as_server": true})
 
 	if err != nil {

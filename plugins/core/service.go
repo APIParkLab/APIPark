@@ -15,9 +15,17 @@ func (p *plugin) ServiceApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/my_services", []string{"context", "query:team", "query:keyword"}, []string{"services"}, p.serviceController.SearchMyServices),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/services", []string{"context", "query:team", "query:keyword"}, []string{"services"}, p.serviceController.Search),
 
-		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/services/mine", []string{"context", "query:keyword"}, []string{"services"}, p.serviceController.MySimple),
+		//pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/services/mine", []string{"context", "query:keyword"}, []string{"services"}, p.serviceController.MySimple),
+		//
+		//pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/services", []string{"context", "query:keyword"}, []string{"services"}, p.serviceController.Simple),
 
-		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/services", []string{"context", "query:keyword"}, []string{"services"}, p.serviceController.Simple),
+		// AI服务
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/ai-services", []string{"context", "query:service", "query:keyword"}, []string{"service"}, p.serviceController.SearchAIServices),
+		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/team/ai-service", []string{"context", "query:service", "body"}, []string{"service"}, p.serviceController.Create),
+		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/ai-service/info", []string{"context", "query:service", "body"}, []string{"service"}, p.serviceController.Edit),
+		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/ai-service", []string{"context", "query:service"}, nil, p.serviceController.Delete),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/my_ai_services", []string{"context", "query:team", "query:keyword"}, []string{"services"}, p.serviceController.SearchMyAIServices),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/ai-service/info", []string{"context", "query:service"}, []string{"services"}, p.serviceController.Get),
 
 		// 应用相关
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/app/info", []string{"context", "query:app"}, []string{"app"}, p.appController.GetApp),

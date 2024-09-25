@@ -8,31 +8,51 @@ import (
 
 var (
 	_ IServiceController = (*imlServiceController)(nil)
-	_ IAppController     = (*imlAppController)(nil)
+
+	_ IAppController = (*imlAppController)(nil)
 )
 
 type imlServiceController struct {
-	module service.IServiceModule `autowired:""`
+	module    service.IServiceModule    `autowired:""`
+	docModule service.IServiceDocModule `autowired:""`
+}
+
+func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error) {
+	kind := "ai"
+	input.Kind = &kind
+	return i.module.Create(ctx, teamID, input)
+}
+
+func (i *imlServiceController) DeleteAIService(ctx *gin.Context, id string) error {
+	return i.module.Delete(ctx, id, "ai")
+}
+
+func (i *imlServiceController) SearchMyAIServices(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {
+	return i.module.SearchMyServicesByKind(ctx, teamID, keyword, "ai")
+}
+
+func (i *imlServiceController) SearchAIServices(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {
+	return i.module.Search(ctx, teamID, keyword, "ai")
 }
 
 func (i *imlServiceController) SearchMyServices(ctx *gin.Context, teamId string, keyword string) ([]*service_dto.ServiceItem, error) {
-	return i.module.SearchMyServices(ctx, teamId, keyword)
+	return i.module.SearchMyServicesByKind(ctx, teamId, keyword, "")
 }
 
-func (i *imlServiceController) Simple(ctx *gin.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
-	return i.module.Simple(ctx, keyword)
-}
-
-func (i *imlServiceController) MySimple(ctx *gin.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
-	return i.module.MySimple(ctx, keyword)
-}
+//func (i *imlServiceController) Simple(ctx *gin.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
+//	return i.module.Simple(ctx, keyword)
+//}
+//
+//func (i *imlServiceController) MySimple(ctx *gin.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
+//	return i.module.MySimple(ctx, keyword)
+//}
 
 func (i *imlServiceController) Get(ctx *gin.Context, id string) (*service_dto.Service, error) {
 	return i.module.Get(ctx, id)
 }
 
 func (i *imlServiceController) Search(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {
-	return i.module.Search(ctx, teamID, keyword)
+	return i.module.Search(ctx, teamID, keyword, "")
 }
 
 func (i *imlServiceController) Create(ctx *gin.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error) {
@@ -44,15 +64,15 @@ func (i *imlServiceController) Edit(ctx *gin.Context, id string, input *service_
 }
 
 func (i *imlServiceController) Delete(ctx *gin.Context, id string) error {
-	return i.module.Delete(ctx, id)
+	return i.module.Delete(ctx, id, "")
 }
 
 func (i *imlServiceController) ServiceDoc(ctx *gin.Context, id string) (*service_dto.ServiceDoc, error) {
-	return i.module.ServiceDoc(ctx, id)
+	return i.docModule.ServiceDoc(ctx, id)
 }
 
 func (i *imlServiceController) SaveServiceDoc(ctx *gin.Context, id string, input *service_dto.SaveServiceDoc) error {
-	return i.module.SaveServiceDoc(ctx, id, input)
+	return i.docModule.SaveServiceDoc(ctx, id, input)
 }
 
 type imlAppController struct {
