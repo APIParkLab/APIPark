@@ -27,15 +27,19 @@ func (i *imlProviderService) Save(ctx context.Context, id string, cfg *SetProvid
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
-		if cfg.Name == nil || cfg.Config == nil || cfg.DefaultLLM == nil || cfg.Status == nil {
+		if cfg.Name == nil || cfg.Config == nil || cfg.DefaultLLM == nil {
 			return errors.New("invalid params")
+		}
+		status := false
+		if cfg.Status != nil {
+			status = *cfg.Status
 		}
 		info = &ai.Provider{
 			UUID:       id,
 			Name:       *cfg.Name,
 			DefaultLLM: *cfg.DefaultLLM,
 			Config:     base64.RawStdEncoding.EncodeToString([]byte(*cfg.Config)),
-			Status:     *cfg.Status,
+			Status:     status,
 			Creator:    userId,
 			Updater:    userId,
 			CreateAt:   now,
