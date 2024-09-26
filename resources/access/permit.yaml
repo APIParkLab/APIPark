@@ -6,6 +6,13 @@ system:
     - PUT:/api/v1/catalogue/sort
   system.api_market.service_classification.view:
     - GET:/api/v1/catalogues
+  system.devops.ai_provider.view:
+    - GET:/api/v1/ai/providers
+    - GET:/api/v1/ai/provider
+    - POST:/api/v1/ai/provider
+    - PUT:/api/v1/ai/provider
+  system.devops.ai_provider.manager:
+    - DELETE:/api/v1/ai/provider
   system.devops.cluster.manager:
     - PUT:/api/v1/cluster/reset
     - POST:/api/v1/cluster/check
