@@ -4,15 +4,26 @@ import { $t } from "@common/locales"
 import { Icon } from "@iconify/react/dist/iconify.js"
 import { Button, Card, Collapse } from "antd"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 
 export default function Guide(){
     const [showGuide, setShowGuide] = useState(localStorage.getItem('showGuide') !== 'false' )
     const [, forceUpdate] = useState<unknown>(null);
     const {state} = useGlobalContext()
+    const location = useLocation()
+    const currentUrl = location.pathname
+    const navigator = useNavigate()
 
     useEffect(()=>{
         localStorage.setItem('showGuide', showGuide.toString())
     },[showGuide])
+    useEffect(()=>{
+        if(currentUrl === '/guide'){
+            setTimeout(()=>{
+                navigator('/guide/page')
+            },0)
+        }
+    },[])
     useEffect(()=>{forceUpdate({})},[state.language])
     return (
        <InsidePage 
