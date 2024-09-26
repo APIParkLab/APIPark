@@ -24,9 +24,10 @@ class InsidePageProps {
     headerClassName?:string=''
     /** 整个页面滚动 */
     scrollPage?:boolean = true
+    customBtn?:ReactNode
 }
 
-const InsidePage:FC<InsidePageProps> = ({showBanner=true,pageTitle,tagList,showBtn,btnTitle,btnAccess,description,children,onBtnClick,backUrl,showBorder=true,className='',contentClassName='',headerClassName='',scrollPage=true})=>{
+const InsidePage:FC<InsidePageProps> = ({showBanner=true,pageTitle,tagList,showBtn,btnTitle,btnAccess,description,children,onBtnClick,backUrl,showBorder=true,className='',contentClassName='',headerClassName='',scrollPage=true,customBtn})=>{
     const navigate = useNavigate();
 
     const goBack = () => {
@@ -50,6 +51,7 @@ const InsidePage:FC<InsidePageProps> = ({showBanner=true,pageTitle,tagList,showB
                         {showBtn && <WithPermission access={btnAccess}><Button type="primary" onClick={()=> {
                             onBtnClick&&onBtnClick()
                         }}>{btnTitle}</Button></WithPermission>}
+                        {customBtn}
                     </div>
                     <p >
                         {description}

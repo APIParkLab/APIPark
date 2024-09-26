@@ -220,6 +220,11 @@ export const ApprovalRouteColumns = [
         render:(value)=>value?.join(', ')
     },
     {
+        title:('名称'),
+        dataIndex:'name',
+        ellipsis:true,
+    },
+    {
         title:('路径'),
         dataIndex:'path',
         ellipsis:true
