@@ -46,13 +46,14 @@ const themeToken = {
      const mainPage = project === 'core' ?'/service/list':'/serviceHub/list'
 
    const TOTAL_MENU_ITEMS:MenuProps['items'] =  useMemo(() => [
-    getNavItem($t('工作空间'), 'workspace','/guide',<Icon icon="ic:baseline-space-dashboard" width="18" height="18"/>, [
-      getNavItem($t('我的'), 'my','/guide',null,[
-        getNavItem(<a>{$t('首页')}</a>, 'guide','/guide',<Icon icon="ic:baseline-home" width="18" height="18"/>,undefined,undefined,''),
-        getNavItem(<a>{$t('应用')}</a>, 'tenantManagement','/tenantManagement',<Icon icon="ic:baseline-apps" width="18" height="18"/>,undefined,undefined,''),
-        getNavItem(<a>{$t('服务')}</a>, 'service','/service',<Icon icon="ic:baseline-blinds-closed" width="18" height="18"/>,undefined,undefined,''),
-        getNavItem(<a>{$t('团队')}</a>, 'team','/team',<Icon icon="ic:baseline-people-alt" width="18" height="18"/>,undefined,undefined,''),
-      ],undefined,''),
+    getNavItem($t('工作空间'), 'workspace','/guide/page',<Icon icon="ic:baseline-space-dashboard" width="18" height="18"/>, [
+        getNavItem(<a>{$t('首页')}</a>, 'guide','/guide/page',<Icon icon="ic:baseline-home" width="18" height="18"/>,undefined,undefined,'all'),
+        getNavItem(<a>{$t('应用')}</a>, 'tenantManagement','/tenantManagement',<Icon icon="ic:baseline-apps" width="18" height="18"/>,undefined,undefined,'all'),
+        getNavItem(<a>{$t('团队')}</a>, 'team','/team',<Icon icon="ic:baseline-people-alt" width="18" height="18"/>,undefined,undefined,'all'),
+      getNavItem($t('服务'), 'my','/service',null,[
+        getNavItem(<a>{$t('REST 服务')}</a>, 'service','/service',<Icon icon="ic:baseline-blinds-closed" width="18" height="18"/>,undefined,undefined,''),
+        getNavItem(<a>{$t('AI 服务')}</a>, 'aiservice','/aiservice',<Icon icon="eos-icons:ai" width="18" height="18"/>,undefined,undefined,''),
+    ],undefined,''),
     ]),
     getNavItem(<a>{$t('API 市场')}</a>, 'serviceHub','/serviceHub',<Icon icon="ic:baseline-hub" width="18" height="18"/>,undefined,undefined,'system.workspace.api_market.view'),
 
@@ -72,6 +73,7 @@ const themeToken = {
   
       getNavItem($t('运维与集成'), 'maintenanceCenter','/cluster', null, [
         getNavItem(<a>{$t('集群')}</a>, 'cluster','/cluster',<Icon icon="ic:baseline-device-hub" width="18" height="18"/>,undefined,undefined,'system.devops.cluster.view'),
+        getNavItem(<a>{$t('AI 配置')}</a>, 'aisetting','/aisetting',<Icon icon="hugeicons:ai-network" width="18" height="18"/>,undefined,undefined,'system.devops.cluster.view'),
         getNavItem(<a>{$t('数据源')}</a>, 'datasourcing','/datasourcing',<Icon icon="ic:baseline-monitor-heart" width="18" height="18"/>,undefined,undefined,'system.devops.data_source.view'),
         getNavItem(<a>{$t('证书')}</a>, 'cert','/cert',<Icon icon="ic:baseline-security" width="18" height="18"/>,undefined,undefined,'system.devops.ssl_certificate.view'),
         getNavItem(<a>{$t('日志')}</a>, 'logsettings','/logsettings',<Icon icon="ic:baseline-sticky-note-2" width="18" height="18"/>,undefined,undefined,'system.devops.log_configuration.view'),
@@ -109,7 +111,7 @@ const themeToken = {
                     }
                     // 处理没有 routes 的菜单项
                     if (item.access) {
-                        return hasAccess(item.access) ? item : null;
+                        return (item.access === 'all' || hasAccess(item.access)) ? item : null;
                     }
 
                     // 如果没有 access 和 routes，则保留

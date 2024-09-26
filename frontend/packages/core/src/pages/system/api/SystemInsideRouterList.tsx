@@ -11,7 +11,7 @@ import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import SystemInsideRouterCreate from "./SystemInsideRouterCreate.tsx";
 import {useSystemContext} from "../../../contexts/SystemContext.tsx";
 import { SYSTEM_API_TABLE_COLUMNS } from "../../../const/system/const.tsx";
-import {SystemApiTableListItem, SystemInsideRouterCreateHandle, SystemInsideApiDocumentHandle } from "../../../const/system/type.ts";
+import {SystemApiTableListItem, SystemInsideRouterCreateHandle } from "../../../const/system/type.ts";
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission.tsx";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { checkAccess } from "@common/utils/permission.ts";

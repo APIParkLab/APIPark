@@ -67,7 +67,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 const {disable, protocols, path, methods, description, match, proxy} = data.router
-                form.setFieldsValue({disable, protocols, path, methods, description, match,proxy
+                form.setFieldsValue({disable, protocols, path:prefixForce && path?.startsWith(apiPrefix + '/')? path.slice((apiPrefix?.length || 0) + 1) : path, methods, description, match,proxy
                 })
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
@@ -158,7 +158,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
                             }]}
                             className={styles['form-input-group']}
                         >
-                            <Input  prefix={type === 'edit' ? null :(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
+                            <Input  prefix={(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
                                 placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
 

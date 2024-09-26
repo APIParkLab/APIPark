@@ -179,15 +179,15 @@ const CardTitle = (service:ServiceHubTableListItem)=>{
         <div className="flex">
             <Avatar shape="square" size={50} className=" border-none bg-[linear-gradient(135deg,white,#f0f0f0)] text-[#333] rounded-[12px]" src={service.logo ?  <img src={service.logo} alt="Logo" style={{  maxWidth: '200px', width:'45px',height:'45px',objectFit:'unset'}} /> : undefined}> {service.logo ? '' : service.name.substring(0,1)}</Avatar>
             <div className="pl-[20px] w-[calc(100%-50px)]">
-                <p className="text-[14px] h-[20px] leading-[20px] truncate w-full">{service.name}</p>
+                <p className="text-[14px] h-[20px] leading-[20px] truncate w-full flex items-center gap-[4px]">{service.name}</p>
                 <div className="mt-[10px] h-[20px] flex items-center font-normal">
                     <Tag color="#7371fc1b" className="text-theme font-normal border-0 mr-[12px] max-w-[150px] truncate" key={service.id} bordered={false} title={service.catalogue?.name || '-'}>{service.catalogue?.name || '-'}</Tag>
                    
                     <Tooltip  title={$t('API 数量')}>
-                        <span className="mr-[12px]"><ApiOutlined className="mr-[1px] text-[14px] h-[14px] w-[14px]"/><span className="font-normal text-[14px]">{service.apiNum ?? '-'}</span></span>
+                        <span className="mr-[12px] flex items-center"><ApiOutlined className="mr-[1px] text-[14px] h-[14px] w-[14px]"/><span className="font-normal text-[14px]">{service.apiNum ?? '-'}</span></span>
                     </Tooltip>
                     <Tooltip  title={$t('接入应用数量')}>
-                        <span className="mr-[12px] flex items-center"><span className="h-[14px] mr-[4px] flex items-center"><iconpark-icon size="14px" name="auto-generate-api"></iconpark-icon></span><span className="font-normal text-[14px]">{service.subscriberNum ?? '-'}</span></span>
+                        <span className="mr-[12px] flex items-center"><span className="h-[14px] mr-[4px] flex items-center "><iconpark-icon size="14px" name="auto-generate-api"></iconpark-icon></span><span className="font-normal text-[14px]">{service.subscriberNum ?? '-'}</span></span>
                     </Tooltip>
                 </div>
             </div>

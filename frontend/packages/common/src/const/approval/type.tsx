@@ -106,11 +106,11 @@ export type PublishTableListItem = {
 export type PublishApprovalModalProps = {
     type:'approval'|'view'|'add'|'publish'|'online'
     data:PublishApprovalInfoType | PublishApprovalInfoType &{id?:string} | PublishVersionTableListItem
-    insideSystem?:boolean
+    insidePage?:boolean
     serviceId:string
     teamId:string
     clusterPublishStatus?:SystemInsidePublishOnlineItems[]
-    
+    serviceType?:'rest'|'ai'
 }
 
 export type PublishApprovalModalHandle = {
