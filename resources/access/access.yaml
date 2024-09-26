@@ -185,7 +185,7 @@ system:
             apis:
               - "POST:/api/v1/monitor/config"
       - name: ai_provider
-        cname: AI服务提供商
+        cname: AI 模型供应商
         value: 'ai_provider'
         children:
           - name: view
