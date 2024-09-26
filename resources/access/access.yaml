@@ -184,6 +184,23 @@ system:
             value: 'manager'
             apis:
               - "POST:/api/v1/monitor/config"
+      - name: ai_provider
+        cname: AI服务提供商
+        value: 'ai_provider'
+        children:
+          - name: view
+            cname: 查看
+            value: 'view'
+            guest_allow: true
+            apis:
+              - "GET:/api/v1/ai/providers"
+              - "GET:/api/v1/ai/provider/config"
+          - name: manager
+            cname: 管理
+            value: 'manager'
+            apis:
+              - "PUT:/api/v1/ai/provider/config"
+              - "PUT:/api/v1/ai/provider/default-llm"
   - name: dashboard
     cname: 仪表盘
     value: 'dashboard'
