@@ -1,9 +1,9 @@
 ![image](https://github.com/user-attachments/assets/96e36db5-2733-49c8-8e1e-ecbcc60a3943)
 
 <p align="center">
-  简体中文
+  <a href="/README.md">English</a>
   | 
-  <a href="/README.md">简体中文</a>
+  简体中文
 </p>
 
 APIPark 是全球首个开源企业级 API 开放平台，帮助组织快速构建企业内部 API 门户/市场，享受极致的转发性能、API 可观测性、服务治理、多租户管理、订阅审批流程等诸多好处。
