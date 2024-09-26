@@ -131,10 +131,11 @@ const ServiceHubDetail = ()=>{
                             className={ `rounded-[12px] border-none rounded-[12px] ${ serviceBasicInfo?.logo ? 'bg-[linear-gradient(135deg,white,#f0f0f0)]' : 'bg-theme'}`} 
                             src={ serviceBasicInfo?.logo ?  <img src={serviceBasicInfo?.logo} alt="Logo" style={{  maxWidth: '200px', width:'45px',height:'45px',objectFit:'unset'}} 
                             /> : undefined}
-                            icon={serviceBasicInfo?.logo ? '' :<iconpark-icon   name="auto-generate-api"></iconpark-icon>}> </Avatar>
+                            icon={serviceBasicInfo?.logo ? '' :<iconpark-icon  name="auto-generate-api"></iconpark-icon>}> </Avatar>
 
                         <div className="pl-[20px] w-[calc(100%-50px)]">
-                            <p className="text-[14px] h-[20px] leading-[20px] truncate font-bold">{serviceName}</p>
+                            <p className="text-[14px] h-[20px] leading-[20px] truncate font-bold flex items-center gap-[4px]">{serviceName}
+                            </p>
                             <div className="mt-[10px] flex flex-col gap-btnrbase font-normal">
                                 {serviceDesc || '-'}
                                 <div>

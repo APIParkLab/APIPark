@@ -2,7 +2,7 @@ import {App, Col, Form, Input, Row, Table, Tooltip} from "antd";
 import {forwardRef, useEffect, useImperativeHandle, useMemo} from "react";
 import {PublishApprovalInfoType, PublishApprovalModalHandle, PublishApprovalModalProps, PublishVersionTableListItem} from "@common/const/approval/type.tsx";
 import {useFetch} from "@common/hooks/http.ts";
-import {BasicResponse, FORM_ERROR_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, STATUS_COLOR, VALIDATE_MESSAGE} from "@common/const/const.tsx";
+import {BasicResponse, FORM_ERROR_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, STATUS_COLOR} from "@common/const/const.tsx";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { SYSTEM_PUBLISH_ONLINE_COLUMNS } from "@core/const/system/const.tsx";
 import { $t } from "@common/locales";
@@ -14,7 +14,7 @@ import { SystemInsidePublishOnlineItems } from "@core/pages/system/publish/Syste
 
 export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle,PublishApprovalModalProps>((props, ref) => {
     const { message } = App.useApp()
-    const { type,data,insideSystem = false,serviceId, teamId} = props
+    const { type,data,insidePage = false, serviceType = 'rest', serviceId, teamId} = props
     const [form] = Form.useForm();
     const {fetchData} = useFetch()
     const {state} = useGlobalContext()
@@ -109,7 +109,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
     })),[state.language])
 
     
-    const translatedRouteColumns = useMemo(()=>ApprovalRouteColumns.map((x)=>({
+    const translatedRouteColumns = useMemo(()=>ApprovalRouteColumns.filter(x=> serviceType === 'rest' ? x.dataIndex !== 'name' : x.dataIndex !== 'methods').map((x)=>({
         ...x, 
         ...(x.dataIndex === 'change' ? {
             render:(_,entity)=>(
@@ -122,7 +122,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
         }:{}
     ),
     title: typeof x.title === 'string' ? $t(x.title) : x.title,
-})),[state.language])
+})),[state.language, serviceType])
 
     const translatedPublishColumns = useMemo(()=>SYSTEM_PUBLISH_ONLINE_COLUMNS.map((x)=>{
         if(x.dataIndex === 'status'){
@@ -142,7 +142,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
 
     return (
         <>
-            {!insideSystem && <>
+            {!insidePage && <>
             <Row className="my-mbase">
                 <Col className="text-left" span={4}><span >{$t('申请系统')}：</span></Col>
                 <Col span={18}>{(data as PublishApprovalInfoType).project || '-'}</Col>
@@ -177,7 +177,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
             >
 
                 {
-                    insideSystem && 
+                    insidePage && 
                     <>
                         <Form.Item
                             label={$t("版本号")}
@@ -205,16 +205,20 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                             dataSource={data.diffs?.routers || []}
                             pagination={false}
                         /></Row>
-                    <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('上游列表')}：</span></Row>
-                    <Row  className="mb-mbase ">
-                        <Table
-                            bordered={true}
-                            columns={translatedUpstreamColumns}
-                            size="small"
-                            rowKey="id"
-                            dataSource={data.diffs?.upstreams || []}
-                            pagination={false}
-                        /></Row>
+                        {
+                            serviceType === 'rest' && <>
+                                <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('上游列表')}：</span></Row>
+                                <Row  className="mb-mbase ">
+                                    <Table
+                                        bordered={true}
+                                        columns={translatedUpstreamColumns}
+                                        size="small"
+                                        rowKey="id"
+                                        dataSource={data.diffs?.upstreams || []}
+                                        pagination={false}
+                                    /></Row>
+                            </>
+                        }
                 <Form.Item
                     label={$t("备注")}
                     name="remark"

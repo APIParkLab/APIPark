@@ -4,6 +4,7 @@ import { App } from "antd";
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { checkAccess } from "@common/utils/permission";
 import { PERMISSION_DEFINITION } from "@common/const/permissions";
+import { $t } from "@common/locales";
 
 interface GlobalState {
     isAuthenticated: boolean;
@@ -46,7 +47,8 @@ export const GlobalContext = createContext<{
     checkPermission:(access:keyof typeof PERMISSION_DEFINITION[0] | Array<keyof typeof PERMISSION_DEFINITION[0]>)=>boolean
     teamDataFlushed:boolean
     accessInit:boolean
-
+    aiConfigFlushed:boolean
+    setAiConfigFlushed:(flush:boolean)=>void
 } | undefined>(undefined);
 
 const globalReducer = (state: GlobalState, action: GlobalAction): GlobalState => {
@@ -107,13 +109,14 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
         version: '1.0.0',
         updateDate: '2024-07-01',
         powered:'Powered by https://apipark.com',
-        mainPage:'/guide',
+        mainPage:'/guide/page',
         language:'en'
     });
     const [accessData,setAccessData] = useState<Map<string,string[]>>(new Map())
     const [pluginAccessDictionary, setPluginAccessDictionary] = useState<{[k:string]:string}>({})
     const [teamDataFlushed, setTeamDataFlushed] = useState<boolean>(false)
     const [accessInit, setAccessInit] = useState<boolean>(false)
+    const [aiConfigFlushed, setAiConfigFlushed] = useState<boolean>(false)
     let getGlobalAccessPromise: Promise<BasicResponse<{ access:string[] }>> | null = null
 
     const getGlobalAccessData = ()=>{
@@ -153,7 +156,6 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
         setAccessData(prevData => prevData.set('team',[]))
     }
 
-
     const getPluginAccessDictionary = (pluginData:{[k:string]:string})=>{
         setPluginAccessDictionary(pluginData)
     }
@@ -174,14 +176,15 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
         return revs
     }
 
-
     return (
         <GlobalContext.Provider value={
             { state, dispatch,accessData,pluginAccessDictionary,
-            getGlobalAccessData,getPluginAccessDictionary,
+            getGlobalAccessData,
+            getPluginAccessDictionary,
             getTeamAccessData,teamDataFlushed,
             cleanTeamAccessData,
-            resetAccess ,checkPermission,accessInit}}>
+            resetAccess ,checkPermission,accessInit,
+            aiConfigFlushed, setAiConfigFlushed}}>
             {children}
         </GlobalContext.Provider>
     );

@@ -174,6 +174,16 @@ export const PERMISSION_DEFINITION = [
           "anyOf": [{ "backend": ["system.devops.cluster.manager"] }]
         }
       },
+      "system.devops.ai_provider.view": {
+        "granted": {
+          "anyOf": [{ "backend": ["system.devops.ai_provider.view"] }]
+        }
+      },
+      "system.devops.ai_provider.edit": {
+        "granted": {
+          "anyOf": [{ "backend": ["system.devops.ai_provider.manager"] }]
+        }
+      },
       "system.devops.ssl_certificate.view": {
         "granted": {
           "anyOf": [{ "backend": ["system.devops.ssl_certificate.view"] }]

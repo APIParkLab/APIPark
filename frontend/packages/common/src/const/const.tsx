@@ -26,7 +26,7 @@ export const routerKeyMap = new Map<string, string[]|string>([
     ['operationCenter',['member','user','role','servicecategories']],
     ['organization',['member','user','role']],
     ['serviceHubSetting',['servicecategories']],
-    ['maintenanceCenter',['datasourcing','cluster','cert','logsettings','resourcesettings','openapi']
+    ['maintenanceCenter',['aisetting','datasourcing','cluster','cert','logsettings','resourcesettings','openapi']
   ]])
   
     
@@ -43,7 +43,8 @@ export const routerKeyMap = new Map<string, string[]|string>([
     input:('请输入'),
     select:('请选择'),
     startWithAlphabet:('英文数字下划线任意一种，首字母必须为英文'),
-    specialStartWithAlphabet:('支持字母开头、英文数字中横线下划线组合')
+    specialStartWithAlphabet:('支持字母开头、英文数字中横线下划线组合'),
+    onlyAlphabet:('字符非法，仅支持英文'),
   }
 
   export const FORM_ERROR_TIPS = {
