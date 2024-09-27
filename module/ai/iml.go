@@ -4,12 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
-	"github.com/APIParkLab/APIPark/module/ai/provider"
 	"github.com/APIParkLab/APIPark/service/ai"
 	"github.com/eolinker/go-common/utils"
 	"gorm.io/gorm"
-	"sort"
 )
 
 var _ IProviderModule = (*imlProviderModule)(nil)
@@ -23,25 +22,20 @@ func (i *imlProviderModule) SimpleProviders(ctx context.Context) ([]*ai_dto.Simp
 	if err != nil {
 		return nil, err
 	}
-	providers := provider.Providers()
-	sort.SliceIsSorted(providers, func(i, j int) bool {
-		return providers[i].Index() < providers[j].Index()
-	})
+	providers := model_runtime.Providers()
+
 	providerMap := utils.SliceToMap(list, func(e *ai.Provider) string {
 		return e.Id
 	})
 	items := make([]*ai_dto.SimpleProviderItem, 0, len(providers))
 	for _, v := range providers {
 		item := &ai_dto.SimpleProviderItem{
-			Id:   v.Info().Id,
-			Name: v.Info().Name,
-			Logo: v.Info().Logo,
+			Id:   v.ID(),
+			Name: v.Name(),
+			Logo: v.Logo(),
 		}
-		if info, has := providerMap[v.Info().Id]; has {
-			err = v.GlobalConfig().CheckConfig(info.Config)
-			if err == nil {
-				item.Configured = true
-			}
+		if _, has := providerMap[v.ID()]; has {
+			item.Configured = true
 		}
 		items = append(items, item)
 	}
@@ -53,32 +47,25 @@ func (i *imlProviderModule) Providers(ctx context.Context) ([]*ai_dto.ProviderIt
 	if err != nil {
 		return nil, err
 	}
-	providers := provider.Providers()
-	sort.SliceIsSorted(providers, func(i, j int) bool {
-		return providers[i].Index() < providers[j].Index()
-	})
+	providers := model_runtime.Providers()
 	providerMap := utils.SliceToMap(list, func(e *ai.Provider) string {
 		return e.Id
 	})
 	items := make([]*ai_dto.ProviderItem, 0, len(providers))
 	for _, v := range providers {
-		item := &ai_dto.ProviderItem{
-			Id:         v.Info().Id,
-			Name:       v.Info().Name,
-			Logo:       v.Info().Logo,
-			DefaultLLM: v.Info().DefaultLLM,
+		defaultLLM, has := v.DefaultModel(model_runtime.ModelTypeLLM)
+		if !has {
+			continue
 		}
-		if info, has := providerMap[v.Info().Id]; has {
-			llm, has := v.LLM(info.DefaultLLM)
-			if !has {
-				continue
-			}
-			err = v.GlobalConfig().CheckConfig(info.Config)
-			if err == nil {
-				item.Configured = true
-			}
-			item.DefaultLLM = info.DefaultLLM
-			item.DefaultLLMLogo = llm.Logo
+		item := &ai_dto.ProviderItem{
+			Id:             v.ID(),
+			Name:           v.Name(),
+			Logo:           v.Logo(),
+			DefaultLLM:     defaultLLM.ID(),
+			DefaultLLMLogo: defaultLLM.Logo(),
+		}
+		if _, has = providerMap[v.ID()]; has {
+			item.Configured = true
 		}
 		items = append(items, item)
 	}
@@ -86,7 +73,7 @@ func (i *imlProviderModule) Providers(ctx context.Context) ([]*ai_dto.ProviderIt
 }
 
 func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Provider, error) {
-	p, has := provider.GetProvider(id)
+	p, has := model_runtime.GetProvider(id)
 	if !has {
 		return nil, fmt.Errorf("ai provider not found")
 	}
@@ -96,36 +83,41 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 			return nil, err
 		}
 		return &ai_dto.Provider{
-			Id:           p.Info().Id,
-			Name:         p.Info().Name,
-			Config:       p.GlobalConfig().DefaultConfig(),
-			GetAPIKeyUrl: p.Info().GetAPIKeyUrl,
+			Id:           p.ID(),
+			Name:         p.Name(),
+			Config:       p.DefaultConfig(),
+			GetAPIKeyUrl: p.HelpUrl(),
 		}, nil
 	}
 
 	return &ai_dto.Provider{
 		Id:           info.Id,
 		Name:         info.Name,
-		Config:       p.GlobalConfig().MaskConfig(info.Config),
-		GetAPIKeyUrl: p.Info().GetAPIKeyUrl,
+		Config:       p.MaskConfig(info.Config),
+		GetAPIKeyUrl: p.HelpUrl(),
 	}, nil
 }
 
 func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.LLMItem, *ai_dto.ProviderItem, error) {
-	p, has := provider.GetProvider(driver)
+	p, has := model_runtime.GetProvider(driver)
 	if !has {
 		return nil, nil, fmt.Errorf("ai provider not found")
 	}
 
-	llms := p.LLMs()
+	llms, has := p.ModelsByType(model_runtime.ModelTypeLLM)
+	if !has {
+		return nil, nil, fmt.Errorf("ai provider not found")
+	}
 
 	items := make([]*ai_dto.LLMItem, 0, len(llms))
 	for _, v := range llms {
 		items = append(items, &ai_dto.LLMItem{
-			Id:     v.Id,
-			Logo:   v.Logo,
-			Config: p.InvokeConfig().DefaultConfig(),
-			Scopes: v.Scopes,
+			Id:     v.ID(),
+			Logo:   v.Logo(),
+			Config: p.DefaultConfig(),
+			Scopes: []string{
+				"chat",
+			},
 		})
 	}
 	info, err := i.providerService.Get(ctx, driver)
@@ -133,17 +125,20 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil, err
 		}
-
+		defaultLLM, has := p.DefaultModel(model_runtime.ModelTypeLLM)
+		if !has {
+			return nil, nil, fmt.Errorf("ai provider default llm not found")
+		}
 		return items, &ai_dto.ProviderItem{
-			Id:         p.Info().Id,
-			Name:       p.Info().Name,
-			DefaultLLM: p.Info().DefaultLLM,
-			Logo:       p.Info().Logo,
+			Id:         p.ID(),
+			Name:       p.Name(),
+			DefaultLLM: defaultLLM.ID(),
+			Logo:       p.Logo(),
 			Configured: false,
 		}, err
 	}
 
-	return items, &ai_dto.ProviderItem{Id: info.Id, Name: info.Name, DefaultLLM: info.DefaultLLM, Logo: p.Info().Logo, Configured: true}, nil
+	return items, &ai_dto.ProviderItem{Id: info.Id, Name: info.Name, DefaultLLM: info.DefaultLLM, Logo: p.Logo(), Configured: true}, nil
 }
 
 func (i *imlProviderModule) UpdateProviderStatus(ctx context.Context, id string, enable bool) error {
@@ -152,14 +147,20 @@ func (i *imlProviderModule) UpdateProviderStatus(ctx context.Context, id string,
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
-		p, has := provider.GetProvider(id)
+		p, has := model_runtime.GetProvider(id)
 		if !has {
 			return fmt.Errorf("ai provider not found")
 		}
-		cfg := p.GlobalConfig().DefaultConfig()
+		cfg := p.DefaultConfig()
+		name := p.Name()
+		defaultLLm, ok := p.DefaultModel(model_runtime.ModelTypeLLM)
+		if !ok {
+			return fmt.Errorf("ai provider default llm not found")
+		}
+		defaultLLmId := defaultLLm.ID()
 		return i.providerService.Save(ctx, id, &ai.SetProvider{
-			Name:       &p.Info().Name,
-			DefaultLLM: &p.Info().DefaultLLM,
+			Name:       &name,
+			DefaultLLM: &defaultLLmId,
 			Config:     &cfg,
 			Status:     &enable,
 		})
@@ -176,13 +177,19 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
-		p, has := provider.GetProvider(id)
+		p, has := model_runtime.GetProvider(id)
 		if !has {
 			return fmt.Errorf("ai provider not found")
 		}
+		name := p.Name()
+		defaultLLm, ok := p.DefaultModel(model_runtime.ModelTypeLLM)
+		if !ok {
+			return fmt.Errorf("ai provider default llm not found")
+		}
+		defaultLLmId := defaultLLm.ID()
 		return i.providerService.Save(ctx, id, &ai.SetProvider{
-			Name:       &p.Info().Name,
-			DefaultLLM: &p.Info().DefaultLLM,
+			Name:       &name,
+			DefaultLLM: &defaultLLmId,
 			Config:     &input.Config,
 		})
 	}
@@ -197,13 +204,14 @@ func (i *imlProviderModule) UpdateProviderDefaultLLM(ctx context.Context, id str
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
-		p, has := provider.GetProvider(id)
+		p, has := model_runtime.GetProvider(id)
 		if !has {
 			return fmt.Errorf("ai provider not found")
 		}
-		cfg := p.GlobalConfig().DefaultConfig()
+		name := p.Name()
+		cfg := p.DefaultConfig()
 		return i.providerService.Save(ctx, id, &ai.SetProvider{
-			Name:       &p.Info().Name,
+			Name:       &name,
 			DefaultLLM: &input.LLM,
 			Config:     &cfg,
 		})

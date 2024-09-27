@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
-	"github.com/APIParkLab/APIPark/module/ai/provider"
 	ai_api "github.com/APIParkLab/APIPark/service/ai-api"
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	"github.com/APIParkLab/APIPark/service/service"
@@ -203,7 +203,7 @@ func (i *imlAPIModule) List(ctx context.Context, keyword string, serviceId strin
 	if err != nil {
 		return nil, err
 	}
-	p, has := provider.GetProvider(info.AdditionalConfig["provider"])
+	p, has := model_runtime.GetProvider(info.AdditionalConfig["provider"])
 	if !has {
 		return nil, fmt.Errorf("provider not found")
 	}
@@ -211,9 +211,9 @@ func (i *imlAPIModule) List(ctx context.Context, keyword string, serviceId strin
 		modelItem := ai_api_dto.ModelItem{
 			Id: t.Model,
 		}
-		model, has := p.LLM(t.Model)
+		model, has := p.DefaultModel(t.Model)
 		if has {
-			modelItem.Logo = model.Logo
+			modelItem.Logo = model.Logo()
 		}
 		return &ai_api_dto.APIItem{
 			Id:          t.ID,
