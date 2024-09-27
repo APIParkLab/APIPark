@@ -3,7 +3,6 @@ package ai
 import (
 	"context"
 	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
-	"github.com/APIParkLab/APIPark/module/ai/provider/openAI"
 	"github.com/eolinker/go-common/autowire"
 	"reflect"
 )
@@ -19,7 +18,6 @@ type IProviderModule interface {
 }
 
 func init() {
-	openAI.Register()
 	autowire.Auto[IProviderModule](func() reflect.Value {
 		return reflect.ValueOf(&imlProviderModule{})
 	})
