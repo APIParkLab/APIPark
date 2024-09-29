@@ -261,6 +261,7 @@ func (i *imlRouterModule) Create(ctx context.Context, serviceId string, dto *rou
 			Service:     serviceId,
 			Team:        info.Team,
 			Methods:     dto.Methods,
+			Protocols:   dto.Protocols,
 			Path:        path,
 			Match:       string(match),
 		})
@@ -278,6 +279,12 @@ func (i *imlRouterModule) Edit(ctx context.Context, serviceId string, apiId stri
 	}
 
 	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		if dto.Path != nil {
+			err = i.apiService.Exist(ctx, "", &api.Exist{Path: *dto.Path, Methods: *dto.Methods})
+			if err != nil {
+				return err
+			}
+		}
 		if dto.Proxy != nil {
 			err = i.apiService.SaveProxy(ctx, apiId, router_dto.ToServiceProxy(dto.Proxy))
 			if err != nil {

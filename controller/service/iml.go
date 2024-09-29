@@ -1,9 +1,15 @@
 package service
 
 import (
+	"fmt"
+	"github.com/APIParkLab/APIPark/module/ai"
+	ai_api "github.com/APIParkLab/APIPark/module/ai-api"
+	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
 	"github.com/APIParkLab/APIPark/module/service"
 	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"strings"
 )
 
 var (
@@ -13,14 +19,67 @@ var (
 )
 
 type imlServiceController struct {
-	module    service.IServiceModule    `autowired:""`
-	docModule service.IServiceDocModule `autowired:""`
+	module         service.IServiceModule    `autowired:""`
+	docModule      service.IServiceDocModule `autowired:""`
+	aiAPIModule    ai_api.IAPIModule         `autowired:""`
+	providerModule ai.IProviderModule        `autowired:""`
 }
 
 func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error) {
 	kind := "ai"
 	input.Kind = &kind
-	return i.module.Create(ctx, teamID, input)
+	if input.Provider == nil {
+		return nil, fmt.Errorf("provider is required")
+	}
+	p, err := i.providerModule.Provider(ctx, *input.Provider)
+	if err != nil {
+		return nil, err
+	}
+	if input.Id == "" {
+		input.Id = uuid.New().String()
+	}
+	if input.Prefix == "" {
+		if len(input.Id) < 9 {
+			input.Prefix = input.Id
+		} else {
+			input.Prefix = input.Id[:8]
+		}
+	}
+	info, err := i.module.Create(ctx, teamID, input)
+	if err != nil {
+		return nil, err
+	}
+	_, err = i.aiAPIModule.Create(
+		ctx,
+		info.Id,
+		&ai_api_dto.CreateAPI{
+			Name:        "Default API",
+			Path:        fmt.Sprintf("/%s", strings.Trim(input.Prefix, "/")),
+			Description: "Default API for service",
+			Disable:     false,
+			AiPrompt: &ai_api_dto.AiPrompt{
+				Variables: []*ai_api_dto.AiPromptVariable{
+					{
+						Key:         "Query",
+						Description: "",
+						Require:     true,
+					},
+				},
+				Prompt: "{{Query}}",
+			},
+			AiModel: &ai_api_dto.AiModel{
+				Id:     p.DefaultLLM,
+				Config: p.DefaultLLMConfig,
+			},
+			Timeout: 300000,
+			Retry:   0,
+		},
+	)
+	if err != nil {
+		i.module.Delete(ctx, info.Id, "ai")
+		return nil, err
+	}
+	return info, nil
 }
 
 func (i *imlServiceController) DeleteAIService(ctx *gin.Context, id string) error {

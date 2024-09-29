@@ -51,6 +51,7 @@ func genRequestBodySchema(variables []*ai_api_dto.AiPromptVariable) *openapi3.Sc
 	required := make([]string, 0, len(variables))
 	for _, v := range variables {
 		val := openapi3.NewStringSchema()
+		val.Example = ""
 		val.Description = v.Description
 		if v.Require {
 			required = append(required, v.Key)

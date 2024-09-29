@@ -9,6 +9,7 @@ import (
 	"github.com/APIParkLab/APIPark/service/ai"
 	"github.com/eolinker/go-common/utils"
 	"gorm.io/gorm"
+	"sort"
 )
 
 var _ IProviderModule = (*imlProviderModule)(nil)
@@ -58,17 +59,22 @@ func (i *imlProviderModule) Providers(ctx context.Context) ([]*ai_dto.ProviderIt
 			continue
 		}
 		item := &ai_dto.ProviderItem{
-			Id:             v.ID(),
-			Name:           v.Name(),
-			Logo:           v.Logo(),
-			DefaultLLM:     defaultLLM.ID(),
-			DefaultLLMLogo: defaultLLM.Logo(),
+			Id:   v.ID(),
+			Name: v.Name(),
+			Logo: v.Logo(),
 		}
-		if _, has = providerMap[v.ID()]; has {
+		if info, has := providerMap[v.ID()]; has {
 			item.Configured = true
+			item.DefaultLLM = defaultLLM.ID()
+			item.DefaultLLMLogo = defaultLLM.Logo()
+			item.UpdateTime = info.UpdateAt
 		}
 		items = append(items, item)
 	}
+	sort.SliceIsSorted(items, func(i, j int) bool {
+
+		return items[i].UpdateTime.After(items[j].UpdateTime)
+	})
 	return items, nil
 }
 
@@ -82,19 +88,30 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
+		defaultLLM, has := p.DefaultModel(model_runtime.ModelTypeLLM)
+		if !has {
+			return nil, fmt.Errorf("ai provider llm not found")
+		}
 		return &ai_dto.Provider{
-			Id:           p.ID(),
-			Name:         p.Name(),
-			Config:       p.DefaultConfig(),
-			GetAPIKeyUrl: p.HelpUrl(),
+			Id:               p.ID(),
+			Name:             p.Name(),
+			Config:           p.DefaultConfig(),
+			GetAPIKeyUrl:     p.HelpUrl(),
+			DefaultLLM:       defaultLLM.ID(),
+			DefaultLLMConfig: defaultLLM.Logo(),
 		}, nil
 	}
-
+	defaultLLM, has := p.GetModel(info.DefaultLLM)
+	if !has {
+		return nil, fmt.Errorf("ai provider llm not found")
+	}
 	return &ai_dto.Provider{
-		Id:           info.Id,
-		Name:         info.Name,
-		Config:       p.MaskConfig(info.Config),
-		GetAPIKeyUrl: p.HelpUrl(),
+		Id:               info.Id,
+		Name:             info.Name,
+		Config:           p.MaskConfig(info.Config),
+		GetAPIKeyUrl:     p.HelpUrl(),
+		DefaultLLM:       defaultLLM.ID(),
+		DefaultLLMConfig: defaultLLM.DefaultConfig(),
 	}, nil
 }
 
@@ -114,7 +131,7 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 		items = append(items, &ai_dto.LLMItem{
 			Id:     v.ID(),
 			Logo:   v.Logo(),
-			Config: p.DefaultConfig(),
+			Config: v.DefaultConfig(),
 			Scopes: []string{
 				"chat",
 			},
@@ -130,11 +147,12 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 			return nil, nil, fmt.Errorf("ai provider default llm not found")
 		}
 		return items, &ai_dto.ProviderItem{
-			Id:         p.ID(),
-			Name:       p.Name(),
-			DefaultLLM: defaultLLM.ID(),
-			Logo:       p.Logo(),
-			Configured: false,
+			Id:             p.ID(),
+			Name:           p.Name(),
+			DefaultLLM:     defaultLLM.ID(),
+			DefaultLLMLogo: defaultLLM.Logo(),
+			Logo:           p.Logo(),
+			Configured:     false,
 		}, err
 	}
 
