@@ -68,7 +68,7 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 		}
 		defaultCfg[v.Variable] = v.Label[entity.LanguageEnglish]
 	}
-	defaultCfgByte, _ := json.Marshal(defaultCfg)
+	defaultCfgByte, _ := json.MarshalIndent(defaultCfg, "", "  ")
 	provider.defaultConfig = string(defaultCfgByte)
 	provider.paramValidator = params
 	for name, f := range modelContents {
@@ -86,6 +86,7 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 			if model.ID() == defaultModel {
 				provider.SetDefaultModel(name, model)
 			}
+			models = append(models, model)
 		}
 		provider.SetModelsByType(name, models)
 	}
@@ -158,7 +159,7 @@ func (p *Provider) MaskConfig(cfg string) string {
 	}
 	for _, key := range p.maskKeys {
 		if v, ok := data[key]; ok {
-			data[key] = PartialMasking(v, 0, -1)
+			data[key] = PartialMasking(v, 4, -1)
 		}
 	}
 	result, _ := json.Marshal(data)

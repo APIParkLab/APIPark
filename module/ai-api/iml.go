@@ -8,6 +8,7 @@ import (
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
 	ai_api "github.com/APIParkLab/APIPark/service/ai-api"
+	"github.com/APIParkLab/APIPark/service/api"
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	"github.com/APIParkLab/APIPark/service/service"
 	"github.com/eolinker/go-common/auto"
@@ -17,6 +18,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"net/http"
+	"strings"
 )
 
 var _ IAPIModule = (*imlAPIModule)(nil)
@@ -29,6 +31,7 @@ type imlAPIModule struct {
 	serviceService service.IServiceService `autowired:""`
 	apiDocService  api_doc.IAPIDocService  `autowired:""`
 	aiAPIService   ai_api.IAPIService      `autowired:""`
+	apiService     api.IAPIService         `autowired:""`
 	transaction    store.ITransaction      `autowired:""`
 }
 
@@ -95,7 +98,30 @@ func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_a
 		input.Id = uuid.New().String()
 	}
 	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		err := i.updateAPIDoc(ctx, serviceId, input.Path, input.Description, input.AiPrompt)
+		err = i.apiService.Exist(ctx, "", &api.Exist{Path: input.Path, Methods: []string{http.MethodPost}})
+		if err != nil {
+			return err
+		}
+		err = i.apiService.Create(ctx, &api.Create{
+			UUID:        input.Id,
+			Description: input.Description,
+			Service:     serviceId,
+			Team:        info.Team,
+			Methods: []string{
+				http.MethodPost,
+			},
+			Protocols: []string{
+				"http",
+				"https",
+			},
+			Disable: false,
+			Path:    input.Path,
+			Match:   "{}",
+		})
+		if err != nil {
+			return err
+		}
+		err = i.updateAPIDoc(ctx, serviceId, input.Path, input.Description, input.AiPrompt)
 		if err != nil {
 			return err
 		}
@@ -137,6 +163,26 @@ func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string,
 		}
 		if input.Path != nil {
 			apiInfo.Path = *input.Path
+			prefix, err := i.Prefix(ctx, serviceId)
+			if err != nil {
+				return err
+			}
+			if !strings.HasSuffix(apiInfo.Path, prefix) {
+				if apiInfo.Path[0] != '/' {
+					apiInfo.Path = fmt.Sprintf("/%s", apiInfo.Path)
+				}
+				apiInfo.Path = fmt.Sprintf("%s%s", prefix, apiInfo.Path)
+				err := i.apiService.Exist(ctx, apiId, &api.Exist{Path: apiInfo.Path, Methods: []string{http.MethodPost}})
+				if err != nil {
+					return err
+				}
+				err = i.apiService.Save(ctx, apiId, &api.Edit{
+					Path: &apiInfo.Path,
+				})
+				if err != nil {
+					return err
+				}
+			}
 		}
 		if input.Description != nil {
 			apiInfo.Description = *input.Description
@@ -181,7 +227,11 @@ func (i *imlAPIModule) Delete(ctx context.Context, serviceId string, apiId strin
 		return fmt.Errorf("service kind is not ai service")
 	}
 	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		err = i.deleteAPIDoc(ctx, serviceId, apiId)
+		apiInfo, err := i.aiAPIService.Get(ctx, apiId)
+		if err != nil {
+			return err
+		}
+		err = i.deleteAPIDoc(ctx, serviceId, apiInfo.Path)
 		if err != nil {
 			return err
 		}
@@ -275,4 +325,18 @@ func ConvertStruct[T any](data interface{}) (*T, error) {
 		return nil, err
 	}
 	return &t, nil
+}
+
+func (i *imlAPIModule) Prefix(ctx context.Context, serviceId string) (string, error) {
+	pInfo, err := i.serviceService.Check(ctx, serviceId, map[string]bool{"as_server": true})
+	if err != nil {
+		return "", err
+	}
+
+	if pInfo.Prefix != "" {
+		if pInfo.Prefix[0] != '/' {
+			pInfo.Prefix = fmt.Sprintf("/%s", strings.TrimSuffix(pInfo.Prefix, "/"))
+		}
+	}
+	return strings.TrimSuffix(pInfo.Prefix, "/"), nil
 }

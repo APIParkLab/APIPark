@@ -2,15 +2,14 @@ package model_runtime
 
 import (
 	"embed"
-	"errors"
 	"fmt"
 	"github.com/eolinker/eosc"
 	"strings"
 )
 
-var (
-	ErrInvalidAPIKey = errors.New("invalid api key")
-)
+func init() {
+	Load()
+}
 
 type IConfig interface {
 	Check(cfg string) error
@@ -87,7 +86,7 @@ func ReadFile(dir embed.FS, name string) (eosc.Untyped[string, string], error) {
 		if file.IsDir() {
 			continue
 		}
-		if !strings.HasSuffix(file.Name(), ".yaml") {
+		if !strings.HasSuffix(file.Name(), ".yaml") && !strings.HasSuffix(file.Name(), ".svg") {
 			continue
 		}
 		data, err := dir.ReadFile(fmt.Sprintf("%s/%s", name, file.Name()))

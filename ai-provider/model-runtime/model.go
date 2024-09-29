@@ -107,7 +107,7 @@ func NewModel(data string, logo string) (IModel, error) {
 			Required: p.Required,
 		})
 	}
-	dCfg, err := json.Marshal(defaultConfig)
+	dCfg, err := json.MarshalIndent(defaultConfig, "", "  ")
 	if err != nil {
 		return nil, err
 	}

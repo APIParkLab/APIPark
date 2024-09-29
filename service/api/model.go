@@ -71,6 +71,8 @@ func FromEntityInfo(e *api.Info) *Info {
 	}
 }
 
+type Kind string
+
 type Create struct {
 	UUID        string
 	Description string
