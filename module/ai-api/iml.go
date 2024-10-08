@@ -86,41 +86,41 @@ func (i *imlAPIModule) deleteAPIDoc(ctx context.Context, serviceId string, path 
 	})
 }
 
-func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_api_dto.CreateAPI) (*ai_api_dto.API, error) {
+func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_api_dto.CreateAPI) error {
 	info, err := i.serviceService.Get(ctx, serviceId)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if info.Kind != service.AIService {
-		return nil, fmt.Errorf("service kind is not ai service")
+		return fmt.Errorf("service kind is not ai service")
 	}
 	if input.Id == "" {
 		input.Id = uuid.New().String()
 	}
-	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		err = i.apiService.Exist(ctx, "", &api.Exist{Path: input.Path, Methods: []string{http.MethodPost}})
-		if err != nil {
-			return err
-		}
-		err = i.apiService.Create(ctx, &api.Create{
-			UUID:        input.Id,
-			Description: input.Description,
-			Service:     serviceId,
-			Team:        info.Team,
-			Methods: []string{
-				http.MethodPost,
-			},
-			Protocols: []string{
-				"http",
-				"https",
-			},
-			Disable: false,
-			Path:    input.Path,
-			Match:   "{}",
-		})
-		if err != nil {
-			return err
-		}
+	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		//err = i.apiService.Exist(ctx, "", &api.Exist{Path: input.Path, Methods: []string{http.MethodPost}})
+		//if err != nil {
+		//	return err
+		//}
+		//err = i.apiService.Create(ctx, &api.Create{
+		//	UUID:        input.Id,
+		//	Description: input.Description,
+		//	Service:     serviceId,
+		//	Team:        info.Team,
+		//	Methods: []string{
+		//		http.MethodPost,
+		//	},
+		//	Protocols: []string{
+		//		"http",
+		//		"https",
+		//	},
+		//	Disable: false,
+		//	Path:    input.Path,
+		//	Match:   "{}",
+		//})
+		//if err != nil {
+		//	return err
+		//}
 		err = i.updateAPIDoc(ctx, serviceId, input.Path, input.Description, input.AiPrompt)
 		if err != nil {
 			return err
@@ -140,50 +140,47 @@ func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_a
 			},
 		})
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	return i.Get(ctx, serviceId, input.Id)
 }
 
-func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string, input *ai_api_dto.EditAPI) (*ai_api_dto.API, error) {
+func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string, input *ai_api_dto.EditAPI) error {
 	info, err := i.serviceService.Get(ctx, serviceId)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if info.Kind != service.AIService {
-		return nil, fmt.Errorf("service kind is not ai service")
+		return fmt.Errorf("service kind is not ai service")
 	}
 
-	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
 		apiInfo, err := i.aiAPIService.Get(ctx, apiId)
 		if err != nil {
 			return err
 		}
 		if input.Path != nil {
 			apiInfo.Path = *input.Path
-			prefix, err := i.Prefix(ctx, serviceId)
-			if err != nil {
-				return err
-			}
-			if !strings.HasSuffix(apiInfo.Path, prefix) {
-				if apiInfo.Path[0] != '/' {
-					apiInfo.Path = fmt.Sprintf("/%s", apiInfo.Path)
-				}
-				apiInfo.Path = fmt.Sprintf("%s%s", prefix, apiInfo.Path)
-				err := i.apiService.Exist(ctx, apiId, &api.Exist{Path: apiInfo.Path, Methods: []string{http.MethodPost}})
-				if err != nil {
-					return err
-				}
-				err = i.apiService.Save(ctx, apiId, &api.Edit{
-					Path: &apiInfo.Path,
-				})
-				if err != nil {
-					return err
-				}
-			}
 		}
+		//	prefix, err := i.Prefix(ctx, serviceId)
+		//	if err != nil {
+		//		return err
+		//	}
+		//	if !strings.HasSuffix(apiInfo.Path, prefix) {
+		//		if apiInfo.Path[0] != '/' {
+		//			apiInfo.Path = fmt.Sprintf("/%s", apiInfo.Path)
+		//		}
+		//		apiInfo.Path = fmt.Sprintf("%s%s", prefix, apiInfo.Path)
+		//		err := i.apiService.Exist(ctx, apiId, &api.Exist{Path: apiInfo.Path, Methods: []string{http.MethodPost}})
+		//		if err != nil {
+		//			return err
+		//		}
+		//		err = i.apiService.Save(ctx, apiId, &api.Edit{
+		//			Path: &apiInfo.Path,
+		//		})
+		//		if err != nil {
+		//			return err
+		//		}
+		//	}
+		//}
 		if input.Description != nil {
 			apiInfo.Description = *input.Description
 		}
@@ -211,11 +208,6 @@ func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string,
 			AdditionalConfig: &apiInfo.AdditionalConfig,
 		})
 	})
-	if err != nil {
-		return nil, err
-	}
-
-	return i.Get(ctx, serviceId, apiId)
 }
 
 func (i *imlAPIModule) Delete(ctx context.Context, serviceId string, apiId string) error {

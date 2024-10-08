@@ -280,7 +280,7 @@ func (i *imlRouterModule) Edit(ctx context.Context, serviceId string, apiId stri
 
 	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		if dto.Path != nil {
-			err = i.apiService.Exist(ctx, "", &api.Exist{Path: *dto.Path, Methods: *dto.Methods})
+			err = i.apiService.Exist(ctx, apiId, &api.Exist{Path: *dto.Path, Methods: *dto.Methods})
 			if err != nil {
 				return err
 			}

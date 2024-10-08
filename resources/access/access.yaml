@@ -339,7 +339,7 @@ team:
             value: 'manager'
             apis:
               - "POST:/api/v1/service/publish/release/do"
-              - "PUT:/api/v1/service/publish/execute"
+#              - "PUT:/api/v1/service/publish/execute"
               - "DELETE:/api/v1/service/release"
       - name: subscription management
         cname: 订阅方管理

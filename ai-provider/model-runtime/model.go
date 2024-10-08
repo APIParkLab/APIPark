@@ -14,10 +14,11 @@ type IModel interface {
 }
 
 type Model struct {
-	id            string
-	logo          string
-	defaultConfig string
-	validator     IParamValidator
+	id   string
+	logo string
+	//defaultConfig string
+	IConfig
+	//validator IParamValidator
 }
 
 func (m *Model) ID() string {
@@ -26,19 +27,6 @@ func (m *Model) ID() string {
 
 func (m *Model) Logo() string {
 	return m.logo
-}
-
-func (m *Model) Check(cfg string) error {
-	data := make(map[string]interface{})
-	err := json.Unmarshal([]byte(cfg), &data)
-	if err != nil {
-		return err
-	}
-	return m.validator.Valid(data)
-}
-
-func (m *Model) DefaultConfig() string {
-	return m.defaultConfig
 }
 
 func NewModel(data string, logo string) (IModel, error) {
@@ -112,9 +100,8 @@ func NewModel(data string, logo string) (IModel, error) {
 		return nil, err
 	}
 	return &Model{
-		id:            cfg.Model,
-		logo:          logo,
-		defaultConfig: string(dCfg),
-		validator:     params,
+		id:      cfg.Model,
+		logo:    logo,
+		IConfig: NewConfig(string(dCfg), params),
 	}, nil
 }

@@ -41,3 +41,5 @@ curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/oauth2 > eolinker_com
 curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/strategy-plugin-grey > eolinker_com_apinto_strategy-plugin-grey.json
 curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/strategy-plugin-fuse > eolinker_com_apinto_strategy-plugin-fuse.json
 curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/response_file_parse > eolinker_com_apinto_response_file_parse.json
+curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/ai_formatter > eolinker_com_apinto_ai_formatter.json
+curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/ai_prompt > eolinker_com_apinto_ai_prompt.json

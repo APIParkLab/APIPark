@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/textproto"
 	"strings"
-	
+
 	"github.com/APIParkLab/APIPark/common"
-	
+
 	"github.com/APIParkLab/APIPark/common/enum"
 	"github.com/APIParkLab/APIPark/gateway"
 )
@@ -79,7 +79,7 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 	//若请求路径包含restful参数
 	if common.IsRestfulPath(r.Path) {
 		rewritePlugin.PathType = "regex" //正则替换
-		
+
 		//如果转发路径包含restful参数
 		if common.IsRestfulPath(r.ProxyPath) {
 			r.ProxyPath = formatProxyPath(r.Path, r.ProxyPath)
@@ -100,7 +100,7 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 			},
 		}
 	}
-	
+
 	rules := make([]*Rule, 0, len(r.Rules))
 	for _, m := range r.Rules {
 		rule := &Rule{
@@ -108,11 +108,11 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 			Name:  m.Key,
 			Value: "",
 		}
-		
+
 		if m.Position == enum.MatchPositionHeader {
 			rule.Name = textproto.CanonicalMIMEHeaderKey(rule.Name)
 		}
-		
+
 		switch m.MatchType {
 		case enum.MatchTypeEqual:
 			rule.Value = m.Pattern
@@ -137,7 +137,7 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 		case enum.MatchTypeAny:
 			rule.Value = "*"
 		}
-		
+
 		rules = append(rules, rule)
 	}
 	plugin := map[string]*Plugin{
@@ -148,8 +148,8 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 	}
 	for k, v := range r.Plugins {
 		plugin[k] = &Plugin{
-			Disable: false,
-			Config:  v,
+			Disable: v.Disable,
+			Config:  v.Config,
 		}
 	}
 	hosts := make([]string, 0, len(r.Host))
@@ -160,7 +160,7 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 	if r.Labels != nil {
 		labels = r.Labels
 	}
-	
+
 	return &Router{
 		BasicInfo: &BasicInfo{
 			ID:          fmt.Sprintf("%s@router", r.ID),
@@ -195,7 +195,7 @@ func formatProxyPath(requestPath, proxyPath string) string {
 			i += 1
 		}
 	}
-	
+
 	for param, order := range restfulSet {
 		newProxyPath = strings.ReplaceAll(newProxyPath, param, order)
 	}

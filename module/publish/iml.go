@@ -50,7 +50,7 @@ type imlPublishModule struct {
 }
 
 func (m *imlPublishModule) initGateway(ctx context.Context, partitionId string, clientDriver gateway.IClientDriver) error {
-
+	return nil
 	projects, err := m.serviceService.List(ctx)
 	if err != nil {
 		return err

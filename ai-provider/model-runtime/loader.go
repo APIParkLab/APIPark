@@ -2,6 +2,7 @@ package model_runtime
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
 	"github.com/eolinker/eosc"
 	"strings"
@@ -13,7 +14,44 @@ func init() {
 
 type IConfig interface {
 	Check(cfg string) error
+	GenConfig(target string, origin string) (string, error)
 	DefaultConfig() string
+}
+
+func NewConfig(cfg string, validator IParamValidator) *Config {
+	return &Config{cfg: cfg, validator: validator}
+}
+
+type Config struct {
+	cfg       string
+	validator IParamValidator
+}
+
+func (c *Config) Check(cfg string) error {
+	data := make(map[string]interface{})
+	err := json.Unmarshal([]byte(cfg), &data)
+	if err != nil {
+		return err
+	}
+	return c.validator.Valid(data)
+}
+
+func (c *Config) GenConfig(target string, origin string) (string, error) {
+	var targetData map[string]interface{}
+	err := json.Unmarshal([]byte(target), &targetData)
+	if err != nil {
+		return "", err
+	}
+	var originData map[string]interface{}
+	err = json.Unmarshal([]byte(origin), &originData)
+	if err != nil {
+		return "", err
+	}
+	return c.validator.GenConfig(targetData, originData)
+}
+
+func (c *Config) DefaultConfig() string {
+	return c.cfg
 }
 
 const (

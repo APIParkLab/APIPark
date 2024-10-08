@@ -2,6 +2,7 @@ package ai
 
 import (
 	"context"
+	"github.com/APIParkLab/APIPark/gateway"
 	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
 	"github.com/eolinker/go-common/autowire"
 	"reflect"
@@ -19,6 +20,8 @@ type IProviderModule interface {
 
 func init() {
 	autowire.Auto[IProviderModule](func() reflect.Value {
-		return reflect.ValueOf(&imlProviderModule{})
+		module := new(imlProviderModule)
+		gateway.RegisterInitHandleFunc(module.initGateway)
+		return reflect.ValueOf(module)
 	})
 }

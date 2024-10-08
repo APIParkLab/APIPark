@@ -37,3 +37,4 @@ provider_credential_schema:
       placeholder:
         zh_Hans: 在此输入您的 API URL
         en_US: Enter your API URL
+address: https://api.openai.com

@@ -108,7 +108,6 @@ type PluginSetting struct {
 }
 
 type Request struct {
-	//ID        string   `json:"id"`
 	Path      string   `json:"path"`
 	Methods   []string `json:"methods"`
 	Protocols []string `json:"protocols"`
@@ -143,3 +142,5 @@ type Match struct {
 	Key       string `json:"key"`
 	Pattern   string `json:"pattern"`
 }
+
+type Plugin map[string]interface{}
