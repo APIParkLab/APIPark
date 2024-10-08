@@ -29,6 +29,7 @@ type HistoryType string
 const (
 	HistoryRequest HistoryType = "request"
 	HistoryProxy   HistoryType = "proxy"
+	HistoryPlugin  HistoryType = "plugin"
 )
 
 type imlAPIService struct {
@@ -36,9 +37,30 @@ type imlAPIService struct {
 	apiInfoStore         api.IAPIInfoStore                     `autowired:""`
 	requestCommitService commit.ICommitWithKeyService[Request] `autowired:""`
 	proxyCommitService   commit.ICommitWithKeyService[Proxy]   `autowired:""`
+	//pluginCommitService  commit.ICommitWithKeyService[Plugin]  `autowired:""`
 	universally.IServiceGet[API]
 	universally.IServiceDelete
 }
+
+//func (i *imlAPIService) ListLatestCommitPlugin(ctx context.Context, aid ...string) ([]*commit.Commit[Plugin], error) {
+//	return i.pluginCommitService.ListLatest(ctx, aid...)
+//}
+//
+//func (i *imlAPIService) GetPluginCommit(ctx context.Context, commitId string) (*commit.Commit[Plugin], error) {
+//	return i.pluginCommitService.Get(ctx, commitId)
+//}
+//
+//func (i *imlAPIService) ListPluginCommit(ctx context.Context, commitId ...string) ([]*commit.Commit[Plugin], error) {
+//	return i.pluginCommitService.List(ctx, commitId...)
+//}
+//
+//func (i *imlAPIService) SavePlugin(ctx context.Context, aid string, data *Plugin) error {
+//	return i.pluginCommitService.Save(ctx, aid, data)
+//}
+//
+//func (i *imlAPIService) LatestPlugin(ctx context.Context, aid string) (*commit.Commit[Plugin], error) {
+//	return i.pluginCommitService.Latest(ctx, aid)
+//}
 
 func (i *imlAPIService) ListLatestCommitRequest(ctx context.Context, aid ...string) ([]*commit.Commit[Request], error) {
 	return i.requestCommitService.ListLatest(ctx, aid...)
@@ -228,12 +250,18 @@ func (i *imlAPIService) Exist(ctx context.Context, aid string, a *Exist) error {
 			}
 			continue
 		}
+		if t.UUID == aid {
+			continue
+		}
+
 		for _, m := range t.Method {
+
 			existMethodMap[m] = struct{}{}
 		}
 	}
 	for _, m := range a.Methods {
 		if _, ok := existMethodMap[m]; ok {
+
 			return fmt.Errorf("method(%s),path(%s) is exist", m, a.Path)
 		}
 	}

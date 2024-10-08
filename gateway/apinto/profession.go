@@ -6,6 +6,7 @@ const (
 	ProfessionRouter      = "router"
 	ProfessionApplication = "app"
 	ProfessionService     = "service"
+	ProfessionAIProvider  = "ai-provider"
 )
 
 var dynamicResourceMap = map[string]Worker{
@@ -41,6 +42,10 @@ var dynamicResourceMap = map[string]Worker{
 	"certificate": {
 		Profession: ProfessionCertificate,
 		Driver:     "server",
+	},
+	"openai": {
+		Profession: ProfessionAIProvider,
+		Driver:     "openai",
 	},
 }
 

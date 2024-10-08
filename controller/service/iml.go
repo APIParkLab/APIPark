@@ -1,12 +1,17 @@
 package service
 
 import (
+	"context"
 	"fmt"
+	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 	"github.com/APIParkLab/APIPark/module/ai"
 	ai_api "github.com/APIParkLab/APIPark/module/ai-api"
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
 	"github.com/APIParkLab/APIPark/module/service"
 	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
+	"github.com/APIParkLab/APIPark/module/upstream"
+	upstream_dto "github.com/APIParkLab/APIPark/module/upstream/dto"
+	"github.com/eolinker/go-common/store"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"strings"
@@ -23,6 +28,56 @@ type imlServiceController struct {
 	docModule      service.IServiceDocModule `autowired:""`
 	aiAPIModule    ai_api.IAPIModule         `autowired:""`
 	providerModule ai.IProviderModule        `autowired:""`
+	upstreamModule upstream.IUpstreamModule  `autowired:""`
+	transaction    store.ITransaction        `autowired:""`
+}
+
+func newAIUpstream(id string, provider string, uri model_runtime.IProviderURI) *upstream_dto.Upstream {
+	return &upstream_dto.Upstream{
+		Type:            "http",
+		Balance:         "round-robin",
+		Timeout:         300000,
+		Retry:           0,
+		Remark:          fmt.Sprintf("auto create by ai service %s,provider is %s", id, provider),
+		LimitPeerSecond: 0,
+		ProxyHeaders:    nil,
+		Scheme:          uri.Scheme(),
+		PassHost:        "node",
+		Nodes: []*upstream_dto.NodeConfig{
+			{
+				Address: uri.Host(),
+				Weight:  100,
+			},
+		},
+	}
+}
+
+func (i *imlServiceController) EditAIService(ctx *gin.Context, id string, input *service_dto.EditService) (*service_dto.Service, error) {
+
+	if input.Provider == nil {
+		return nil, fmt.Errorf("provider is required")
+	}
+	p, has := model_runtime.GetProvider(*input.Provider)
+	if !has {
+		return nil, fmt.Errorf("provider not found")
+	}
+	info, err := i.module.Get(ctx, id)
+	if err != nil {
+
+	}
+	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		info, err = i.module.Edit(ctx, id, input)
+		if err != nil {
+			return err
+		}
+		_, err = i.upstreamModule.Save(ctx, id, newAIUpstream(id, *input.Provider, p.URI()))
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return info, nil
 }
 
 func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error) {
@@ -31,7 +86,7 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 	if input.Provider == nil {
 		return nil, fmt.Errorf("provider is required")
 	}
-	p, err := i.providerModule.Provider(ctx, *input.Provider)
+	pv, err := i.providerModule.Provider(ctx, *input.Provider)
 	if err != nil {
 		return nil, err
 	}
@@ -45,44 +100,51 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 			input.Prefix = input.Id[:8]
 		}
 	}
-	info, err := i.module.Create(ctx, teamID, input)
-	if err != nil {
-		return nil, err
+	p, has := model_runtime.GetProvider(*input.Provider)
+	if !has {
+		return nil, fmt.Errorf("provider not found")
 	}
-	_, err = i.aiAPIModule.Create(
-		ctx,
-		info.Id,
-		&ai_api_dto.CreateAPI{
-			Name:        "Default API",
-			Path:        fmt.Sprintf("/%s", strings.Trim(input.Prefix, "/")),
-			Description: "Default API for service",
-			Disable:     false,
-			AiPrompt: &ai_api_dto.AiPrompt{
-				Variables: []*ai_api_dto.AiPromptVariable{
-					{
-						Key:         "Query",
-						Description: "",
-						Require:     true,
+	var info *service_dto.Service
+	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		info, err = i.module.Create(ctx, teamID, input)
+		if err != nil {
+			return err
+		}
+		err = i.aiAPIModule.Create(
+			ctx,
+			info.Id,
+			&ai_api_dto.CreateAPI{
+				Name:        "Default API",
+				Path:        fmt.Sprintf("/%s", strings.Trim(input.Prefix, "/")),
+				Description: "Default API for service",
+				Disable:     false,
+				AiPrompt: &ai_api_dto.AiPrompt{
+					Variables: []*ai_api_dto.AiPromptVariable{
+						{
+							Key:         "Query",
+							Description: "",
+							Require:     true,
+						},
 					},
+					Prompt: "{{Query}}",
 				},
-				Prompt: "{{Query}}",
+				AiModel: &ai_api_dto.AiModel{
+					Id:     pv.DefaultLLM,
+					Config: pv.DefaultLLMConfig,
+				},
+				Timeout: 300000,
+				Retry:   0,
 			},
-			AiModel: &ai_api_dto.AiModel{
-				Id:     p.DefaultLLM,
-				Config: p.DefaultLLMConfig,
-			},
-			Timeout: 300000,
-			Retry:   0,
-		},
-	)
-	if err != nil {
-		i.module.Delete(ctx, info.Id, "ai")
-		return nil, err
-	}
-	return info, nil
+		)
+		_, err = i.upstreamModule.Save(ctx, info.Id, newAIUpstream(info.Id, *input.Provider, p.URI()))
+		return err
+	})
+
+	return info, err
 }
 
 func (i *imlServiceController) DeleteAIService(ctx *gin.Context, id string) error {
+	// TODO: 检查是否有发布过版本，若发布，则不允许删除
 	return i.module.Delete(ctx, id, "ai")
 }
 

@@ -22,15 +22,11 @@ type IServiceController interface {
 	Edit(ctx *gin.Context, id string, input *service_dto.EditService) (*service_dto.Service, error)
 	// Delete 删除
 	Delete(ctx *gin.Context, id string) error
-	// Simple 获取简易列表
-	//Simple(ctx *gin.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
-	//// MySimple 获取我的简易列表
-	//MySimple(ctx *gin.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
 	ServiceDoc(ctx *gin.Context, id string) (*service_dto.ServiceDoc, error)
 	SaveServiceDoc(ctx *gin.Context, id string, input *service_dto.SaveServiceDoc) error
 
 	CreateAIService(ctx *gin.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error)
-	//EditAIService(ctx *gin.Context, id string, input *service_dto.EditService) (*service_dto.Service, error)
+	EditAIService(ctx *gin.Context, id string, input *service_dto.EditService) (*service_dto.Service, error)
 	DeleteAIService(ctx *gin.Context, id string) error
 	SearchMyAIServices(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error)
 	SearchAIServices(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error)

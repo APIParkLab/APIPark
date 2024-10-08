@@ -6,6 +6,7 @@ import (
 	"github.com/APIParkLab/APIPark/ai-provider/model-runtime/entity"
 	"github.com/eolinker/eosc"
 	"gopkg.in/yaml.v3"
+	"net/url"
 	"strings"
 )
 
@@ -22,12 +23,19 @@ type IProvider interface {
 	MaskConfig(cfg string) string
 }
 
+type IProviderURI interface {
+	Scheme() string
+	Host() string
+	Path() string
+}
+
 type IProviderInfo interface {
 	ID() string
 	Name() string
 	DefaultModel(modelType string) (IModel, bool)
 	HelpUrl() string
 	Logo() string
+	URI() IProviderURI
 }
 
 func NewProvider(providerData string, modelContents map[string]eosc.Untyped[string, string]) (IProvider, error) {
@@ -36,11 +44,15 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 	if err != nil {
 		return nil, err
 	}
-
+	uri, err := newProviderUri(providerCfg.Address)
+	if err != nil {
+		return nil, err
+	}
 	assetsFiles, ok := modelContents[DirAssets]
 	if !ok {
 		return nil, fmt.Errorf("assets not found")
 	}
+
 	delete(modelContents, DirAssets)
 	providerLogo, _ := assetsFiles.Get(providerCfg.IconLarge[entity.LanguageEnglish])
 	modelLogo, _ := assetsFiles.Get(providerCfg.IconSmall[entity.LanguageEnglish])
@@ -53,24 +65,27 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 		defaultModels: eosc.BuildUntyped[string, IModel](),
 		modelsByType:  eosc.BuildUntyped[string, []IModel](),
 		maskKeys:      make([]string, 0),
+		uri:           uri,
 	}
 	defaultCfg := make(map[string]string)
 	params := make(ParamValidator, 0, len(providerCfg.ProviderCredentialSchema.CredentialFormSchemas))
 	for _, v := range providerCfg.ProviderCredentialSchema.CredentialFormSchemas {
-		params = append(params, Param{
+		param := Param{
 			Name:     v.Variable,
 			Default:  v.Label[entity.LanguageEnglish],
 			Type:     ParameterTypeStr,
 			Required: v.Required,
-		})
+		}
+
 		if v.Type == "secret-input" {
 			provider.maskKeys = append(provider.maskKeys, v.Variable)
+			param.Secret = true
 		}
+		params = append(params, param)
 		defaultCfg[v.Variable] = v.Label[entity.LanguageEnglish]
 	}
 	defaultCfgByte, _ := json.MarshalIndent(defaultCfg, "", "  ")
-	provider.defaultConfig = string(defaultCfgByte)
-	provider.paramValidator = params
+	provider.IConfig = NewConfig(string(defaultCfgByte), params)
 	for name, f := range modelContents {
 		models := make([]IModel, 0, f.Count())
 		defaultModel := providerCfg.Default[name]
@@ -90,20 +105,25 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 		}
 		provider.SetModelsByType(name, models)
 	}
+
 	return provider, nil
 }
 
 type Provider struct {
-	id             string
-	name           string
-	logo           string
-	helpUrl        string
-	defaultConfig  string
-	paramValidator IParamValidator
-	models         eosc.Untyped[string, IModel]
-	defaultModels  eosc.Untyped[string, IModel]
-	modelsByType   eosc.Untyped[string, []IModel]
-	maskKeys       []string
+	id            string
+	name          string
+	logo          string
+	helpUrl       string
+	models        eosc.Untyped[string, IModel]
+	defaultModels eosc.Untyped[string, IModel]
+	modelsByType  eosc.Untyped[string, []IModel]
+	maskKeys      []string
+	uri           IProviderURI
+	IConfig
+}
+
+func (p *Provider) URI() IProviderURI {
+	return p.uri
 }
 
 func (p *Provider) ID() string {
@@ -138,19 +158,6 @@ func (p *Provider) ModelsByType(modelType string) ([]IModel, bool) {
 	return p.modelsByType.Get(modelType)
 }
 
-func (p *Provider) Check(cfg string) error {
-	data := make(map[string]interface{})
-	err := json.Unmarshal([]byte(cfg), &data)
-	if err != nil {
-		return err
-	}
-	return p.paramValidator.Valid(data)
-}
-
-func (p *Provider) DefaultConfig() string {
-	return p.defaultConfig
-}
-
 func (p *Provider) MaskConfig(cfg string) string {
 	var data map[string]string
 	err := json.Unmarshal([]byte(cfg), &data)
@@ -158,8 +165,8 @@ func (p *Provider) MaskConfig(cfg string) string {
 		return cfg
 	}
 	for _, key := range p.maskKeys {
-		if v, ok := data[key]; ok {
-			data[key] = PartialMasking(v, 4, -1)
+		if _, ok := data[key]; ok {
+			data[key] = "******"
 		}
 	}
 	result, _ := json.Marshal(data)
@@ -176,6 +183,43 @@ func (p *Provider) SetModel(id string, model IModel) {
 
 func (p *Provider) SetModelsByType(modelType string, models []IModel) {
 	p.modelsByType.Set(modelType, models)
+}
+
+type providerUri struct {
+	scheme string
+	host   string
+	path   string
+}
+
+func newProviderUri(addr string) (IProviderURI, error) {
+	uri, err := url.Parse(addr)
+	if err != nil {
+		return nil, err
+	}
+	if uri.Host == "" {
+		return nil, fmt.Errorf("host is empty")
+	}
+	if uri.Scheme == "" {
+		return nil, fmt.Errorf("scheme is empty")
+	}
+
+	return &providerUri{
+		scheme: uri.Scheme,
+		host:   uri.Host,
+		path:   uri.Path,
+	}, nil
+}
+
+func (p *providerUri) Scheme() string {
+	return p.scheme
+}
+
+func (p *providerUri) Host() string {
+	return p.host
+}
+
+func (p *providerUri) Path() string {
+	return p.path
 }
 
 func PartialMasking(origin string, begin int, length int) string {
