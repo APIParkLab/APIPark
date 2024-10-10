@@ -4,8 +4,9 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
-	"github.com/eolinker/eosc"
 	"strings"
+
+	"github.com/eolinker/eosc"
 )
 
 func init() {
