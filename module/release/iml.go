@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	service_doc "github.com/APIParkLab/APIPark/service/service-doc"
 
@@ -136,13 +137,21 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 		}
 		serviceDoc, err := m.serviceDocService.Get(ctx, serviceId)
 		if err != nil {
-			return err
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return err
+			}
+			serviceDoc = &service_doc.Doc{
+				Doc: "",
+			}
 		}
 		err = m.serviceDocService.CommitDoc(ctx, serviceId, serviceDoc)
 		if err != nil {
 			return err
 		}
 		serviceDocCommit, err := m.serviceDocService.LatestDocCommit(ctx, serviceId)
+		if err != nil {
+
+		}
 		if !m.releaseService.Completeness(utils.SliceToSlice(clusters, func(s *cluster.Cluster) string {
 			return s.Uuid
 		}), apiUUIDS, requestCommits, apiProxy, upstreams) {

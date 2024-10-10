@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/APIParkLab/APIPark/service/universally/commit"
 	"strings"
+
+	"github.com/APIParkLab/APIPark/service/universally/commit"
 
 	"github.com/APIParkLab/APIPark/service/service"
 	"github.com/APIParkLab/APIPark/service/upstream"
@@ -253,10 +254,14 @@ func (i *imlRouterModule) Create(ctx context.Context, serviceId string, dto *rou
 		if err != nil {
 			return err
 		}
-
+		name := dto.Name
+		if name == "" {
+			name = dto.Id
+		}
 		match, _ := json.Marshal(dto.MatchRules)
 		return i.apiService.Create(ctx, &api.Create{
 			UUID:        dto.Id,
+			Name:        name,
 			Description: dto.Description,
 			Service:     serviceId,
 			Team:        info.Team,

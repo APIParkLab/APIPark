@@ -37,30 +37,9 @@ type imlAPIService struct {
 	apiInfoStore         api.IAPIInfoStore                     `autowired:""`
 	requestCommitService commit.ICommitWithKeyService[Request] `autowired:""`
 	proxyCommitService   commit.ICommitWithKeyService[Proxy]   `autowired:""`
-	//pluginCommitService  commit.ICommitWithKeyService[Plugin]  `autowired:""`
 	universally.IServiceGet[API]
 	universally.IServiceDelete
 }
-
-//func (i *imlAPIService) ListLatestCommitPlugin(ctx context.Context, aid ...string) ([]*commit.Commit[Plugin], error) {
-//	return i.pluginCommitService.ListLatest(ctx, aid...)
-//}
-//
-//func (i *imlAPIService) GetPluginCommit(ctx context.Context, commitId string) (*commit.Commit[Plugin], error) {
-//	return i.pluginCommitService.Get(ctx, commitId)
-//}
-//
-//func (i *imlAPIService) ListPluginCommit(ctx context.Context, commitId ...string) ([]*commit.Commit[Plugin], error) {
-//	return i.pluginCommitService.List(ctx, commitId...)
-//}
-//
-//func (i *imlAPIService) SavePlugin(ctx context.Context, aid string, data *Plugin) error {
-//	return i.pluginCommitService.Save(ctx, aid, data)
-//}
-//
-//func (i *imlAPIService) LatestPlugin(ctx context.Context, aid string) (*commit.Commit[Plugin], error) {
-//	return i.pluginCommitService.Latest(ctx, aid)
-//}
 
 func (i *imlAPIService) ListLatestCommitRequest(ctx context.Context, aid ...string) ([]*commit.Commit[Request], error) {
 	return i.requestCommitService.ListLatest(ctx, aid...)
@@ -137,6 +116,9 @@ func (i *imlAPIService) Save(ctx context.Context, id string, model *Edit) error 
 		if err != nil {
 			return err
 		}
+		if model.Name != nil {
+			ev.Name = *model.Name
+		}
 
 		if model.Description != nil {
 			ev.Description = *model.Description
@@ -186,7 +168,7 @@ func (i *imlAPIService) Create(ctx context.Context, input *Create) (err error) {
 
 		ne := api.API{
 			UUID:     input.UUID,
-			Name:     input.UUID,
+			Name:     input.Name,
 			Service:  input.Service,
 			Team:     input.Team,
 			Creator:  operater,
@@ -201,7 +183,7 @@ func (i *imlAPIService) Create(ctx context.Context, input *Create) (err error) {
 		ev := &api.Info{
 			Id:          ne.Id,
 			UUID:        ne.UUID,
-			Name:        ne.UUID,
+			Name:        ne.Name,
 			Description: input.Description,
 			Updater:     operater,
 			UpdateAt:    time.Now(),
