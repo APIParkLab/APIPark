@@ -3,11 +3,13 @@ package model_runtime
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/APIParkLab/APIPark/ai-provider/model-runtime/entity"
-	"github.com/eolinker/eosc"
-	"gopkg.in/yaml.v3"
 	"net/url"
 	"strings"
+
+	yaml "gopkg.in/yaml.v3"
+
+	"github.com/APIParkLab/APIPark/ai-provider/model-runtime/entity"
+	"github.com/eolinker/eosc"
 )
 
 const (
@@ -54,8 +56,14 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 	}
 
 	delete(modelContents, DirAssets)
-	providerLogo, _ := assetsFiles.Get(providerCfg.IconLarge[entity.LanguageEnglish])
-	modelLogo, _ := assetsFiles.Get(providerCfg.IconSmall[entity.LanguageEnglish])
+	providerLogo, ok := assetsFiles.Get(providerCfg.IconLarge[entity.LanguageEnglish])
+	if !ok {
+		return nil, fmt.Errorf("provider logo not found:%s", providerCfg.Provider)
+	}
+	modelLogo, ok := assetsFiles.Get(providerCfg.IconSmall[entity.LanguageEnglish])
+	if !ok {
+		return nil, fmt.Errorf("model logo not found:%s", providerCfg.Provider)
+	}
 	provider := &Provider{
 		id:            providerCfg.Provider,
 		name:          providerCfg.Label[entity.LanguageEnglish],
