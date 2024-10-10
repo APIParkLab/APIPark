@@ -9,7 +9,8 @@ import (
 )
 
 type API struct {
-	UUID      string
+	UUID string
+
 	Service   string
 	Team      string
 	Creator   string
@@ -75,6 +76,7 @@ type Kind string
 
 type Create struct {
 	UUID        string
+	Name        string
 	Description string
 	Service     string
 	Team        string
@@ -86,6 +88,7 @@ type Create struct {
 }
 
 type Edit struct {
+	Name        *string
 	Description *string
 	Methods     *[]string
 	Protocols   *[]string
@@ -108,6 +111,7 @@ type PluginSetting struct {
 }
 
 type Request struct {
+	Name      string   `json:"name"`
 	Path      string   `json:"path"`
 	Methods   []string `json:"methods"`
 	Protocols []string `json:"protocols"`

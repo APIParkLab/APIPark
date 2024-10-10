@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/APIParkLab/APIPark/service/api"
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	"github.com/APIParkLab/APIPark/service/cluster"
@@ -95,6 +96,7 @@ func (m *imlServiceDiff) DiffForLatest(ctx context.Context, serviceId string, ba
 			Target: apiInfo.UUID,
 			Key:    "request",
 			Data: &api.Request{
+				Name:      apiInfo.Name,
 				Path:      apiInfo.Path,
 				Methods:   apiInfo.Methods,
 				Protocols: apiInfo.Protocols,
@@ -221,6 +223,7 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 	for _, rc := range target.apiRequestCommits {
 		apiId := rc.Target
 		a := &service_diff.ApiDiff{
+			Name:     rc.Data.Name,
 			APi:      rc.Target,
 			Method:   rc.Data.Methods,
 			Protocol: rc.Data.Protocols,
@@ -266,6 +269,7 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 		apiInfo := rc.Data
 		if baseApis.Has(rc.Target) {
 			out.Apis = append(out.Apis, &service_diff.ApiDiff{
+				Name:     apiInfo.Name,
 				APi:      rc.Target,
 				Method:   apiInfo.Methods,
 				Protocol: apiInfo.Protocols,
@@ -328,6 +332,7 @@ func (m *imlServiceDiff) Out(ctx context.Context, diff *service_diff.Diff) (*Dif
 	out := &DiffOut{}
 	out.Routers = utils.SliceToSlice(diff.Apis, func(i *service_diff.ApiDiff) *RouterDiffOut {
 		return &RouterDiffOut{
+			Name:      i.Name,
 			Methods:   i.Method,
 			Path:      i.Path,
 			Change:    i.Change,

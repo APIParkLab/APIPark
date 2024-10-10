@@ -3,10 +3,19 @@ package service
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"strings"
+
+	"github.com/APIParkLab/APIPark/model/plugin_model"
+	"github.com/APIParkLab/APIPark/service/api"
+
+	router_dto "github.com/APIParkLab/APIPark/module/router/dto"
+
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 	"github.com/APIParkLab/APIPark/module/ai"
 	ai_api "github.com/APIParkLab/APIPark/module/ai-api"
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
+	"github.com/APIParkLab/APIPark/module/router"
 	"github.com/APIParkLab/APIPark/module/service"
 	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
 	"github.com/APIParkLab/APIPark/module/upstream"
@@ -14,7 +23,6 @@ import (
 	"github.com/eolinker/go-common/store"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"strings"
 )
 
 var (
@@ -27,6 +35,7 @@ type imlServiceController struct {
 	module         service.IServiceModule    `autowired:""`
 	docModule      service.IServiceDocModule `autowired:""`
 	aiAPIModule    ai_api.IAPIModule         `autowired:""`
+	routerModule   router.IRouterModule      `autowired:""`
 	providerModule ai.IProviderModule        `autowired:""`
 	upstreamModule upstream.IUpstreamModule  `autowired:""`
 	transaction    store.ITransaction        `autowired:""`
@@ -110,32 +119,81 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 		if err != nil {
 			return err
 		}
+		path := fmt.Sprintf("/%s/demo_translation_api", strings.Trim(input.Prefix, "/"))
+		timeout := 300000
+		retry := 0
+		aiPrompt := &ai_api_dto.AiPrompt{
+			Variables: []*ai_api_dto.AiPromptVariable{
+				{
+					Key:         "source_lang",
+					Description: "",
+					Require:     true,
+				},
+				{
+					Key:         "target_lang",
+					Description: "",
+					Require:     true,
+				},
+				{
+					Key:         "text",
+					Description: "",
+					Require:     true,
+				},
+			},
+			Prompt: "You need to translate {{source_lang}} into {{target_lang}}, and the following is the content that needs to be translated.\n---\n{{text}}",
+		}
+		aiModel := &ai_api_dto.AiModel{
+			Id:     pv.DefaultLLM,
+			Config: pv.DefaultLLMConfig,
+		}
+		name := "Demo Translation API"
+		description := "A demo that shows you how to use a prompt to create a Translation API."
 		err = i.aiAPIModule.Create(
 			ctx,
 			info.Id,
 			&ai_api_dto.CreateAPI{
-				Name:        "Default API",
-				Path:        fmt.Sprintf("/%s", strings.Trim(input.Prefix, "/")),
-				Description: "Default API for service",
+				Name:        name,
+				Path:        path,
+				Description: description,
 				Disable:     false,
-				AiPrompt: &ai_api_dto.AiPrompt{
-					Variables: []*ai_api_dto.AiPromptVariable{
-						{
-							Key:         "Query",
-							Description: "",
-							Require:     true,
-						},
-					},
-					Prompt: "{{Query}}",
-				},
-				AiModel: &ai_api_dto.AiModel{
-					Id:     pv.DefaultLLM,
-					Config: pv.DefaultLLMConfig,
-				},
-				Timeout: 300000,
-				Retry:   0,
+				AiPrompt:    aiPrompt,
+				AiModel:     aiModel,
+				Timeout:     timeout,
+				Retry:       retry,
 			},
 		)
+		plugins := make(map[string]api.PluginSetting)
+		plugins["ai_prompt"] = api.PluginSetting{
+			Config: plugin_model.ConfigType{
+				"prompt":    aiPrompt.Prompt,
+				"variables": aiPrompt.Variables,
+			},
+		}
+		plugins["ai_formatter"] = api.PluginSetting{
+			Config: plugin_model.ConfigType{
+				"model":    aiModel.Id,
+				"provider": fmt.Sprintf("%s@ai-provider", info.Provider.Id),
+				"config":   aiModel.Config,
+			},
+		}
+		_, err = i.routerModule.Create(ctx, info.Id, &router_dto.Create{
+			Id:   input.Id,
+			Name: name,
+			Path: path,
+			Methods: []string{
+				http.MethodPost,
+			},
+			Description: description,
+			Protocols:   []string{"http", "https"},
+			MatchRules:  nil,
+			Proxy: &router_dto.InputProxy{
+				Path:    path,
+				Timeout: timeout,
+				Retry:   retry,
+				Plugins: plugins,
+			},
+			Disable: false,
+		})
 		_, err = i.upstreamModule.Save(ctx, info.Id, newAIUpstream(info.Id, *input.Provider, p.URI()))
 		return err
 	})
