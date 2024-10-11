@@ -26,7 +26,7 @@ func (s ServiceType) Int() int {
 	case PublicService:
 		return 2
 	default:
-		return 0
+		return 2
 	}
 }
 
@@ -38,7 +38,7 @@ func ToServiceType(s int) ServiceType {
 	case 2:
 		return PublicService
 	default:
-		return UnknownService
+		return PublicService
 	}
 }
 
