@@ -55,6 +55,26 @@ var dynamicResourceMap = map[string]Worker{
 		Profession: ProfessionAIProvider,
 		Driver:     "moonshot",
 	},
+	"tongyi": {
+		Profession: ProfessionAIProvider,
+		Driver:     "tongyi",
+	},
+	"zhipuai": {
+		Profession: ProfessionAIProvider,
+		Driver:     "zhipuai",
+	},
+	"fireworks": {
+		Profession: ProfessionAIProvider,
+		Driver:     "fireworks",
+	},
+	"novita": {
+		Profession: ProfessionAIProvider,
+		Driver:     "novita",
+	},
+	"mistralai": {
+		Profession: ProfessionAIProvider,
+		Driver:     "mistralai",
+	},
 }
 
 type Worker struct {
