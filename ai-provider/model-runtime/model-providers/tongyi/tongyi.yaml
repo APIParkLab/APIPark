@@ -16,8 +16,6 @@ help:
     en_US: https://bailian.console.aliyun.com/?apiKey=1#/api-key
 supported_model_types:
   - llm
-  - tts
-  - text-embedding
 configurate_methods:
   - predefined-model
   - customizable-model
