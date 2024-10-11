@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
+
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
 	ai_api "github.com/APIParkLab/APIPark/service/ai-api"
@@ -17,8 +20,6 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"net/http"
-	"strings"
 )
 
 var _ IAPIModule = (*imlAPIModule)(nil)
@@ -50,16 +51,17 @@ func (i *imlAPIModule) getAPIDoc(ctx context.Context, serviceId string) (*openap
 	return openapi3Loader.LoadFromData([]byte(doc.Content))
 }
 
-func (i *imlAPIModule) updateAPIDoc(ctx context.Context, serviceId string, path string, description string, aiPrompt *ai_api_dto.AiPrompt) error {
+func (i *imlAPIModule) updateAPIDoc(ctx context.Context, serviceId string, serviceName string, path string, summary string, description string, aiPrompt *ai_api_dto.AiPrompt) error {
 	doc, err := i.getAPIDoc(ctx, serviceId)
 	if err != nil {
 		return err
 	}
+
 	var variables []*ai_api_dto.AiPromptVariable
 	if aiPrompt != nil {
 		variables = aiPrompt.Variables
 	}
-	doc.AddOperation(path, http.MethodPost, genOperation(description, variables))
+	doc.AddOperation(path, http.MethodPost, genOperation(summary, description, variables))
 	result, err := doc.MarshalJSON()
 	if err != nil {
 		return err
@@ -98,30 +100,7 @@ func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_a
 		input.Id = uuid.New().String()
 	}
 	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		//err = i.apiService.Exist(ctx, "", &api.Exist{Path: input.Path, Methods: []string{http.MethodPost}})
-		//if err != nil {
-		//	return err
-		//}
-		//err = i.apiService.Create(ctx, &api.Create{
-		//	UUID:        input.Id,
-		//	Description: input.Description,
-		//	Service:     serviceId,
-		//	Team:        info.Team,
-		//	Methods: []string{
-		//		http.MethodPost,
-		//	},
-		//	Protocols: []string{
-		//		"http",
-		//		"https",
-		//	},
-		//	Disable: false,
-		//	Path:    input.Path,
-		//	Match:   "{}",
-		//})
-		//if err != nil {
-		//	return err
-		//}
-		err = i.updateAPIDoc(ctx, serviceId, input.Path, input.Description, input.AiPrompt)
+		err = i.updateAPIDoc(ctx, serviceId, info.Name, input.Path, input.Name, input.Description, input.AiPrompt)
 		if err != nil {
 			return err
 		}
@@ -160,31 +139,10 @@ func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string,
 		if input.Path != nil {
 			apiInfo.Path = *input.Path
 		}
-		//	prefix, err := i.Prefix(ctx, serviceId)
-		//	if err != nil {
-		//		return err
-		//	}
-		//	if !strings.HasSuffix(apiInfo.Path, prefix) {
-		//		if apiInfo.Path[0] != '/' {
-		//			apiInfo.Path = fmt.Sprintf("/%s", apiInfo.Path)
-		//		}
-		//		apiInfo.Path = fmt.Sprintf("%s%s", prefix, apiInfo.Path)
-		//		err := i.apiService.Exist(ctx, apiId, &api.Exist{Path: apiInfo.Path, Methods: []string{http.MethodPost}})
-		//		if err != nil {
-		//			return err
-		//		}
-		//		err = i.apiService.Save(ctx, apiId, &api.Edit{
-		//			Path: &apiInfo.Path,
-		//		})
-		//		if err != nil {
-		//			return err
-		//		}
-		//	}
-		//}
 		if input.Description != nil {
 			apiInfo.Description = *input.Description
 		}
-		err = i.updateAPIDoc(ctx, serviceId, apiInfo.Path, apiInfo.Description, input.AiPrompt)
+		err = i.updateAPIDoc(ctx, serviceId, info.Name, apiInfo.Path, apiInfo.Name, apiInfo.Description, input.AiPrompt)
 		if err != nil {
 			return err
 		}

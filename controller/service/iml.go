@@ -162,6 +162,9 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 				Retry:       retry,
 			},
 		)
+		if err != nil {
+			return err
+		}
 		plugins := make(map[string]api.PluginSetting)
 		plugins["ai_prompt"] = api.PluginSetting{
 			Config: plugin_model.ConfigType{
