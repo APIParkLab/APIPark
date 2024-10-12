@@ -79,4 +79,4 @@ model_credential_schema:
           label:
             en_US: Tool Call
             zh_Hans: Tool Call
-address: https://api.openai.com
+address: https://api.stepfun.com
