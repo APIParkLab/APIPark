@@ -13,12 +13,12 @@ func genOpenAPI3Template(title string, description string) *openapi3.T {
 		Description: description,
 		Version:     "beta",
 	}
-	result.Tags = openapi3.Tags{
-		{
-			Name:        title,
-			Description: description,
-		},
-	}
+	//result.Tags = openapi3.Tags{
+	//	{
+	//		Name:        title,
+	//		Description: description,
+	//	},
+	//}
 	result.Components = components
 	result.Paths = new(openapi3.Paths)
 	return result
@@ -159,15 +159,16 @@ func genResponseSchema() *openapi3.Schema {
 	result := openapi3.NewObjectSchema()
 	result.Description = "Response from the server"
 	result.WithPropertyRef("message", messageSchemaRef)
-	result.WithProperty("code", openapi3.NewInt32Schema().WithMin(0))
+	openapi3.NewIntegerSchema()
+	result.WithProperty("code", openapi3.NewIntegerSchema())
 	result.WithProperty("error", openapi3.NewStringSchema())
-	result.WithProperty("finish_reason", openapi3.NewStringSchema().WithEnum([]string{
+	result.WithProperty("finish_reason", openapi3.NewStringSchema().WithEnum(
 		"stop",
 		"length",
 		"function_call",
 		"content_filter",
 		"null",
-	}))
+	))
 
 	return result
 }

@@ -75,6 +75,39 @@ func ToServiceKind(s int) Kind {
 	}
 }
 
+const (
+	ApprovalTypeAuto   ApprovalType = "auto"
+	ApprovalTypeManual ApprovalType = "manual"
+)
+
+type ApprovalType string
+
+func (s ApprovalType) String() string {
+	return string(s)
+}
+
+func (s ApprovalType) Int() int {
+	switch s {
+	case "auto":
+		return 1
+	case "manual":
+		return 0
+	default:
+		return 0
+	}
+}
+
+func ToApprovalType(s int) ApprovalType {
+	switch s {
+	case 1:
+		return "auto"
+	case 0:
+		return "manual"
+	default:
+		return "manual"
+	}
+}
+
 type Service struct {
 	Id               string
 	Name             string
@@ -88,6 +121,7 @@ type Service struct {
 	AdditionalConfig map[string]string
 	AsServer         bool
 	AsApp            bool
+	ApprovalType     ApprovalType
 	CreateTime       time.Time
 	UpdateTime       time.Time
 }
@@ -107,6 +141,7 @@ func FromEntity(e *service.Service) *Service {
 		ServiceType:      ToServiceType(e.ServiceType),
 		Kind:             ToServiceKind(e.Kind),
 		Catalogue:        e.Catalogue,
+		ApprovalType:     ToApprovalType(e.ApprovalType),
 		AsServer:         e.AsServer,
 		AsApp:            e.AsApp,
 		CreateTime:       e.CreateAt,
@@ -126,6 +161,7 @@ type Create struct {
 	Kind             Kind
 	Catalogue        string
 	AdditionalConfig map[string]string
+	ApprovalType     ApprovalType
 	AsServer         bool
 	AsApp            bool
 }
@@ -138,6 +174,7 @@ type Edit struct {
 	Catalogue        *string
 	Logo             *string
 	AdditionalConfig *map[string]string
+	ApprovalType     *ApprovalType
 }
 
 type CreateTag struct {

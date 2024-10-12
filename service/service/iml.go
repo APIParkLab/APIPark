@@ -159,6 +159,7 @@ func createEntityHandler(i *Create) *service.Service {
 		Prefix:           i.Prefix,
 		Team:             i.Team,
 		ServiceType:      i.ServiceType.Int(),
+		ApprovalType:     i.ApprovalType.Int(),
 		Kind:             i.Kind.Int(),
 		AdditionalConfig: string(cfg),
 		Catalogue:        i.Catalogue,
@@ -188,5 +189,8 @@ func updateHandler(e *service.Service, i *Edit) {
 	if i.AdditionalConfig != nil {
 		cfg, _ := json.Marshal(*i.AdditionalConfig)
 		e.AdditionalConfig = string(cfg)
+	}
+	if i.ApprovalType != nil {
+		e.ApprovalType = (*i.ApprovalType).Int()
 	}
 }

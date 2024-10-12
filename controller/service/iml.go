@@ -197,7 +197,16 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 			},
 			Disable: false,
 		})
+		if err != nil {
+			return err
+		}
 		_, err = i.upstreamModule.Save(ctx, info.Id, newAIUpstream(info.Id, *input.Provider, p.URI()))
+		if err != nil {
+			return err
+		}
+		i.docModule.SaveServiceDoc(ctx, info.Id, &service_dto.SaveServiceDoc{
+			Doc: "The Translation API allows developers to translate text from one language to another. It supports multiple languages and enables easy integration of high-quality translation features into applications. With simple API requests, you can quickly translate content into different target languages.",
+		})
 		return err
 	})
 

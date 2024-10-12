@@ -44,20 +44,21 @@ type SimpleAppItem struct {
 }
 
 type Service struct {
-	Id          string         `json:"id"`
-	Name        string         `json:"name"`
-	Prefix      string         `json:"prefix,omitempty"`
-	Description string         `json:"description"`
-	Team        auto.Label     `json:"team" aolabel:"team"`
-	CreateTime  auto.TimeLabel `json:"create_time"`
-	UpdateTime  auto.TimeLabel `json:"update_time"`
-	ServiceType string         `json:"service_type"`
-	Catalogue   auto.Label     `json:"catalogue" aolabel:"catalogue"`
-	Tags        []auto.Label   `json:"tags" aolabel:"tag"`
-	Logo        string         `json:"logo"`
-	Provider    *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
-	AsServer    bool           `json:"as_server"`
-	AsApp       bool           `json:"as_app"`
+	Id           string         `json:"id"`
+	Name         string         `json:"name"`
+	Prefix       string         `json:"prefix,omitempty"`
+	Description  string         `json:"description"`
+	Team         auto.Label     `json:"team" aolabel:"team"`
+	CreateTime   auto.TimeLabel `json:"create_time"`
+	UpdateTime   auto.TimeLabel `json:"update_time"`
+	ServiceType  string         `json:"service_type"`
+	Catalogue    auto.Label     `json:"catalogue" aolabel:"catalogue"`
+	Tags         []auto.Label   `json:"tags" aolabel:"tag"`
+	Logo         string         `json:"logo"`
+	Provider     *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
+	ApprovalType string         `json:"approval_type"`
+	AsServer     bool           `json:"as_server"`
+	AsApp        bool           `json:"as_app"`
 }
 
 type App struct {
@@ -73,18 +74,19 @@ type App struct {
 func ToService(model *service.Service) *Service {
 
 	s := &Service{
-		Id:          model.Id,
-		Name:        model.Name,
-		Prefix:      model.Prefix,
-		Description: model.Description,
-		Team:        auto.UUID(model.Team),
-		ServiceType: model.ServiceType.String(),
-		Logo:        model.Logo,
-		Catalogue:   auto.UUID(model.Catalogue),
-		CreateTime:  auto.TimeLabel(model.CreateTime),
-		UpdateTime:  auto.TimeLabel(model.UpdateTime),
-		AsServer:    model.AsServer,
-		AsApp:       model.AsApp,
+		Id:           model.Id,
+		Name:         model.Name,
+		Prefix:       model.Prefix,
+		Description:  model.Description,
+		Team:         auto.UUID(model.Team),
+		ServiceType:  model.ServiceType.String(),
+		Logo:         model.Logo,
+		Catalogue:    auto.UUID(model.Catalogue),
+		CreateTime:   auto.TimeLabel(model.CreateTime),
+		UpdateTime:   auto.TimeLabel(model.UpdateTime),
+		ApprovalType: model.ApprovalType.String(),
+		AsServer:     model.AsServer,
+		AsApp:        model.AsApp,
 	}
 	switch model.Kind {
 	case service.AIService:
