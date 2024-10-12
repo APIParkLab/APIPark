@@ -18,6 +18,7 @@ type Service struct {
 	IsDelete         int       `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除"`
 	Kind             int       `gorm:"type:tinyint(4);not null;column:kind;comment:服务种类，0:Rest服务，1:AI服务"`
 	AdditionalConfig string    `gorm:"type:text;not null;column:additional_config;comment:额外配置"`
+	ApprovalType     int       `gorm:"type:tinyint(4);not null;column:approval_type;comment:审批类型"`
 	AsServer         bool      `gorm:"type:tinyint(1);not null;column:as_server;comment:是否为服务端项目"`
 	AsApp            bool      `gorm:"type:tinyint(1);not null;column:as_app;comment:是否为应用项目"`
 }

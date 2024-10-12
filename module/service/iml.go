@@ -313,6 +313,7 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 		Catalogue:        input.Catalogue,
 		Prefix:           input.Prefix,
 		Logo:             input.Logo,
+		ApprovalType:     service.ApprovalType(input.ApprovalType),
 		AdditionalConfig: make(map[string]string),
 	}
 	if mo.ServiceType == service.PublicService && mo.Catalogue == "" {
@@ -340,6 +341,7 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 	} else {
 		mo.AsServer = *input.AsServer
 	}
+
 	input.Prefix = strings.Trim(strings.Trim(input.Prefix, " "), "/")
 	err := i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		if input.Tags != nil {
@@ -385,6 +387,10 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 				return fmt.Errorf("catalogue can not be empty")
 			}
 		}
+		var approvalType service.ApprovalType
+		if input.ApprovalType != nil {
+			approvalType = service.ApprovalType(*input.ApprovalType)
+		}
 
 		err = i.serviceService.Save(ctx, id, &service.Edit{
 			Name:             input.Name,
@@ -393,6 +399,7 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 			ServiceType:      serviceType,
 			Catalogue:        input.Catalogue,
 			AdditionalConfig: &info.AdditionalConfig,
+			ApprovalType:     &approvalType,
 		})
 		if err != nil {
 			return err

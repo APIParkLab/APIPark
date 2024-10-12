@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	"math"
 	"sort"
+
+	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 
 	service_doc "github.com/APIParkLab/APIPark/service/service-doc"
 
@@ -118,6 +119,10 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 				// 当系统不可作为订阅方时，不可订阅
 				continue
 			}
+			status := subscribe.ApplyStatusReview
+			if s.ApprovalType == service.ApprovalTypeAuto {
+				status = subscribe.ApplyStatusSubscribe
+			}
 
 			err = i.subscribeApplyService.Create(ctx, &subscribe.CreateApply{
 				Uuid:        uuid.New().String(),
@@ -126,7 +131,7 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 				Application: appId,
 				ApplyTeam:   appInfo.Team,
 				Reason:      subscribeInfo.Reason,
-				Status:      subscribe.ApplyStatusReview,
+				Status:      status,
 				Applier:     userId,
 			})
 
@@ -137,20 +142,20 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 			// 修改订阅表状态
 			subscribers, err := i.subscribeService.ListByApplication(ctx, subscribeInfo.Service, appId)
 			if err != nil {
-				if !errors.Is(err, gorm.ErrRecordNotFound) {
-					return err
-				}
-				err = i.subscribeService.Create(ctx, &subscribe.CreateSubscribe{
-					Uuid:        uuid.New().String(),
-					Service:     subscribeInfo.Service,
-					Application: appId,
-					ApplyStatus: subscribe.ApplyStatusReview,
-					From:        subscribe.FromSubscribe,
-				})
-				if err != nil {
-					return err
-				}
-
+				//if !errors.Is(err, gorm.ErrRecordNotFound) {
+				//	return err
+				//}
+				//err = i.subscribeService.Create(ctx, &subscribe.CreateSubscribe{
+				//	Uuid:        uuid.New().String(),
+				//	Service:     subscribeInfo.Service,
+				//	Application: appId,
+				//	ApplyStatus: status,
+				//	From:        subscribe.FromSubscribe,
+				//})
+				//if err != nil {
+				//	return err
+				//}
+				return err
 			} else {
 				subscriberMap := utils.SliceToMap(subscribers, func(t *subscribe.Subscribe) string {
 					return t.Application
@@ -161,14 +166,13 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 						Uuid:        uuid.New().String(),
 						Service:     subscribeInfo.Service,
 						Application: appId,
-						ApplyStatus: subscribe.ApplyStatusReview,
+						ApplyStatus: status,
 						From:        subscribe.FromSubscribe,
 					})
 					if err != nil {
 						return err
 					}
 				} else if v.ApplyStatus != subscribe.ApplyStatusSubscribe {
-					status := subscribe.ApplyStatusReview
 					err = i.subscribeService.Save(ctx, v.Id, &subscribe.UpdateSubscribe{
 						ApplyStatus: &status,
 					})
