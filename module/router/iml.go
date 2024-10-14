@@ -164,6 +164,9 @@ func (i *imlRouterModule) Search(ctx context.Context, keyword string, serviceId 
 	if err != nil {
 		return nil, err
 	}
+	if len(list) == 0 {
+		return []*router_dto.Item{}, nil
+	}
 	apiInfos, err := i.apiService.ListInfo(ctx, utils.SliceToSlice(list, func(s *api.API) string {
 		return s.UUID
 	})...)
@@ -229,10 +232,10 @@ func (i *imlRouterModule) Create(ctx context.Context, serviceId string, dto *rou
 	if err != nil {
 		return nil, err
 	}
-	prefix, err := i.Prefix(ctx, serviceId)
-	if err != nil {
-		return nil, err
-	}
+	//prefix, err := i.Prefix(ctx, serviceId)
+	//if err != nil {
+	//	return nil, err
+	//}
 	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		if dto.Id == "" {
 			dto.Id = uuid.New().String()
@@ -242,7 +245,7 @@ func (i *imlRouterModule) Create(ctx context.Context, serviceId string, dto *rou
 			return err
 		}
 
-		path := fmt.Sprintf("%s%s", prefix, dto.Path)
+		//path := fmt.Sprintf("%s%s", prefix, dto.Path)
 
 		err = i.apiService.Exist(ctx, "", &api.Exist{Path: dto.Path, Methods: dto.Methods})
 		if err != nil {
@@ -267,7 +270,7 @@ func (i *imlRouterModule) Create(ctx context.Context, serviceId string, dto *rou
 			Team:        info.Team,
 			Methods:     dto.Methods,
 			Protocols:   dto.Protocols,
-			Path:        path,
+			Path:        dto.Path,
 			Match:       string(match),
 		})
 	})

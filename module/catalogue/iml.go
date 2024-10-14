@@ -7,6 +7,11 @@ import (
 	"math"
 	"sort"
 
+	"github.com/eolinker/eosc/log"
+
+	"github.com/APIParkLab/APIPark/gateway"
+	"github.com/APIParkLab/APIPark/service/cluster"
+
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 
 	service_doc "github.com/APIParkLab/APIPark/service/service-doc"
@@ -54,8 +59,20 @@ type imlCatalogueModule struct {
 	subscribeService      subscribe.ISubscribeService      `autowired:""`
 	subscribeApplyService subscribe.ISubscribeApplyService `autowired:""`
 	transaction           store.ITransaction               `autowired:""`
+	clusterService        cluster.IClusterService          `autowired:""`
 
 	root *Root
+}
+
+func (i *imlCatalogueModule) onlineSubscriber(ctx context.Context, clusterId string, sub *gateway.SubscribeRelease) error {
+	client, err := i.clusterService.GatewayClient(ctx, clusterId)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = client.Close(ctx)
+	}()
+	return client.Subscribe().Online(ctx, sub)
 }
 
 func (i *imlCatalogueModule) Get(ctx context.Context, id string) (*catalogue_dto.Catalogue, error) {
@@ -122,6 +139,21 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 			status := subscribe.ApplyStatusReview
 			if s.ApprovalType == service.ApprovalTypeAuto {
 				status = subscribe.ApplyStatusSubscribe
+				cs, err := i.clusterService.List(ctx)
+				if err != nil {
+					return err
+				}
+				for _, c := range cs {
+					err := i.onlineSubscriber(ctx, c.Uuid, &gateway.SubscribeRelease{
+						Service:     subscribeInfo.Service,
+						Application: appId,
+						Expired:     "0",
+					})
+
+					if err != nil {
+						log.Errorf("online subscriber for cluster[%s] %v", c.Uuid, err)
+					}
+				}
 			}
 
 			err = i.subscribeApplyService.Create(ctx, &subscribe.CreateApply{
