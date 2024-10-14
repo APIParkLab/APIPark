@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/APIParkLab/APIPark/gateway"
+
 	"github.com/eolinker/eosc"
 )
 
@@ -110,6 +112,10 @@ func LoadProvider(name string) error {
 	if err != nil {
 		return err
 	}
+	gateway.RegisterDynamicResourceDriver(provider.ID(), gateway.Worker{
+		Profession: gateway.ProfessionAIProvider,
+		Driver:     provider.ID(),
+	})
 	Register(provider.ID(), provider)
 	return nil
 }

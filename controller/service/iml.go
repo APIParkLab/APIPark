@@ -148,10 +148,12 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 		}
 		name := "Demo Translation API"
 		description := "A demo that shows you how to use a prompt to create a Translation API."
+		apiId := uuid.New().String()
 		err = i.aiAPIModule.Create(
 			ctx,
 			info.Id,
 			&ai_api_dto.CreateAPI{
+				Id:          apiId,
 				Name:        name,
 				Path:        path,
 				Description: description,
@@ -180,7 +182,7 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 			},
 		}
 		_, err = i.routerModule.Create(ctx, info.Id, &router_dto.Create{
-			Id:   input.Id,
+			Id:   apiId,
 			Name: name,
 			Path: path,
 			Methods: []string{
