@@ -38,4 +38,4 @@ provider_credential_schema:
       placeholder:
         zh_Hans: 在此输入您的 Secret Key
         en_US: Enter your Secret Key
-address: https://api.openai.com
+address: https://aip.baidubce.com
