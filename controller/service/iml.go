@@ -95,10 +95,7 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 	if input.Provider == nil {
 		return nil, fmt.Errorf("provider is required")
 	}
-	pv, err := i.providerModule.Provider(ctx, *input.Provider)
-	if err != nil {
-		return nil, err
-	}
+
 	if input.Id == "" {
 		input.Id = uuid.New().String()
 	}
@@ -113,8 +110,14 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 	if !has {
 		return nil, fmt.Errorf("provider not found")
 	}
+	m, has := p.DefaultModel(model_runtime.ModelTypeLLM)
+	if !has {
+		return nil, fmt.Errorf("provider default llm not found")
+	}
+
 	var info *service_dto.Service
-	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+	err := i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		var err error
 		info, err = i.module.Create(ctx, teamID, input)
 		if err != nil {
 			return err
@@ -143,8 +146,8 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 			Prompt: "You need to translate {{source_lang}} into {{target_lang}}, and the following is the content that needs to be translated.\n---\n{{text}}",
 		}
 		aiModel := &ai_api_dto.AiModel{
-			Id:     pv.DefaultLLM,
-			Config: pv.DefaultLLMConfig,
+			Id:     m.ID(),
+			Config: m.DefaultConfig(),
 		}
 		name := "Demo Translation API"
 		description := "A demo that shows you how to use a prompt to create a Translation API."

@@ -32,7 +32,15 @@ func (p ParamValidator) GenConfig(target map[string]interface{}, origin map[stri
 		if !ok || v == "******" {
 			continue
 		}
-		target[rule.Name] = origin[rule.Name]
+		tv, ok := target[rule.Name]
+		if !ok {
+			continue
+		}
+		v, ok = tv.(string)
+		if !ok || v == "******" {
+			target[rule.Name] = origin[rule.Name]
+		}
+
 	}
 	data, err := json.Marshal(target)
 	if err != nil {

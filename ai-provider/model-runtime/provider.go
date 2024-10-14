@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"strings"
 
 	yaml "gopkg.in/yaml.v3"
 
@@ -228,31 +227,4 @@ func (p *providerUri) Host() string {
 
 func (p *providerUri) Path() string {
 	return p.path
-}
-
-func PartialMasking(origin string, begin int, length int) string {
-	target := strings.Builder{}
-	runes := []rune(origin)
-	size := len(runes)
-	if begin > size {
-		return origin
-	} else if length == -1 || begin+length > size {
-		for i := 0; i < begin; i++ {
-			target.WriteRune(runes[i])
-		}
-		for i := begin; i < size; i++ {
-			target.WriteRune('*')
-		}
-	} else {
-		for i := 0; i < begin; i++ {
-			target.WriteRune(runes[i])
-		}
-		for i := begin; i < begin+length; i++ {
-			target.WriteRune('*')
-		}
-		for i := begin + length; i < size; i++ {
-			target.WriteRune(runes[i])
-		}
-	}
-	return target.String()
 }
