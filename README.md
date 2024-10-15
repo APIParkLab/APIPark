@@ -6,7 +6,9 @@
   <a href="/readme/readme-zh-cn.md">简体中文</a>
 </p>
 
-APIPark is the world's first open-source enterprise API open platform, helping organizations quickly build internal API portals/marketplaces and enjoy ultimate forwarding performance, API observability, service governance, multi tenant management, subscription approval processes, and many other benefits.
+🦄APIPark is the #1 open-source AI Gateway and Developer Portal, enabling you to easily manage, integrate, and deploy AI and API services. APIPark seamlessly connects with various large AI models and packages these AI capabilities into APIs for easy invocation. 
+
+✨Additionally, APIPark provides robust API management features, including API creation, monitoring, and access control, ensuring developers can efficiently and securely develop and manage their APIs.
 
 <br>
 
