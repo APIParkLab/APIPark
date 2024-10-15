@@ -6,22 +6,21 @@
   <a href="/readme/readme-zh-cn.md">简体中文</a>
 </p>
 
-🦄APIPark is the #1 open-source AI Gateway and Developer Portal, enabling you to easily manage, integrate, and deploy AI and API services. APIPark seamlessly connects with various large AI models and packages these AI capabilities into APIs for easy invocation. 
+🦄APIPark is the #1 open-source AI Gateway and Developer Portal, enabling you to easily manage, integrate, and deploy AI and API services. APIPark Easily connect to powerful AI models and package them as APIs for effortless use. 
 
 ✨Additionally, APIPark provides robust API management features, including API creation, monitoring, and access control, ensuring developers can efficiently and securely develop and manage their APIs.
 
 <br>
 
 # ✨  Quick Start
-APIPark is committed to providing one-stop API open and access products for global enterprises, and creating a new generation of API asset governance standards. APIPark is open sourced using the Apache 2.0 protocol.
+APIPark is dedicated to providing a one-stop AI & API open platform for enterprises and developers, open-sourced under the Apache 2.0 license.
 
-APIPark is committed to addressing several key challenges that enterprises face in API management:
-- Complex API call relationships: Simplifies API interactions in complex system architectures.
-- Data usage tracking: Provides comprehensive API usage monitoring and reporting.
-- Compliance management: Ensure that APIs comply with organizational and regulatory standards.
+APIPark aims to solve the following challenges:
+- Easily connect to powerful AI models and package them as APIs for effortless use.
+- Manage complex AI & API call relationships.
+- Oversee API creation, monitoring, and security.
 - Fault detection and troubleshooting: Simplify the identification and resolution of system issues.
-- Quantifying the Value of Data Assets: Enhancing the Visibility and Valuation of Data Assets.
-
+- Quantify the value of data assets: Enhance visibility and valuation of data assets."
 
 <br>
 
