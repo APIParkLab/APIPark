@@ -27,12 +27,4 @@ provider_credential_schema:
       placeholder:
         zh_Hans: 在此输入您的 API Key
         en_US: Enter your API Key
-    - variable: minimax_group_id
-      label:
-        en_US: Group ID
-      type: text-input
-      required: true
-      placeholder:
-        zh_Hans: 在此输入您的 Group ID
-        en_US: Enter your group ID
-address: https://api.openai.com
+address: https://api.minimax.chat
