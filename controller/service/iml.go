@@ -106,17 +106,21 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 			input.Prefix = input.Id[:8]
 		}
 	}
+	pv, err := i.providerModule.Provider(ctx, *input.Provider)
+	if err != nil {
+		return nil, err
+	}
 	p, has := model_runtime.GetProvider(*input.Provider)
 	if !has {
 		return nil, fmt.Errorf("provider not found")
 	}
-	m, has := p.DefaultModel(model_runtime.ModelTypeLLM)
+	m, has := p.GetModel(pv.DefaultLLM)
 	if !has {
-		return nil, fmt.Errorf("provider default llm not found")
+		return nil, fmt.Errorf("model %s not found", pv.DefaultLLM)
 	}
 
 	var info *service_dto.Service
-	err := i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
 		var err error
 		info, err = i.module.Create(ctx, teamID, input)
 		if err != nil {
