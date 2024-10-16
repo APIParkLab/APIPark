@@ -112,12 +112,11 @@ func (i *imlServiceModule) ExportAll(ctx context.Context) ([]*service_dto.Export
 
 }
 
-func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, keyword string, kind service.Kind) ([]*service.Service, error) {
+func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, keyword string) ([]*service.Service, error) {
 
 	userID := utils.UserId(ctx)
 	condition := make(map[string]interface{})
 	condition["as_server"] = true
-	condition["kind"] = kind.Int()
 	if teamId != "" {
 		_, err := i.teamService.Get(ctx, teamId)
 		if err != nil {
@@ -137,8 +136,8 @@ func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, 
 
 }
 
-func (i *imlServiceModule) SearchMyServicesByKind(ctx context.Context, teamId string, keyword string, kind string) ([]*service_dto.ServiceItem, error) {
-	services, err := i.searchMyServices(ctx, teamId, keyword, service.Kind(kind))
+func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, keyword string) ([]*service_dto.ServiceItem, error) {
+	services, err := i.searchMyServices(ctx, teamId, keyword)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +155,7 @@ func (i *imlServiceModule) SearchMyServicesByKind(ctx context.Context, teamId st
 			continue
 		}
 		apiCount := apiCountMap[model.Id]
-		item := toServiceItem(service.Kind(kind), model)
+		item := toServiceItem(model)
 		item.ApiNum = apiCount
 		item.CanDelete = apiCount == 0
 		items = append(items, item)
@@ -242,7 +241,7 @@ func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Ser
 	return s, nil
 }
 
-func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword string, kind string) ([]*service_dto.ServiceItem, error) {
+func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {
 	var list []*service.Service
 	var err error
 	if teamID != "" {
@@ -250,9 +249,9 @@ func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword st
 		if err != nil {
 			return nil, err
 		}
-		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"team": teamID, "as_server": true, "kind": service.Kind(kind).Int()}, "update_at desc")
+		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"team": teamID, "as_server": true}, "update_at desc")
 	} else {
-		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"as_server": true, "kind": service.Kind(kind).Int()}, "update_at desc")
+		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"as_server": true}, "update_at desc")
 	}
 	if err != nil {
 		return nil, err
@@ -270,7 +269,7 @@ func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword st
 	items := make([]*service_dto.ServiceItem, 0, len(list))
 	for _, model := range list {
 		apiCount := apiCountMap[model.Id]
-		item := toServiceItem(service.Kind(kind), model)
+		item := toServiceItem(model)
 		item.ApiNum = apiCount
 		item.CanDelete = apiCount == 0
 		items = append(items, item)
@@ -278,7 +277,7 @@ func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword st
 	return items, nil
 }
 
-func toServiceItem(kind service.Kind, model *service.Service) *service_dto.ServiceItem {
+func toServiceItem(model *service.Service) *service_dto.ServiceItem {
 	item := &service_dto.ServiceItem{
 		Id:          model.Id,
 		Name:        model.Name,
@@ -286,8 +285,9 @@ func toServiceItem(kind service.Kind, model *service.Service) *service_dto.Servi
 		CreateTime:  auto.TimeLabel(model.CreateTime),
 		UpdateTime:  auto.TimeLabel(model.UpdateTime),
 		Team:        auto.UUID(model.Team),
+		ServiceKind: model.Kind.String(),
 	}
-	switch kind {
+	switch model.Kind {
 	case service.RestService:
 		return item
 	case service.AIService:
@@ -315,19 +315,17 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 		Logo:             input.Logo,
 		ApprovalType:     service.ApprovalType(input.ApprovalType),
 		AdditionalConfig: make(map[string]string),
+		Kind:             service.Kind(input.Kind),
 	}
 	if mo.ServiceType == service.PublicService && mo.Catalogue == "" {
 		return nil, fmt.Errorf("catalogue can not be empty")
 	}
-	if input.Kind != nil {
-		mo.Kind = service.Kind(*input.Kind)
-		switch mo.Kind {
-		case service.AIService:
-			if input.Provider == nil {
-				return nil, fmt.Errorf("ai service: provider can not be empty")
-			}
-			mo.AdditionalConfig["provider"] = *input.Provider
+	switch mo.Kind {
+	case service.AIService:
+		if input.Provider == nil {
+			return nil, fmt.Errorf("ai service: provider can not be empty")
 		}
+		mo.AdditionalConfig["provider"] = *input.Provider
 	}
 	if input.AsApp == nil {
 		// 默认值为false
@@ -429,18 +427,8 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 	return i.Get(ctx, id)
 }
 
-func (i *imlServiceModule) Delete(ctx context.Context, id string, kind string) error {
-	info, err := i.serviceService.Get(ctx, id)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil
-		}
-		return err
-	}
-	if info.Kind.Int() != service.Kind(kind).Int() {
-		return fmt.Errorf("kind is not match")
-	}
-	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
+func (i *imlServiceModule) Delete(ctx context.Context, id string) error {
+	err := i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		count, err := i.apiService.CountByService(ctx, id)
 		if err != nil {
 			return err

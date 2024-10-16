@@ -61,7 +61,7 @@ func newAIUpstream(id string, provider string, uri model_runtime.IProviderURI) *
 	}
 }
 
-func (i *imlServiceController) EditAIService(ctx *gin.Context, id string, input *service_dto.EditService) (*service_dto.Service, error) {
+func (i *imlServiceController) editAIService(ctx *gin.Context, id string, input *service_dto.EditService) (*service_dto.Service, error) {
 
 	if input.Provider == nil {
 		return nil, fmt.Errorf("provider is required")
@@ -89,9 +89,7 @@ func (i *imlServiceController) EditAIService(ctx *gin.Context, id string, input 
 	return info, nil
 }
 
-func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error) {
-	kind := "ai"
-	input.Kind = &kind
+func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error) {
 	if input.Provider == nil {
 		return nil, fmt.Errorf("provider is required")
 	}
@@ -222,21 +220,8 @@ func (i *imlServiceController) CreateAIService(ctx *gin.Context, teamID string, 
 	return info, err
 }
 
-func (i *imlServiceController) DeleteAIService(ctx *gin.Context, id string) error {
-	// TODO: 检查是否有发布过版本，若发布，则不允许删除
-	return i.module.Delete(ctx, id, "ai")
-}
-
-func (i *imlServiceController) SearchMyAIServices(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {
-	return i.module.SearchMyServicesByKind(ctx, teamID, keyword, "ai")
-}
-
-func (i *imlServiceController) SearchAIServices(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {
-	return i.module.Search(ctx, teamID, keyword, "ai")
-}
-
 func (i *imlServiceController) SearchMyServices(ctx *gin.Context, teamId string, keyword string) ([]*service_dto.ServiceItem, error) {
-	return i.module.SearchMyServicesByKind(ctx, teamId, keyword, "")
+	return i.module.SearchMyServices(ctx, teamId, keyword)
 }
 
 //func (i *imlServiceController) Simple(ctx *gin.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
@@ -252,19 +237,29 @@ func (i *imlServiceController) Get(ctx *gin.Context, id string) (*service_dto.Se
 }
 
 func (i *imlServiceController) Search(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {
-	return i.module.Search(ctx, teamID, keyword, "")
+	return i.module.Search(ctx, teamID, keyword)
 }
 
 func (i *imlServiceController) Create(ctx *gin.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error) {
+	if input.Kind == "ai" {
+		return i.createAIService(ctx, teamID, input)
+	}
 	return i.module.Create(ctx, teamID, input)
 }
 
 func (i *imlServiceController) Edit(ctx *gin.Context, id string, input *service_dto.EditService) (*service_dto.Service, error) {
+	info, err := i.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if info.ServiceKind == "ai" {
+		return i.editAIService(ctx, id, input)
+	}
 	return i.module.Edit(ctx, id, input)
 }
 
 func (i *imlServiceController) Delete(ctx *gin.Context, id string) error {
-	return i.module.Delete(ctx, id, "")
+	return i.module.Delete(ctx, id)
 }
 
 func (i *imlServiceController) ServiceDoc(ctx *gin.Context, id string) (*service_dto.ServiceDoc, error) {

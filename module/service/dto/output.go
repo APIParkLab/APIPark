@@ -9,6 +9,7 @@ type ServiceItem struct {
 	Id          string         `json:"id"`
 	Name        string         `json:"name"`
 	Team        auto.Label     `json:"team" aolabel:"team"`
+	ServiceKind string         `json:"service_kind"`
 	ApiNum      int64          `json:"api_num"`
 	Description string         `json:"description"`
 	CreateTime  auto.TimeLabel `json:"create_time"`
@@ -59,6 +60,7 @@ type Service struct {
 	ApprovalType string         `json:"approval_type"`
 	AsServer     bool           `json:"as_server"`
 	AsApp        bool           `json:"as_app"`
+	ServiceKind  string         `json:"service_kind"`
 }
 
 type App struct {
@@ -87,6 +89,7 @@ func ToService(model *service.Service) *Service {
 		ApprovalType: model.ApprovalType.String(),
 		AsServer:     model.AsServer,
 		AsApp:        model.AsApp,
+		ServiceKind:  model.Kind.String(),
 	}
 	switch model.Kind {
 	case service.AIService:
