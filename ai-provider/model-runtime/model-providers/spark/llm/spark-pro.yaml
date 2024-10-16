@@ -1,4 +1,4 @@
-model: spark-pro
+model: generalv3
 label:
   en_US: Spark Pro
 model_type: llm

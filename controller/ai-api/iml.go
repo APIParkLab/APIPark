@@ -3,6 +3,8 @@ package ai_api
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/APIParkLab/APIPark/model/plugin_model"
 	ai_api "github.com/APIParkLab/APIPark/module/ai-api"
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
@@ -13,8 +15,6 @@ import (
 	"github.com/eolinker/go-common/store"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"net/http"
-	"strings"
 )
 
 var _ IAPIController = (*imlAPIController)(nil)
@@ -117,24 +117,24 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 				},
 			}
 		}
-		path := apiInfo.Path
-		if input.Path != nil {
-			inputPath := *input.Path
-			prefix, err := i.module.Prefix(ctx, serviceId)
-			if err != nil {
-				return err
-			}
-			if !strings.HasSuffix(inputPath, prefix) {
-				if inputPath[0] != '/' {
-					inputPath = fmt.Sprintf("/%s", inputPath)
-				}
-				path = fmt.Sprintf("%s%s", prefix, inputPath)
-			} else {
-				path = inputPath
-			}
-		}
-		proxy.Path = path
-		input.Path = &path
+		//path := apiInfo.Path
+		//if input.Path != nil {
+		//	inputPath := *input.Path
+		//	prefix, err := i.module.Prefix(ctx, serviceId)
+		//	if err != nil {
+		//		return err
+		//	}
+		//	if !strings.HasSuffix(inputPath, prefix) {
+		//		if inputPath[0] != '/' {
+		//			inputPath = fmt.Sprintf("/%s", inputPath)
+		//		}
+		//		path = fmt.Sprintf("%s%s", prefix, inputPath)
+		//	} else {
+		//		path = inputPath
+		//	}
+		//}
+		//proxy.Path = path
+		//input.Path = &path
 		_, err = i.routerModule.Edit(ctx, serviceId, apiId, &router_dto.Edit{
 			Description: input.Description,
 			Proxy:       proxy,
