@@ -2,8 +2,9 @@ package service
 
 import (
 	"context"
-	"github.com/APIParkLab/APIPark/module/system"
 	"reflect"
+
+	"github.com/APIParkLab/APIPark/module/system"
 
 	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
 
@@ -24,11 +25,13 @@ type IServiceModule interface {
 	// Delete 删除项目
 	Delete(ctx context.Context, id string) error
 	// Simple 获取简易项目列表
-	Simple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
+	//Simple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
 
 	// MySimple 获取我的简易项目列表
-	MySimple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
+	//MySimple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
+}
 
+type IServiceDocModule interface {
 	ServiceDoc(ctx context.Context, pid string) (*service_dto.ServiceDoc, error)
 	// SaveServiceDoc 保存服务文档
 	SaveServiceDoc(ctx context.Context, pid string, input *service_dto.SaveServiceDoc) error
@@ -71,6 +74,11 @@ func init() {
 
 	autowire.Auto[IExportAppModule](func() reflect.Value {
 		return reflect.ValueOf(appModule)
+	})
+
+	serviceDocModule := new(imlServiceDocModule)
+	autowire.Auto[IServiceDocModule](func() reflect.Value {
+		return reflect.ValueOf(serviceDocModule)
 	})
 
 }

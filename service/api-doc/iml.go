@@ -3,11 +3,12 @@ package api_doc
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/APIParkLab/APIPark/service/universally/commit"
 	"github.com/APIParkLab/APIPark/stores/api"
 	"github.com/eolinker/go-common/utils"
 	"gorm.io/gorm"
-	"time"
 )
 
 var (
@@ -26,11 +27,7 @@ func (i *imlAPIDocService) LatestAPICountByCommits(ctx context.Context, commitId
 	}
 	countMap := make(map[string]int64)
 	for _, c := range commits {
-		doc, err := NewDocLoader(c.Data.Content)
-		if err != nil {
-			return nil, err
-		}
-		countMap[c.Target] = doc.APICount()
+		countMap[c.Target] = c.Data.APICount
 	}
 	return countMap, nil
 }

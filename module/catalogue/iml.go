@@ -4,9 +4,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	"math"
 	"sort"
+
+	"github.com/APIParkLab/APIPark/service/setting"
+
+	"github.com/eolinker/eosc/log"
+
+	"github.com/APIParkLab/APIPark/gateway"
+	"github.com/APIParkLab/APIPark/service/cluster"
+
+	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 
 	service_doc "github.com/APIParkLab/APIPark/service/service-doc"
 
@@ -53,8 +61,20 @@ type imlCatalogueModule struct {
 	subscribeService      subscribe.ISubscribeService      `autowired:""`
 	subscribeApplyService subscribe.ISubscribeApplyService `autowired:""`
 	transaction           store.ITransaction               `autowired:""`
+	clusterService        cluster.IClusterService          `autowired:""`
+	settingService        setting.ISettingService          `autowired:""`
+	root                  *Root
+}
 
-	root *Root
+func (i *imlCatalogueModule) onlineSubscriber(ctx context.Context, clusterId string, sub *gateway.SubscribeRelease) error {
+	client, err := i.clusterService.GatewayClient(ctx, clusterId)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = client.Close(ctx)
+	}()
+	return client.Subscribe().Online(ctx, sub)
 }
 
 func (i *imlCatalogueModule) Get(ctx context.Context, id string) (*catalogue_dto.Catalogue, error) {
@@ -118,6 +138,25 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 				// 当系统不可作为订阅方时，不可订阅
 				continue
 			}
+			status := subscribe.ApplyStatusReview
+			if s.ApprovalType == service.ApprovalTypeAuto {
+				status = subscribe.ApplyStatusSubscribe
+				cs, err := i.clusterService.List(ctx)
+				if err != nil {
+					return err
+				}
+				for _, c := range cs {
+					err := i.onlineSubscriber(ctx, c.Uuid, &gateway.SubscribeRelease{
+						Service:     subscribeInfo.Service,
+						Application: appId,
+						Expired:     "0",
+					})
+
+					if err != nil {
+						log.Errorf("online subscriber for cluster[%s] %v", c.Uuid, err)
+					}
+				}
+			}
 
 			err = i.subscribeApplyService.Create(ctx, &subscribe.CreateApply{
 				Uuid:        uuid.New().String(),
@@ -126,7 +165,7 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 				Application: appId,
 				ApplyTeam:   appInfo.Team,
 				Reason:      subscribeInfo.Reason,
-				Status:      subscribe.ApplyStatusReview,
+				Status:      status,
 				Applier:     userId,
 			})
 
@@ -137,20 +176,20 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 			// 修改订阅表状态
 			subscribers, err := i.subscribeService.ListByApplication(ctx, subscribeInfo.Service, appId)
 			if err != nil {
-				if !errors.Is(err, gorm.ErrRecordNotFound) {
-					return err
-				}
-				err = i.subscribeService.Create(ctx, &subscribe.CreateSubscribe{
-					Uuid:        uuid.New().String(),
-					Service:     subscribeInfo.Service,
-					Application: appId,
-					ApplyStatus: subscribe.ApplyStatusReview,
-					From:        subscribe.FromSubscribe,
-				})
-				if err != nil {
-					return err
-				}
-
+				//if !errors.Is(err, gorm.ErrRecordNotFound) {
+				//	return err
+				//}
+				//err = i.subscribeService.Create(ctx, &subscribe.CreateSubscribe{
+				//	Uuid:        uuid.New().String(),
+				//	Service:     subscribeInfo.Service,
+				//	Application: appId,
+				//	ApplyStatus: status,
+				//	From:        subscribe.FromSubscribe,
+				//})
+				//if err != nil {
+				//	return err
+				//}
+				return err
 			} else {
 				subscriberMap := utils.SliceToMap(subscribers, func(t *subscribe.Subscribe) string {
 					return t.Application
@@ -161,14 +200,13 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 						Uuid:        uuid.New().String(),
 						Service:     subscribeInfo.Service,
 						Application: appId,
-						ApplyStatus: subscribe.ApplyStatusReview,
+						ApplyStatus: status,
 						From:        subscribe.FromSubscribe,
 					})
 					if err != nil {
 						return err
 					}
 				} else if v.ApplyStatus != subscribe.ApplyStatusSubscribe {
-					status := subscribe.ApplyStatusReview
 					err = i.subscribeService.Save(ctx, v.Id, &subscribe.UpdateSubscribe{
 						ApplyStatus: &status,
 					})
@@ -245,19 +283,23 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 		}
 		serviceDoc = commit.Data.Content
 	}
+	invokeAddress, _ := i.settingService.Get(ctx, setting.KeyInvokeAddress)
+
 	return &catalogue_dto.ServiceDetail{
 		Name:        s.Name,
 		Description: s.Description,
 		Document:    serviceDoc,
 		Basic: &catalogue_dto.ServiceBasic{
-			Team:       auto.UUID(s.Team),
-			ApiNum:     apiNum,
-			AppNum:     int(countMap[s.Id]),
-			Tags:       auto.List(tagIds),
-			Catalogue:  auto.UUID(s.Catalogue),
-			Version:    r.Version,
-			UpdateTime: auto.TimeLabel(r.CreateAt),
-			Logo:       s.Logo,
+			Team:          auto.UUID(s.Team),
+			ApiNum:        apiNum,
+			AppNum:        int(countMap[s.Id]),
+			Tags:          auto.List(tagIds),
+			Catalogue:     auto.UUID(s.Catalogue),
+			Version:       r.Version,
+			UpdateTime:    auto.TimeLabel(r.CreateAt),
+			Logo:          s.Logo,
+			ApprovalType:  s.ApprovalType.String(),
+			InvokeAddress: invokeAddress,
 		},
 		APIDoc: apiDoc,
 	}, nil

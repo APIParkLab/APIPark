@@ -3,11 +3,11 @@ package apinto
 import (
 	"context"
 	"strings"
-	
+
 	"github.com/APIParkLab/APIPark/gateway/apinto/auth"
-	
+
 	"github.com/APIParkLab/APIPark/gateway/apinto/entity"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
 	admin_client "github.com/eolinker/eosc/process-admin/client"
 )
@@ -28,7 +28,7 @@ func (a *ApplicationClient) Online(ctx context.Context, applications ...*gateway
 		return err
 	}
 	for _, app := range applications {
-		err = a.client.Set(ctx, genWorkerID(app.ID, ProfessionApplication), a.toApinto(app))
+		err = a.client.Set(ctx, genWorkerID(app.ID, gateway.ProfessionApplication), a.toApinto(app))
 		if err != nil {
 			a.client.Rollback(ctx)
 			return err
@@ -43,7 +43,7 @@ func (a *ApplicationClient) Offline(ctx context.Context, applications ...*gatewa
 		return err
 	}
 	for _, app := range applications {
-		err = a.client.Del(ctx, genWorkerID(app.ID, ProfessionApplication))
+		err = a.client.Del(ctx, genWorkerID(app.ID, gateway.ProfessionApplication))
 		if err != nil {
 			a.client.Rollback(ctx)
 			return err
@@ -79,7 +79,7 @@ func (a *ApplicationClient) toApinto(app *gateway.ApplicationRelease) interface{
 	}
 	return &entity.Application{
 		BasicInfo: &entity.BasicInfo{
-			ID:          genWorkerID(app.ID, ProfessionApplication),
+			ID:          genWorkerID(app.ID, gateway.ProfessionApplication),
 			Name:        app.ID,
 			Description: app.Description,
 			Driver:      "app",

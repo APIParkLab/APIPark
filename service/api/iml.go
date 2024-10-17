@@ -29,6 +29,7 @@ type HistoryType string
 const (
 	HistoryRequest HistoryType = "request"
 	HistoryProxy   HistoryType = "proxy"
+	HistoryPlugin  HistoryType = "plugin"
 )
 
 type imlAPIService struct {
@@ -115,6 +116,9 @@ func (i *imlAPIService) Save(ctx context.Context, id string, model *Edit) error 
 		if err != nil {
 			return err
 		}
+		if model.Name != nil {
+			ev.Name = *model.Name
+		}
 
 		if model.Description != nil {
 			ev.Description = *model.Description
@@ -161,14 +165,18 @@ func (i *imlAPIService) Create(ctx context.Context, input *Create) (err error) {
 		} else {
 			input.UUID = uuid.NewString()
 		}
+		if input.Upstream == "" {
+			input.Upstream = input.Service
+		}
 
 		ne := api.API{
 			UUID:     input.UUID,
-			Name:     input.UUID,
+			Name:     input.Name,
 			Service:  input.Service,
 			Team:     input.Team,
 			Creator:  operater,
 			CreateAt: time.Now(),
+			Upstream: input.Upstream,
 			Method:   input.Methods,
 			Path:     input.Path,
 		}
@@ -179,7 +187,7 @@ func (i *imlAPIService) Create(ctx context.Context, input *Create) (err error) {
 		ev := &api.Info{
 			Id:          ne.Id,
 			UUID:        ne.UUID,
-			Name:        ne.UUID,
+			Name:        ne.Name,
 			Description: input.Description,
 			Updater:     operater,
 			UpdateAt:    time.Now(),
@@ -188,6 +196,7 @@ func (i *imlAPIService) Create(ctx context.Context, input *Create) (err error) {
 			Method:      input.Methods,
 			Path:        input.Path,
 			Match:       input.Match,
+			Upstream:    input.Upstream,
 			Service:     input.Service,
 			Team:        input.Team,
 		}
@@ -228,12 +237,18 @@ func (i *imlAPIService) Exist(ctx context.Context, aid string, a *Exist) error {
 			}
 			continue
 		}
+		if t.UUID == aid {
+			continue
+		}
+
 		for _, m := range t.Method {
+
 			existMethodMap[m] = struct{}{}
 		}
 	}
 	for _, m := range a.Methods {
 		if _, ok := existMethodMap[m]; ok {
+
 			return fmt.Errorf("method(%s),path(%s) is exist", m, a.Path)
 		}
 	}

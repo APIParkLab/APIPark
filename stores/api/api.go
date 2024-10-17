@@ -23,15 +23,29 @@ type IAPIDocStore interface {
 	store.IBaseStore[Doc]
 }
 
+type IAiAPIInfoStore interface {
+	store.ISearchStore[AiAPIInfo]
+}
+
+type imlAiAPIInfoStore struct {
+	store.SearchStoreSoftDelete[AiAPIInfo]
+}
+
 func init() {
 
 	autowire.Auto[IApiBaseStore](func() reflect.Value {
 		return reflect.ValueOf(new(imlApiBaseStore))
 	})
+
 	autowire.Auto[IAPIInfoStore](func() reflect.Value {
 		return reflect.ValueOf(new(store.Store[Info]))
 	})
+
 	autowire.Auto[IAPIDocStore](func() reflect.Value {
 		return reflect.ValueOf(new(imlAPIDocStore))
+	})
+
+	autowire.Auto[IAiAPIInfoStore](func() reflect.Value {
+		return reflect.ValueOf(new(imlAiAPIInfoStore))
 	})
 }

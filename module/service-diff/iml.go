@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/APIParkLab/APIPark/service/service"
+
 	"github.com/APIParkLab/APIPark/service/api"
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	"github.com/APIParkLab/APIPark/service/cluster"
@@ -16,6 +19,7 @@ import (
 
 type imlServiceDiff struct {
 	apiService      api.IAPIService           `autowired:""`
+	serviceService  service.IServiceService   `autowired:""`
 	apiDocService   api_doc.IAPIDocService    `autowired:""`
 	upstreamService upstream.IUpstreamService `autowired:""`
 	releaseService  release.IReleaseService   `autowired:""`
@@ -76,7 +80,10 @@ func (m *imlServiceDiff) getBaseInfo(ctx context.Context, serviceId, baseRelease
 	return base, nil
 }
 func (m *imlServiceDiff) DiffForLatest(ctx context.Context, serviceId string, baseRelease string) (*service_diff.Diff, bool, error) {
-
+	serviceInfo, err := m.serviceService.Get(ctx, serviceId)
+	if err != nil {
+		return nil, false, fmt.Errorf("get service info failed:%w", err)
+	}
 	apis, err := m.apiService.ListForService(ctx, serviceId)
 	if err != nil {
 		return nil, false, err
@@ -95,11 +102,13 @@ func (m *imlServiceDiff) DiffForLatest(ctx context.Context, serviceId string, ba
 			Target: apiInfo.UUID,
 			Key:    "request",
 			Data: &api.Request{
+				Name:      apiInfo.Name,
 				Path:      apiInfo.Path,
 				Methods:   apiInfo.Methods,
 				Protocols: apiInfo.Protocols,
 				Match:     apiInfo.Match,
 				Disable:   apiInfo.Disable,
+				Upstream:  apiInfo.Upstream,
 			},
 		})
 
@@ -116,6 +125,9 @@ func (m *imlServiceDiff) DiffForLatest(ctx context.Context, serviceId string, ba
 	upstreamCommits, err := m.upstreamService.ListLatestCommit(ctx, serviceId)
 	if err != nil {
 		return nil, false, err
+	}
+	if len(upstreamCommits) == 0 && serviceInfo.Kind == service.RestService {
+		return nil, false, fmt.Errorf("upstream not found")
 	}
 
 	base, err := m.getBaseInfo(ctx, serviceId, baseRelease)
@@ -184,11 +196,14 @@ func (m *imlServiceDiff) getReleaseInfo(ctx context.Context, releaseId string) (
 			return nil, err
 		}
 	}
-
-	upstreamCommits, err := m.upstreamService.ListCommit(ctx, upstreamCommitIds...)
-	if err != nil {
-		return nil, err
+	var upstreamCommits []*commit.Commit[upstream.Config]
+	if len(upstreamCommitIds) > 0 {
+		upstreamCommits, err = m.upstreamService.ListCommit(ctx, upstreamCommitIds...)
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	return &projectInfo{
 		apiRequestCommits: requestCommits,
 		apiProxyCommits:   proxyCommits,
@@ -221,6 +236,7 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 	for _, rc := range target.apiRequestCommits {
 		apiId := rc.Target
 		a := &service_diff.ApiDiff{
+			Name:     rc.Data.Name,
 			APi:      rc.Target,
 			Method:   rc.Data.Methods,
 			Protocol: rc.Data.Protocols,
@@ -266,6 +282,7 @@ func (m *imlServiceDiff) diff(partitions []string, base, target *projectInfo) *s
 		apiInfo := rc.Data
 		if baseApis.Has(rc.Target) {
 			out.Apis = append(out.Apis, &service_diff.ApiDiff{
+				Name:     apiInfo.Name,
 				APi:      rc.Target,
 				Method:   apiInfo.Methods,
 				Protocol: apiInfo.Protocols,
@@ -328,6 +345,7 @@ func (m *imlServiceDiff) Out(ctx context.Context, diff *service_diff.Diff) (*Dif
 	out := &DiffOut{}
 	out.Routers = utils.SliceToSlice(diff.Apis, func(i *service_diff.ApiDiff) *RouterDiffOut {
 		return &RouterDiffOut{
+			Name:      i.Name,
 			Methods:   i.Method,
 			Path:      i.Path,
 			Change:    i.Change,
@@ -338,6 +356,9 @@ func (m *imlServiceDiff) Out(ctx context.Context, diff *service_diff.Diff) (*Dif
 	})
 
 	for _, u := range diff.Upstreams {
+		if u.Data == nil {
+			continue
+		}
 		typeValue := u.Data.Type
 
 		if typeValue == "" {

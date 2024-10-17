@@ -1,10 +1,13 @@
 package core
 
 import (
+	"net/http"
+
+	"github.com/APIParkLab/APIPark/controller/ai"
+	ai_api "github.com/APIParkLab/APIPark/controller/ai-api"
 	"github.com/APIParkLab/APIPark/controller/monitor"
 	"github.com/APIParkLab/APIPark/controller/router"
 	"github.com/APIParkLab/APIPark/controller/system"
-	"net/http"
 
 	plugin_cluster "github.com/APIParkLab/APIPark/controller/plugin-cluster"
 
@@ -66,6 +69,7 @@ type plugin struct {
 	catalogueController         catalogue.ICatalogueController                     `autowired:""`
 	upstreamController          upstream.IUpstreamController                       `autowired:""`
 	routerController            router.IRouterController                           `autowired:""`
+	aiAPIController             ai_api.IAPIController                              `autowired:""`
 	apiDocController            router.IAPIDocController                           `autowired:""`
 	subscribeController         subscribe.ISubscribeController                     `autowired:""`
 	appAuthorizationController  application_authorization.IAuthorizationController `autowired:""`
@@ -77,6 +81,8 @@ type plugin struct {
 	commonController            common.ICommonController                           `autowired:""`
 	exportConfigController      system.IExportConfigController                     `autowired:""`
 	importConfigController      system.IImportConfigController                     `autowired:""`
+	aiProviderController        ai.IProviderController                             `autowired:""`
+	settingController           system.ISettingController                          `autowired:""`
 	apis                        []pm3.Api
 }
 
@@ -97,6 +103,7 @@ func (p *plugin) OnComplete() {
 	p.apis = append(p.apis, p.PartitionPluginApi()...)
 	p.apis = append(p.apis, p.commonApis()...)
 	p.apis = append(p.apis, p.systemApis()...)
+	p.apis = append(p.apis, p.aiAPIs()...)
 }
 
 func (p *plugin) Name() string {

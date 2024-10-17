@@ -3,6 +3,7 @@ package team
 import (
 	"context"
 	"fmt"
+
 	"github.com/eolinker/go-common/utils"
 
 	"github.com/eolinker/ap-account/service/role"
@@ -159,4 +160,20 @@ func (m *imlTeamModule) Delete(ctx context.Context, id string) error {
 		return nil
 	})
 	return err
+}
+
+func (m *imlTeamModule) OnInit() {
+	ctx := context.Background()
+	list, err := m.service.List(ctx)
+	if err != nil {
+		return
+	}
+	if len(list) == 0 {
+		teamId := uuid.New().String()
+		err = m.service.Create(ctx, &team.CreateTeam{
+			Id:          teamId,
+			Name:        "Default Team",
+			Description: "Auto create default team",
+		})
+	}
 }

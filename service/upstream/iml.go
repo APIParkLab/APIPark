@@ -2,7 +2,6 @@ package upstream
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/APIParkLab/APIPark/service/universally/commit"
@@ -62,7 +61,8 @@ func (i *imlUpstreamService) ListLatestCommit(ctx context.Context, serviceIds ..
 		return nil, err
 	}
 	if len(upstreams) == 0 {
-		return nil, errors.New("upstream not found")
+		return nil, nil
+		//return nil, errors.New("upstream not found")
 	}
 	targetId := utils.SliceToSlice(upstreams, func(u *upstream.Upstream) string {
 		return u.UUID

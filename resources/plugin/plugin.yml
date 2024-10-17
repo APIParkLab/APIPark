@@ -1,4 +1,4 @@
-version: v5
+version: v6
 sort:
   - "access_log"
   - "monitor"
@@ -75,3 +75,11 @@ plugin:
     status: global
     config:
       cache: redis@output
+  ai_prompt:
+    id: eolinker.com:apinto:ai_prompt
+    name: ai_prompt
+    status: enable
+  ai_formatter:
+    id: eolinker.com:apinto:ai_formatter
+    name: ai_formatter
+    status: enable
