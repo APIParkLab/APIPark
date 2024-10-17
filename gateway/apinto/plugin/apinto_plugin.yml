@@ -31,6 +31,7 @@
       content_typ: "text/plan"
       charset: "utf-8"
       body: "Forbidden"
+
 -
   id: eolinker.com:apinto:strategy-plugin-visit
   name: strategy_visit
@@ -62,5 +63,11 @@
   rely: eolinker.com:apinto:plugin_app
   config:
     cache: redis@output
-
-
+-
+  id: eolinker.com:apinto:ai_prompt
+  name: ai_prompt
+  status: enable
+-
+  id: eolinker.com:apinto:ai_formatter
+  name: ai_formatter
+  status: enable

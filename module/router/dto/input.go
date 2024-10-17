@@ -3,8 +3,9 @@ package router_dto
 import (
 	"errors"
 	"fmt"
-	"github.com/eolinker/go-common/utils"
 	"strings"
+
+	"github.com/eolinker/go-common/utils"
 
 	"github.com/APIParkLab/APIPark/service/api"
 )
@@ -21,11 +22,13 @@ var validMethods = map[string]struct{}{
 
 type Create struct {
 	Id          string      `json:"id"`
+	Name        string      `json:"name"`
 	Path        string      `json:"path"`
 	Methods     []string    `json:"methods"`
 	Description string      `json:"description"`
 	Protocols   []string    `json:"protocols"`
 	MatchRules  []Match     `json:"match"`
+	Upstream    string      `json:"upstream"`
 	Proxy       *InputProxy `json:"proxy"`
 	Disable     bool        `json:"disable"`
 }
@@ -67,6 +70,7 @@ type Edit struct {
 	Protocols   *[]string   `json:"protocols"`
 	MatchRules  *[]Match    `json:"match"`
 	Disable     *bool       `json:"disable"`
+	Upstream    *string     `json:"upstream"`
 }
 
 func ToServiceProxy(proxy *InputProxy) *api.Proxy {

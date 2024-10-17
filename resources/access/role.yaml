@@ -5,6 +5,8 @@ system:
       - system.api_market.service_classification.manager
       - system.api_market.service_classification.view
       - system.dashboard.run_view.view
+      - system.devops.ai_provider.view
+      - system.devops.ai_provider.manager
       - system.devops.cluster.manager
       - system.devops.cluster.view
       - system.devops.log_configuration.manager
@@ -40,6 +42,8 @@ system:
       - system.api_market.service_classification.manager
       - system.api_market.service_classification.view
       - system.dashboard.run_view.view
+      - system.devops.ai_provider.view
+      - system.devops.ai_provider.manager
       - system.devops.cluster.manager
       - system.devops.cluster.view
       - system.devops.log_configuration.manager

@@ -29,7 +29,6 @@ func (i *imlAPIDocModule) UpdateDoc(ctx context.Context, serviceId string, input
 	}
 	err = i.apiDocService.UpdateDoc(ctx, serviceId, &api_doc.UpdateDoc{
 		ID:      input.Id,
-		Service: serviceId,
 		Content: input.Content,
 	})
 	if err != nil {

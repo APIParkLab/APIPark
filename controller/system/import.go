@@ -187,10 +187,10 @@ func (i *imlImportConfigController) importServices(ctx context.Context) error {
 			}
 		}
 
-		err = i.serviceModule.SaveServiceDoc(ctx, d.Id, &service_dto.SaveServiceDoc{Doc: d.Doc})
-		if err != nil {
-			return fmt.Errorf("save service(%s) doc error: %v", d.Id, err)
-		}
+		//err = i.serviceModule.SaveServiceDoc(ctx, d.Id, &service_dto.SaveServiceDoc{Doc: d.Doc})
+		//if err != nil {
+		//	return fmt.Errorf("save service(%s) doc error: %v", d.Id, err)
+		//}
 	}
 	return nil
 }

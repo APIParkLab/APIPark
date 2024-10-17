@@ -70,9 +70,9 @@ system:
             apis:
               - "GET:/api/v1/team/roles"
               - "GET:/api/v1/team/role"
-  - name: API Market
-    cname: 'API市场'
-    value: 'api_market'
+  - name: System Settings
+    cname: '系统设置'
+    value: 'settings'
     children:
       - name: service classification
         cname: '服务分类'
@@ -93,7 +93,24 @@ system:
               - "DELETE:/api/v1/catalogue"
               - "PUT:/api/v1/catalogue/sort"
             dependents:
-              - system.api_market.service_classification.view
+              - system.settings.service_classification.view
+      - name: General
+        cname: 常规设置
+        value: 'general'
+        children:
+          - name: view
+            cname: 查看
+            value: 'view'
+            guest_allow: true
+            apis:
+#              - "GET:/api/v1/setting"
+          - name: manager
+            cname: 管理
+            value: 'manager'
+            apis:
+#              - "PUT:/api/v1/setting"
+            dependents:
+              - system.settings.general.view
   - name: Devops
     cname: 运维
     value: 'devops'
@@ -132,6 +149,8 @@ system:
               - "POST:/api/v1/certificate"
               - "PUT:/api/v1/certificate"
               - "DELETE:/api/v1/certificate"
+            dependents:
+              - system.devops.ssl_certificate.view
       - name: Data Source
         cname: '数据源'
         value: 'data_source'
@@ -169,6 +188,8 @@ system:
               - "DELETE:/api/v1/dynamic/{name}/batch"
               - "PUT:/api/v1/dynamic/{name}/online"
               - "PUT:/api/v1/dynamic/{name}/offline"
+            dependents:
+              - system.devops.log_configuration.view
       - name: monitor
         cname: 监控
         value: 'monitor'
@@ -184,6 +205,28 @@ system:
             value: 'manager'
             apis:
               - "POST:/api/v1/monitor/config"
+            dependents:
+              - system.devops.monitor.view
+      - name: ai_provider
+        cname: AI 模型供应商
+        value: 'ai_provider'
+        children:
+          - name: view
+            cname: 查看
+            value: 'view'
+            guest_allow: true
+            apis:
+              - "GET:/api/v1/ai/providers"
+              - "GET:/api/v1/ai/provider/config"
+          - name: manager
+            cname: 管理
+            value: 'manager'
+            apis:
+              - "PUT:/api/v1/ai/provider/config"
+              - "PUT:/api/v1/ai/provider/default-llm"
+            dependents:
+              - system.devops.ai_provider.view
+
   - name: dashboard
     cname: 仪表盘
     value: 'dashboard'
@@ -322,7 +365,7 @@ team:
             value: 'manager'
             apis:
               - "POST:/api/v1/service/publish/release/do"
-              - "PUT:/api/v1/service/publish/execute"
+#              - "PUT:/api/v1/service/publish/execute"
               - "DELETE:/api/v1/service/release"
       - name: subscription management
         cname: 订阅方管理
