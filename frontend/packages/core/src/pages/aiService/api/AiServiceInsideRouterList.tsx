@@ -105,7 +105,7 @@ const AiServiceInsideRouterList:FC = ()=>{
             fixed:'right',
             valueType: 'option',
             render: (_: React.ReactNode, entity: AiServiceRouterTableListItem) => [
-                <TableBtnWithPermission  access="team.service.router.edit" key="edit"  btnType="edit"  onClick={()=>{navigator(`/aiservice/${teamId}/inside/${serviceId}/route/${entity.id}`)}}  btnTitle="编辑"/>,
+                <TableBtnWithPermission  access="team.service.router.edit" key="edit"  btnType="edit"  onClick={()=>{navigator(`/service/${teamId}/aiInside/${serviceId}/route/${entity.id}`)}}  btnTitle="编辑"/>,
                  <Divider type="vertical" className="mx-0"  key="div3"/>,
                  <TableBtnWithPermission  access="team.service.router.delete" key="delete"   btnType="delete"  onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/>,
             ],
@@ -130,7 +130,7 @@ const AiServiceInsideRouterList:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/aiservice/list`}>{$t('服务')}</Link>
+                title:<Link to={`/service/list`}>{$t('服务')}</Link>
             },
             {
                 title:$t('路由')
@@ -164,7 +164,7 @@ const AiServiceInsideRouterList:FC = ()=>{
                 dataSource={tableListDataSource}
                 addNewBtnTitle={$t('添加路由')}
                 searchPlaceholder={$t('输入 URL 查找路由')}
-                onAddNewBtnClick={()=>{navigator(`/aiservice/${teamId}/inside/${serviceId}/route/create`)}}
+                onAddNewBtnClick={()=>{navigator(`/service/${teamId}/aiInside/${serviceId}/route/create`)}}
                 addNewBtnAccess="team.service.router.add"
                 tableClickAccess="team.service.router.view"
                 manualReloadTable={manualReloadTable}
@@ -172,7 +172,7 @@ const AiServiceInsideRouterList:FC = ()=>{
                 onChange={() => {
                     setTableHttpReload(false)
                 }}
-                onRowClick={(row:AiServiceRouterTableListItem)=>navigator(`/aiservice/${teamId}/inside/${serviceId}/route/${row.id}`)}
+                onRowClick={(row:AiServiceRouterTableListItem)=>navigator(`/service/${teamId}/aiInside/${serviceId}/route/${row.id}`)}
                 tableClass="mr-PAGE_INSIDE_X "
                 />
         </>

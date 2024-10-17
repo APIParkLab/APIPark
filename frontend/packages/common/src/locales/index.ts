@@ -5,19 +5,19 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import crc32 from 'crc/crc32';
 // 引入需要实现国际化的简体、繁体、英文三种数据的json文件
 import zhCN from 'antd/locale/zh_CN';
-import enGB from 'antd/locale/en_GB';
+import enUS from 'antd/locale/en_US';
 import localZh_CN from './scan/zh-CN.json'; // 本地翻译中文文件
-import localEn_GB from './scan/en-GB.json'; // 本地翻译英文文件
+import localEn_US from './scan/en-US.json'; // 本地翻译英文文件
 // import config from '../../../../i18next-scanner.config.js';
 
 const resources = {
-  cn: {
+  'zh-CH': {
     translation: localZh_CN,
     ...zhCN
   },
-  en: {
-    translation: localEn_GB,
-    ...enGB
+  'en-US': {
+    translation: localEn_US,
+    ...enUS
   }
 };
 

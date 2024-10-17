@@ -41,12 +41,12 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                 return
             }
             form.validateFields().then((value)=>{
-            fetchData<BasicResponse<null>>(url,
+                fetchData<BasicResponse<null>>(url,
                     {method,
+                    ...(type !== 'addDep' && type !== 'addMember' && {eoParams: {id:entity!.id}}),
                     eoBody:({
                         ...value,
                         ...(value?.departmentIds ?{ departmentIds:Array.isArray(value?.departmentIds)? value?.departmentIds : [value?.departmentIds]}:{}),
-                        ...(type !== 'addDep' && type !== 'addMember' && {eoParams: {id:entity!.id}})
                     }),eoTransformKeys:['departmentIds']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
@@ -154,14 +154,14 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                     name="name"
                     rules={[{required: true,whitespace:true }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
+                    <Input className="w-INPUT_NORMAL" disabled={type ==='editMember'} placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("邮箱")}
                     name="email"
                     rules={[{required: true,whitespace:true },{type:"email",message: $t(VALIDATE_MESSAGE.email)}]}
                 >
-                    <Input className="w-INPUT_NORMAL" disabled={type ==='editMember'} placeholder={$t(PLACEHOLDER.input)}/>
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("部门")}
@@ -169,7 +169,6 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                 >
                     <TreeSelect
                             className="w-INPUT_NORMAL"
-                            disabled={type ==='editMember'}
                             fieldNames={{label:'name',value:'id',children:'children'}}
                             showSearch
                             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}

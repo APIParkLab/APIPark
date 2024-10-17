@@ -121,7 +121,7 @@ const AiServiceInsideSubscriber:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/aiservice/list`}>{$t('服务')}</Link>
+                title:<Link to={`/service/list`}>{$t('服务')}</Link>
             },
             {
                 title:$t('订阅方管理')
@@ -245,7 +245,7 @@ export const AiServiceSubscriberConfig = forwardRef<AiServiceSubscriberConfigHan
             labelAlign='left'
             scrollToFirstError
             form={form}
-            className="mx-auto  "
+            className="mx-auto "
             name="systemInsideSubscriber"
             autoComplete="off"
         >

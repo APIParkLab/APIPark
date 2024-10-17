@@ -1,4 +1,4 @@
-import {FC, useMemo} from 'react';
+import {FC, useEffect, useMemo} from 'react';
 import ECharts,{EChartsOption} from 'echarts-for-react';
 import { changeNumberUnit } from '../utils/dashboard';
 import { $t } from '@common/locales';
@@ -91,7 +91,7 @@ const MonitorPieGraph: FC<PieGraphProps> = ({ className,title, pieData, labelNam
         data: transferData(pieData),
       },
     ],
-  }),[state.language])
+  }),[state.language,pieData])
   
   return (
   <div className={`${className} min-w-[570px] p-[16px] relative text-DESC_TEXT overflow-x-auto rounded`}>

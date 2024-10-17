@@ -1,9 +1,7 @@
 
 import { FormInstance, UploadFile } from "antd";
-import { HeaderParamsType, BodyParamsType, QueryParamsType, RestParamsType, ResultListType, ApiBodyType } from "@common/const/api-detail";
 import { EntityItem, MatchItem } from "@common/const/type";
 import { SubscribeEnum, SubscribeFromEnum } from "./const";
-import { HTTPMethod, Protocol } from "@common/components/postcat/api/RequestMethod";
 
 export type SystemTableListItem = {
     id:string;
@@ -13,6 +11,7 @@ export type SystemTableListItem = {
     serviceNum: number,
     description:string;
     master:EntityItem;
+    service_kind:'ai'|'rest',
     createTime:string;
 };
 
@@ -27,7 +26,9 @@ export type SystemConfigFieldType = {
     team?:string;
     master?:string;
     serviceType?:'public'|'inner';
+    serviceKind:'ai'|'rest';
     catalogue?:string | string[];
+    approvalType?:string;
 };
 
 export type SystemSubServiceTableListItem = {
@@ -94,6 +95,7 @@ export type SystemApiProxyFieldType = {
     protocols: string[];
     id:string;
     description?:string;
+    disable:boolean;
     path:string;
     methods:string[];
     match:MatchItem[]
@@ -291,8 +293,6 @@ export type SystemInsideApiDocumentProps = {
 
 export type SystemInsideApiProxyProps = {
     className?:string
-    service:string
-    teamId:string
     initProxyValue?:SystemApiProxyType
     value?:SystemApiProxyType
     type:'add'|'edit'
