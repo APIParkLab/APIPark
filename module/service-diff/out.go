@@ -14,6 +14,7 @@ type DiffOut struct {
 }
 
 type RouterDiffOut struct {
+	Name        string                  `json:"name,omitempty"`
 	Methods     []string                `json:"methods,omitempty"`
 	Protocols   []string                `json:"protocols,omitempty"`
 	Path        string                  `json:"path,omitempty"`

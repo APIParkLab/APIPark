@@ -9,10 +9,12 @@ type ServiceItem struct {
 	Id          string         `json:"id"`
 	Name        string         `json:"name"`
 	Team        auto.Label     `json:"team" aolabel:"team"`
+	ServiceKind string         `json:"service_kind"`
 	ApiNum      int64          `json:"api_num"`
 	Description string         `json:"description"`
 	CreateTime  auto.TimeLabel `json:"create_time"`
 	UpdateTime  auto.TimeLabel `json:"update_time"`
+	Provider    *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
 	CanDelete   bool           `json:"can_delete"`
 }
 
@@ -43,19 +45,22 @@ type SimpleAppItem struct {
 }
 
 type Service struct {
-	Id          string         `json:"id"`
-	Name        string         `json:"name"`
-	Prefix      string         `json:"prefix,omitempty"`
-	Description string         `json:"description"`
-	Team        auto.Label     `json:"team" aolabel:"team"`
-	CreateTime  auto.TimeLabel `json:"create_time"`
-	UpdateTime  auto.TimeLabel `json:"update_time"`
-	ServiceType string         `json:"service_type"`
-	Catalogue   auto.Label     `json:"catalogue" aolabel:"catalogue"`
-	Tags        []auto.Label   `json:"tags" aolabel:"tag"`
-	Logo        string         `json:"logo"`
-	AsServer    bool           `json:"as_server"`
-	AsApp       bool           `json:"as_app"`
+	Id           string         `json:"id"`
+	Name         string         `json:"name"`
+	Prefix       string         `json:"prefix,omitempty"`
+	Description  string         `json:"description"`
+	Team         auto.Label     `json:"team" aolabel:"team"`
+	CreateTime   auto.TimeLabel `json:"create_time"`
+	UpdateTime   auto.TimeLabel `json:"update_time"`
+	ServiceType  string         `json:"service_type"`
+	Catalogue    auto.Label     `json:"catalogue" aolabel:"catalogue"`
+	Tags         []auto.Label   `json:"tags" aolabel:"tag"`
+	Logo         string         `json:"logo"`
+	Provider     *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
+	ApprovalType string         `json:"approval_type"`
+	AsServer     bool           `json:"as_server"`
+	AsApp        bool           `json:"as_app"`
+	ServiceKind  string         `json:"service_kind"`
 }
 
 type App struct {
@@ -69,20 +74,29 @@ type App struct {
 }
 
 func ToService(model *service.Service) *Service {
-	return &Service{
-		Id:          model.Id,
-		Name:        model.Name,
-		Prefix:      model.Prefix,
-		Description: model.Description,
-		Team:        auto.UUID(model.Team),
-		ServiceType: model.ServiceType.String(),
-		Logo:        model.Logo,
-		Catalogue:   auto.UUID(model.Catalogue),
-		CreateTime:  auto.TimeLabel(model.CreateTime),
-		UpdateTime:  auto.TimeLabel(model.UpdateTime),
-		AsServer:    model.AsServer,
-		AsApp:       model.AsApp,
+
+	s := &Service{
+		Id:           model.Id,
+		Name:         model.Name,
+		Prefix:       model.Prefix,
+		Description:  model.Description,
+		Team:         auto.UUID(model.Team),
+		ServiceType:  model.ServiceType.String(),
+		Logo:         model.Logo,
+		Catalogue:    auto.UUID(model.Catalogue),
+		CreateTime:   auto.TimeLabel(model.CreateTime),
+		UpdateTime:   auto.TimeLabel(model.UpdateTime),
+		ApprovalType: model.ApprovalType.String(),
+		AsServer:     model.AsServer,
+		AsApp:        model.AsApp,
+		ServiceKind:  model.Kind.String(),
 	}
+	switch model.Kind {
+	case service.AIService:
+		provider := auto.UUID(model.AdditionalConfig["provider"])
+		s.Provider = &provider
+	}
+	return s
 }
 
 type MemberItem struct {

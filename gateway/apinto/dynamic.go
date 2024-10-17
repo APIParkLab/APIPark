@@ -3,13 +3,13 @@ package apinto
 import (
 	"context"
 	"errors"
-	
+
 	"github.com/eolinker/go-common/encoding"
-	
+
 	"github.com/eolinker/eosc/process-admin/cmd/proto"
-	
+
 	"github.com/APIParkLab/APIPark/gateway/apinto/entity"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
 	admin_client "github.com/eolinker/eosc/process-admin/client"
 )
@@ -17,12 +17,12 @@ import (
 var _ gateway.IDynamicClient = &DynamicClient{}
 
 func NewDynamicClient(client admin_client.Client, resource string) (*DynamicClient, error) {
-	cfg, has := dynamicResourceMap[resource]
+	cfg, has := gateway.GetDynamicResourceDriver(resource)
 	if !has {
 		return nil, errors.New("resource not found")
-		
+
 	}
-	
+
 	return &DynamicClient{client: client, profession: cfg.Profession, driver: cfg.Driver}, nil
 }
 
