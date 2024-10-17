@@ -3,7 +3,6 @@ package apinto
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/APIParkLab/APIPark/gateway/apinto/driver"
 
@@ -56,29 +55,33 @@ func (p *ProjectClient) online(ctx context.Context, project *gateway.ProjectRele
 	if project == nil {
 		return nil
 	}
-	if project.Upstream == nil {
-		return fmt.Errorf("upstream is nil")
-	}
 	matches := map[string]string{
 		"project": project.Id,
 	}
+	if project.Upstream != nil {
+		//upstreams, err := matchLabels[entity.Service](ctx, p.client, gateway.ProfessionService, matches)
+		//if err != nil {
+		//	if !errors.Is(err, proto.Nil) {
+		//		return err
+		//	}
+		//}
+		//upstreamMap := utils.SliceToMap(upstreams, func(t *entity.Service) string {
+		//	return t.ID
+		//})
 
-	upstreams, err := matchLabels[entity.Service](ctx, p.client, gateway.ProfessionService, matches)
-	if err != nil {
-		if !errors.Is(err, proto.Nil) {
+		upstreamId := genWorkerID(project.Upstream.ID, gateway.ProfessionService)
+		err := p.client.Set(ctx, upstreamId, entity.ToService(project.Upstream, project.Version, matches))
+		if err != nil {
 			return err
 		}
+		//for id := range upstreamMap {
+		//	err = p.client.Del(ctx, id)
+		//	if err != nil {
+		//		return err
+		//	}
+		//}
 	}
-	upstreamMap := utils.SliceToMap(upstreams, func(t *entity.Service) string {
-		return t.ID
-	})
 
-	upstreamId := genWorkerID(project.Upstream.ID, gateway.ProfessionService)
-	err = p.client.Set(ctx, upstreamId, entity.ToService(project.Upstream, project.Version, matches))
-	if err != nil {
-		return err
-	}
-	delete(upstreamMap, upstreamId)
 	routers, err := matchLabels[entity.Router](ctx, p.client, gateway.ProfessionRouter, matches)
 	if err != nil {
 		if !errors.Is(err, proto.Nil) {
@@ -94,7 +97,6 @@ func (p *ProjectClient) online(ctx context.Context, project *gateway.ProjectRele
 		if api.Labels == nil {
 			api.Labels = make(map[string]string)
 		}
-		api.Service = upstreamId
 		api.Labels["provider"] = project.Id
 		routerInfo := entity.ToRouter(api, project.Version, matches)
 
@@ -115,12 +117,6 @@ func (p *ProjectClient) online(ctx context.Context, project *gateway.ProjectRele
 			return err
 		}
 
-	}
-	for id := range upstreamMap {
-		err = p.client.Del(ctx, id)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil

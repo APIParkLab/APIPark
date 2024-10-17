@@ -165,6 +165,9 @@ func (i *imlAPIService) Create(ctx context.Context, input *Create) (err error) {
 		} else {
 			input.UUID = uuid.NewString()
 		}
+		if input.Upstream == "" {
+			input.Upstream = input.Service
+		}
 
 		ne := api.API{
 			UUID:     input.UUID,
@@ -173,6 +176,7 @@ func (i *imlAPIService) Create(ctx context.Context, input *Create) (err error) {
 			Team:     input.Team,
 			Creator:  operater,
 			CreateAt: time.Now(),
+			Upstream: input.Upstream,
 			Method:   input.Methods,
 			Path:     input.Path,
 		}
@@ -192,6 +196,7 @@ func (i *imlAPIService) Create(ctx context.Context, input *Create) (err error) {
 			Method:      input.Methods,
 			Path:        input.Path,
 			Match:       input.Match,
+			Upstream:    input.Upstream,
 			Service:     input.Service,
 			Team:        input.Team,
 		}

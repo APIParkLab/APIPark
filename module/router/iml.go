@@ -232,10 +232,7 @@ func (i *imlRouterModule) Create(ctx context.Context, serviceId string, dto *rou
 	if err != nil {
 		return nil, err
 	}
-	//prefix, err := i.Prefix(ctx, serviceId)
-	//if err != nil {
-	//	return nil, err
-	//}
+
 	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		if dto.Id == "" {
 			dto.Id = uuid.New().String()
@@ -244,8 +241,6 @@ func (i *imlRouterModule) Create(ctx context.Context, serviceId string, dto *rou
 		if err != nil {
 			return err
 		}
-
-		//path := fmt.Sprintf("%s%s", prefix, dto.Path)
 
 		err = i.apiService.Exist(ctx, "", &api.Exist{Path: dto.Path, Methods: dto.Methods})
 		if err != nil {
@@ -272,6 +267,7 @@ func (i *imlRouterModule) Create(ctx context.Context, serviceId string, dto *rou
 			Protocols:   dto.Protocols,
 			Path:        dto.Path,
 			Match:       string(match),
+			Upstream:    dto.Upstream,
 		})
 	})
 	if err != nil {
@@ -311,6 +307,7 @@ func (i *imlRouterModule) Edit(ctx context.Context, serviceId string, apiId stri
 			Protocols:   dto.Protocols,
 			Disable:     dto.Disable,
 			Path:        dto.Path,
+			Upstream:    dto.Upstream,
 			Match:       match,
 		})
 		if err != nil {
@@ -333,66 +330,6 @@ func (i *imlRouterModule) Delete(ctx context.Context, serviceId string, apiId st
 	}
 	return i.apiService.Delete(ctx, apiId)
 }
-
-//func (i *imlRouterModule) Copy(ctx context.Context, serviceId string, apiId string, dto *router_dto.Create) (*router_dto.SimpleDetail, error) {
-//	info, err := i.serviceService.Check(ctx, serviceId, asServer)
-//	if err != nil {
-//		return nil, err
-//	}
-//	oldApi, err := i.apiService.Get(ctx, apiId)
-//	if err != nil {
-//		return nil, err
-//	}
-//	prefix, err := i.Prefix(ctx, serviceId)
-//	if err != nil {
-//		return nil, err
-//	}
-//	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
-//		if dto.Id == "" {
-//			dto.Id = uuid.New().String()
-//		}
-//		err = dto.Validate()
-//		if err != nil {
-//			return err
-//		}
-//
-//		path := fmt.Sprintf("%s/%s", strings.TrimSuffix(prefix, "/"), strings.TrimPrefix(dto.Path, "/"))
-//		err = i.apiService.Exist(ctx, serviceId, &api.Exist{Path: path, Methods: dto.Methods})
-//		if err != nil {
-//			return err
-//		}
-//
-//		proxy, err := i.apiService.LatestProxy(ctx, oldApi.UUID)
-//		if err != nil {
-//			if !errors.Is(err, gorm.ErrRecordNotFound) {
-//				return err
-//			}
-//		}
-//		//upstreamId := ""
-//		if proxy != nil {
-//			err = i.apiService.SaveProxy(ctx, dto.Id, proxy.Data)
-//			if err != nil {
-//				return err
-//			}
-//		}
-//
-//		match, _ := json.Marshal(dto.MatchRules)
-//		return i.apiService.Create(ctx, &api.Create{
-//			UUID:    dto.Id,
-//			Name:    dto.Name,
-//			Service: serviceId,
-//			Team:    info.Team,
-//			Methods:  dto.Methods,
-//			Path:    path,
-//			Match:   string(match),
-//		})
-//
-//	})
-//	if err != nil {
-//		return nil, err
-//	}
-//	return i.SimpleDetail(ctx, serviceId, dto.Id)
-//}
 
 func (i *imlRouterModule) Prefix(ctx context.Context, serviceId string) (string, error) {
 	pInfo, err := i.serviceService.Check(ctx, serviceId, asServer)

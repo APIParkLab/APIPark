@@ -12,6 +12,10 @@ var (
 	_ ISettingService = (*imlSettingService)(nil)
 )
 
+const (
+	KeyInvokeAddress = "system.node.invoke_address"
+)
+
 type imlSettingService struct {
 	store setting.ISettingStore `autowired:""`
 }
