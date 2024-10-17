@@ -1,12 +1,13 @@
 package core
 
 import (
+	"net/http"
+
 	"github.com/APIParkLab/APIPark/controller/ai"
 	ai_api "github.com/APIParkLab/APIPark/controller/ai-api"
 	"github.com/APIParkLab/APIPark/controller/monitor"
 	"github.com/APIParkLab/APIPark/controller/router"
 	"github.com/APIParkLab/APIPark/controller/system"
-	"net/http"
 
 	plugin_cluster "github.com/APIParkLab/APIPark/controller/plugin-cluster"
 
@@ -81,6 +82,7 @@ type plugin struct {
 	exportConfigController      system.IExportConfigController                     `autowired:""`
 	importConfigController      system.IImportConfigController                     `autowired:""`
 	aiProviderController        ai.IProviderController                             `autowired:""`
+	settingController           system.ISettingController                          `autowired:""`
 	apis                        []pm3.Api
 }
 

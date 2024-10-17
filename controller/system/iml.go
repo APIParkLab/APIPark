@@ -5,16 +5,20 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"time"
+
+	system_dto "github.com/APIParkLab/APIPark/module/system/dto"
+
 	application_authorization "github.com/APIParkLab/APIPark/module/application-authorization"
 	"github.com/APIParkLab/APIPark/module/catalogue"
 	"github.com/APIParkLab/APIPark/module/router"
 	"github.com/APIParkLab/APIPark/module/service"
 	"github.com/APIParkLab/APIPark/module/subscribe"
+	"github.com/APIParkLab/APIPark/module/system"
 	"github.com/APIParkLab/APIPark/module/team"
 	"github.com/APIParkLab/APIPark/module/upstream"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"time"
 )
 
 var _ IExportConfigController = (*imlExportConfigController)(nil)
@@ -164,4 +168,20 @@ func (i *imlExportConfigController) appendFiles(ctx *gin.Context) ([]*ExportFile
 	}
 
 	return files, nil
+}
+
+var (
+	_ ISettingController = (*imlSettingController)(nil)
+)
+
+type imlSettingController struct {
+	settingModule system.ISettingModule `autowired:""`
+}
+
+func (i *imlSettingController) Get(ctx *gin.Context) (*system_dto.Setting, error) {
+	return i.settingModule.Get(ctx), nil
+}
+
+func (i *imlSettingController) Set(ctx *gin.Context, input *system_dto.InputSetting) error {
+	return i.settingModule.Set(ctx, input)
 }
