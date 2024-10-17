@@ -1,7 +1,7 @@
 
 import  {forwardRef, useEffect, useImperativeHandle, useMemo, useState} from "react";
 import {App, Button, Form, Input, Radio, Row, Select, TreeSelect, Upload} from "antd";
-import { Link, useNavigate, useParams} from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import {BasicResponse, DELETE_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
@@ -10,10 +10,10 @@ import { EntityItem, MemberItem, SimpleTeamItem} from "@common/const/type.ts";
 import { v4 as uuidv4 } from 'uuid'
 import { SystemConfigFieldType, SystemConfigHandle } from "../../const/system/type.ts";
 import { validateUrlSlash } from "@common/utils/validate.ts";
-import { compressImage, normFile } from "@common/utils/uploadPic.ts"; 
+import { normFile } from "@common/utils/uploadPic.ts"; 
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext.tsx";
 import { useSystemContext } from "../../contexts/SystemContext.tsx";
-import { SERVICE_VISUALIZATION_OPTIONS } from "@core/const/system/const.tsx";
+import { SERVICE_APPROVAL_OPTIONS, SERVICE_KIND_OPTIONS, SERVICE_VISUALIZATION_OPTIONS } from "@core/const/system/const.tsx";
 import { RcFile, UploadChangeParam, UploadFile, UploadProps } from "antd/es/upload/interface";
 import { LoadingOutlined } from "@ant-design/icons";
 import { getImgBase64 } from "@common/utils/dataTransfer.ts";
@@ -22,8 +22,13 @@ import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { $t } from "@common/locales/index.ts";
+import { AiServiceConfigFieldType } from "@core/const/ai-service/type.ts";
 
-const MAX_SIZE = 2 * 1024; // 1KB
+
+export type SimpleAiProviderItem = EntityItem & {
+    configured:boolean
+    logo:string
+}
 
 const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
     const { message,modal } = App.useApp()
@@ -35,17 +40,45 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
     const navigate = useNavigate();
     const {setBreadcrumb} = useBreadcrumb()
     const { setSystemInfo} = useSystemContext()
-    const [showClassify, setShowClassify] = useState<boolean>()
+    const [showClassify, setShowClassify] = useState<boolean>(true)
+    const [showAI, setShowAI] = useState<boolean>(false)
     const [imageBase64, setImageBase64] = useState<string | null>(null);
     const [tagOptionList, setTagOptionList] = useState<DefaultOptionType[]>([])
     const [serviceClassifyOptionList, setServiceClassifyOptionList] = useState<DefaultOptionType[]>()
     const [uploadLoading, setUploadLoading] = useState<boolean>(false)
-    const {checkPermission,accessInit, getGlobalAccessData,state} = useGlobalContext()
+    const {checkPermission,accessInit, getGlobalAccessData,state, aiConfigFlushed, setAiConfigFlushed} = useGlobalContext()
+    const [providerOptionList, setProviderOptionList] = useState<DefaultOptionType[]>()
+    const location = useLocation()
+    const currentUrl = location.pathname
 
     useImperativeHandle(ref, () => ({
         save:onFinish
     }));
 
+    useEffect(()=>{
+        if(currentUrl.indexOf('aiInside') !== -1){
+            setShowAI(true)
+        }
+    },[currentUrl])
+
+    const getProviderOptionList = ()=>{
+        setProviderOptionList([])
+        fetchData<BasicResponse<{ providers: SimpleAiProviderItem[] }>>('simple/ai/providers',{method:'GET',eoTransformKeys:[]}).then(response=>{
+            const {code,data,msg} = response
+            if(code === STATUS_CODE.SUCCESS){
+                const configuredProvider = data.providers?.filter(x=>x.configured)?.map((x:SimpleAiProviderItem)=>{return {...x,
+                    label: x.name, value:x.id
+                }})
+                setProviderOptionList(configuredProvider)
+                if(!serviceId && configuredProvider.length > 0){
+                    form.setFieldsValue({provider: configuredProvider[0]?.id})
+                }
+            }else{
+                message.error(msg || $t(RESPONSE_TIPS.error))
+            }
+        })
+    }
+    
     const beforeUpload = async (file: RcFile) => {
         if (!['image/png', 'image/jpeg', 'image/svg+xml'].includes(file.type)) {
             alert($t('只允许上传PNG、JPG或SVG格式的图片'));
@@ -71,6 +104,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
             return false;
         };
     
+
 
     const handleChange: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
         if (info.file.status === 'uploading') {
@@ -104,6 +138,10 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                 }})||[])
                 setServiceClassifyOptionList(data.catalogues)
 
+                   if(form.getFieldValue('catalogue') === undefined&&data.catalogues.length){
+                    form.setFieldValue('catalogue',data.catalogues[0].id); 
+                }
+
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
             }
@@ -113,7 +151,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
 
     // 获取表单默认值
     const getSystemInfo = () => {
-        fetchData<BasicResponse<{ service: SystemConfigFieldType }>>('service/info',{method:'GET',eoParams:{team:teamId, service:serviceId},eoTransformKeys:['team_id','service_type']}).then(response=>{
+        fetchData<BasicResponse<{ service: SystemConfigFieldType }>>('service/info',{method:'GET',eoParams:{team:teamId, service:serviceId},eoTransformKeys:['team_id','service_type','approval_type','service_kind']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setTimeout(()=>{
@@ -122,6 +160,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         team:data.service.team.id,
                         catalogue:data.service.catalogue?.id,
                         tags:data.service.tags?.map((x:EntityItem)=>x.name),
+                        provider:data.service.provider?.id,
                          logoFile:[
                             {
                                 uid: '-1', // 文件唯一标识
@@ -142,7 +181,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
 
     const onFinish:()=>Promise<boolean|string> = () => {
         return form.validateFields().then((value)=>{
-            return fetchData<BasicResponse<{service:{id:string}}>>(serviceId === undefined? 'team/service':'service/info',{method:serviceId === undefined? 'POST' : 'PUT',eoParams: {...(serviceId === undefined ? {team:value.team} :{service:serviceId,team:teamId})},eoBody:({...value,prefix:value.prefix?.trim()}), eoTransformKeys:['serviceType']},).then(response=>{
+            return fetchData<BasicResponse<{service:{id:string}}>>(serviceId === undefined? 'team/service':'service/info',{method:serviceId === undefined? 'POST' : 'PUT',eoParams: {...(serviceId === undefined ? {team:value.team} :{service:serviceId,team:teamId})},eoBody:({...value,prefix:value.prefix?.trim()}), eoTransformKeys:['serviceType','approvalType','serviceKind']},).then(response=>{
                 const {code,data,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
                     message.success(msg || $t(RESPONSE_TIPS.success))
@@ -168,6 +207,9 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                 setTeamOptionList(data.teams?.map((x:MemberItem)=>{return {...x,
                     label:x.name, value:x.id
                 }}))
+                if(form.getFieldValue('team') === undefined&&data.teams?.length){
+                    form.setFieldValue('team',data.teams[0].id); 
+                }
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
             }
@@ -186,6 +228,11 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
         })
     }
 
+
+    useEffect(()=>{
+        aiConfigFlushed && getProviderOptionList()
+    },[aiConfigFlushed])
+
     useEffect(() => {
         if(accessInit){
             getTeamOptionList()
@@ -194,6 +241,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                 getTeamOptionList()
             })
         }
+        getProviderOptionList()
         getTagAndServiceClassifyList()
         if (serviceId !== undefined) {
             setOnEdit(true);
@@ -205,12 +253,15 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                 {
                     title: $t('设置')
                 }])
-
         } else {
             setOnEdit(false);
-            form.setFieldValue('id',uuidv4());
+            const id = uuidv4()
+            form.setFieldValue('id',id);
+            form.setFieldValue('serviceKind',serviceTypeOptions[0].value)
+            form.setFieldValue('prefix',`${id.split('-')[0]}/`)
             form.setFieldValue('team',teamId); 
-            form.setFieldValue('serviceType','inner'); 
+            form.setFieldValue('serviceType','public'); 
+            form.setFieldValue('approvalType','auto'); 
         }
         return (form.setFieldsValue({}))
     }, [serviceId]);
@@ -234,7 +285,9 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
         })
     }
 
-    const visualizationOptions = useMemo(()=>SERVICE_VISUALIZATION_OPTIONS.map((x)=>({...x, label:$t(x.label)})),[state.language])
+    const serviceTypeOptions =  useMemo(()=>SERVICE_KIND_OPTIONS.map((x)=>({...x, label:$t(x.label)})),[state.language]);
+    // const visualizationOptions = useMemo(()=>SERVICE_VISUALIZATION_OPTIONS.map((x)=>({...x, label:$t(x.label)})),[state.language])
+    const approvalOptions = useMemo(()=>SERVICE_APPROVAL_OPTIONS.map((x)=>({...x, label:$t(x.label)})),[state.language])
 
     return (
         <>
@@ -259,25 +312,90 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         </Form.Item>
 
                         <Form.Item<SystemConfigFieldType>
-                            label={$t("服务ID")}
+                            label={$t("服务 ID")}
                             name="id"
                             rules={[{ required: true ,whitespace:true }]}
                         >
                             <Input className="w-INPUT_NORMAL" disabled={onEdit} placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
+                        {!onEdit&&
+                          <Form.Item<SystemConfigFieldType>
+                            label={$t("服务类型")}
+                            name="serviceKind"
+                            rules={[{required: true}]}
+                        >
+                                    <Select className="w-INPUT_NORMAL" disabled={onEdit} placeholder={$t(PLACEHOLDER.input)} options={serviceTypeOptions}  onChange={(value)=>setShowAI(value === 'ai')}>
+                                    </Select>
+                        </Form.Item>
+}
+                        {showAI &&   <Form.Item<AiServiceConfigFieldType>
+                            label={$t("默认 AI 供应商")}
+                            name="provider"
+                            rules={[{ required: true }]}
+                            extra={serviceId ? $t('创建 API 时会默认选择该供应商，修改默认供应商不会影响现有 API') : ''}
+                        >{
+                            (providerOptionList && providerOptionList.length >0 ) ? <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} options={providerOptionList} >
+                            </Select> : <p>{$t("未配置任何 AI 模型供应商，")}<a href="/aisetting" target="_blank" onClick={()=>setAiConfigFlushed(false)}>{$t('立即配置')}</a></p>
+                        }
+                        </Form.Item>}
+                      
 
                         <Form.Item<SystemConfigFieldType>
                             label={$t("API 调用前缀")}
                             name="prefix"
-                            extra={$t("选填，作为服务内所有API的前缀，比如host/{service_name}/{api_path}，一旦保存无法修改")}
-                            rules={[
+                            extra={$t("作为服务内所有API的前缀，比如host/{service_name}/{api_path}，一旦保存无法修改")}
+                            rules={[{ required: true ,whitespace:true },
                             {
                             validator: validateUrlSlash,
                             }]}
                         >
                             <Input prefix={onEdit ? '' : '/'} className="w-INPUT_NORMAL" disabled={onEdit} placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
+                        {!onEdit && <Form.Item<SystemConfigFieldType>
+                            label={$t("所属团队")}
+                            name="team"
+                            rules={[{ required: true }]}
+                        >
+                            <Select className="w-INPUT_NORMAL" disabled={onEdit} placeholder={$t(PLACEHOLDER.input)} options={teamOptionList} >
+                            </Select>
+                        </Form.Item>}
+                    
+                        <Form.Item<SystemConfigFieldType>
+                            label={$t("订阅审批")}
+                            name="approvalType"
+                            rules={[{required: true}]}
+                        >
+                            <Radio.Group className="flex flex-col" options={approvalOptions}  />
+                        </Form.Item>
 
+                        {/* <Form.Item<SystemConfigFieldType>
+                            label={$t("服务类型")}
+                            name="serviceType"
+                            rules={[{required: true}]}
+                        >
+                            <Radio.Group className="flex flex-col" options={visualizationOptions} onChange={(e)=>{setShowClassify(e.target.value === 'public')}} />
+                        </Form.Item> */}
+
+                        {showClassify &&
+                        <Form.Item<SystemConfigFieldType>
+                            label={$t("所属服务分类")}
+                            name="catalogue"
+                            extra={$t("设置服务展示在服务市场中的哪个分类下")}
+                            rules={[{required: true}]}
+                        >
+                            <TreeSelect
+                                className="w-INPUT_NORMAL"
+                                fieldNames={{label:'name',value:'id',children:'children'}}
+                                showSearch
+                                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                                placeholder={$t(PLACEHOLDER.select)}
+                                allowClear
+                                treeDefaultExpandAll
+                                treeData={serviceClassifyOptionList}
+                            />
+                        </Form.Item>
+                        }
+                        
                         <Form.Item<SystemConfigFieldType>
                             label={$t("图标")}
                             name="logoFile"
@@ -313,15 +431,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         >
                         </Form.Item>
 
-                        {!onEdit && <Form.Item<SystemConfigFieldType>
-                            label={$t("所属团队")}
-                            name="team"
-                            rules={[{ required: true }]}
-                        >
-                            <Select className="w-INPUT_NORMAL" disabled={onEdit} placeholder={$t(PLACEHOLDER.input)} options={teamOptionList} >
-                            </Select>
-                        </Form.Item>}
-
+                     
 
                         <Form.Item<SystemConfigFieldType>
                             label={$t("标签")}
@@ -334,34 +444,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                                 options={tagOptionList}>
                             </Select>
                         </Form.Item>
-
-                        <Form.Item<SystemConfigFieldType>
-                            label={$t("服务类型")}
-                            name="serviceType"
-                            rules={[{required: true}]}
-                        >
-                            <Radio.Group className="flex flex-col" options={visualizationOptions} onChange={(e)=>{setShowClassify(e.target.value === 'public')}} />
-                        </Form.Item>
-
-                        {showClassify &&
-                        <Form.Item<SystemConfigFieldType>
-                            label={$t("所属服务分类")}
-                            name="catalogue"
-                            extra={$t("设置服务展示在服务市场中的哪个分类下")}
-                            rules={[{required: true}]}
-                        >
-                            <TreeSelect
-                                className="w-INPUT_NORMAL"
-                                fieldNames={{label:'name',value:'id',children:'children'}}
-                                showSearch
-                                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                                placeholder={$t(PLACEHOLDER.select)}
-                                allowClear
-                                treeDefaultExpandAll
-                                treeData={serviceClassifyOptionList}
-                            />
-                        </Form.Item>
-                        }
+    
                         {onEdit && <>
                         <Row className="mb-[10px]"
                             // wrapperCol={{ offset: 5, span: 19 }}

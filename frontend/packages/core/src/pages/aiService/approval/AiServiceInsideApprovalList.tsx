@@ -48,7 +48,7 @@ const AiServiceInsideApprovalList:FC = ()=>{
         if(code === STATUS_CODE.SUCCESS){
             const modalIns = modal.confirm({
                 title:type === 'approval' ? $t('审批') : $t('查看'),
-                content:<SubscribeApprovalModalContent ref={subscribeRef} data={{...data.approval}  as SubscribeApprovalInfoType} type={type} serviceId={serviceId!} teamId={teamId!} inAiService/>,
+                content:<SubscribeApprovalModalContent ref={subscribeRef} data={{...data.approval}  as SubscribeApprovalInfoType} type={type} serviceId={serviceId!} teamId={teamId!} inSystem/>,
                 onOk:()=>{
                     return subscribeRef.current?.save('pass').then((res)=>res === true && manualReloadTable())
                 },
@@ -143,7 +143,7 @@ const AiServiceInsideApprovalList:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/aiservice/list`}>{$t('服务')}</Link>
+                title:<Link to={`/service/list`}>{$t('服务')}</Link>
             },
             {
                 title:$t('订阅审批')

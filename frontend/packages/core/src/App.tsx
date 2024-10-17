@@ -6,15 +6,25 @@ import {BreadcrumbProvider} from "@common/contexts/BreadcrumbContext.tsx";
 import { StyleProvider } from '@ant-design/cssinjs';
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
+import zhTW from 'antd/locale/zh_TW';
+import jaJP from 'antd/locale/ja_JP';
 import useInitializeMonaco from "@common/hooks/useInitializeMonaco";
 import { useEffect, useMemo, useState } from 'react';
 import 'dayjs/locale/zh-cn';
+import 'dayjs/locale/zh-tw';
+import 'dayjs/locale/ja';
 import dayjs from 'dayjs';
 import { useGlobalContext } from '@common/contexts/GlobalStateContext';
 import { $t } from '@common/locales';
 
 type Locale = ConfigProviderProps['locale'];
 
+const languageMap: Record<string, Locale> = {
+  'zh-CN':zhCN,
+  'en-US':enUS,
+  'zh-TW':zhTW,
+  'ja-JP':jaJP
+}
 
 
 const antdComponentThemeToken = {
@@ -147,7 +157,7 @@ function App() {
 
   useEffect(() => {
       dayjs.locale(state.language);
-      setLocal(state.language === 'cn' ? zhCN : enUS);
+      setLocal(languageMap[state.language]);
   },[state.language])
   
   const validateMessages = useMemo(()=>({

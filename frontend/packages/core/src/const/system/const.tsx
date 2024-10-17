@@ -100,12 +100,15 @@ export const SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
         ellipsis:true,
     },
     {
+        title:('类型'),
+        dataIndex: 'service_kind',
+        width: 140,
+        ellipsis:true,
+    },
+    {
         title:('所属团队'),
         dataIndex: ['team','name'],
         ellipsis:true,
-        // filters: true,
-        // onFilter: true,
-        // filterSearch: true,
     },
     {
         title:('API 数量'),
@@ -348,6 +351,14 @@ export const PROXY_HEADER_CONFIG:ConfigField<ProxyHeaderItem>[] = [
 export const SERVICE_VISUALIZATION_OPTIONS = [
     {label:('内部服务：可通过网关访问，但不展示在服务广场'),value:'inner'},
     {label:('公开服务：可通过网关访问，展示在服务广场，可被其他应用订阅'),value:'public'}];
+
+    
+export const SERVICE_APPROVAL_OPTIONS = [
+    {label:('无需审批：允许任何应用调用该服务'),value:'auto'},
+    {label:('人工审批：仅允许通过人工审批的应用调用该服务'),value:'manual'}];
+export const SERVICE_KIND_OPTIONS = [
+        {label:('REST'),value:'rest'},
+        {label:('AI'),value:'ai'}];
 
 
 

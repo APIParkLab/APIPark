@@ -1,9 +1,12 @@
 import { Codebox } from "@common/components/postcat/api/Codebox"
-import { PLACEHOLDER } from "@common/const/const"
+import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const"
+import { useFetch } from "@common/hooks/http"
 import { $t } from "@common/locales"
-import { AiProviderLlmsItems } from "@core/pages/aiSetting/AiSettingList"
-import { Form, Select, Tag } from "antd"
-import { forwardRef, useEffect, useImperativeHandle } from "react"
+import { AiProviderDefaultConfig, AiProviderLlmsItems } from "@core/pages/aiSetting/AiSettingList"
+import { SimpleAiProviderItem } from "@core/pages/system/SystemConfig"
+import { Form, message, Select, Tag } from "antd"
+import { DefaultOptionType } from "antd/es/select"
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 
 export type AiServiceRouterModelConfigHandle = {
     save:()=>Promise<{id:string, config:string}>
@@ -21,16 +24,51 @@ type AiServiceRouterModelConfigField = {
 
 const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, AiServiceRouterModelConfigProps>((props, ref)=>{
     const [form] = Form.useForm();
-    const {llmList,entity} = props
-
+    const {entity} = props
+    const [providerList, setProviderList]= useState<DefaultOptionType[]>([])
+    const [llmList, setLlmList]= useState<DefaultOptionType[]>([])
+    const {fetchData} = useFetch()
     useImperativeHandle(ref, ()=>({
         save:form.validateFields
         })
     )
 
     useEffect(()=>{
+        getProviderList()
         form.setFieldsValue(entity)
     },[])
+
+    const getProviderList = ()=>{
+        setProviderList([])
+        fetchData<BasicResponse<{ providers: SimpleAiProviderItem[] }>>('simple/ai/providers',{method:'GET',eoTransformKeys:[]}).then(response=>{
+            const {code,data,msg} = response
+            if(code === STATUS_CODE.SUCCESS){
+                setProviderList(data.providers?.filter(x=>x.configured)?.map((x:SimpleAiProviderItem)=>{return {...x,
+                    label: x.name, value:x.id
+                }}))
+            }else{
+                message.error(msg || $t(RESPONSE_TIPS.error))
+            }
+        })
+    }
+
+    const getLlmList = (provider:string)=>{
+        fetchData<BasicResponse<{llms:AiProviderLlmsItems[],provider:AiProviderDefaultConfig}>>('ai/provider/llms',{method:'GET',eoParams:{provider}, eoTransformKeys:['default_llm']}).then(response=>{
+            const {code,data,msg} = response
+            if(code === STATUS_CODE.SUCCESS){
+                setLlmList(data.llms)
+                form.setFieldsValue({
+                    id:data.provider.defaultLlm,
+                    config:data.llms.find(x=>x.id===data.provider.defaultLlm)?.config})
+            }else{
+                message.error(msg || $t(RESPONSE_TIPS.error))
+            }
+        }).catch((errorInfo)=> console.error(errorInfo))
+    }
+
+    const handleChangeProvider = (provider:string)=>{
+        getLlmList(provider)
+    }
 
     return (
         <Form
@@ -42,7 +80,20 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
                     name="aiServiceInsideRouterModalConfig"
                     autoComplete="off"
                 >
-                        
+                        <Form.Item<AiServiceRouterModelConfigField>
+                            label={$t("模型供应商")}
+                            name="provider"
+                            rules={[{ required: true }]}
+                        >
+                            <Select className="w-INPUT_NORMAL" 
+                                placeholder={$t(PLACEHOLDER.select)} 
+                                options={providerList}
+                                onChange={(e)=>{
+                                    handleChangeProvider(e)
+                                }}>
+                            </Select>
+                        </Form.Item>
+
                         <Form.Item<AiServiceRouterModelConfigField>
                             label={$t("模型")}
                             name="id"
@@ -52,11 +103,13 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
                                 placeholder={$t(PLACEHOLDER.select)} 
                                 options={llmList?.map(x=>({
                                     value:x.id, 
-                                    label:<div className="flex items-center gap-[4px]">
-                                            <div className="flex items-center" dangerouslySetInnerHTML={{ __html: x.logo }}></div>
+                                    label:<div className="flex items-center gap-[10px]">
                                             <span>{x.id}</span>
                                             {x?.scopes?.map(s=><Tag >{s?.toLocaleUpperCase()}</Tag>)}
-                                            </div>}))}>
+                                            </div>}))}
+                                onChange={(e)=>{
+                                    form.setFieldValue('config',llmList.find(x=>x.id===e)?.config)
+                                }}>
                             </Select>
                         </Form.Item>
 

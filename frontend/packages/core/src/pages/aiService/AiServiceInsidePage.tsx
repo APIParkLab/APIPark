@@ -60,8 +60,8 @@ const AiServiceInsidePage:FC = ()=> {
    const SYSTEM_PAGE_MENU_ITEMS = useMemo(()=>[
     getItem($t('服务'), 'assets', null,
         [
-            getItem(<Link to="./api">{$t('API')}</Link>, 'api',undefined,undefined,undefined,'team.service.api_doc.view'),
-            getItem(<Link to="./route">{$t('路由')}</Link>, 'route',undefined,undefined,undefined,'team.service.router.view'),
+            getItem(<Link to="./route">{$t('API 路由')}</Link>, 'route',undefined,undefined,undefined,'team.service.router.view'),
+            getItem(<Link to="./api">{$t('API 文档')}</Link>, 'api',undefined,undefined,undefined,'team.service.api_doc.view'),
             getItem(<Link to="./document">{$t('使用说明')}</Link>, 'document',undefined,undefined,undefined,''),
             getItem(<Link to="./publish">{$t('发布')}</Link>, 'publish',undefined,undefined,undefined,'team.service.release.view'),
             ],
@@ -95,7 +95,7 @@ const AiServiceInsidePage:FC = ()=> {
         }
         const filteredMenu = filterMenu(SYSTEM_PAGE_MENU_ITEMS as MenuItemGroupType<MenuItemType>[])
         setActiveMenu((pre)=>{
-            return pre ?? 'api'
+            return pre ?? 'route'
         })
         return  filteredMenu || []
     },[accessData,accessInit, SYSTEM_PAGE_MENU_ITEMS])
@@ -111,7 +111,7 @@ const AiServiceInsidePage:FC = ()=> {
         }else if(serviceId !== currentUrl.split('/')[currentUrl.split('/').length - 1]){ 
             setActiveMenu(currentUrl.split('/')[currentUrl.split('/').length - 1])
         }else{
-            setActiveMenu('api')
+            setActiveMenu('route')
         }
     }, [currentUrl]);
 
@@ -123,7 +123,7 @@ const AiServiceInsidePage:FC = ()=> {
 
     useEffect(()=>{
         if( activeMenu && serviceId === currentUrl.split('/')[currentUrl.split('/').length - 1]){
-            navigateTo(`/aiservice/${teamId}/inside/${serviceId}/${activeMenu}`)
+            navigateTo(`/service/${teamId}/aiInside/${serviceId}/${activeMenu}`)
         }
     },[activeMenu])
 
@@ -137,7 +137,7 @@ const AiServiceInsidePage:FC = ()=> {
             tagList={[{label:
                 <Paragraph className="mb-0" copyable={serviceId ? { text: serviceId } : false}>{$t('服务 ID')}：{serviceId || '-'}</Paragraph>
             }]}
-            backUrl="/aiservice/list">
+            backUrl="/service/list">
             <div className="flex flex-1 h-full">
                 <Menu
                     onClick={onMenuClick}

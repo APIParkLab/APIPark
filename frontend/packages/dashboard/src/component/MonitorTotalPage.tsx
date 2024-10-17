@@ -79,7 +79,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
       const [fullScreen, setFullScreen] = useState<boolean>(false)
       const [recordQuery, setRecordQuery] = useState<SearchBody&{timeButton:''|'hour'|'day'|'threeDays'|'sevenDays'}>()
       const [queryBtnLoading, setQueryBtnLoading] = useState<boolean>(false)
-      const [totalEmpty, setTotalEmpty] = useState<boolean>(true)
+      const [totalEmpty, setTotalEmpty] = useState<boolean>(false)
       const [requestStatus, dispatch] = useReducer(reducer, initialState);
       
       useEffect(() => {
@@ -92,7 +92,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
       }, []);
     
       const getMonitorData = () => {
-        setTotalEmpty(true)
+        // setTotalEmpty(true)
         dispatch({ type: ACTIONS.RESET });
         // ...根据时间和集群获取监控数据...
          let query = queryData
@@ -126,7 +126,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
                   // this.proxyPieRef?.changePieChart()
                   setRequestSucRate(data.requestSummary.total === 0 ? '0%' : (data.requestSummary.success * 100 / data.requestSummary.total).toFixed(2) + '%')
                   setProxySucRate(data.proxySummary.total === 0 ? '0%' : (data.proxySummary.success * 100 / data.proxySummary.total).toFixed(2) + '%')
-                  setTotalEmpty(data.requestSummary.total === 0 && data.proxySummary.total === 0)
+                  // setTotalEmpty(data.requestSummary.total === 0 && data.proxySummary.total === 0)
                 }else{
                   setPieError(true)
                   message.error(msg || $t(RESPONSE_TIPS.dataError))

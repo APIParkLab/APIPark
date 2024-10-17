@@ -46,3 +46,7 @@ export const SERVICE_HUB_TABLE_COLUMNS: PageProColumns<ServiceHubTableListItem>[
 ];
 
 
+export const approvalTypeTranslate = {
+    'auto':'无需审批',
+    'manual':'需要审批'
+}

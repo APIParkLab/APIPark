@@ -1,12 +1,11 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import InsidePage from "@common/components/aoplatform/InsidePage";
 import { BasicResponse, STATUS_CODE, RESPONSE_TIPS } from "@common/const/const";
-import { EntityItem } from "@common/const/type";
 import { useFetch } from "@common/hooks/http";
 import { $t } from "@common/locales";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { App, Spin, Card, Tag, Select, Button, Empty } from "antd";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { App, Spin, Card, Tag, Select, Button, Empty, Divider } from "antd";
+import { memo, useEffect, useRef, useState } from "react";
 import AiSettingModalContent, { AiSettingModalContentHandle } from "./AiSettingModal";
 import WithPermission from "@common/components/aoplatform/WithPermission";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
@@ -27,10 +26,12 @@ export type AiProviderLlmsItems = {
     id:string
     logo:string
     scopes:('chat'|'completions')[]
+    config:string
 }
 
 export type AiProviderDefaultConfig = {
     id:string
+    provider:string
     name:string
     logo:string
     defaultLlm:string
@@ -49,11 +50,8 @@ const AiSettingList = ()=>{
     const [aiSettingList, setAiSettingList] = useState<AiSettingListItem[]>([])
     const [loading, setLoading] = useState<boolean>(false)
     // const [updateLoading, setUpdateLoading] = useState<boolean>(false)
-    const [loadingDefaultModel, setLoadingDefaultModel] = useState<string>('')
     const modalRef = useRef<AiSettingModalContentHandle>() 
     const {setAiConfigFlushed,accessData} = useGlobalContext()
-    const [llmMap, setLlmMap] = useState<Map<string, {loading:boolean, list:DefaultOptionType[]}>>(new Map<string, {loading:boolean, list:DefaultOptionType[]}>)
-    const [currentProvider, setCurrentProvider] = useState<string>()
 
     const getAiSettingList = ()=>{
         setLoading(true)
@@ -68,42 +66,6 @@ const AiSettingList = ()=>{
         }).finally(()=>setLoading(false))
     }
 
-    const getLlmList = (provider:AiSettingListItem)=>{
-         setLlmMap(prev=>{
-            const newMap = new Map(prev);
-            if(newMap.get(provider.id)){
-                newMap.get(provider.id)!.loading = true
-            }else{
-                newMap.set(provider.id, {loading:true,list:[]})
-            }
-            return newMap
-         })
-
-         fetchData<BasicResponse<{llms:AiProviderLlmsItems[]}>>(`ai/provider/llms`,{method:'GET',eoParams:{provider:provider.id}}).then(response=>{
-            const {code,data,msg} = response
-            if(code === STATUS_CODE.SUCCESS){
-                setLlmMap(prev=>{
-                    const newMap = new Map(prev);
-                    const llmDetail = newMap.get(provider.id)
-                    llmDetail!.list = data.llms?.map((x:AiProviderLlmsItems)=>({
-                        label:<div className="flex w-full items-center gap-[4px]">
-                                <div className="flex items-center" dangerouslySetInnerHTML={{ __html: x.logo }} />
-                                <span>{x.id}</span></div>, 
-                        value:x.id}))
-                    return newMap
-                })
-            }else{
-                message.error(msg || $t(RESPONSE_TIPS.error))
-            }
-         }).finally(()=>{
-            setLlmMap(prev=>{
-                const newMap = new Map(prev);
-                const llmDetail = newMap.get(provider.id)
-                llmDetail!.loading = false
-                return newMap
-            })
-         })
-    }
 
     // 第一期暂时隐藏
     // const updateModalList = ()=>{
@@ -158,33 +120,107 @@ const AiSettingList = ()=>{
         })
     }
 
-    const changeDefaultModel = (value: string, entity:AiSettingListItem) => {
-        setLoadingDefaultModel(entity.id)
-        return fetchData<BasicResponse<null>>(`ai/provider/default-llm`,{method:'PUT', eoBody:{llm:value}, eoParams:{provider:entity.id}}).then(response=>{
-            const {code,msg} = response
-            if(code === STATUS_CODE.SUCCESS){
-                getAiSettingList()
-                message.success(msg || $t(RESPONSE_TIPS.success))
-            }else{
-                message.error(msg || $t(RESPONSE_TIPS.error))
-            }
-        }).finally(()=>setLoadingDefaultModel(''))
-    };
-
-    const modelOptions = useMemo(()=>{
-        
-        return currentProvider ? llmMap?.get(currentProvider)?.list : []
-    },[currentProvider,llmMap])
-  
     useEffect(() => {
         getAiSettingList()
     }, []);
 
+    const CardBox = memo(({provider}:{provider:AiSettingListItem})=>{
+        const [options, setOptions] = useState<DefaultOptionType[]>([])
+        const [loading, setLoading] = useState<boolean>(false)
+        const [defaultLlm, setDefaultLlm] = useState<string>(provider.defaultLlm)
+
+        const getLlmList = ()=>{
+            if(options.length > 0) return
+            setLoading(true)
+            fetchData<BasicResponse<{llms:AiProviderLlmsItems[]}>>(`ai/provider/llms`,{method:'GET',eoParams:{provider:provider.id}}).then(response=>{
+               const {code,data,msg} = response
+               if(code === STATUS_CODE.SUCCESS){
+                setOptions(data.llms?.map((x:AiProviderLlmsItems)=>({
+                           label:<span className="w-full truncate">{x.id}</span>, 
+                           value:x.id})))
+               }else{
+                   message.error(msg || $t(RESPONSE_TIPS.error))
+               }
+            }).finally(()=>{
+                setLoading(false)
+            })
+       }
+
+       
+        const changeDefaultModel = (value: string, entity:AiSettingListItem) => {
+            setLoading(true)
+            return fetchData<BasicResponse<null>>(`ai/provider/default-llm`,{method:'PUT', eoBody:{llm:value}, eoParams:{provider:entity.id}}).then(response=>{
+                const {code,msg} = response
+                if(code === STATUS_CODE.SUCCESS){
+                    setDefaultLlm(value)
+                    message.success(msg || $t(RESPONSE_TIPS.success))
+                }else{
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                }
+            }).finally(()=>setLoading(false))
+        };
+    
+        
+        return (
+            <Card title={
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center h-[22px] ai-setting-svg-container" dangerouslySetInnerHTML={{ __html: provider.logo }}  />
+                        <Tag bordered={false} color={provider.configured ? 'green' : undefined} className="h-[22px] px-[4px] text-center">
+                            {provider.configured ? $t('已配置') : $t('未配置')}
+                        </Tag>
+                </div> }
+                    className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible  h-[156px] m-0 flex flex-col "  
+                    classNames={{header:'border-b-[0px] p-[20px] px-[24px]', body:"pt-0 flex-1"}} 
+                    >
+                        <div className="flex flex-col justify-between h-full gap-btnbase ">
+                            <div className="flex items-center w-full h-[32px]  flex-1">{
+                                provider.configured && <><label className="text-nowrap">{$t('默认')}：</label>
+                                    <WithPermission access="system.devops.ai_provider.edit">
+                                        <Select
+                                            value={defaultLlm}
+                                            variant="borderless"
+                                            className="flex-1 overflow-hidden"
+                                            // style={{ width: '100%' }}
+                                            onChange={(value)=>changeDefaultModel(value, provider)}
+                                            options={options}
+                                            onFocus={()=> getLlmList()}
+                                            loading={loading }
+                                            />
+                                    </WithPermission>
+                                </> 
+                                }
+                                   
+                                </div>
+                            <WithPermission access="system.devops.ai_provider.view">
+                                <Button block icon={<Icon icon="ic:outline-settings"  width={18} height={18}/>} onClick={()=>openModal(provider)} classNames={{icon:'h-[18px]'}}>{$t('设置')}</Button>
+                            </WithPermission>
+                        </div>
+                </Card>
+        )
+    });
+
+    const ModelCardArea = ({modelList,className}:{ modelList:AiSettingListItem[] ;className?:string})=>{
+        return ( <>
+            { modelList.length > 0 ?
+            <div 
+                className={className}
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gap: '20px',
+                }}
+            >
+                {modelList.map((provider:AiSettingListItem)=><CardBox key={provider.id} provider={provider} />)}
+            </div> : <Empty  image={Empty.PRESENTED_IMAGE_SIMPLE}/>
+        }</>
+        )
+    }
 
     return (<>
         <InsidePage 
-            className="pb-PAGE_INSIDE_B overflow-y-auto"
-            pageTitle={$t('AI 模型供应商')} 
+            className="overflow-y-auto pb-PAGE_INSIDE_B"
+            pageTitle={$t('AI 模型管理')}
+            description={$t('配置好 AI 模型后，你可以使用对应的大模型来创建 AI 服务')} 
             showBorder={false}
             scrollPage={false}
             // customBtn={
@@ -202,55 +238,17 @@ const AiSettingList = ()=>{
             // }
             >
             <Spin className="h-full" wrapperClassName="h-full pr-PAGE_INSIDE_X"  indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading}>
-            {aiSettingList && aiSettingList.length > 0 ?  <div 
-                    style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                        gap: '20px',
-                    }}
-                >
-                    {aiSettingList.map((provider:AiSettingListItem)=>(
-                        <Card title={
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center" dangerouslySetInnerHTML={{ __html: provider.logo }} />
-                                    <Tag bordered={false} color={provider.configured ? 'green' : undefined} className="h-[22px] px-[4px] text-center">
-                                        {provider.configured ? $t('已配置') : $t('未配置')}
-                                    </Tag>
-                            </div> }
-                                className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible  h-[156px] m-0 flex flex-col "  
-                                classNames={{header:'border-b-[0px] p-[20px] px-[24px]', body:"pt-0 flex-1"}} 
-                                >
-                                    <div className="flex flex-col gap-btnbase h-full justify-between">
-                                        <div className="flex items-center w-full h-[32px]">
-                                                <label className="text-nowrap">{$t('默认')}：</label>
-                                                <WithPermission access="system.devops.ai_provider.edit">
-                                                    <Select
-                                                        value={provider.defaultLlm}
-                                                        variant="borderless"
-                                                        style={{ width: '100%' }}
-                                                        onChange={(value)=>changeDefaultModel(value, provider)}
-                                                        labelRender={(props)=>{
-                                                            return !props.label && !llmMap.get(provider.id)?.list?.length ? 
-                                                                <div className="flex items-center">
-                                                                    <div className="flex items-center" dangerouslySetInnerHTML={{__html:provider.defaultLlmLogo}}></div>
-                                                                    <span>{provider.defaultLlm}</span>
-                                                                </div>: props.label }}
-    x                                                    options={modelOptions}
-                                                         onFocus={()=>{if(!llmMap.get(provider.id)?.loading  && !llmMap.get(provider.id)?.list?.length ){
-                                                            getLlmList(provider)
-                                                            setCurrentProvider(provider.id)
-                                                            }}}
-                                                         loading={llmMap.get(provider.id)?.loading || !!(loadingDefaultModel && loadingDefaultModel === provider.id )}
-                                                        />
-                                                </WithPermission>
-                                            </div>
-                                        <WithPermission access="system.devops.ai_provider.view">
-                                            <Button block icon={<Icon icon="ic:outline-settings"  width={18} height={18}/>} onClick={()=>openModal(provider)} classNames={{icon:'h-[18px]'}}>{$t('设置')}</Button>
-                                        </WithPermission>
-                                    </div>
-                            </Card>
-                    ))}
-                </div>:<Empty  image={Empty.PRESENTED_IMAGE_SIMPLE}/>}
+            {aiSettingList && aiSettingList.length > 0 ? <div>
+                <p className="text-[14px] text-[#666] mb-[4px] font-bold">{$t('已配置')}</p>
+                <ModelCardArea className="mb-[20px]" modelList={aiSettingList.filter((item)=>item.configured) || [] }/>
+                    {
+                        aiSettingList.filter((item)=>!item.configured).length > 0 && <>
+                            <Divider style={{margin:'20px 0 !important;'}} />
+                            <p className="text-[14px] text-[#666]  mb-[4px] mt-[20px]  font-bold">{$t('未配置')}</p>
+                            <ModelCardArea modelList={aiSettingList.filter((item)=>!item.configured) || [] }/>
+                        </>
+                    }
+            </div>:<Empty  image={Empty.PRESENTED_IMAGE_SIMPLE}/>}
         </Spin>
         </InsidePage>
     </>)
