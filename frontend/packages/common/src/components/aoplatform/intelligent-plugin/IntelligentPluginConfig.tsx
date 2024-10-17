@@ -176,7 +176,7 @@ export const IntelligentPluginConfig =  forwardRef<IntelligentPluginConfigHandle
     const { state } = useGlobalContext()
 
     useEffect(()=>{
-        setValidateLanguage(state.language === 'cn' ? 'zh-CN' : 'en-US')
+        setValidateLanguage(state.language)
     },[state.language])
 
     const pluginEditSchema = {

@@ -353,14 +353,14 @@ export default function SystemRunning(){
           labelCfg: {
             style: {
               fill: '5B8FF9',
-              opacity: 0 // 将透明度设置为0,隐藏提示信息,hover 才出现
+              opacity: 0 
             }
           }
         },
         defaultCombo: {
           labelCfg: {
             style: {
-              fill: '#666', // combo 的文本颜色
+              fill: '#666'
             },
           },
         },

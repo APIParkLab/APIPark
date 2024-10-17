@@ -10,9 +10,10 @@ import { useOutletContext, useParams } from "react-router-dom"
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes"
 import { TenantManagementServiceListItem } from "../../../const/serviceHub/type"
 import { ApprovalModalContent } from "./ApprovalModalContent"
-import { checkAccess } from "@common/utils/permission"
 import { useGlobalContext } from "@common/contexts/GlobalStateContext"
 import { $t } from "@common/locales"
+import WithPermission from "@common/components/aoplatform/WithPermission"
+import { checkAccess } from "@common/utils/permission"
 
 export default function ManagementInsideService(){
     const {message, modal} = App.useApp()
@@ -99,10 +100,18 @@ export default function ManagementInsideService(){
             },
             width:600,
             okText:$t('确认'),
-            okButtonProps:{
-                disabled : !checkAccess( `team.application.authorization.${type}`, accessData)
-            },
             cancelText:$t('取消'),
+            okButtonProps:{
+                disabled : !checkAccess( `team.application.authorization.${type}`, accessData )
+            },
+            footer: (_, { OkBtn, CancelBtn }) => (
+                <> 
+                      <CancelBtn />
+                      <WithPermission access={`team.application.authorization.${type}`}>
+                        <OkBtn />
+                      </WithPermission>
+                </>
+            ),
             closable:true,
             icon:<></>,
         })
@@ -132,11 +141,11 @@ export default function ManagementInsideService(){
         }:{
             key: 'cancelSub',
             label: (
-                // <WithPermission access="system.organization.member.department.delete"  key="deletePermission">
+                // <WithPermission access="team.application.authorization.delete"  showDisabled={true} key="deletePermission">
                     <Button key="cancelSub" type="text" className="h-[32px] border-none p-0 flex items-center bg-transparent " onClick={()=>openModal('cancelSub',entity)}>
                     {$t('取消订阅')}
                 </Button>
-                // </WithPermission>
+                //  </WithPermission>
             ),
         },
     ]

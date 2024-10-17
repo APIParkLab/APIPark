@@ -32,13 +32,14 @@ const WithPermission = ({access, tooltip, children,disabled, showDisabled = true
 
 
     return (
-      <>
+      <>{
+      }
         {editAccess && !disabled && cloneElement(children)}
         {editAccess && disabled  && <Tooltip  title={tooltip}> 
             { cloneElement(children, {disabled:true})}
              </Tooltip>}
-        {!editAccess && (children?.type !== Button && children?.type !== Upload && showDisabled ) && <Tooltip  title={tooltip ?? $t("暂无操作权限，请联系管理员分配。")}> 
-            { cloneElement(children, {disabled:true})}
+        {!editAccess && (children?.type !== Button && children?.type !== Upload && showDisabled) && <Tooltip  title={tooltip ?? $t("暂无操作权限，请联系管理员分配。")}> 
+            { cloneElement(children, {disabled:true,okButtonProps:{disabled:true}})}
              </Tooltip>}
         
       </>

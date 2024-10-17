@@ -60,7 +60,7 @@ const SystemInsideApiDocument = forwardRef<SystemInsideApiDocumentHandle,SystemI
                     uploadFile(file)
                     return false;  
                 }}>
-                <Button type="primary">{$t(type === 'new' ? '上传文件' :'替换文件')}</Button>
+                <Button type="primary">{$t(type === 'new' ? '上传 OpenAPI 文档 (.json/.yaml)' :'替换 OpenAPI 文档 (.json/.yaml)')}</Button>
             </Upload>
         </WithPermission>
         )
@@ -113,7 +113,7 @@ const SystemInsideApiDocument = forwardRef<SystemInsideApiDocumentHandle,SystemI
             <div className="flex items-center gap-btnbase justify-end pb-btnbase pr-btnbase mr-PAGE_INSIDE_X">
                 <UploadBtn type="edit" updated={updated}/>
                 <WithPermission access="team.service.api_doc.edit">
-                    <Button type="primary" onClick={()=>setShowEditor(true)}>{$t('打开编辑器')}</Button>
+                    <Button type="primary" onClick={()=>setShowEditor(true)}>{$t('打开 OpenAPI YAML 编辑器')}</Button>
                 </WithPermission>
             </div>
             <div className="flex-1 overflow-auto pr-PAGE_INSIDE_X">
@@ -137,7 +137,7 @@ const SystemInsideApiDocument = forwardRef<SystemInsideApiDocumentHandle,SystemI
                     <div className="flex items-center gap-btnbase justify-center">
                         <UploadBtn type="new" updated={updated}/>
                         <WithPermission access="team.service.api_doc.edit">
-                            <Button type="primary" onClick={()=>setShowEditor(true)}>{$t('打开编辑器')}</Button>
+                            <Button type="primary" onClick={()=>setShowEditor(true)}>{$t('打开 OpenAPI YAML 编辑器')}</Button>
                         </WithPermission>
                     </div>
                 </Empty>}

@@ -1,21 +1,18 @@
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx"
 import {ActionType} from "@ant-design/pro-components";
 import  {FC, useEffect, useMemo, useRef, useState} from "react";
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {App, Divider} from "antd";
 import {BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import { SimpleMemberItem} from '@common/const/type.ts'
 import {useFetch} from "@common/hooks/http.ts";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
-import SystemInsideRouterCreate from "./SystemInsideRouterCreate.tsx";
-import {useSystemContext} from "../../../contexts/SystemContext.tsx";
 import { SYSTEM_API_TABLE_COLUMNS } from "../../../const/system/const.tsx";
-import {SystemApiTableListItem, SystemInsideRouterCreateHandle } from "../../../const/system/type.ts";
+import {SystemApiTableListItem } from "../../../const/system/type.ts";
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission.tsx";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { checkAccess } from "@common/utils/permission.ts";
-import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter.tsx";
 import { $t } from "@common/locales/index.ts";
 
 const SystemInsideRouterList:FC = ()=>{
@@ -26,15 +23,10 @@ const SystemInsideRouterList:FC = ()=>{
     const [tableHttpReload, setTableHttpReload] = useState(true);
     const {fetchData} = useFetch()
     const pageListRef = useRef<ActionType>(null);
-    const {apiPrefix, prefixForce} = useSystemContext()
     const [memberValueEnum, setMemberValueEnum] = useState<SimpleMemberItem[]>([])
     const {accessData,state} = useGlobalContext()
-    const [drawerType,setDrawerType]= useState<'add'|'edit'|'view'|'upstream'|undefined>()
-    const [open, setOpen] = useState(false);
-    const drawerAddFormRef = useRef<SystemInsideRouterCreateHandle>(null)
     const {serviceId, teamId}  = useParams<RouterParams>()
-
-    const [curApi, setCurApi] = useState<SystemApiTableListItem>()
+    const navigator = useNavigate()
 
     const getRoutesList = (): Promise<{ data: SystemApiTableListItem[], success: boolean }>=> {
         if(!tableHttpReload){
@@ -113,7 +105,7 @@ const SystemInsideRouterList:FC = ()=>{
             fixed:'right',
             valueType: 'option',
             render: (_: React.ReactNode, entity: SystemApiTableListItem) => [
-                <TableBtnWithPermission  access="team.service.router.edit" key="edit"  btnType="edit"  onClick={()=>{openDrawer('edit',entity)}}  btnTitle="编辑"/>,
+                <TableBtnWithPermission  access="team.service.router.edit" key="edit"  btnType="edit"  onClick={()=>{navigator(`/service/${teamId}/inside/${serviceId}/route/${entity.id}`)}}  btnTitle="编辑"/>,
                  <Divider type="vertical" className="mx-0"  key="div3"/>,
                  <TableBtnWithPermission  access="team.service.router.delete" key="delete"   btnType="delete"  onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/>,
             ],
@@ -135,12 +127,12 @@ const SystemInsideRouterList:FC = ()=>{
         }
     }
 
-    const openDrawer = (type:'add'|'edit'|'view',entity?:SystemApiTableListItem)=>{
-        setCurApi(entity)
-        setDrawerType(type)
-    }
+    // const openDrawer = (type:'add'|'edit'|'view',entity?:SystemApiTableListItem)=>{
+    //     setCurApi(entity)
+    //     setDrawerType(type)
+    // }
 
-    useEffect(()=>{drawerType !== undefined ? setOpen(true):setOpen(false)},[drawerType])
+    // useEffect(()=>{drawerType !== undefined ? setOpen(true):setOpen(false)},[drawerType])
 
     useEffect(() => {
         setBreadcrumb([
@@ -155,10 +147,10 @@ const SystemInsideRouterList:FC = ()=>{
         manualReloadTable()
     }, [serviceId]);
 
-    const onClose = () => {
-        setDrawerType(undefined);
-        setCurApi(undefined)
-      };
+    // const onClose = () => {
+    //     setDrawerType(undefined);
+    //     setCurApi(undefined)
+    //   };
     
     const columns = useMemo(()=>{
         return [...SYSTEM_API_TABLE_COLUMNS].map(x=>{
@@ -179,17 +171,17 @@ const SystemInsideRouterList:FC = ()=>{
             return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
     },[memberValueEnum,state.language])
 
-    const handlerSubmit:() => Promise<string | boolean>|undefined= ()=>{
-        switch(drawerType){
-            case 'add':{
-                return drawerAddFormRef.current?.save()?.then((res)=>{res && manualReloadTable();return res})
-            }
-            case 'edit':{
-                return drawerAddFormRef.current?.save()?.then((res)=>{res && manualReloadTable();return res})
-            }
-            default:return undefined
-        }
-    }
+    // const handlerSubmit:() => Promise<string | boolean>|undefined= ()=>{
+    //     switch(drawerType){
+    //         case 'add':{
+    //             return drawerAddFormRef.current?.save()?.then((res)=>{res && manualReloadTable();return res})
+    //         }
+    //         case 'edit':{
+    //             return drawerAddFormRef.current?.save()?.then((res)=>{res && manualReloadTable();return res})
+    //         }
+    //         default:return undefined
+    //     }
+    // }
 
     return (
         <>
@@ -201,7 +193,8 @@ const SystemInsideRouterList:FC = ()=>{
                 dataSource={tableListDataSource}
                 addNewBtnTitle={$t('添加路由')}
                 searchPlaceholder={$t('输入 URL 查找路由')}
-                onAddNewBtnClick={()=>{openDrawer('add')}}
+                // onAddNewBtnClick={()=>{openDrawer('add')}}
+                onAddNewBtnClick={()=>{navigator(`/service/${teamId}/inside/${serviceId}/route/create`)}}
                 addNewBtnAccess="team.service.router.add"
                 tableClickAccess="team.service.router.view"
                 manualReloadTable={manualReloadTable}
@@ -209,10 +202,10 @@ const SystemInsideRouterList:FC = ()=>{
                 onChange={() => {
                     setTableHttpReload(false)
                 }}
-                onRowClick={(row:SystemApiTableListItem)=>openDrawer('edit',row)}
+                onRowClick={(row:SystemApiTableListItem)=>navigator(`/service/${teamId}/inside/${serviceId}/route/${row.id}`)}
                 tableClass="mr-PAGE_INSIDE_X "
                 />
-                <DrawerWithFooter 
+                {/* <DrawerWithFooter 
                     title={drawerType === 'add' ? $t("添加路由"):$t("路由详情")} 
                     open={open} 
                     onClose={onClose} 
@@ -220,7 +213,7 @@ const SystemInsideRouterList:FC = ()=>{
                     showOkBtn={drawerType !== 'view'} 
                     >
                          <SystemInsideRouterCreate ref={drawerAddFormRef} type={drawerType as 'add'|'edit'|'copy'}  entity={drawerType === 'edit' ? curApi : undefined} modalApiPrefix={apiPrefix} serviceId={serviceId!} teamId={teamId!} modalPrefixForce={prefixForce}/>
-                </DrawerWithFooter>
+                </DrawerWithFooter> */}
         </>
     )
 
