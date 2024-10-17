@@ -1,1 +1,1 @@
-{"group":"eolinker.com","project":"apinto","name":"plugin_app","version":"innert","render":{"type":"object","eo:type":"object"}}
+{"group":"eolinker.com","project":"apinto","name":"plugin_app","version":"innert","render":{"type":"object","eo:type":"object","properties":{"force_auth":{"type":"boolean","eo:type":"boolean","label":"是否强制认证"}},"ui:sort":["force_auth"]}}

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -31,6 +32,20 @@ func (i *imlServiceService) ServiceList(ctx context.Context, serviceIds ...strin
 		w["uuid"] = serviceIds
 	}
 	w["as_server"] = true
+	list, err := i.store.List(ctx, w)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(list, FromEntity), nil
+}
+
+func (i *imlServiceService) ServiceListByKind(ctx context.Context, kind Kind, serviceIds ...string) ([]*Service, error) {
+	w := make(map[string]interface{})
+	if len(serviceIds) > 0 {
+		w["uuid"] = serviceIds
+	}
+	w["as_server"] = true
+	w["kind"] = kind
 	list, err := i.store.List(ctx, w)
 	if err != nil {
 		return nil, err
@@ -131,21 +146,25 @@ func uniquestHandler(i *Create) []map[string]interface{} {
 	return []map[string]interface{}{{"uuid": i.Id}}
 }
 func createEntityHandler(i *Create) *service.Service {
+	cfg, _ := json.Marshal(i.AdditionalConfig)
 	now := time.Now()
 	return &service.Service{
-		Id:          0,
-		UUID:        i.Id,
-		Name:        i.Name,
-		CreateAt:    now,
-		UpdateAt:    now,
-		Description: i.Description,
-		Logo:        i.Logo,
-		Prefix:      i.Prefix,
-		Team:        i.Team,
-		ServiceType: i.ServiceType.Int(),
-		Catalogue:   i.Catalogue,
-		AsServer:    i.AsServer,
-		AsApp:       i.AsApp,
+		Id:               0,
+		UUID:             i.Id,
+		Name:             i.Name,
+		CreateAt:         now,
+		UpdateAt:         now,
+		Description:      i.Description,
+		Logo:             i.Logo,
+		Prefix:           i.Prefix,
+		Team:             i.Team,
+		ServiceType:      i.ServiceType.Int(),
+		ApprovalType:     i.ApprovalType.Int(),
+		Kind:             i.Kind.Int(),
+		AdditionalConfig: string(cfg),
+		Catalogue:        i.Catalogue,
+		AsServer:         i.AsServer,
+		AsApp:            i.AsApp,
 	}
 }
 func updateHandler(e *service.Service, i *Edit) {
@@ -158,11 +177,20 @@ func updateHandler(e *service.Service, i *Edit) {
 	if i.ServiceType != nil {
 		e.ServiceType = (*i.ServiceType).Int()
 	}
+	if i.Kind != nil {
+		e.Kind = (*i.Kind).Int()
+	}
 	if i.Catalogue != nil {
 		e.Catalogue = *i.Catalogue
 	}
 	if i.Logo != nil {
 		e.Logo = *i.Logo
 	}
-
+	if i.AdditionalConfig != nil {
+		cfg, _ := json.Marshal(*i.AdditionalConfig)
+		e.AdditionalConfig = string(cfg)
+	}
+	if i.ApprovalType != nil {
+		e.ApprovalType = (*i.ApprovalType).Int()
+	}
 }

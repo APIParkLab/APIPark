@@ -18,6 +18,7 @@ type IServiceService interface {
 	SearchPublicServices(ctx context.Context, keyword string) ([]*Service, error)
 	Check(ctx context.Context, id string, rule map[string]bool) (*Service, error)
 	ServiceList(ctx context.Context, serviceIds ...string) ([]*Service, error)
+	ServiceListByKind(ctx context.Context, kind Kind, serviceIds ...string) ([]*Service, error)
 	AppList(ctx context.Context, appIds ...string) ([]*Service, error)
 }
 

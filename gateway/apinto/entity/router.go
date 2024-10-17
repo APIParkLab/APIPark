@@ -26,7 +26,6 @@ type Router struct {
 	Retry     int                `json:"retry"`
 	TimeOut   int                `json:"time_out"`
 	Labels    map[string]string  `json:"labels"`
-	Disable   bool               `json:"disable"`
 }
 
 type Rule struct {
@@ -149,8 +148,8 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 	}
 	for k, v := range r.Plugins {
 		plugin[k] = &Plugin{
-			Disable: false,
-			Config:  v,
+			Disable: v.Disable,
+			Config:  v.Config,
 		}
 	}
 	hosts := make([]string, 0, len(r.Host))
@@ -160,10 +159,6 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 	labels := make(map[string]string)
 	if r.Labels != nil {
 		labels = r.Labels
-	}
-	protocols := []string{"http", "https"}
-	if len(r.Protocols) > 0 {
-		protocols = r.Protocols
 	}
 
 	return &Router{
@@ -175,18 +170,16 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 			Version:     version,
 			Matches:     matches,
 		},
-		Host:   hosts,
-		Method: r.Methods,
-
+		Host:      hosts,
+		Method:    r.Method,
 		Location:  r.Path,
 		Rules:     rules,
-		Service:   r.Service,
+		Service:   fmt.Sprintf("%s@service", r.Service),
 		Plugins:   plugin,
 		Retry:     r.Retry,
 		TimeOut:   r.Timeout,
 		Labels:    labels,
-		Protocols: protocols,
-		Disable:   r.Disable,
+		Protocols: []string{"http", "https"},
 	}
 }
 

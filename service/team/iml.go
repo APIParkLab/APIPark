@@ -3,11 +3,11 @@ package team
 import (
 	"context"
 	"time"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/eolinker/go-common/auto"
-	
+
 	"github.com/APIParkLab/APIPark/service/universally"
 	"github.com/APIParkLab/APIPark/stores/team"
 )
@@ -26,13 +26,14 @@ type imlTeamService struct {
 
 func (s *imlTeamService) OnComplete() {
 	s.IServiceGet = universally.NewGetSoftDelete[Team, team.Team](s.teamStore, FromEntity)
-	
+
 	s.IServiceDelete = universally.NewSoftDelete[team.Team](s.teamStore)
-	
+
 	s.IServiceCreate = universally.NewCreatorSoftDelete[CreateTeam, team.Team](s.teamStore, "team", createEntityHandler, uniquestHandler, labelHandler)
-	
+
 	s.IServiceEdit = universally.NewEdit[EditTeam, team.Team](s.teamStore, updateHandler, labelHandler)
 	auto.RegisterService("team", s)
+
 }
 
 func (s *imlTeamService) GetLabels(ctx context.Context, ids ...string) map[string]string {
@@ -70,6 +71,6 @@ func updateHandler(e *team.Team, i *EditTeam) {
 	if i.Description != nil {
 		e.Description = *i.Description
 	}
-	
+
 	e.UpdateAt = time.Now()
 }

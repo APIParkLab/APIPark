@@ -3,17 +3,17 @@ package apinto
 import (
 	"context"
 	"errors"
-	"fmt"
+
 	"github.com/APIParkLab/APIPark/gateway/apinto/driver"
-	
+
 	"github.com/eolinker/eosc/process-admin/cmd/proto"
-	
+
 	"github.com/eolinker/go-common/encoding"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/APIParkLab/APIPark/gateway/apinto/entity"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
 	admin_client "github.com/eolinker/eosc/process-admin/client"
 )
@@ -23,7 +23,7 @@ var _ gateway.IProjectClient = &ProjectClient{}
 func init() {
 	driver.RegisterApiPublishHandler(func(ctx context.Context, client admin_client.Client, api *entity.Router, extends map[string]any) error {
 		return client.Set(ctx, api.ID, api)
-		
+
 	})
 }
 
@@ -55,30 +55,34 @@ func (p *ProjectClient) online(ctx context.Context, project *gateway.ProjectRele
 	if project == nil {
 		return nil
 	}
-	if project.Upstream == nil {
-		return fmt.Errorf("upstream is nil")
-	}
 	matches := map[string]string{
 		"project": project.Id,
 	}
-	
-	upstreams, err := matchLabels[entity.Service](ctx, p.client, ProfessionService, matches)
-	if err != nil {
-		if !errors.Is(err, proto.Nil) {
+	if project.Upstream != nil {
+		//upstreams, err := matchLabels[entity.Service](ctx, p.client, gateway.ProfessionService, matches)
+		//if err != nil {
+		//	if !errors.Is(err, proto.Nil) {
+		//		return err
+		//	}
+		//}
+		//upstreamMap := utils.SliceToMap(upstreams, func(t *entity.Service) string {
+		//	return t.ID
+		//})
+
+		upstreamId := genWorkerID(project.Upstream.ID, gateway.ProfessionService)
+		err := p.client.Set(ctx, upstreamId, entity.ToService(project.Upstream, project.Version, matches))
+		if err != nil {
 			return err
 		}
+		//for id := range upstreamMap {
+		//	err = p.client.Del(ctx, id)
+		//	if err != nil {
+		//		return err
+		//	}
+		//}
 	}
-	upstreamMap := utils.SliceToMap(upstreams, func(t *entity.Service) string {
-		return t.ID
-	})
-	
-	upstreamId := genWorkerID(project.Upstream.ID, ProfessionService)
-	err = p.client.Set(ctx, upstreamId, entity.ToService(project.Upstream, project.Version, matches))
-	if err != nil {
-		return err
-	}
-	delete(upstreamMap, upstreamId)
-	routers, err := matchLabels[entity.Router](ctx, p.client, ProfessionRouter, matches)
+
+	routers, err := matchLabels[entity.Router](ctx, p.client, gateway.ProfessionRouter, matches)
 	if err != nil {
 		if !errors.Is(err, proto.Nil) {
 			return err
@@ -87,16 +91,15 @@ func (p *ProjectClient) online(ctx context.Context, project *gateway.ProjectRele
 	routerMap := utils.SliceToMap(routers, func(t *entity.Router) string {
 		return t.ID
 	})
-	
+
 	for _, api := range project.Apis {
-		id := genWorkerID(api.ID, ProfessionRouter)
+		id := genWorkerID(api.ID, gateway.ProfessionRouter)
 		if api.Labels == nil {
 			api.Labels = make(map[string]string)
 		}
-		api.Service = upstreamId
 		api.Labels["provider"] = project.Id
 		routerInfo := entity.ToRouter(api, project.Version, matches)
-		
+
 		err = driver.ApiPublish(ctx, p.client, routerInfo, api.Extends)
 		if err != nil {
 			return err
@@ -113,15 +116,9 @@ func (p *ProjectClient) online(ctx context.Context, project *gateway.ProjectRele
 		if err != nil {
 			return err
 		}
-		
+
 	}
-	for id := range upstreamMap {
-		err = p.client.Del(ctx, id)
-		if err != nil {
-			return err
-		}
-	}
-	
+
 	return nil
 }
 
@@ -137,16 +134,16 @@ func (p *ProjectClient) Offline(ctx context.Context, projects ...*gateway.Projec
 			return err
 		}
 	}
-	
+
 	return p.client.Commit(ctx)
 }
 
 func (p *ProjectClient) delete(ctx context.Context, id string) error {
-	err := p.deleteByLabels(ctx, ProfessionRouter, map[string]string{"project": id})
+	err := p.deleteByLabels(ctx, gateway.ProfessionRouter, map[string]string{"project": id})
 	if err != nil {
 		return err
 	}
-	return p.deleteByLabels(ctx, ProfessionService, map[string]string{"project": id})
+	return p.deleteByLabels(ctx, gateway.ProfessionService, map[string]string{"project": id})
 }
 func matchLabels[T any](ctx context.Context, client admin_client.Client, profession string, labels map[string]string, t ...[]*T) ([]*T, error) {
 	list, err := client.MatchLabels(ctx, profession, labels)
