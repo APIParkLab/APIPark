@@ -63,12 +63,12 @@ const AiServiceInsideRouterCreate = () => {
         return variablesTableRef?.current?.validateFields().then(()=>{
             return form.validateFields().then((formValue)=>{
                 const {name, path, description, variables, prompt, timeout, retry} = formValue
-                const body = {name, path: !routeId && prefixForce ?  `${apiPrefix}/${path}`:path , description,timeout, retry,aiPrompt:{variables:variables, prompt:prompt},aiModel:{id:defaultLlm?.id, config:defaultLlm?.config}}
+                const body = {name, path: prefixForce ?  `${apiPrefix}/${path}`:path , description,timeout, retry,aiPrompt:{variables:variables, prompt:prompt},aiModel:{id:defaultLlm?.id, provider:defaultLlm?.provider, config:defaultLlm?.config}}
                 return fetchData<BasicResponse<null>>('service/ai-router',{method: routeId ? 'PUT' : 'POST',eoBody:(body), eoParams: {service:serviceId,team:teamId, ...(routeId ? {router:routeId}: {})},eoTransformKeys:['aiPrompt','aiModel']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
                         message.success(msg || $t(RESPONSE_TIPS.success))
-                        navigator(`/aiservice/${teamId}/inside/${serviceId}/route`)
+                        navigator(`/service/${teamId}/aiInside/${serviceId}/route`)
                         return Promise.resolve(true)
                     }else{
                         message.error(msg || $t(RESPONSE_TIPS.error))
@@ -94,7 +94,8 @@ const AiServiceInsideRouterCreate = () => {
                 const {path, aiPrompt,aiModel} = data.api
                 form.setFieldsValue({...data.api,...aiPrompt, path:prefixForce && path?.startsWith(apiPrefix + '/')? path.slice((apiPrefix?.length || 0) + 1) : path })
                 setVariablesTable(aiPrompt.variables as VariableItems[])
-                setDefaultLlm(prev => ({...prev, id:aiModel?.id, config:aiModel.config}) as (AiProviderDefaultConfig & { config: string; }))
+                setDefaultLlm(prev => ({...prev, provider: aiModel?.provider, id:aiModel?.id, config:aiModel.config}) as (AiProviderDefaultConfig & { config: string; }))
+                getDefaultModelConfig(aiModel?.provider)
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
             }
@@ -102,15 +103,16 @@ const AiServiceInsideRouterCreate = () => {
         .finally(()=>setLoading(false))
     }
 
-    const getDefaultModelConfig = ()=>{
-        fetchData<BasicResponse<{llms:AiProviderLlmsItems[],provider:AiProviderDefaultConfig}>>('ai/provider/llms',{method:'GET',eoParams:{provider:aiServiceInfo?.provider?.id}, eoTransformKeys:['default_llm']}).then(response=>{
+    const getDefaultModelConfig = (provider?:string)=>{
+        fetchData<BasicResponse<{llms:AiProviderLlmsItems[],provider:AiProviderDefaultConfig}>>('ai/provider/llms',{method:'GET',eoParams:{provider:provider ?? aiServiceInfo?.provider?.id}, eoTransformKeys:['default_llm']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setLlmList(data.llms)
                 setDefaultLlm(prev => {
                     const llmSetting = data.llms?.find((x:AiProviderLlmsItems)=>x.id ===( prev?.id ?? data.provider.defaultLlm))
                     return {...prev, 
-                        defaultLlm:data.provider.defaultLlm, 
+                        defaultLlm:data.provider.defaultLlm,
+                        provider:data.provider.id, 
                         name:data.provider.name,
                         config:llmSetting?.config || '',
                         ...(llmSetting ?? {})
@@ -124,7 +126,7 @@ const AiServiceInsideRouterCreate = () => {
 
 
     useEffect(()=>{
-        aiServiceInfo?.provider && getDefaultModelConfig()
+        !routeId && aiServiceInfo?.provider && getDefaultModelConfig()
     },[
         aiServiceInfo
     ])
@@ -175,7 +177,7 @@ const AiServiceInsideRouterCreate = () => {
     
     const handlerSubmit:() => Promise<boolean>|undefined= ()=>{
         return drawerAddFormRef.current?.save()?.then((res:{id:string, config:string})=>{
-            setDefaultLlm(prev => ({...prev, id:res.id, config:res.config, logo:llmList?.find((x:AiProviderLlmsItems)=>x.id === res.id)?.logo}) as (AiProviderDefaultConfig & { config: string; }))
+            setDefaultLlm(prev => ({...prev, provider:res.provider, id:res.id, config:res.config, logo:llmList?.find((x:AiProviderLlmsItems)=>x.id === res.id)?.logo}) as (AiProviderDefaultConfig & { config: string; }))
         return true})
     }
 
@@ -185,16 +187,16 @@ const AiServiceInsideRouterCreate = () => {
 
     return (
         
-        <InsidePage pageTitle={ 'AI 路由设置'|| '-'} 
+        <InsidePage pageTitle={ $t('AI 路由设置')|| '-'} 
             showBorder={false}
             scrollPage={false}
             className="overflow-y-auto"
-            backUrl={`/aiservice/${teamId}/inside/${serviceId}/route`}
+            backUrl={`/service/${teamId}/aiInside/${serviceId}/route`}
             customBtn={
-                <div className="flex gap-btnbase items-center">
+                <div className="flex items-center gap-btnbase">
                     <Button icon={<Icon icon='ic:baseline-tune' height={18} width={18} />} iconPosition='end' onClick={()=>openDrawer('edit')}>
-                        <div className="flex items-center gap-[4px]">
-                            <span  className="flex items-center " dangerouslySetInnerHTML={{__html: defaultLlm?.logo || ''}}></span>
+                        <div className="flex items-center gap-[10px]">
+                            <span  className="flex items-center  h-[24px] ai-setting-svg-container " dangerouslySetInnerHTML={{__html: defaultLlm?.logo || ''}}></span>
                             <span>{defaultLlm?.id || defaultLlm?.defaultLlm}</span>
                             {defaultLlm?.scopes?.map(x=><Tag >{x?.toLocaleUpperCase()}</Tag>)}
                         </div>
@@ -211,14 +213,14 @@ const AiServiceInsideRouterCreate = () => {
                     labelAlign='left'
                     scrollToFirstError
                     form={form}
-                    className="mx-auto  flex flex-col  h-full"
+                    className="flex flex-col h-full mx-auto"
                     name="AiServiceInsideRouterCreate"
                     onValuesChange={handleValuesChange}
                     onFinish={onFinish}
                     autoComplete="off"
                 >
                     <div className="">
-                        <Row className="flex items-center gap-btnbase w-full justify-between">
+                        <Row className="flex items-center justify-between w-full gap-btnbase">
                             <Form.Item<AiServiceRouterField>
                                 className="flex-1"
                                 label={$t("路由名称")}
@@ -247,7 +249,7 @@ const AiServiceInsideRouterCreate = () => {
                         </Form.Item>
 
                         <Form.Item<AiServiceRouterField>
-                                    label={<div className="w-full flex justify-between items-center"><span>{$t("变量")}</span><a className="flex items-center gap-[4px]" onClick={addVariable}><Icon icon="ic:baseline-add" width={16} height={16} />New</a></div>}
+                                    label={<div className="flex items-center justify-between w-full"><span>{$t("变量")}</span><a className="flex items-center gap-[4px]" onClick={addVariable}><Icon icon="ic:baseline-add" width={16} height={16} />New</a></div>}
                                     name="variables"
                                     className="[&>.ant-row>.ant-col>label]:w-full"
                                 >
@@ -264,7 +266,7 @@ const AiServiceInsideRouterCreate = () => {
                             <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t('输入这个接口的描述')}/>
                         </Form.Item>
 
-                        <Row className="flex items-center gap-btnbase w-full justify-between">
+                        <Row className="flex items-center justify-between w-full gap-btnbase">
                                 <Form.Item<AiServiceRouterField>
                                     className="flex-1"
                                     label={$t("请求超时时间")}

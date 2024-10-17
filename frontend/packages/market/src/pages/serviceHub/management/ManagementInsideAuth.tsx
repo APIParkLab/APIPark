@@ -59,7 +59,6 @@ export default function ManagementInsideAuth(){
     }
     
     const openModal =async (type:'view'|'delete'|'add'|'edit',entity?:SystemAuthorityTableListItem)=>{
-        //console.log(type,entity)
         let title:string = ''
         let content:string|React.ReactNode = ''
         switch (type){
@@ -161,7 +160,7 @@ export default function ManagementInsideAuth(){
                     const item = authList[index];
                 return (<Card className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] m-[10px]" classNames={{body:' flex items-center justify-center p-[20px]'}} >
                     <div className="w-full">
-                        <div className="flex items-center justify-between w-full"><span>{item.name}</span><div><Button  type="text" className="bg-[#7371fc20] hover:bg-[#7371fc19] text-theme" onClick={()=>openModal('view',item)}>{$t('查看')}</Button><Dropdown className="ml-btnbase" menu={{items:dropdownMenu(item)}}  trigger={['hover']} >
+                        <div className="flex items-start justify-between w-full"><span>{item.name}</span><div><Button  type="text" className="bg-[#7371fc20] hover:bg-[#7371fc19] text-theme" onClick={()=>openModal('view',item)}>{$t('查看')}</Button><Dropdown className="ml-btnbase" menu={{items:dropdownMenu(item)}}  trigger={['hover']} >
                     <Button type="text" className="px-[7px]" onClick={(e)=>{ e.stopPropagation();}}><MoreOutlined  rotate={90} className="tree-title-more" /></Button>
                </Dropdown></div></div>
                         <div> 

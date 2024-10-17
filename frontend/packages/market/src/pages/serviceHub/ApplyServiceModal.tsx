@@ -63,14 +63,14 @@ export const ApplyServiceModal = forwardRef<ApplyServiceHandle,ApplyServiceProps
             >
                 <Select className="w-INPUT_NORMAL" disabled={reApply} placeholder={$t("搜索或选择应用")} mode="multiple" options={mySystemOptionList?.filter((x)=>x.value !== entity.id)}/>
             </Form.Item>
-
+            { entity.approvalType === 'manual' &&
             <Form.Item
                 label={$t("申请理由")}
                 name="reason"
             >
                 <Input.TextArea className="w-INPUT_NORMAL" placeholder=""/>
             </Form.Item>
-
+        }
         </Form>
     </WithPermission>)
 })

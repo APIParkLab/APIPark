@@ -8,20 +8,34 @@ import { Icon } from '@iconify/react/dist/iconify.js';
 const LanguageSetting = ({mode = 'light'}:{mode?:'dark'|'light'}) => {
     const { dispatch,state} = useGlobalContext()
     const items = [
-    {
-      key: 'cn',
-      label: <Button key="cn" type="text" className="border-none p-0 flex items-center bg-transparent ">
-        {$t('简体')}
+      {
+        key: 'en-US',
+        label:<Button key="en" type="text" className="border-none p-0 flex items-center bg-transparent ">
+         English
       </Button>,
-      title: $t('简体'),
-    },
-    {
-      key: 'en',
-      label:<Button key="en" type="text" className="border-none p-0 flex items-center bg-transparent ">
-      {$t('英文')}
-    </Button>,
-    title:$t('英文')
-    }
+      title:'English'
+      },
+      {
+        key: 'ja-JP',
+        label: <Button key="jp" type="text" className="border-none p-0 flex items-center bg-transparent ">
+          日本語
+        </Button>,
+        title: '日本語',
+      },
+      {
+        key: 'zh-TW',
+        label: <Button key="tw" type="text" className="border-none p-0 flex items-center bg-transparent ">
+           繁體中文
+        </Button>,
+        title: '繁體中文',
+      },
+      {
+        key: 'zh-CN',
+        label: <Button key="cn" type="text" className="border-none p-0 flex items-center bg-transparent ">
+            简体中文
+        </Button>,
+        title: '简体中文',
+      },
   ];
 
   const langLabel = useMemo(()=>items.find((item) => item?.key === state.language)?.title,[state.language])
@@ -30,9 +44,9 @@ const LanguageSetting = ({mode = 'light'}:{mode?:'dark'|'light'}) => {
     const savedLang = sessionStorage.getItem('i18nextLng') 
     const browserLang = navigator.language || navigator.userLanguage
     if(savedLang){
-       dispatch({ type: 'UPDATE_LANGUAGE',  language: savedLang.startsWith('cn') ? 'cn' : 'en'  });
+       dispatch({ type: 'UPDATE_LANGUAGE',  language: savedLang });
     }else{
-      dispatch({ type: 'UPDATE_LANGUAGE',  language: browserLang.startsWith('zh') ? 'cn'  : 'en' });
+      dispatch({ type: 'UPDATE_LANGUAGE',  language: browserLang });
     }
   },[
   ])

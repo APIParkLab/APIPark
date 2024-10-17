@@ -3,17 +3,7 @@ import { FormInstance, UploadFile } from "antd";
 import { EntityItem } from "@common/const/type";
 import { SubscribeEnum, SubscribeFromEnum } from "./const";
 
-export type AiServiceTableListItem = {
-    id:string;
-    name: string;
-    team: EntityItem;
-    apiNum: number;
-    description:string;
-    createTime:string;
-    updateTime:string;
-    canDelete:boolean;
-    provider:EntityItem
-}
+
 
 export type AiServiceConfigFieldType = {
     name?: string;
@@ -28,6 +18,7 @@ export type AiServiceConfigFieldType = {
     master?:string;
     serviceType?:'public'|'inner';
     catalogue?:string | string[];
+    approvalType?:string;
 };
 
 export type AiServiceSubServiceTableListItem = {

@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react"
 import EditableTableWithModal from "@common/components/aoplatform/EditableTableWithModal";
 import { PROXY_HEADER_CONFIG, UPSTREAM_PROXY_HEADER_TYPE_OPTIONS } from "../../../const/system/const";
 import { SystemApiProxyType, ProxyHeaderItem, SystemInsideApiProxyHandle, SystemInsideApiProxyProps } from "../../../const/system/type";
-import { PLACEHOLDER, VALIDATE_MESSAGE } from "@common/const/const";
+import { PLACEHOLDER, } from "@common/const/const";
 import { $t } from "@common/locales";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 

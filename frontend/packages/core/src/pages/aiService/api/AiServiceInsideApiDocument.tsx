@@ -36,7 +36,7 @@ const AiServiceInsideApiDocument = forwardRef<AiServiceInsideApiDocumentHandle,A
     const ApiPreview = ({spec}:{spec?:string | object})=>{
         return (
         <div className="h-full overflow-hidden">
-            <div className="flex-1 overflow-auto pr-PAGE_INSIDE_X">
+            <div className="flex-1 h-full overflow-auto pr-PAGE_INSIDE_X">
             <ApiDocument spec={spec}/>
             </div>
         </div>
@@ -46,7 +46,7 @@ const AiServiceInsideApiDocument = forwardRef<AiServiceInsideApiDocumentHandle,A
 
     return (<>
         <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} wrapperClassName=' h-full overflow-hidden '>
-            <div className=" h-full">
+            <div className=" h-full ai-service-api-preview">
               { apiDetail ? <ApiPreview  spec={apiDetail} />
                 : <Empty image={EmptySVG} >
                 </Empty>}

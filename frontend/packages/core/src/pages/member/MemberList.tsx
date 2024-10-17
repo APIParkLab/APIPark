@@ -139,7 +139,7 @@ const MemberList = ()=>{
             fixed:'right',
             valueType: 'option',
             render: (_: React.ReactNode, entity: MemberTableListItem) => [
-                <TableBtnWithPermission  access="system.organization.role.system.edit" key="edit" btnType="edit" onClick={()=>{openModal('editMember',entity)}} btnTitle="编辑"/>,
+                <TableBtnWithPermission  access="system.organization.member.edit" key="edit" btnType="edit" onClick={()=>{openModal('editMember',entity)}} btnTitle="编辑"/>,
             ],
         }
     ]

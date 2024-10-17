@@ -9,12 +9,13 @@ import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx
 import {useFetch} from "@common/hooks/http.ts";
 import { SimpleTeamItem ,SimpleMemberItem} from "@common/const/type.ts";
 import { SystemConfigHandle, SystemTableListItem } from "../../const/system/type.ts";
-import { SYSTEM_TABLE_COLUMNS } from "../../const/system/const.tsx";
+import { SERVICE_KIND_OPTIONS, SYSTEM_TABLE_COLUMNS } from "../../const/system/const.tsx";
 import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter.tsx";
 import SystemConfig from "./SystemConfig.tsx";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { $t } from "@common/locales/index.ts";
 import Joyride from "react-joyride";
+import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 
 const SystemList:FC = ()=>{
     const navigate = useNavigate();
@@ -117,12 +118,21 @@ const SystemList:FC = ()=>{
     
     const columns = useMemo(()=>{
         const res =  SYSTEM_TABLE_COLUMNS.map(x=>{
-            if(x.filters &&((x.dataIndex as string[])?.indexOf('master') !== -1 ) ){
+            const dataIndex=(x.dataIndex as string[]);
+
+            if(x.filters &&dataIndex?.indexOf('master') !== -1  ){
                 x.valueEnum = memberValueEnum
             } 
-            if(x.filters &&((x.dataIndex as string[])?.indexOf('team') !== -1 ) ){
+            if(x.filters &&dataIndex?.indexOf('team') !== -1 ){
                 x.valueEnum = teamList
             } 
+            if((x.dataIndex as string)==='service_kind'){
+                x.valueEnum={};
+                SERVICE_KIND_OPTIONS
+            .forEach(option => {
+                (x.valueEnum as any)[option.value] = { text: $t(option.label) };
+            });
+            }
             
             return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
             return res
@@ -141,8 +151,13 @@ const SystemList:FC = ()=>{
       ];
       
     return (
-          <div className="h-full w-full pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B">
-                {/* <Joyride steps={steps} run={true} /> */}
+                
+            <InsidePage 
+                pageTitle={$t('服务')} 
+                description={'APIPark '+$t("服务提供了高性能 API 网关，并且可以无缝接入多种大型 AI 模型，并将这些 AI 能力打包成 API 进行调用，从而大幅简化了 AI 模型的使用门槛。同时，我们的平台提供了完善的 API 管理功能，支持 API 的创建、监控、访问控制等，保障开发者可以高效、安全地开发和管理 API 服务。")}
+                showBorder={false}
+                contentClassName=" pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B"
+                >
             <PageList
                 id="global_system"
                 ref={pageListRef}
@@ -161,12 +176,12 @@ const SystemList:FC = ()=>{
                 onSearchWordChange={(e) => {
                     setTableSearchWord(e.target.value)
                 }}
-                onRowClick={(row:SystemTableListItem)=>navigate(`/service/${row.team.id}/inside/${row.id}`)}
+                onRowClick={(row:SystemTableListItem)=>navigate(`/service/${row.team.id}/${row.service_kind==='ai'?'aiInside':'inside'}/${row.id}`)}
                 />
                     <DrawerWithFooter title={$t("添加服务")} open={open} onClose={onClose} onSubmit={()=>drawerFormRef.current?.save()?.then((res)=>{res && manualReloadTable();return res})} >
                         <SystemConfig ref={drawerFormRef} />
                     </DrawerWithFooter>
-                </div>
+                </InsidePage>
     )
 
 }
