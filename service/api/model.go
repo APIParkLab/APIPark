@@ -17,6 +17,7 @@ type API struct {
 	Method    []string
 	Path      string
 	Protocols []string
+	Upstream  string
 	CreateAt  time.Time
 	IsDelete  bool
 }
@@ -29,6 +30,7 @@ type Info struct {
 	UpdateAt    time.Time
 	Service     string
 	Team        string
+	Upstream    string
 	Creator     string
 	Updater     string
 	Methods     []string
@@ -39,7 +41,10 @@ type Info struct {
 }
 
 func FromEntity(e *api.API) *API {
-
+	upstream := e.Upstream
+	if upstream == "" {
+		upstream = e.Service
+	}
 	return &API{
 		UUID:      e.UUID,
 		CreateAt:  e.CreateAt,
@@ -48,12 +53,17 @@ func FromEntity(e *api.API) *API {
 		Team:      e.Team,
 		Creator:   e.Creator,
 		Method:    e.Method,
+		Upstream:  upstream,
 		Path:      e.Path,
 		Protocols: e.Protocol,
 	}
 }
 
 func FromEntityInfo(e *api.Info) *Info {
+	upstream := e.Upstream
+	if upstream == "" {
+		upstream = e.Service
+	}
 	return &Info{
 		UUID:        e.UUID,
 		Name:        e.Name,
@@ -65,6 +75,7 @@ func FromEntityInfo(e *api.Info) *Info {
 		Creator:     e.Creator,
 		Updater:     e.Updater,
 		Methods:     e.Method,
+		Upstream:    upstream,
 		Protocols:   e.Protocol,
 		Path:        e.Path,
 		Match:       e.Match,
@@ -82,6 +93,7 @@ type Create struct {
 	Team        string
 	Methods     []string
 	Protocols   []string
+	Upstream    string
 	Disable     bool
 	Path        string
 	Match       string
@@ -94,6 +106,7 @@ type Edit struct {
 	Protocols   *[]string
 	Disable     *bool
 	Path        *string
+	Upstream    *string
 	Match       *string
 }
 
@@ -117,15 +130,17 @@ type Request struct {
 	Protocols []string `json:"protocols"`
 	Match     string   `json:"match"`
 	Disable   bool     `json:"disable"`
+	Upstream  string   `json:"upstream"`
 }
 
 type Proxy struct {
-	Path    string                   `json:"path"`
-	Timeout int                      `json:"timeout"`
-	Retry   int                      `json:"retry"`
-	Plugins map[string]PluginSetting `json:"plugins"`
-	Extends map[string]any           `json:"extends"`
-	Headers []*Header                `json:"headers"`
+	Path     string                   `json:"path"`
+	Upstream string                   `json:"upstream"`
+	Timeout  int                      `json:"timeout"`
+	Retry    int                      `json:"retry"`
+	Plugins  map[string]PluginSetting `json:"plugins"`
+	Extends  map[string]any           `json:"extends"`
+	Headers  []*Header                `json:"headers"`
 }
 
 type Header struct {

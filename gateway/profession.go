@@ -19,6 +19,10 @@ func GetDynamicResourceDriver(key string) (Worker, bool) {
 }
 
 var dynamicResourceMap = map[string]Worker{
+	"service": {
+		Profession: ProfessionService,
+		Driver:     "http",
+	},
 	"file-access-log": {
 		Profession: ProfessionOutput,
 		Driver:     "file",

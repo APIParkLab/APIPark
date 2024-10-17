@@ -7,6 +7,8 @@ import (
 	"math"
 	"sort"
 
+	"github.com/APIParkLab/APIPark/service/setting"
+
 	"github.com/eolinker/eosc/log"
 
 	"github.com/APIParkLab/APIPark/gateway"
@@ -60,8 +62,8 @@ type imlCatalogueModule struct {
 	subscribeApplyService subscribe.ISubscribeApplyService `autowired:""`
 	transaction           store.ITransaction               `autowired:""`
 	clusterService        cluster.IClusterService          `autowired:""`
-
-	root *Root
+	settingService        setting.ISettingService          `autowired:""`
+	root                  *Root
 }
 
 func (i *imlCatalogueModule) onlineSubscriber(ctx context.Context, clusterId string, sub *gateway.SubscribeRelease) error {
@@ -281,19 +283,23 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 		}
 		serviceDoc = commit.Data.Content
 	}
+	invokeAddress, _ := i.settingService.Get(ctx, setting.KeyInvokeAddress)
+
 	return &catalogue_dto.ServiceDetail{
 		Name:        s.Name,
 		Description: s.Description,
 		Document:    serviceDoc,
 		Basic: &catalogue_dto.ServiceBasic{
-			Team:       auto.UUID(s.Team),
-			ApiNum:     apiNum,
-			AppNum:     int(countMap[s.Id]),
-			Tags:       auto.List(tagIds),
-			Catalogue:  auto.UUID(s.Catalogue),
-			Version:    r.Version,
-			UpdateTime: auto.TimeLabel(r.CreateAt),
-			Logo:       s.Logo,
+			Team:          auto.UUID(s.Team),
+			ApiNum:        apiNum,
+			AppNum:        int(countMap[s.Id]),
+			Tags:          auto.List(tagIds),
+			Catalogue:     auto.UUID(s.Catalogue),
+			Version:       r.Version,
+			UpdateTime:    auto.TimeLabel(r.CreateAt),
+			Logo:          s.Logo,
+			ApprovalType:  s.ApprovalType.String(),
+			InvokeAddress: invokeAddress,
 		},
 		APIDoc: apiDoc,
 	}, nil

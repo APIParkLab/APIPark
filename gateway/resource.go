@@ -3,6 +3,7 @@ package gateway
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/APIParkLab/APIPark/model/plugin_model"
 )
 
@@ -84,6 +85,7 @@ type BasicItem struct {
 	ID          string
 	Description string
 	Version     string
+	Resource    string
 	MatchLabels map[string]string
 }
 

@@ -9,6 +9,7 @@ type API struct {
 	Driver   string    `gorm:"size:36;not null;column:driver;comment:驱动;index:driver"`                      // 驱动
 	Service  string    `gorm:"size:36;not null;column:service;comment:服务;index:service"`                    // 服务
 	Team     string    `gorm:"size:36;not null;column:team;comment:团队;index:team"`                          // 团队id
+	Upstream string    `gorm:"size:36;not null;column:upstream;comment:上游;index:upstream"`                  // 上游ID
 	Creator  string    `gorm:"size:36;not null;column:creator;comment:创建人;index:creator" aovalue:"creator"` // 创建人
 	CreateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
 	IsDelete int       `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除 0:未删除 1:已删除"`
@@ -23,6 +24,7 @@ type Info struct {
 	Description string    `gorm:"size:255;not null;column:description;comment:description"`
 	Service     string    `gorm:"size:36;not null;column:service;comment:服务;index:service"`
 	Team        string    `gorm:"size:36;not null;column:team;comment:团队;index:team"` // 团队id
+	Upstream    string    `gorm:"size:36;not null;column:upstream;comment:上游;index:upstream"`
 	Method      []string  `gorm:"size:36;not null;column:method;comment:请求方法;serializer:json" `
 	Path        string    `gorm:"size:512;not null;column:path;comment:请求路径"`
 	Protocol    []string  `gorm:"type:text;null;column:protocol;comment:协议;serializer:json"`

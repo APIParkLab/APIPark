@@ -207,10 +207,6 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 		return c.Target, c.Data
 	})
 
-	upstreamCommits, err := m.upstreamService.ListCommit(ctx, upstreamCommitIds...)
-	if err != nil {
-		return nil, err
-	}
 	apis := make([]*gateway.ApiRelease, 0, len(apiInfos))
 	for _, a := range apiInfos {
 		apiInfo := &gateway.ApiRelease{
@@ -221,7 +217,7 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 			},
 			Path:    a.Path,
 			Method:  a.Methods,
-			Service: a.Service,
+			Service: a.Upstream,
 		}
 		proxy, ok := proxyCommitMap[a.UUID]
 		if ok {
@@ -246,28 +242,34 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 	}
 	projectReleaseMap := make(map[string]*gateway.ProjectRelease)
 	upstreamReleaseMap := make(map[string]*gateway.UpstreamRelease)
-
-	for _, c := range upstreamCommits {
-		for _, partitionId := range clusterIds {
-			upstreamRelease := &gateway.UpstreamRelease{
-				BasicItem: &gateway.BasicItem{
-					ID:      c.Target,
-					Version: version,
-					MatchLabels: map[string]string{
-						"serviceId": projectID,
-					},
-				},
-				PassHost: c.Data.PassHost,
-				Scheme:   c.Data.Scheme,
-				Balance:  c.Data.Balance,
-				Timeout:  c.Data.Timeout,
-				Nodes: utils.SliceToSlice(c.Data.Nodes, func(n *upstream.NodeConfig) string {
-					return fmt.Sprintf("%s weight=%d", n.Address, n.Weight)
-				}),
-			}
-
-			upstreamReleaseMap[partitionId] = upstreamRelease
+	if len(upstreamCommitIds) > 0 {
+		upstreamCommits, err := m.upstreamService.ListCommit(ctx, upstreamCommitIds...)
+		if err != nil {
+			return nil, err
 		}
+		for _, c := range upstreamCommits {
+			for _, partitionId := range clusterIds {
+				upstreamRelease := &gateway.UpstreamRelease{
+					BasicItem: &gateway.BasicItem{
+						ID:      c.Target,
+						Version: version,
+						MatchLabels: map[string]string{
+							"serviceId": projectID,
+						},
+					},
+					PassHost: c.Data.PassHost,
+					Scheme:   c.Data.Scheme,
+					Balance:  c.Data.Balance,
+					Timeout:  c.Data.Timeout,
+					Nodes: utils.SliceToSlice(c.Data.Nodes, func(n *upstream.NodeConfig) string {
+						return fmt.Sprintf("%s weight=%d", n.Address, n.Weight)
+					}),
+				}
+
+				upstreamReleaseMap[partitionId] = upstreamRelease
+			}
+		}
+
 	}
 
 	for _, clusterId := range clusterIds {

@@ -30,14 +30,16 @@ type ServiceDetail struct {
 }
 
 type ServiceBasic struct {
-	Team       auto.Label     `json:"team" aolabel:"team"`
-	ApiNum     int            `json:"api_num"`
-	AppNum     int            `json:"app_num"`
-	Tags       []auto.Label   `json:"tags" aolabel:"tag"`
-	Catalogue  auto.Label     `json:"catalogue" aolabel:"catalogue"`
-	Version    string         `json:"version"`
-	UpdateTime auto.TimeLabel `json:"update_time"`
-	Logo       string         `json:"logo"`
+	Team          auto.Label     `json:"team" aolabel:"team"`
+	ApiNum        int            `json:"api_num"`
+	AppNum        int            `json:"app_num"`
+	Tags          []auto.Label   `json:"tags" aolabel:"tag"`
+	Catalogue     auto.Label     `json:"catalogue" aolabel:"catalogue"`
+	Version       string         `json:"version"`
+	UpdateTime    auto.TimeLabel `json:"update_time"`
+	Logo          string         `json:"logo"`
+	ApprovalType  string         `json:"approval_type"`
+	InvokeAddress string         `json:"invoke_address"`
 }
 
 type ServiceApiBasic struct {

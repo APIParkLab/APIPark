@@ -73,7 +73,8 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 				Retry:   input.Retry,
 				Plugins: plugins,
 			},
-			Disable: false,
+			Upstream: info.Provider.Id,
+			Disable:  false,
 		})
 
 		return err
@@ -100,6 +101,7 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 			Retry:   apiInfo.Proxy.Retry,
 			Plugins: apiInfo.Proxy.Plugins,
 		}
+		var upstream *string
 		if input.AiModel != nil {
 			proxy.Plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
@@ -108,7 +110,9 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 					"config":   input.AiModel.Config,
 				},
 			}
+			upstream = &info.Provider.Id
 		}
+
 		if input.AiPrompt != nil {
 			proxy.Plugins["ai_prompt"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
@@ -117,30 +121,14 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 				},
 			}
 		}
-		//path := apiInfo.Path
-		//if input.Path != nil {
-		//	inputPath := *input.Path
-		//	prefix, err := i.module.Prefix(ctx, serviceId)
-		//	if err != nil {
-		//		return err
-		//	}
-		//	if !strings.HasSuffix(inputPath, prefix) {
-		//		if inputPath[0] != '/' {
-		//			inputPath = fmt.Sprintf("/%s", inputPath)
-		//		}
-		//		path = fmt.Sprintf("%s%s", prefix, inputPath)
-		//	} else {
-		//		path = inputPath
-		//	}
-		//}
-		//proxy.Path = path
-		//input.Path = &path
+
 		_, err = i.routerModule.Edit(ctx, serviceId, apiId, &router_dto.Edit{
 			Description: input.Description,
 			Proxy:       proxy,
 			Path:        input.Path,
 			Disable:     input.Disable,
 			Methods:     &apiInfo.Methods,
+			Upstream:    upstream,
 		})
 		if err != nil {
 			return err

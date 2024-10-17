@@ -10,7 +10,7 @@ type CreateService struct {
 	Tags         []string `json:"tags"`
 	Catalogue    string   `json:"catalogue"`
 	ApprovalType string   `json:"approval_type"`
-	Kind         string   `json:"kind"`
+	Kind         string   `json:"service_kind"`
 	Provider     *string  `json:"provider" aocheck:"ai_provider"`
 	AsApp        *bool    `json:"as_app"`
 	AsServer     *bool    `json:"as_server"`

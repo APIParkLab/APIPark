@@ -113,6 +113,7 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 				Protocols: a.Protocols,
 				Match:     a.Match,
 				Disable:   a.Disable,
+				Upstream:  a.Upstream,
 			})
 			if err != nil {
 				return err
