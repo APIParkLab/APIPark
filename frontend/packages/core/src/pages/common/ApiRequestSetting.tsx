@@ -67,7 +67,7 @@ export default function ApiRequestSetting(){
                     >
                         <Form.Item<ApiRequestSettingFieldType>
                             label={$t("API 调用地址")}
-                            name="name"
+                            name="invokeAddress"
                             rules={[{ required: true,whitespace:true  }]}
                             extra={$t("API base URL 一般设置为API 网关的外部网络访问地址，或者是API网关绑定的域名。")}
                         >
