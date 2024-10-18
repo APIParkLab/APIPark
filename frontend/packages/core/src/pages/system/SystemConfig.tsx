@@ -237,7 +237,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
         if(accessInit){
             getTeamOptionList()
         }else{
-            getGlobalAccessData()?.then(()=>{
+            getGlobalAccessData()?.then?.(()=>{
                 getTeamOptionList()
             })
         }

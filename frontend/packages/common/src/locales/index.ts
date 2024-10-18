@@ -6,8 +6,12 @@ import crc32 from 'crc/crc32';
 // 引入需要实现国际化的简体、繁体、英文三种数据的json文件
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
+import jaJP from 'antd/locale/ja_JP';
+import zhTW from 'antd/locale/zh_TW';
 import localZh_CN from './scan/zh-CN.json'; // 本地翻译中文文件
 import localEn_US from './scan/en-US.json'; // 本地翻译英文文件
+import localZh_TW from './scan/zh-TW.json'; // 本地翻译英文文件
+import localJa_JP from './scan/ja-JP.json'; // 本地翻译英文文件
 // import config from '../../../../i18next-scanner.config.js';
 
 const resources = {
@@ -18,6 +22,14 @@ const resources = {
   'en-US': {
     translation: localEn_US,
     ...enUS
+  },
+  'zh-TW': {
+    translation: localZh_TW,
+    ...zhTW
+  },
+  'ja-JP': {
+    translation: localJa_JP,
+    ...jaJP
   }
 };
 

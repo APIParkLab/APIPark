@@ -45,7 +45,7 @@ const RoleList = ()=>{
         return fetchData<BasicResponse<{roles:RoleTableListItem[]}>>(`${group}/roles`,{method:'GET'}).then(response=>{
             const {code,data,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                return  {data:data.roles?.map((x:RoleTableListItem)=>({...x,name:$t(x.name)})), success: true}
+                return  {data:data.roles?.map((x:RoleTableListItem)=>({...x,name:(x.name)})), success: true}
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
                 return {data:[], success:false}

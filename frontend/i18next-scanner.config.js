@@ -10,6 +10,7 @@ const systemLanguage = {
 };
 const localesDir = 'packages/common/src/locales/scan';
 const newJsonDir = 'packages/common/src/locales/scan/newJson';
+const oldJsonDir = 'packages/common/src/locales/scan/oldJson';
 const keyHashFile = 'packages/common/src/locales/keyHashMap.json';
 let existData = {};
 let keyHashMap = {};
@@ -34,6 +35,14 @@ fs.readdirSync(localesDir).forEach(file => {
 });
 
 const keyList = Object.keys(existData);
+
+
+// 清空 newJson 目录下的所有语言文件
+Object.values(systemLanguage).forEach(lng => {
+  const newJsonPath = path.join(newJsonDir, `${lng}.json`);
+  fs.writeFileSync(newJsonPath, JSON.stringify({}));  // 清空文件
+});
+
 
 module.exports = {
   input: [
@@ -110,6 +119,28 @@ module.exports = {
   flush: function(done) {
     // 将 keyHashMap 写入文件
     fs.writeFileSync(keyHashFile, JSON.stringify(keyHashMap, null, 2));
+
+
+    // 遍历每种语言，处理旧字段
+    keyList.forEach((lng) => {
+      const localeFilePath = path.join(localesDir, `${lng}.json`);
+      const oldJsonPath = path.join(oldJsonDir, `${lng}.json`);
+      const langData = existData[lng] || {};
+
+      let oldJsonData = {};
+
+      // 将不存在于 keyHashMap 中的键移动到 oldJson 文件中
+      Object.keys(langData).forEach(hashKey => {
+        if (!Object.values(keyHashMap).includes(hashKey)) {
+          oldJsonData[hashKey] = langData[hashKey];  // 将旧的 key 移到 oldJson 中
+        }
+      });
+
+      // 写入 oldJson 文件
+      if (Object.keys(oldJsonData).length > 0) {
+        fs.writeFileSync(oldJsonPath, JSON.stringify(oldJsonData, null, 2));
+      }
+    });
     done();
   }
 };
