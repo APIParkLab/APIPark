@@ -47,7 +47,7 @@ const AiServiceInsideApprovalList:FC = ()=>{
         message.destroy()
         if(code === STATUS_CODE.SUCCESS){
             const modalIns = modal.confirm({
-                title:type === 'approval' ? $t('审批') : $t('查看'),
+                title:type === 'approval' ? $t('审核') : $t('查看'),
                 content:<SubscribeApprovalModalContent ref={subscribeRef} data={{...data.approval}  as SubscribeApprovalInfoType} type={type} serviceId={serviceId!} teamId={teamId!} inSystem/>,
                 onOk:()=>{
                     return subscribeRef.current?.save('pass').then((res)=>res === true && manualReloadTable())
@@ -92,7 +92,7 @@ const AiServiceInsideApprovalList:FC = ()=>{
             valueType: 'option',
             render: (_: React.ReactNode, entity: SubscribeApprovalTableListItem) => [
                 pageStatus === 0 ? 
-                <TableBtnWithPermission  access="team.service.subscription.approval" key="approval"  btnType="approval" onClick={()=>{openModal('approval',entity)}} btnTitle="审批"/>
+                <TableBtnWithPermission  access="team.service.subscription.approval" key="approval"  btnType="approval" onClick={()=>{openModal('approval',entity)}} btnTitle="审核"/>
                 :<TableBtnWithPermission  access="team.service.subscription.view" key="view"  btnType="view" onClick={()=>{openModal('view',entity)}} btnTitle="查看"/>,
             ],
         }
@@ -146,7 +146,7 @@ const AiServiceInsideApprovalList:FC = ()=>{
                 title:<Link to={`/service/list`}>{$t('服务')}</Link>
             },
             {
-                title:$t('订阅审批')
+                title:$t('订阅审核')
             }
         ])
         getMemberList()

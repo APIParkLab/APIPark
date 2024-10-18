@@ -227,9 +227,9 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                 </Form.Item>
 {/* 
                 {type !== 'add' && type !== 'publish' && <Form.Item
-                    label={$t("审批意见"
+                    label={$t("审核意见"
                     name="opinion"
-                    extra="选择拒绝时，审批意见为必填"
+                    extra="选择拒绝时，审核意见为必填"
                 >
                     <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} onChange={()=>{  form.setFields([
                         {

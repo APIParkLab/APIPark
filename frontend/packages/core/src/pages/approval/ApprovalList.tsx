@@ -82,7 +82,7 @@ export default function ApprovalList({pageType,pageStatus}:{pageType:'subscribe'
         message.destroy()
         if(code === STATUS_CODE.SUCCESS){
             const modalInst = modal.confirm({
-                title:type === 'approval' ? $t('审批') : $t('查看'),
+                title:type === 'approval' ? $t('审核') : $t('查看'),
                 content:pageType === 'subscribe' ?
                     <SubscribeApprovalModalContent ref={subscribeRef} data={data.approval  as SubscribeApprovalInfoType} type={type}/>
                     :<PublishApprovalModalContent ref={publishRef} data={data.approval  as PublishApprovalInfoType} type={type} systemId={''}/>,
@@ -145,7 +145,7 @@ export default function ApprovalList({pageType,pageStatus}:{pageType:'subscribe'
             valueType: 'option',
             render: (_: React.ReactNode, entity: ApprovalTableListItem) => [
                 pageStatus === 0 ?
-                <TableBtnWithPermission  access="" key="approval"  btnType="approval" onClick={()=>{openModal('approval',entity)}} btnTitle="审批"/>
+                <TableBtnWithPermission  access="" key="approval"  btnType="approval" onClick={()=>{openModal('approval',entity)}} btnTitle="审核"/>
                 :<TableBtnWithPermission  access="" key="view"  btnType="publish" onClick={()=>{openModal('view',entity)}} btnTitle="查看"/>,
             ]
         }

@@ -12,11 +12,11 @@ import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 const items: TabsProps['items'] = [
     {
         key: '0',
-        label: $t('待审批'),
+        label: $t('待审核'),
     },
     {
         key: '1',
-        label: $t('已审批'),
+        label: $t('已审核'),
     }
 ];
 

@@ -73,7 +73,7 @@ curl -sSO https://download.apipark.com/install/quick-start.sh; bash quick-start.
     </td>
     <td width="50%">
             <img src="https://apipark.com/wp-content/uploads/2024/08/Application.png" />
-      APIPark 对所有 API 资源提供流程审批功能，避免违规或避开平台来调用API，调用方需要先申请API资源，并等待服务方审核通过后才能正式调用API。
+      APIPark 对所有 API 资源提供流程审核功能，避免违规或避开平台来调用API，调用方需要先申请API资源，并等待服务方审核通过后才能正式调用API。
     </td>
   </tr>
 
@@ -120,7 +120,7 @@ curl -sSO https://download.apipark.com/install/quick-start.sh; bash quick-start.
 
 ## 多租户管理和灵活订阅
   - 支持多租户管理，满足不同业务单元需求。
-  - 灵活的订阅和审批流程简化 API 的使用和管理。
+  - 灵活的订阅和审核流程简化 API 的使用和管理。
 
 ## 增强 API 可观测性
   - 实时监控和追踪 API 使用情况。
