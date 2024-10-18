@@ -253,7 +253,7 @@ const TeamInsideMember:FC = ()=>{
                                 className="w-full"
                                 mode="multiple"
                                 value={entity.roles?.map((x:EntityItem)=>x.id)}
-                                options={roleList?.map((x:{id:string,name:string})=>({label:$t(x.name), value:x.id}))}
+                                options={roleList?.map((x:{id:string,name:string})=>({label:(x.name), value:x.id}))}
                                 onChange={(value)=>{
                                     changeMemberInfo(value,entity ).then((res)=>{
                                         if(res) manualReloadTable()

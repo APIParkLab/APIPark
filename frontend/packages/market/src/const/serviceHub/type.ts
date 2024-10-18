@@ -17,6 +17,7 @@ export type ServiceBasicInfoType = {
     logo?:string
     invokeAddress:string
     approvalType:'auto'|'manual'
+    serviceType:'ai'|'rest'
 }
 
 export type ServiceDetailType = {

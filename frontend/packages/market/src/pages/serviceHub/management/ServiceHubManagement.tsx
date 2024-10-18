@@ -33,7 +33,7 @@ export default function ServiceHubManagement() {
 
 const getServiceList = ()=>{
     if(!accessInit){
-        getGlobalAccessData()?.then(()=>{getServiceList()})
+        getGlobalAccessData()?.then?.(()=>{getServiceList()})
         return
     }
     setServiceLoading(true)
@@ -56,7 +56,7 @@ const getServiceList = ()=>{
   
   const getTeamsList = ()=>{
     if(!accessInit){
-        getGlobalAccessData()?.then(()=>{getTeamsList()})
+        getGlobalAccessData()?.then?.(()=>{getTeamsList()})
         return
     }
     setPageLoading(true)
