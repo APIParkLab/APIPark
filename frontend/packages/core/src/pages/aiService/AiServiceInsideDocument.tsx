@@ -80,7 +80,7 @@ const ServiceInsideDocument = ()=>{
                     ],  toolbar:  'undo redo | styles | bold italic | alignleft aligncenter alignright alignjustify | codesample |table|' +
                         'bullist numlist outdent indent | link image | print preview media fullscreen | ' +
                         'forecolor backcolor emoticons | help',
-                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px;  }   img { max-width: 100%; }',
                     setup: setupEditor,
                     codesample_languages:[
                         {
