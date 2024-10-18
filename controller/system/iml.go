@@ -7,14 +7,31 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/eolinker/eosc/log"
+
+	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
+
+	"github.com/APIParkLab/APIPark/model/plugin_model"
+	"github.com/APIParkLab/APIPark/service/api"
+
+	ai_api "github.com/APIParkLab/APIPark/module/ai-api"
+
+	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
+	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
+	router_dto "github.com/APIParkLab/APIPark/module/router/dto"
+
+	"github.com/eolinker/go-common/store"
+
+	"github.com/APIParkLab/APIPark/module/ai"
 
 	catalogue_dto "github.com/APIParkLab/APIPark/module/catalogue/dto"
 
 	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
 	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
 	team_dto "github.com/APIParkLab/APIPark/module/team/dto"
-	"github.com/eolinker/eosc/log"
 	"github.com/eolinker/go-common/register"
 	"github.com/eolinker/go-common/server"
 	"github.com/eolinker/go-common/utils"
@@ -201,35 +218,84 @@ func (i *imlSettingController) Set(ctx *gin.Context, input *system_dto.InputSett
 type imlInitController struct {
 	teamModule                     team.ITeamModule                               `autowired:""`
 	appModule                      service.IAppModule                             `autowired:""`
+	serviceModule                  service.IServiceModule                         `autowired:""`
 	applicationAuthorizationModule application_authorization.IAuthorizationModule `autowired:""`
 	catalogueModule                catalogue.ICatalogueModule                     `autowired:""`
+	providerModule                 ai.IProviderModule                             `autowired:""`
+	transaction                    store.ITransaction                             `autowired:""`
+	aiAPIModule                    ai_api.IAPIModule                              `autowired:""`
+	docModule                      service.IServiceDocModule                      `autowired:""`
+	routerModule                   router.IRouterModule                           `autowired:""`
 }
 
 func (i *imlInitController) OnInit() {
 	register.Handle(func(v server.Server) {
 		ctx := utils.SetUserId(context.Background(), "admin")
-		teams, err := i.teamModule.Search(ctx, "")
-		if err != nil {
-			log.Error("get teams error: %v", err)
-			return
-		}
-		if len(teams) == 0 {
+
+		err := i.transaction.Transaction(ctx, func(ctx context.Context) error {
+			teams, err := i.teamModule.Search(ctx, "")
+			if err != nil {
+				return fmt.Errorf("get teams error: %v", err)
+			}
+			if len(teams) > 0 {
+				return nil
+			}
+			items, err := i.catalogueModule.Search(ctx, "")
+			if err != nil {
+				return fmt.Errorf("get catalogue error: %v", err)
+			}
+			catalogueId := uuid.New().String()
+			if len(items) == 0 {
+				err = i.catalogueModule.Create(ctx, &catalogue_dto.CreateCatalogue{
+					Id:   catalogueId,
+					Name: "Default Catalogue",
+				})
+				if err != nil {
+					return fmt.Errorf("create default catalogue error: %v", err)
+				}
+			} else {
+				catalogueId = items[0].Id
+			}
+
 			info, err := i.teamModule.Create(ctx, &team_dto.CreateTeam{
 				Name:        "Default Team",
 				Description: "Auto created By APIPark",
 			})
 			if err != nil {
-				log.Error("create default team error: %v", err)
-				return
+				return fmt.Errorf("create default team error: %v", err)
+			}
+			// 创建Rest服务
+			_, err = i.serviceModule.Create(ctx, info.Id, &service_dto.CreateService{
+				Name:         "REST Demo Service",
+				Prefix:       "/rest-demo",
+				Description:  "Auto created By APIPark",
+				ServiceType:  "public",
+				Catalogue:    catalogueId,
+				ApprovalType: "auto",
+				Kind:         "rest",
+			})
+			if err != nil {
+				return fmt.Errorf("create default service error: %v", err)
+			}
+			// 创建AI服务
+			err = i.createAIService(ctx, info.Id, &service_dto.CreateService{
+				Name:         "AI Demo Service",
+				Prefix:       "/ai-demo",
+				Description:  "Auto created By APIPark",
+				ServiceType:  "public",
+				Catalogue:    catalogueId,
+				ApprovalType: "auto",
+				Kind:         "ai",
+			})
+			if err != nil {
+				return err
 			}
 			app, err := i.appModule.CreateApp(ctx, info.Id, &service_dto.CreateApp{
 				Name:        "Demo Application",
 				Description: "Auto created By APIPark",
 			})
 			if err != nil {
-				i.teamModule.Delete(ctx, info.Id)
-				log.Error("create default app error: %v", err)
-				return
+				return fmt.Errorf("create default app error: %v", err)
 			}
 			_, err = i.applicationAuthorizationModule.AddAuthorization(ctx, app.Id, &application_authorization_dto.CreateAuthorization{
 				Name:       "Default API Key",
@@ -242,25 +308,144 @@ func (i *imlInitController) OnInit() {
 				},
 			})
 			if err != nil {
-				i.teamModule.Delete(ctx, info.Id)
-				i.appModule.DeleteApp(ctx, app.Id)
-				log.Error("create default api key error: %v", err)
-				return
+				return fmt.Errorf("create default api key error: %v", err)
 			}
-		}
-		items, err := i.catalogueModule.Search(ctx, "")
+			return nil
+		})
 		if err != nil {
-			log.Error("get catalogue error: %v", err)
-			return
-		}
-		if len(items) == 0 {
-			err = i.catalogueModule.Create(ctx, &catalogue_dto.CreateCatalogue{
-				Name: "Default Catalogue",
-			})
-			if err != nil {
-				log.Error("create default catalogue error: %v", err)
-				return
-			}
+			log.Errorf("init iml error: %v", err)
 		}
 	})
+}
+func (i *imlInitController) createAIService(ctx context.Context, teamID string, input *service_dto.CreateService) error {
+
+	providerId := "openai"
+	err := i.providerModule.UpdateProviderConfig(ctx, "openai", &ai_dto.UpdateConfig{
+		Config: "{\n  \"openai_api_base\": \"API Base\",\n  \"openai_api_key\": \"API Key\",\n  \"openai_organization\": \"Organization\"\n}",
+	})
+	if err != nil {
+		return fmt.Errorf("update openai config error: %v", err)
+	}
+	input.Provider = &providerId
+	if input.Id == "" {
+		input.Id = uuid.New().String()
+	}
+	if input.Prefix == "" {
+		if len(input.Id) < 9 {
+			input.Prefix = input.Id
+		} else {
+			input.Prefix = input.Id[:8]
+		}
+	}
+	pv, err := i.providerModule.Provider(ctx, *input.Provider)
+	if err != nil {
+		return err
+	}
+	p, has := model_runtime.GetProvider(*input.Provider)
+	if !has {
+		return fmt.Errorf("provider not found")
+	}
+	m, has := p.GetModel(pv.DefaultLLM)
+	if !has {
+		return fmt.Errorf("model %s not found", pv.DefaultLLM)
+	}
+
+	var info *service_dto.Service
+	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		var err error
+		info, err = i.serviceModule.Create(ctx, teamID, input)
+		if err != nil {
+			return err
+		}
+		path := fmt.Sprintf("/%s/demo_translation_api", strings.Trim(input.Prefix, "/"))
+		timeout := 300000
+		retry := 0
+		aiPrompt := &ai_api_dto.AiPrompt{
+			Variables: []*ai_api_dto.AiPromptVariable{
+				{
+					Key:         "source_lang",
+					Description: "",
+					Require:     true,
+				},
+				{
+					Key:         "target_lang",
+					Description: "",
+					Require:     true,
+				},
+				{
+					Key:         "text",
+					Description: "",
+					Require:     true,
+				},
+			},
+			Prompt: "You need to translate {{source_lang}} into {{target_lang}}, and the following is the content that needs to be translated.\n---\n{{text}}",
+		}
+		aiModel := &ai_api_dto.AiModel{
+			Id:     m.ID(),
+			Config: m.DefaultConfig(),
+		}
+		name := "Demo Translation API"
+		description := "A demo that shows you how to use a prompt to create a Translation API."
+		apiId := uuid.New().String()
+		err = i.aiAPIModule.Create(
+			ctx,
+			info.Id,
+			&ai_api_dto.CreateAPI{
+				Id:          apiId,
+				Name:        name,
+				Path:        path,
+				Description: description,
+				Disable:     false,
+				AiPrompt:    aiPrompt,
+				AiModel:     aiModel,
+				Timeout:     timeout,
+				Retry:       retry,
+			},
+		)
+		if err != nil {
+			return err
+		}
+		plugins := make(map[string]api.PluginSetting)
+		plugins["ai_prompt"] = api.PluginSetting{
+			Config: plugin_model.ConfigType{
+				"prompt":    aiPrompt.Prompt,
+				"variables": aiPrompt.Variables,
+			},
+		}
+		plugins["ai_formatter"] = api.PluginSetting{
+			Config: plugin_model.ConfigType{
+				"model":    aiModel.Id,
+				"provider": fmt.Sprintf("%s@ai-provider", info.Provider.Id),
+				"config":   aiModel.Config,
+			},
+		}
+		_, err = i.routerModule.Create(ctx, info.Id, &router_dto.Create{
+			Id:   apiId,
+			Name: name,
+			Path: path,
+			Methods: []string{
+				http.MethodPost,
+			},
+			Description: description,
+			Protocols:   []string{"http", "https"},
+			MatchRules:  nil,
+			Proxy: &router_dto.InputProxy{
+				Path:    path,
+				Timeout: timeout,
+				Retry:   retry,
+				Plugins: plugins,
+			},
+			Disable:  false,
+			Upstream: info.Provider.Id,
+		})
+		if err != nil {
+			return err
+		}
+
+		return i.docModule.SaveServiceDoc(ctx, info.Id, &service_dto.SaveServiceDoc{
+			Doc: "The Translation API allows developers to translate text from one language to another. It supports multiple languages and enables easy integration of high-quality translation features into applications. With simple API requests, you can quickly translate content into different target languages.",
+		})
+	})
+
+	return err
 }
