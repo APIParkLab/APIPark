@@ -105,11 +105,11 @@ export const AI_SERVICE_VARIABLES_TABLE_COLUMNS: PageProColumns<VariableItems & 
 export const AiService_INSIDE_APPROVAL_TAB_ITEMS: TabsProps['items'] = [
     {
         key: '0',
-        label:('待审批'),
+        label:('待审核'),
     },
     {
         key: '1',
-        label: ('已审批'),
+        label: ('已审核'),
     }
 ];
 

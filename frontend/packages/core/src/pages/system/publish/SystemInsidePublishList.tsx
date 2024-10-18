@@ -176,7 +176,7 @@ const SystemInsidePublicList:FC = ()=>{
                 );
                 message.destroy();
                 if (code === STATUS_CODE.SUCCESS) {
-                    setDrawerTitle($t('审批'))
+                    setDrawerTitle($t('审核'))
                     setDrawerType(type)
                     setDrawerData(data.publish)
                     setDrawerOkTitle($t('通过'))
@@ -298,7 +298,7 @@ const SystemInsidePublicList:FC = ()=>{
 
         if((entity as PublishVersionTableListItem).status === 'apply'){
             btnArr =  [
-                    <TableBtnWithPermission  access="team.service.release.approval" key="approval" btnType="approval" onClick={()=>{openDrawer('approval',entity)}} btnTitle="审批"/>,
+                    <TableBtnWithPermission  access="team.service.release.approval" key="approval" btnType="approval" onClick={()=>{openDrawer('approval',entity)}} btnTitle="审核"/>,
                     <Divider type="vertical" className="mx-0"  key="div1"/>,
                     viewBtn,
                     <Divider type="vertical" className="mx-0"  key="div2"/>,

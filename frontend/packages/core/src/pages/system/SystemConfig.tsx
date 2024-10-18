@@ -361,7 +361,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         </Form.Item>}
                     
                         <Form.Item<SystemConfigFieldType>
-                            label={$t("订阅审批")}
+                            label={$t("订阅审核")}
                             name="approvalType"
                             rules={[{required: true}]}
                         >

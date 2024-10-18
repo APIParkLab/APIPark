@@ -36,13 +36,13 @@ type IExportSubscribeModule interface {
 }
 
 type ISubscribeApprovalModule interface {
-	// GetApprovalList 获取审批列表
+	// GetApprovalList 获取审核列表
 	GetApprovalList(ctx context.Context, pid string, status int) ([]*subscribe_dto.ApprovalItem, error)
-	// GetApprovalDetail 获取审批详情
+	// GetApprovalDetail 获取审核详情
 	GetApprovalDetail(ctx context.Context, pid string, id string) (*subscribe_dto.Approval, error)
-	// Pass 通过审批
+	// Pass 通过审核
 	Pass(ctx context.Context, pid string, id string, approveInfo *subscribe_dto.Approve) error
-	// Reject 驳回审批
+	// Reject 驳回审核
 	Reject(ctx context.Context, pid string, id string, approveInfo *subscribe_dto.Approve) error
 
 	ExportAll(ctx context.Context) ([]*subscribe_dto.ExportApproval, error)
