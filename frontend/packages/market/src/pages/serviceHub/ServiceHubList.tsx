@@ -78,7 +78,7 @@ export const initialServiceHubListState = {
             if(!dataSet.selectedTag || dataSet.selectedTag.length === 0) return false
             if((!x.tags || !x.tags.length )&& dataSet.selectedTag.indexOf('empty') === -1) return false
             if(x.tags && x.tags.length && !x.tags.some(tag => dataSet.selectedTag.includes(tag.id))) return false;
-            if( dataSet.keyword && !x.name.includes(dataSet.keyword)) return false
+            if( dataSet.keyword && !x.name.toLocaleLowerCase().includes(dataSet.keyword.toLocaleLowerCase())) return false
             return true
         })
     }
