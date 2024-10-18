@@ -354,8 +354,8 @@ export const SERVICE_VISUALIZATION_OPTIONS = [
 
     
 export const SERVICE_APPROVAL_OPTIONS = [
-    {label:('无需审批：允许任何应用调用该服务'),value:'auto'},
-    {label:('人工审批：仅允许通过人工审批的应用调用该服务'),value:'manual'}];
+    {label:('无需审核：允许任何应用调用该服务'),value:'auto'},
+    {label:('人工审核：仅允许通过人工审核的应用调用该服务'),value:'manual'}];
 export const SERVICE_KIND_OPTIONS = [
         {label:('REST'),value:'rest'},
         {label:('AI'),value:'ai'}];
@@ -398,11 +398,11 @@ export const SYSTEM_UPSTREAM_GLOBAL_CONFIG_TABLE_COLUMNS: PageProColumns<GlobalN
 export const SYSTEM_INSIDE_APPROVAL_TAB_ITEMS: TabsProps['items'] = [
     {
         key: '0',
-        label:('待审批'),
+        label:('待审核'),
     },
     {
         key: '1',
-        label: ('已审批'),
+        label: ('已审核'),
     }
 ];
 

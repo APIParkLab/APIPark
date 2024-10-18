@@ -68,7 +68,7 @@ const SystemInsidePage:FC = ()=> {
         'group'),
     getItem($t('订阅管理'), 'provideSer', null,
         [
-            getItem(<Link to="./approval">{$t('订阅审批')}</Link>, 'approval',undefined,undefined,undefined,'team.service.subscription.view'),
+            getItem(<Link to="./approval">{$t('订阅审核')}</Link>, 'approval',undefined,undefined,undefined,'team.service.subscription.view'),
             getItem(<Link to="./subscriber">{$t('订阅方管理')}</Link>, 'subscriber',undefined,undefined,undefined,'team.service.subscription.view'),
         ],
         'group'),
