@@ -24,8 +24,9 @@ type AiPromptVariable struct {
 }
 
 type AiModel struct {
-	Id     string `json:"id"`
-	Config string `json:"config"`
+	Id       string `json:"id"`
+	Config   string `json:"config"`
+	Provider string `json:"provider"`
 }
 
 type EditAPI struct {

@@ -2,8 +2,9 @@ package ai_api
 
 import (
 	"encoding/json"
-	"github.com/APIParkLab/APIPark/stores/api"
 	"time"
+
+	"github.com/APIParkLab/APIPark/stores/api"
 )
 
 type API struct {
