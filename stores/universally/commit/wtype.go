@@ -24,6 +24,7 @@ func NewCommitWithKey[H any](name, key string) *StoreWidthType[H] {
 		Store: Store[H]{
 			latestTableName: name + "_latest",
 			commitTableName: name + "_commit",
+			name:            name,
 		},
 		key: key,
 	}

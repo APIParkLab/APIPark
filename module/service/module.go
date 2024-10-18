@@ -24,6 +24,7 @@ type IServiceModule interface {
 	Edit(ctx context.Context, id string, input *service_dto.EditService) (*service_dto.Service, error)
 	// Delete 删除项目
 	Delete(ctx context.Context, id string) error
+
 	// Simple 获取简易项目列表
 	//Simple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
 
