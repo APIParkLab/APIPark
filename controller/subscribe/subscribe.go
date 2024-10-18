@@ -29,11 +29,11 @@ type ISubscribeController interface {
 }
 
 type ISubscribeApprovalController interface {
-	// GetApprovalList 获取审批列表
+	// GetApprovalList 获取审核列表
 	GetApprovalList(ctx *gin.Context, project string, status int) ([]*subscribe_dto.ApprovalItem, error)
-	// GetApprovalDetail 获取审批详情
+	// GetApprovalDetail 获取审核详情
 	GetApprovalDetail(ctx *gin.Context, project string, id string) (*subscribe_dto.Approval, error)
-	// Approval 审批
+	// Approval 审核
 	Approval(ctx *gin.Context, project string, id string, approveInfo *subscribe_dto.Approve) error
 }
 
