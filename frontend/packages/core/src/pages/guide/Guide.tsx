@@ -97,12 +97,12 @@ export default function Guide(){
             items: [
                 {
                     title: $t("订阅服务"),
-                    description: $t('如果需要调用某个服务的 API，需要先订阅该服务，并且等待提供服务的团队审批后才可发起 API 请求。'),
+                    description: $t('如果需要调用某个服务的 API，需要先订阅该服务，并且等待提供服务的团队审核后才可发起 API 请求。'),
                     link: 'https://docs.apipark.com/docs/tutorials/api-market/service'
                 },
                 {
-                    title: $t("审批订阅申请"),
-                    description: $t('提供服务的团队可以审批来自其他团队的订阅申请，审批通过后的应用才可发起 API 请求。'),
+                    title: $t("审核订阅申请"),
+                    description: $t('提供服务的团队可以审核来自其他团队的订阅申请，审核通过后的应用才可发起 API 请求。'),
                     link: 'https://docs.apipark.com/docs/quick/suberscriber/subscribe'
                 }
             ]
@@ -141,7 +141,7 @@ export default function Guide(){
                 <a className="" href="https://github.com/APIParkLab/APIPark" target="_blank"><img src="https://img.shields.io/github/stars/APIParkLab/APIPark?style=social"alt="" /></a>
             </div>} 
             description={<div className="flex flex-col gap-[8px]">
-                <p>{$t("你能通过 APIPark 快速在企业内部构建 API 开放门户/市场，享受极致的转发性能、API 可观测、服务治理、多租户管理、订阅审批流程等诸多好处。")}</p>
+                <p>{$t("你能通过 APIPark 快速在企业内部构建 API 开放门户/市场，享受极致的转发性能、API 可观测、服务治理、多租户管理、订阅审核流程等诸多好处。")}</p>
                 <p>{$t("如果你喜欢我们的产品，欢迎给我们 Star 或提供产品反馈意见。")}</p>
             </div>}
             showBorder={false}
