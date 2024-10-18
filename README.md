@@ -33,7 +33,7 @@
 <br>
 
 # 💌 Why Did We Build APIPark?
-Before building APIPark, we spent seven successful years developing an API development and automated testing platform with over 1 million developer users, 500+ enterprise customers, and multi-million-dollar investment from Sequoia Capital.
+Before building APIPark, we spent seven years developing an API development and automated testing platform with over 1 million developer users, 500+ enterprise customers, and multi-million-dollar investment from Sequoia Capital.
 
 As AI and Agents evolved, we noticed many enterprises wanted to integrate AI into both internal and third-party APIs, enabling AI agents to perform more complex tasks beyond being just knowledge-based Q&A bots. Hence, we built APIPark—your all-in-one AI gateway and API developer portal to accelerate your AI API development and quickly build your product or AI agent!
 
