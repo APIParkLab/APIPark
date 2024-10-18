@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"strings"
 
+	application_authorization "github.com/APIParkLab/APIPark/module/application-authorization"
+	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
+
 	"github.com/APIParkLab/APIPark/model/plugin_model"
 	"github.com/APIParkLab/APIPark/service/api"
 
@@ -271,7 +274,8 @@ func (i *imlServiceController) SaveServiceDoc(ctx *gin.Context, id string, input
 }
 
 type imlAppController struct {
-	module service.IAppModule `autowired:""`
+	module     service.IAppModule                             `autowired:""`
+	authModule application_authorization.IAuthorizationModule `autowired:""`
 }
 
 func (i *imlAppController) Search(ctx *gin.Context, teamId string, keyword string) ([]*service_dto.AppItem, error) {
@@ -279,7 +283,25 @@ func (i *imlAppController) Search(ctx *gin.Context, teamId string, keyword strin
 }
 
 func (i *imlAppController) CreateApp(ctx *gin.Context, teamID string, input *service_dto.CreateApp) (*service_dto.App, error) {
-	return i.module.CreateApp(ctx, teamID, input)
+	app, err := i.module.CreateApp(ctx, teamID, input)
+	if err != nil {
+		return nil, err
+	}
+	_, err = i.authModule.AddAuthorization(ctx, app.Id, &application_authorization_dto.CreateAuthorization{
+		Name:       "Default API Key",
+		Driver:     "apikey",
+		Position:   "Header",
+		TokenName:  "Authorization",
+		ExpireTime: 0,
+		Config: map[string]interface{}{
+			"apikey": uuid.New().String(),
+		},
+	})
+	if err != nil {
+		i.module.DeleteApp(ctx, app.Id)
+		return nil, err
+	}
+	return app, nil
 }
 func (i *imlAppController) UpdateApp(ctx *gin.Context, appId string, input *service_dto.UpdateApp) (*service_dto.App, error) {
 	return i.module.UpdateApp(ctx, appId, input)

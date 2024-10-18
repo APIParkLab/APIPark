@@ -21,6 +21,9 @@ type ISettingController interface {
 	Set(ctx *gin.Context, input *system_dto.InputSetting) error
 }
 
+type IInitController interface {
+}
+
 func init() {
 	autowire.Auto[IExportConfigController](func() reflect.Value {
 		return reflect.ValueOf(new(imlExportConfigController))
@@ -32,5 +35,9 @@ func init() {
 
 	autowire.Auto[ISettingController](func() reflect.Value {
 		return reflect.ValueOf(new(imlSettingController))
+	})
+
+	autowire.Auto[IInitController](func() reflect.Value {
+		return reflect.ValueOf(new(imlInitController))
 	})
 }

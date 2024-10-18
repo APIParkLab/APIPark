@@ -2,25 +2,27 @@ system:
   - name: supper_admin
     cname: 超级管理员
     permits:
-      - system.api_market.service_classification.manager
-      - system.api_market.service_classification.view
       - system.dashboard.run_view.view
-      - system.devops.ai_provider.view
       - system.devops.ai_provider.manager
+      - system.devops.ai_provider.view
       - system.devops.cluster.manager
       - system.devops.cluster.view
+      - system.devops.data_source.manager
+      - system.devops.data_source.view
       - system.devops.log_configuration.manager
       - system.devops.log_configuration.view
       - system.devops.ssl_certificate.manager
       - system.devops.ssl_certificate.view
-      - system.devops.data_source.manager
-      - system.devops.data_source.view
       - system.organization.member.manager
       - system.organization.member.view
       - system.organization.role.view_system_role
       - system.organization.role.view_team_role
       - system.organization.team.manager
       - system.organization.team.view
+      - system.settings.general.manager
+      - system.settings.general.view
+      - system.settings.service_classification.manager
+      - system.settings.service_classification.view
       - system.workspace.api_market.view
       - system.workspace.application.view_all
       - system.workspace.service.view_all
@@ -39,23 +41,25 @@ system:
   - name: devops_admin
     cname: 运维管理员
     permits:
-      - system.api_market.service_classification.manager
-      - system.api_market.service_classification.view
       - system.dashboard.run_view.view
-      - system.devops.ai_provider.view
       - system.devops.ai_provider.manager
+      - system.devops.ai_provider.view
       - system.devops.cluster.manager
       - system.devops.cluster.view
+      - system.devops.data_source.manager
+      - system.devops.data_source.view
       - system.devops.log_configuration.manager
       - system.devops.log_configuration.view
       - system.devops.ssl_certificate.manager
       - system.devops.ssl_certificate.view
-      - system.devops.data_source.manager
-      - system.devops.data_source.view
       - system.workspace.api_market.view
       - system.workspace.application.view_all
       - system.workspace.service.view_all
       - system.workspace.team.view_all
+      - system.settings.general.manager
+      - system.settings.general.view
+      - system.settings.service_classification.manager
+      - system.settings.service_classification.view
   - name: member
     cname: 普通成员
     permits:
@@ -64,7 +68,7 @@ system:
   - name: guest
     cname: 只读成员
     permits:
-      - system.api_market.service_classification.view
+      - system.settings.service_classification.view
       - system.devops.cluster.view
       - system.devops.log_configuration.view
       - system.devops.ssl_certificate.view
