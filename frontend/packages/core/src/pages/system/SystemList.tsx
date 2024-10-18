@@ -34,7 +34,7 @@ const SystemList:FC = ()=>{
 
     const getSystemList = ()=>{
         if(!accessInit){
-            getGlobalAccessData()?.then(()=>{
+            getGlobalAccessData()?.then?.(()=>{
                 getSystemList()
             })
             return
@@ -63,7 +63,7 @@ const SystemList:FC = ()=>{
 
     const getTeamsList = ()=>{
         if(!accessInit){
-            getGlobalAccessData()?.then(()=>{
+            getGlobalAccessData()?.then?.(()=>{
                 getTeamsList()
             })
             return
