@@ -1,13 +1,18 @@
 ![image](https://github.com/user-attachments/assets/96e36db5-2733-49c8-8e1e-ecbcc60a3943)
 
 <p align="center">
-  <a href="/README.md">English</a>
+  English
   | 
-  简体中文
+  <a href="/readme/readme-jp.md">日本語</a>
+  | 
+  <a href="/readme/readme-zh-cn.md">简体中文</a>
+  | 
+  <a href="/readme/readme-zh-tw.md">繁體中文</a>
 </p>
 
-🦄APIPark 是开源的一站式AI网关和API开发者门户，帮助开发者和企业轻松管理、集成和部署AI服务。APIPark 基于 Apache 2.0 协议开源，这意味着它可以免费商用！
+<b>🦄APIPark 是开源的一站式AI网关和API开发者门户，帮助开发者和企业轻松管理、集成和部署AI服务。APIPark 基于 Apache 2.0 协议开源，这意味着它可以免费商用！</b>
 
+<br>
 
 ✨你可以通过APIPark实现以下需求：
 1. 快速接入 100+ AI 模型，我们支持所有主流的AI公司！
@@ -17,6 +22,8 @@
 5. 管理调用的应用、API Key，保障你的 API 安全和稳定性。
 6. 通过清晰的图表来监控你的 AI API 使用情况。
 7. 将API请求日志快速输出到第三方日志平台。
+
+<br>
 
 ✨APIPark 还是一个强大的云原生 API 网关：
 1. 拥有比 Nginx 更高的性能，并且支持集群部署，能够支持大规模的流量。
