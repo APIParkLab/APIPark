@@ -48,7 +48,7 @@ export const routerKeyMap = new Map<string, string[]|string>([
   }
 
   export const FORM_ERROR_TIPS = {
-    refuseOpinion: ('选择拒绝时，审批意见为必填'),
+    refuseOpinion: ('选择拒绝时，审核意见为必填'),
     clusterTest:('无法连接集群，请检查集群地址是否正确或防火墙配置'),
     
   }

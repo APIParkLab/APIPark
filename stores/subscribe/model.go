@@ -12,7 +12,7 @@ type Subscribe struct {
 	Applier     string    `gorm:"size:36;not null;column:applier;comment:申请人;index:applier"`
 	From        int       `gorm:"type:tinyint(1);not null;column:from;comment:来源;index:status;"`
 	CreateAt    time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
-	ApproveAt   time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:approve_at;comment:审批时间"`
+	ApproveAt   time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:approve_at;comment:审核时间"`
 }
 
 func (s *Subscribe) IdValue() int64 {
@@ -33,10 +33,10 @@ type Apply struct {
 	ApplyTeam   string    `gorm:"size:36;not null;column:apply_team;comment:申请团队id;index:apply_team;"`          // 申请团队id
 	Applier     string    `gorm:"size:36;not null;column:applier;comment:申请人;index:applier;" aovalue:"creator"`
 	ApplyAt     time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:apply_at;comment:申请时间"`
-	Approver    string    `gorm:"size:36;not null;column:approver;comment:审批人;index:approver;"`
-	ApproveAt   time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:approve_at;comment:审批时间"`
-	Status      int       `gorm:"type:tinyint(1);not null;column:status;comment:审批状态;index:status;"`
-	Opinion     string    `gorm:"type:text;not null;column:opinion;comment:审批意见;"`
+	Approver    string    `gorm:"size:36;not null;column:approver;comment:审核人;index:approver;"`
+	ApproveAt   time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:approve_at;comment:审核时间"`
+	Status      int       `gorm:"type:tinyint(1);not null;column:status;comment:审核状态;index:status;"`
+	Opinion     string    `gorm:"type:text;not null;column:opinion;comment:审核意见;"`
 	Reason      string    `gorm:"type:text;not null;column:reason;comment:申请原因;"`
 }
 

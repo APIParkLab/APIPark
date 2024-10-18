@@ -473,10 +473,10 @@ func (i *imlSubscribeApprovalModule) Reject(ctx context.Context, pid string, id 
 func (i *imlSubscribeApprovalModule) GetApprovalList(ctx context.Context, pid string, status int) ([]*subscribe_dto.ApprovalItem, error) {
 	applyStatus := make([]int, 0, 2)
 	if status == 0 {
-		// 获取待审批列表
+		// 获取待审核列表
 		applyStatus = append(applyStatus, subscribe.ApplyStatusReview)
 	} else {
-		// 获取已审批列表
+		// 获取已审核列表
 		applyStatus = append(applyStatus, subscribe.ApplyStatusRefuse, subscribe.ApplyStatusSubscribe)
 	}
 	items, err := i.subscribeApplyService.ListByStatus(ctx, pid, applyStatus...)
