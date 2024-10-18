@@ -1,6 +1,8 @@
 system:
   - name: organization
     cname: '组织管理'
+    i18n:
+      zh_CN: 组织管理
     value: 'organization'
     children:
       - name: member
@@ -190,23 +192,6 @@ system:
               - "PUT:/api/v1/dynamic/{name}/offline"
             dependents:
               - system.devops.log_configuration.view
-      - name: monitor
-        cname: 监控
-        value: 'monitor'
-        children:
-          - name: view
-            cname: 查看
-            value: 'view'
-            guest_allow: true
-            apis:
-              - "GET:/api/v1/monitor/config"
-          - name: manager
-            cname: 管理
-            value: 'manager'
-            apis:
-              - "POST:/api/v1/monitor/config"
-            dependents:
-              - system.devops.monitor.view
       - name: ai_provider
         cname: AI 模型供应商
         value: 'ai_provider'

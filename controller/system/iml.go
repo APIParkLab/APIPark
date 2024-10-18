@@ -3,10 +3,22 @@ package system
 import (
 	"archive/zip"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
+
+	catalogue_dto "github.com/APIParkLab/APIPark/module/catalogue/dto"
+
+	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
+	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
+	team_dto "github.com/APIParkLab/APIPark/module/team/dto"
+	"github.com/eolinker/eosc/log"
+	"github.com/eolinker/go-common/register"
+	"github.com/eolinker/go-common/server"
+	"github.com/eolinker/go-common/utils"
+	"github.com/google/uuid"
 
 	system_dto "github.com/APIParkLab/APIPark/module/system/dto"
 
@@ -184,4 +196,71 @@ func (i *imlSettingController) Get(ctx *gin.Context) (*system_dto.Setting, error
 
 func (i *imlSettingController) Set(ctx *gin.Context, input *system_dto.InputSetting) error {
 	return i.settingModule.Set(ctx, input)
+}
+
+type imlInitController struct {
+	teamModule                     team.ITeamModule                               `autowired:""`
+	appModule                      service.IAppModule                             `autowired:""`
+	applicationAuthorizationModule application_authorization.IAuthorizationModule `autowired:""`
+	catalogueModule                catalogue.ICatalogueModule                     `autowired:""`
+}
+
+func (i *imlInitController) OnInit() {
+	register.Handle(func(v server.Server) {
+		ctx := utils.SetUserId(context.Background(), "admin")
+		teams, err := i.teamModule.Search(ctx, "")
+		if err != nil {
+			log.Error("get teams error: %v", err)
+			return
+		}
+		if len(teams) == 0 {
+			info, err := i.teamModule.Create(ctx, &team_dto.CreateTeam{
+				Name:        "Default Team",
+				Description: "Auto created By APIPark",
+			})
+			if err != nil {
+				log.Error("create default team error: %v", err)
+				return
+			}
+			app, err := i.appModule.CreateApp(ctx, info.Id, &service_dto.CreateApp{
+				Name:        "Demo Application",
+				Description: "Auto created By APIPark",
+			})
+			if err != nil {
+				i.teamModule.Delete(ctx, info.Id)
+				log.Error("create default app error: %v", err)
+				return
+			}
+			_, err = i.applicationAuthorizationModule.AddAuthorization(ctx, app.Id, &application_authorization_dto.CreateAuthorization{
+				Name:       "Default API Key",
+				Driver:     "apikey",
+				Position:   "Header",
+				TokenName:  "Authorization",
+				ExpireTime: 0,
+				Config: map[string]interface{}{
+					"apikey": uuid.New().String(),
+				},
+			})
+			if err != nil {
+				i.teamModule.Delete(ctx, info.Id)
+				i.appModule.DeleteApp(ctx, app.Id)
+				log.Error("create default api key error: %v", err)
+				return
+			}
+		}
+		items, err := i.catalogueModule.Search(ctx, "")
+		if err != nil {
+			log.Error("get catalogue error: %v", err)
+			return
+		}
+		if len(items) == 0 {
+			err = i.catalogueModule.Create(ctx, &catalogue_dto.CreateCatalogue{
+				Name: "Default Catalogue",
+			})
+			if err != nil {
+				log.Error("create default catalogue error: %v", err)
+				return
+			}
+		}
+	})
 }
