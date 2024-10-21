@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
+
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
 	ai_api "github.com/APIParkLab/APIPark/service/ai-api"
 	"github.com/APIParkLab/APIPark/service/api"
@@ -203,19 +204,8 @@ func (i *imlAPIModule) List(ctx context.Context, keyword string, serviceId strin
 	if err != nil {
 		return nil, err
 	}
-	p, has := model_runtime.GetProvider(info.AdditionalConfig["provider"])
-	if !has {
-		return nil, fmt.Errorf("provider not found")
-	}
 	return utils.SliceToSlice(apis, func(t *ai_api.API) *ai_api_dto.APIItem {
-		modelItem := ai_api_dto.ModelItem{
-			Id: t.Model,
-		}
-		model, has := p.DefaultModel(t.Model)
-		if has {
-			modelItem.Logo = model.Logo()
-		}
-		return &ai_api_dto.APIItem{
+		item := &ai_api_dto.APIItem{
 			Id:          t.ID,
 			Name:        t.Name,
 			RequestPath: t.Path,
@@ -225,8 +215,32 @@ func (i *imlAPIModule) List(ctx context.Context, keyword string, serviceId strin
 			Updater:     auto.UUID(t.Updater),
 			CreateTime:  auto.TimeLabel(t.CreateAt),
 			UpdateTime:  auto.TimeLabel(t.UpdateAt),
-			Model:       modelItem,
 		}
+		aiModel, err := ConvertStruct[ai_api_dto.AiModel](t.AdditionalConfig["ai_model"])
+		if err != nil {
+			return item
+		}
+		p, has := model_runtime.GetProvider(aiModel.Provider)
+		if has {
+			item.Provider = ai_api_dto.ProviderItem{
+				Id:   p.ID(),
+				Name: p.Name(),
+				Logo: p.Logo(),
+			}
+			m, has := p.GetModel(t.Model)
+			if has {
+				item.Model = ai_api_dto.ModelItem{
+					Id:   m.ID(),
+					Logo: m.Logo(),
+				}
+			}
+		} else {
+
+			item.Model = ai_api_dto.ModelItem{
+				Id: aiModel.Id,
+			}
+		}
+		return item
 	}), nil
 }
 

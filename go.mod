@@ -7,13 +7,12 @@ go 1.21
 require (
 	github.com/eolinker/ap-account v1.0.12
 	github.com/eolinker/eosc v0.17.3
-	github.com/eolinker/go-common v1.0.4
+	github.com/eolinker/go-common v1.1.0
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/getkin/kin-openapi v0.127.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
-	github.com/mitchellh/mapstructure v1.5.0
 	github.com/urfave/cli/v2 v2.27.2
 	golang.org/x/crypto v0.24.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -78,5 +77,3 @@ require (
 )
 
 //replace github.com/eolinker/ap-account => ../../eolinker/ap-account
-//
-//replace github.com/eolinker/go-common => ../../eolinker/go-common

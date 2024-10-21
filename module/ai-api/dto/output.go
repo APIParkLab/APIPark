@@ -26,10 +26,17 @@ type APIItem struct {
 	Updater     auto.Label     `json:"updater" aolabel:"user"`
 	CreateTime  auto.TimeLabel `json:"create_time"`
 	UpdateTime  auto.TimeLabel `json:"update_time"`
+	Provider    ProviderItem   `json:"provider"`
 	Model       ModelItem      `json:"model"`
 }
 
 type ModelItem struct {
 	Id   string `json:"id"`
+	Logo string `json:"logo"`
+}
+
+type ProviderItem struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
 	Logo string `json:"logo"`
 }

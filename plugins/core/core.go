@@ -83,6 +83,7 @@ type plugin struct {
 	importConfigController      system.IImportConfigController                     `autowired:""`
 	aiProviderController        ai.IProviderController                             `autowired:""`
 	settingController           system.ISettingController                          `autowired:""`
+	initController              system.IInitController                             `autowired:""`
 	apis                        []pm3.Api
 }
 
