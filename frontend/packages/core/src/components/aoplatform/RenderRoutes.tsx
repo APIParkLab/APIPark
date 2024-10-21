@@ -142,13 +142,13 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                                     {
                                         
                                         path:'route/create',
-                                        key: uuidv4(),
+                                        key: 'restServiceInsideRouteCreate',
                                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideRouterCreate')),
                                     },
                                     {
                                         
                                         path:'route/:routeId',
-                                        key: uuidv4(),
+                                        key: 'restServiceInsideRouteEdit',
                                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideRouterCreate')),
                                     },
                                     {
