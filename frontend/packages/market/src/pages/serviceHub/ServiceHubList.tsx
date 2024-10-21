@@ -138,7 +138,7 @@ const ServiceHubList:FC = ()=>{
                 <div className="pt-[20px]">
                 <Card title={CardTitle(item)} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px] m-0 transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]"  classNames={{header:'border-b-[0px] p-[20px] ', body:"pt-0"}} onClick={()=>showDocumentDetail(item)}>
                    <span className="line-clamp-3  text-[12px] text-[#666] " 
-                    style={{'word-break':'auto-phrase'}}>{item.description || $t('暂无服务描述')}</span> 
+                    style={{wordBreak:'auto-phrase'}}>{item.description || $t('暂无服务描述')}</span> 
                 </Card>
                 </div>
             );

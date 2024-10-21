@@ -1,10 +1,8 @@
-
 export type BasicResponse<T> = {
     code:number
     data:T
     msg:string
 }
-
 
 export const STATUS_CODE = {
     SUCCESS:0,
@@ -29,6 +27,7 @@ export const routerKeyMap = new Map<string, string[]|string>([
     ['maintenanceCenter',['aisetting','datasourcing','cluster','cert','logsettings','resourcesettings','openapi']
   ]])
   
+
     
   export const COLUMNS_TITLE  = {
     operate : ''
