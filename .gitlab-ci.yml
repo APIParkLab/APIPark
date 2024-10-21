@@ -56,14 +56,13 @@ builder:
     - |
       if [ -n "$(git diff --name-status HEAD~1 HEAD -- frontend)" ]; then
         ./scripts/build.sh $BUILD_DIR ${VERSION} all ""
-        echo "print frontend dir file:"
-        ll -a frontend
-        rm -fr ../artifacts/dist
-        cp -r frontend/dist ../artifacts/dist
-        echo "print artifacts dir file:"
-        ll -a ../artifacts
       else
         ./scripts/build.sh $BUILD_DIR ${VERSION}
+      fi
+      if [ -d "frontend/dist" ]; then
+        echo "copy frontend/dist to artifacts/dist"
+        rm -fr ../artifacts/dist
+        cp -r frontend/dist ../artifacts/dist
       fi
       cp $BUILD_DIR/${APP_PRE}_linux_amd64.tar.gz ${SAVE_DIR}
 
