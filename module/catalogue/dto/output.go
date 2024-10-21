@@ -39,6 +39,7 @@ type ServiceBasic struct {
 	UpdateTime    auto.TimeLabel `json:"update_time"`
 	Logo          string         `json:"logo"`
 	ApprovalType  string         `json:"approval_type"`
+	ServiceKind   string         `json:"service_kind"`
 	InvokeAddress string         `json:"invoke_address"`
 }
 

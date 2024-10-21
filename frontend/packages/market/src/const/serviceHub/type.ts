@@ -15,6 +15,9 @@ export type ServiceBasicInfoType = {
     updateTime:string
     version:string
     logo?:string
+    invokeAddress:string
+    approvalType:'auto'|'manual'
+    serviceType:'ai'|'rest'
 }
 
 export type ServiceDetailType = {
@@ -63,7 +66,7 @@ export type ServiceHubTableListItem = {
 
 
 export type ApplyServiceProps = {
-    entity:ServiceHubTableListItem & {app:EntityItem}
+    entity:ServiceBasicInfoType & EntityItem
     mySystemOptionList:DefaultOptionType[]
     reApply?:boolean
 }

@@ -1,18 +1,11 @@
-import { GlobalNodeItem, MyServiceTableListItem, NodeItem, ProxyHeaderItem, ServiceApiTableListItem, SimpleApiItem, SystemApiTableListItem, SystemAuthorityTableListItem, SystemMemberTableListItem, SystemSubServiceTableListItem, SystemSubscriberTableListItem, SystemTableListItem, SystemUpstreamTableListItem } from "./type";
-import { Input, InputNumber, MenuProps, Select, TabsProps, Tooltip } from "antd";
-import { ColumnsType } from "antd/es/table";
-import { getItem } from "@common/utils/navigation";
-import { MatchItem, MemberItem } from "@common/const/type";
+import { GlobalNodeItem, ProxyHeaderItem, SystemApiTableListItem, SystemMemberTableListItem, SystemSubscriberTableListItem, SystemTableListItem } from "./type";
+import { Input, TabsProps } from "antd";
+import { MatchItem } from "@common/const/type";
 import { ConfigField } from "@common/components/aoplatform/EditableTableWithModal";
 import { frontendTimeSorter } from "@common/utils/dataTransfer";
-import { COLUMNS_TITLE, STATUS_COLOR, VALIDATE_MESSAGE } from "@common/const/const";
-import { LoadingOutlined } from "@ant-design/icons";
-import { SystemInsidePublishOnlineItems } from "../../pages/system/publish/SystemInsidePublishOnline";
-import dayjs from 'dayjs';
-import { Link } from "react-router-dom";
+import { COLUMNS_TITLE } from "@common/const/const";
 
 import { PageProColumns } from "@common/components/aoplatform/PageList";
-import { $t } from "@common/locales";
 
 export enum SubscribeEnum{
     Rejected = 0,
@@ -107,12 +100,15 @@ export const SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
         ellipsis:true,
     },
     {
+        title:('类型'),
+        dataIndex: 'service_kind',
+        width: 140,
+        ellipsis:true,
+    },
+    {
         title:('所属团队'),
         dataIndex: ['team','name'],
         ellipsis:true,
-        // filters: true,
-        // onFilter: true,
-        // filterSearch: true,
     },
     {
         title:('API 数量'),
@@ -126,16 +122,6 @@ export const SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
         title: ('描述'),
         dataIndex: 'description',
         ellipsis:true,
-    },
-    {
-        title:('负责人'),
-        dataIndex: ['master','name'],
-        ellipsis: true,
-        width:108,
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        filterSearch: true,
     },
     {
         title:('创建时间'),
@@ -194,21 +180,6 @@ export const SYSTEM_SUBSCRIBER_TABLE_COLUMNS: PageProColumns<SystemSubscriberTab
     },
 ];
 
-
-export const memberModalColumn:ColumnsType<MemberItem> = [
-    {title:('成员'),
-        render:(_,entity)=>{
-            return <>
-                <div>
-                    <p>
-                        <span>{entity.name}</span>
-                        {entity.email !== undefined && <span className="text-status_offline">{entity.email}</span>}
-                    </p>
-                    <p>{entity.department}</p>
-                </div>
-            </>
-        }}
-]
 
 export const SYSTEM_MEMBER_TABLE_COLUMN: PageProColumns<SystemMemberTableListItem>[] = [
     {
@@ -319,65 +290,6 @@ export const SYSTEM_API_TABLE_COLUMNS: PageProColumns<SystemApiTableListItem>[] 
     },
 ];
 
-
-
-export const SYSTEM_UPSTREAM_TABLE_COLUMNS: PageProColumns<SystemUpstreamTableListItem>[] = [
-    {
-        title:('名称'),
-        dataIndex: 'name',
-        ellipsis:true,
-        width:160,
-        fixed:'left',
-        sorter: (a,b)=> {
-            return a.name.localeCompare(b.name)
-        },
-    },
-    {
-        title:('上游 ID'),
-        dataIndex: 'id',
-        width: 140,
-        ellipsis:true
-    },
-    {
-        title:('创建人'),
-        dataIndex: ['creator','name'],
-        ellipsis: true,
-        width:88,
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        filterSearch: true,
-    },
-    {
-        title:('更新人'),
-        dataIndex: ['updater','name'],
-        ellipsis: true,
-        width:88,
-        filters: true,
-        onFilter: true,
-        valueType: 'select',
-        filterSearch: true,
-    },
-    {
-        title:('创建时间'),
-        dataIndex: 'createTime',
-        width:182,
-        ellipsis:true,
-        sorter: (a,b)=> {
-            return a.createTime.localeCompare(b.createTime)
-        }
-    },
-    {
-        title:('更新时间'),
-        dataIndex: 'updateTime',
-        width:182,
-        ellipsis:true,
-        sorter: (a,b)=> {
-            return a.updateTime.localeCompare(b.updateTime)
-        },
-    },
-];
-
 export const UpstreamDriverEnum = {
     'static':('静态上游'),
     'discoveries':('动态服务发现'),
@@ -435,80 +347,19 @@ export const PROXY_HEADER_CONFIG:ConfigField<ProxyHeaderItem>[] = [
     }
 ]
 
-export const NODE_CONFIG:ConfigField<NodeItem>[] = [
-    {
-        title:('集群'),
-        key: 'cluster',
-        component: <Select className="w-INPUT_NORMAL" options={[]}/>,
-        required: true
-    }, {
-        title:('地址'),
-        key: 'address',
-        component: <Input className="w-INPUT_NORMAL" />,
-        renderText: (value: string) => {
-            return value
-        },
-        required: true
-    }, {
-        title:('权重'),
-        key: 'weight',
-        component: <InputNumber className="w-INPUT_NORMAL"/>,
-        renderText: (value: string) => {
-            return value
-        },
-        required: true
-    }
-]
 
 export const SERVICE_VISUALIZATION_OPTIONS = [
     {label:('内部服务：可通过网关访问，但不展示在服务广场'),value:'inner'},
     {label:('公开服务：可通过网关访问，展示在服务广场，可被其他应用订阅'),value:'public'}];
 
     
+export const SERVICE_APPROVAL_OPTIONS = [
+    {label:('无需审核：允许任何应用调用该服务'),value:'auto'},
+    {label:('人工审核：仅允许通过人工审核的应用调用该服务'),value:'manual'}];
+export const SERVICE_KIND_OPTIONS = [
+        {label:('REST'),value:'rest'},
+        {label:('AI'),value:'ai'}];
 
-export const SYSTEM_MYSERVICE_API_TABLE_COLUMNS: PageProColumns<ServiceApiTableListItem>[] = [
-    {
-        title:(' '),
-        dataIndex: 'id',
-        width:'40px',
-        fixed:'left'
-    },
-    {
-        title:('名称'),
-        dataIndex: 'name',
-        width:160,
-        fixed:'left',
-        ellipsis:true
-    },
-    {
-        title:('请求方式'),
-        dataIndex: 'method',
-        ellipsis:true
-    },
-    {
-        title:('请求路径'),
-        dataIndex: 'path',
-        ellipsis:true
-    },
-    {
-        title: ('描述'),
-        dataIndex: 'description',
-        ellipsis:true
-    }
-];
-
-
-export const apiModalColumn:ColumnsType<SimpleApiItem> = [
-    {
-        title:('所有 API'),
-        dataIndex:'method',
-    },
-    {
-        title:'',
-        dataIndex:'name',
-        ellipsis:true
-    }
-]
 
 
 export const SYSTEM_UPSTREAM_GLOBAL_CONFIG_TABLE_COLUMNS: PageProColumns<GlobalNodeItem & {_id:string}>[] = [
@@ -547,11 +398,11 @@ export const SYSTEM_UPSTREAM_GLOBAL_CONFIG_TABLE_COLUMNS: PageProColumns<GlobalN
 export const SYSTEM_INSIDE_APPROVAL_TAB_ITEMS: TabsProps['items'] = [
     {
         key: '0',
-        label:('待审批'),
+        label:('待审核'),
     },
     {
         key: '1',
-        label: ('已审批'),
+        label: ('已审核'),
     }
 ];
 

@@ -9,6 +9,7 @@ import  { ClusterNodeModal } from "./PartitionInsideClusterNode.tsx";
 import { LoadingOutlined } from "@ant-design/icons";
 import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 import { $t } from "@common/locales/index.ts";
+import { extractIPFromURL, isPrivateIP} from '@common/utils/ip.ts'
 
 const PartitionInsideCluster:FC = ()=> {
     const {setBreadcrumb} = useBreadcrumb()
@@ -86,11 +87,24 @@ const PartitionInsideCluster:FC = ()=> {
     )
 }
 
+
+const IpTypeTag = ({ip:url}:{ip:string}) =>{
+    const ip = extractIPFromURL(url);
+    const isPrivate :boolean= ip ? isPrivateIP(ip) : false
+    return (
+        <span  className={`px-[4px] py-[2px] text-[#fff] text-[12px] leading-[16px] rounded m-0 ${isPrivate ? 'bg-[#87d068]' : 'bg-[#3d46f2]'}`}>
+            {isPrivate ? $t('私有网络') : $t('公共网络')}
+        </span>
+    )
+}
 export function ClusterConfigPreview (x:PartitionClusterNodeTableListItem){
     return <div className="flex flex-col gap-[4px] ">
-        <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('管理地址')}：</Col><Col>{x.managerAddress.map(m=>(<p className="leading-[22px]">{m}</p>))}</Col></Row>
-        <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('服务地址')}：</Col><Col>{x.serviceAddress.map(m=>(<p className="leading-[22px]">{m}</p>))}</Col></Row>
-        <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('同步地址')}：</Col><Col><p className="leading-[22px]">{x.peerAddress}</p></Col></Row>
+        <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('管理地址')}：</Col><Col>{x.managerAddress.map(m=>(
+            <p className="leading-[22px] flex items-center gap-[5px]"><IpTypeTag ip={m} />{m}</p>))}</Col></Row>
+        <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('服务地址')}：</Col><Col>{x.serviceAddress.map(m=>(
+            <p className="leading-[22px] flex items-center gap-[5px]"><IpTypeTag ip={m} />{m}</p>))}</Col></Row>
+        <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('同步地址')}：</Col><Col>
+            <p className="leading-[22px] flex items-center gap-[5px]"><IpTypeTag ip={x.peerAddress} />{x.peerAddress}</p></Col></Row>
 </div>}
 
 export default PartitionInsideCluster

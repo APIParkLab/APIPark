@@ -35,7 +35,7 @@ const TeamList:FC = ()=>{
 
     const getTeamList = ()=>{
         if(!accessInit){
-            getGlobalAccessData()?.then(()=>{getTeamList()})
+            getGlobalAccessData()?.then?.(()=>{getTeamList()})
             return
         }
         return fetchData<BasicResponse<{teams:TeamTableListItem}>>(!checkPermission('system.workspace.team.view_all') ? 'teams':'manager/teams',{method:'GET',eoParams:{keyword:searchWord},eoTransformKeys:['create_time','service_num','can_delete']}).then(response=>{
@@ -85,7 +85,6 @@ const TeamList:FC = ()=>{
     };
 
     const openModal = async (type:'add'|'edit'|'delete',entity?:TeamTableListItem)=>{
-        //console.log(type,entity)
         let title:string = ''
         let content:string | React.ReactNode= ''
         switch (type){

@@ -12,10 +12,10 @@ type Publish struct {
 	ApplyTime   time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:apply_time;comment:申请时间"`
 	Applicant   string    `gorm:"size:36;not null;column:applicant;comment:申请人;index:applicant"`
 	Remark      string    `gorm:"type:text;not null;column:remark;comment:备注"`
-	ApproveTime time.Time `gorm:"type:timestamp;DEFAULT:CURRENT_TIMESTAMP;column:approve_time;comment:审批时间"`
-	Approver    string    `gorm:"size:36;not null;column:approver;comment:审批人;index:approver"`
-	Comments    string    `gorm:"type:text;not null;column:comments;comment:审批意见"`
-	Status      int       `gorm:"type:int(11);not null;column:status;index:status; comment:状态, 0: 申请中, 1: 审批中, 2: 审批通过, 3: 审批拒绝, 4: 已发布 5: 已中止 6: 已关闭 7: 发布中 8：发布失败"`
+	ApproveTime time.Time `gorm:"type:timestamp;DEFAULT:CURRENT_TIMESTAMP;column:approve_time;comment:审核时间"`
+	Approver    string    `gorm:"size:36;not null;column:approver;comment:审核人;index:approver"`
+	Comments    string    `gorm:"type:text;not null;column:comments;comment:审核意见"`
+	Status      int       `gorm:"type:int(11);not null;column:status;index:status; comment:状态, 0: 申请中, 1: 审核中, 2: 审核通过, 3: 审核拒绝, 4: 已发布 5: 已中止 6: 已关闭 7: 发布中 8：发布失败"`
 }
 
 func (t *Publish) IdValue() int64 {
@@ -55,7 +55,7 @@ type Status struct {
 	Id       int64     `gorm:"column:id;type:BIGINT(20);NOT NULL;comment:id;primary_key;comment:主键ID;"`
 	Publish  string    `gorm:"type:varchar(36);not null;column:publish;comment:publish id;uniqueIndex:unique"`
 	Cluster  string    `gorm:"type:varchar(36);not null;column:cluster;comment:cluster;uniqueIndex:unique"`
-	Status   int       `gorm:"type:int(11);not null;column:status;index:status; comment:状态, 0: 申请中, 1: 审批中, 2: 审批通过, 3: 审批拒绝, 4: 已发布 5: 已中止 6: 已关闭 7: 发布中 8：发布失败"`
+	Status   int       `gorm:"type:int(11);not null;column:status;index:status; comment:状态, 0: 申请中, 1: 审核中, 2: 审核通过, 3: 审核拒绝, 4: 已发布 5: 已中止 6: 已关闭 7: 发布中 8：发布失败"`
 	Error    string    `gorm:"type:text;not null;column:error;comment:错误信息"`
 	UpdateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:更新时间"`
 }

@@ -32,7 +32,7 @@ const TeamInsidePage:FC = ()=> {
     };
 
     const TEAM_INSIDE_MENU_ITEMS = useMemo(()=> [
-        getItem(('管理'), 'grp', null,
+        getItem($t('管理'), 'grp', null,
             [
                 getItem(<Link to="member">{$t('成员')}</Link>, 'member',undefined, undefined, undefined,'team.team.member.view'),
                 getItem(<Link to="setting">{$t('设置')}</Link>, 'setting',undefined,undefined,undefined,'team.team.team.view')],

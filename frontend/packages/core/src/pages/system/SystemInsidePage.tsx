@@ -19,7 +19,7 @@ const APP_MODE = import.meta.env.VITE_APP_MODE;
 
 const SystemInsidePage:FC = ()=> {
     const { message } = App.useApp()
-    const { teamId,serviceId,apiId} = useParams<RouterParams>();
+    const { teamId,serviceId,apiId,routeId} = useParams<RouterParams>();
     const location = useLocation()
     const currentUrl = location.pathname
     const {fetchData} = useFetch()
@@ -27,6 +27,7 @@ const SystemInsidePage:FC = ()=> {
     const { accessData,checkPermission,accessInit,state} = useGlobalContext()
     const [activeMenu, setActiveMenu] = useState<string>()
     const navigateTo = useNavigate()
+    const [showMenu, setShowMenu] = useState<boolean>(false)
 
     const getSystemInfo = ()=>{
         fetchData<BasicResponse<{ service:SystemConfigFieldType }>>('service/info',{method:'GET',eoParams:{team:teamId, service:serviceId}}).then(response=>{
@@ -58,8 +59,8 @@ const SystemInsidePage:FC = ()=> {
    const SYSTEM_PAGE_MENU_ITEMS = useMemo(()=>[
     getItem($t('服务'), 'assets', null,
         [
-            getItem(<Link to="./api">{$t('API')}</Link>, 'api',undefined,undefined,undefined,'team.service.api_doc.view'),
-            getItem(<Link to="./route">{$t('路由')}</Link>, 'route',undefined,undefined,undefined,'team.service.router.view'),
+            getItem(<Link to="./route">{$t('API 路由')}</Link>, 'route',undefined,undefined,undefined,'team.service.router.view'),
+            getItem(<Link to="./api">{$t('API 文档')}</Link>, 'api',undefined,undefined,undefined,'team.service.api_doc.view'),
             getItem(<Link to="./upstream">{$t('上游')}</Link>, 'upstream',undefined,undefined,undefined,'team.service.upstream.view'),
             getItem(<Link to="./document">{$t('使用说明')}</Link>, 'document',undefined,undefined,undefined,''),
             getItem(<Link to="./publish">{$t('发布')}</Link>, 'publish',undefined,undefined,undefined,'team.service.release.view'),
@@ -67,7 +68,7 @@ const SystemInsidePage:FC = ()=> {
         'group'),
     getItem($t('订阅管理'), 'provideSer', null,
         [
-            getItem(<Link to="./approval">{$t('订阅审批')}</Link>, 'approval',undefined,undefined,undefined,'team.service.subscription.view'),
+            getItem(<Link to="./approval">{$t('订阅审核')}</Link>, 'approval',undefined,undefined,undefined,'team.service.subscription.view'),
             getItem(<Link to="./subscriber">{$t('订阅方管理')}</Link>, 'subscriber',undefined,undefined,undefined,'team.service.subscription.view'),
         ],
         'group'),
@@ -94,7 +95,7 @@ const SystemInsidePage:FC = ()=> {
         }
         const filteredMenu = filterMenu(SYSTEM_PAGE_MENU_ITEMS as MenuItemGroupType<MenuItemType>[])
         setActiveMenu((pre)=>{
-            return pre ?? 'api'
+            return pre ?? 'route'
         })
         return  filteredMenu || []
     },[accessData,accessInit, SYSTEM_PAGE_MENU_ITEMS])
@@ -104,12 +105,13 @@ const SystemInsidePage:FC = ()=> {
     };
     
     useEffect(() => {
+        setShowMenu(!routeId && !currentUrl.includes('route/create'))
         if(apiId !== undefined){
             setActiveMenu('api')
         }else if(serviceId !== currentUrl.split('/')[currentUrl.split('/').length - 1]){ 
             setActiveMenu(currentUrl.split('/')[currentUrl.split('/').length - 1])
         }else{
-            setActiveMenu('api')
+            setActiveMenu('route')
         }
     }, [currentUrl]);
 
@@ -130,7 +132,7 @@ const SystemInsidePage:FC = ()=> {
     }, [serviceId]);
 
     return (
-        <>
+        <>{showMenu ?
         <InsidePage pageTitle={systemInfo?.name || '-'} 
                 tagList={[{label:
                     <Paragraph className="mb-0" copyable={serviceId ? { text: serviceId } : false}>{$t('服务 ID')}：{serviceId || '-'}</Paragraph>
@@ -149,7 +151,7 @@ const SystemInsidePage:FC = ()=> {
                             <Outlet/>
                     </div>
                 </div>
-            </InsidePage>
+            </InsidePage>: <Outlet/> }
 
         </>
     )
