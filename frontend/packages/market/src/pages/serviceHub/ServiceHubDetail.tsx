@@ -35,7 +35,7 @@ const ServiceHubDetail = ()=>{
     const navigate = useNavigate();
 
     const getServiceBasicInfo = ()=>{
-        fetchData<BasicResponse<{service:ServiceDetailType}>>('catalogue/service',{method:'GET',eoParams:{service:serviceId}, eoTransformKeys:['app_num','api_num','update_time','api_doc','invoke_address','approval_type','service_type']}).then(response=>{
+        fetchData<BasicResponse<{service:ServiceDetailType}>>('catalogue/service',{method:'GET',eoParams:{service:serviceId}, eoTransformKeys:['app_num','api_num','update_time','api_doc','invoke_address','approval_type','service_kind']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setService(data.service)
@@ -113,7 +113,7 @@ const ServiceHubDetail = ()=>{
         {
             key: 'api-document',
             label: $t('API 文档'),
-            children: <div className={`p-btnbase  ${serviceBasicInfo?.serviceType?.toLocaleLowerCase() === 'ai' ? 'ai-service-api-preview' : ''}`}><ServiceHubApiDocument service={service!} /></div>,
+            children: <div className={`p-btnbase  ${serviceBasicInfo?.serviceKind?.toLocaleLowerCase() === 'ai' ? 'ai-service-api-preview' : ''}`}><ServiceHubApiDocument service={service!} /></div>,
             icon: <ApiFilled />
         }
     ]
