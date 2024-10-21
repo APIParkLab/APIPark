@@ -398,7 +398,8 @@ func (i *imlProviderModule) initGateway(ctx context.Context, clusterId string, c
 func (i *imlProviderModule) syncGateway(ctx context.Context, clusterId string, releases []*gateway.DynamicRelease, online bool) error {
 	client, err := i.clusterService.GatewayClient(ctx, clusterId)
 	if err != nil {
-		return err
+		log.Errorf("get apinto client error: %v", err)
+		return nil
 	}
 	defer func() {
 		err := client.Close(ctx)

@@ -1,23 +1,25 @@
 system:
-  system.api_market.service_classification.manager:
-    - POST:/api/v1/catalogue
-    - PUT:/api/v1/catalogue
-    - DELETE:/api/v1/catalogue
-    - PUT:/api/v1/catalogue/sort
-  system.api_market.service_classification.view:
-    - GET:/api/v1/catalogues
+  system.dashboard.run_view.view:
+    - GET:/api/v1/monitor/overview/invoke
+    - GET:/api/v1/monitor/overview/message
+    - GET:/api/v1/monitor/overview/top10
+    - GET:/api/v1/monitor/overview/summary
+  system.devops.ai_provider.manager:
+    - PUT:/api/v1/ai/provider/config
+    - PUT:/api/v1/ai/provider/default-llm
   system.devops.ai_provider.view:
     - GET:/api/v1/ai/providers
-    - GET:/api/v1/ai/provider
-    - POST:/api/v1/ai/provider
-    - PUT:/api/v1/ai/provider
-  system.devops.ai_provider.manager:
-    - DELETE:/api/v1/ai/provider
+    - GET:/api/v1/ai/provider/config
   system.devops.cluster.manager:
     - PUT:/api/v1/cluster/reset
     - POST:/api/v1/cluster/check
   system.devops.cluster.view:
     - GET:/api/v1/cluster/nodes
+  system.devops.data_source.manager:
+    - POST:/api/v1/monitor/config
+    - PUT:/api/v1/monitor/config
+  system.devops.data_source.view:
+    - GET:/api/v1/monitor/config
   system.devops.log_configuration.manager:
     - POST:/api/v1/dynamic/{name}
     - PUT:/api/v1/dynamic/{name}/config
@@ -64,6 +66,14 @@ system:
   system.organization.team.view:
     - GET:/api/v1/manager/teams
     - GET:/api/v1/manager/team
+  system.settings.general.manager:
+  system.settings.general.view:
+  system.settings.service_classification.manager:
+    - POST:/api/v1/catalogue
+    - PUT:/api/v1/catalogue
+    - DELETE:/api/v1/catalogue
+    - PUT:/api/v1/catalogue/sort
+  system.settings.service_classification.view:
   system.workspace.api_market.view:
     - GET:/api/v1/catalogue/services
     - GET:/api/v1/catalogue/service
@@ -72,10 +82,9 @@ system:
   system.workspace.service.view_all:
     - GET:/api/v1/services
   system.workspace.team.view_all:
-    - GET:/api/v1/teams
+    - GET:/api/v1/manager/teams
 team:
   team.application.application.manager:
-    - GET:/api/v1/app/info
     - PUT:/api/v1/app/info
     - POST:/api/v1/team/app
     - DELETE:/api/v1/app
@@ -93,20 +102,13 @@ team:
     - POST:/api/v1/application/subscription/cancel_apply
   team.application.subscription.view:
     - GET:/api/v1/application/subscriptions
-  team.service.api.manager:
-    - POST:/api/v1/service/api
-    - PUT:/api/v1/service/api
-    - DELETE:/api/v1/service/api
-    - POST:/api/v1/service/api/copy
-  team.service.api.view:
-    - GET:/api/v1/service/apis
-    - GET:/api/v1/service/api/detail
-    - GET:/api/v1/service/api/detail/simple
-    - GET:/api/v1/service/api/define
-    - GET:/api/v1/service/apis/simple
+  team.service.api_doc.manager:
+    - PUT:/api/v1/service/api_doc
+    - POST:/api/v1/service/api_doc/upload
+  team.service.api_doc.view:
+    - GET:/api/v1/service/api_doc
   team.service.release.manager:
     - POST:/api/v1/service/publish/release/do
-    - PUT:/api/v1/service/publish/execute
     - DELETE:/api/v1/service/release
   team.service.release.view:
     - GET:/api/v1/service/releases
@@ -115,8 +117,16 @@ team:
     - GET:/api/v1/service/publish/check
     - GET:/api/v1/service/release/preview
     - GET:/api/v1/service/publish/status
+  team.service.router.manager:
+    - POST:/api/v1/service/router
+    - PUT:/api/v1/service/router
+    - DELETE:/api/v1/service/router
+  team.service.router.view:
+    - GET:/api/v1/service/routers
+    - GET:/api/v1/service/router/detail
+    - GET:/api/v1/service/router/detail/simple
+    - GET:/api/v1/service/router/define
   team.service.service.manager:
-    - GET:/api/v1/service/info
     - PUT:/api/v1/service/info
     - POST:/api/v1/team/service
     - DELETE:/api/v1/team/service
@@ -138,7 +148,6 @@ team:
     - PUT:/api/v1/team/member/role
   team.team.member.view:
     - GET:/api/v1/team/members
-    - GET:/api/v1/team/members/simple
     - GET:/api/v1/team/members/toadd
   team.team.team.manager:
     - POST:/api/v1/manager/team

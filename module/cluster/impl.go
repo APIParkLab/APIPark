@@ -2,16 +2,18 @@ package cluster
 
 import (
 	"context"
-	
+
+	"github.com/APIParkLab/APIPark/service/setting"
+
 	cluster_dto "github.com/APIParkLab/APIPark/module/cluster/dto"
-	
+
 	"github.com/APIParkLab/APIPark/gateway/admin"
 	"github.com/eolinker/eosc/log"
-	
+
 	"github.com/eolinker/go-common/store"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
-	
+
 	"github.com/APIParkLab/APIPark/service/cluster"
 	"github.com/eolinker/ap-account/service/account"
 	"github.com/eolinker/go-common/utils"
@@ -23,6 +25,7 @@ var (
 
 type imlClusterModule struct {
 	clusterService  cluster.IClusterService `autowired:""`
+	settingService  setting.ISettingService `autowired:""`
 	userNameService account.IAccountService `autowired:""`
 	transaction     store.ITransaction      `autowired:""`
 }
@@ -42,12 +45,12 @@ func (m *imlClusterModule) CheckCluster(ctx context.Context, address ...string) 
 		}
 	})
 	nodeStatus(ctx, nodesOut)
-	
+
 	return nodesOut, nil
 }
 
 func (m *imlClusterModule) ResetCluster(ctx context.Context, clusterId string, address string) ([]*cluster_dto.Node, error) {
-	
+
 	nodes, err := m.clusterService.UpdateAddress(ctx, clusterId, address)
 	if err != nil {
 		return nil, err
@@ -65,7 +68,10 @@ func (m *imlClusterModule) ResetCluster(ctx context.Context, clusterId string, a
 			Gateways: i.Server,
 		}
 	})
-	
+	v, has := m.settingService.Get(ctx, setting.KeyInvokeAddress)
+	if (!has || v == "") && len(nodesOut) > 0 && len(nodesOut[0].Gateways) > 0 {
+		m.settingService.Set(ctx, setting.KeyInvokeAddress, nodesOut[0].Gateways[0], utils.UserId(ctx))
+	}
 	nodeStatus(ctx, nodesOut)
 	return nodesOut, nil
 }
@@ -83,7 +89,7 @@ func (m *imlClusterModule) initGateway(ctx context.Context, clusterId string) er
 	return gateway.InitGateway(ctx, clusterId, client)
 }
 func (m *imlClusterModule) ClusterNodes(ctx context.Context, clusterId string) ([]*cluster_dto.Node, error) {
-	
+
 	nodes, err := m.clusterService.Nodes(ctx)
 	if err != nil {
 		return nil, err
@@ -98,7 +104,7 @@ func (m *imlClusterModule) ClusterNodes(ctx context.Context, clusterId string) (
 		}
 	})
 	nodeStatus(ctx, nodesOut)
-	
+
 	return nodesOut, nil
 }
 
