@@ -42,9 +42,7 @@ const ServiceHubDetail = ()=>{
                 setServiceBasicInfo(data.service.basic)
                 setServiceName(data.service.name)
                 setServiceDesc(data.service.description)
-                // setApplied(data.service.applied)
                 setServiceDoc(DOMPurify.sanitize(data.service.document))
-                // setActiveKey(data.service.apis.map((x)=>x.id))
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
             }
