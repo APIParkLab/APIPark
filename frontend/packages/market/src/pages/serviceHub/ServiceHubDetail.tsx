@@ -158,7 +158,7 @@ const ServiceHubDetail = ()=>{
                     <Descriptions title={$t("服务信息")} column={1} size={'small'}>
                         <Descriptions.Item label={$t("接入应用")}>{serviceBasicInfo?.appNum ?? '-'}</Descriptions.Item>
                         <Descriptions.Item label={$t("供应方")}>{serviceBasicInfo?.team?.name || '-'}</Descriptions.Item>
-                        <Descriptions.Item label={$t("审核")}>{serviceBasicInfo?.approvalType ? (approvalTypeTranslate[serviceBasicInfo?.approvalType] || '-' ): '-'}</Descriptions.Item>
+                        <Descriptions.Item label={$t("审核")}>{serviceBasicInfo?.approvalType ? $t((approvalTypeTranslate[serviceBasicInfo?.approvalType] || '-' )): '-'}</Descriptions.Item>
                         <Descriptions.Item label={$t("分类")}>{serviceBasicInfo?.catalogue?.name || '-'}</Descriptions.Item>
                         <Descriptions.Item label={$t("标签")}>{serviceBasicInfo?.tags?.map(x=>x.name)?.join(',') || '-'}</Descriptions.Item>
                     </Descriptions>
