@@ -29,7 +29,7 @@ var (
 	indexHtml []byte
 )
 var (
-	expires      = time.Hour * 24 * 3
+	expires      = time.Hour * 24 * 7
 	cacheControl = fmt.Sprintf("public, max-age=%d", 3600*24*7)
 )
 
