@@ -56,10 +56,11 @@ builder:
     - |
       if [ -n "$(git diff --name-status HEAD~1 HEAD -- frontend)" ]; then
         ./scripts/build.sh $BUILD_DIR ${VERSION} all ""
-        echo ""
+        echo "print frontend dir file:"
         ll -a frontend
         rm -fr ../artifacts/dist
         cp -r frontend/dist ../artifacts/dist
+        echo "print artifacts dir file:"
         ll -a ../artifacts
       else
         ./scripts/build.sh $BUILD_DIR ${VERSION}
