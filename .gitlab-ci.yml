@@ -47,6 +47,9 @@ builder:
   script:
     - go mod tidy
     - |
+      if [ -d "../artifacts" ]; then
+        mkdir -p ../artifacts
+      fi
       if [ -d "../artifacts/dist" ]; then
         cp -r ../artifacts/dist frontend/dist
       fi
