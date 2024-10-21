@@ -17,8 +17,8 @@ export const ManagementAuthorityView = ({entity}:ManagementAuthorityViewProps)=>
         <div className="my-btnybase">{
             detail?.length > 0 && detail.map((k,i)=>(
                 <Row className="leading-[32px]" key={i}>
-                    <Col className="pr-[8px]" offset={1} span={6}>{$t(k.key)}:</Col>
-                    <Col className="break-all" span={17}>{ ['永久','否','是'].indexOf(k.value)!== -1 ? $t(k.value) : (k.value || '-')}</Col>
+                    <Col className="pr-[8px]" offset={1} span={7}>{$t(k.key)}:</Col>
+                    <Col className="break-all" span={16}>{ ['永久','否','是'].indexOf(k.value)!== -1 ? $t(k.value) : (k.value || '-')}</Col>
                 </Row>
             ))
         }

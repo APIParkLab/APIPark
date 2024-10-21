@@ -93,7 +93,7 @@ const IpTypeTag = ({ip:url}:{ip:string}) =>{
     const isPrivate :boolean= ip ? isPrivateIP(ip) : false
     return (
         <span  className={`px-[4px] py-[2px] text-[#fff] text-[12px] leading-[16px] rounded m-0 ${isPrivate ? 'bg-[#87d068]' : 'bg-[#3d46f2]'}`}>
-            {isPrivate ? '私有网络' : '公共网络'}
+            {isPrivate ? $t('私有网络') : $t('公共网络')}
         </span>
     )
 }
