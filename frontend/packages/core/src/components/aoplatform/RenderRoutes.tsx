@@ -5,14 +5,15 @@ import BasicLayout from '@common/components/aoplatform/BasicLayout';
 import {createElement, ReactElement,ReactNode,Suspense} from 'react';
 import { v4 as uuidv4 } from 'uuid'
 import {App, Skeleton} from "antd";
-import ApprovalPage from "@core/pages/approval/ApprovalPage.tsx";
-import {SystemProvider} from "@core/contexts/SystemContext.tsx";
 import {useGlobalContext} from "@common/contexts/GlobalStateContext.tsx";
 import {FC,lazy} from 'react';
 import { TeamProvider } from '@core/contexts/TeamContext.tsx';
-import SystemOutlet from '@core/pages/system/SystemOutlet.tsx';
 import { TenantManagementProvider } from '@market/contexts/TenantManagementContext.tsx';
 import  Guide  from '@core/pages/guide/Guide';
+import { AiServiceProvider } from '@core/contexts/AiServiceContext';
+import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
+import SystemOutlet from '@core/pages/system/SystemOutlet';
+import { SystemProvider } from '@core/contexts/SystemContext';
 
 type RouteConfig = {
     path:string
@@ -42,6 +43,7 @@ export type RouterParams  = {
     appId:string
     roleType:string 
     roleId:string
+    routeId:string
 }
 
 const PUBLIC_ROUTES:RouteConfig[] = [
@@ -107,8 +109,8 @@ const PUBLIC_ROUTES:RouteConfig[] = [
             },
             {
                 path:'service',
-                component:<SystemOutlet />,
                 key: uuidv4(),
+                component:<SystemOutlet />,
                 provider: SystemProvider,
                 children:[
                     {
@@ -140,6 +142,18 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                                         path:'api',
                                         key: uuidv4(),
                                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideApiDocument.tsx')),
+                                    },
+                                    {
+                                        
+                                        path:'route/create',
+                                        key: uuidv4(),
+                                        lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideRouterCreate')),
+                                    },
+                                    {
+                                        
+                                        path:'route/:routeId',
+                                        key: uuidv4(),
+                                        lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideRouterCreate')),
                                     },
                                     {
                                         path:'route',
@@ -214,7 +228,93 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                                         ]
                                     },
                                 ]
-                            }
+                            },
+                            {
+                                    path:'aiInside/:serviceId',
+                                    component:<AiServiceOutlet />,
+                                    provider: AiServiceProvider,
+                                    key: uuidv4(),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/AiServiceInsidePage.tsx')),
+                                    children:[
+                                        {
+                                            path:'api',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/api/AiServiceInsideApiDocument')),
+                                        },
+                                        {
+                                            
+                                            path:'route/create',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/api/AiServiceInsideRouterCreate')),
+                                        },
+                                        {
+                                            
+                                            path:'route/:routeId',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/api/AiServiceInsideRouterCreate')),
+                                        },
+                                        {
+                                            path:'route',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/api/AiServiceInsideRouterList')),
+                                        },
+                                        {
+                                            path:'document',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/AiServiceInsideDocument.tsx')),
+                                        },
+                                        {
+                                            path:'subscriber',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/AiServiceInsideSubscriber.tsx')),
+                                            children:[
+    
+                                            ]
+                                        },
+                                        {
+                                            path:'approval',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/approval/AiServiceInsideApproval')),
+                                            children:[
+                                                {
+                                                    path:'',
+                                                    key: uuidv4(),
+                                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/approval/AiServiceInsideApprovalList')),
+                                                },
+                                                {
+                                                    path:'*',
+                                                    key: uuidv4(),
+                                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/approval/AiServiceInsideApprovalList')),
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            path:'publish',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/publish/AiServiceInsidePublish')),
+                                            children:[
+                                                {
+                                                    path:'',
+                                                    key: uuidv4(),
+                                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/publish/AiServiceInsidePublishList')),
+                                                },
+                                                {
+                                                    path:'*',
+                                                    key: uuidv4(),
+                                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/publish/AiServiceInsidePublishList')),
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            path:'setting',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemConfig.tsx')),
+                                            children:[
+    
+                                            ]
+                                        },
+                                    ]
+                                }
                         ]
                     }
                 ]
@@ -228,6 +328,11 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                 path:'cluster',
                 key: uuidv4(),
                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/partitions/PartitionInsideCluster.tsx')),
+            },
+            {
+                path:'aisetting',
+                key: uuidv4(),
+                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiSetting/AiSettingList.tsx')),
             },
             {
                 path:'cert',
@@ -256,8 +361,8 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                     }]
             },
             {
-                path:'servicecategories',
-                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/serviceCategory/ServiceCategory.tsx')),
+                path:'commonsetting',
+                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/common/CommonPage.tsx')),
                 key:uuidv4(),
             },
             {

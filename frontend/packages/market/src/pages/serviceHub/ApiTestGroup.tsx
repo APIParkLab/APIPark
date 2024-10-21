@@ -18,7 +18,6 @@ export default function ApiTestGroup({apiInfoList,selectedApiId }:ApiTestGroupTy
     const [selectedApi,setSelectedApi] = useState<string[]>([selectedApiId])
     const [selectedApiInfo, setSelectedApiInfo] = useState<ApiDetail>()
     const onSearchWordChange = (e:unknown)=>{
-        //console.log(e)
     }
 
     useEffect(()=>{

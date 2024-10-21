@@ -35,7 +35,7 @@ export const SUBSCRIBE_APPROVAL_TABLE_COLUMN : PageProColumns<ApprovalTableListI
         ellipsis:true
     },
     {
-        title:('审批状态'),
+        title:('审核状态'),
         dataIndex: 'status',
         valueType: 'text',
     },
@@ -46,13 +46,13 @@ export const SUBSCRIBE_APPROVAL_TABLE_COLUMN : PageProColumns<ApprovalTableListI
         width:88,
     },
     {
-        title:('审批人'),
+        title:('审核人'),
         dataIndex: ['approver','name'],
         ellipsis: true,
         width:88
     },
     {
-        title:('审批时间'),
+        title:('审核时间'),
         dataIndex: 'approvalTime',
         ellipsis: true,
         // sorter: true,,
@@ -131,7 +131,7 @@ export const SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN : PageProColumns<Subscri
         ellipsis:true
     },
     {
-        title:('审批状态'),
+        title:('审核状态'),
         dataIndex: 'status',
         valueType: 'select',
         ellipsis: true,
@@ -139,7 +139,7 @@ export const SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN : PageProColumns<Subscri
         onFilter: true,
     },
     {
-        title:('审批人'),
+        title:('审核人'),
         dataIndex: ['approver','name'],
         ellipsis: true,
         width:88,
@@ -149,7 +149,7 @@ export const SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN : PageProColumns<Subscri
         filterSearch: true,
     },
     {
-        title:('审批时间'),
+        title:('审核时间'),
         dataIndex: 'approvalTime',
         ellipsis: true,
         // sorter: true,,
@@ -174,8 +174,8 @@ export type SubscribeApprovalTableListItem = {
 
 
 export const PublishApplyStatusEnum = {
-    'accept': ("审批完成"),
-    'apply': ("发布审批中"),
+    'accept': ("审核完成"),
+    'apply': ("发布审核中"),
     'running': ("在线"),
     'none': ("-"),
     'refuse': ("已拒绝"),
@@ -220,6 +220,11 @@ export const ApprovalRouteColumns = [
         render:(value)=>value?.join(', ')
     },
     {
+        title:('名称'),
+        dataIndex:'name',
+        ellipsis:true,
+    },
+    {
         title:('路径'),
         dataIndex:'path',
         ellipsis:true
@@ -255,8 +260,8 @@ export const ApprovalUpstreamColumns = [
 ]
 
 export const PublishStatusEnum = {
-    'apply': ('待审批'),
-    'accept' : ('审批通过'),
+    'apply': ('待审核'),
+    'accept' : ('审核通过'),
     'done' : ('已发布'),
     'stop': ('发布终止'),
     'close': ('已关闭'),
@@ -276,7 +281,8 @@ export const PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN : PageProColumns<Publis
     {
         title:('版本说明'),
         dataIndex: 'remark',
-        ellipsis:true
+        ellipsis:true,
+        width:160,
     },
     {
         title:('创建版本时间'),
@@ -298,7 +304,7 @@ export const PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN : PageProColumns<Publis
         title:('创建人'),
         dataIndex: ['creator','name'],
         ellipsis: true,
-        width:88,
+        width:120,
         filters: true,
         onFilter: true,
         valueType: 'select',
@@ -323,17 +329,19 @@ export const PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN : PageProColumns<Publish
     {
         title:('版本号'),
         dataIndex: 'version',
-        ellipsis:true
+        ellipsis:true,
+        width:130,
     },
     {
         title:('版本说明'),
         dataIndex: 'remark',
-        ellipsis:true
+        ellipsis:true,
+        width:160,
     },
     {
         title:('发布状态'),
         dataIndex: 'status',
-        ellipsis:true
+        ellipsis:true,
     },
     {
         title:('备注'),
@@ -351,7 +359,7 @@ export const PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN : PageProColumns<Publish
         filterSearch: true,
     },
     {
-        title:('审批人'),
+        title:('审核人'),
         dataIndex: ['approver','name'],
         ellipsis: true,
         width:88,
@@ -384,7 +392,7 @@ export const PUBLISH_APPROVAL_TABLE_COLUMN : PageProColumns<ApprovalTableListIte
         ellipsis:true
     },
     {
-        title:('审批状态'),
+        title:('审核状态'),
         dataIndex: 'status',
         ellipsis:{
             showTitle:true
@@ -404,7 +412,7 @@ export const PUBLISH_APPROVAL_TABLE_COLUMN : PageProColumns<ApprovalTableListIte
         filterSearch: true,
     },
     {
-        title:('审批人'),
+        title:('审核人'),
         dataIndex: ['approver','name'],
         ellipsis: true,
         width:88,
@@ -414,7 +422,7 @@ export const PUBLISH_APPROVAL_TABLE_COLUMN : PageProColumns<ApprovalTableListIte
         filterSearch: true,
     },
     {
-        title:('审批时间'),
+        title:('审核时间'),
         dataIndex: 'approvalTime',
         // sorter: true,
         ellipsis:true,

@@ -11,7 +11,6 @@ import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 type PermissionItem = {
     name:string 
-    cname:string 
     value:string
 }
 
@@ -57,9 +56,9 @@ const PermissionContent = ({permits,onChange,value=[],id,dependenciesMap}:{permi
             permits.map((item:PermissionClassify)=>(
                 <>
                     <div className="flex flex-col gap-btnbase" key={`group-${item.name}`}>
-                        {item.cname !== '' && <p className="">{$t(item.cname)}</p>}
+                        {item.name !== '' && <p className="">{(item.name)}</p>}
                         <div className=" pl-[20px]">
-                            {item.children.map(x=><Checkbox id={x.value} key={x.value} checked={value && value.length > 0 && value.indexOf(x.value)>-1} onChange={onSingleCheckboxChange}>{$t(x.cname)}</Checkbox>)}
+                            {item.children.map(x=><Checkbox id={x.value} key={x.value} checked={value && value.length > 0 && value.indexOf(x.value)>-1} onChange={onSingleCheckboxChange}>{(x.name)}</Checkbox>)}
                         </div>
                     </div>
                 </>
@@ -76,7 +75,7 @@ const PermissionContent = ({permits,onChange,value=[],id,dependenciesMap}:{permi
         const items = useMemo(()=>{
             const generatePermissionItem = (permissionItem:RolePermissionItem[])=> permissionItem.map((item:RolePermissionItem)=>({
                         key:item.name,
-                        label:$t(item.cname),
+                        label:(item.name),
                         children:<PermissionContent value={value} permits={item.children} onChange={(e)=>onChange?.(e)} id={id!} dependenciesMap={dependenciesMap!}/>
                     }))
             return  permissionTemplate && permissionTemplate.length > 0 ? generatePermissionItem(permissionTemplate) : []

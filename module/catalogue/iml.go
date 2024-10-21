@@ -299,6 +299,7 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 			UpdateTime:    auto.TimeLabel(r.CreateAt),
 			Logo:          s.Logo,
 			ApprovalType:  s.ApprovalType.String(),
+			ServiceKind:   s.Kind.String(),
 			InvokeAddress: invokeAddress,
 		},
 		APIDoc: apiDoc,

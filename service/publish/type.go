@@ -6,9 +6,9 @@ type StatusType int
 
 const (
 	StatusNone         StatusType = iota
-	StatusApply                   //审批中
-	StatusAccept                  // 审批通过
-	StatusRefuse                  // 审批拒绝
+	StatusApply                   //审核中
+	StatusAccept                  // 审核通过
+	StatusRefuse                  // 审核拒绝
 	StatusDone                    // 已发布
 	StatusStop                    // 已中止
 	StatusClose                   // 已关闭

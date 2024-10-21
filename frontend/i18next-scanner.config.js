@@ -1,26 +1,48 @@
 const fs = require('fs');
+const path = require('path');
 const { crc32 } = require('crc');
 
 const systemLanguage = {
+  en_US: 'en-US',
   zh_CN: 'zh-CN',
-  en_GB: 'en-GB'
+  ja_JP: 'ja-JP',
+  zh_TW: 'zh-TW'
 };
-// 读取已经存在在en.json文件的词条
+const localesDir = 'packages/common/src/locales/scan';
+const newJsonDir = 'packages/common/src/locales/scan/newJson';
+const oldJsonDir = 'packages/common/src/locales/scan/oldJson';
+const keyHashFile = 'packages/common/src/locales/keyHashMap.json';
 let existData = {};
-try {
-  console.log('Current working directory:', process.cwd());
-  const existJsonData = fs.readFileSync('packages/common/src/locales/scan/en-GB.json');
-  existData = JSON.parse(existJsonData);
-} catch (error) {
-  if (error.code === 'ENOENT') {
-    console.warn('File not found: packages/common/src/locales/scan/en-GB.json. Creating an empty file.');
-    fs.writeFileSync('packages/common/src/locales/scan/en-GB.json', JSON.stringify({}));
-  } else {
-    throw error;
+let keyHashMap = {};
+fs.readdirSync(localesDir).forEach(file => {
+  if (path.extname(file) === '.json') {
+    const lang = path.basename(file, '.json');
+    const filePath = path.join(localesDir, file);
+    try {
+      console.log('Current working directory:', process.cwd(),filePath);
+      const existJsonData = fs.readFileSync(filePath);
+      existData[lang] = JSON.parse(existJsonData);
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        console.warn(`File not found: ${filePath}. Creating an empty file.`);
+        fs.writeFileSync(filePath, JSON.stringify({}));
+        existData[lang] = {};
+      } else {
+        throw error;
+      }
+    }
   }
-}
+});
 
 const keyList = Object.keys(existData);
+
+
+// 清空 newJson 目录下的所有语言文件
+Object.values(systemLanguage).forEach(lng => {
+  const newJsonPath = path.join(newJsonDir, `${lng}.json`);
+  fs.writeFileSync(newJsonPath, JSON.stringify({}));  // 清空文件
+});
+
 
 module.exports = {
   input: [
@@ -34,7 +56,7 @@ module.exports = {
     debug: true,
     func: false,
     trans: false,
-    lngs: [systemLanguage.zh_CN, systemLanguage.en_GB],
+    lngs: [systemLanguage.zh_CN, systemLanguage.en_US, systemLanguage.ja_JP, systemLanguage.zh_TW],
     defaultLng: systemLanguage.zh_CN,
     resource: {
       loadPath: './newJson/{{lng}}.json', // 输入路径 (手动新建目录)
@@ -58,9 +80,65 @@ module.exports = {
     parser.parseFuncFromString(content, { list: ['t'] }, (key, options) => {
       options.defaultValue = key;
       const hashKey = `K${crc32(key).toString(16)}`; // crc32转换格式
-      // 如果词条不存在，则写入
-      if (!keyList.includes(hashKey)) {
-        parser.set(hashKey, options);
+      keyHashMap[key] = hashKey; 
+
+
+      // 遍历每种语言，逐个语言检查翻译是否存在
+      keyList.forEach((lng) => {
+        const langData = existData[lng] || {};
+
+        // 如果某语言没有翻译该字段，则记录到该语言的 newJson 文件中
+        if (!langData[hashKey]) {
+          const newJsonPath = path.join(newJsonDir, `${lng}.json`);
+          let newJsonData = {};
+
+          // 读取当前语言的 newJson 文件，如果已存在，则加载
+          try {
+            const newJsonRaw = fs.readFileSync(newJsonPath);
+            newJsonData = JSON.parse(newJsonRaw);
+          } catch (error) {
+            if (error.code !== 'ENOENT') {
+              throw error;
+            }
+          }
+
+          // 只添加尚未存在的 key
+          if (!newJsonData[hashKey]) {
+            newJsonData[hashKey] = options.defaultValue; // 使用原始 key 作为默认值
+            fs.writeFileSync(newJsonPath, JSON.stringify(newJsonData, null, 2));
+          }
+        }
+      });
+      // // 如果词条不存在，则写入
+      // if (!keyList.includes(hashKey)) {
+      //   parser.set(hashKey, options);
+      // }
+    });
+    done();
+  },
+  flush: function(done) {
+    // 将 keyHashMap 写入文件
+    fs.writeFileSync(keyHashFile, JSON.stringify(keyHashMap, null, 2));
+
+
+    // 遍历每种语言，处理旧字段
+    keyList.forEach((lng) => {
+      const localeFilePath = path.join(localesDir, `${lng}.json`);
+      const oldJsonPath = path.join(oldJsonDir, `${lng}.json`);
+      const langData = existData[lng] || {};
+
+      let oldJsonData = {};
+
+      // 将不存在于 keyHashMap 中的键移动到 oldJson 文件中
+      Object.keys(langData).forEach(hashKey => {
+        if (!Object.values(keyHashMap).includes(hashKey)) {
+          oldJsonData[hashKey] = langData[hashKey];  // 将旧的 key 移到 oldJson 中
+        }
+      });
+
+      // 写入 oldJson 文件
+      if (Object.keys(oldJsonData).length > 0) {
+        fs.writeFileSync(oldJsonPath, JSON.stringify(oldJsonData, null, 2));
       }
     });
     done();

@@ -1,12 +1,10 @@
 
 import { useNavigate, useParams } from "react-router-dom"
-import { RouterParams } from "@core/components/aoplatform/RenderRoutes"
 import MonitorTotalPage from "@dashboard/component/MonitorTotalPage"
 import { BasicResponse } from "@common/const/const"
 import { InvokeData, MessageData, MonitorApiData, MonitorSubscriberData, PieData, SearchBody } from "@dashboard/const/type"
 import { useFetch } from "@common/hooks/http"
 import { objectToSearchParameters } from "@common/utils/router"
-import { useEffect } from "react"
 export default function DashboardTotal() {
     const {fetchData } = useFetch()
     const navigateTo = useNavigate()

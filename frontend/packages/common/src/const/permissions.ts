@@ -121,22 +121,32 @@ export const PERMISSION_DEFINITION = [
       },
       "system.api_market.service_classification.view": {
         "granted": {
-          "anyOf": [{ "backend": ["system.api_market.service_classification.view"] }]
+          "anyOf": [{ "backend": ["system.settings.service_classification.view"] }]
         }
       },
       "system.api_market.service_classification.add": {
         "granted": {
-          "anyOf": [{ "backend": ["system.api_market.service_classification.manager"] }]
+          "anyOf": [{ "backend": ["system.settings.service_classification.manager"] }]
         }
       },
       "system.api_market.service_classification.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["system.api_market.service_classification.manager"] }]
+          "anyOf": [{ "backend": ["system.settings.service_classification.manager"] }]
         }
       },
       "system.api_market.service_classification.delete": {
         "granted": {
-          "anyOf": [{ "backend": ["system.api_market.service_classification.manager"] }]
+          "anyOf": [{ "backend": ["system.settings.service_classification.manager"] }]
+        }
+      },
+      "system.devops.system_setting.view": {
+        "granted": {
+          "anyOf": [{ "backend": ["system.settings.general.view"] }]
+        }
+      },
+      "system.devops.system_setting.edit": {
+        "granted": {
+          "anyOf": [{ "backend": ["system.settings.general.manager"] }]
         }
       },
       "system.dashboard.run_view.view":{
@@ -172,6 +182,16 @@ export const PERMISSION_DEFINITION = [
       "system.devops.cluster.delete": {
         "granted": {
           "anyOf": [{ "backend": ["system.devops.cluster.manager"] }]
+        }
+      },
+      "system.devops.ai_provider.view": {
+        "granted": {
+          "anyOf": [{ "backend": ["system.devops.ai_provider.view"] }]
+        }
+      },
+      "system.devops.ai_provider.edit": {
+        "granted": {
+          "anyOf": [{ "backend": ["system.devops.ai_provider.manager"] }]
         }
       },
       "system.devops.ssl_certificate.view": {
@@ -445,6 +465,16 @@ export const PERMISSION_DEFINITION = [
         }
       },
       "team.application.authorization.delete": {
+        "granted": {
+          "anyOf": [{ "backend": ["team.application.authorization.manager"] }]
+        }
+      },
+      "team.application.authorization.cancelSubApply": {
+        "granted": {
+          "anyOf": [{ "backend": ["team.application.authorization.manager"] }]
+        }
+      },
+      "team.application.authorization.cancelSub": {
         "granted": {
           "anyOf": [{ "backend": ["team.application.authorization.manager"] }]
         }

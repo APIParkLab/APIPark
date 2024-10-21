@@ -1,4 +1,4 @@
-import {App, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
+import {App, Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
 import  {forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
 import EditableTableWithModal from "@common/components/aoplatform/EditableTableWithModal.tsx";
 import styles from "./SystemInsideApi.module.css"
@@ -12,23 +12,33 @@ import { $t } from "@common/locales/index.ts";
 import SystemInsideApiProxy from "@core/pages/system/api/SystemInsideApiProxy.tsx";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
+import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSystemContext } from "@core/contexts/SystemContext.tsx";
+import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 
 const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,SystemInsideRouterCreateProps>((props, ref) => {
     const { message } = App.useApp()
-    const {type, entity, serviceId,teamId, modalApiPrefix:apiPrefix, modalPrefixForce:prefixForce} = props
+    const {serviceId, teamId, routeId}  = useParams<RouterParams>()
     const [form] = Form.useForm();
     const {fetchData} = useFetch()
     const [loading, setLoading] = useState<boolean>(false)
     const proxyRef = useRef<SystemInsideApiProxyHandle>(null)
     const { state } = useGlobalContext()
+    const {apiPrefix, prefixForce} = useSystemContext()
+    const navigator = useNavigate()
 
     const onFinish = ()=>{
         return Promise.all([proxyRef.current?.validate?.(), form.validateFields()]).then(([,formValue])=>{
-            const body = {...formValue,path:formValue.path.trim(),proxy:{...formValue.proxy,path:formValue.proxy.path ? (formValue.proxy.path.startsWith('/')? formValue.proxy.path: '/'+ formValue.proxy.path) : undefined}}
-            return fetchData<BasicResponse<null>>('service/router',{method: type === 'add' ? 'POST' : 'PUT',eoBody:(body), eoParams: {service:serviceId,team:teamId, ...(type === 'edit' ? {router:entity?.id}: {})},eoTransformKeys:['matchType','disable']}).then(response=>{
+            const body = {...formValue,
+                path: prefixForce? `${apiPrefix}/${formValue.path.trim()}` : formValue.path.trim(),
+                proxy:{...formValue.proxy,path:formValue.proxy.path ? (formValue.proxy.path.startsWith('/')? formValue.proxy.path: '/'+ formValue.proxy.path) : undefined}}
+            return fetchData<BasicResponse<null>>('service/router',{
+                method: routeId ? 'PUT' :'POST' ,eoBody:(body), eoParams: {service:serviceId,team:teamId,  router:routeId },eoTransformKeys:['matchType','disable']}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
                     message.success(msg || $t(RESPONSE_TIPS.success))
+                        navigator(`/service/${teamId}/inside/${serviceId}/route`)
                     return Promise.resolve(true)
                 }else{
                     message.error(msg || $t(RESPONSE_TIPS.error))
@@ -41,7 +51,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
     const copy: ()=>Promise<boolean | string> =  ()=>{
         return new Promise((resolve, reject)=>{
             return form.validateFields().then((value)=>{
-                fetchData<BasicResponse<{api:SystemApiProxyFieldType}>>('service/api/copy',{method:'POST',eoParams:{service:serviceId,team:teamId, api:entity!.id},eoBody:({...value,path:value.path.trim()})}).then(response=>{
+                fetchData<BasicResponse<{api:SystemApiProxyFieldType}>>('service/api/copy',{method:'POST',eoParams:{service:serviceId,team:teamId, api:routeId},eoBody:({...value,path:value.path.trim()})}).then(response=>{
                     const {code,data,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
                         message.success(msg || $t(RESPONSE_TIPS.success))
@@ -63,11 +73,11 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
 
     const getRouterConfig = ()=>{
         setLoading(true)
-        fetchData<BasicResponse<{router:SystemApiProxyFieldType}>>('service/router/detail',{method:'GET',eoParams:{service:serviceId,team:teamId, router:entity!.id}, eoTransformKeys:['create_time','update_time','match_type','upstream_id','opt_type']}).then(response=>{
+        fetchData<BasicResponse<{router:SystemApiProxyFieldType}>>('service/router/detail',{method:'GET',eoParams:{service:serviceId,team:teamId, router:routeId}, eoTransformKeys:['create_time','update_time','match_type','upstream_id','opt_type']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 const {disable, protocols, path, methods, description, match, proxy} = data.router
-                form.setFieldsValue({disable, protocols, path, methods, description, match,proxy
+                form.setFieldsValue({disable, protocols, path:prefixForce && path?.startsWith(apiPrefix + '/')? path.slice((apiPrefix?.length || 0) + 1) : path, methods, description, match,proxy
                 })
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
@@ -77,28 +87,15 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
     }
 
     useEffect(() => {
-        switch(type){
-            case 'edit':
+        if(routeId){
                 getRouterConfig()
-                break;
-            case 'add':
-                form.setFieldValue('prefix',apiPrefix)
-                form.setFieldValue(['proxy','timeout'],10000)
-                form.setFieldValue(['proxy','retry'],0)
-                form.setFieldValue('protocols',['HTTP','HTTPS'])
-                break;
-            case 'copy':
-                // form.setFieldsValue({
-                //     ...entity,
-                //     name:`${$t('副本')}-${entity!.name}`,
-                //     ...(prefixForce?
-                //         {prefix:apiPrefix,path: entity!.path.substring(apiPrefix?.length|| 0)}:
-                //         {}),
-                //     proxy:{timeout:10000, retry:0, ...entity?.proxy}
-                // });
-                break;
+        }else{
+            form.setFieldValue('prefix',apiPrefix)
+            form.setFieldValue(['proxy','timeout'],10000)
+            form.setFieldValue(['proxy','retry'],0)
+            form.setFieldValue('protocols',['HTTP','HTTPS'])
         }
-        return (form.setFieldsValue({}))
+            return (form.setFieldsValue({}))
     }, []);
 
 
@@ -118,7 +115,19 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
         })
     }, [state.language])
 
-    return (<div className="h-full w-full">
+    return (
+        <InsidePage pageTitle={ $t('API 路由设置')|| '-'} 
+            showBorder={false}
+            scrollPage={false}
+            className="overflow-y-auto"
+            backUrl={`/service/${teamId}/inside/${serviceId}/route`}
+            customBtn={
+                <div className="flex gap-btnbase items-center">
+                    <Button type="primary" onClick={onFinish}>
+                        {$t('保存')}
+                    </Button>
+                </div>
+            }>
             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} className=''>
                 <Form
                     layout='vertical'
@@ -158,7 +167,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
                             }]}
                             className={styles['form-input-group']}
                         >
-                            <Input  prefix={type === 'edit' ? null :(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
+                            <Input  prefix={(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
                                 placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
 
@@ -190,20 +199,18 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
                         </Form.Item>
                         {/* } */}
 
-                        { type !== 'copy' &&<>
 
                         <Row className="mb-btnybase mt-[40px]"><Col  ><span className="font-bold mr-[13px]">{$t('转发规则设置')} </span></Col></Row>
                         <Form.Item<SystemApiProxyFieldType>
                             className="mb-0 bg-transparent border-none p-0"
                             name="proxy"
                         >
-                            <SystemInsideApiProxy type={type} serviceId={serviceId!} teamId={teamId!} ref={proxyRef} />
+                            <SystemInsideApiProxy type={routeId ? 'edit' : 'add'}  ref={proxyRef} />
                         </Form.Item>
-                        </>}
                         </div>
                     </Form>
                 </Spin>
-    </div>
+    </InsidePage>
     )
 })
 export default SystemInsideRouterCreate

@@ -34,7 +34,7 @@ const SystemInsidePublicList:FC = ()=>{
     const drawerRef = useRef<PublishApprovalModalHandle>(null)
     const [extraModalBtnLoading,setExtraModalBtnLoading] = useState<boolean>(false)
     const [pageStatus,setPageStatus] = useState<0|1>(0 as 0|1)
-    const [pageType, setPageType] = useState<'insideSystem'|'global'>('insideSystem')
+    const [pageType, setPageType] = useState<'insidePage'|'global'>('insidePage')
     const query =new URLSearchParams(useLocation().search)
     const currLocation = useLocation().pathname
     const [memberValueEnum, setMemberValueEnum] = useState<SimpleMemberItem[]>([])
@@ -50,7 +50,7 @@ const SystemInsidePublicList:FC = ()=>{
         current?: number | undefined;
         keyword?: string | undefined;
     })=>{
-        if(!(pageType !== 'insideSystem' && pageStatus !== 0 ) && !tableHttpReload){
+        if(!(pageType !== 'insidePage' && pageStatus !== 0 ) && !tableHttpReload){
             setTableHttpReload(true)
             return Promise.resolve({
                 data: tableListDataSource,
@@ -59,7 +59,7 @@ const SystemInsidePublicList:FC = ()=>{
         }
         return fetchData<BasicResponse<{releases?:PublishVersionTableListItem[],publishs?:PublishTableListItem[]}>>(
             pageStatus === 0 ? 'service/releases':'service/publishs',
-            {method:'GET',eoParams:(pageType !== 'insideSystem' && pageStatus !== 0 )  ? {service:serviceId,team:teamId,page:params?.current,page_size:params?.pageSize}:{service:serviceId,team:teamId},eoTransformKeys:['pageSize','apply_time','approve_time','release_status','is_valid','fail_msg','create_time','can_rollback','flow_id','can_delete']}).then(response=>{
+            {method:'GET',eoParams:(pageType !== 'insidePage' && pageStatus !== 0 )  ? {service:serviceId,team:teamId,page:params?.current,page_size:params?.pageSize}:{service:serviceId,team:teamId},eoTransformKeys:['pageSize','apply_time','approve_time','release_status','is_valid','fail_msg','create_time','can_rollback','flow_id','can_delete']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 const finalRes = pageStatus === 0 ? data.releases.map((x:PublishVersionTableListItem)=>{if(!x.status|| x.status === 'close'){x.status = 'none'} return x}):data.publishs
@@ -176,7 +176,7 @@ const SystemInsidePublicList:FC = ()=>{
                 );
                 message.destroy();
                 if (code === STATUS_CODE.SUCCESS) {
-                    setDrawerTitle($t('审批'))
+                    setDrawerTitle($t('审核'))
                     setDrawerType(type)
                     setDrawerData(data.publish)
                     setDrawerOkTitle($t('通过'))
@@ -270,7 +270,7 @@ const SystemInsidePublicList:FC = ()=>{
     const tableOperation = (entity:PublishTableListItem | PublishVersionTableListItem)=>{
         const viewBtn = <TableBtnWithPermission  access="team.service.release.view" key="view" btnType="view"  onClick={()=>{openDrawer('view',entity)}} btnTitle="查看详情"/>
         let btnArr:React.ReactNode[] = []
-        if(pageType !== 'insideSystem' && pageStatus !== 0){
+        if(pageType !== 'insidePage' && pageStatus !== 0){
             btnArr =  [
                     viewBtn
                 ]
@@ -298,7 +298,7 @@ const SystemInsidePublicList:FC = ()=>{
 
         if((entity as PublishVersionTableListItem).status === 'apply'){
             btnArr =  [
-                    <TableBtnWithPermission  access="team.service.release.approval" key="approval" btnType="approval" onClick={()=>{openDrawer('approval',entity)}} btnTitle="审批"/>,
+                    <TableBtnWithPermission  access="team.service.release.approval" key="approval" btnType="approval" onClick={()=>{openDrawer('approval',entity)}} btnTitle="审核"/>,
                     <Divider type="vertical" className="mx-0"  key="div1"/>,
                     viewBtn,
                     <Divider type="vertical" className="mx-0"  key="div2"/>,
@@ -374,7 +374,7 @@ const SystemInsidePublicList:FC = ()=>{
     }
 
     const columns = useMemo(()=>{
-        return ((pageType === 'insideSystem' || pageStatus === 0 ) ?
+        return ((pageType === 'insidePage' || pageStatus === 0 ) ?
              PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN
              :PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN)
              .map(x=>{
@@ -386,7 +386,7 @@ const SystemInsidePublicList:FC = ()=>{
                     x.valueEnum = tmpValueEnum
                 }
                 if(x.dataIndex === 'status'){
-                    x.valueEnum = (pageType === 'insideSystem' || pageStatus === 0 ) ? new Map([
+                    x.valueEnum = (pageType === 'insidePage' || pageStatus === 0 ) ? new Map([
                         ['apply',<span className={PublishTableStatusColorClass.apply}>{$t(PublishApplyStatusEnum.apply || '-')}</span>],
                         ['running',<span className={PublishTableStatusColorClass.running}>{$t(PublishApplyStatusEnum.running || '-')}</span>],
                         ['none',<span className={PublishTableStatusColorClass.none}>{$t(PublishApplyStatusEnum.none || '-')}</span>],
@@ -419,7 +419,7 @@ const SystemInsidePublicList:FC = ()=>{
     }, [query]);
 
     useEffect(()=>{
-        setPageType(currLocation.split('/')[0] === 'service' ? 'insideSystem' : 'global')
+        setPageType(currLocation.split('/')[0] === 'service' ? 'insidePage' : 'global')
     },[currLocation])
 
     const manualReloadTable = () => {
@@ -517,7 +517,7 @@ const SystemInsidePublicList:FC = ()=>{
                     </Button>
                     </WithPermission> :undefined}
               >
-                <PublishApprovalModalContent insideSystem ref={drawerRef}
+                <PublishApprovalModalContent insidePage ref={drawerRef}
                                                         data={drawerData as PublishVersionTableListItem } type={drawerType} serviceId={serviceId!} teamId={teamId!} />
             </DrawerWithFooter>
         </>

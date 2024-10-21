@@ -31,6 +31,7 @@ const AddToDepartment = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((
     const { message } = App.useApp()
     const [expandedKeys, setExpandedKeys] = useState<string[]>([])
     const {fetchData} = useFetch()
+    const { state} = useGlobalContext()
     const save:()=>Promise<boolean | string> =  ()=>{
         return new Promise((resolve, reject)=>{
                 fetchData<BasicResponse<null>>('user/department/member',{method:'POST',eoBody:({userIds:selectedUserIds,departmentIds:selectedKeys}),eoTransformKeys:['departmentIds','userIds']}).then(response=>{
@@ -71,6 +72,13 @@ const AddToDepartment = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((
         })
     }
 
+    const translatedTreeData = useMemo(()=>
+        treeData?.map((x:DataNode)=>({...x,
+            name:$t((x as unknown as {name:string}).name),
+            checkable:false,
+            children:x.children?.map((y)=>({...y,checkable:false}))
+        })),[state.language,treeData])
+
 
     const onCheck: TreeProps['onCheck'] = (checkedKeys:string[]) => {
         setSelectedKeys(checkedKeys.checked)
@@ -94,10 +102,10 @@ const AddToDepartment = forwardRef<AddToDepartmentHandle,AddToDepartmentProps>((
                     selectable={false}
                     onCheck={onCheck}
                     onExpand={(expandedKeys:string[])=>{setExpandedKeys(expandedKeys)}}
-                    treeData={treeData}
+                    treeData={translatedTreeData}
                     selectedKeys={[selectedKeys]}
                     expandedKeys={expandedKeys}
-                    fieldNames={{title:$t('name'),key:'id',children:'children'}}
+                    fieldNames={{title:'name',key:'id',children:'children'}}
                 />
             </div>
         </div>)
@@ -131,7 +139,7 @@ const MemberList = ()=>{
             fixed:'right',
             valueType: 'option',
             render: (_: React.ReactNode, entity: MemberTableListItem) => [
-                <TableBtnWithPermission  access="system.organization.role.system.edit" key="edit" btnType="edit" onClick={()=>{openModal('editMember',entity)}} btnTitle="编辑"/>,
+                <TableBtnWithPermission  access="system.organization.member.edit" key="edit" btnType="edit" onClick={()=>{openModal('editMember',entity)}} btnTitle="编辑"/>,
             ],
         }
     ]
@@ -340,7 +348,7 @@ const MemberList = ()=>{
                                 className="w-full"
                                 mode="multiple"
                                 value={entity.roles?.map((x:EntityItem)=>x.id)}
-                                options={roleSelectableList?.map((x:{id:string,name:string})=>({label:$t(x.name), value:x.id}))}
+                                options={roleSelectableList?.map((x:{id:string,name:string})=>({label:(x.name), value:x.id}))}
                                 onChange={(value)=>{
                                     changeMemberInfo(value,entity ).then((res)=>{
                                         if(res) manualReloadTable()
@@ -386,11 +394,11 @@ const MemberList = ()=>{
             onRowClick={handleRowClick}
             tableClickAccess="system.organization.member.edit"
             afterNewBtn={[
-                selectedRowKeys.length > 0 && memberGroupId &&<WithPermission key="removeFromDepPermission" access="system.organization.member.edit"><Button className="mr-btnbase"  key="removeFromDep" onClick={()=>handleMemberAction('removeFromDep').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})}>移出当前部门</Button></WithPermission>,
-                selectedRowKeys.length > 0 &&  memberGroupId &&<WithPermission key="addToDepPermission" access="system.organization.member.edit"><Button className="mr-btnbase" key="addToDep" onClick={()=>openModal('addToDep')}>加入部门</Button></WithPermission>,
-                selectedRowKeys.length > 0 && memberGroupId !== 'disable' &&<WithPermission key="blockedPermission" access="system.organization.member.block"><Button className="mr-btnbase"  key="blocked" onClick={()=>handleMemberAction('blocked').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})}>禁用成员</Button></WithPermission>,
-                selectedRowKeys.length > 0 && <WithPermission key="activatePermission" access="system.organization.member.block"><Button className="mr-btnbase"  key="activate" onClick={()=>handleMemberAction('activate').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})}>启用成员</Button></WithPermission>,
-                selectedRowKeys.length > 0 &&<WithPermission key="deletePermission" access="system.organization.member.delete"><Button className="mr-btnbase"  key="delete" onClick={()=>openModal('delete')}>删除成员</Button></WithPermission>,
+                selectedRowKeys.length > 0 && memberGroupId &&<WithPermission key="removeFromDepPermission" access="system.organization.member.edit"><Button className="mr-btnbase"  key="removeFromDep" onClick={()=>handleMemberAction('removeFromDep').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})}>{$t('移出当前部门')}</Button></WithPermission>,
+                selectedRowKeys.length > 0 &&  memberGroupId &&<WithPermission key="addToDepPermission" access="system.organization.member.edit"><Button className="mr-btnbase" key="addToDep" onClick={()=>openModal('addToDep')}>{$t('加入部门')}</Button></WithPermission>,
+                selectedRowKeys.length > 0 && memberGroupId !== 'disable' &&<WithPermission key="blockedPermission" access="system.organization.member.block"><Button className="mr-btnbase"  key="blocked" onClick={()=>handleMemberAction('blocked').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})}>{$t('禁用成员')}</Button></WithPermission>,
+                selectedRowKeys.length > 0 && <WithPermission key="activatePermission" access="system.organization.member.block"><Button className="mr-btnbase"  key="activate" onClick={()=>handleMemberAction('activate').then((res)=>{if(res === true){refreshGroup && refreshGroup();manualReloadTable()}})}>{$t('启用成员')}</Button></WithPermission>,
+                selectedRowKeys.length > 0 &&<WithPermission key="deletePermission" access="system.organization.member.delete"><Button className="mr-btnbase"  key="delete" onClick={()=>openModal('delete')}>{$t('删除成员')}</Button></WithPermission>,
             ]}
             onSearchWordChange={(e) => {
                 setSearchWord(e.target.value)

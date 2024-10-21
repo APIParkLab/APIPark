@@ -248,8 +248,8 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                     }]
             },
             {
-                path:'servicecategories',
-                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/serviceCategory/ServiceCategory.tsx')),
+                path:'commonsetting',
+                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/common/CommonPage.tsx')),
                 key:uuidv4(),
             },
             {

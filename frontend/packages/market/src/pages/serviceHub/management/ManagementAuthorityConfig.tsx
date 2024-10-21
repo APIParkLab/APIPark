@@ -119,9 +119,9 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
             >
                 <Select disabled={type === 'edit'} className="w-INPUT_NORMAL" options={[
                     {label:'Basic',value:'basic'},
-                    {label:'Jwt',value:'jwt'},
-                    {label:'AkSk',value:'aksk'},
-                    {label:'Apikey',value:'apikey'}]}  onChange={(e)=>onDriverChange(e)} placeholder={$t(PLACEHOLDER.input)}/>
+                    {label:'JWT',value:'jwt'},
+                    {label:'AK/SK',value:'aksk'},
+                    {label:'API Key',value:'apikey'}]}  onChange={(e)=>onDriverChange(e)} placeholder={$t(PLACEHOLDER.input)}/>
             </Form.Item>
 
             <Form.Item

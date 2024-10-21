@@ -14,7 +14,6 @@ import { useBreadcrumb } from "@common/contexts/BreadcrumbContext";
 import { LoadingOutlined } from "@ant-design/icons";
 import { cloneDeep } from "lodash-es";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import InsidePage from "@common/components/aoplatform/InsidePage";
 import { EntityItem } from "@common/const/type";
 import { $t } from "@common/locales";
 
@@ -242,20 +241,10 @@ export default function ServiceCategory(){
     }
 
     useEffect(()=>{
-        setBreadcrumb([
-            {
-                title: $t('服务分类管理')}])
         getCategoryList()
     },[])
 
     return (
-        <InsidePage 
-                pageTitle={$t('服务分类管理')} 
-                description={$t("设置服务可选择的分类，方便团队成员快速找到API。")}
-                showBorder={false}
-                contentClassName="pr-PAGE_INSIDE_X"
-                scrollPage={false}
-                >
             <div className="border border-solid border-BORDER p-[20px] rounded-[10px] ">
                 <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} className=''>
                     <Tree
@@ -272,6 +261,5 @@ export default function ServiceCategory(){
                         </WithPermission>
                     </Spin>
                 </div>
-        </InsidePage>
     )
 }

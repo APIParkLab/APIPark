@@ -23,10 +23,10 @@ export const routerKeyMap = new Map<string, string[]|string>([
     ['workspace',['tenantManagement','service','team','guide']],
     ['my',['tenantManagement','service','team']],
     ['mainPage',['dashboard','systemrunning']],
-    ['operationCenter',['member','user','role','servicecategories']],
+    ['operationCenter',['member','user','role','common']],
     ['organization',['member','user','role']],
-    ['serviceHubSetting',['servicecategories']],
-    ['maintenanceCenter',['datasourcing','cluster','cert','logsettings','resourcesettings','openapi']
+    ['serviceHubSetting',['common']],
+    ['maintenanceCenter',['aisetting','datasourcing','cluster','cert','logsettings','resourcesettings','openapi']
   ]])
   
     
@@ -43,11 +43,12 @@ export const routerKeyMap = new Map<string, string[]|string>([
     input:('请输入'),
     select:('请选择'),
     startWithAlphabet:('英文数字下划线任意一种，首字母必须为英文'),
-    specialStartWithAlphabet:('支持字母开头、英文数字中横线下划线组合')
+    specialStartWithAlphabet:('支持字母开头、英文数字中横线下划线组合'),
+    onlyAlphabet:('字符非法，仅支持英文'),
   }
 
   export const FORM_ERROR_TIPS = {
-    refuseOpinion: ('选择拒绝时，审批意见为必填'),
+    refuseOpinion: ('选择拒绝时，审核意见为必填'),
     clusterTest:('无法连接集群，请检查集群地址是否正确或防火墙配置'),
     
   }
