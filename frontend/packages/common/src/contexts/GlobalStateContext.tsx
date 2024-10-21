@@ -47,6 +47,14 @@ export const GlobalContext = createContext<{
     checkPermission:(access:keyof typeof PERMISSION_DEFINITION[0] | Array<keyof typeof PERMISSION_DEFINITION[0]>)=>boolean
     teamDataFlushed:boolean
     accessInit:boolean
+    // 插件系统
+    pluginEventHub:unknown
+    pluginSlotHubService:{
+        addSlot:(name:string, content:unknown)=>void 
+        addSlotArr:(name:string, content:unknown[])=>void
+        removeSlot:(name:string)=>void
+        getSlot:(name:string)=>unknown
+    }
     aiConfigFlushed:boolean
     setAiConfigFlushed:(flush:boolean)=>void
 } | undefined>(undefined);
@@ -118,6 +126,8 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
     const [accessInit, setAccessInit] = useState<boolean>(false)
     const [aiConfigFlushed, setAiConfigFlushed] = useState<boolean>(false)
     let getGlobalAccessPromise: Promise<BasicResponse<{ access:string[] }>> | null = null
+    const [pluginEventHub] = useState<unknown>({})
+    const [pluginSlotHub] = useState<Map<string,unknown>>(new Map())
 
     const getGlobalAccessData = ()=>{
         if(getGlobalAccessPromise){
@@ -176,6 +186,14 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
         return revs
     }
 
+    const pluginSlotHubService = {
+          addSlot:pluginSlotHub.set,
+          addSlotArr : (name:string, content:any[]) => {pluginSlotHub.get(name) ? pluginSlotHub.set(name, (pluginSlotHub.get(name) as Array<unknown>).push(content)) : pluginSlotHub.set(name, content)},
+          removeSlot:pluginSlotHub.delete,
+          getSlot:pluginSlotHub.get
+        }
+
+
     return (
         <GlobalContext.Provider value={
             { state, dispatch,accessData,pluginAccessDictionary,
@@ -184,7 +202,7 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
             getTeamAccessData,teamDataFlushed,
             cleanTeamAccessData,
             resetAccess ,checkPermission,accessInit,
-            aiConfigFlushed, setAiConfigFlushed}}>
+            aiConfigFlushed, setAiConfigFlushed,pluginEventHub,pluginSlotHubService}}>
             {children}
         </GlobalContext.Provider>
     );
