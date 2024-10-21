@@ -68,7 +68,6 @@ deployer:
     APIPARK_GUEST_MODE: allow
     APIPARK_GUEST_ID: dklejrfbhjqwdh
   script:
-    - cp artifacts/${APP_PRE}_linux_amd64.tar.gz ${SAVE_DIR}
     - cd ${SAVE_DIR};mkdir -p ${APP_PRE};tar -zxvf ${APP_PRE}_linux_amd64.tar.gz -C ${APP_PRE};cd ${APP_PRE};./install.sh ${SAVE_DIR};./run.sh restart;cd ${SAVE_DIR} && ./clean.sh ${APP_PRE}
   when: on_success
 success:
