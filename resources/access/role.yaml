@@ -1,33 +1,35 @@
 system:
-  - name: supper_admin
-    cname: 超级管理员
+  - name: supper admin
+    value: supper_admin
     permits:
-      - system.api_market.service_classification.manager
-      - system.api_market.service_classification.view
       - system.dashboard.run_view.view
-      - system.devops.ai_provider.view
       - system.devops.ai_provider.manager
+      - system.devops.ai_provider.view
       - system.devops.cluster.manager
       - system.devops.cluster.view
+      - system.devops.data_source.manager
+      - system.devops.data_source.view
       - system.devops.log_configuration.manager
       - system.devops.log_configuration.view
       - system.devops.ssl_certificate.manager
       - system.devops.ssl_certificate.view
-      - system.devops.data_source.manager
-      - system.devops.data_source.view
       - system.organization.member.manager
       - system.organization.member.view
       - system.organization.role.view_system_role
       - system.organization.role.view_team_role
       - system.organization.team.manager
       - system.organization.team.view
+      - system.settings.general.manager
+      - system.settings.general.view
+      - system.settings.service_classification.manager
+      - system.settings.service_classification.view
       - system.workspace.api_market.view
       - system.workspace.application.view_all
       - system.workspace.service.view_all
       - system.workspace.team.view_all
     supper: true
-  - name: team_admin
-    cname: 团队管理员
+  - name: team admin
+    value: team_admin
     permits:
       - system.organization.role.view_team_role
       - system.organization.team.manager
@@ -36,35 +38,37 @@ system:
       - system.workspace.application.view_all
       - system.workspace.service.view_all
       - system.workspace.team.view_all
-  - name: devops_admin
-    cname: 运维管理员
+  - name: devops admin
+    value: devops_admin
     permits:
-      - system.api_market.service_classification.manager
-      - system.api_market.service_classification.view
       - system.dashboard.run_view.view
-      - system.devops.ai_provider.view
       - system.devops.ai_provider.manager
+      - system.devops.ai_provider.view
       - system.devops.cluster.manager
       - system.devops.cluster.view
+      - system.devops.data_source.manager
+      - system.devops.data_source.view
       - system.devops.log_configuration.manager
       - system.devops.log_configuration.view
       - system.devops.ssl_certificate.manager
       - system.devops.ssl_certificate.view
-      - system.devops.data_source.manager
-      - system.devops.data_source.view
       - system.workspace.api_market.view
       - system.workspace.application.view_all
       - system.workspace.service.view_all
       - system.workspace.team.view_all
-  - name: member
-    cname: 普通成员
+      - system.settings.general.manager
+      - system.settings.general.view
+      - system.settings.service_classification.manager
+      - system.settings.service_classification.view
+  - name: general member
+    value: member
     permits:
     - system.workspace.api_market.view
     default: true
   - name: guest
-    cname: 只读成员
+    value: guest
     permits:
-      - system.api_market.service_classification.view
+      - system.settings.service_classification.view
       - system.devops.cluster.view
       - system.devops.log_configuration.view
       - system.devops.ssl_certificate.view
@@ -79,8 +83,8 @@ system:
       - system.workspace.team.view_all
       - system.dashboard.run_view.view
 team:
-  - name: team_admin
-    cname: 团队管理员
+  - name: team admin
+    value: team_admin
     permits:
       - team.application.application.manager
       - team.application.authorization.manager
@@ -103,8 +107,8 @@ team:
       - team.team.team.manager
       - team.team.team.view
     supper: true
-  - name: service_admin
-    cname: 服务管理员
+  - name: service admin
+    value: service_admin
     permits:
       - team.service.service.manager
       - team.service.upstream.manager
@@ -118,8 +122,8 @@ team:
       - team.service.release.manager
       - team.service.release.view
       - team.team.member.view
-  - name: service_developer
-    cname: 服务开发者
+  - name: service developer
+    value: service_developer
     permits:
       - team.service.upstream.manager
       - team.service.upstream.view
@@ -130,8 +134,8 @@ team:
       - team.service.release.manager
       - team.service.release.view
       - team.team.member.view
-  - name: application_admin
-    cname: 应用管理员
+  - name: application admin
+    value: application_admin
     permits:
       - team.application.application.manager
       - team.application.authorization.manager
@@ -139,8 +143,8 @@ team:
       - team.application.subscription.manager
       - team.application.subscription.view
       - team.team.member.view
-  - name: application_developer
-    cname: 应用开发者
+  - name: application developer
+    value: application_developer
     permits:
       - team.application.authorization.view
       - team.application.subscription.manager
@@ -148,7 +152,7 @@ team:
       - team.team.member.view
     default: true
   - name: guest
-    cname: 只读成员
+    value: guest
     permits:
       - team.application.authorization.view
       - team.application.subscription.view
