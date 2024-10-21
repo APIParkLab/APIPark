@@ -15,7 +15,7 @@ stages:
   - notice
   - prefix
   - build
-  - publish
+  - deploy
   - webhook
 
 feishu-informer: # 飞书回调
