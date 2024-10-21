@@ -57,57 +57,69 @@ import Guide from '@core/pages/guide/Guide';
       type: 'module',
         path:'service',
         component:<SystemOutlet />,
-        key: uuidv4(),
+        key: 'restService',
         provider: SystemProvider,
         children:[
             {
                 path:'',
-                key:uuidv4(),
+                key:'restServiceList',
                 component:<Navigate to="list" />
             },
             {
                 path:'list',
-                key: uuidv4(),
+                key: 'restServiceList2',
                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemList.tsx')),
             },
             {
                 path:'list/:teamId',
-                key: uuidv4(),
+                key: 'restServiceList3',
                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemList.tsx')),
             },
             {
                 path:':teamId',
                 component:<Outlet/>,
-                key: uuidv4(),
+                key: 'restServiceInside',
                 children:[
                     {
                         path:'inside/:serviceId',
-                        key: uuidv4(),
+                        key: 'restServiceInside2',
                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemInsidePage.tsx')),
                         children:[
                             {
                                 path:'api',
-                                key: uuidv4(),
+                                key: 'restServiceInsideApi',
                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideApiDocument.tsx')),
                             },
                             {
+                                
+                                path:'route/create',
+                                key: 'restServiceInsideRouteCreate',
+                                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideRouterCreate')),
+                            },
+                            {
+                                
+                                path:'route/:routeId',
+                                key: 'restServiceInsideRouteEdit',
+                                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideRouterCreate')),
+                            },
+                            {
                                 path:'router',
-                                key: uuidv4(),
+                                key: 'restServiceInsideRoute',
                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideRouterList')),
                             },
                             {
                                 path:'upstream',
-                                key: uuidv4(),
+                                key: 'restServiceInsideUpstream',
                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/upstream/SystemInsideUpstreamContent.tsx')),
                             },
                             {
                                 path:'document',
-                                key: uuidv4(),
+                                key: 'restServiceInsideDocument',
                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemInsideDocument.tsx')),
                             },
                             {
                                 path:'subscriber',
-                                key: uuidv4(),
+                                key: 'restServiceInsideSubscriber',
                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemInsideSubscriber.tsx')),
                                 children:[
   
@@ -115,17 +127,17 @@ import Guide from '@core/pages/guide/Guide';
                             },
                             {
                                 path:'approval',
-                                key: uuidv4(),
+                                key: 'restServiceInsideApproval',
                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/approval/SystemInsideApproval.tsx')),
                                 children:[
                                     {
                                         path:'',
-                                        key: uuidv4(),
+                                        key: 'restServiceInsideApprovalList',
                                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/approval/SystemInsideApprovalList.tsx')),
                                     },
                                     {
                                         path:'*',
-                                        key: uuidv4(),
+                                        key: 'restServiceInsideApprovalList2',
                                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/approval/SystemInsideApprovalList.tsx')),
                                     }
                                 ]
@@ -133,37 +145,123 @@ import Guide from '@core/pages/guide/Guide';
                             {
                                 path:'topology',
                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemTopology.tsx')),
-                                key: uuidv4(),
+                                key: 'systemTopology',
                                 children:[
                                 ]
                             },
                             {
                                 path:'publish',
-                                key: uuidv4(),
+                                key: 'systemPublish',
                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/publish/SystemInsidePublish.tsx')),
                                 children:[
                                     {
                                         path:'',
-                                        key: uuidv4(),
+                                        key: 'systemPublishList',
                                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/publish/SystemInsidePublishList.tsx')),
                                     },
                                     {
                                         path:'*',
-                                        key: uuidv4(),
+                                        key: 'systemPublishList2',
                                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/publish/SystemInsidePublishList.tsx')),
                                     }
                                 ]
                             },
                             {
                                 path:'setting',
-                                key: uuidv4(),
+                                key: 'systemConfig',
                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemConfig.tsx')),
                                 children:[
   
                                 ]
                             },
                         ]
-                    }
+                    },
+                    {
+                            path:'aiInside/:serviceId',
+                            component:<AiServiceOutlet />,
+                            provider: AiServiceProvider,
+                            key: uuidv4(),
+                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/AiServiceInsidePage.tsx')),
+                            children:[
+                                {
+                                    path:'api',
+                                    key: uuidv4(),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/api/AiServiceInsideApiDocument')),
+                                },
+                                {
+                                    
+                                    path:'route/create',
+                                    key: uuidv4(),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/api/AiServiceInsideRouterCreate')),
+                                },
+                                {
+                                    
+                                    path:'route/:routeId',
+                                    key: uuidv4(),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/api/AiServiceInsideRouterCreate')),
+                                },
+                                {
+                                    path:'route',
+                                    key: uuidv4(),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/api/AiServiceInsideRouterList')),
+                                },
+                                {
+                                    path:'document',
+                                    key: uuidv4(),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/AiServiceInsideDocument.tsx')),
+                                },
+                                {
+                                    path:'subscriber',
+                                    key: uuidv4(),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/AiServiceInsideSubscriber.tsx')),
+                                    children:[
+
+                                    ]
+                                },
+                                {
+                                    path:'approval',
+                                    key: uuidv4(),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/approval/AiServiceInsideApproval')),
+                                    children:[
+                                        {
+                                            path:'',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/approval/AiServiceInsideApprovalList')),
+                                        },
+                                        {
+                                            path:'*',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/approval/AiServiceInsideApprovalList')),
+                                        }
+                                    ]
+                                },
+                                {
+                                    path:'publish',
+                                    key: uuidv4(),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/publish/AiServiceInsidePublish')),
+                                    children:[
+                                        {
+                                            path:'',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/publish/AiServiceInsidePublishList')),
+                                        },
+                                        {
+                                            path:'*',
+                                            key: uuidv4(),
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/publish/AiServiceInsidePublishList')),
+                                        }
+                                    ]
+                                },
+                                {
+                                    path:'setting',
+                                    key: uuidv4(),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemConfig.tsx')),
+                                    children:[
+
+                                    ]
+                                },
+                            ]
+                        }
                 ]
             }
         ]
@@ -199,10 +297,6 @@ import Guide from '@core/pages/guide/Guide';
                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@market/pages/serviceHub/ServiceHubDetail.tsx')),
            }]
       }],
-  
-    ['servicecategories', { type: 'module',
-      lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/serviceCategory/ServiceCategory.tsx')),
-    }],
   
      ['tenantManagement', { type: 'module',
       component:<Outlet />,
