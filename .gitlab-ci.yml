@@ -45,9 +45,9 @@ builder:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
   script:
-    - go mod tidy
+    - set -e
     - |
-      if [ -d "../artifacts" ]; then
+      if [ ! -d "../artifacts" ]; then
         mkdir -p ../artifacts
       fi
       if [ -d "../artifacts/dist" ]; then
