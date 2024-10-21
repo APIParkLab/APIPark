@@ -23,7 +23,7 @@ feishu-informer: # 飞书回调
   variables:
     DIFF_URL: "$CI_MERGE_REQUEST_PROJECT_URL/-/merge_requests/$CI_MERGE_REQUEST_IID/diffs"
   rules:
-    - if: $CI_PIPELINE_SOURCE=="merge_request_event" && $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE=="merge_request_event" && $CI_COMMIT_BRANCH =~ "main"
   script:
     - echo "merge request"
     - |
