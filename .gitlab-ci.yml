@@ -46,11 +46,14 @@ builder:
     - if: $CI_COMMIT_BRANCH =~ "main"
   script:
     - go mod tidy
-    - mv ../artifacts/dist frontend/dist
+    - |
+      if [ -d "../artifacts/dist" ]; then
+        cp -r ../artifacts/dist frontend/dist
+      fi
     - |
       if [ -n "$(git diff --name-status HEAD~1 HEAD -- frontend)" ]; then
         ./scripts/build.sh $BUILD_DIR ${VERSION} all ""
-        rm -rf ../artifacts/dist
+        rm -fr ../artifacts/dist
         cp -r frontend/dist ../artifacts/dist
       else
         ./scripts/build.sh $BUILD_DIR ${VERSION}
