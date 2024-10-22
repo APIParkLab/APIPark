@@ -1,4 +1,4 @@
-![image]( https://github.com/user-attachments/assets/96e36db5-2733-49c8-8e1e-ecbcc60a3943 )
+![image](https://apipark.com/wp-content/uploads/2024/10/AI-Gateway-After.png)
 
 <p align="center">
   English
@@ -61,104 +61,94 @@ curl -sSO  https://download.apipark.com/install/quick-start.sh ;  bash quick-sta
 <table>
   <tr>
     <th>
-      Connect to 100+ major models from all mainstream AI Companies
+      Connect to 100+ AI models
     </th>
     <th>
-      Standardize all AI API call formats, with no additional adaptation work required
+      Unified API to use all AI
     </th>
 
   </tr>
 
   <tr>
     <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/%E9%A1%B5%E9%9D%A2-1.png" />
-      The API Service Plaza is one of APIPark’s core features, aiming to solve the problem of fragmented and chaotic internal API management in enterprises. Through the API Service Plaza, enterprises can showcase all API services on a unified platform, allowing different departments and teams to easily find and use the required API services.
+        <img src="https://apipark.com/wp-content/uploads/2024/10/AI-Gateway.png" />
+    </td>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/Unified-API.png" />
+    </td>
+  </tr>
+
+  <tr>
+    <th>
+      Transform AI & Prompt to REST API
+    </th>
+    <th>
+      API Developer Portal
+    </th>
+
+  </tr>
+
+  <tr>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/Prompt-template.png" />
+    </td>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/developer-portal.png" />
+    </td>
+  </tr>
+
+  <tr>
+    <th>
+      High Performance
+    </th>
+    <th>
+      Manage API lifecycle
+    </th>
+
+  </tr>
+
+  <tr>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/hyper-performance.png" />
     </td>
     <td width="50%">
         <img src="https://apipark.com/wp-content/uploads/2024/08/Life-Cycle.png" />
-      The full API lifecycle management feature helps enterprises standardize the API management process, manage API traffic forwarding and load balancing, and oversee all API versions published externally. This improves API quality and maintainability, enabling efficient development and stable operation to support rapid business growth and innovation.
-    </td>
-  </tr>
-
-  <tr>
-    <th>
-      Combine AI models and prompt templates to form new AI APIs
-    </th>
-    <th>
-      Switching AI models or modifying prompts won’t affect your APP or microservices
-    </th>
-
-  </tr>
-
-  <tr>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/%E9%A1%B5%E9%9D%A2-1.png" />
-      The API Service Plaza is one of APIPark’s core features, aiming to solve the problem of fragmented and chaotic internal API management in enterprises. Through the API Service Plaza, enterprises can showcase all API services on a unified platform, allowing different departments and teams to easily find and use the required API services.
-    </td>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/Life-Cycle.png" />
-      The full API lifecycle management feature helps enterprises standardize the API management process, manage API traffic forwarding and load balancing, and oversee all API versions published externally. This improves API quality and maintainability, enabling efficient development and stable operation to support rapid business growth and innovation.
-    </td>
-  </tr>
-
-  <tr>
-    <th>
-      Centrally manage and display all AI / REST APIs
-    </th>
-    <th>
-      Cover the entire API lifecycle from design, release, operation, to deprecation
-    </th>
-
-  </tr>
-
-  <tr>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/%E9%A1%B5%E9%9D%A2-1.png" />
-      The API Service Plaza is one of APIPark’s core features, aiming to solve the problem of fragmented and chaotic internal API management in enterprises. Through the API Service Plaza, enterprises can showcase all API services on a unified platform, allowing different departments and teams to easily find and use the required API services.
-    </td>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/Life-Cycle.png" />
-      The full API lifecycle management feature helps enterprises standardize the API management process, manage API traffic forwarding and load balancing, and oversee all API versions published externally. This improves API quality and maintainability, enabling efficient development and stable operation to support rapid business growth and innovation.
     </td>
   </tr>
   
   <tr>
     <th>
-      Manage multiple tenants, ensuring data isolation and security
+      Review subscription before allowing API requests
     </th>
     <th>
-      API resources require approval before usage
+      Manage subscriber
     </th>
   </tr>
 
   <tr>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/Multi-tenant.png" />
-      The multi-tenant management feature allows enterprises to manage multiple tenants on the same platform. Each tenant can have independent resources, users, and permission settings, ensuring data and operation isolation, improving resource utilization efficiency, and simplifying management.
-    </td>
     <td width="50%">
             <img src="https://apipark.com/wp-content/uploads/2024/08/Application.png" />
-      APIPark provides a process approval feature for all API resources, preventing violations or unauthorized API usage. Callers must apply for API resources and wait for the service provider's approval before officially using the API.
+    </td>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/08/Multi-tenant.png" />
     </td>
   </tr>
 
   <tr>
     <th>
-      Use detailed call logs to trace API access at any time
+      Logging
     </th>
     <th>
-      Comprehensive statistical reports*
+      Analysis
     </th>
   </tr>
 
   <tr>
     <td width="50%">
         <img src="https://apipark.com/wp-content/uploads/2024/08/Chart-1.png" />
-      The API call log feature provides enterprises with comprehensive logging capabilities, recording all relevant information for each API call. These logs allow enterprises to quickly trace and troubleshoot API call issues, ensuring system stability and data security.
     </td>
     <td width="50%">
             <img src="https://apipark.com/wp-content/uploads/2024/08/Chart.png" />
-      Through historical call data analysis, APIPark can display long-term API call trends and performance changes, helping enterprises perform preventative maintenance before problems arise.
     </td>
   </tr>
   
