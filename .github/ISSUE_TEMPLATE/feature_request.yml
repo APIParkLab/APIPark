@@ -1,5 +1,5 @@
 name: "Feature Request"
-description: Suggest an enhancement to APINTO.
+description: Suggest an enhancement to APIPark.
 title: "feat: As a user, I want to ..., so that ..."
 body:
   - type: markdown
