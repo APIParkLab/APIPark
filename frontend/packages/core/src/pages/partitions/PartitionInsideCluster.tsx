@@ -103,8 +103,8 @@ export function ClusterConfigPreview (x:PartitionClusterNodeTableListItem){
             <p className="leading-[22px] flex items-center gap-[5px]"><IpTypeTag ip={m} />{m}</p>))}</Col></Row>
         <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('服务地址')}：</Col><Col>{x.serviceAddress.map(m=>(
             <p className="leading-[22px] flex items-center gap-[5px]"><IpTypeTag ip={m} />{m}</p>))}</Col></Row>
-        <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('同步地址')}：</Col><Col>
-            <p className="leading-[22px] flex items-center gap-[5px]"><IpTypeTag ip={x.peerAddress} />{x.peerAddress}</p></Col></Row>
+        <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('同步地址')}：</Col><Col>{x.peerAddress.map(m=>(
+            <p className="leading-[22px] flex items-center gap-[5px]"><IpTypeTag ip={m} />{m}</p>))}</Col></Row>
 </div>}
 
 export default PartitionInsideCluster
