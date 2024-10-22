@@ -15,7 +15,7 @@ import localJa_JP from './scan/ja-JP.json'; // 本地翻译英文文件
 // import config from '../../../../i18next-scanner.config.js';
 
 const resources = {
-  'zh-CH': {
+  'zh-CN': {
     translation: localZh_CN,
     ...zhCN
   },
