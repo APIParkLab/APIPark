@@ -9,6 +9,8 @@ import { Outlet, Navigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import {ProtectedRoute} from '@businessEntry/components/aoplatform/RenderRoutes';
 import Guide from '@core/pages/guide/Guide';
+import { AiServiceProvider } from '@core/contexts/AiServiceContext';
+import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
 
   // 内置插件与对应组件/模块
   export const routerMap:Map<string, unknown> = new Map([
@@ -180,7 +182,7 @@ import Guide from '@core/pages/guide/Guide';
                             path:'aiInside/:serviceId',
                             component:<AiServiceOutlet />,
                             provider: AiServiceProvider,
-                            key: uuidv4(),
+                            key: 'aiServiceInside',
                             lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/AiServiceInsidePage.tsx')),
                             children:[
                                 {
