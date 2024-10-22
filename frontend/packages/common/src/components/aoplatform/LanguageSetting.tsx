@@ -1,6 +1,5 @@
 import { Dropdown, Row, Col, Button } from 'antd';
 import i18n from '@common/locales';
-import { $t } from '@common/locales';
 import { memo, useEffect, useMemo } from 'react';
 import { useGlobalContext } from '@common/contexts/GlobalStateContext';
 import { Icon } from '@iconify/react/dist/iconify.js';
