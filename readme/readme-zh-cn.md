@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/96e36db5-2733-49c8-8e1e-ecbcc60a3943)
+![image](https://apipark.com/wp-content/uploads/2024/10/AI-Gateway-After.png)
 
 <p align="center">
   English
@@ -62,104 +62,94 @@ curl -sSO https://download.apipark.com/install/quick-start.sh; bash quick-start.
 <table>
   <tr>
     <th>
-      接入所有主流AI供应商的 100+ 大模型
+      快速接入 100+ AI 模型
     </th>
     <th>
-      统一所有 AI API 的调用格式，没有额外的适配工作
+      通过统一的 API 格式来调用所有 AI
     </th>
 
   </tr>
 
   <tr>
     <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/%E9%A1%B5%E9%9D%A2-1.png" />
-      API 服务广场是 APIPark 的核心功能之一，旨在解决企业内部 API 分散、管理混乱的问题。通过 API 服务广场，企业可以将所有的 API 服务集中展示在一个统一的平台上，使得不同部门和团队能够轻松找到并使用所需的 API 服务。
+        <img src="https://apipark.com/wp-content/uploads/2024/10/AI-Gateway.png" />
+    </td>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/Unified-API.png" />
+    </td>
+  </tr>
+
+  <tr>
+    <th>
+      一键将 Prompt 提示词封装成 REST API
+    </th>
+    <th>
+     在团队内快速共享 API 服务
+    </th>
+
+  </tr>
+
+  <tr>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/Prompt-template.png" />
+    </td>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/developer-portal.png" />
+    </td>
+  </tr>
+
+  <tr>
+    <th>
+      比肩 Nginx 的强大性能
+    </th>
+    <th>
+      一站式完成 API 设计、发布、调用、下线
+    </th>
+
+  </tr>
+
+  <tr>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/hyper-performance.png" />
     </td>
     <td width="50%">
         <img src="https://apipark.com/wp-content/uploads/2024/08/Life-Cycle.png" />
-      API 全生命周期管理功能帮助企业规范 API 的管理流程，管理 API 的流量转发和负载均衡，并管理所有 API 对外发布的版本。提升 API 的质量和可维护性。通过这个功能，企业可以实现 API 的高效开发和稳定运营，从而支持业务的快速发展和创新。
-    </td>
-  </tr>
-
-  <tr>
-    <th>
-      组合 AI 模型和 Prompt 提示词，形成新的 AI API
-    </th>
-    <th>
-      切换 AI 模型或者修改 Prompt 不会影响你的 APP 应用或者微服务
-    </th>
-
-  </tr>
-
-  <tr>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/%E9%A1%B5%E9%9D%A2-1.png" />
-      API 服务广场是 APIPark 的核心功能之一，旨在解决企业内部 API 分散、管理混乱的问题。通过 API 服务广场，企业可以将所有的 API 服务集中展示在一个统一的平台上，使得不同部门和团队能够轻松找到并使用所需的 API 服务。
-    </td>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/Life-Cycle.png" />
-      API 全生命周期管理功能帮助企业规范 API 的管理流程，管理 API 的流量转发和负载均衡，并管理所有 API 对外发布的版本。提升 API 的质量和可维护性。通过这个功能，企业可以实现 API 的高效开发和稳定运营，从而支持业务的快速发展和创新。
-    </td>
-  </tr>
-
-  <tr>
-    <th>
-      集中管理与展示所有 AI / REST API
-    </th>
-    <th>
-      覆盖 API 从设计、发布、运行、下线的全过程
-    </th>
-
-  </tr>
-
-  <tr>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/%E9%A1%B5%E9%9D%A2-1.png" />
-      API 服务广场是 APIPark 的核心功能之一，旨在解决企业内部 API 分散、管理混乱的问题。通过 API 服务广场，企业可以将所有的 API 服务集中展示在一个统一的平台上，使得不同部门和团队能够轻松找到并使用所需的 API 服务。
-    </td>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/Life-Cycle.png" />
-      API 全生命周期管理功能帮助企业规范 API 的管理流程，管理 API 的流量转发和负载均衡，并管理所有 API 对外发布的版本。提升 API 的质量和可维护性。通过这个功能，企业可以实现 API 的高效开发和稳定运营，从而支持业务的快速发展和创新。
     </td>
   </tr>
   
   <tr>
     <th>
-      管理多个租户，确保数据隔离和安全
+      审核租户的API的调用申请
     </th>
     <th>
-      API资源需要先申请并等待审核通过才能调用
+      多租户管理
     </th>
   </tr>
 
   <tr>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/Multi-tenant.png" />
-      多租户管理功能为企业提供了在同一平台上管理多个租户的能力，每个租户可以拥有独立的资源、用户和权限设置，确保数据和操作的隔离，帮助提升资源利用效率和管理便捷性。
-    </td>
     <td width="50%">
             <img src="https://apipark.com/wp-content/uploads/2024/08/Application.png" />
-      APIPark 对所有 API 资源提供流程审核功能，避免违规或避开平台来调用API，调用方需要先申请API资源，并等待服务方审核通过后才能正式调用API。
+    </td>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/08/Multi-tenant.png" />
     </td>
   </tr>
 
   <tr>
     <th>
-      通过详细的调用日志，帮助排查API在任意时刻的访问情况
+      详细记录所有 API 的调用日志
     </th>
     <th>
-      丰富的统计报表*
+      强大的数据分析
     </th>
   </tr>
 
   <tr>
     <td width="50%">
         <img src="https://apipark.com/wp-content/uploads/2024/08/Chart-1.png" />
-      API 调用日志功能为企业提供了全面的日志记录能力，详细记录每一次 API 调用的所有相关信息。通过这些日志，企业可以快速追踪和排查 API 调用中的问题，确保系统的稳定运行和数据安全。
     </td>
     <td width="50%">
             <img src="https://apipark.com/wp-content/uploads/2024/08/Chart.png" />
-      通过对历史调用数据的分析，APIPark 能够展示 API 长期的调用趋势和性能变化，帮助企业在问题发生前进行预防性维护。
     </td>
   </tr>
   
