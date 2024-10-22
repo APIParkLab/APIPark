@@ -1,7 +1,7 @@
 ![image](https://github.com/user-attachments/assets/96e36db5-2733-49c8-8e1e-ecbcc60a3943)
 
 <p align="center">
-  English
+  <a href="/README.md">English</a>
   | 
   <a href="/readme/readme-jp.md">日本語</a>
   | 
@@ -61,108 +61,99 @@ curl -sSO https://download.apipark.com/install/quick-start.sh; bash quick-start.
 <table>
   <tr>
     <th>
-      主要なAIプロバイダの100以上の大規模モデルに接続
+      100以上のAIモデルに迅速に接続
     </th>
     <th>
-      すべてのAI APIの呼び出しフォーマットを統一し、追加の適応作業は不要
+      統一されたAPIフォーマットで全てのAIを呼び出し
     </th>
 
   </tr>
 
   <tr>
     <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/%E9%A1%B5%E9%9D%A2-1.png" />
-      APIサービスプラザはAPIParkの中心機能の1つであり、企業内部のAPIが分散し、管理が混乱している問題を解決することを目指しています。APIサービスプラザを通じて、企業はすべてのAPIサービスを統一されたプラットフォームで集中表示し、異なる部門やチームが必要なAPIサービスを簡単に見つけて使用できるようにします。
+        <img src="https://apipark.com/wp-content/uploads/2024/10/AI-Gateway.png" />
+    </td>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/Unified-API.png" />
+    </td>
+  </tr>
+
+  <tr>
+    <th>
+      プロンプトテンプレートをREST APIにワンクリックで変換
+    </th>
+    <th>
+      チーム内でAPIサービスを迅速に共有
+    </th>
+
+  </tr>
+
+  <tr>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/Prompt-template.png" />
+    </td>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/developer-portal.png" />
+    </td>
+  </tr>
+
+  <tr>
+    <th>
+      Nginxに匹敵する高性能
+    </th>
+    <th>
+      APIの設計、公開、呼び出し、停止までをワンストップで対応
+    </th>
+
+  </tr>
+
+  <tr>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/10/hyper-performance.png" />
     </td>
     <td width="50%">
         <img src="https://apipark.com/wp-content/uploads/2024/08/Life-Cycle.png" />
-      APIのライフサイクル管理機能は、APIの管理プロセスを標準化し、トラフィック転送や負荷分散を管理し、外部に公開されるすべてのAPIバージョンを管理します。これにより、APIの品質と保守性が向上し、企業は効率的なAPI開発と安定した運用を実現でき、ビジネスの急速な成長とイノベーションをサポートします。
-    </td>
-  </tr>
-
-  <tr>
-    <th>
-      AIモデルとプロンプトを組み合わせ、新しいAI APIを作成
-    </th>
-    <th>
-      AIモデルを切り替えたり、プロンプトを変更しても、アプリやマイクロサービスに影響を与えない
-    </th>
-
-  </tr>
-
-  <tr>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/%E9%A1%B5%E9%9D%A2-1.png" />
-      APIサービスプラザはAPIParkの中心機能の1つであり、企業内部のAPIが分散し、管理が混乱している問題を解決することを目指しています。APIサービスプラザを通じて、企業はすべてのAPIサービスを統一されたプラットフォームで集中表示し、異なる部門やチームが必要なAPIサービスを簡単に見つけて使用できるようにします。
-    </td>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/Life-Cycle.png" />
-      APIのライフサイクル管理機能は、APIの管理プロセスを標準化し、トラフィック転送や負荷分散を管理し、外部に公開されるすべてのAPIバージョンを管理します。これにより、APIの品質と保守性が向上し、企業は効率的なAPI開発と安定した運用を実現でき、ビジネスの急速な成長とイノベーションをサポートします。
-    </td>
-  </tr>
-
-  <tr>
-    <th>
-      すべてのAI / REST APIを一元管理および表示
-    </th>
-    <th>
-      APIの設計、公開、運用、廃止までの全過程をカバー
-    </th>
-
-  </tr>
-
-  <tr>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/%E9%A1%B5%E9%9D%A2-1.png" />
-      APIサービスプラザはAPIParkの中心機能の1つであり、企業内部のAPIが分散し、管理が混乱している問題を解決することを目指しています。APIサービスプラザを通じて、企業はすべてのAPIサービスを統一されたプラットフォームで集中表示し、異なる部門やチームが必要なAPIサービスを簡単に見つけて使用できるようにします。
-    </td>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/Life-Cycle.png" />
-      APIのライフサイクル管理機能は、APIの管理プロセスを標準化し、トラフィック転送や負荷分散を管理し、外部に公開されるすべてのAPIバージョンを管理します。これにより、APIの品質と保守性が向上し、企業は効率的なAPI開発と安定した運用を実現でき、ビジネスの急速な成長とイノベーションをサポートします。
     </td>
   </tr>
   
   <tr>
     <th>
-      複数のテナントを管理し、データの分離とセキュリティを確保
+      テナントのAPI呼び出しリクエストを承認
     </th>
     <th>
-      APIリソースの利用には申請と承認が必要
+      マルチテナント管理
     </th>
   </tr>
 
   <tr>
-    <td width="50%">
-        <img src="https://apipark.com/wp-content/uploads/2024/08/Multi-tenant.png" />
-      マルチテナント管理機能は、企業が1つのプラットフォームで複数のテナントを管理する能力を提供します。各テナントは独立したリソース、ユーザー、権限設定を持つことができ、データと操作の分離を確保し、リソース利用効率と管理の利便性を向上させます。
-    </td>
     <td width="50%">
             <img src="https://apipark.com/wp-content/uploads/2024/08/Application.png" />
-      APIParkはすべてのAPIリソースにプロセス承認機能を提供し、違反やプラットフォームを回避したAPIの呼び出しを防ぎます。呼び出し元はAPIリソースを申請し、サービス提供者の承認後に正式にAPIを利用できます。
+    </td>
+    <td width="50%">
+        <img src="https://apipark.com/wp-content/uploads/2024/08/Multi-tenant.png" />
     </td>
   </tr>
 
   <tr>
     <th>
-      詳細な呼び出しログを使用して、任意の時点でAPIアクセス状況を調査
+      全てのAPI呼び出しを詳細に記録
     </th>
     <th>
-      豊富な統計レポート*
+      強力なデータ分析機能
     </th>
   </tr>
 
   <tr>
     <td width="50%">
         <img src="https://apipark.com/wp-content/uploads/2024/08/Chart-1.png" />
-      API呼び出しログ機能は、企業に包括的なログ記録機能を提供し、すべてのAPI呼び出しに関する関連情報を詳細に記録します。これらのログを使用して、企業はAPI呼び出しにおける問題を迅速に追跡し、トラブルシューティングを行い、システムの安定運用とデータセキュリティを確保します。
     </td>
     <td width="50%">
             <img src="https://apipark.com/wp-content/uploads/2024/08/Chart.png" />
-      過去の呼び出しデータを分析することで、APIParkはAPIの長期的な呼び出しトレンドとパフォーマンスの変化を表示し、企業が問題が発生する前に予防的なメンテナンスを行うのに役立ちます。
     </td>
   </tr>
   
 </table>
+
 
 <br>
 
