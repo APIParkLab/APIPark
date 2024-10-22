@@ -1,7 +1,7 @@
 ![image](https://github.com/user-attachments/assets/96e36db5-2733-49c8-8e1e-ecbcc60a3943)
 
 <p align="center">
-  English
+  <a href="/README.md">English</a>
   | 
   <a href="/readme/readme-jp.md">日本語</a>
   | 
