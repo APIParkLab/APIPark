@@ -132,6 +132,10 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
             return {...item}
         })
     }, [state.language])
+    
+    
+    const apiPathMatchRulesOptions = useMemo(()=>API_PATH_MATCH_RULES.map(
+        x=>({label:$t(x.label), value:x.value})),[state.language])
 
     return (
         <InsidePage pageTitle={ $t('API 路由设置')|| '-'} 
@@ -185,7 +189,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
                                         }]}
                                         noStyle
                                     >
-                                    <Select  placeholder={$t(PLACEHOLDER.select)} options={API_PATH_MATCH_RULES} className="w-[30%] min-w-[100px]"/>
+                                    <Select  placeholder={$t(PLACEHOLDER.select)} options={apiPathMatchRulesOptions} className="w-[30%] min-w-[100px]"/>
                                     </Form.Item>
                                 <Form.Item<SystemApiProxyFieldType>
                                         name="path"
