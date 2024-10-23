@@ -7,7 +7,7 @@ type Provider struct {
 	Name             string `json:"name"`
 	Config           string `json:"config"`
 	GetAPIKeyUrl     string `json:"get_apikey_url"`
-	DefaultLLM       string `json:"-"`
+	DefaultLLM       string `json:"defaultLLM"`
 	DefaultLLMConfig string `json:"-"`
 }
 
@@ -18,6 +18,8 @@ type ProviderItem struct {
 	DefaultLLMLogo string    `json:"default_llm_logo"`
 	Logo           string    `json:"logo"`
 	Configured     bool      `json:"configured"`
+	Recommend      bool      `json:"recommend"`
+	Sort           int       `json:"sort"`
 	UpdateTime     time.Time `json:"-"`
 }
 

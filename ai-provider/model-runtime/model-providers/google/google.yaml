@@ -1,6 +1,6 @@
 provider: google
 label:
-  en_US: Google
+  en_US: Google Gemini
 description:
   en_US: Google's Gemini model.
   zh_Hans: 谷歌提供的 Gemini 模型.
@@ -39,3 +39,5 @@ provider_credential_schema:
         zh_Hans: 在此输入您的 API Base, 如：https://api.google.com
         en_US: Enter your API Base, e.g. https://api.google.com
 address: https://generativelanguage.googleapis.com
+recommend: true
+sort: 3
