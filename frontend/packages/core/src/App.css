@@ -272,3 +272,16 @@ a{
       stroke: rgba(255, 255, 255, 0.1);
       mask-image: radial-gradient(100% 100% at top right, white, transparent);
   }
+
+  .login-block{
+    background-color: rgba(255, 255, 255, 0.1);
+    .login-input{
+      color:#fff;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      &:hover, &:focus, &.ant-input-status-error, &.ant-input-status-error:hover, &.ant-input-status-error:focus-within{
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+    }
+  }

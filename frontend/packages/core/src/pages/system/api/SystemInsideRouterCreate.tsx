@@ -1,10 +1,10 @@
-import {App, Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
+import {App, Button, Col, Form, Input, Row, Select, Space, Spin, Switch} from "antd";
 import  {forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
 import EditableTableWithModal from "@common/components/aoplatform/EditableTableWithModal.tsx";
 import styles from "./SystemInsideApi.module.css"
 import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
-import { API_PROTOCOL, HTTP_METHOD, MATCH_CONFIG, MatchPositionEnum, MatchTypeEnum } from "../../../const/system/const.tsx";
+import { API_PATH_MATCH_RULES, API_PROTOCOL, HTTP_METHOD, MATCH_CONFIG, MatchPositionEnum, MatchTypeEnum } from "../../../const/system/const.tsx";
 import { SystemInsideRouterCreateHandle, SystemInsideRouterCreateProps, SystemApiProxyFieldType, SystemInsideApiProxyHandle } from "../../../const/system/type.ts";
 import { MatchItem } from "@common/const/type.ts";
 import { validateUrlSlash } from "@common/utils/validate.ts";
@@ -31,7 +31,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
     const onFinish = ()=>{
         return Promise.all([proxyRef.current?.validate?.(), form.validateFields()]).then(([,formValue])=>{
             const body = {...formValue,
-                path: prefixForce? `${apiPrefix}/${formValue.path.trim()}` : formValue.path.trim(),
+                path: `${prefixForce ? apiPrefix + '/' : ''}${formValue.path.trim()}${formValue.pathMatch === 'prefix' ? '/*' : ''}`,
                 proxy:{...formValue.proxy,path:formValue.proxy.path ? (formValue.proxy.path.startsWith('/')? formValue.proxy.path: '/'+ formValue.proxy.path) : undefined}}
             return fetchData<BasicResponse<null>>('service/router',{
                 method: routeId ? 'PUT' :'POST' ,eoBody:(body), eoParams: {service:serviceId,team:teamId,  router:routeId },eoTransformKeys:['matchType','disable']}).then(response=>{
@@ -77,7 +77,24 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 const {disable, protocols, path, methods, description, match, proxy} = data.router
-                form.setFieldsValue({disable, protocols, path:prefixForce && path?.startsWith(apiPrefix + '/')? path.slice((apiPrefix?.length || 0) + 1) : path, methods, description, match,proxy
+                let newPath = path
+                let pathMatch = 'full'
+                if(prefixForce && path?.startsWith(apiPrefix + '/')){
+                    newPath = path.slice((apiPrefix?.length || 0) + 1)
+                }
+                if(newPath.endsWith('/*')){
+                    newPath = newPath.slice(0,-2)
+                    pathMatch = 'prefix'
+                }
+                form.setFieldsValue({
+                    disable, 
+                    protocols, 
+                    path:newPath,
+                    pathMatch,
+                    methods,
+                    description,
+                    match,
+                    proxy
                 })
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
@@ -94,6 +111,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
             form.setFieldValue(['proxy','timeout'],10000)
             form.setFieldValue(['proxy','retry'],0)
             form.setFieldValue('protocols',['HTTP','HTTPS'])
+            form.setFieldValue('pathMatch','prefix')
         }
             return (form.setFieldsValue({}))
     }, []);
@@ -157,18 +175,35 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
                             <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} mode="multiple" options={API_PROTOCOL}>
                             </Select>
                         </Form.Item>
-
-                        <Form.Item<SystemApiProxyFieldType>
-                            label={$t("请求路径")}
-                            name="path"
-                            rules={[{ required: true,whitespace:true  },
-                            {
-                            validator: validateUrlSlash,
-                            }]}
-                            className={styles['form-input-group']}
-                        >
-                            <Input  prefix={(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
-                                placeholder={$t(PLACEHOLDER.input)}/>
+                        <Form.Item label={$t("请求路径")}>
+                            <Space.Compact block>
+                                <Form.Item
+                                        name="pathMatch"
+                                        rules={[{ required: true,whitespace:true  },
+                                        {
+                                        validator: validateUrlSlash,
+                                        }]}
+                                        noStyle
+                                    >
+                                    <Select  placeholder={$t(PLACEHOLDER.select)} options={API_PATH_MATCH_RULES} className="w-[30%] min-w-[100px]"/>
+                                    </Form.Item>
+                                <Form.Item<SystemApiProxyFieldType>
+                                        name="path"
+                                        rules={[{ required: true,whitespace:true  },
+                                        {
+                                        validator: validateUrlSlash,
+                                        }]}
+                                        noStyle
+                                    >
+                                    <Input  prefix={(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
+                                        placeholder={$t(PLACEHOLDER.input)} onChange={(e)=>{
+                                            if((e.target.value as string).endsWith('/*')){
+                                                form.setFieldValue('path',e.target.value.slice(0,-2))
+                                                form.setFieldValue('pathMatch','prefix')
+                                            }
+                                            }}/>
+                                    </Form.Item>
+                            </Space.Compact>
                         </Form.Item>
 
                         <Form.Item<SystemApiProxyFieldType>

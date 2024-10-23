@@ -69,6 +69,11 @@ export const API_PROTOCOL = [
     {label:'HTTPS',value:'HTTPS'}
 ]
 
+export const API_PATH_MATCH_RULES = [
+    {label:'前缀匹配',value:'prefix'},
+    {label:'全等匹配',value:'full'}
+]
+
 
 export const ALGORITHM_ITEM = [
     {label:'HS256',value:'HS256'},
