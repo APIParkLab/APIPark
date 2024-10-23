@@ -38,3 +38,5 @@ provider_credential_schema:
         zh_Hans: 在此输入您的 API URL
         en_US: Enter your API URL
 address: https://api.anthropic.com
+recommend: true
+sort: 2

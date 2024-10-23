@@ -5,5 +5,6 @@ type UpdateLLM struct {
 }
 
 type UpdateConfig struct {
-	Config string `json:"config"`
+	DefaultLLM string `json:"default_llm"`
+	Config     string `json:"config"`
 }

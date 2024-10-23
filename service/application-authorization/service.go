@@ -3,7 +3,7 @@ package application_authorization
 import (
 	"context"
 	"reflect"
-	
+
 	"github.com/APIParkLab/APIPark/service/universally"
 	"github.com/eolinker/go-common/autowire"
 )
@@ -14,6 +14,7 @@ type IAuthorizationService interface {
 	universally.IServiceCreate[Create]
 	universally.IServiceEdit[Edit]
 	ListByApp(ctx context.Context, appId ...string) ([]*Authorization, error)
+	CountByApp(ctx context.Context, appId ...string) (map[string]int64, error)
 }
 
 func init() {
