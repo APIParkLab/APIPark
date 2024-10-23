@@ -14,7 +14,6 @@ import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter
 import SystemConfig from "./SystemConfig.tsx";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { $t } from "@common/locales/index.ts";
-import Joyride from "react-joyride";
 import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 
 const SystemList:FC = ()=>{
@@ -37,7 +36,7 @@ const SystemList:FC = ()=>{
             getGlobalAccessData()?.then?.(()=>{
                 getSystemList()
             })
-            return
+            return Promise.resolve({data:[], success:false})
         }
         if(!tableHttpReload){
             setTableHttpReload(true)

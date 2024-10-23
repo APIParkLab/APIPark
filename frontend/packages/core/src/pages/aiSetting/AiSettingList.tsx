@@ -164,7 +164,10 @@ const AiSettingList = ()=>{
         return (
             <Card title={
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center h-[22px] ai-setting-svg-container" dangerouslySetInnerHTML={{ __html: provider.logo }}  />
+                        <div className="flex items-center  gap-[4px]">
+                            <span className=" flex items-center h-[22px]  ai-setting-svg-container" dangerouslySetInnerHTML={{ __html: provider.logo }}  ></span>
+                            <span className="font-normal">{provider.name}</span>
+                        </div>
                         <Tag bordered={false} color={provider.configured ? 'green' : undefined} className="h-[22px] px-[4px] text-center">
                             {provider.configured ? $t('已配置') : $t('未配置')}
                         </Tag>
