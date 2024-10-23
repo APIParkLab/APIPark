@@ -22,6 +22,8 @@ type IProvider interface {
 	ModelsByType(modelType string) ([]IModel, bool)
 	IConfig
 	MaskConfig(cfg string) string
+	Sort() int
+	Recommend() bool
 }
 
 type IProviderURI interface {
@@ -72,6 +74,8 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 		defaultModels: eosc.BuildUntyped[string, IModel](),
 		modelsByType:  eosc.BuildUntyped[string, []IModel](),
 		maskKeys:      make([]string, 0),
+		recommend:     providerCfg.Recommend,
+		sort:          providerCfg.Sort,
 		uri:           uri,
 	}
 	defaultCfg := make(map[string]string)
@@ -126,7 +130,17 @@ type Provider struct {
 	modelsByType  eosc.Untyped[string, []IModel]
 	maskKeys      []string
 	uri           IProviderURI
+	sort          int
+	recommend     bool
 	IConfig
+}
+
+func (p *Provider) Sort() int {
+	return p.sort
+}
+
+func (p *Provider) Recommend() bool {
+	return p.recommend
 }
 
 func (p *Provider) URI() IProviderURI {
