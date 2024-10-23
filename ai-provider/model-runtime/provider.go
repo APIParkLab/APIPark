@@ -55,10 +55,10 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 	}
 
 	delete(modelContents, DirAssets)
-	providerLogo, ok := assetsFiles.Get(providerCfg.IconLarge[entity.LanguageEnglish])
-	if !ok {
-		return nil, fmt.Errorf("provider logo not found:%s", providerCfg.Provider)
-	}
+	//providerLogo, ok := assetsFiles.Get(providerCfg.IconLarge[entity.LanguageEnglish])
+	//if !ok {
+	//	return nil, fmt.Errorf("provider logo not found:%s", providerCfg.Provider)
+	//}
 	modelLogo, ok := assetsFiles.Get(providerCfg.IconSmall[entity.LanguageEnglish])
 	if !ok {
 		return nil, fmt.Errorf("model logo not found:%s", providerCfg.Provider)
@@ -66,7 +66,7 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 	provider := &Provider{
 		id:            providerCfg.Provider,
 		name:          providerCfg.Label[entity.LanguageEnglish],
-		logo:          providerLogo,
+		logo:          modelLogo,
 		helpUrl:       providerCfg.Help.URL[entity.LanguageEnglish],
 		models:        eosc.BuildUntyped[string, IModel](),
 		defaultModels: eosc.BuildUntyped[string, IModel](),
