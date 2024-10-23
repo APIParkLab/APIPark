@@ -181,8 +181,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
   export const APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG:(PageProColumns<MonitorApiData>&{eoTitle:string})[] = [
   
     {
-      title:('应用名称'),
-      eoTitle:('应用名称'),
+      title:('消费者名称'),
+      eoTitle:('消费者名称'),
       dataIndex: 'name',
       width:160,
       ellipsis:true,
@@ -190,8 +190,8 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
       disable:true
     },
     {
-      title:('应用 ID'),
-      eoTitle:('应用 ID'),
+      title:('消费者 ID'),
+      eoTitle:('消费者 ID'),
       dataIndex: 'id',
       width: 140,
       ellipsis:true,

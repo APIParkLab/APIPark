@@ -1,6 +1,6 @@
 
   /**
-   * @description 获取全局应用关系视图（即空间下所有项目组的 api 关联关系)
+   * @description 获取全局消费者关系视图（即空间下所有项目组的 api 关联关系)
    * @param request
    * @returns
    */
@@ -22,7 +22,7 @@ import {  NodeData } from "@core/const/system-running/type"
 import {  TopologyProjectItem, TopologyServiceItem } from "@core/pages/systemRunning/SystemRunning"
 
   /**
-   * @description 获取全局应用关系视图（即空间下所有项目组的 api 关联关系)
+   * @description 获取全局消费者关系视图（即空间下所有项目组的 api 关联关系)
    * @param request
    * @returns
    */

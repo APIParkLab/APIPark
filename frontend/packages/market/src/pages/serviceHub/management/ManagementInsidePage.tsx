@@ -32,7 +32,7 @@ export default function ManagementInsidePage(){
     const TENANT_MANAGEMENT_APP_MENU: MenuProps['items'] = useMemo(()=>[
         getItem($t('订阅的服务'), 'service'),
         getItem($t('访问授权'), 'authorization'),
-        getItem($t('应用管理'), 'setting'),
+        getItem($t('消费者管理'), 'setting'),
     ],[state.language]) 
 
     const menuData = useMemo(()=>{
@@ -45,7 +45,7 @@ export default function ManagementInsidePage(){
 
     const onMenuClick: MenuProps['onClick'] = (node) => {
             setActiveMenu(node.key)
-            navigateTo(`/tenantManagement/${teamId}/inside/${appId}/${node.key}`)
+            navigateTo(`/consumer/${teamId}/inside/${appId}/${node.key}`)
     };
 
     useEffect(()=>{
@@ -60,7 +60,7 @@ export default function ManagementInsidePage(){
             }
             setBreadcrumb(
                 [
-                    {title:<Link to={`/tenantManagement/list/${teamId}`}>{$t('应用')}</Link>},
+                    {title:<Link to={`/consumer/list/${teamId}`}>{$t('消费者')}</Link>},
                    ...(_appName ? [{title:_appName}] : [])
                 ]
             )
@@ -84,7 +84,7 @@ useEffect(()=>{
         <div className="flex flex-1 h-full">
             <div className="w-[220px] border-0 border-solid border-r-[1px] border-r-BORDER">
             <div className="text-[18px] leading-[25px] pl-[12px] py-[12px]">
-                <Button type="text" onClick={()=>navigateTo(`/tenantManagement/list/${teamId}`)}><ArrowLeftOutlined className="max-h-[14px]" />{$t('返回')}</Button>
+                <Button type="text" onClick={()=>navigateTo(`/consumer/list/${teamId}`)}><ArrowLeftOutlined className="max-h-[14px]" />{$t('返回')}</Button>
             </div>
             <Menu
                 onClick={onMenuClick}

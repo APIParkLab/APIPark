@@ -165,7 +165,7 @@ const TeamList:FC = ()=>{
     return (
             <InsidePage 
                 pageTitle={$t('团队')} 
-                description={$t("设置团队和成员，然后你可以在团队内创建服务和应用、订阅API，成员只能看到所属团队内的服务和应用。")}
+                description={$t("设置团队和成员，然后你可以在团队内创建服务和消费者、订阅API，成员只能看到所属团队内的服务和消费者。")}
                 showBorder={false}
                 contentClassName=" pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B"
                 >

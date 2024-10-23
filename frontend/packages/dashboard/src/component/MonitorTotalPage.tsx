@@ -212,7 +212,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
           children:<MonitorTable className="py-[10px]" ref={monitorApiTableRef} type='api' id="dashboard_top10_api" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorApiData,'api')}} request={()=>getTablesData(queryData||{},'api')}/>
       },
       {
-          label:$t('应用调用量 Top10'),
+          label:$t('消费者调用量 Top10'),
           key:'subscribers',
           children:<MonitorTable className="py-[10px]"  ref={monitorSubTableRef} type='subscribers'  id="dashboard_top10_subscriber" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorSubscriberData,'subscriber')}}  request={()=>getTablesData(queryData||{},'subscriber')} />
       },

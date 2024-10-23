@@ -48,8 +48,8 @@ const themeToken = {
    const TOTAL_MENU_ITEMS:MenuProps['items'] =  useMemo(() => [
     getNavItem($t('工作空间'), 'workspace','/guide/page',<Icon icon="ic:baseline-space-dashboard" width="18" height="18"/>, [
         getNavItem(<a>{$t('首页')}</a>, 'guide','/guide/page',<Icon icon="ic:baseline-home" width="18" height="18"/>,undefined,undefined,'all'),
-        getNavItem(<a>{$t('应用')}</a>, 'tenantManagement','/tenantManagement',<Icon icon="ic:baseline-apps" width="18" height="18"/>,undefined,undefined,'all'),
         getNavItem(<a>{$t('服务')}</a>, 'service','/service',<Icon icon="ic:baseline-blinds-closed" width="18" height="18"/>,undefined,undefined,'all'),
+        getNavItem(<a>{$t('消费者')}</a>, 'consumer','/consumer',<Icon icon="ic:baseline-apps" width="18" height="18"/>,undefined,undefined,'all'),
         getNavItem(<a>{$t('团队')}</a>, 'team','/team',<Icon icon="ic:baseline-people-alt" width="18" height="18"/>,undefined,undefined,'all'),
     ]),
     getNavItem($t('API 市场'), 'serviceHub','/serviceHub',<Icon icon="ic:baseline-hub" width="18" height="18"/>,undefined,undefined,'system.workspace.api_market.view'),
