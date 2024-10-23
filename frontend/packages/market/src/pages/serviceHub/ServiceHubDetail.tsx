@@ -1,7 +1,7 @@
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import { App, Avatar, Button, Descriptions, Divider, Tabs} from "antd";
-import  { useEffect, useRef, useState} from "react";
+import  { useEffect, useMemo, useRef, useState} from "react";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
@@ -34,17 +34,33 @@ const ServiceHubDetail = ()=>{
     const [service, setService] = useState<ServiceDetailType>()
     const navigate = useNavigate();
 
+    const modifyApiDoc = (apiDoc:string, apiPrefix:string)=>{
+        if(!apiDoc) return ''
+        if(!apiPrefix) return apiDoc
+        try{
+            const openApiSpec = JSON.parse(apiDoc);
+            // 遍历并修改 paths，给每个路径添加前缀
+            const modifiedPaths:Record<string,unknown> = {};
+            for (const [path, pathItem] of Object.entries(openApiSpec.paths)) {
+              modifiedPaths[apiPrefix + path] = pathItem;
+            }
+            openApiSpec.paths = modifiedPaths;
+            return JSON.stringify(openApiSpec);
+        }catch(err){
+            console.warn('拼接api前缀失败',err)
+        }
+        return apiDoc
+    }
+
     const getServiceBasicInfo = ()=>{
-        fetchData<BasicResponse<{service:ServiceDetailType}>>('catalogue/service',{method:'GET',eoParams:{service:serviceId}, eoTransformKeys:['app_num','api_num','update_time','api_doc','invoke_address','approval_type','service_type']}).then(response=>{
+        fetchData<BasicResponse<{service:ServiceDetailType}>>('catalogue/service',{method:'GET',eoParams:{service:serviceId}, eoTransformKeys:['app_num','api_num','update_time','api_doc','invoke_address','approval_type','service_kind']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                setService(data.service)
+                setService({...data.service,apiDoc:modifyApiDoc(data.service.apiDoc, data.service.basic?.invokeAddress)})
                 setServiceBasicInfo(data.service.basic)
                 setServiceName(data.service.name)
                 setServiceDesc(data.service.description)
-                // setApplied(data.service.applied)
                 setServiceDoc(DOMPurify.sanitize(data.service.document))
-                // setActiveKey(data.service.apis.map((x)=>x.id))
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
             }
@@ -113,7 +129,7 @@ const ServiceHubDetail = ()=>{
         {
             key: 'api-document',
             label: $t('API 文档'),
-            children: <div className={`p-btnbase  ${serviceBasicInfo?.serviceType?.toLocaleLowerCase() === 'ai' ? 'ai-service-api-preview' : ''}`}><ServiceHubApiDocument service={service!} /></div>,
+            children: <div className={`p-btnbase  ${serviceBasicInfo?.serviceKind?.toLocaleLowerCase() === 'ai' ? 'ai-service-api-preview' : ''}`}><ServiceHubApiDocument service={service!} /></div>,
             icon: <ApiFilled />
         }
     ]
@@ -156,7 +172,7 @@ const ServiceHubDetail = ()=>{
             </section>
             <section className="col-span-1 p-btnbase px-btnrbase">
                     <Descriptions title={$t("服务信息")} column={1} size={'small'}>
-                        <Descriptions.Item label={$t("接入应用")}>{serviceBasicInfo?.appNum ?? '-'}</Descriptions.Item>
+                        <Descriptions.Item label={$t("接入消费者")}>{serviceBasicInfo?.appNum ?? '-'}</Descriptions.Item>
                         <Descriptions.Item label={$t("供应方")}>{serviceBasicInfo?.team?.name || '-'}</Descriptions.Item>
                         <Descriptions.Item label={$t("审核")}>{serviceBasicInfo?.approvalType ? $t((approvalTypeTranslate[serviceBasicInfo?.approvalType] || '-' )): '-'}</Descriptions.Item>
                         <Descriptions.Item label={$t("分类")}>{serviceBasicInfo?.catalogue?.name || '-'}</Descriptions.Item>

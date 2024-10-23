@@ -67,7 +67,7 @@ export type PartitionClusterNodeTableListItem = {
     name: string;
     managerAddress:string[];
     serviceAddress:string[];
-    peerAddress:string;
+    peerAddress:string[];
     status:0|1;
 };
 
