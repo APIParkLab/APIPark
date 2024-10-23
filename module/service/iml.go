@@ -603,7 +603,7 @@ func (i *imlAppModule) Search(ctx context.Context, teamId string, keyword string
 
 		}
 	}
-	appMap, err := i.authService.CountByApp(ctx, serviceIds...)
+	authMap, err := i.authService.CountByApp(ctx, serviceIds...)
 	if err != nil {
 		return nil, err
 	}
@@ -621,7 +621,7 @@ func (i *imlAppModule) Search(ctx context.Context, teamId string, keyword string
 			SubscribeNum:       subscribeNum,
 			SubscribeVerifyNum: verifyNum,
 			CanDelete:          subscribeNum == 0,
-			AuthNum:            appMap[model.Id],
+			AuthNum:            authMap[model.Id],
 		})
 	}
 	sort.Slice(items, func(i, j int) bool {
@@ -728,6 +728,10 @@ func (i *imlAppModule) SearchMyApps(ctx context.Context, teamId string, keyword 
 	if err != nil {
 		return nil, err
 	}
+	authMap, err := i.authService.CountByApp(ctx, serviceIds...)
+	if err != nil {
+		return nil, err
+	}
 
 	subscribeCount := map[string]int64{}
 	subscribeVerifyCount := map[string]int64{}
@@ -764,6 +768,7 @@ func (i *imlAppModule) SearchMyApps(ctx context.Context, teamId string, keyword 
 			SubscribeNum:       subscribeNum,
 			SubscribeVerifyNum: verifyNum,
 			CanDelete:          subscribeNum == 0,
+			AuthNum:            authMap[model.Id],
 		})
 	}
 	sort.Slice(items, func(i, j int) bool {
