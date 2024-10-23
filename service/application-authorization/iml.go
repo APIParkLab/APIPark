@@ -3,11 +3,11 @@ package application_authorization
 import (
 	"context"
 	"time"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	"github.com/eolinker/go-common/auto"
-	
+
 	"github.com/APIParkLab/APIPark/service/universally"
 	"github.com/APIParkLab/APIPark/stores/service"
 )
@@ -22,6 +22,14 @@ type imlAuthorizationService struct {
 	universally.IServiceDelete
 	universally.IServiceCreate[Create]
 	universally.IServiceEdit[Edit]
+}
+
+func (i *imlAuthorizationService) CountByApp(ctx context.Context, appId ...string) (map[string]int64, error) {
+	w := map[string]interface{}{}
+	if len(appId) > 0 {
+		w["application"] = appId
+	}
+	return i.store.CountByGroup(ctx, "", w, "application")
 }
 
 func (i *imlAuthorizationService) ListByApp(ctx context.Context, appId ...string) ([]*Authorization, error) {
@@ -51,11 +59,11 @@ func (i *imlAuthorizationService) GetLabels(ctx context.Context, ids ...string) 
 
 func (i *imlAuthorizationService) OnComplete() {
 	i.IServiceGet = universally.NewGet[Authorization, service.Authorization](i.store, FromEntity)
-	
+
 	i.IServiceDelete = universally.NewDelete[service.Authorization](i.store)
-	
+
 	i.IServiceCreate = universally.NewCreator[Create, service.Authorization](i.store, "project_authorization", createEntityHandler, uniquestHandler, labelHandler)
-	
+
 	i.IServiceEdit = universally.NewEdit[Edit, service.Authorization](i.store, updateHandler, labelHandler)
 	auto.RegisterService("project_authorization", i)
 }
