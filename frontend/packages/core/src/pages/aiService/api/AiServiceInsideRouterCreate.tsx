@@ -1,5 +1,5 @@
 import {App, Button, Form, Input, InputNumber, Row, Select, Space, Spin, Tag} from "antd";
-import  { MutableRefObject, useEffect, useRef, useState} from "react";
+import  { MutableRefObject, useEffect, useMemo, useRef, useState} from "react";
 import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { $t } from "@common/locales/index.ts";
@@ -19,6 +19,7 @@ import { AiProviderDefaultConfig, AiProviderLlmsItems } from "@core/pages/aiSett
 import { EditableFormInstance } from "@ant-design/pro-components";
 import { validateUrlSlash } from "@common/utils/validate";
 import { API_PATH_MATCH_RULES } from "@core/const/system/const";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 type AiServiceRouterField = {
     name:string
@@ -61,6 +62,8 @@ const AiServiceInsideRouterCreate = () => {
     const [defaultLlm, setDefaultLlm] = useState<AiProviderDefaultConfig & {config:string}>()
     const [llmList, setLlmList] = useState<AiProviderLlmsItems[]>([])
     const [variablesTableRef, setVariablesTableRef] = useState<MutableRefObject<EditableFormInstance<T> | undefined>>()
+    const {state} = useGlobalContext()
+    
     const onFinish =  ()=>{
         return variablesTableRef?.current?.validateFields().then(()=>{
             return form.validateFields().then((formValue)=>{
@@ -204,6 +207,9 @@ const AiServiceInsideRouterCreate = () => {
         setDrawerType(undefined);
       };
 
+    const apiPathMatchRulesOptions = useMemo(()=>API_PATH_MATCH_RULES.map(
+        x=>({label:$t(x.label), value:x.value})),[state.language])
+
     return (
         
         <InsidePage pageTitle={ $t('AI 路由设置')|| '-'} 
@@ -260,7 +266,7 @@ const AiServiceInsideRouterCreate = () => {
                                         }]}
                                         noStyle
                                     >
-                                    <Select  placeholder={$t(PLACEHOLDER.select)} options={API_PATH_MATCH_RULES} className="w-[30%] min-w-[100px]"/>
+                                    <Select  placeholder={$t(PLACEHOLDER.select)} options={apiPathMatchRulesOptions} className="w-[30%] min-w-[100px]"/>
                                     </Form.Item>
                                 <Form.Item<AiServiceRouterField>
                                         name="path"
