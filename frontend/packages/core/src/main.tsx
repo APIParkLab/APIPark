@@ -10,7 +10,7 @@ async function initializeApp() {
     // 初始化行为
     // await fetchInitialConfig(); // 示例：获取初始配置
     
-    // 异步操作完成后，渲染React应用
+    // 异步操作完成后，渲染React消费者
     ReactDOM.createRoot(document.getElementById('root')!).render(
       <StrictMode>
         <GlobalProvider>

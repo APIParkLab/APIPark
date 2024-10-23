@@ -30,7 +30,7 @@ export default function Guide(){
                 },
                 {
                     title: $t("创建调用 Token"),
-                    description: $t('为了安全地调用 API，你需要创建一个应用以及Token。'),
+                    description: $t('为了安全地调用 API，你需要创建一个消费者以及Token。'),
                     link: 'https://docs.apipark.com/docs/quick/suberscriber/application'
                 },
                 {
@@ -50,7 +50,7 @@ export default function Guide(){
                 },
                 {
                     title: $t("创建调用 Token"),
-                    description: $t('为了安全地调用 API，你需要创建一个应用以及Token。'),
+                    description: $t('为了安全地调用 API，你需要创建一个消费者以及Token。'),
                     link: 'https://docs.apipark.com/docs/quick/suberscriber/subscribe'
                 },
                 {
@@ -82,7 +82,7 @@ export default function Guide(){
                 },
                 {
                     title: $t("团队"),
-                    description: $t('团队中包含了人员、应用和服务，不同团队之间的应用和服务数据是隔离的，可用于管理企业内部不同的部门/项目组/团队。'),
+                    description: $t('团队中包含了人员、消费者和服务，不同团队之间的消费者和服务数据是隔离的，可用于管理企业内部不同的部门/项目组/团队。'),
                     link: 'https://docs.apipark.com/docs/quick/provider/service'
                 },
                 {
@@ -102,7 +102,7 @@ export default function Guide(){
                 },
                 {
                     title: $t("审核订阅申请"),
-                    description: $t('提供服务的团队可以审核来自其他团队的订阅申请，审核通过后的应用才可发起 API 请求。'),
+                    description: $t('提供服务的团队可以审核来自其他团队的订阅申请，审核通过后的消费者才可发起 API 请求。'),
                     link: 'https://docs.apipark.com/docs/quick/suberscriber/subscribe'
                 }
             ]

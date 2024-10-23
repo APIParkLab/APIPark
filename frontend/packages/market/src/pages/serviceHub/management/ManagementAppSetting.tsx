@@ -8,7 +8,7 @@ export default function ManagementAppSetting(){
     
     return (
         <div className=" h-full pt-[32px]">
-        <div className="flex items-center justify-between w-full ml-[10px] text-[18px] leading-[25px] pb-[16px]" ><span className="font-bold">{$t('应用管理')}</span></div>
+        <div className="flex items-center justify-between w-full ml-[10px] text-[18px] leading-[25px] pb-[16px]" ><span className="font-bold">{$t('消费者管理')}</span></div>
         <div className="h-[calc(100%-41px)] flex flex-col ">
             <ManagementConfig type='edit' teamId={teamId!} appId={appId!}/>
         </div>
