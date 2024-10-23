@@ -1,7 +1,7 @@
 export const BASE_GROUP_ORDER = JSON.stringify({})
 
 /**
- * 应用关系图节点字体大小
+ * 消费者关系图节点字体大小
  */
 export const RELATIVE_PICTURE_NODE_FONTSIZE = 14
 

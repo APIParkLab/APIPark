@@ -96,7 +96,7 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
             const {code,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 message.success(msg || $t(RESPONSE_TIPS.success))
-                navigate(`/tenantManagement/list`)
+                navigate(`/consumer/list`)
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
             }
@@ -131,7 +131,7 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
         >
             <div>
             <Form.Item<ManagementConfigFieldType>
-                label={$t("应用名称")}
+                label={$t("消费者名称")}
                 name="name"
                 rules={[{ required: true,whitespace:true  }]}
             >
@@ -139,7 +139,7 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
             </Form.Item>
 
             <Form.Item<ManagementConfigFieldType>
-                label={$t("应用 ID")}
+                label={$t("消费者 ID")}
                 name="id"
                 rules={[{ required: true ,whitespace:true }]}
             >
@@ -167,10 +167,10 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
             
                 <WithPermission access="team.application.application.delete" showDisabled={false}>
                     <div className="bg-[rgb(255_120_117_/_5%)] rounded-[10px] mt-[50px] p-btnrbase pb-0">
-                            <p className="text-left"><span className="font-bold">{$t('删除应用')}：</span>{$t('删除操作不可恢复，请谨慎操作！')}</p>
+                            <p className="text-left"><span className="font-bold">{$t('删除消费者')}：</span>{$t('删除操作不可恢复，请谨慎操作！')}</p>
                                 <div className="text-left">
                                     <WithPermission access="team.application.application.delete">
-                                        <Button className="m-auto mt-[16px] mb-[20px]" type="default" danger={true} onClick={deleteApplicationModal} loading={delBtnLoading}>{$t('删除应用')}</Button>
+                                        <Button className="m-auto mt-[16px] mb-[20px]" type="default" danger={true} onClick={deleteApplicationModal} loading={delBtnLoading}>{$t('删除消费者')}</Button>
                                         </WithPermission>
                                 </div>
                             </div>
