@@ -147,7 +147,11 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 	}
 	defaultLLM, has := p.GetModel(info.DefaultLLM)
 	if !has {
-		return nil, fmt.Errorf("ai provider llm not found")
+		model, has := p.DefaultModel(model_runtime.ModelTypeLLM)
+		if !has {
+			return nil, fmt.Errorf("ai provider llm not found")
+		}
+		defaultLLM = model
 	}
 	return &ai_dto.Provider{
 		Id:               info.Id,
@@ -197,7 +201,7 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 			DefaultLLMLogo: defaultLLM.Logo(),
 			Logo:           p.Logo(),
 			Configured:     false,
-		}, err
+		}, nil
 	}
 
 	return items, &ai_dto.ProviderItem{Id: info.Id, Name: info.Name, DefaultLLM: info.DefaultLLM, Logo: p.Logo(), Configured: true}, nil
