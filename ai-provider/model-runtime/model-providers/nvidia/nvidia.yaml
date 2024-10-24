@@ -1,6 +1,6 @@
 provider: nvidia
 label:
-  en_US: API Catalog
+  en_US: Nvidia
 description:
   en_US: API Catalog
   zh_Hans: API Catalog

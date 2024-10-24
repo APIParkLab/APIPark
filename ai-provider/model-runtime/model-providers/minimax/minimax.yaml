@@ -28,3 +28,5 @@ provider_credential_schema:
         zh_Hans: 在此输入您的 API Key
         en_US: Enter your API Key
 address: https://api.minimax.chat
+recommend: true
+sort: 5
