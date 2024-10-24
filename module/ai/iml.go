@@ -201,7 +201,7 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 			DefaultLLMLogo: defaultLLM.Logo(),
 			Logo:           p.Logo(),
 			Configured:     false,
-		}, err
+		}, nil
 	}
 
 	return items, &ai_dto.ProviderItem{Id: info.Id, Name: info.Name, DefaultLLM: info.DefaultLLM, Logo: p.Logo(), Configured: true}, nil
