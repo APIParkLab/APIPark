@@ -649,5 +649,10 @@
   "K5c4e2865": "Create and manage your own consumer entities, with each consumer able to subscribe to multiple API services, ensuring the necessary permissions are obtained before making any calls. You can generate API keys or other credentials for consumers to securely call API services.",
   "K40a89bd8": "Enter Name, ID to Search Member",
   "Kba74f26d": "Access Consumer",
-  "K70b79760": "Number of Access Consumers"
+  "K70b79760": "Number of Access Consumers",
+  "K93c2696e": "Online Result",
+  "K6e32a344": "Number of Services",
+  "Ka701316": "Number of Auths",
+  "K9eaa2eb6": "List",
+  "Kfaec39e9": "Block"
 }
