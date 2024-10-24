@@ -4,12 +4,11 @@ import { BasicResponse, STATUS_CODE, RESPONSE_TIPS } from "@common/const/const";
 import { useFetch } from "@common/hooks/http";
 import { $t } from "@common/locales";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { App, Spin, Card, Tag, Select, Button, Empty, Divider } from "antd";
+import { App, Spin, Card, Tag, Button, Empty, Divider } from "antd";
 import { memo, useEffect, useRef, useState } from "react";
 import AiSettingModalContent, { AiSettingModalContentHandle } from "./AiSettingModal";
 import WithPermission from "@common/components/aoplatform/WithPermission";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
-import { DefaultOptionType } from "antd/es/select";
 import { checkAccess } from "@common/utils/permission";
 
 export type AiSettingListItem = {
@@ -90,7 +89,7 @@ const AiSettingList = ()=>{
         }
         modal.confirm({
             title:$t('模型配置'),
-            content:<AiSettingModalContent ref={modalRef} entity={data.provider} readOnly={!checkAccess('system.devops.ai_provider.edit', accessData)}/>,
+            content:<AiSettingModalContent ref={modalRef} entity={{...data.provider,defaultLlm:entity.defaultLlm}} readOnly={!checkAccess('system.devops.ai_provider.edit', accessData)}/>,
             onOk:()=>{
                 return modalRef.current?.save().then((res)=>{if(res === true) 
                     setAiConfigFlushed(true)
@@ -125,48 +124,12 @@ const AiSettingList = ()=>{
     }, []);
 
     const CardBox = memo(({provider}:{provider:AiSettingListItem})=>{
-        const [options, setOptions] = useState<DefaultOptionType[]>([])
-        const [loading, setLoading] = useState<boolean>(false)
-        const [defaultLlm, setDefaultLlm] = useState<string>(provider.defaultLlm)
-
-        const getLlmList = ()=>{
-            if(options.length > 0) return
-            setLoading(true)
-            fetchData<BasicResponse<{llms:AiProviderLlmsItems[]}>>(`ai/provider/llms`,{method:'GET',eoParams:{provider:provider.id}}).then(response=>{
-               const {code,data,msg} = response
-               if(code === STATUS_CODE.SUCCESS){
-                setOptions(data.llms?.map((x:AiProviderLlmsItems)=>({
-                           label:<span className="w-full truncate">{x.id}</span>, 
-                           value:x.id})))
-               }else{
-                   message.error(msg || $t(RESPONSE_TIPS.error))
-               }
-            }).finally(()=>{
-                setLoading(false)
-            })
-       }
-
-       
-        const changeDefaultModel = (value: string, entity:AiSettingListItem) => {
-            setLoading(true)
-            return fetchData<BasicResponse<null>>(`ai/provider/default-llm`,{method:'PUT', eoBody:{llm:value}, eoParams:{provider:entity.id}}).then(response=>{
-                const {code,msg} = response
-                if(code === STATUS_CODE.SUCCESS){
-                    setDefaultLlm(value)
-                    message.success(msg || $t(RESPONSE_TIPS.success))
-                }else{
-                    message.error(msg || $t(RESPONSE_TIPS.error))
-                }
-            }).finally(()=>setLoading(false))
-        };
-    
-        
         return (
             <Card title={
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center  gap-[4px]">
+                    <div className="flex w-full items-center justify-between gap-[4px]">
+                        <div className="flex flex-1 overflow-hidden items-center  gap-[4px]">
                             <span className=" flex items-center h-[22px]  ai-setting-svg-container" dangerouslySetInnerHTML={{ __html: provider.logo }}  ></span>
-                            <span className="font-normal">{provider.name}</span>
+                            <span className="font-normal truncate">{provider.name}</span>
                         </div>
                         <Tag bordered={false} color={provider.configured ? 'green' : undefined} className="h-[22px] px-[4px] text-center">
                             {provider.configured ? $t('已配置') : $t('未配置')}
@@ -178,18 +141,7 @@ const AiSettingList = ()=>{
                         <div className="flex flex-col justify-between h-full gap-btnbase ">
                             <div className="flex items-center w-full h-[32px]  flex-1">{
                                 provider.configured && <><label className="text-nowrap">{$t('默认')}：</label>
-                                    <WithPermission access="system.devops.ai_provider.edit">
-                                        <Select
-                                            value={defaultLlm}
-                                            variant="borderless"
-                                            className="flex-1 overflow-hidden"
-                                            // style={{ width: '100%' }}
-                                            onChange={(value)=>changeDefaultModel(value, provider)}
-                                            options={options}
-                                            onFocus={()=> getLlmList()}
-                                            loading={loading }
-                                            />
-                                    </WithPermission>
+                                <span className="flex-1 overflow-hidden truncate">{provider.defaultLlm}</span>
                                 </> 
                                 }
                                    
@@ -248,8 +200,8 @@ const AiSettingList = ()=>{
                         aiSettingList.filter((item)=>!item.configured).length > 0 && <>
                             <Divider style={{margin:'20px 0 !important;'}} />
                             <p className="text-[14px] text-[#666]  mb-[4px] mt-[20px]  font-bold">{$t('未配置')}</p>
-                            <ModelCardArea modelList={aiSettingList.filter((item)=>!item.configured) || [] }/>
-                        </>
+                                <ModelCardArea modelList={aiSettingList.filter((item)=>!item.configured) || [] }/>
+                            </>
                     }
             </div>:<Empty  image={Empty.PRESENTED_IMAGE_SIMPLE}/>}
         </Spin>
