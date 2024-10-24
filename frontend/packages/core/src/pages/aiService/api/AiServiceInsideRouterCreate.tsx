@@ -1,5 +1,5 @@
-import {App, Button, Form, Input, InputNumber, Row, Spin, Tag} from "antd";
-import  { MutableRefObject, useEffect, useRef, useState} from "react";
+import {App, Button, Form, Input, InputNumber, Row, Select, Space, Spin, Tag} from "antd";
+import  { MutableRefObject, useEffect, useMemo, useRef, useState} from "react";
 import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { $t } from "@common/locales/index.ts";
@@ -17,6 +17,9 @@ import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter
 import AiServiceRouterModelConfig, { AiServiceRouterModelConfigHandle } from "./AiServiceInsideRouterModelConfig";
 import { AiProviderDefaultConfig, AiProviderLlmsItems } from "@core/pages/aiSetting/AiSettingList";
 import { EditableFormInstance } from "@ant-design/pro-components";
+import { validateUrlSlash } from "@common/utils/validate";
+import { API_PATH_MATCH_RULES } from "@core/const/system/const";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 
 type AiServiceRouterField = {
     name:string
@@ -59,11 +62,16 @@ const AiServiceInsideRouterCreate = () => {
     const [defaultLlm, setDefaultLlm] = useState<AiProviderDefaultConfig & {config:string}>()
     const [llmList, setLlmList] = useState<AiProviderLlmsItems[]>([])
     const [variablesTableRef, setVariablesTableRef] = useState<MutableRefObject<EditableFormInstance<T> | undefined>>()
+    const {state} = useGlobalContext()
+    
     const onFinish =  ()=>{
         return variablesTableRef?.current?.validateFields().then(()=>{
             return form.validateFields().then((formValue)=>{
-                const {name, path, description, variables, prompt, timeout, retry} = formValue
-                const body = {name, path: prefixForce ?  `${apiPrefix}/${path}`:path , description,timeout, retry,aiPrompt:{variables:variables, prompt:prompt},aiModel:{id:defaultLlm?.id, provider:defaultLlm?.provider, config:defaultLlm?.config}}
+                const {name, path, description, variables, prompt, timeout, retry,pathMatch} = formValue
+                const body = {
+                    name, 
+                    path: `${prefixForce ? apiPrefix + '/' : ''}${path.trim()}${pathMatch === 'prefix' ? '/*' : ''}`,
+                    description,timeout, retry,aiPrompt:{variables:variables, prompt:prompt},aiModel:{id:defaultLlm?.id, provider:defaultLlm?.provider, config:defaultLlm?.config}}
                 return fetchData<BasicResponse<null>>('service/ai-router',{method: routeId ? 'PUT' : 'POST',eoBody:(body), eoParams: {service:serviceId,team:teamId, ...(routeId ? {router:routeId}: {})},eoTransformKeys:['aiPrompt','aiModel']}).then(response=>{
                     const {code,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
@@ -92,7 +100,20 @@ const AiServiceInsideRouterCreate = () => {
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 const {path, aiPrompt,aiModel} = data.api
-                form.setFieldsValue({...data.api,...aiPrompt, path:prefixForce && path?.startsWith(apiPrefix + '/')? path.slice((apiPrefix?.length || 0) + 1) : path })
+                let newPath = path
+                let pathMatch = 'full'
+                if(prefixForce && path?.startsWith(apiPrefix + '/')){
+                    newPath = path.slice((apiPrefix?.length || 0) + 1)
+                }
+                if(newPath.endsWith('/*')){
+                    newPath = newPath.slice(0,-2)
+                    pathMatch = 'prefix'
+                }
+                form.setFieldsValue({
+                    ...data.api,
+                    ...aiPrompt, 
+                    path:newPath,
+                    pathMatch})
                 setVariablesTable(aiPrompt.variables as VariableItems[])
                 setDefaultLlm(prev => ({...prev, provider: aiModel?.provider, id:aiModel?.id, config:aiModel.config}) as (AiProviderDefaultConfig & { config: string; }))
                 getDefaultModelConfig(aiModel?.provider)
@@ -141,7 +162,8 @@ const AiServiceInsideRouterCreate = () => {
                 variables:[{key:'Query',value:'',require:true}],
                 prompt:'{{Query}}',
                 retry:0,
-                timeout:300000
+                timeout:300000,
+                pathMatch:'prefix'
             })
         }
         return (form.setFieldsValue({}))
@@ -184,6 +206,9 @@ const AiServiceInsideRouterCreate = () => {
     const onClose = () => {
         setDrawerType(undefined);
       };
+
+    const apiPathMatchRulesOptions = useMemo(()=>API_PATH_MATCH_RULES.map(
+        x=>({label:$t(x.label), value:x.value})),[state.language])
 
     return (
         
@@ -230,15 +255,38 @@ const AiServiceInsideRouterCreate = () => {
                                 <Input  className="w-INPUT_NORMAL"   placeholder={$t(PLACEHOLDER.input)}/>
                             </Form.Item>
                             
-                            <Form.Item<AiServiceRouterField>
-                                className="flex-1"
-                                label={$t("请求路径")}
-                                name="path"
-                                rules={[{ required: true,whitespace:true }]}
-                            >
-                                <Input  prefix={prefixForce ? `${apiPrefix}/` :"/"} className="w-INPUT_NORMAL" 
-                                    placeholder={$t(PLACEHOLDER.input)}/>
-                            </Form.Item>
+                            
+                        <Form.Item label={$t("请求路径")}>
+                            <Space.Compact block>
+                                <Form.Item
+                                        name="pathMatch"
+                                        rules={[{ required: true,whitespace:true  },
+                                        {
+                                        validator: validateUrlSlash,
+                                        }]}
+                                        noStyle
+                                    >
+                                    <Select  placeholder={$t(PLACEHOLDER.select)} options={apiPathMatchRulesOptions} className="w-[30%] min-w-[100px]"/>
+                                    </Form.Item>
+                                <Form.Item<AiServiceRouterField>
+                                        name="path"
+                                        rules={[{ required: true,whitespace:true  },
+                                        {
+                                        validator: validateUrlSlash,
+                                        }]}
+                                        noStyle
+                                    >
+                                    <Input  prefix={(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
+                                        placeholder={$t(PLACEHOLDER.input)} onChange={(e)=>{
+                                            if((e.target.value as string).endsWith('/*')){
+                                                form.setFieldValue('path',e.target.value.slice(0,-2))
+                                                form.setFieldValue('pathMatch','prefix')
+                                            }
+                                            }}/>
+                                    </Form.Item>
+                            </Space.Compact>
+                        </Form.Item>
+
                         </Row>
 
                         <Form.Item<AiServiceRouterField>

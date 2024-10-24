@@ -272,3 +272,21 @@ a{
       stroke: rgba(255, 255, 255, 0.1);
       mask-image: radial-gradient(100% 100% at top right, white, transparent);
   }
+
+  .login-block{
+    background: rgba(255, 255, 255, 0.1) !important;
+    .login-input{
+      color:#fff !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      &:hover, &:focus, &.ant-input-status-error, &.ant-input-status-error:hover, &.ant-input-status-error:focus-within{
+        background: rgba(255, 255, 255, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      }
+    }
+    
+  input:-webkit-autofill,
+  input:-webkit-autofill:focus {
+    transition: background-color 0s 600000s, color 0s 600000s !important;
+  }
+  }

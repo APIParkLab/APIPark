@@ -127,46 +127,46 @@ const ServiceHubList:FC = ()=>{
     return (
         <ServiceHubGroup filterOption={filterOption} dispatch={dispatch}>
             <div className="h-full  padding-top-40"> 
-        <Spin className="h-full" wrapperClassName="h-full"  indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={filterOption.listLoading}>
-            {filterOption.showServicesList && filterOption.showServicesList.length > 0 ? <VirtuosoGrid
-            style={{ height: '100%'}} 
-            data={filterOption.showServicesList}
-            totalCount={filterOption.showServicesList.length}
-            itemContent={(index) => {
-                const item = filterOption.showServicesList[index];
-            return (
-                <div className="pt-[20px]">
-                <Card title={CardTitle(item)} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px] m-0 transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]"  classNames={{header:'border-b-[0px] p-[20px] ', body:"pt-0"}} onClick={()=>showDocumentDetail(item)}>
-                   <span className="line-clamp-3  text-[12px] text-[#666] " 
-                    style={{'word-break':'auto-phrase'}}>{item.description || $t('暂无服务描述')}</span> 
-                </Card>
-                </div>
-            );
-            }}
-            components={{
-                List: forwardRef(({ style, children, ...props }, ref) => (
-                <div
-                    ref={ref}
-                    {...props}
-                    style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                        columnGap: '20px',
-                        padding:'40px',
-                        ...style,
-                        paddingBottom:'40px'
+                <Spin className="h-full" wrapperClassName="h-full"  indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={filterOption.listLoading}>
+                    {filterOption.showServicesList && filterOption.showServicesList.length > 0 ? <VirtuosoGrid
+                    style={{ height: '100%'}} 
+                    data={filterOption.showServicesList}
+                    totalCount={filterOption.showServicesList.length}
+                    itemContent={(index) => {
+                        const item = filterOption.showServicesList[index];
+                    return (
+                        <div className="pt-[20px]">
+                        <Card title={CardTitle(item)} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px] m-0 transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]"  classNames={{header:'border-b-[0px] p-[20px] ', body:"pt-0"}} onClick={()=>showDocumentDetail(item)}>
+                        <span className="line-clamp-3  text-[12px] text-[#666] " 
+                            style={{'word-break':'auto-phrase'}}>{item.description || $t('暂无服务描述')}</span> 
+                        </Card>
+                        </div>
+                    );
                     }}
-                >
-                    {children}
-                </div>
-                )),
-                Item: ({ children, ...props }) => (
-                <>
-                    {children}</>
-                )
-            }}
-        />:<Empty  image={Empty.PRESENTED_IMAGE_SIMPLE}/>}
-        </Spin>
+                    components={{
+                        List: forwardRef(({ style, children, ...props }, ref) => (
+                        <div
+                            ref={ref}
+                            {...props}
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                                columnGap: '20px',
+                                padding:'40px',
+                                ...style,
+                                paddingBottom:'40px'
+                            }}
+                        >
+                            {children}
+                        </div>
+                        )),
+                        Item: ({ children, ...props }) => (
+                        <>
+                            {children}</>
+                        )
+                    }}
+                />:<Empty  image={Empty.PRESENTED_IMAGE_SIMPLE}/>}
+                </Spin>
         </div>
       </ServiceHubGroup>
     )
@@ -186,7 +186,7 @@ const CardTitle = (service:ServiceHubTableListItem)=>{
                     <Tooltip  title={$t('API 数量')}>
                         <span className="mr-[12px] flex items-center"><ApiOutlined className="mr-[1px] text-[14px] h-[14px] w-[14px]"/><span className="font-normal text-[14px]">{service.apiNum ?? '-'}</span></span>
                     </Tooltip>
-                    <Tooltip  title={$t('接入应用数量')}>
+                    <Tooltip  title={$t('接入消费者数量')}>
                         <span className="mr-[12px] flex items-center"><span className="h-[14px] mr-[4px] flex items-center "><iconpark-icon size="14px" name="auto-generate-api"></iconpark-icon></span><span className="font-normal text-[14px]">{service.subscriberNum ?? '-'}</span></span>
                     </Tooltip>
                 </div>

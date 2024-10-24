@@ -49,14 +49,14 @@ export interface GetProjectGroupRelativeRequest {
   }
   
   /**
-   * 获取空间应用(项目组)关联关系请求体
+   * 获取空间消费者(项目组)关联关系请求体
    */
   export interface GetSpaceProjectGroupRelativeRequest {
     spaceId: string
   }
   
   /**
-   * 获取空间应用（项目组）关联关系返回体
+   * 获取空间消费者（项目组）关联关系返回体
    */
   export interface GetSpaceProjectGroupRelativeResponse {
     success: boolean
