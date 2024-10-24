@@ -57,11 +57,11 @@ export const ApplyServiceModal = forwardRef<ApplyServiceHandle,ApplyServiceProps
                 <Col span={18}>{entity.id}</Col>
             </Row>
             <Form.Item
-                label={$t("应用")}
+                label={$t("消费者")}
                 name="applications"
                 rules={[{ required: true }]}
             >
-                <Select className="w-INPUT_NORMAL" disabled={reApply} placeholder={$t("搜索或选择应用")} mode="multiple" options={mySystemOptionList?.filter((x)=>x.value !== entity.id)}/>
+                <Select className="w-INPUT_NORMAL" disabled={reApply} placeholder={$t("搜索或选择消费者")} mode="multiple" options={mySystemOptionList?.filter((x)=>x.value !== entity.id)}/>
             </Form.Item>
             { entity.approvalType === 'manual' &&
             <Form.Item

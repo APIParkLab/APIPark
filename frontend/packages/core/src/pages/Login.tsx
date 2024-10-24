@@ -139,7 +139,7 @@ const Login:FC = ()=> {
 
             </div>
             {/* <div className="w-full border-box text-right pr-[40px]"></div> */}
-             <div className="w-[410px] mx-auto flex-1 flex flex-col items-center justify-center z-[3]" >
+             <div className="mx-auto flex-1 flex flex-col items-center justify-center z-[3]" >
                  <div className="mx-auto">
                     <span className="flex items-center justify-center">
                       <img
@@ -149,14 +149,10 @@ const Login:FC = ()=> {
                     </span>
                  </div>
 
-                 <section className="block w-[410px] mx-auto mt-[46px] bg-MAIN_BG p-[30px] box-border rounded-[10px] shadow-[0_5px_20px_0_rgba(0,0,0,5%)]">
+                 <section className="block w-[410px] mx-auto mt-[46px] p-[30px] box-border rounded-[10px] shadow-[0_5px_20px_0_rgba(0,0,0,5%)] login-block">
                      <div className="h-full">
-                         <div>
-                             <div className="flex justify-center items-center">
-                                 <span className="text-[24px] text-[#101010]">{$t('登录')}</span>
-                             </div>
-
-                             <Form onFinish={login} className="w-[350px] pt-[28px]"
+                         <div className="">
+                             <Form onFinish={login} className="w-[350px]"
                                    ref={formRef}>
                                  <Form.Item
                                      className="p-0 bg-transparent rounded border-none"
@@ -164,7 +160,7 @@ const Login:FC = ()=> {
                                      rules={[{ required: true, message: $t('请输入账号') ,whitespace:true }]}
                                  >
                                      <Input
-                                         className="w-[350px] h-[40px]"
+                                         className="w-[350px] h-[40px] login-input"
                                          placeholder={$t("账号")}
                                          autoComplete="on"
                                          autoFocus
@@ -172,12 +168,12 @@ const Login:FC = ()=> {
                                  </Form.Item>
 
                                  <Form.Item
-                                     className="p-0 bg-transparent rounded border-none"
+                                     className="p-0 bg-transparent rounded border-none "
                                      name="password"
                                      rules={[{ required: true, message: $t('请输入密码')  }]}
                                  >
                                      <Input.Password
-                                         className="w-[350px] h-[40px]"
+                                         className="w-[350px] h-[40px] login-input"
                                          placeholder={$t("密码")}
                                          autoComplete="off"
                                      />
@@ -209,8 +205,9 @@ const Login:FC = ()=> {
                  </section>
 
                  <section className="flex flex-col items-center mt-[46px] text-SECOND_TEXT">
-                     <p className="leading-[28px]">{$t('Version (0)-(1)',[state.version,state.updateDate])}</p>
-                     <p className="leading-[28px]">{$t(state.powered)}</p>
+                    <p className="leading-[28px]">
+                        {$t('Version (0)-(1)',[state.version,state.updateDate])}, {$t(state.powered)}
+                     </p>
                         <LanguageSetting mode="light"/>
                  </section>
              </div>

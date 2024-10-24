@@ -99,7 +99,7 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
          fetchTableData(data).then((resp) => {
           const {code,data,msg} = resp
           if(code === STATUS_CODE.SUCCESS){
-            exportExcel($t('应用调用统计'), [query!.start!, query!.end!], $t('应用调用统计'), 'dashboard_application', APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG, data.statistics)
+            exportExcel($t('消费者调用统计'), [query!.start!, query!.end!], $t('消费者调用统计'), 'dashboard_application', APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG, data.statistics)
           }else{
               message.error(msg || $t(RESPONSE_TIPS.dataError))
           }
@@ -144,13 +144,13 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
                   onTimeRangeChange={handleTimeRangeChange}/>
             <div className="flex flex-wrap items-center row-gap-[12px]  pt-btnybase mr-btnybase">
               <div>
-                <label className="inline-block  whitespace-nowrap">{$t('应用')}：</label>
+                <label className="inline-block  whitespace-nowrap">{$t('消费者')}：</label>
                 <Select
                   className="w-[346px]"
                   mode="multiple"
                   maxTagCount={1}
                   // maxTagPlaceholder={(selectedList) => `and ${selectedList.length} more selected`}
-                  placeholder={$t("请选择应用")}
+                  placeholder={$t("请选择消费者")}
                   value={queryData?.projects}
                   options={listOfApps}
                   onChange={(value)=>{setQueryData(prevData=>({...prevData || {}, projects:value}))}}

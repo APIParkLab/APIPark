@@ -69,6 +69,11 @@ export const API_PROTOCOL = [
     {label:'HTTPS',value:'HTTPS'}
 ]
 
+export const API_PATH_MATCH_RULES = [
+    {label:'前缀匹配',value:'prefix'},
+    {label:'全等匹配',value:'full'}
+]
+
 
 export const ALGORITHM_ITEM = [
     {label:'HS256',value:'HS256'},
@@ -350,12 +355,12 @@ export const PROXY_HEADER_CONFIG:ConfigField<ProxyHeaderItem>[] = [
 
 export const SERVICE_VISUALIZATION_OPTIONS = [
     {label:('内部服务：可通过网关访问，但不展示在服务广场'),value:'inner'},
-    {label:('公开服务：可通过网关访问，展示在服务广场，可被其他应用订阅'),value:'public'}];
+    {label:('公开服务：可通过网关访问，展示在服务广场，可被其他消费者订阅'),value:'public'}];
 
     
 export const SERVICE_APPROVAL_OPTIONS = [
-    {label:('无需审核：允许任何应用调用该服务'),value:'auto'},
-    {label:('人工审核：仅允许通过人工审核的应用调用该服务'),value:'manual'}];
+    {label:('无需审核：允许任何消费者调用该服务'),value:'auto'},
+    {label:('人工审核：仅允许通过人工审核的消费者调用该服务'),value:'manual'}];
 export const SERVICE_KIND_OPTIONS = [
         {label:('REST'),value:'rest'},
         {label:('AI'),value:'ai'}];
