@@ -196,7 +196,7 @@ useEffect(() => {
                             item.type === 'addNewItem' ?<WithPermission access="team.application.application.add" showDisabled={false}><Card className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px]  transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{body:'h-[180px] flex items-center justify-center cursor-pointer'}} onClick={()=>{openModal('add')}}>
                                     <div className="flex items-center"><Icon icon="ic:baseline-add" width="18" height="18"/><span>{$t('添加消费者')}</span></div>
                             </Card></WithPermission> : <Card title={CardTitle(item)} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px]  transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] ', body:"pt-0"}} onClick={()=>{setAppName(item.name);navigateTo(`/consumer/${teamId}/inside/${item.id}/service`)}}>
-                            <span className="line-clamp-3 break-all">{item.description || $t('暂无服务描述')}</span> 
+                            <span className="line-clamp-3 break-all">{item.description || $t('暂无消费者描述')}</span> 
 
                                 </Card>}</div>
                             );
@@ -293,8 +293,8 @@ const TableArea = memo(({language, getServiceList, addNewApp, setTableHttpReload
         id="service_hub_list"
         columns={[...columns]}
         request={()=>getServiceList()}
-        addNewBtnTitle={$t("添加服务")}
-        searchPlaceholder={$t("输入名称、ID 查找服务")}
+        addNewBtnTitle={$t("添加消费者")}
+        searchPlaceholder={$t("输入名称、ID 查找消费者")}
         onAddNewBtnClick={addNewApp}
         onChange={() => {
             setTableHttpReload(false)
