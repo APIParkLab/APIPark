@@ -106,10 +106,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle,AiSettingMo
                                     label:<div className="flex items-center gap-[10px]">
                                             <span>{x.id}</span>
                                             {x?.scopes?.map(s=><Tag >{s?.toLocaleUpperCase()}</Tag>)}
-                                            </div>}))}
-                                onChange={(e)=>{
-                                    form.setFieldValue('config',llmList?.find(x=>x.id===e)?.config)
-                                }}>
+                                            </div>}))}>
                             </Select>
                         </Form.Item>
 
