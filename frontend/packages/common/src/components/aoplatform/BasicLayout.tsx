@@ -1,19 +1,15 @@
 import { 
-    ConfigProvider,
-    Dropdown, 
     MenuProps,
     App,
-    Button} from 'antd';
+    Button,
+    ConfigProvider,
+    Dropdown} from 'antd';
+import { Outlet, useLocation, useNavigate} from "react-router-dom";
 import Logo from '@common/assets/layout-logo.png';
 import AvatarPic from '@common/assets/default-avatar.png'
-import {Outlet, useLocation, useNavigate} from "react-router-dom";
-import { useEffect, useMemo, useState} from "react";
+import {  useEffect, useMemo, useState} from "react";
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx';
 import { PERMISSION_DEFINITION } from '@common/const/permissions.ts';
-  import {
-    ProConfigProvider,
-    ProLayout,
-  } from '@ant-design/pro-components';
 import { BasicResponse, RESPONSE_TIPS, routerKeyMap, STATUS_CODE } from '@common/const/const.tsx';
 import { UserInfoType } from '@common/const/type.ts';
 import { useFetch } from '@common/hooks/http.ts';
@@ -21,6 +17,7 @@ import { ProjectFilled } from '@ant-design/icons';
 import { getNavItem } from '@common/utils/navigation';
 import { Icon } from '@iconify/react';
 import { $t } from '@common/locales';
+import { ProConfigProvider, ProLayout } from '@ant-design/pro-components';
 import LanguageSetting from './LanguageSetting';
 
 const APP_MODE = import.meta.env.VITE_APP_MODE;
@@ -41,9 +38,8 @@ const themeToken = {
      const navigator = useNavigate()
      const location = useLocation()
      const currentUrl = location.pathname
-    const { state,accessData,checkPermission,accessInit} = useGlobalContext()
-    const [pathname, setPathname] = useState(currentUrl);
-     const mainPage = project === 'core' ?'/service/list':'/serviceHub/list'
+    const { state,accessData,checkPermission,accessInit,dispatch,resetAccess,getGlobalAccessData} = useGlobalContext()
+    const [pathname, setPathname] = useState(currentUrl);     const mainPage = project === 'core' ?'/service/list':'/serviceHub/list'
 
    const TOTAL_MENU_ITEMS:MenuProps['items'] =  useMemo(() => [
     getNavItem($t('工作空间'), 'workspace','/guide/page',<Icon icon="ic:baseline-space-dashboard" width="18" height="18"/>, [
@@ -126,7 +122,6 @@ const themeToken = {
 
      
     const { message } = App.useApp()
-    const { dispatch,resetAccess,getGlobalAccessData} = useGlobalContext()
     const [userInfo,setUserInfo] = useState<UserInfoType>()
     const {fetchData} = useFetch()
     const navigate = useNavigate();
@@ -163,8 +158,8 @@ const themeToken = {
         })
     }
 
-    const items: MenuProps['items'] = [
-        {
+    const items: MenuProps['items'] = useMemo(() => [
+        userInfo?.type !== 'guest' && {
             key: '2',
             label: (
                 <Button key="changePsw" type="text" className="flex items-center p-0 bg-transparent border-none " onClick={()=>navigator('/userProfile/changepsw')}>
@@ -178,7 +173,7 @@ const themeToken = {
                 {$t('退出登录')}
                 </Button>)
         },
-    ];
+    ].filter(Boolean), [userInfo]);
 
 
 
