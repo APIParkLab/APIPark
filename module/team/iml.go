@@ -111,13 +111,13 @@ func (m *imlTeamModule) Create(ctx context.Context, input *team_dto.CreateTeam) 
 		if err != nil {
 			return err
 		}
-		supperRole, err := m.roleService.GetSupperRole(ctx, role.GroupTeam)
+		superRole, err := m.roleService.GetSupperRole(ctx, role.GroupTeam)
 		if err != nil {
 			return err
 		}
 
 		return m.roleMemberService.Add(ctx, &role.AddMember{
-			Role:   supperRole.Id,
+			Role:   superRole.Id,
 			User:   input.Master,
 			Target: role.TeamTarget(input.Id),
 		})
