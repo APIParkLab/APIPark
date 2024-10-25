@@ -1,24 +1,3 @@
 {
-  "Kfe93ef35": "Application",
-  "Kffd7e274": "No Review: All applications are allowed to subscribe to this service",
-  "K8a8b13e4": "Manual Review: Only reviewed and approved applications can subscribe to this service",
-  "K9bdd8403": "To securely call APIs, you need to create an application and a token.",
-  "Kc8239422": "Teams include personnel, applications, and services. Data between different teams is isolated, and can be used to manage different departments/project teams/teams within the enterprise.",
-  "Ka0a8840a": "Review subscription requests from other applications. Only approved requests can initiate API calls.",
-  "K5ece3bac": "Set up teams and members. You can then create services and applications, subscribe to APIs within the team. Members can only see services and applications within their team.",
-  "K1512e983": "Application Call Statistics",
-  "Kb4d2007f": "Please Select Application",
-  "Kc0915603": "Application Top 10",
-  "Kd8a7a689": "Search or Select Application",
-  "Kb7e869a4": "Application Settings",
-  "K5168eb63": "Application Name",
-  "K546e46f": "Application ID",
-  "K95764d1d": "Delete Application",
-  "K667bbbe7": "Add Application",
-  "K8723422e": "Access Application",
-  "K93d5a66e": "Number of Access Applications",
-  "K216a1ac7": "Application Developer",
-  "K27924db": "Application Administrator",
-  "Kd55c6887": "Review",
-  "K831aa6c0": "Applicant - Application"
+  "K40a89bd8": "Enter Name, ID to Search Member"
 }

@@ -7,6 +7,8 @@ import (
 	"sort"
 	"strings"
 
+	application_authorization "github.com/APIParkLab/APIPark/service/application-authorization"
+
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 
 	service_tag "github.com/APIParkLab/APIPark/service/service-tag"
@@ -532,11 +534,12 @@ var (
 )
 
 type imlAppModule struct {
-	teamService       team.ITeamService              `autowired:""`
-	serviceService    service.IServiceService        `autowired:""`
-	teamMemberService team_member.ITeamMemberService `autowired:""`
-	subscribeService  subscribe.ISubscribeService    `autowired:""`
-	transaction       store.ITransaction             `autowired:""`
+	teamService       team.ITeamService                               `autowired:""`
+	serviceService    service.IServiceService                         `autowired:""`
+	teamMemberService team_member.ITeamMemberService                  `autowired:""`
+	subscribeService  subscribe.ISubscribeService                     `autowired:""`
+	authService       application_authorization.IAuthorizationService `autowired:""`
+	transaction       store.ITransaction                              `autowired:""`
 }
 
 func (i *imlAppModule) ExportAll(ctx context.Context) ([]*service_dto.ExportApp, error) {
@@ -600,6 +603,10 @@ func (i *imlAppModule) Search(ctx context.Context, teamId string, keyword string
 
 		}
 	}
+	authMap, err := i.authService.CountByApp(ctx, serviceIds...)
+	if err != nil {
+		return nil, err
+	}
 	items := make([]*service_dto.AppItem, 0, len(services))
 	for _, model := range services {
 		subscribeNum := subscribeCount[model.Id]
@@ -614,6 +621,7 @@ func (i *imlAppModule) Search(ctx context.Context, teamId string, keyword string
 			SubscribeNum:       subscribeNum,
 			SubscribeVerifyNum: verifyNum,
 			CanDelete:          subscribeNum == 0,
+			AuthNum:            authMap[model.Id],
 		})
 	}
 	sort.Slice(items, func(i, j int) bool {
@@ -720,6 +728,10 @@ func (i *imlAppModule) SearchMyApps(ctx context.Context, teamId string, keyword 
 	if err != nil {
 		return nil, err
 	}
+	authMap, err := i.authService.CountByApp(ctx, serviceIds...)
+	if err != nil {
+		return nil, err
+	}
 
 	subscribeCount := map[string]int64{}
 	subscribeVerifyCount := map[string]int64{}
@@ -756,6 +768,7 @@ func (i *imlAppModule) SearchMyApps(ctx context.Context, teamId string, keyword 
 			SubscribeNum:       subscribeNum,
 			SubscribeVerifyNum: verifyNum,
 			CanDelete:          subscribeNum == 0,
+			AuthNum:            authMap[model.Id],
 		})
 	}
 	sort.Slice(items, func(i, j int) bool {

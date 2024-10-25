@@ -21,8 +21,10 @@ type Provider struct {
 	Help                     Help                     `json:"help" yaml:"help"`
 	SupportedModelTypes      []string                 `json:"supported_model_types" yaml:"supported_model_types"`
 	ProviderCredentialSchema ProviderCredentialSchema `json:"provider_credential_schema" yaml:"provider_credential_schema"`
-	Default                  map[string]string        `json:"default"`
-	Address                  string                   `json:"address"`
+	Default                  map[string]string        `json:"default" yaml:"default"`
+	Address                  string                   `json:"address" yaml:"address"`
+	Recommend                bool                     `json:"recommend" yaml:"recommend"`
+	Sort                     int                      `json:"sort" yaml:"sort"`
 }
 
 type ProviderCredentialSchema struct {
