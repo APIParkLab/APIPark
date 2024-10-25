@@ -45,7 +45,7 @@ body:
           label: Steps to Reproduce
           description: Share the steps you took so that we can reproduce the issue. Reports without proper steps details will likely be closed.
           placeholder: |
-              1. Run apinto via the Docker image.
+              1. Run APIPark via the Docker image.
               2. Create a Route with the Admin API.
               3. Try configuring ...
               4. ...
@@ -57,7 +57,7 @@ body:
           label: Environment
           description: Share your environment details. Reports without proper environment details will likely be closed.
           value: |
-              - APINTO Dashboard version (run `apinto dashboard version`):
+              - APIPark Dashboard version:
               - Operating system (run `uname -a`):
       validations:
           required: true
