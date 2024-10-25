@@ -153,7 +153,7 @@ const SystemList:FC = ()=>{
                 
             <InsidePage 
                 pageTitle={$t('服务')} 
-                description={'APIPark '+$t("服务提供了高性能 API 网关，并且可以无缝接入多种大型 AI 模型，并将这些 AI 能力打包成 API 进行调用，从而大幅简化了 AI 模型的使用门槛。同时，我们的平台提供了完善的 API 管理功能，支持 API 的创建、监控、访问控制等，保障开发者可以高效、安全地开发和管理 API 服务。")}
+                description={$t("服务提供了高性能 API 网关，并且可以无缝接入多种大型 AI 模型，并将这些 AI 能力打包成 API 进行调用，从而大幅简化了 AI 模型的使用门槛。同时，我们的平台提供了完善的 API 管理功能，支持 API 的创建、监控、访问控制等，保障开发者可以高效、安全地开发和管理 API 服务。")}
                 showBorder={false}
                 contentClassName=" pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B"
                 >
