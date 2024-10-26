@@ -7,6 +7,8 @@ export type UserInfoType = {
     email: string
     phone: string
     avatar: string
+    type:string
+
 }
 
 export type UserProfileProps = {
