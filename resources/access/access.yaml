@@ -262,11 +262,9 @@ system:
             apis:
               - "GET:/api/v1/manager/teams"
       - name: api market
-#        cname: API市场
         value: 'api_market'
         children:
           - name: view
-#            cname: 查看
             value: 'view'
             guest_allow: true
             apis:
@@ -274,15 +272,12 @@ system:
               - "GET:/api/v1/catalogue/service"
 team:
   - name: service
-#    cname: 服务
     value: 'service'
     children:
       - name: router
-#        cname: 路由
         value: 'router'
         children:
           - name: view
-#            cname: 查看
             value: 'view'
             guest_allow: true
             apis:
@@ -291,7 +286,6 @@ team:
               - "GET:/api/v1/service/router/detail/simple"
               - "GET:/api/v1/service/router/define"
           - name: manager
-#            cname: 管理
             value: 'manager'
             apis:
               - "POST:/api/v1/service/router"
