@@ -85,10 +85,7 @@ func (i *imlProviderModule) Providers(ctx context.Context) ([]*ai_dto.ProviderIt
 	})
 	items := make([]*ai_dto.ProviderItem, 0, len(providers))
 	for _, v := range providers {
-		defaultLLM, has := v.DefaultModel(model_runtime.ModelTypeLLM)
-		if !has {
-			continue
-		}
+
 		item := &ai_dto.ProviderItem{
 			Id:        v.ID(),
 			Name:      v.Name(),
@@ -97,6 +94,10 @@ func (i *imlProviderModule) Providers(ctx context.Context) ([]*ai_dto.ProviderIt
 			Sort:      v.Sort(),
 		}
 		if info, has := providerMap[v.ID()]; has {
+			defaultLLM, has := v.GetModel(info.DefaultLLM)
+			if !has {
+				continue
+			}
 			item.Configured = true
 			item.DefaultLLM = defaultLLM.ID()
 			item.DefaultLLMLogo = defaultLLM.Logo()
@@ -279,10 +280,13 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
-		//defaultLLm, ok := p.DefaultModel(model_runtime.ModelTypeLLM)
-		//if !ok {
-		//	return fmt.Errorf("ai provider default llm not found")
-		//}
+		if input.DefaultLLM == "" {
+			defaultLLM, has := p.DefaultModel(model_runtime.ModelTypeLLM)
+			if !has {
+				return fmt.Errorf("ai provider default llm not found")
+			}
+			input.DefaultLLM = defaultLLM.ID()
+		}
 		info = &ai.Provider{
 			Id:         id,
 			Name:       p.Name(),
@@ -344,20 +348,13 @@ func (i *imlProviderModule) UpdateProviderDefaultLLM(ctx context.Context, id str
 	})
 }
 
-func (i *imlProviderModule) getAiProviders(ctx context.Context, clusterId string) ([]*gateway.DynamicRelease, error) {
-	list, err := i.providerService.List(ctx, clusterId)
-	if err != nil {
-		return nil, err
-	}
+func (i *imlProviderModule) getAiProviders(ctx context.Context) ([]*gateway.DynamicRelease, error) {
+	list, err := i.providerService.List(ctx)
 	if err != nil {
 		return nil, err
 	}
 	providers := make([]*gateway.DynamicRelease, 0, len(list))
 	for _, p := range list {
-		if !p.Status {
-			// 关闭
-			continue
-		}
 		cfg := make(map[string]interface{})
 		err = json.Unmarshal([]byte(p.Config), &cfg)
 		if err != nil {
@@ -380,7 +377,7 @@ func (i *imlProviderModule) getAiProviders(ctx context.Context, clusterId string
 	return providers, nil
 }
 func (i *imlProviderModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
-	providers, err := i.getAiProviders(ctx, clusterId)
+	providers, err := i.getAiProviders(ctx)
 	if err != nil {
 		return err
 	}
@@ -397,7 +394,7 @@ func (i *imlProviderModule) initGateway(ctx context.Context, clusterId string, c
 		if err != nil {
 			return err
 		}
-		err = client.Online(ctx, providers...)
+		err = client.Online(ctx, p)
 		if err != nil {
 			return err
 		}
