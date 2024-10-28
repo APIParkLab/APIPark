@@ -53,7 +53,7 @@ const getServiceList = (dataType?:'block'|'list')=>{
     }
     
     setServiceLoading(true)
-        return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team: dataType === 'list' ? undefined : teamId,keyword:tableSearchWord},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num','auth_num']}).then(response=>{
+        return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team: dataType === 'list' ? undefined : teamId,keyword:tableSearchWord},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num','auth_num','create_time','can_delete']}).then(response=>{
         const {code,data,msg} = response
         if(code === STATUS_CODE.SUCCESS){
             setServiceList([...data.apps,{type:'addNewItem'}])
