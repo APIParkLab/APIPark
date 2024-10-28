@@ -1,9 +1,4 @@
-/*
- * @Date: 2023-11-27 17:31:44
- * @LastEditors: maggieyyy
- * @LastEditTime: 2024-06-05 10:36:11
- * @FilePath: \frontend\packages\market\tailwind.config.js
- */
+
 /** @type {import('tailwindcss').Config} */
 
 export default {

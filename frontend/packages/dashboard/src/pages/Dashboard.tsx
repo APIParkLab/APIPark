@@ -10,7 +10,6 @@ import { reject } from "lodash-es";
 import { EntityItem } from "@common/const/type";
 import { LoadingOutlined } from "@ant-design/icons";
 import DashboardInstruction from "./DashboardInstruction";
-import cluster from "cluster";
 
 export default function Dashboard(){
     const { setBreadcrumb } = useBreadcrumb()
