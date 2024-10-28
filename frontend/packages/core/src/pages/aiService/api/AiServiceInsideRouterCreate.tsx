@@ -256,7 +256,7 @@ const AiServiceInsideRouterCreate = () => {
                             </Form.Item>
                             
                             
-                        <Form.Item label={$t("请求路径")}>
+                        <Form.Item  className="flex-1" label={$t("请求路径")}>
                             <Space.Compact block>
                                 <Form.Item
                                         name="pathMatch"
@@ -276,7 +276,7 @@ const AiServiceInsideRouterCreate = () => {
                                         }]}
                                         noStyle
                                     >
-                                    <Input  prefix={(prefixForce ? `${apiPrefix}/` :"/")} className="w-INPUT_NORMAL" 
+                                    <Input  prefix={(prefixForce ? `${apiPrefix}/` :"/")} 
                                         placeholder={$t(PLACEHOLDER.input)} onChange={(e)=>{
                                             if((e.target.value as string).endsWith('/*')){
                                                 form.setFieldValue('path',e.target.value.slice(0,-2))

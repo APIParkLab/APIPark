@@ -1,6 +1,6 @@
 system:
-  - name: supper admin
-    value: supper_admin
+  - name: super admin
+    value: super_admin
     permits:
       - system.dashboard.run_view.view
       - system.devops.ai_provider.manager
