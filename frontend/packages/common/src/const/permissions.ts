@@ -296,12 +296,12 @@ export const PERMISSION_DEFINITION = [
       },
       "team.service.service_intro.add": {
         "granted": {
-          "anyOf": [{ "backend": [" team.service.service_intro.manager"] }]
+          "anyOf": [{ "backend": ["team.service.service_intro.manager"] }]
         }
       },
       "team.service.service_intro.edit": {
         "granted": {
-          "anyOf": [{ "backend": [" team.service.service_intro.manager"] }]
+          "anyOf": [{ "backend": ["team.service.service_intro.manager"] }]
         }
       },
       "team.service.api_doc.import": {
