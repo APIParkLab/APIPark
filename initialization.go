@@ -6,6 +6,11 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"os"
+	"sort"
+	"strings"
+	"time"
+
 	_ "github.com/APIParkLab/APIPark/resources/access"
 	_ "github.com/APIParkLab/APIPark/resources/permit"
 	_ "github.com/APIParkLab/APIPark/resources/plugin"
@@ -14,19 +19,15 @@ import (
 	"github.com/eolinker/go-common/permit"
 	"github.com/eolinker/go-common/pm3"
 	"github.com/eolinker/go-common/utils"
-	"os"
-	"sort"
-	"strings"
-	"time"
 )
 
 const unsetValue = "-"
 
 func doCheck() {
 	accessConf, unset := loadAccess()
-	
+
 	drivers := pm3.List()
-	
+
 	newAccess := 0
 	for _, p := range drivers {
 		if ac, ok := p.(pm3.AccessConfig); ok {
@@ -39,9 +40,9 @@ func doCheck() {
 					}
 				}
 			}
-			
+
 		}
-		
+
 	}
 	for asKey := range permit.All() {
 		key := strings.ToLower(asKey)
@@ -53,12 +54,11 @@ func doCheck() {
 	if newAccess > 0 || unset > 0 {
 		f := accessFile()
 		fmt.Printf("%d access need set, see : %s and %s", newAccess+unset, saveTemplate(accessConf, f), saveCsv(accessConf, f))
-		
 	}
 	os.Exit(0)
 }
 func accessFile() string {
-	
+
 	if version == "" {
 		return time.Now().Format("20060102-150405")
 	}
@@ -84,7 +84,7 @@ func saveCsv(as map[string]*Access, key string) string {
 	err = os.WriteFile(filePath, buf.Bytes(), 0666)
 	if err != nil {
 		log.Fatal(err)
-		
+
 	}
 	return filePath
 }
@@ -111,9 +111,9 @@ func (ls AccessListSort) Swap(i, j int) {
 
 func saveTemplate(as map[string]*Access, key string) string {
 	out := make(map[string][]access.Access)
-	
+
 	for _, a := range as {
-		
+
 		out[a.Group] = append(out[a.Group], access.Access{
 			Name:  a.Name,
 			CName: a.Cname,
@@ -130,7 +130,7 @@ func saveTemplate(as map[string]*Access, key string) string {
 	err = os.WriteFile(filePath, buf.Bytes(), 0666)
 	if err != nil {
 		log.Fatal(err)
-		
+
 	}
 	return filePath
 }
