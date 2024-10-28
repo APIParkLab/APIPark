@@ -1,10 +1,3 @@
-/*
- * @Date: 2024-05-10 14:19:56
- * @LastEditors: maggieyyy
- * @LastEditTime: 2024-05-10 15:55:29
- * @FilePath: \frontend\jest.config.js
- */
-
 module.exports = {
   roots: ['<rootDir>/packages'],
   testMatch: ['**/__tests__/**/*.+(ts|tsx|js)', '**/?(*.)+(spec|test).+(ts|tsx|js)'],
