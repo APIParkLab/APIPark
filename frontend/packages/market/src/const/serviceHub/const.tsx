@@ -25,7 +25,6 @@ export const SERVICE_HUB_TABLE_COLUMNS: PageProColumns<ServiceHubTableListItem>[
         title:('团队'),
         dataIndex: ['team','name'],
         ellipsis:true,
-        renderText:(_,entity:ServiceHubTableListItem)=>entity.tags?.map(x=>x.name).join(',') || '-'
     },
     {
         title:('订阅服务数量'),
