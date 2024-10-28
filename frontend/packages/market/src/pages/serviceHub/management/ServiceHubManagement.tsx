@@ -76,42 +76,69 @@ const getServiceList = (dataType?:'block'|'list')=>{
   };
 
   
-  const getTeamsList = ()=>{
-    setPageLoading(true)
-    if(!accessInit){
-        setTimeout(()=>{
-            const accessInitd = getGlobalAccessData()
-            if(!accessInitd){
-                setTimeout(()=>{
-                    getTeamsList()
-                },100)
-                return
+  const getTeamsList = () => {
+    setPageLoading(true);
+
+    const fetchTeams = () => {
+        fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(
+            !checkPermission('system.workspace.team.view_all') 
+                ? 'simple/teams/mine' 
+                : 'simple/teams',
+            {
+                method: 'GET',
+                eoTransformKeys: ['app_num', 'subscribe_num'],
             }
-            const afterAccessInitd = getGlobalAccessData()?.then
-            if(!afterAccessInitd){
-                setTimeout(()=>{
-                    getTeamsList()
-                },100)
-                return
+        )
+        .then(response => {
+            const { code, data, msg } = response;
+            if (code === STATUS_CODE.SUCCESS) {
+                setTeamList(
+                    data.teams.map((x: SimpleTeamItem) => ({
+                        label: (
+                            <div className="flex items-center justify-between">
+                                <span className="w-[calc(100%-42px)] truncate" title={x.name}>
+                                    {x.name}
+                                </span>
+                                <span className="bg-[#fff] rounded-[5px] h-[20px] w-[30px] flex items-center justify-center">
+                                    {x.appNum || 0}
+                                </span>
+                            </div>
+                        ),
+                        key: x.id,
+                    }))
+                );
+                if (!teamId && data.teams?.[0]?.id) {
+                    navigateTo(data.teams[0].id);
+                }
+            } else {
+                message.error(msg || $t(RESPONSE_TIPS.error));
             }
-            afterAccessInitd(()=>{getTeamsList()})
-    },100)
-        return
+        })
+        .finally(() => {
+            setPageLoading(false);
+        });
+    };
+
+    if (!accessInit) {
+        const checkAccessData = () => {
+            const accessInitd = getGlobalAccessData();
+            if (!accessInitd) {
+                setTimeout(checkAccessData, 100);
+                return;
+            }
+
+            if (typeof accessInitd.then === 'function') {
+                accessInitd.then(fetchTeams);
+            } else {
+                fetchTeams();
+            }
+        };
+
+        checkAccessData();
+    } else {
+        fetchTeams();
     }
-    fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(!checkPermission('system.workspace.team.view_all') ?'simple/teams/mine' :'simple/teams',{method:'GET',eoTransformKeys:['app_num','subscribe_num']}).then(response=>{
-        const {code,data,msg} = response
-        if(code === STATUS_CODE.SUCCESS){
-            setTeamList(data.teams.map((x:SimpleTeamItem)=>({label:<div className="flex items-center justify-between "><span  className="w-[calc(100%-42px)] truncate" title={x.name}>{x.name}</span><span className="bg-[#fff] rounded-[5px] h-[20px] w-[30px] flex items-center justify-center">{x.appNum || 0}</span></div>, key:x.id})))
-            if(!teamId && data.teams?.[0]?.id){
-                navigateTo(data.teams[0].id)
-            }
-        }else{
-            message.error(msg || $t(RESPONSE_TIPS.error))
-        }
-    }).finally(()=>{
-        setPageLoading(false)
-    })
-}
+};
   
   
   const openModal = async (type:'add'|'edit'|'delete')=>{
