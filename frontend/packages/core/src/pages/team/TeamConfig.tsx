@@ -37,7 +37,7 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
     const {checkPermission,accessInit} = useGlobalContext()
     const pageType= useMemo(()=>{
         if(!accessInit) return 'myteam'
-        return checkPermission('system.organization.team.view') ? 'manage' : 'myteam'
+        return checkPermission('system.workspace.team.view_all') ? 'manage' : 'myteam'
     },[checkPermission,accessInit]) 
     
     const [canDelete, setCanDelete] = useState<boolean>(false)
