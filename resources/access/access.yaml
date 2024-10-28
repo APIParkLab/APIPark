@@ -1,21 +1,75 @@
 system:
-  - name: organization
-#    cname: '组织管理'
-    value: 'organization'
+  - name: workspace
+    value: 'workspace'
     children:
-      - name: member
-#        cname: '成员'
-        value: 'member'
+      - name: consumer
+        value: 'application'
+        children:
+          - name: view all consumer
+            value: 'view_all'
+            guest_allow: true
+          - name: manager all consumer
+            value: "manager_all"
+            dependents:
+              - system.workspace.consumer.view_all
+      - name: service
+        value: 'service'
+        children:
+          - name: view all service
+            value: 'view_all'
+            guest_allow: true
+          - name: manager all consumer
+            value: "manager_all"
+            dependents:
+              - system.workspace.service.view_all
+      - name: team
+        value: 'team'
+        children:
+          - name: view all team
+            value: 'view_all'
+            guest_allow: true
+          - name: create
+            value: 'create'
+          - name: manager
+            value: 'manager'
+            dependents:
+              - system.workspace.team.view_all
+  - name: api portal
+    value: 'api_portal'
+    children:
+      - name: api portal
+        value: 'api_portal'
         children:
           - name: view
-#            cname: '查看'
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/user/accounts"
-              - "GET:/api/v1/user/departments"
+  - name: analysis
+    value: 'analysis'
+    children:
+      - name: run view
+        value: 'run_view'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+  - name: system settings
+    value: 'settings'
+    children:
+      - name: general
+        value: 'general'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
           - name: manager
-#            cname: '管理'
+            value: 'manager'
+      - name: account
+        value: 'account'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
             value: 'manager'
             apis:
               - "POST:/api/v1/user/account"
@@ -31,93 +85,20 @@ system:
               - "POST:/api/v1/user/department/member/remove"
               - "POST:/api/v1/account/role"
             dependents:
-              - system.organization.member.view
-      - name: team
-        cname: '团队'
-        value: 'team'
-        children:
-          - name: view
-#            cname: '查看'
-            value: 'view'
-            guest_allow: true
-            apis:
-              - "GET:/api/v1/manager/teams"
-              - "GET:/api/v1/manager/team"
-          - name: manager
-#            cname: '管理'
-            value: 'manager'
-            apis:
-              - "POST:/api/v1/manager/team"
-              - "PUT:/api/v1/manager/team"
-              - "DELETE:/api/v1/manager/team"
-            dependents:
-              - system.organization.team.view
+              - system.settings.account.view
       - name: role
-#        cname: '角色'
         value: 'role'
         children:
-          - name: view system role
-            cname: '查看系统角色'
+          - name: view
             guest_allow: true
-            value: 'view_system_role'
+            value: 'view'
             apis:
               - "GET:/api/v1/system/roles"
               - "GET:/api/v1/system/role"
-          - name: view team role
-            cname: '查看团队角色'
-            guest_allow: true
-            value: 'view_team_role'
-            apis:
               - "GET:/api/v1/team/roles"
               - "GET:/api/v1/team/role"
-  - name: System Settings
-#    cname: '系统设置'
-    value: 'settings'
-    children:
-      - name: service classification
-#        cname: '服务分类'
-        value: 'service_classification'
-        children:
-          - name: view
-#            cname: '查看'
-            value: 'view'
-            guest_allow: true
-#            apis:
-#              - "GET:/api/v1/catalogues"
-          - name: manager
-#            cname: '管理'
-            value: 'manager'
-            apis:
-              - "POST:/api/v1/catalogue"
-              - "PUT:/api/v1/catalogue"
-              - "DELETE:/api/v1/catalogue"
-              - "PUT:/api/v1/catalogue/sort"
-            dependents:
-              - system.settings.service_classification.view
-      - name: General
-#        cname: 常规设置
-        value: 'general'
-        children:
-          - name: view
-#            cname: 查看
-            value: 'view'
-            guest_allow: true
-            apis:
-#              - "GET:/api/v1/setting"
-          - name: manager
-#            cname: 管理
-            value: 'manager'
-            apis:
-#              - "PUT:/api/v1/setting"
-            dependents:
-              - system.settings.general.view
-  - name: Devops
-#    cname: 运维
-    value: 'devops'
-    children:
-      - name: cluster
-        cname: 集群
-        value: 'cluster'
+      - name: api gateway
+        value: 'api_gateway'
         children:
           - name: view
             cname: 查看
@@ -126,53 +107,63 @@ system:
             apis:
               - "GET:/api/v1/cluster/nodes"
           - name: manager
-#            cname: 管理
             value: 'manager'
             apis:
               - "PUT:/api/v1/cluster/reset"
               - "POST:/api/v1/cluster/check"
+      - name: ai provider
+        value: 'ai_provider'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+            apis:
+              - "GET:/api/v1/ai/providers"
+              - "GET:/api/v1/ai/provider/config"
+          - name: manager
+            value: 'manager'
+            apis:
+              - "PUT:/api/v1/ai/provider/config"
+              - "PUT:/api/v1/ai/provider/default-llm"
+            dependents:
+              - system.settings.ai_provider.view
       - name: ssl certificate
         cname: 证书
         value: 'ssl_certificate'
         children:
           - name: view
-#            cname: 查看
             value: 'view'
             guest_allow: true
             apis:
               - "GET:/api/v1/certificates"
               - "GET:/api/v1/certificate"
           - name: manager
-#            cname: 管理
             value: 'manager'
             apis:
               - "POST:/api/v1/certificate"
               - "PUT:/api/v1/certificate"
               - "DELETE:/api/v1/certificate"
             dependents:
-              - system.devops.ssl_certificate.view
+              - system.settings.ssl_certificate.view
       - name: Data Source
-#        cname: '数据源'
         value: 'data_source'
         children:
           - name: view
-#            cname: '查看'
             value: 'view'
             guest_allow: true
             apis:
               - "GET:/api/v1/monitor/config"
           - name: manager
-#            cname: '管理'
             value: 'manager'
             apis:
               - "POST:/api/v1/monitor/config"
               - "PUT:/api/v1/monitor/config"
+            dependents:
+              - system.settings.data_source.view
       - name: log configuration
-#        cname: 日志
         value: 'log_configuration'
         children:
           - name: view
-#            cname: 查看
             value: 'view'
             guest_allow: true
             apis:
@@ -180,7 +171,6 @@ system:
               - "GET:/api/v1/dynamic/{name}/list"
               - "GET:/api/v1/dynamic/{name}/render"
           - name: manager
-#            cname: 管理
             value: 'manager'
             apis:
               - "POST:/api/v1/dynamic/{name}"
@@ -189,93 +179,13 @@ system:
               - "PUT:/api/v1/dynamic/{name}/online"
               - "PUT:/api/v1/dynamic/{name}/offline"
             dependents:
-              - system.devops.log_configuration.view
-      - name: ai provider
-#        cname: AI 模型供应商
-        value: 'ai_provider'
-        children:
-          - name: view
-#            cname: 查看
-            value: 'view'
-            guest_allow: true
-            apis:
-              - "GET:/api/v1/ai/providers"
-              - "GET:/api/v1/ai/provider/config"
-          - name: manager
-#            cname: 管理
-            value: 'manager'
-            apis:
-              - "PUT:/api/v1/ai/provider/config"
-              - "PUT:/api/v1/ai/provider/default-llm"
-            dependents:
-              - system.devops.ai_provider.view
-
-  - name: dashboard
-#    cname: 仪表盘
-    value: 'dashboard'
-    children:
-      - name: run view
-#        cname: 运行视图
-        value: 'run_view'
-        children:
-          - name: view
-#            cname: 查看
-            value: 'view'
-            guest_allow: true
-            apis:
-              - "GET:/api/v1/monitor/overview/invoke"
-              - "GET:/api/v1/monitor/overview/message"
-              - "GET:/api/v1/monitor/overview/top10"
-              - "GET:/api/v1/monitor/overview/summary"
-  - name: workspace
-#    cname: 工作空间
-    value: 'workspace'
-    children:
-      - name: application
-#        cname: 应用
-        value: 'application'
-        children:
-          - name: view all application
-#            cname: 查看所有应用
-            value: 'view_all'
-            guest_allow: true
-            apis:
-              - "GET:/api/v1/apps"
-      - name: service
-#        cname: 服务
-        value: 'service'
-        children:
-          - name: view all service
-#            cname: 查看所有服务
-            value: 'view_all'
-            guest_allow: true
-            apis:
-              - "GET:/api/v1/services"
-      - name: team
-#        cname: 团队
-        value: 'team'
-        children:
-          - name: view all team
-#            cname: 查看所有团队
-            value: 'view_all'
-            guest_allow: true
-            apis:
-              - "GET:/api/v1/manager/teams"
-      - name: api market
-        value: 'api_market'
-        children:
-          - name: view
-            value: 'view'
-            guest_allow: true
-            apis:
-              - "GET:/api/v1/catalogue/services"
-              - "GET:/api/v1/catalogue/service"
+              - system.settings.log_configuration.view
 team:
   - name: service
     value: 'service'
     children:
-      - name: router
-        value: 'router'
+      - name: api
+        value: 'api'
         children:
           - name: view
             value: 'view'
@@ -291,43 +201,53 @@ team:
               - "POST:/api/v1/service/router"
               - "PUT:/api/v1/service/router"
               - "DELETE:/api/v1/service/router"
+            dependents:
+                - team.service.api.view
       - name: api doc
         cname: API文档
         value: 'api_doc'
         children:
           - name: view
-#            cname: 查看
             value: 'view'
             guest_allow: true
             apis:
               - "GET:/api/v1/service/api_doc"
           - name: manager
-#            cname: 管理
             value: 'manager'
             apis:
               - "PUT:/api/v1/service/api_doc"
               - "POST:/api/v1/service/api_doc/upload"
+            dependents:
+                - team.service.api_doc.view
+      - name: service intro
+        value: 'service_intro'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+                - team.service.service_intro.view
       - name: upstream
         cname: 上游
         value: 'upstream'
         children:
           - name: view
-#            cname: 查看
             value: 'view'
             guest_allow: true
             apis:
               - "GET:/api/v1/service/upstream"
           - name: manager
-#            cname: 管理
             value: 'manager'
             apis:
               - "PUT:/api/v1/service/upstream"
+            dependents:
+                - team.service.upstream.view
       - name: release
-#        cname: 发布
         value: 'release'
         children:
           - name: view
-#            cname: 查看
             value: 'view'
             guest_allow: true
             apis:
@@ -338,18 +258,16 @@ team:
               - "GET:/api/v1/service/release/preview"
               - "GET:/api/v1/service/publish/status"
           - name: manager
-#            cname: 管理
             value: 'manager'
             apis:
               - "POST:/api/v1/service/publish/release/do"
-#              - "PUT:/api/v1/service/publish/execute"
               - "DELETE:/api/v1/service/release"
+            dependents:
+              - team.service.release.view
       - name: subscription management
-#        cname: 订阅方管理
         value: 'subscription'
         children:
           - name: view
-#            cname: 查看
             value: 'view'
             guest_allow: true
             apis:
@@ -357,50 +275,49 @@ team:
               - "GET:/api/v1/service/approval/subscribe"
               - "GET:/api/v1/service/subscribers"
           - name: manager
-#            cname: 管理
             value: 'manager'
             apis:
               - "POST:/api/v1/service/approval/subscribe"
               - "POST:/api/v1/service/subscriber"
               - "DELETE:/api/v1/service/subscriber"
+            dependents:
+                - team.service.subscription.view
       - name: service
-#        cname: 服务管理
         value: 'service'
         children:
           - name: manager
-#            cname: 管理
             value: 'manager'
             apis:
               - "PUT:/api/v1/service/info"
               - "POST:/api/v1/team/service"
               - "DELETE:/api/v1/team/service"
-  - name: application
-    cname: 应用
-    value: 'application'
+            dependents:
+              - team.service.service.manager
+  - name: consumer
+    value: 'consumer'
     children:
       - name: subscription Service
         cname: 订阅服务
         value: 'subscription'
         children:
-          - name: view
-#            cname: 查看
-            value: 'view'
+          - name: subscribe
+            value: 'subscribe'
+
+          - name: view subscribed services
+            value: 'view_subscribed_service'
             guest_allow: true
             apis:
-              - "GET:/api/v1/application/subscriptions"
-          - name: manager
-#            cname: 管理
-            value: 'manager'
+              - "GET:/api/v1/application/subscription"
+          - name: manager subscribed services
+            value: 'manager_subscribed_services'
             apis:
               - "POST:/api/v1/catalogue/service/subscribe"
               - "POST:/api/v1/application/subscription/cancel"
               - "POST:/api/v1/application/subscription/cancel_apply"
       - name: authorization
-#        cname: 访问授权
         value: 'authorization'
         children:
           - name: view
-#            cname: 查看
             value: 'view'
             guest_allow: true
             apis:
@@ -408,60 +325,66 @@ team:
               - "GET:/api/v1/app/authorizations"
               - "GET:/api/v1/app/authorization/details"
           - name: manager
-#            cname: 管理
             value: 'manager'
             apis:
               - "POST:/api/v1/app/authorization"
               - "PUT:/api/v1/app/authorization"
               - "DELETE:/api/v1/app/authorization"
-      - name: application
-#        cname: 应用
+      - name: consumer
         value: 'application'
         children:
           - name: manager
-#            cname: 管理
             value: 'manager'
             apis:
               - "PUT:/api/v1/app/info"
               - "POST:/api/v1/team/app"
-              - "DELETE:/api/v1/app"
   - name: team
-#    cname: 团队
     value: 'team'
     children:
+      - name: service
+        value: 'service'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+              - team.team.service.view
+      - name: consumer
+        value: 'consumer'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+              - team.team.consumer.view
       - name: member
-#        cname: 成员
         value: 'member'
         children:
           - name: view
-#            cname: 查看
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/team/members"
-              - "GET:/api/v1/team/members/toadd"
           - name: manager
-#            cname: 管理
             value: 'manager'
-            apis:
-              - "POST:/api/v1/team/member"
-              - "DELETE:/api/v1/team/member"
-              - "PUT:/api/v1/team/member/role"
+            dependents:
+              - team.team.member.view
       - name: team
-#        cname: 团队管理
         value: 'team'
         children:
           - name: view
-#            cname: '查看'
             value: 'view'
             guest_allow: true
             apis:
               - "GET:/api/v1/manager/teams"
               - "GET:/api/v1/manager/team"
           - name: manager
-#            cname: '管理'
             value: 'manager'
             apis:
               - "POST:/api/v1/manager/team"
               - "PUT:/api/v1/manager/team"
               - "DELETE:/api/v1/manager/team"
+            dependents:
+              - team.team.team.view
