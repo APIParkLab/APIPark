@@ -1,6 +1,6 @@
 {
   "ai provider": "AI Provider",
-  "api market": "API Market",
+  "api market": "API Portal",
   "api doc": "API Documentation",
   "application": "Application",
   "application admin": "Application Administrator",
@@ -29,7 +29,7 @@
   "ssl certificate": "SSL Certificate",
   "subscription management": "Subscription Management",
   "subscription service": "Subscription Service",
-  "supper admin": "Super Administrator",
+  "super admin": "Super Administrator",
   "system settings": "System Settings",
   "team": "Team",
   "team admin": "Team Administrator",

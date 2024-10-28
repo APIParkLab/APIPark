@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli"
 )
 
 // These should be set via go build -ldflags -X 'xxxx'.
@@ -20,7 +20,7 @@ var profileInfo []byte
 
 func init() {
 	buffer := &bytes.Buffer{}
-	fmt.Fprintf(buffer, "Apinto version: %s\n", Version)
+	fmt.Fprintf(buffer, "APIPark version: %s\n", Version)
 	fmt.Fprintf(buffer, "Golang version: %s\n", goVersion)
 	fmt.Fprintf(buffer, "Git commit hash: %s\n", gitCommit)
 	fmt.Fprintf(buffer, "Built on: %s\n", BuildTime)
