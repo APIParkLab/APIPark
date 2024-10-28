@@ -58,7 +58,6 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setLlmList(data.llms)
-                console.log(data)
                 form.setFieldsValue({
                     id:data.provider.defaultLlm,
                     config:data.llms.find(x=>x.id===data.provider.defaultLlm)?.config})
