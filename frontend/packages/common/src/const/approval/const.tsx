@@ -344,11 +344,6 @@ export const PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN : PageProColumns<Publish
         ellipsis:true,
     },
     {
-        title:('备注'),
-        dataIndex: 'comments',
-        ellipsis:true
-    },
-    {
         title:('申请人'),
         dataIndex: ['applicant','name'],
         ellipsis: true,
