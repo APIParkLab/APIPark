@@ -145,7 +145,8 @@ func (m *imlTeamModule) Edit(ctx context.Context, id string, input *team_dto.Edi
 func (m *imlTeamModule) Delete(ctx context.Context, id string) error {
 	err := m.transaction.Transaction(ctx, func(ctx context.Context) error {
 		count, err := m.serviceService.Count(ctx, "", map[string]interface{}{
-			"team": id,
+			"team":      id,
+			"is_delete": false,
 		})
 		if err != nil {
 			return err

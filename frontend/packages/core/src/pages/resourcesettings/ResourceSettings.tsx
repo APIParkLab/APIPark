@@ -47,7 +47,7 @@ const LogSettings = ()=>{
                 undefined,
                 undefined,
                 undefined,
-                'system.devops.log_configuration.view')
+                'system.settings.log_configuration.view')
         })
         return newMenu
     },[state.language,menuItems])
