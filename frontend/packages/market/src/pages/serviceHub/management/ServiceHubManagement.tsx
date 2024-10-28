@@ -76,6 +76,7 @@ const getServiceList = ()=>{
 
   
   const getTeamsList = ()=>{
+    console.log('GetTeamList', accessInit,getGlobalAccessData)
     if(!accessInit){
         getGlobalAccessData()?.then?.(()=>{getTeamsList()})
         return
@@ -167,6 +168,7 @@ useEffect(() => {
     )
     getTeamsList()
     setAppName('')
+    console.log()
 }, []);
 
 
