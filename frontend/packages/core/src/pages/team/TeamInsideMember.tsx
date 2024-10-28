@@ -252,6 +252,7 @@ const TeamInsideMember:FC = ()=>{
                             <Select
                                 className="w-full"
                                 mode="multiple"
+                                maxTagCount="responsive"
                                 value={entity.roles?.map((x:EntityItem)=>x.id)}
                                 options={roleList?.map((x:{id:string,name:string})=>({label:(x.name), value:x.id}))}
                                 onChange={(value)=>{
