@@ -1,16 +1,15 @@
 
-import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx"
+import PageList from "@common/components/aoplatform/PageList.tsx"
 import {ActionType} from "@ant-design/pro-components";
 import  {FC, useEffect, useMemo, useRef, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
-import {App, Divider, Modal} from "antd";
-import {BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
+import {App, Modal} from "antd";
+import {BasicResponse, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import { SimpleMemberItem } from "@common/const/type.ts";
 import {useFetch} from "@common/hooks/http.ts";
 import { TEAM_TABLE_COLUMNS } from "../../const/team/const.tsx";
 import { TeamConfigFieldType, TeamConfigHandle, TeamTableListItem } from "../../const/team/type.ts";
-import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission.tsx";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { checkAccess } from "@common/utils/permission.ts";
 import TeamConfig from "./TeamConfig.tsx";
@@ -131,21 +130,6 @@ const TeamList:FC = ()=>{
         })
     }
 
-    const operation:PageProColumns<TeamTableListItem>[] =[
-        {
-            title: COLUMNS_TITLE.operate,
-            key: 'option',
-            fixed:'right',
-            btnNums:2,
-            valueType: 'option',
-            render: (_: React.ReactNode, entity: TeamTableListItem) => [
-                    <TableBtnWithPermission  access="" key="view" btnType="view" navigateTo={`../inside/${entity.id}/setting`} btnTitle="查看"/>,
-                    <Divider type="vertical" className="mx-0"  key="div2"/>,
-                    <TableBtnWithPermission  access="system.organization.team.delete" key="delete" btnType="delete" disabled={!entity.canDelete} tooltip="服务数据清除后，方可删除" onClick={()=>{openModal('delete',entity)}} btnTitle="删除"/>,
-            ],
-        }
-    ]
-
     useEffect(() => {
         setBreadcrumb([
             {title: $t('团队')}
@@ -173,7 +157,7 @@ const TeamList:FC = ()=>{
                 id="global_team"
                 className="pl-btnbase"
                 ref={pageListRef}
-                columns = {[...columns,...operation]}
+                columns = {[...columns]}
                 request = {()=>getTeamList()}
                 showPagination={false}
                 addNewBtnTitle={$t('添加团队')}
@@ -207,7 +191,7 @@ const TeamList:FC = ()=>{
                     }
                     return res})}
             >
-                <TeamConfig ref={teamConfigRef} inModal entity={modalType === 'add' ? undefined : curTeam} />
+                <TeamConfig ref={teamConfigRef} entity={modalType === 'add' ? undefined : curTeam} />
             </Modal>
         </InsidePage>
     )
