@@ -145,7 +145,7 @@ system:
               - "DELETE:/api/v1/certificate"
             dependents:
               - system.settings.ssl_certificate.view
-      - name: Data Source
+      - name: data source
         value: 'data_source'
         children:
           - name: view
@@ -264,7 +264,7 @@ team:
               - "DELETE:/api/v1/service/release"
             dependents:
               - team.service.release.view
-      - name: subscription management
+      - name: subscription review
         value: 'subscription'
         children:
           - name: view
@@ -296,13 +296,12 @@ team:
   - name: consumer
     value: 'consumer'
     children:
-      - name: subscription Service
+      - name: subscription service
         cname: 订阅服务
         value: 'subscription'
         children:
-          - name: subscribe
+          - name: allow subscribe service
             value: 'subscribe'
-
           - name: view subscribed services
             value: 'view_subscribed_service'
             guest_allow: true
@@ -371,20 +370,15 @@ team:
             value: 'manager'
             dependents:
               - team.team.member.view
-      - name: team
+      - name: team settings
         value: 'team'
         children:
           - name: view
             value: 'view'
             guest_allow: true
             apis:
-              - "GET:/api/v1/manager/teams"
-              - "GET:/api/v1/manager/team"
           - name: manager
             value: 'manager'
             apis:
-              - "POST:/api/v1/manager/team"
-              - "PUT:/api/v1/manager/team"
-              - "DELETE:/api/v1/manager/team"
             dependents:
               - team.team.team.view
