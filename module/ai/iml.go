@@ -348,20 +348,13 @@ func (i *imlProviderModule) UpdateProviderDefaultLLM(ctx context.Context, id str
 	})
 }
 
-func (i *imlProviderModule) getAiProviders(ctx context.Context, clusterId string) ([]*gateway.DynamicRelease, error) {
-	list, err := i.providerService.List(ctx, clusterId)
-	if err != nil {
-		return nil, err
-	}
+func (i *imlProviderModule) getAiProviders(ctx context.Context) ([]*gateway.DynamicRelease, error) {
+	list, err := i.providerService.List(ctx)
 	if err != nil {
 		return nil, err
 	}
 	providers := make([]*gateway.DynamicRelease, 0, len(list))
 	for _, p := range list {
-		if !p.Status {
-			// 关闭
-			continue
-		}
 		cfg := make(map[string]interface{})
 		err = json.Unmarshal([]byte(p.Config), &cfg)
 		if err != nil {
@@ -384,7 +377,7 @@ func (i *imlProviderModule) getAiProviders(ctx context.Context, clusterId string
 	return providers, nil
 }
 func (i *imlProviderModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
-	providers, err := i.getAiProviders(ctx, clusterId)
+	providers, err := i.getAiProviders(ctx)
 	if err != nil {
 		return err
 	}
@@ -401,7 +394,7 @@ func (i *imlProviderModule) initGateway(ctx context.Context, clusterId string, c
 		if err != nil {
 			return err
 		}
-		err = client.Online(ctx, providers...)
+		err = client.Online(ctx, p)
 		if err != nil {
 			return err
 		}
