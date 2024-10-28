@@ -37,13 +37,14 @@ export default function ServiceHubManagement() {
     const [tableListDataSource, setTableListDataSource] = useState<ServiceHubAppListItem[]>([]);
     const [tableSearchWord, setTableSearchWord] = useState<string>('')
 
-const getServiceList = ()=>{
+const getServiceList = (dataType?:'block'|'list')=>{
+    dataType = dataType ?? dataShowType
     if(!accessInit){
-        getGlobalAccessData()?.then?.(()=>{getServiceList()})
+        getGlobalAccessData()?.then?.(()=>{getServiceList(dataType)})
         return Promise.resolve({data:[], success:false})
     }
     
-    if(dataShowType === 'list' && !tableHttpReload){
+    if(dataType === 'list' && !tableHttpReload){
         setTableHttpReload(true)
         return Promise.resolve({
             data: tableListDataSource,
@@ -52,7 +53,7 @@ const getServiceList = ()=>{
     }
     
     setServiceLoading(true)
-        return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team:teamId,keyword:tableSearchWord},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num','auth_num']}).then(response=>{
+        return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team: dataType === 'list' ? undefined : teamId,keyword:tableSearchWord},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num','auth_num']}).then(response=>{
         const {code,data,msg} = response
         if(code === STATUS_CODE.SUCCESS){
             setServiceList([...data.apps,{type:'addNewItem'}])
@@ -76,13 +77,27 @@ const getServiceList = ()=>{
 
   
   const getTeamsList = ()=>{
+    setPageLoading(true)
     if(!accessInit){
         setTimeout(()=>{
-            getGlobalAccessData()?.then?.(()=>{getTeamsList()})
-    },200)
+            const accessInitd = getGlobalAccessData()
+            if(!accessInitd){
+                setTimeout(()=>{
+                    getTeamsList()
+                },100)
+                return
+            }
+            const afterAccessInitd = getGlobalAccessData()?.then
+            if(!afterAccessInitd){
+                setTimeout(()=>{
+                    getTeamsList()
+                },100)
+                return
+            }
+            afterAccessInitd(()=>{getTeamsList()})
+    },100)
         return
     }
-    setPageLoading(true)
     fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(!checkPermission('system.workspace.team.view_all') ?'simple/teams/mine' :'simple/teams',{method:'GET',eoTransformKeys:['app_num','subscribe_num']}).then(response=>{
         const {code,data,msg} = response
         if(code === STATUS_CODE.SUCCESS){
@@ -169,7 +184,6 @@ useEffect(() => {
     )
     getTeamsList()
     setAppName('')
-    console.log()
 }, []);
 
 
@@ -244,13 +258,13 @@ useEffect(() => {
             customBtn={
                 <Radio.Group
                   options={dataShowTypeOptions}
-                  onChange={(e)=>setDataShowType(e.target.value)}
+                  onChange={(e)=>{setDataShowType(e.target.value); setTableHttpReload(true); if(e.target.value === 'block'){getServiceList(e.target.value)}}}
                   value={dataShowType}
                   optionType="button"
                   buttonStyle="solid"
                 />}
             >{
-                dataShowType === 'block' ? <BlockArea /> : <TableArea language={state.language} getServiceList={getServiceList} addNewApp={()=>openModal('add')} setTableHttpReload={setTableHttpReload} setTableSearchWord={setTableSearchWord} editApp={(row:ServiceHubAppListItem)=>{setAppName(row.name);navigateTo(`/consumer/${row.team.id}/inside/${row.id}/service`)}}/>
+                dataShowType === 'block' ? <BlockArea /> : <TableArea language={state.language} getServiceList={()=>getServiceList('list')} addNewApp={()=>openModal('add')} setTableHttpReload={setTableHttpReload} setTableSearchWord={setTableSearchWord} editApp={(row:ServiceHubAppListItem)=>{setAppName(row.name);navigateTo(`/consumer/${row.team.id}/inside/${row.id}/service`)}}/>
             }
     </InsidePage> :
         <Empty className="mt-[100px]" image={Empty.PRESENTED_IMAGE_SIMPLE} />
