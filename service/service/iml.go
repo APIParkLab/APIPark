@@ -68,6 +68,7 @@ func (i *imlServiceService) SearchPublicServices(ctx context.Context, keyword st
 func (i *imlServiceService) ServiceCountByTeam(ctx context.Context, teamId ...string) (map[string]int64, error) {
 	w := map[string]interface{}{
 		"as_server": true,
+		"is_delete": false,
 	}
 	if len(teamId) > 0 {
 		w["team"] = teamId
@@ -77,7 +78,8 @@ func (i *imlServiceService) ServiceCountByTeam(ctx context.Context, teamId ...st
 
 func (i *imlServiceService) AppCountByTeam(ctx context.Context, teamId ...string) (map[string]int64, error) {
 	w := map[string]interface{}{
-		"as_app": true,
+		"as_app":    true,
+		"is_delete": false,
 	}
 	if len(teamId) > 0 {
 		w["team"] = teamId
