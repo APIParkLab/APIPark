@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net"
+	"net/http"
+
 	"github.com/eolinker/eosc/log"
 	"github.com/eolinker/go-common/autowire"
 	"github.com/eolinker/go-common/cftool"
 	"github.com/eolinker/go-common/permit"
 	"github.com/eolinker/go-common/server"
-	"net"
-	"net/http"
 )
 
 var (
@@ -54,7 +55,6 @@ func main() {
 	for access, paths := range srv.Permits() {
 		permit.AddPermitRule(access, paths...)
 	}
-
 	err = http.Serve(ln, srv)
 	if err != nil {
 		log.Fatal(err)

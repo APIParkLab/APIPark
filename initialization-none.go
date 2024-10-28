@@ -9,5 +9,4 @@ import (
 )
 
 func doCheck() {
-
 }
