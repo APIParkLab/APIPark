@@ -76,9 +76,10 @@ const getServiceList = ()=>{
 
   
   const getTeamsList = ()=>{
-    console.log('GetTeamList', accessInit,getGlobalAccessData)
     if(!accessInit){
-        getGlobalAccessData()?.then?.(()=>{getTeamsList()})
+        setTimeout(()=>{
+            getGlobalAccessData()?.then?.(()=>{getTeamsList()})
+    },200)
         return
     }
     setPageLoading(true)
