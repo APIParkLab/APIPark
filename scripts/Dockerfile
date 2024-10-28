@@ -1,4 +1,4 @@
-# 名称：apinto通用镜像
+# 名称：apipark通用镜像
 # 创建时间：2022-10-25
 FROM centos:7.9.2009
 MAINTAINER liujian

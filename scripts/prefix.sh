@@ -25,6 +25,7 @@ cd "./eosc" && git pull
 # =========================================================================
 echo "更新 aoaccount"
 cd "${BASEPATH}/"
+
 if [ ! -d "./aoaccount" ]; then
    git clone http://gitlab.eolink.com/apinto/aoaccount.git
 fi
