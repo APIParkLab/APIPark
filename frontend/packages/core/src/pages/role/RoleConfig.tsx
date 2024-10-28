@@ -176,12 +176,16 @@ const RoleConfig = ()=>{
     },[permissionInfo, state.language])
 
     useEffect(() => {
-        getPermissionTemplate()
         form.setFieldsValue({name:'',permits:[]})
         if(roleId){
             getPermissionInfo()
         }
     }, []);
+
+    useEffect(()=>{
+        getPermissionTemplate()
+
+    },[state.language])
 
     const onFinish =async() => {
             const body = await form.validateFields()
