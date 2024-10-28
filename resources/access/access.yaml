@@ -378,13 +378,8 @@ team:
             value: 'view'
             guest_allow: true
             apis:
-              - "GET:/api/v1/manager/teams"
-              - "GET:/api/v1/manager/team"
           - name: manager
             value: 'manager'
             apis:
-              - "POST:/api/v1/manager/team"
-              - "PUT:/api/v1/manager/team"
-              - "DELETE:/api/v1/manager/team"
             dependents:
               - team.team.team.view
