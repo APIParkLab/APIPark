@@ -77,7 +77,9 @@ const getServiceList = ()=>{
   
   const getTeamsList = ()=>{
     if(!accessInit){
-        getGlobalAccessData()?.then?.(()=>{getTeamsList()})
+        setTimeout(()=>{
+            getGlobalAccessData()?.then?.(()=>{getTeamsList()})
+    },200)
         return
     }
     setPageLoading(true)
@@ -167,6 +169,7 @@ useEffect(() => {
     )
     getTeamsList()
     setAppName('')
+    console.log()
 }, []);
 
 

@@ -48,27 +48,27 @@ const themeToken = {
         getNavItem(<a>{$t('消费者')}</a>, 'consumer','/consumer',<Icon icon="ic:baseline-apps" width="18" height="18"/>,undefined,undefined,'all'),
         getNavItem(<a>{$t('团队')}</a>, 'team','/team',<Icon icon="ic:baseline-people-alt" width="18" height="18"/>,undefined,undefined,'all'),
     ]),
-    getNavItem($t('API 市场'), 'serviceHub','/serviceHub',<Icon icon="ic:baseline-hub" width="18" height="18"/>,undefined,undefined,'system.workspace.api_market.view'),
+    getNavItem($t('API 市场'), 'serviceHub','/serviceHub',<Icon icon="ic:baseline-hub" width="18" height="18"/>,undefined,undefined,'system.api_portal.api_portal.view'),
 
      getNavItem($t('仪表盘'), 'mainPage', APP_MODE === 'pro' ? '/analytics' : '/analytics/total',<Icon icon="ic:baseline-bar-chart" width="18" height="18"/>,[
-      getNavItem(<a >{$t('运行视图')}</a>, 'analytics',APP_MODE === 'pro' ? '/analytics' : '/analytics/total' ,<ProjectFilled />,undefined,undefined,'system.dashboard.run_view.view'),
+      getNavItem(<a >{$t('运行视图')}</a>, 'analytics',APP_MODE === 'pro' ? '/analytics' : '/analytics/total' ,<ProjectFilled />,undefined,undefined,'system.analysis.run_view.view'),
       APP_MODE === 'pro' ? getNavItem(<a >{$t('系统拓扑图')}</a>, 'systemrunning','/systemrunning',<ProjectFilled />,undefined,undefined,'system.dashboard.systemrunning.view') : null,
-    ],undefined,'system.dashboard.run_view.view'),
+    ],undefined,'system.analysis.run_view.view'),
   
     getNavItem($t('系统设置'), 'operationCenter','/commonsetting',<Icon icon="ic:baseline-settings" width="18" height="18"/>, [
             getNavItem($t('系统'), 'serviceHubSetting','/commonsetting',null,[
             getNavItem(<a>{$t('常规')}</a>, 'commonsetting','/commonsetting',<Icon icon="ic:baseline-hub" width="18" height="18"/>,undefined,undefined,'system.api_market.service_classification.view'),
-            getNavItem(<a>{$t('API 网关')}</a>, 'cluster','/cluster',<Icon icon="ic:baseline-device-hub" width="18" height="18"/>,undefined,undefined,'system.devops.cluster.view'),
-            getNavItem(<a>{$t('AI 模型')}</a>, 'aisetting','/aisetting',<Icon icon="hugeicons:ai-network" width="18" height="18"/>,undefined,undefined,'system.devops.cluster.view'),
+            getNavItem(<a>{$t('API 网关')}</a>, 'cluster','/cluster',<Icon icon="ic:baseline-device-hub" width="18" height="18"/>,undefined,undefined,'system.settings.api_gateway.view'),
+            getNavItem(<a>{$t('AI 模型')}</a>, 'aisetting','/aisetting',<Icon icon="hugeicons:ai-network" width="18" height="18"/>,undefined,undefined,'system.settings.api_gateway.view'),
         ],undefined,'system.api_market.service_classification.view'),
       getNavItem($t('用户'), 'organization','/member',null,[
-        getNavItem(<a>{$t('账号')}</a>, 'member','/member',<Icon icon="ic:baseline-people-alt" width="18" height="18"/>,undefined,undefined,'system.organization.member.view'),
+        getNavItem(<a>{$t('账号')}</a>, 'member','/member',<Icon icon="ic:baseline-people-alt" width="18" height="18"/>,undefined,undefined,'system.settings.account.view'),
         getNavItem(<a>{$t('角色')}</a>, 'role','/role',<Icon icon="ic:baseline-verified-user" width="18" height="18"/>,undefined,undefined,'system.organization.role.view'),
       ],undefined,''),
       getNavItem($t('集成'), 'maintenanceCenter','/datasourcing', null, [
-        getNavItem(<a>{$t('数据源')}</a>, 'datasourcing','/datasourcing',<Icon icon="ic:baseline-monitor-heart" width="18" height="18"/>,undefined,undefined,'system.devops.data_source.view'),
-        getNavItem(<a>{$t('证书')}</a>, 'cert','/cert',<Icon icon="ic:baseline-security" width="18" height="18"/>,undefined,undefined,'system.devops.ssl_certificate.view'),
-        getNavItem(<a>{$t('日志')}</a>, 'logsettings','/logsettings',<Icon icon="ic:baseline-sticky-note-2" width="18" height="18"/>,undefined,undefined,'system.devops.log_configuration.view'),
+        getNavItem(<a>{$t('数据源')}</a>, 'datasourcing','/datasourcing',<Icon icon="ic:baseline-monitor-heart" width="18" height="18"/>,undefined,undefined,'system.settings.data_source.view'),
+        getNavItem(<a>{$t('证书')}</a>, 'cert','/cert',<Icon icon="ic:baseline-security" width="18" height="18"/>,undefined,undefined,'system.settings.ssl_certificate.view'),
+        getNavItem(<a>{$t('日志')}</a>, 'logsettings','/logsettings',<Icon icon="ic:baseline-sticky-note-2" width="18" height="18"/>,undefined,undefined,'system.settings.log_configuration.view'),
         APP_MODE === 'pro' ? getNavItem(<a>{$t('资源')}</a>, 'resourcesettings','/resourcesettings',null,undefined,undefined,'system.partition.self.view'):null,
         APP_MODE === 'pro' ? getNavItem(<a>{$t('Open API')}</a>, 'openapi','/openapi',null,undefined,undefined,'system.openapi.self.view'):null,
       ]),

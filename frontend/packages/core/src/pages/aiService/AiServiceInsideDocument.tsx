@@ -137,7 +137,7 @@ const ServiceInsideDocument = ()=>{
             <div className=" pl-[8px] py-btnbase ">
                     <div className="flex justify-between items-center">
                         <p className="text-[14px] leading-[20px] text-[#999999]"><span className="mr-[20px]">{$t('最近一次更新者')}：{updater || '-'}</span><span>{$t('最近一次更新时间')}：{updateTime || '-'}</span></p>
-                        <WithPermission access="team.service.service.edit"><Button type="primary" className="mr-btnbase" onClick={save}>{$t('保存')}</Button></WithPermission>
+                        <WithPermission access="team.service.service_intro.edit"><Button type="primary" className="mr-btnbase" onClick={save}>{$t('保存')}</Button></WithPermission>
                     </div>
                 </div>
         </div>)

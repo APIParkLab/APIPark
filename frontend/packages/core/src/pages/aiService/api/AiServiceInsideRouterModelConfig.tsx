@@ -18,6 +18,7 @@ export type AiServiceRouterModelConfigProps = {
 }
 
 type AiServiceRouterModelConfigField = {
+    provider:string
     id:string
     config:string
 }
@@ -57,6 +58,7 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 setLlmList(data.llms)
+                console.log(data)
                 form.setFieldsValue({
                     id:data.provider.defaultLlm,
                     config:data.llms.find(x=>x.id===data.provider.defaultLlm)?.config})
@@ -69,6 +71,10 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
     const handleChangeProvider = (provider:string)=>{
         getLlmList(provider)
     }
+
+    useEffect(()=>{
+        getLlmList(entity.provider)
+    },[])
 
     return (
         <Form
