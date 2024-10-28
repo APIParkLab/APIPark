@@ -292,7 +292,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
 
     return (
         <>
-                <WithPermission access={onEdit ? 'team.service.service.edit' :''}>
+                <WithPermission access={onEdit ? ['team.service.service.edit'] :''}>
                 <Form
                     layout='vertical'
                     labelAlign='left'
@@ -460,7 +460,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         <Row className="mb-[10px]"
                             // wrapperCol={{ offset: 5, span: 19 }}
                             >
-                        <WithPermission access={onEdit ? 'team.service.service.edit' :''}>
+                        <WithPermission access={onEdit ? ['team.service.service.edit'] :''}>
                             <Button type="primary" htmlType="submit">
                                 {$t('保存')}
                             </Button>
@@ -468,11 +468,11 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         </Row></>}
                     </div>
                     {onEdit && <>
-                        <WithPermission access="team.service.service.delete" showDisabled={false}>
+                        <WithPermission access={["team.service.service.delete"]} showDisabled={false}>
                             <div className="bg-[rgb(255_120_117_/_5%)] rounded-[10px] mt-[50px] p-btnrbase pb-0">
                             <p className="text-left"><span className="font-bold">{$t('删除服务')}：</span>{$t('删除操作不可恢复，请谨慎操作！')}</p>
                                 <div className="text-left">
-                                    <WithPermission access="team.service.service.delete">
+                                    <WithPermission access={["team.service.service.delete"]}>
                                         <Button className="m-auto mt-[16px] mb-[20px]" type="default"  danger={true} onClick={deleteSystemModal}>{$t('删除服务')}</Button>
                                         </WithPermission>
                                 </div>
