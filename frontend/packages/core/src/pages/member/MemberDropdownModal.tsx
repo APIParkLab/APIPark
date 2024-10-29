@@ -1,10 +1,12 @@
 import {App, Form, Input, TreeSelect} from "antd";
-import {forwardRef, useEffect, useImperativeHandle, useState} from "react";
+import {forwardRef, useEffect, useImperativeHandle, useMemo, useState} from "react";
 import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { MemberDropdownModalHandle, MemberDropdownModalProps, DepartmentListItem, MemberDropdownModalFieldType, MemberTableListItem } from "../../const/member/type.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { $t } from "@common/locales/index.ts";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
+import { DataNode } from "antd/es/tree/index";
 
 export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDropdownModalProps>((props,ref)=>{
     const { message} = App.useApp()
@@ -12,6 +14,7 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
     const {type,entity,selectedMemberGroupId} = props
     const {fetchData} = useFetch()
     const [departmentList, setDepartmentList] = useState<DepartmentListItem[]>([])
+    const { state } = useGlobalContext()
 
     const save:()=>Promise<boolean | string> =  ()=>{
         let url:string
@@ -97,6 +100,24 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
 
     }, []);
 
+    
+    const treeData = useMemo(() => {
+        const loop = (data: DepartmentListItem[]): unknown[] =>
+            data?.map((item) => {
+                const title = ['unknown','disable'].indexOf(item.id) === -1 ?item.name :  $t(item.name) as string;
+                if (item.children) {
+                    return {...item,name:title, children:loop(item.children)}
+                }
+
+                return {
+                    ...item,
+                    name: title
+                };
+            });
+        return loop(departmentList);
+    }, [departmentList,state.language]);
+
+    console.log(treeData)
 
     return (<WithPermission access="">
         <Form
@@ -175,7 +196,7 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                             placeholder={$t(PLACEHOLDER.select)}
                             allowClear
                             treeDefaultExpandAll
-                            treeData={departmentList}
+                            treeData={treeData}
                             multiple
                         />
                 </Form.Item>
