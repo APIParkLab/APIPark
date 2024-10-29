@@ -1,5 +1,6 @@
 package main
 
+// init module
 import (
 	_ "github.com/APIParkLab/APIPark/frontend"
 	_ "github.com/APIParkLab/APIPark/gateway/apinto"
