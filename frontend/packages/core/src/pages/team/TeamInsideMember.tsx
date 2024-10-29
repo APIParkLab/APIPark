@@ -100,23 +100,27 @@ const TeamInsideMember:FC = ()=>{
                 ] 
               : [...departmentMap.get('_withoutDepartment') || []];
           
-              
+              let allMemberSelectedFlag:boolean = true
               for(const [k,v] of departmentMap){
                 if(k !== '_withoutDepartment' && allMemberIds.length > 0 ){
                      // 筛选出部门内没被勾选的用户，如果不存在没勾选用户，需要将部门id放入ids中
                      if(v.filter(m => allMemberIds.indexOf(m.id) === -1).length  === 0){
                          setAllMemberSelectedDepartIds((pre)=>[...pre, k])
+                     }else if(['unknown','disable'].indexOf(k) === -1){
+                        allMemberSelectedFlag = false
                      }
                 }
              }
-             
-             if(!finalData[0].children || finalData[0].children.filter(m => allMemberIds.indexOf(m.id) === -1).length  === 0){
-                 setAllMemberSelectedDepartIds((pre)=>[...pre, topDepartmentId])
+
+             if(departmentMap.get('_withoutDepartment')?.filter(x=>allMemberIds.indexOf(x)!==-1).length === 0 && allMemberSelectedFlag){
+                setAllMemberSelectedDepartIds((pre)=>[...pre, topDepartmentId])
              }
+
 
               return  {data:finalData, success: true}
         }).catch(()=>({data:[], success:false}))
       }
+
       
     const getMemberList = ()=>{
         return fetchData<BasicResponse<{members:TeamMemberTableListItem}>>('team/members',{method:'GET',eoParams:{keyword:searchWord, team:teamId},eoTransformKeys:['attach_time','is_delete']}).then(response=>{
@@ -331,7 +335,8 @@ const TeamInsideMember:FC = ()=>{
                     disabledData={treeDisabledData}
                     request={()=>getDepartmentMemberList()}
                     onSelect={(selectedData: Set<string>) => {
-                        setAddMemberBtnDisabled((selectedData.length === 0));
+                        const memberKeyFromModal = Array.from(selectedData)?.filter(x => allMemberIds.indexOf(x) === -1 &&selectableMemberIds.has(x)) || [];
+                        setAddMemberBtnDisabled((memberKeyFromModal.length === 0));
                     }}
                     searchPlaceholder={$t("输入名称查找用户")}
                  />
