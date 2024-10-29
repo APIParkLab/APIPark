@@ -148,53 +148,20 @@ const generateTree = (
     return (
         <div ref={parentRef}>
         <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} className=''>
-        <Input  placeholder={searchPlaceholder} onChange={(e)=>setSearchWord(e.target.value)} value={searchWord} />
-        <Tree
-          checkable
-          expandedKeys={expandedKeys}
-          checkedKeys={targetKeys}
-          selectable={false}
-          onCheck={(e)=>{setTargetKeys(e);
-            onSelect(((e as string[])?.filter(x=>disabledData.indexOf(x as string) === -1))||[])}}
-          onExpand={setExpandedKeys}
-          treeData={translatedDataSource}
-          blockNode 
-        />
+          <Input  placeholder={searchPlaceholder} onChange={(e)=>setSearchWord(e.target.value)} value={searchWord} />
+          <Tree
+            checkable
+            className="mt-[10px]"
+            expandedKeys={expandedKeys}
+            checkedKeys={targetKeys}
+            selectable={false}
+            onCheck={(e)=>{setTargetKeys(e);
+              onSelect(((e as string[])?.filter(x=>disabledData.indexOf(x as string) === -1))||[])}}
+            onExpand={setExpandedKeys}
+            treeData={translatedDataSource}
+            blockNode 
+          />
 
-          {/* <Transfer
-            showSearch
-            onSearch={(dir)=>{
-              memo = {}; 
-            }}
-            listStyle={{width:'408px'}}
-            disabledData={disabledData}
-            filterOption={(inputValue: string, item: any) => handlerFilterOption(inputValue, item)}
-            targetKeys={targetKeys}
-            dataSource={transferDataSource}
-            className="tree-transfer"
-            render={(item) => item.title!}
-            showSelectAll={false}
-            onChange={onChange}
-            titles={['','']}
-            >
-            {({ direction, onItemSelect, selectedKeys,onItemSelectAll ,filteredItems}) => {
-              const treeProps = {
-                dataSource:translatedDataSource, direction, onItemSelect, selectedKeys,onItemSelectAll ,filteredItems,token,tableHeight,targetKeys,disabledData
-              }
-                if (direction === 'left') {
-                    const checkedKey = [...selectedKeys, ...targetKeys as string[]];
-                    return (
-                      <TransferTree {...treeProps} checkedKey={checkedKey} />
-                    );
-                }
-                if(direction === 'right'){
-                  const checkedKey = [...selectedKeys,...targetKeys as string[]];
-                  return (
-                     <TransferTree {...treeProps} checkedKey={checkedKey} />
-                  );
-                }
-            }}
-            </Transfer> */}
             </Spin>
         </div>
       );
