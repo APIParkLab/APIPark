@@ -1,27 +1,24 @@
 
-import { GetProp, TransferProps, TreeDataNode, theme, Transfer, Tree, Spin } from "antd";
-import { DataNode, TreeProps } from "antd/es/tree";
+import { TransferProps, TreeDataNode, Tree, Spin, Input } from "antd";
+import { DataNode } from "antd/es/tree";
 import {  Ref, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { ApartmentOutlined, LoadingOutlined, UserOutlined } from "@ant-design/icons";
-import { cloneDeep, debounce } from "lodash-es";
+import { LoadingOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 import { $t } from "@common/locales";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
-
-type TransferItem = GetProp<TransferProps, 'dataSource'>[number];
+import Search from "antd/es/input/Search";
 
 export type TransferTableProps<T> = {
   request?:(k?:string)=>Promise<{data:T[],success:boolean}>
   columns: ColumnsType<T>
   primaryKey:string
-  onSelect:(selectedData:T[])=>void
+  onSelect:(selectedData:string[])=>void
   tableType?:'member'|'api'
   disabledData:string[]
   searchPlaceholder?:string
 }
 
 export type TransferTableHandle<T> = {
-  selectedData: () => T[];
   selectedRowKeys: () => React.Key[];
 }
 
@@ -31,10 +28,6 @@ interface TreeTransferProps {
   onChange: TransferProps['onChange'];
 }
   
-// Customize Table Transfer
-const isChecked = (selectedKeys: React.Key[], eventKey: React.Key) =>
-  selectedKeys.includes(eventKey);
-
 const generateTree = (
   treeNodes: TreeDataNode[] = [],
   checkedKeys: TreeTransferProps['targetKeys'] = [], 
@@ -73,167 +66,102 @@ const generateTree = (
     )
 };
 
-const TransferTree = (props)=>{
-  const { direction, token, tableHeight, dataSource, targetKeys, onItemSelect, onItemSelectAll,checkedKey,selectedKeys, filteredItems ,disabledData} = props;
-  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
-
-  const getExpandedKeys = (newData:TreeDataNode[], expandedSet:Set<string> = new Set())=>{
-    newData.forEach((item)=>{
-      if(item.children && item.children.length > 0){
-        expandedSet.add(item.key)
-        getExpandedKeys(item.children,expandedSet)
-      }
-    })
-    return expandedSet
-  }
-
-  const treeData:TreeDataNode[] = useMemo(()=>{
-    const filteredSet = filteredItems && filteredItems.length > 0 ? new Set(filteredItems.map((x)=>x.id))  : new Set()
-    const res =  dataSource && dataSource.length > 0 ? generateTree(dataSource, targetKeys,direction === 'right',disabledData,filteredSet) : []
-    setExpandedKeys(Array.from(getExpandedKeys(res)))
-    return res
-  },[
-    dataSource, targetKeys,direction ,disabledData,filteredItems
-  ])
-
-  const onExpand: TreeProps['onExpand'] = (expandedKeysValue) => {
-    setExpandedKeys(expandedKeysValue as string[]);
-  };
-
-  return (
-    
-    <div style={{ padding: token.paddingXS }}>
-      <Tree
-          className="icon-tree"
-          blockNode
-          checkable
-          showIcon
-          checkedKeys={direction === 'left' ? Array.from(new Set([...checkedKey,...disabledData])) : selectedKeys }
-          defaultExpandAll
-          expandedKeys={expandedKeys}
-          onExpand={onExpand}
-          height={tableHeight}
-          icon={(props)=> { return (props.type === 'member' ? <UserOutlined /> :<ApartmentOutlined /> )} }
-          treeData={treeData}
-          onCheck={(_checkedKeys, e:{checked: boolean, checkedNodes, node, event, halfCheckedKeys}) => {
-              if(e.checked){
-                  onItemSelectAll( _checkedKeys, e.checked);
-              }else{
-                  const checkedKeyArrFromTree = e.checkedNodes.map(node => node.key)
-                  onItemSelectAll((checkedKey as string[]).filter(key => checkedKeyArrFromTree.indexOf(key) === -1),e.checked)
-              }
-          }}
-          onSelect={(_, { node: { key } }) => {
-              onItemSelect(key as string, !isChecked(checkedKey, key));
-          }}
-      />
-    </div>
-  )
-}
-
 
  const MemberTransfer= forwardRef<TransferTableHandle<{[k:string]:unknown}>, TransferTableProps<{[k:string]:unknown}>>(
   <T extends {[k:string]:unknown}>(props: TransferTableProps<T>, ref:Ref<TransferTableHandle<T>>) => {
     const {request,columns,primaryKey,onSelect,tableType,disabledData = [],searchPlaceholder} = props
-    const [tableHeight, setTableHeight] = useState(window.innerHeight * 80 / 100 - 64 - 72 - 56 - 16 -3);
     const [targetKeys, setTargetKeys] = useState<TreeTransferProps['targetKeys']>([]);
     const [dataSource, setDataSource] = useState<DataNode[] >([])
     const parentRef = useRef<HTMLDivElement>(null);
     const [loading, setLoading] = useState<boolean>(false)
     const {state} = useGlobalContext()
-    
+    const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
+    const [searchWord, setSearchWord] = useState<string>('')
     useEffect(()=>{
       setTargetKeys(disabledData)
     },[disabledData])
 
     useImperativeHandle(ref, () =>({
-      selectedData: () => dataSource,
       selectedRowKeys: () => targetKeys,}))
 
-    const onChange: TreeTransferProps['onChange'] = (keys) => {
-      onSelect?.(new Set(keys))
-      setTargetKeys(Array.from(new Set(keys)));
-    };
+  const translatedDataSource = useMemo(()=>{
+    
+    const loop = (data: DataNode[]): DataNode[] =>
+      data?.map((item) => {
+          const strTitle:string = item.name === '所有成员' ? $t(item.name) as string : item.name as string;
+          const index = strTitle.indexOf(searchWord);
+          const beforeStr = strTitle.substring(0, index);
+          const afterStr = strTitle.slice(index + searchWord.length);
+          const title =
+              index > -1 ? (
+                  <span className='w-[calc(100%-16px)] truncate' title={strTitle}>
+                      {beforeStr}
+                      <span className="text-theme">{searchWord}</span>
+                      {afterStr}
+                  </span>
+              ) : (
+                  <span className='w-[calc(100%-16px)] truncate' title={`${strTitle}`}>{strTitle}</span>
+              )
+          if (item.children) {
+              return {
+                  ...item,
+                  title, 
+                  disableCheckbox:disabledData.indexOf(item.key as string) !== -1,
+                  children: loop(item.children as T[]) };
+          }
 
-  const { token } = theme.useToken();
-
-  const transferDataSource: TransferItem[] = useMemo(()=>{
-      function flatten(list: TreeDataNode[] = [], res:TransferItem[]) {
-        list.forEach((item) => {
-          res.push({...item, title:item.title === '所有成员' ? $t((item as unknown as {title:string}).title):item.title }as TransferItem);
-          flatten(item.children,res);
-        });
-      }
-      const res:TransferItem[] =[]
-      flatten(dataSource,res);
-      return res
-  },[
-    dataSource, state.language
-  ])
-
-
-  const translatedDataSource = useMemo(()=>dataSource.map((item)=>({
-    ...item, 
-    name:item.name === '所有成员' ? $t((item as unknown as {name:string}).name):item.name,
-  })),[dataSource, state.language])
-
-
-
-  let memo: Record<string, boolean> = {};
-
-  const handlerFilterOption = (inputValue: string, item: any, parentResult: boolean = false, childrenSet: Set<string> = new Set()): boolean => {
-    const cacheKey = `${inputValue}_${item.key}`;
-    if (memo[cacheKey]) {
-      return memo[cacheKey];
-    }
-
-    childrenSet.add(item.key);
-    let result = item.title.includes(inputValue) || parentResult
-    if (item.children) {
-      for (const child of item.children) {
-        if (handlerFilterOption(inputValue, child, result,childrenSet)) {
-          result = true;
-        }
-      }
-    }
-  
-    if (result) {
-      memo[cacheKey] = result;
-      childrenSet.forEach((key) => {
-        memo[`${inputValue}_${key}`] = result;
+          return {
+              ...item,
+              title, 
+              isLeaf:true,
+              disableCheckbox:disabledData.indexOf(item.key as string) !== -1
+          };
       });
-    }
-    return result;
-  };
+      console.log(searchWord, dataSource)
+  return loop(dataSource);
+  },[dataSource, state.language, searchWord])
+
+  const getInitExpandKeys = (data:T[], expandKeys:string[] = [])=>{
+    data.forEach((item)=>{
+      if(item.children?.length){
+        expandKeys.push(item.key as string)
+        getInitExpandKeys(item.children,expandKeys)
+      }
+    })
+    return expandKeys
+  }
   
   const getDataSource = ()=>{
     setLoading(true)
     request && request().then((res)=>{
         const {data,success} = res
         setDataSource(success? data : [])
+        setExpandedKeys(getInitExpandKeys(success? data:[]))
     }).finally(()=>{setLoading(false)})
-}
+  }
 
-useEffect(() => {
-  getDataSource()
-  const handleResize = () => {
-      setTableHeight(window.innerHeight * 80 / 100 - 64 - 72 - 56 - 16 -3)
-  };
 
-  const debouncedHandleResize = debounce(handleResize, 200);
-
-  // 监听窗口大小变化
-  window.addEventListener('resize', debouncedHandleResize);
-  handleResize();
-  return () => {
-    window.removeEventListener('resize', debouncedHandleResize);
-  };
-}, []);
+  useEffect(() => {
+    getDataSource()
+  }, []);
 
     return (
         <div ref={parentRef}>
         <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} className=''>
-          <Transfer
+        <Input  placeholder={searchPlaceholder} onChange={(e)=>setSearchWord(e.target.value)} value={searchWord} />
+        <Tree
+          checkable
+          expandedKeys={expandedKeys}
+          checkedKeys={targetKeys}
+          selectable={false}
+          onCheck={(e)=>{setTargetKeys(e);
+            onSelect(((e as string[])?.filter(x=>disabledData.indexOf(x as string) === -1))||[])}}
+          onExpand={setExpandedKeys}
+          treeData={translatedDataSource}
+          blockNode 
+        />
+
+          {/* <Transfer
             showSearch
             onSearch={(dir)=>{
               memo = {}; 
@@ -266,7 +194,7 @@ useEffect(() => {
                   );
                 }
             }}
-            </Transfer>
+            </Transfer> */}
             </Spin>
         </div>
       );
