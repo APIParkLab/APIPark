@@ -9,6 +9,7 @@ type Kind int
 
 func (k *Kind) UnmarshalJSON(bytes []byte) error {
 	str := ""
+
 	err := json.Unmarshal(bytes, &str)
 	if err != nil {
 		return err
