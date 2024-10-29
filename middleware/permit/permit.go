@@ -3,7 +3,7 @@ package permit_middleware
 import (
 	"net/http"
 	"reflect"
-	
+
 	permit_identity "github.com/APIParkLab/APIPark/middleware/permit/identity"
 	"github.com/eolinker/eosc/log"
 	"github.com/eolinker/go-common/autowire"
@@ -42,11 +42,11 @@ func (p *PermitMiddleware) Sort() int {
 func (p *PermitMiddleware) Check(method string, path string) (bool, []gin.HandlerFunc) {
 	// 当前路径是否有配置权限
 	accessRules, has := permit.GetPathRule(method, path)
-	
+
 	if !has || len(accessRules) == 0 {
 		return false, nil
 	}
-	
+
 	return true, []gin.HandlerFunc{
 		func(ginCtx *gin.Context) {
 			userId := utils.UserId(ginCtx)
@@ -56,19 +56,14 @@ func (p *PermitMiddleware) Check(method string, path string) (bool, []gin.Handle
 				ginCtx.Abort()
 				return
 			}
-			
-			//if userId == "admin" {
-			//	// 超级管理员不校验
-			//	return
-			//}
-			
+
 			for _, group := range checkSort {
 				accessList, has := accessRules[group]
 				if !has {
 					// 当前分组没有配置权限
 					continue
 				}
-				
+
 				domainHandler, has := permit.SelectDomain(group)
 				if !has {
 					// 当前分组没有配置身份handler

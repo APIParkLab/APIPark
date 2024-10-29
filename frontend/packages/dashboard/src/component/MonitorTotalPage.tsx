@@ -231,9 +231,9 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
     }
 
       return (
-        <div className={`h-full overflow-hidden pb-btnybase flex flex-col  bg-[#fff]`}>
+        <div className={`h-full overflow-hidden pb-btnybase flex flex-col  bg-[#fff] `}>
           <ScrollableSection>
-          <div className="flex items-center flex-wrap pb-[10px] px-btnbase content-before bg-MAIN_BG">
+          <div className="flex items-center flex-wrap pb-[10px] px-btnbase content-before bg-MAIN_BG pr-PAGE_INSIDE_X  ">
             <TimeRangeSelector 
               labelSize="small"
               initialTimeButton={timeButton}
@@ -247,7 +247,7 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
           </div>
           <Spin wrapperClassName={`flex-1 ${totalEmpty ?'':'overflow-auto'}`} indicator={<LoadingOutlined style={{ fontSize: 24 }} spin/>} spinning={queryBtnLoading}>
             {totalEmpty ?<Empty className="mt-[100px]" image={Empty.PRESENTED_IMAGE_SIMPLE} />:
-              <div className=" h-full scroll-area">
+              <div className=" h-full scroll-area pr-PAGE_INSIDE_X ">
               {/* 图表区域 */}
               <div className=" px-btnbase  mt-[12px] mb-[16px] grid gap-[20px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(570px, 1fr))'}}>
                 {/* 请求统计饼图 */}

@@ -146,7 +146,7 @@ const AiSettingList = ()=>{
                                 }
                                    
                                 </div>
-                            <WithPermission access="system.devops.ai_provider.view">
+                            <WithPermission access="system.settings.ai_provider.view">
                                 <Button block icon={<Icon icon="ic:outline-settings"  width={18} height={18}/>} onClick={()=>openModal(provider)} classNames={{icon:'h-[18px]'}}>{$t('设置')}</Button>
                             </WithPermission>
                         </div>

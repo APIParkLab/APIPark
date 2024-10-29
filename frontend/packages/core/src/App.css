@@ -290,3 +290,8 @@ a{
     transition: background-color 0s 600000s, color 0s 600000s !important;
   }
   }
+
+  .ant-select-selection-overflow-item:first-child {
+    max-width: calc(100% - 60px);
+    margin-right: 4px;
+    }

@@ -37,13 +37,14 @@ export default function ServiceHubManagement() {
     const [tableListDataSource, setTableListDataSource] = useState<ServiceHubAppListItem[]>([]);
     const [tableSearchWord, setTableSearchWord] = useState<string>('')
 
-const getServiceList = ()=>{
+const getServiceList = (dataType?:'block'|'list')=>{
+    dataType = dataType ?? dataShowType
     if(!accessInit){
-        getGlobalAccessData()?.then?.(()=>{getServiceList()})
+        getGlobalAccessData()?.then?.(()=>{getServiceList(dataType)})
         return Promise.resolve({data:[], success:false})
     }
     
-    if(dataShowType === 'list' && !tableHttpReload){
+    if(dataType === 'list' && !tableHttpReload){
         setTableHttpReload(true)
         return Promise.resolve({
             data: tableListDataSource,
@@ -52,7 +53,7 @@ const getServiceList = ()=>{
     }
     
     setServiceLoading(true)
-        return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team:teamId,keyword:tableSearchWord},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num','auth_num']}).then(response=>{
+        return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team: dataType === 'list' ? undefined : teamId,keyword:tableSearchWord},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num','auth_num','create_time','can_delete']}).then(response=>{
         const {code,data,msg} = response
         if(code === STATUS_CODE.SUCCESS){
             setServiceList([...data.apps,{type:'addNewItem'}])
@@ -75,26 +76,69 @@ const getServiceList = ()=>{
   };
 
   
-  const getTeamsList = ()=>{
-    if(!accessInit){
-        getGlobalAccessData()?.then?.(()=>{getTeamsList()})
-        return
-    }
-    setPageLoading(true)
-    fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(!checkPermission('system.workspace.team.view_all') ?'simple/teams/mine' :'simple/teams',{method:'GET',eoTransformKeys:['app_num','subscribe_num']}).then(response=>{
-        const {code,data,msg} = response
-        if(code === STATUS_CODE.SUCCESS){
-            setTeamList(data.teams.map((x:SimpleTeamItem)=>({label:<div className="flex items-center justify-between "><span  className="w-[calc(100%-42px)] truncate" title={x.name}>{x.name}</span><span className="bg-[#fff] rounded-[5px] h-[20px] w-[30px] flex items-center justify-center">{x.appNum || 0}</span></div>, key:x.id})))
-            if(!teamId && data.teams?.[0]?.id){
-                navigateTo(data.teams[0].id)
+  const getTeamsList = () => {
+    setPageLoading(true);
+
+    const fetchTeams = () => {
+        fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(
+            !checkPermission('system.workspace.team.view_all') 
+                ? 'simple/teams/mine' 
+                : 'simple/teams',
+            {
+                method: 'GET',
+                eoTransformKeys: ['app_num', 'subscribe_num'],
             }
-        }else{
-            message.error(msg || $t(RESPONSE_TIPS.error))
-        }
-    }).finally(()=>{
-        setPageLoading(false)
-    })
-}
+        )
+        .then(response => {
+            const { code, data, msg } = response;
+            if (code === STATUS_CODE.SUCCESS) {
+                setTeamList(
+                    data.teams.map((x: SimpleTeamItem) => ({
+                        label: (
+                            <div className="flex items-center justify-between">
+                                <span className="w-[calc(100%-42px)] truncate" title={x.name}>
+                                    {x.name}
+                                </span>
+                                <span className="bg-[#fff] rounded-[5px] h-[20px] w-[30px] flex items-center justify-center">
+                                    {x.appNum || 0}
+                                </span>
+                            </div>
+                        ),
+                        key: x.id,
+                    }))
+                );
+                if (!teamId && data.teams?.[0]?.id) {
+                    navigateTo(data.teams[0].id);
+                }
+            } else {
+                message.error(msg || $t(RESPONSE_TIPS.error));
+            }
+        })
+        .finally(() => {
+            setPageLoading(false);
+        });
+    };
+
+    if (!accessInit) {
+        const checkAccessData = () => {
+            const accessInitd = getGlobalAccessData();
+            if (!accessInitd) {
+                setTimeout(checkAccessData, 100);
+                return;
+            }
+
+            if (typeof accessInitd.then === 'function') {
+                accessInitd.then(fetchTeams);
+            } else {
+                fetchTeams();
+            }
+        };
+
+        checkAccessData();
+    } else {
+        fetchTeams();
+    }
+};
   
   
   const openModal = async (type:'add'|'edit'|'delete')=>{
@@ -241,13 +285,13 @@ useEffect(() => {
             customBtn={
                 <Radio.Group
                   options={dataShowTypeOptions}
-                  onChange={(e)=>setDataShowType(e.target.value)}
+                  onChange={(e)=>{setDataShowType(e.target.value); setTableHttpReload(true); if(e.target.value === 'block'){getServiceList(e.target.value)}}}
                   value={dataShowType}
                   optionType="button"
                   buttonStyle="solid"
                 />}
             >{
-                dataShowType === 'block' ? <BlockArea /> : <TableArea language={state.language} getServiceList={getServiceList} addNewApp={()=>openModal('add')} setTableHttpReload={setTableHttpReload} setTableSearchWord={setTableSearchWord} editApp={(row:ServiceHubAppListItem)=>{setAppName(row.name);navigateTo(`/consumer/${row.team.id}/inside/${row.id}/service`)}}/>
+                dataShowType === 'block' ? <BlockArea /> : <TableArea language={state.language} getServiceList={()=>getServiceList('list')} addNewApp={()=>openModal('add')} setTableHttpReload={setTableHttpReload} setTableSearchWord={setTableSearchWord} editApp={(row:ServiceHubAppListItem)=>{setAppName(row.name);navigateTo(`/consumer/${row.team.id}/inside/${row.id}/service`)}}/>
             }
     </InsidePage> :
         <Empty className="mt-[100px]" image={Empty.PRESENTED_IMAGE_SIMPLE} />
