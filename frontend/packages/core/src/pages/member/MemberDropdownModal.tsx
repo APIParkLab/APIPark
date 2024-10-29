@@ -117,7 +117,6 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
         return loop(departmentList);
     }, [departmentList,state.language]);
 
-    console.log(treeData)
 
     return (<WithPermission access="">
         <Form

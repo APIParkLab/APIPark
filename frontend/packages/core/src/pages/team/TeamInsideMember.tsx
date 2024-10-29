@@ -273,13 +273,17 @@ const TeamInsideMember:FC = ()=>{
     },[ state.language,roleList])
 
     useEffect(() => {
-        getRoleList()
         setBreadcrumb([
             {title:<Link to="/team/list">{$t('团队')}</Link>},
             {title:$t('成员')}
         ])
         manualReloadTable()
     }, [teamId]);
+
+
+    useEffect(()=>{
+        getRoleList()
+    },[state.language])
 
     const treeDisabledData = useMemo(()=>{ return [...allMemberIds,...allMemberSelectedDepartIds]},[allMemberIds,allMemberSelectedDepartIds])
     
@@ -303,7 +307,7 @@ const TeamInsideMember:FC = ()=>{
                    title={$t("添加成员")}
                    open={modalVisible}
                    destroyOnClose={true}
-                   width={900}
+                   width={600}
                    onCancel={() => cleanModalData()}
                    maskClosable={false}
                    footer={[
@@ -327,10 +331,9 @@ const TeamInsideMember:FC = ()=>{
                     disabledData={treeDisabledData}
                     request={()=>getDepartmentMemberList()}
                     onSelect={(selectedData: Set<string>) => {
-                        const memberKeyFromModal = Array.from(selectedData)?.filter(x => allMemberIds.indexOf(x) === -1 &&selectableMemberIds.has(x)) || [];
-                        setAddMemberBtnDisabled((memberKeyFromModal.length === 0));
+                        setAddMemberBtnDisabled((selectedData.length === 0));
                     }}
-                    searchPlaceholder={$t("搜索用户名、邮箱")}
+                    searchPlaceholder={$t("搜索用户名")}
                  />
                </Modal>
         </>

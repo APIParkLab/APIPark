@@ -34,7 +34,7 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
     const [managerOption, setManagerOption] = useState<DefaultOptionType[]>([])
     const { setBreadcrumb} = useBreadcrumb()
     const { setTeamInfo } =useTeamContext()
-    const {checkPermission,accessInit} = useGlobalContext()
+    const {checkPermission,accessInit,state} = useGlobalContext()
     const pageType= useMemo(()=>{
         if(!accessInit) return 'myteam'
         return checkPermission('system.workspace.team.view_all') ? 'manage' : 'myteam'
@@ -128,7 +128,10 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
             getTeamInfo();
         } else {
             setOnEdit(false);
-            form.setFieldsValue({id:uuidv4()}); // 清空 initialValues
+            form.setFieldsValue(
+                {id:uuidv4(),
+                    master:state?.userData?.uid
+                }); // 清空 initialValues
         }
         return (form.setFieldsValue({}))
     }, [teamId]);
