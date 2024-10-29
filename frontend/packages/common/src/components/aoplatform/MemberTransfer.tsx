@@ -2,11 +2,10 @@
 import { TransferProps, TreeDataNode, Tree, Spin, Input } from "antd";
 import { DataNode } from "antd/es/tree";
 import {  Ref, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { LoadingOutlined } from "@ant-design/icons";
+import { ApartmentOutlined, LoadingOutlined, UserOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 import { $t } from "@common/locales";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
-import Search from "antd/es/input/Search";
 
 export type TransferTableProps<T> = {
   request?:(k?:string)=>Promise<{data:T[],success:boolean}>
@@ -107,19 +106,22 @@ const generateTree = (
                   ...item,
                   title, 
                   disableCheckbox:disabledData.indexOf(item.key as string) !== -1,
+                  icon:<ApartmentOutlined />,
                   children: loop(item.children as T[]) };
           }
 
           return {
               ...item,
               title, 
+              icon:<UserOutlined />,
               isLeaf:true,
               disableCheckbox:disabledData.indexOf(item.key as string) !== -1
           };
       });
-      console.log(searchWord, dataSource)
   return loop(dataSource);
   },[dataSource, state.language, searchWord])
+
+  console.log(dataSource)
 
   const getInitExpandKeys = (data:T[], expandKeys:string[] = [])=>{
     data.forEach((item)=>{
@@ -160,6 +162,7 @@ const generateTree = (
             onExpand={setExpandedKeys}
             treeData={translatedDataSource}
             blockNode 
+            showIcon
           />
 
             </Spin>

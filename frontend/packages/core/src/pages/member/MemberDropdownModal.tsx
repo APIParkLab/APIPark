@@ -6,7 +6,6 @@ import { MemberDropdownModalHandle, MemberDropdownModalProps, DepartmentListItem
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { $t } from "@common/locales/index.ts";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
-import { DataNode } from "antd/es/tree/index";
 
 export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDropdownModalProps>((props,ref)=>{
     const { message} = App.useApp()
