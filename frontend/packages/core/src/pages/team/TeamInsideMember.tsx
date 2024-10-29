@@ -333,7 +333,7 @@ const TeamInsideMember:FC = ()=>{
                     onSelect={(selectedData: Set<string>) => {
                         setAddMemberBtnDisabled((selectedData.length === 0));
                     }}
-                    searchPlaceholder={$t("搜索用户名")}
+                    searchPlaceholder={$t("输入名称查找用户")}
                  />
                </Modal>
         </>
