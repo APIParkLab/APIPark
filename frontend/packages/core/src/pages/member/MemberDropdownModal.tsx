@@ -6,7 +6,6 @@ import { MemberDropdownModalHandle, MemberDropdownModalProps, DepartmentListItem
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { $t } from "@common/locales/index.ts";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
-import { DataNode } from "antd/es/tree/index";
 
 export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDropdownModalProps>((props,ref)=>{
     const { message} = App.useApp()
@@ -81,6 +80,15 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
         })
     }
 
+    const generateRandomString = () =>{
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        for (let i = 0; i < 8; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+      }
+
     useEffect(() => {
         switch(type){
             case 'addChild':
@@ -90,7 +98,7 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                 form.setFieldsValue({id:entity!.id,name:entity!.name})
                 break
             case 'addMember':
-                form.setFieldsValue('-1' === selectedMemberGroupId ? {} : {departmentIds:selectedMemberGroupId})
+                form.setFieldsValue({...('-1' === selectedMemberGroupId ? {} : {departmentIds:selectedMemberGroupId}), password:generateRandomString()})
                 break
             case 'editMember':
                 form.setFieldsValue({...entity,departmentIds:(entity as MemberTableListItem )?.department?.map(x=>x.id)})
@@ -180,6 +188,13 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                     label={$t("邮箱")}
                     name="email"
                     rules={[{required: true,whitespace:true },{type:"email",message: $t(VALIDATE_MESSAGE.email)}]}
+                >
+                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
+                </Form.Item>
+                <Form.Item<MemberDropdownModalFieldType>
+                    label={$t("密码")}
+                    name="password"
+                    rules={[{required: type === 'addMember',whitespace:true }]}
                 >
                     <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
