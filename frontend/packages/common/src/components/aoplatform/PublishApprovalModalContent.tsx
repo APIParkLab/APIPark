@@ -219,12 +219,12 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                                     /></Row>
                             </>
                         }
-                <Form.Item
+                {/* <Form.Item
                     label={$t("备注")}
                     name="remark"
                 >
                     <Input.TextArea className="w-INPUT_NORMAL" disabled={type !== 'add' && type !== 'publish'} placeholder={$t(PLACEHOLDER.input)} />
-                </Form.Item>
+                </Form.Item> */}
 {/* 
                 {type !== 'add' && type !== 'publish' && <Form.Item
                     label={$t("审核意见"

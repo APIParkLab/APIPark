@@ -111,13 +111,13 @@ func (m *imlTeamModule) Create(ctx context.Context, input *team_dto.CreateTeam) 
 		if err != nil {
 			return err
 		}
-		supperRole, err := m.roleService.GetSupperRole(ctx, role.GroupTeam)
+		superRole, err := m.roleService.GetSupperRole(ctx, role.GroupTeam)
 		if err != nil {
 			return err
 		}
 
 		return m.roleMemberService.Add(ctx, &role.AddMember{
-			Role:   supperRole.Id,
+			Role:   superRole.Id,
 			User:   input.Master,
 			Target: role.TeamTarget(input.Id),
 		})
@@ -145,7 +145,8 @@ func (m *imlTeamModule) Edit(ctx context.Context, id string, input *team_dto.Edi
 func (m *imlTeamModule) Delete(ctx context.Context, id string) error {
 	err := m.transaction.Transaction(ctx, func(ctx context.Context) error {
 		count, err := m.serviceService.Count(ctx, "", map[string]interface{}{
-			"team": id,
+			"team":      id,
+			"is_delete": false,
 		})
 		if err != nil {
 			return err

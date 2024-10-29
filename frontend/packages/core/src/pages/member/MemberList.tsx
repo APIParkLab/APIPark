@@ -346,7 +346,7 @@ const MemberList = ()=>{
                         <WithPermission access="system.organization.member.edit">
                             <Select
                                 className="w-full"
-                                mode="multiple"
+                                mode="multiple" 
                                 value={entity.roles?.map((x:EntityItem)=>x.id)}
                                 options={roleSelectableList?.map((x:{id:string,name:string})=>({label:(x.name), value:x.id}))}
                                 onChange={(value)=>{
