@@ -33,7 +33,77 @@ const mockData = {
         }
       ]
     }
-  ]
+    // {
+    //   "driver": "apipark.remote.normal",
+    //   "name": "remote",
+    //   "router": [
+    //     {
+    //       "path": "remote",
+    //       "type": "normal"
+    //     }
+    //   ]
+    // },
+    // {
+    //   "driver": "apipark.local.preload",
+    //   "name": "auth",
+    //   "router": [
+    //     {
+    //       "expose": "AppModule",
+    //       "path": "auth",
+    //       "type": "root"
+    //     },
+    //     {
+    //       "expose": "AuthInfoModule",
+    //       "path": "auth-info",
+    //       "type": "normal"
+    //     }
+    //   ]
+    // },
+    // {
+    //   "driver": "apipark.builtIn.component",
+    //   "name": "email",
+    //   "router": [
+    //     {
+    //       "path": "system/email",
+    //       "type": "normal"
+    //     }
+    //   ]
+    // },
+    // {
+    //   "driver": "apipark.builtIn.module",
+    //   "name": "open-api",
+    //   "router": [
+    //     {
+    //       "path": "system/ext-app",
+    //       "type": "normal"
+    //     }
+    //   ]
+    // },
+    // {
+    //   "driver": "apipark.local.router",
+    //   "name": "monitor",
+    //   "router": [
+    //     {
+    //       "expose": "AppModule",
+    //       "path": "monitor",
+    //       "type": "normal"
+    //     }
+    //   ]
+    // },
+    // {
+    //   "driver": "apipark.remote.normal",
+    //   "name": "apispace",
+    //   "router": [
+    //     {
+    //       "path": "remote/apispace",
+    //       "type": "normal"
+    //     }
+    //   ]
+    // }
+  ],
+  powered:'Powered by https://eolink.com',
+  product:'apipark',
+  version:'6438d5aa'
 }
 
 const usePluginLoader = () => {
