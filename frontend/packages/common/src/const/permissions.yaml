@@ -7,7 +7,7 @@ system:
         cname: '成员'
         value: 'member'
         access:
-          - system.organization.member.view
+          - system.settings.account.view
           - system.organization.member.add
           - system.organization.member.edit
           - system.organization.member.delete
@@ -18,7 +18,7 @@ system:
       - name: team_manager
         cname: '团队管理'
         desc: '团队管理'
-        - system.organization.team.view
+        - system.workspace.team.view_all
         - system.organization.team.add
         - system.organization.team.edit
         - system.organization.team.delete
@@ -55,7 +55,7 @@ system:
           cname: 集群
           value: 'cluster'
           children:
-            - system.devops.cluster.view
+            - system.settings.api_gateway.view
             - system.devops.cluster.add
             - system.devops.cluster.edit
             - system.devops.cluster.delete
@@ -63,7 +63,7 @@ system:
           cname: 证书
           value: 'ssl_certificate'
           children:
-            - system.devops.ssl_certificate.view
+            - system.settings.ssl_certificate.view
             - system.devops.ssl_certificate.add
             - system.devops.ssl_certificate.edit
             - system.devops.ssl_certificate.delete
@@ -71,7 +71,7 @@ system:
           cname: 日志
           value: 'log_configuration'
           children:
-            - system.devops.log_configuration.view
+            - system.settings.log_configuration.view
             - system.devops.log_configuration.add
             - system.devops.log_configuration.edit
             - system.devops.log_configuration.publish
@@ -99,7 +99,7 @@ system:
         cname: API市场
         value: 'api_market'
         children:
-          - system.workspace.api_market.view
+          - system.api_portal.api_portal.view
 team:
   - name: service
     cname: 服务
@@ -172,8 +172,8 @@ team:
         cname: 访问授权
         value: 'authorization'
         children:
-          - team.application.authorization.view
-          - team.application.authorization.manager
+          - team.consumer.authorization.view
+          - team.consumer.authorization.manager
           - team.application.authorization.add
           - team.application.authorization.edit
           - team.application.authorization.delete

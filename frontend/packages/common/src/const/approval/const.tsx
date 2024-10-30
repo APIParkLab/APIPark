@@ -15,7 +15,7 @@ export const SUBSCRIBE_APPROVAL_TABLE_COLUMN : PageProColumns<ApprovalTableListI
         },
     },
     {
-        title:('申请方-应用'),
+        title:('申请方-消费者'),
         dataIndex: ['application','name'],
         ellipsis:true
     },
@@ -76,7 +76,7 @@ export const SUBSCRIBE_APPROVAL_INNER_TODO_TABLE_COLUMN : PageProColumns<Subscri
         },
     },
     {
-        title:('申请方-应用'),
+        title:('申请方-消费者'),
         dataIndex: ['application','name'],
         ellipsis:true
     },
@@ -111,7 +111,7 @@ export const SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN : PageProColumns<Subscri
         },
     },
     {
-        title:('申请方-应用'),
+        title:('申请方-消费者'),
         dataIndex: ['application','name'],
         ellipsis:true
     },
@@ -344,11 +344,6 @@ export const PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN : PageProColumns<Publish
         ellipsis:true,
     },
     {
-        title:('备注'),
-        dataIndex: 'comments',
-        ellipsis:true
-    },
-    {
         title:('申请人'),
         dataIndex: ['applicant','name'],
         ellipsis: true,
@@ -445,7 +440,7 @@ export const  ChangeTypeEnum = {
 
 export const SubscribeApprovalList = [
     {
-        title:('申请方应用'),key:'application'
+        title:('申请方消费者'),key:'application'
     },
     {
         title:('申请方所属团队'),key:'applyTeam'

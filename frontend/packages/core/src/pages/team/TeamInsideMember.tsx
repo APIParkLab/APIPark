@@ -100,23 +100,27 @@ const TeamInsideMember:FC = ()=>{
                 ] 
               : [...departmentMap.get('_withoutDepartment') || []];
           
-              
+              let allMemberSelectedFlag:boolean = true
               for(const [k,v] of departmentMap){
                 if(k !== '_withoutDepartment' && allMemberIds.length > 0 ){
                      // 筛选出部门内没被勾选的用户，如果不存在没勾选用户，需要将部门id放入ids中
                      if(v.filter(m => allMemberIds.indexOf(m.id) === -1).length  === 0){
                          setAllMemberSelectedDepartIds((pre)=>[...pre, k])
+                     }else if(['unknown','disable'].indexOf(k) === -1){
+                        allMemberSelectedFlag = false
                      }
                 }
              }
-             
-             if(!finalData[0].children || finalData[0].children.filter(m => allMemberIds.indexOf(m.id) === -1).length  === 0){
-                 setAllMemberSelectedDepartIds((pre)=>[...pre, topDepartmentId])
+
+             if(departmentMap.get('_withoutDepartment')?.filter(x=>allMemberIds.indexOf(x)!==-1).length === 0 && allMemberSelectedFlag){
+                setAllMemberSelectedDepartIds((pre)=>[...pre, topDepartmentId])
              }
+
 
               return  {data:finalData, success: true}
         }).catch(()=>({data:[], success:false}))
       }
+
       
     const getMemberList = ()=>{
         return fetchData<BasicResponse<{members:TeamMemberTableListItem}>>('team/members',{method:'GET',eoParams:{keyword:searchWord, team:teamId},eoTransformKeys:['attach_time','is_delete']}).then(response=>{
@@ -252,6 +256,7 @@ const TeamInsideMember:FC = ()=>{
                             <Select
                                 className="w-full"
                                 mode="multiple"
+                                maxTagCount="responsive"
                                 value={entity.roles?.map((x:EntityItem)=>x.id)}
                                 options={roleList?.map((x:{id:string,name:string})=>({label:(x.name), value:x.id}))}
                                 onChange={(value)=>{
@@ -272,13 +277,17 @@ const TeamInsideMember:FC = ()=>{
     },[ state.language,roleList])
 
     useEffect(() => {
-        getRoleList()
         setBreadcrumb([
             {title:<Link to="/team/list">{$t('团队')}</Link>},
             {title:$t('成员')}
         ])
         manualReloadTable()
     }, [teamId]);
+
+
+    useEffect(()=>{
+        getRoleList()
+    },[state.language])
 
     const treeDisabledData = useMemo(()=>{ return [...allMemberIds,...allMemberSelectedDepartIds]},[allMemberIds,allMemberSelectedDepartIds])
     
@@ -302,7 +311,7 @@ const TeamInsideMember:FC = ()=>{
                    title={$t("添加成员")}
                    open={modalVisible}
                    destroyOnClose={true}
-                   width={900}
+                   width={600}
                    onCancel={() => cleanModalData()}
                    maskClosable={false}
                    footer={[
@@ -329,7 +338,7 @@ const TeamInsideMember:FC = ()=>{
                         const memberKeyFromModal = Array.from(selectedData)?.filter(x => allMemberIds.indexOf(x) === -1 &&selectableMemberIds.has(x)) || [];
                         setAddMemberBtnDisabled((memberKeyFromModal.length === 0));
                     }}
-                    searchPlaceholder={$t("搜索用户名、邮箱")}
+                    searchPlaceholder={$t("输入名称查找用户")}
                  />
                </Modal>
         </>

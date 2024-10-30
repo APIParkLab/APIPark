@@ -171,7 +171,7 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 			Matches:     matches,
 		},
 		Host:      hosts,
-		Method:    r.Method,
+		Method:    r.Methods,
 		Location:  r.Path,
 		Rules:     rules,
 		Service:   fmt.Sprintf("%s@service", r.Service),

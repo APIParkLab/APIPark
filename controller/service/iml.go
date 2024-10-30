@@ -151,8 +151,9 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 			Prompt: "You need to translate {{source_lang}} into {{target_lang}}, and the following is the content that needs to be translated.\n---\n{{text}}",
 		}
 		aiModel := &ai_api_dto.AiModel{
-			Id:     m.ID(),
-			Config: m.DefaultConfig(),
+			Id:       m.ID(),
+			Config:   m.DefaultConfig(),
+			Provider: *input.Provider,
 		}
 		name := "Demo Translation API"
 		description := "A demo that shows you how to use a prompt to create a Translation API."

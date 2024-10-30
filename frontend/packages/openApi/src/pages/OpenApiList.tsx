@@ -216,7 +216,7 @@ export default function OpenApiList(){
         dataSource={tableListDataSource}
         showPagination={false}
         primaryKey="id"
-        addNewBtnTitle={$t("添加应用")}
+        addNewBtnTitle={$t("添加消费者")}
         addNewBtnAccess="system.openapi.self.add"
         onChange={() => {
             setTableHttpReload(false)

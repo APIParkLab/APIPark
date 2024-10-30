@@ -3,7 +3,7 @@ import  {forwardRef, useEffect, useImperativeHandle, useMemo, useState} from "re
 import {App, Button, Form, Input, Radio, Row, Select, TreeSelect, Upload} from "antd";
 import { Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
-import {BasicResponse, DELETE_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
+import {BasicResponse, DELETE_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {DefaultOptionType} from "antd/es/cascader";
 import { EntityItem, MemberItem, SimpleTeamItem} from "@common/const/type.ts";
@@ -13,7 +13,7 @@ import { validateUrlSlash } from "@common/utils/validate.ts";
 import { normFile } from "@common/utils/uploadPic.ts"; 
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext.tsx";
 import { useSystemContext } from "../../contexts/SystemContext.tsx";
-import { SERVICE_APPROVAL_OPTIONS, SERVICE_KIND_OPTIONS, SERVICE_VISUALIZATION_OPTIONS } from "@core/const/system/const.tsx";
+import { SERVICE_APPROVAL_OPTIONS, SERVICE_KIND_OPTIONS } from "@core/const/system/const.tsx";
 import { RcFile, UploadChangeParam, UploadFile, UploadProps } from "antd/es/upload/interface";
 import { LoadingOutlined } from "@ant-design/icons";
 import { getImgBase64 } from "@common/utils/dataTransfer.ts";
@@ -257,7 +257,8 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
             setOnEdit(false);
             const id = uuidv4()
             form.setFieldValue('id',id);
-            form.setFieldValue('serviceKind',serviceTypeOptions[0].value)
+            form.setFieldValue('serviceKind','ai')
+            setShowAI(true)
             form.setFieldValue('prefix',`${id.split('-')[0]}/`)
             form.setFieldValue('team',teamId); 
             form.setFieldValue('serviceType','public'); 
@@ -285,13 +286,13 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
         })
     }
 
-    const serviceTypeOptions =  useMemo(()=>SERVICE_KIND_OPTIONS.map((x)=>({...x, label:$t(x.label)})),[state.language]);
+    // const serviceTypeOptions =  useMemo(()=>SERVICE_KIND_OPTIONS.map((x)=>({...x, label:$t(x.label)})),[state.language]);
     // const visualizationOptions = useMemo(()=>SERVICE_VISUALIZATION_OPTIONS.map((x)=>({...x, label:$t(x.label)})),[state.language])
     const approvalOptions = useMemo(()=>SERVICE_APPROVAL_OPTIONS.map((x)=>({...x, label:$t(x.label)})),[state.language])
 
     return (
         <>
-                <WithPermission access={onEdit ? 'team.service.service.edit' :''}>
+                <WithPermission access={onEdit ? ['team.service.service.edit'] :''}>
                 <Form
                     layout='vertical'
                     labelAlign='left'
@@ -324,8 +325,18 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                             name="serviceKind"
                             rules={[{required: true}]}
                         >
-                                    <Select className="w-INPUT_NORMAL" disabled={onEdit} placeholder={$t(PLACEHOLDER.input)} options={serviceTypeOptions}  onChange={(value)=>setShowAI(value === 'ai')}>
-                                    </Select>
+                                    <Radio.Group disabled={onEdit} onChange={(e)=>{setShowAI(e.target.value === 'ai')}} >
+                                        <Radio.Button className="w-[180px] h-[100px] mr-btnbase" value="ai">
+                                            <div className="w-full h-full flex flex-col items-center justify-center text-black">
+                                                <Icon icon="icon-park-outline:robot-one" height={50} width={50} />
+                                                <span>{$t('AI 服务')}</span></div>
+                                            </Radio.Button>
+                                        <Radio.Button className="w-[180px] h-[100px]" value="rest">
+                                            <div className="w-full h-full flex flex-col items-center justify-center text-black">
+                                                <Icon icon="bx:server" height={50} width={50} />
+                                                <span>{$t('REST 服务')}</span></div>
+                                            </Radio.Button>
+                                        </Radio.Group>
                         </Form.Item>
 }
                         {showAI &&   <Form.Item<AiServiceConfigFieldType>
@@ -449,7 +460,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         <Row className="mb-[10px]"
                             // wrapperCol={{ offset: 5, span: 19 }}
                             >
-                        <WithPermission access={onEdit ? 'team.service.service.edit' :''}>
+                        <WithPermission access={onEdit ? ['team.service.service.edit'] :''}>
                             <Button type="primary" htmlType="submit">
                                 {$t('保存')}
                             </Button>
@@ -457,11 +468,11 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_,ref) => {
                         </Row></>}
                     </div>
                     {onEdit && <>
-                        <WithPermission access="team.service.service.delete" showDisabled={false}>
+                        <WithPermission access={["team.service.service.delete"]} showDisabled={false}>
                             <div className="bg-[rgb(255_120_117_/_5%)] rounded-[10px] mt-[50px] p-btnrbase pb-0">
                             <p className="text-left"><span className="font-bold">{$t('删除服务')}：</span>{$t('删除操作不可恢复，请谨慎操作！')}</p>
                                 <div className="text-left">
-                                    <WithPermission access="team.service.service.delete">
+                                    <WithPermission access={["team.service.service.delete"]}>
                                         <Button className="m-auto mt-[16px] mb-[20px]" type="default"  danger={true} onClick={deleteSystemModal}>{$t('删除服务')}</Button>
                                         </WithPermission>
                                 </div>

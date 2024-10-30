@@ -21,22 +21,22 @@ export default function Guide(){
                 {
                     title: $t("配置你的 AI 模型"),
                     description: $t('通过 APIPark 快速接入各种 AI 模型，使用统一的格式来调用API，并且可以随意切换模型。'),
-                    link: 'https://docs.apipark.com/docs/quick/pre-work/team'
+                    link: 'https://docs.apipark.com/docs/system_setting/ai_model_providers'
                 },
                 {
                     title: $t("创建 AI 服务和 API"),
                     description: $t('创建 AI 类型的服务，并且你可以将 Prompt 提示词设置为一个 API，简化使用 AI 的流程。'),
-                    link: 'https://docs.apipark.com/docs/quick/provider/service'
+                    link: 'https://docs.apipark.com/docs/services/ai_services'
                 },
                 {
                     title: $t("创建调用 Token"),
-                    description: $t('为了安全地调用 API，你需要创建一个应用以及Token。'),
-                    link: 'https://docs.apipark.com/docs/quick/suberscriber/application'
+                    description: $t('为了安全地调用 API，你需要创建一个消费者以及Token。'),
+                    link: 'https://docs.apipark.com/docs/consumers'
                 },
                 {
                     title: $t("调用"),
                     description: $t('现在你可以通过 Token 来调用这些 API。'),
-                    link: 'https://docs.apipark.com/docs/quick/suberscriber/application'
+                    link: 'https://docs.apipark.com/docs/call_api'
                 }
             ]
         },
@@ -46,17 +46,17 @@ export default function Guide(){
                 {
                     title: $t("创建 REST 服务和 API"),
                     description: $t('创建 AI 类型的服务，并且你可以将 Prompt 提示词设置为一个 API，简化使用 AI 的流程。'),
-                    link: 'https://docs.apipark.com/docs/tutorials/api-market/service'
+                    link: 'https://docs.apipark.com/docs/services/rest_services'
                 },
                 {
                     title: $t("创建调用 Token"),
-                    description: $t('为了安全地调用 API，你需要创建一个应用以及Token。'),
-                    link: 'https://docs.apipark.com/docs/quick/suberscriber/subscribe'
+                    description: $t('为了安全地调用 API，你需要创建一个消费者以及Token。'),
+                    link: 'https://docs.apipark.com/docs/consumers'
                 },
                 {
                     title: $t("调用"),
                     description: $t('现在你可以通过 Token 来调用这些 API。'),
-                    link: 'https://docs.apipark.com/docs/quick/provider/approve'
+                    link: 'https://docs.apipark.com/docs/call_api'
                 }
             ]
         },
@@ -66,7 +66,7 @@ export default function Guide(){
                 {
                     title: $t("统计 API 调用情况"),
                     description: $t('仪表盘中提供了多种统计图表，帮助我们了解 API 的运行情况。'),
-                    link: 'https://docs.apipark.com/docs/quick/pre-work/monitor'
+                    link: 'https://docs.apipark.com/docs/analysis'
                 }
             ]
         }
@@ -78,17 +78,17 @@ export default function Guide(){
                 {
                     title: $t("账号与角色"),
                     description: $t('邀请你的团队成员加入 APIPark，共同管理和调用 API。'),
-                    link: 'https://docs.apipark.com/docs/quick/pre-work/team'
+                    link: 'https://docs.apipark.com/docs/system_setting/account_role'
                 },
                 {
                     title: $t("团队"),
-                    description: $t('团队中包含了人员、应用和服务，不同团队之间的应用和服务数据是隔离的，可用于管理企业内部不同的部门/项目组/团队。'),
-                    link: 'https://docs.apipark.com/docs/quick/provider/service'
+                    description: $t('团队中包含了人员、消费者和服务，不同团队之间的消费者和服务数据是隔离的，可用于管理企业内部不同的部门/项目组/团队。'),
+                    link: 'https://docs.apipark.com/docs/teams'
                 },
                 {
                     title: $t("服务"),
                     description: $t('服务内包含一组 API，并且可以发布到 API 市场被其他团队使用。'),
-                    link: 'https://docs.apipark.com/docs/quick/suberscriber/application'
+                    link: 'https://docs.apipark.com/docs/category/-%E6%9C%8D%E5%8A%A1'
                 }
             ]
         },
@@ -98,12 +98,12 @@ export default function Guide(){
                 {
                     title: $t("订阅服务"),
                     description: $t('如果需要调用某个服务的 API，需要先订阅该服务，并且等待提供服务的团队审核后才可发起 API 请求。'),
-                    link: 'https://docs.apipark.com/docs/tutorials/api-market/service'
+                    link: 'https://docs.apipark.com/docs/developer_portal'
                 },
                 {
                     title: $t("审核订阅申请"),
-                    description: $t('提供服务的团队可以审核来自其他团队的订阅申请，审核通过后的应用才可发起 API 请求。'),
-                    link: 'https://docs.apipark.com/docs/quick/suberscriber/subscribe'
+                    description: $t('提供服务的团队可以审核来自其他团队的订阅申请，审核通过后的消费者才可发起 API 请求。'),
+                    link: 'https://docs.apipark.com/docs/services/review_consumers'
                 }
             ]
         },
@@ -113,7 +113,7 @@ export default function Guide(){
                 {
                     title: $t("日志"),
                     description: $t('APIPark 提供详尽的 API 调用日志，帮助企业监控、分析和审计 API 的运行状况。'),
-                    link: 'https://docs.apipark.com/docs/quick/pre-work/monitor'
+                    link: 'https://docs.apipark.com/docs/system_setting/log/'
                 }
             ]
         }

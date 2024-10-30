@@ -1,164 +1,160 @@
 system:
-  - name: supper admin
-    value: supper_admin
+  - name: super admin
+    value: super_admin
     permits:
-      - system.dashboard.run_view.view
-      - system.devops.ai_provider.manager
-      - system.devops.ai_provider.view
-      - system.devops.cluster.manager
-      - system.devops.cluster.view
-      - system.devops.data_source.manager
-      - system.devops.data_source.view
-      - system.devops.log_configuration.manager
-      - system.devops.log_configuration.view
-      - system.devops.ssl_certificate.manager
-      - system.devops.ssl_certificate.view
-      - system.organization.member.manager
-      - system.organization.member.view
-      - system.organization.role.view_system_role
-      - system.organization.role.view_team_role
-      - system.organization.team.manager
-      - system.organization.team.view
+      - system.analysis.run_view.view
+      - system.api_portal.api_portal.view
+      - system.settings.account.manager
+      - system.settings.account.view
+      - system.settings.ai_provider.manager
+      - system.settings.ai_provider.view
+      - system.settings.api_gateway.manager
+      - system.settings.api_gateway.view
+      - system.settings.data_source.manager
+      - system.settings.data_source.view
       - system.settings.general.manager
       - system.settings.general.view
-      - system.settings.service_classification.manager
-      - system.settings.service_classification.view
-      - system.workspace.api_market.view
+      - system.settings.log_configuration.manager
+      - system.settings.log_configuration.view
+      - system.settings.role.view
+      - system.settings.ssl_certificate.manager
+      - system.settings.ssl_certificate.view
+      - system.workspace.application.manager_all
       - system.workspace.application.view_all
+      - system.workspace.service.manager_all
       - system.workspace.service.view_all
+      - system.workspace.team.create
+      - system.workspace.team.manager
       - system.workspace.team.view_all
     supper: true
   - name: team admin
     value: team_admin
     permits:
-      - system.organization.role.view_team_role
-      - system.organization.team.manager
-      - system.organization.team.view
-      - system.workspace.api_market.view
-      - system.workspace.application.view_all
-      - system.workspace.service.view_all
-      - system.workspace.team.view_all
+      - system.api_portal.api_portal.view
+      - system.workspace.team.create
   - name: devops admin
     value: devops_admin
     permits:
-      - system.dashboard.run_view.view
-      - system.devops.ai_provider.manager
-      - system.devops.ai_provider.view
-      - system.devops.cluster.manager
-      - system.devops.cluster.view
-      - system.devops.data_source.manager
-      - system.devops.data_source.view
-      - system.devops.log_configuration.manager
-      - system.devops.log_configuration.view
-      - system.devops.ssl_certificate.manager
-      - system.devops.ssl_certificate.view
-      - system.workspace.api_market.view
+      - system.analysis.run_view.view
+      - system.api_portal.api_portal.view
+      - system.settings.ai_provider.manager
+      - system.settings.ai_provider.view
+      - system.settings.api_gateway.manager
+      - system.settings.api_gateway.view
+      - system.settings.data_source.manager
+      - system.settings.data_source.view
+      - system.settings.general.manager
+      - system.settings.general.view
+      - system.settings.log_configuration.manager
+      - system.settings.log_configuration.view
+      - system.settings.ssl_certificate.manager
+      - system.settings.ssl_certificate.view
       - system.workspace.application.view_all
       - system.workspace.service.view_all
       - system.workspace.team.view_all
-      - system.settings.general.manager
-      - system.settings.general.view
-      - system.settings.service_classification.manager
-      - system.settings.service_classification.view
   - name: general member
     value: member
     permits:
-    - system.workspace.api_market.view
+      - system.api_portal.api_portal.view
     default: true
-  - name: guest
-    value: guest
-    permits:
-      - system.settings.service_classification.view
-      - system.devops.cluster.view
-      - system.devops.log_configuration.view
-      - system.devops.ssl_certificate.view
-      - system.devops.monitor.view
-      - system.organization.member.view
-      - system.organization.role.view_system_role
-      - system.organization.role.view_team_role
-      - system.organization.team.view
-      - system.workspace.api_market.view
-      - system.workspace.application.view_all
-      - system.workspace.service.view_all
-      - system.workspace.team.view_all
-      - system.dashboard.run_view.view
+
 team:
   - name: team admin
     value: team_admin
     permits:
-      - team.application.application.manager
-      - team.application.authorization.manager
-      - team.application.authorization.view
-      - team.application.subscription.manager
-      - team.application.subscription.view
-      - team.service.api_doc.view
+      - team.consumer.application.manager
+      - team.consumer.authorization.manager
+      - team.consumer.authorization.view
+      - team.consumer.subscription.manager_subscribed_services
+      - team.consumer.subscription.subscribe
+      - team.consumer.subscription.view_subscribed_service
+      - team.service.api.manager
+      - team.service.api.view
       - team.service.api_doc.manager
-      - team.service.router.manager
-      - team.service.router.view
+      - team.service.api_doc.view
       - team.service.release.manager
       - team.service.release.view
       - team.service.service.manager
+      - team.service.service_intro.manager
+      - team.service.service_intro.view
       - team.service.subscription.manager
       - team.service.subscription.view
       - team.service.upstream.manager
       - team.service.upstream.view
+      - team.team.consumer.manager
+      - team.team.consumer.view
       - team.team.member.manager
       - team.team.member.view
+      - team.team.service.manager
+      - team.team.service.view
       - team.team.team.manager
       - team.team.team.view
     supper: true
   - name: service admin
     value: service_admin
     permits:
-      - team.service.service.manager
-      - team.service.upstream.manager
-      - team.service.upstream.view
-      - team.service.api_doc.view
+      - team.service.api.manager
+      - team.service.api.view
       - team.service.api_doc.manager
-      - team.service.router.manager
-      - team.service.router.view
-      - team.service.subscription.manager
-      - team.service.subscription.view
+      - team.service.api_doc.view
       - team.service.release.manager
       - team.service.release.view
+      - team.service.service.manager
+      - team.service.service_intro.manager
+      - team.service.service_intro.view
+      - team.service.subscription.manager
+      - team.service.subscription.view
+      - team.service.upstream.manager
+      - team.service.upstream.view
+      - team.team.consumer.view
       - team.team.member.view
+      - team.team.service.manager
+      - team.team.service.view
+      - team.team.team.view
   - name: service developer
     value: service_developer
     permits:
-      - team.service.upstream.manager
-      - team.service.upstream.view
-      - team.service.api_doc.view
+      - team.service.api.manager
+      - team.service.api.view
       - team.service.api_doc.manager
-      - team.service.router.manager
-      - team.service.router.view
+      - team.service.api_doc.view
       - team.service.release.manager
       - team.service.release.view
-      - team.team.member.view
-  - name: application admin
-    value: application_admin
-    permits:
-      - team.application.application.manager
-      - team.application.authorization.manager
-      - team.application.authorization.view
-      - team.application.subscription.manager
-      - team.application.subscription.view
-      - team.team.member.view
-  - name: application developer
-    value: application_developer
-    permits:
-      - team.application.authorization.view
-      - team.application.subscription.manager
-      - team.application.subscription.view
-      - team.team.member.view
-    default: true
-  - name: guest
-    value: guest
-    permits:
-      - team.application.authorization.view
-      - team.application.subscription.view
-      - team.service.router.view
-      - team.service.release.view
+      - team.service.service.manager
+      - team.service.service_intro.manager
+      - team.service.service_intro.view
+      - team.service.subscription.manager
       - team.service.subscription.view
+      - team.service.upstream.manager
       - team.service.upstream.view
+      - team.team.consumer.view
       - team.team.member.view
+      - team.team.service.view
       - team.team.team.view
+  - name: consumer admin
+    value: consumer_admin
+    permits:
+      - team.consumer.application.manager
+      - team.consumer.authorization.manager
+      - team.consumer.authorization.view
+      - team.consumer.subscription.manager_subscribed_services
+      - team.consumer.subscription.subscribe
+      - team.consumer.subscription.view_subscribed_service
+      - team.team.consumer.manager
+      - team.team.consumer.view
+      - team.team.member.view
+      - team.team.service.view
+      - team.team.team.view
+  - name: consumer developer
+    value: consumer_developer
+    permits:
+      - team.consumer.application.manager
+      - team.consumer.authorization.manager
+      - team.consumer.authorization.view
+      - team.consumer.subscription.subscribe
+      - team.consumer.subscription.view_subscribed_service
+      - team.team.consumer.view
+      - team.team.member.view
+      - team.team.service.view
+      - team.team.team.view
+    default: true

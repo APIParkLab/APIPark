@@ -249,3 +249,49 @@ a{
 .ai-service-api-preview .swagger-ui h3.opblock-tag{
   display: none;
 }
+
+    /* 整个背景容器设置 */
+    .background-container {
+      background: radial-gradient(ellipse 80% 900px at top, rgb(255 255 255 / 10%) 0%, rgb(4 0 71) 30%, rgb(13 17 23) 100%);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 1;
+      isolate: isolate;
+  }
+
+  /* SVG背景图案 */
+  .background-pattern {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      stroke: rgba(255, 255, 255, 0.1);
+      mask-image: radial-gradient(100% 100% at top right, white, transparent);
+  }
+
+  .login-block{
+    background: rgba(255, 255, 255, 0.1) !important;
+    .login-input{
+      color:#fff !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      &:hover, &:focus, &.ant-input-status-error, &.ant-input-status-error:hover, &.ant-input-status-error:focus-within{
+        background: rgba(255, 255, 255, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      }
+    }
+    
+  input:-webkit-autofill,
+  input:-webkit-autofill:focus {
+    transition: background-color 0s 600000s, color 0s 600000s !important;
+  }
+  }
+
+  .ant-select-selection-overflow-item:first-child {
+    max-width: calc(100% - 60px);
+    margin-right: 4px;
+    }

@@ -1,9 +1,4 @@
-/*
- * @Date: 2023-11-27 17:31:44
- * @LastEditors: maggieyyy
- * @LastEditTime: 2024-06-04 15:03:36
- * @FilePath: \frontend\tailwind.config.js
- */
+
 /** @type {import('tailwindcss').Config} */
 
 module.exports = {

@@ -361,7 +361,7 @@ const PUBLIC_ROUTES:RouteConfig[] = [
                 key:uuidv4(),
             },
             {
-                path:'tenantManagement',
+                path:'consumer',
                 component:<Outlet />,
                 provider:TenantManagementProvider,
                 key:'tenantManagement',

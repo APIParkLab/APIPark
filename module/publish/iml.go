@@ -128,7 +128,7 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 				Version:     version,
 			},
 			Path:    a.Path,
-			Method:  a.Methods,
+			Methods: a.Methods,
 			Service: a.Service,
 		}
 		proxy, ok := proxyCommitMap[a.UUID]
@@ -216,7 +216,7 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 				Version:     version,
 			},
 			Path:    a.Path,
-			Method:  a.Methods,
+			Methods: a.Methods,
 			Service: a.Upstream,
 		}
 		proxy, ok := proxyCommitMap[a.UUID]
