@@ -276,252 +276,252 @@ export const PERMISSION_DEFINITION = [
       },
       "team.service.api_doc.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api_doc.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.view_all","team.service.api_doc.view"] }]
         }
       },
       "team.service.api_doc.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api_doc.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.api_doc.manager"] }]
         }
       },
       "team.service.api_doc.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api_doc.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.api_doc.manager"] }]
         }
       },
       "team.service.service_intro.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.service_intro.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.view_all","team.service.service_intro.view"] }]
         }
       },
       "team.service.service_intro.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.service_intro.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.service_intro.manager"] }]
         }
       },
       "team.service.service_intro.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.service_intro.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.service_intro.manager"] }]
         }
       },
       "team.service.api_doc.import": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api_doc.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.api_doc.manager"] }]
         }
       },
       "team.service.router.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.view_all","team.service.api.view"] }]
         }
       },
       "team.service.router.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.api.manager"] }]
         }
       },
       "team.service.router.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.api.manager"] }]
         }
       },
       "team.service.router.delete": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.api.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.api.manager"] }]
         }
       },
       "team.service.upstream.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.upstream.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.view_all","team.service.upstream.view"] }]
         }
       },
       "team.service.upstream.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.upstream.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.upstream.manager"] }]
         }
       },
       "team.service.upstream.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.upstream.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.upstream.manager"] }]
         }
       },
       "team.service.upstream.delete": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.upstream.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.upstream.manager"] }]
         }
       },
       "team.service.release.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.release.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.view_all","team.service.release.view"] }]
         }
       },
       "team.service.release.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.release.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.release.manager"] }]
         }
       },
       "team.service.release.online": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.release.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.release.manager"] }]
         }
       },
       "team.service.release.stop": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.release.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.release.manager"] }]
         }
       },
       "team.service.release.cancel": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.release.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.release.manager"] }]
         }
       },
       "team.service.release.rollback": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.release.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.release.manager"] }]
         }
       },
       "team.service.release.delete": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.release.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.release.manager"] }]
         }
       },
       "team.service.release.approval": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.release.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.release.manager"] }]
         }
       },
       "team.service.subscription.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.subscription.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.view_all","team.service.subscription.view"] }]
         }
       },
       "team.service.subscription.approval": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.subscription.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.subscription.manager"] }]
         }
       },
       "team.service.subscription.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.subscription.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.subscription.manager"] }]
         }
       },
       "team.service.subscription.delete": {
         "granted": {
-          "anyOf": [{ "backend": ["team.service.subscription.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.service.subscription.manager"] }]
         }
       },
       "team.service.service.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.team.service.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","system.workspace.service.view_all","team.team.service.view"] }]
         }
       },
       "team.service.service.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.team.service.manager","team.service.service.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.team.service.manager","team.service.service.manager"] }]
         }
       },
       "team.service.service.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["team.team.service.manager","team.service.service.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.team.service.manager","team.service.service.manager"] }]
         }
       },
       "team.service.service.delete": {
         "granted": {
-          "anyOf": [{ "backend": ["team.team.service.manager","team.service.service.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.team.service.manager","team.service.service.manager"] }]
         }
       },
       "team.application.subscription.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.consumer.subscription.view_subscribed_service"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.view_all","team.consumer.subscription.view_subscribed_service"] }]
         }
       },
       "team.application.subscription.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.consumer.subscription.subscribe"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.subscription.subscribe"] }]
         }
       },
       "team.application.subscription.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["team.consumer.subscription.manager_subscribed_services"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.subscription.manager_subscribed_services"] }]
         }
       },
       "team.application.subscription.delete": {
         "granted": {
-          "anyOf": [{ "backend": ["team.team.consumer.subscription.manager_subscribed_services"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.team.consumer.subscription.manager_subscribed_services"] }]
         }
       },
       "team.application.application.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.team.consumer.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.view_all","team.team.consumer.view"] }]
         }
       },
       "team.application.application.add": {
         "granted": {
-          "anyOf": [{ "backend": ['team.team.consumer.manager',"team.consumer.application.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al",'team.team.consumer.manager',"team.consumer.application.manager"] }]
         }
       },
       "team.application.application.edit": {
         "granted": {
-          "anyOf": [{ "backend": ['team.team.consumer.manager',"team.consumer.application.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al",'team.team.consumer.manager',"team.consumer.application.manager"] }]
         }
       },
       "team.application.application.delete": {
         "granted": {
-          "anyOf": [{ "backend": ['team.team.consumer.manager',"team.consumer.application.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al",'team.team.consumer.manager',"team.consumer.application.manager"] }]
         }
       },
       "team.consumer.authorization.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.consumer.authorization.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al","system.workspace.application.view_all","team.consumer.authorization.view"] }]
         }
       },
       "team.application.authorization.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.consumer.authorization.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.authorization.manager"] }]
         }
       },
       "team.application.authorization.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["team.consumer.authorization.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.authorization.manager"] }]
         }
       },
       "team.application.authorization.delete": {
         "granted": {
-          "anyOf": [{ "backend": ["team.consumer.authorization.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.authorization.manager"] }]
         }
       },
       "team.application.authorization.cancelSubApply": {
         "granted": {
-          "anyOf": [{ "backend": ["team.consumer.authorization.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.authorization.manager"] }]
         }
       },
       "team.application.authorization.cancelSub": {
         "granted": {
-          "anyOf": [{ "backend": ["team.consumer.authorization.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.authorization.manager"] }]
         }
       },
       "team.team.team.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.team.team.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.team.view_all","team.team.team.view"] }]
         }
       },
       "team.team.team.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["team.team.team.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.team.manager","team.team.team.manager"] }]
         }
       },
       "team.team.member.view": {
         "granted": {
-          "anyOf": [{ "backend": ["team.team.member.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.team.view_all","team.team.member.view"] }]
         }
       },
       "team.team.member.add": {
         "granted": {
-          "anyOf": [{ "backend": ["team.team.member.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.team.manager","team.team.member.manager"] }]
         }
       },
       "team.team.member.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["team.team.member.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.team.manager","team.team.member.manager"] }]
         }
       },
       "project.mySystem.topology.view": {
