@@ -243,7 +243,7 @@ const themeToken = {
                             </div>
                         )}
                         logo={Logo}
-                        pageTitleRender={()=>$t('APIPark - 企业API数据开放平台')}
+                        pageTitleRender={()=>$t('APIPark')}
                         menuFooterRender={(props) => {
                             if (props?.collapsed) return undefined;
                         }}
