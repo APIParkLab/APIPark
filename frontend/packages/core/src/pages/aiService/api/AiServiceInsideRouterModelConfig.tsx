@@ -18,6 +18,7 @@ export type AiServiceRouterModelConfigProps = {
 }
 
 type AiServiceRouterModelConfigField = {
+    provider:string
     id:string
     config:string
 }
@@ -69,6 +70,10 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
     const handleChangeProvider = (provider:string)=>{
         getLlmList(provider)
     }
+
+    useEffect(()=>{
+        getLlmList(entity.provider)
+    },[])
 
     return (
         <Form

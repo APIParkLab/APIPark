@@ -3,7 +3,7 @@ import {App, Button, Form, Input, Row, Select} from "antd";
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import {RouterParams} from "@core/components/aoplatform/RenderRoutes.tsx";
 import { v4 as uuidv4 } from 'uuid'
-import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
+import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {MemberItem} from "@common/const/type.ts";
 import {useFetch} from "@common/hooks/http.ts";
 import {DefaultOptionType} from "antd/es/cascader";
@@ -34,10 +34,10 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
     const [managerOption, setManagerOption] = useState<DefaultOptionType[]>([])
     const { setBreadcrumb} = useBreadcrumb()
     const { setTeamInfo } =useTeamContext()
-    const {checkPermission,accessInit} = useGlobalContext()
+    const {checkPermission,accessInit,state} = useGlobalContext()
     const pageType= useMemo(()=>{
         if(!accessInit) return 'myteam'
-        return checkPermission('system.organization.team.view') ? 'manage' : 'myteam'
+        return checkPermission('system.workspace.team.view_all') ? 'manage' : 'myteam'
     },[checkPermission,accessInit]) 
     
     const [canDelete, setCanDelete] = useState<boolean>(false)
@@ -128,7 +128,10 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
             getTeamInfo();
         } else {
             setOnEdit(false);
-            form.setFieldsValue({id:uuidv4()}); // 清空 initialValues
+            form.setFieldsValue(
+                {id:uuidv4(),
+                    master:state?.userData?.uid
+                }); // 清空 initialValues
         }
         return (form.setFieldsValue({}))
     }, [teamId]);
@@ -197,7 +200,7 @@ const TeamConfig= forwardRef<TeamConfigHandle,TeamConfigProps>((props,ref) => {
                         <p className="text-left"><span className="font-bold">{$t('删除团队')}：</span>{$t('删除操作不可恢复，请谨慎操作！')}</p>
                             <div className="text-left">
                             <WithPermission access="system.organization.team.delete" disabled={!canDelete}  tooltip={canDelete ? '':$t('服务数据清除后，方可删除')}>
-                                <Button className="m-auto mt-[16px] mb-[20px]" type="default" danger onClick={()=>deleteTeam(entity!)}>{$t('删除')}</Button>
+                                <Button className="m-auto mt-[16px] mb-[20px]" type="default" danger onClick={()=>deleteTeam()}>{$t('删除')}</Button>
                                 </WithPermission>
                             </div>
                         </div>

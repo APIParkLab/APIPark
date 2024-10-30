@@ -35,6 +35,7 @@ export type MemberDropdownModalFieldType = {
     parent?:string
     email?:string
     departmentIds?:string[]
+    password:string
 };
 
 export type MemberDropdownModalProps = {

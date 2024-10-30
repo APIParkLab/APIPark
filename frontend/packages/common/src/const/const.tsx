@@ -18,8 +18,8 @@ export const STATUS_COLOR = {
 
 // avoid changing route within ths same category
 export const routerKeyMap = new Map<string, string[]|string>([
-    ['workspace',['tenantManagement','service','team','guide']],
-    ['my',['tenantManagement','service','team']],
+    ['workspace',['consumer','service','team','guide']],
+    ['my',['consumer','service','team']],
     ['mainPage',['dashboard','systemrunning']],
     ['operationCenter',['member','user','role','common']],
     ['organization',['member','user','role']],
@@ -68,3 +68,8 @@ export const routerKeyMap = new Map<string, string[]|string>([
   export const DELETE_TIPS = {
     default:('该数据删除后将无法找回，请确认是否删除？')
   }
+  
+  export const DATA_SHOW_TYPE_OPTIONS = [
+    {label:'列表', value:'list'},
+    {label:'块', value:'block'},
+  ]

@@ -62,7 +62,7 @@ const SystemInsidePage:FC = ()=> {
             getItem(<Link to="./route">{$t('API 路由')}</Link>, 'route',undefined,undefined,undefined,'team.service.router.view'),
             getItem(<Link to="./api">{$t('API 文档')}</Link>, 'api',undefined,undefined,undefined,'team.service.api_doc.view'),
             getItem(<Link to="./upstream">{$t('上游')}</Link>, 'upstream',undefined,undefined,undefined,'team.service.upstream.view'),
-            getItem(<Link to="./document">{$t('使用说明')}</Link>, 'document',undefined,undefined,undefined,''),
+            getItem(<Link to="./document">{$t('使用说明')}</Link>, 'document',undefined,undefined,undefined,'team.service.service_intro.view'),
             getItem(<Link to="./publish">{$t('发布')}</Link>, 'publish',undefined,undefined,undefined,'team.service.release.view'),
             ],
         'group'),

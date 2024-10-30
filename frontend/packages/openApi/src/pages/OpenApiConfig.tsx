@@ -69,7 +69,7 @@ export const OpenApiConfig = forwardRef<OpenApiConfigHandle,OpenApiConfigProps>(
             autoComplete="off"
         >
             <Form.Item<OpenApiConfigFieldType>
-                label={$t("应用名称")}
+                label={$t("消费者名称")}
                 name="name"
                 rules={[{ required: true,whitespace:true  }]}
             >
@@ -77,7 +77,7 @@ export const OpenApiConfig = forwardRef<OpenApiConfigHandle,OpenApiConfigProps>(
             </Form.Item>
 
             <Form.Item<OpenApiConfigFieldType>
-                label={$t("应用 ID")}
+                label={$t("消费者 ID")}
                 name="id"
                 rules={[{ required: true ,whitespace:true }]}
             >

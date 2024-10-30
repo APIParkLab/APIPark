@@ -85,16 +85,19 @@ func (i *imlProviderModule) Providers(ctx context.Context) ([]*ai_dto.ProviderIt
 	})
 	items := make([]*ai_dto.ProviderItem, 0, len(providers))
 	for _, v := range providers {
-		defaultLLM, has := v.DefaultModel(model_runtime.ModelTypeLLM)
-		if !has {
-			continue
-		}
+
 		item := &ai_dto.ProviderItem{
-			Id:   v.ID(),
-			Name: v.Name(),
-			Logo: v.Logo(),
+			Id:        v.ID(),
+			Name:      v.Name(),
+			Logo:      v.Logo(),
+			Recommend: v.Recommend(),
+			Sort:      v.Sort(),
 		}
 		if info, has := providerMap[v.ID()]; has {
+			defaultLLM, has := v.GetModel(info.DefaultLLM)
+			if !has {
+				continue
+			}
 			item.Configured = true
 			item.DefaultLLM = defaultLLM.ID()
 			item.DefaultLLMLogo = defaultLLM.Logo()
@@ -103,8 +106,19 @@ func (i *imlProviderModule) Providers(ctx context.Context) ([]*ai_dto.ProviderIt
 		items = append(items, item)
 	}
 	sort.Slice(items, func(i, j int) bool {
-
-		return items[i].UpdateTime.After(items[j].UpdateTime)
+		if items[i].Configured == items[j].Configured && items[i].Configured {
+			return items[i].Name < items[j].Name
+		}
+		if items[i].Sort != items[j].Sort {
+			if items[i].Sort == 0 {
+				return false
+			}
+			if items[j].Sort == 0 {
+				return true
+			}
+			return items[i].Sort < items[j].Sort
+		}
+		return items[i].Name < items[j].Name
 	})
 	return items, nil
 }
@@ -134,7 +148,11 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 	}
 	defaultLLM, has := p.GetModel(info.DefaultLLM)
 	if !has {
-		return nil, fmt.Errorf("ai provider llm not found")
+		model, has := p.DefaultModel(model_runtime.ModelTypeLLM)
+		if !has {
+			return nil, fmt.Errorf("ai provider llm not found")
+		}
+		defaultLLM = model
 	}
 	return &ai_dto.Provider{
 		Id:               info.Id,
@@ -184,7 +202,7 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 			DefaultLLMLogo: defaultLLM.Logo(),
 			Logo:           p.Logo(),
 			Configured:     false,
-		}, err
+		}, nil
 	}
 
 	return items, &ai_dto.ProviderItem{Id: info.Id, Name: info.Name, DefaultLLM: info.DefaultLLM, Logo: p.Logo(), Configured: true}, nil
@@ -262,14 +280,17 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
-		defaultLLm, ok := p.DefaultModel(model_runtime.ModelTypeLLM)
-		if !ok {
-			return fmt.Errorf("ai provider default llm not found")
+		if input.DefaultLLM == "" {
+			defaultLLM, has := p.DefaultModel(model_runtime.ModelTypeLLM)
+			if !has {
+				return fmt.Errorf("ai provider default llm not found")
+			}
+			input.DefaultLLM = defaultLLM.ID()
 		}
 		info = &ai.Provider{
 			Id:         id,
 			Name:       p.Name(),
-			DefaultLLM: defaultLLm.ID(),
+			DefaultLLM: input.DefaultLLM,
 			Config:     input.Config,
 		}
 	}
@@ -327,20 +348,13 @@ func (i *imlProviderModule) UpdateProviderDefaultLLM(ctx context.Context, id str
 	})
 }
 
-func (i *imlProviderModule) getAiProviders(ctx context.Context, clusterId string) ([]*gateway.DynamicRelease, error) {
-	list, err := i.providerService.List(ctx, clusterId)
-	if err != nil {
-		return nil, err
-	}
+func (i *imlProviderModule) getAiProviders(ctx context.Context) ([]*gateway.DynamicRelease, error) {
+	list, err := i.providerService.List(ctx)
 	if err != nil {
 		return nil, err
 	}
 	providers := make([]*gateway.DynamicRelease, 0, len(list))
 	for _, p := range list {
-		if !p.Status {
-			// 关闭
-			continue
-		}
 		cfg := make(map[string]interface{})
 		err = json.Unmarshal([]byte(p.Config), &cfg)
 		if err != nil {
@@ -363,7 +377,7 @@ func (i *imlProviderModule) getAiProviders(ctx context.Context, clusterId string
 	return providers, nil
 }
 func (i *imlProviderModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
-	providers, err := i.getAiProviders(ctx, clusterId)
+	providers, err := i.getAiProviders(ctx)
 	if err != nil {
 		return err
 	}
@@ -380,7 +394,7 @@ func (i *imlProviderModule) initGateway(ctx context.Context, clusterId string, c
 		if err != nil {
 			return err
 		}
-		err = client.Online(ctx, providers...)
+		err = client.Online(ctx, p)
 		if err != nil {
 			return err
 		}

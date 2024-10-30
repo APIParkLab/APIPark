@@ -29,7 +29,7 @@ export default function DashboardTabPage(){
             children:<Outlet />
         },
         {
-            label:$t('应用调用统计'),
+            label:$t('消费者调用统计'),
             key:'provider',
             children:<Outlet />
         },

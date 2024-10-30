@@ -1,16 +1,36 @@
 
 <!doctype html>
 <html lang="en">
-  <head>
+  <head id="head">
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/frontend/favicon.ico" />
+    <link id="favicon" rel="icon" type="image/svg+xml" href="/frontend/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>APIPark - 企业API数据开放平台</title>
   </head>
-  <body>
+  <body id="eo-body">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script async src="/frontend/iconpark_eolink.js"></script>
-    <script async src="/frontend/iconpark_apinto.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const eoBody = document.getElementById('eo-body');
+        const favicon = document.getElementById('favicon');
+
+        const createScript = (id, src) => {
+          const script = document.createElement('script');
+          script.id = id;
+          script.async = true;
+          script.src = src;
+          return script;
+        };
+
+        const iconparkApintoSrc = window.location.hostname === 'localhost' ? '/iconpark_apinto.js' : '/frontend/iconpark_apinto.js';
+        const iconparkEolinkSrc = window.location.hostname === 'localhost' ? '/iconpark_eolink.js' : '/frontend/iconpark_eolink.js';
+        const faviconSrc = window.location.hostname === 'localhost' ? '/favicon.ico' : '/frontend/favicon.ico';
+
+        favicon.href = faviconSrc;
+
+        eoBody.appendChild(createScript('iconpark_apinto', iconparkApintoSrc));
+        eoBody.appendChild(createScript('iconpark_eolink', iconparkEolinkSrc));
+      });
+    </script>
   </body>
 </html>

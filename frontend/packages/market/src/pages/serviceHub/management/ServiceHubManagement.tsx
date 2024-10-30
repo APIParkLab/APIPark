@@ -1,7 +1,7 @@
-import { MenuProps, Menu, App, Avatar, Card, Tooltip, Empty } from "antd";
-import { useState, forwardRef, useEffect, useRef } from "react";
+import { MenuProps, Menu, App, Avatar, Card, Tooltip, Empty, Button, Radio } from "antd";
+import { useState, forwardRef, useEffect, useRef, useMemo, memo } from "react";
 import { VirtuosoGrid } from "react-virtuoso";
-import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
+import { BasicResponse, DATA_SHOW_TYPE_OPTIONS, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { ServiceHubAppListItem } from "../../../const/serviceHub/type";
 import { useFetch } from "@common/hooks/http";
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext";
@@ -14,6 +14,9 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 import { $t } from "@common/locales";
 import WithPermission from "@common/components/aoplatform/WithPermission";
+import InsidePage from "@common/components/aoplatform/InsidePage";
+import PageList from "@common/components/aoplatform/PageList";
+import { SERVICE_HUB_TABLE_COLUMNS } from "@market/const/serviceHub/const";
 
 export default function ServiceHubManagement() {
     const { message ,modal} = App.useApp()
@@ -27,53 +30,115 @@ export default function ServiceHubManagement() {
     const [teamList, setTeamList] = useState<MenuItem[]>([])
     const {setAppName} = useTenantManagementContext()
     const navigateTo = useNavigate()
-    const {getTeamAccessData,cleanTeamAccessData,checkPermission,getGlobalAccessData,accessInit} = useGlobalContext()
+    const {getTeamAccessData,cleanTeamAccessData,checkPermission,getGlobalAccessData,accessInit,state} = useGlobalContext()
     type MenuItem = Required<MenuProps>['items'][number];
+    const [dataShowType, setDataShowType] = useState<'block'|'list'>('list')
+    const [tableHttpReload, setTableHttpReload] = useState(true);
+    const [tableListDataSource, setTableListDataSource] = useState<ServiceHubAppListItem[]>([]);
+    const [tableSearchWord, setTableSearchWord] = useState<string>('')
 
-
-const getServiceList = ()=>{
+const getServiceList = (dataType?:'block'|'list')=>{
+    dataType = dataType ?? dataShowType
     if(!accessInit){
-        getGlobalAccessData()?.then?.(()=>{getServiceList()})
-        return
+        getGlobalAccessData()?.then?.(()=>{getServiceList(dataType)})
+        return Promise.resolve({data:[], success:false})
     }
+    
+    if(dataType === 'list' && !tableHttpReload){
+        setTableHttpReload(true)
+        return Promise.resolve({
+            data: tableListDataSource,
+            success: true,
+        });
+    }
+    
     setServiceLoading(true)
-        return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team:teamId,keyword:''},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num']}).then(response=>{
+        return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team: dataType === 'list' ? undefined : teamId,keyword:tableSearchWord},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num','auth_num','create_time','can_delete']}).then(response=>{
         const {code,data,msg} = response
         if(code === STATUS_CODE.SUCCESS){
             setServiceList([...data.apps,{type:'addNewItem'}])
+            setTableListDataSource(data.apps)
+            setTableHttpReload(false)
+            return  {data:data.apps, success: true}
         }else{
             message.error(msg || $t(RESPONSE_TIPS.error))
+            return {data:[], success:false}
         }
+    }).catch(() => {
+        return {data:[], success:false}
     }).finally(()=>{
         setServiceLoading(false)
     })
 }
 
   const onClick: MenuProps['onClick'] = (e) => {
-    navigateTo(`/tenantManagement/list/${e.key}`)
+    navigateTo(`/consumer/list/${e.key}`)
   };
 
   
-  const getTeamsList = ()=>{
-    if(!accessInit){
-        getGlobalAccessData()?.then?.(()=>{getTeamsList()})
-        return
-    }
-    setPageLoading(true)
-    fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(!checkPermission('system.workspace.team.view_all') ?'simple/teams/mine' :'simple/teams',{method:'GET',eoTransformKeys:['app_num','subscribe_num']}).then(response=>{
-        const {code,data,msg} = response
-        if(code === STATUS_CODE.SUCCESS){
-            setTeamList(data.teams.map((x:SimpleTeamItem)=>({label:<div className="flex items-center justify-between "><span  className="w-[calc(100%-42px)] truncate" title={x.name}>{x.name}</span><span className="bg-[#fff] rounded-[5px] h-[20px] w-[30px] flex items-center justify-center">{x.appNum || 0}</span></div>, key:x.id})))
-            if(!teamId && data.teams?.[0]?.id){
-                navigateTo(data.teams[0].id)
+  const getTeamsList = () => {
+    setPageLoading(true);
+
+    const fetchTeams = () => {
+        fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(
+            !checkPermission('system.workspace.team.view_all') 
+                ? 'simple/teams/mine' 
+                : 'simple/teams',
+            {
+                method: 'GET',
+                eoTransformKeys: ['app_num', 'subscribe_num'],
             }
-        }else{
-            message.error(msg || $t(RESPONSE_TIPS.error))
-        }
-    }).finally(()=>{
-        setPageLoading(false)
-    })
-}
+        )
+        .then(response => {
+            const { code, data, msg } = response;
+            if (code === STATUS_CODE.SUCCESS) {
+                setTeamList(
+                    data.teams.map((x: SimpleTeamItem) => ({
+                        label: (
+                            <div className="flex items-center justify-between">
+                                <span className="w-[calc(100%-42px)] truncate" title={x.name}>
+                                    {x.name}
+                                </span>
+                                <span className="bg-[#fff] rounded-[5px] h-[20px] w-[30px] flex items-center justify-center">
+                                    {x.appNum || 0}
+                                </span>
+                            </div>
+                        ),
+                        key: x.id,
+                    }))
+                );
+                if (!teamId && data.teams?.[0]?.id) {
+                    navigateTo(data.teams[0].id);
+                }
+            } else {
+                message.error(msg || $t(RESPONSE_TIPS.error));
+            }
+        })
+        .finally(() => {
+            setPageLoading(false);
+        });
+    };
+
+    if (!accessInit) {
+        const checkAccessData = () => {
+            const accessInitd = getGlobalAccessData();
+            if (!accessInitd) {
+                setTimeout(checkAccessData, 100);
+                return;
+            }
+
+            if (typeof accessInitd.then === 'function') {
+                accessInitd.then(fetchTeams);
+            } else {
+                fetchTeams();
+            }
+        };
+
+        checkAccessData();
+    } else {
+        fetchTeams();
+    }
+};
   
   
   const openModal = async (type:'add'|'edit'|'delete')=>{
@@ -82,7 +147,7 @@ const getServiceList = ()=>{
     let content:string|React.ReactNode = ''
     switch (type){
         case 'add':
-            title=$t('添加应用')
+            title=$t('添加消费者')
             content=<ManagementConfig ref={addManagementRef} type={type} teamId={teamId!} />
             break;
         // case 'edit':{
@@ -124,10 +189,14 @@ const getServiceList = ()=>{
     })
 }
 
+const dataShowTypeOptions = useMemo(()=>DATA_SHOW_TYPE_OPTIONS.map((x)=>({label:$t(x.label),value:x.value})),[
+    state.language
+])
+
 useEffect(()=>{
     if(teamId ){
         getTeamAccessData(teamId)
-        getServiceList()
+        if(dataShowType === 'block'){getServiceList()}
     }
     return ()=>{
         cleanTeamAccessData()
@@ -137,70 +206,94 @@ useEffect(()=>{
 useEffect(() => {
     setBreadcrumb(
         [
-            {title:$t('应用')}
+            {title:$t('消费者')}
         ]
     )
     getTeamsList()
     setAppName('')
 }, []);
 
+
+    const BlockArea = ()=>(
+        <div className="flex flex-1 h-full">
+                        <div className="w-[220px] border-0 border-solid border-r-[1px] border-r-BORDER h-full overflow-hidden">
+                            <div className="text-[18px] leading-[25px] pl-[20px] pt-[20px] pb-[10px] font-bold">{$t('团队')}</div>
+                            <Menu
+                                onClick={onClick}
+                                style={{ width: 220}}
+                                className="overflow-auto h-[calc(100%-55px)]"
+                                mode="inline"
+                                items={teamList}
+                                selectedKeys={teamId?[teamId]:[]}
+                                />
+                        </div>
+                    <div className="w-[calc(100%-220px)] padding-top-20">
+                        <div className="mt-[20px]  ml-[40px] text-[18px] leading-[25px] font-bold">{$t('消费者')}</div>
+                        <VirtuosoGrid
+                            style={{ height: 'calc(100% - 45px)'}}
+                            data={serviceList}
+                            totalCount={serviceList.length}
+                            itemContent={(index) => {
+                                const item = serviceList[index];
+                            return (
+                            <div className="pt-[20px]">{
+                            item.type === 'addNewItem' ?<WithPermission access="team.application.application.add" showDisabled={false}><Card className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px]  transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{body:'h-[180px] flex items-center justify-center cursor-pointer'}} onClick={()=>{openModal('add')}}>
+                                    <div className="flex items-center"><Icon icon="ic:baseline-add" width="18" height="18"/><span>{$t('添加消费者')}</span></div>
+                            </Card></WithPermission> : <Card title={CardTitle(item)} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px]  transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] ', body:"pt-0"}} onClick={()=>{setAppName(item.name);navigateTo(`/consumer/${teamId}/inside/${item.id}/service`)}}>
+                            <span className="line-clamp-3 break-all">{item.description || $t('暂无消费者描述')}</span> 
+
+                                </Card>}</div>
+                            );
+                            }}
+                            components={{
+                                List: forwardRef(({ style, children, ...props }, ref) => (
+                                <div
+                                    ref={ref}
+                                    {...props}
+                                    style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                                    columnGap: '20px',
+                                    padding:'40px',
+                                    ...style,
+                                    paddingBottom:'40px'
+                                }}
+                                >
+                                    {children}
+                                </div>
+                                )),
+                                Item: ({ children, ...props }) => (
+                                <>
+                                    {children}</>
+                                )
+                            }}
+                        />
+                    </div>
+                </div>
+            )
+
+
     return (<>{
         teamList && teamList.length > 0 ?
-        <div className="flex flex-1 h-full">
-            <div className="w-[220px] border-0 border-solid border-r-[1px] border-r-BORDER h-full overflow-hidden">
-                <div className="text-[18px] leading-[25px] pl-[20px] pt-[20px] pb-[10px] font-bold">{$t('团队')}</div>
-                <Menu
-                    onClick={onClick}
-                    style={{ width: 220}}
-                    className="overflow-auto h-[calc(100%-55px)]"
-                    mode="inline"
-                    items={teamList}
-                    selectedKeys={teamId?[teamId]:[]}
-                    />
-            </div>
-        <div className="w-[calc(100%-220px)] padding-top-20">
-            <div className="mt-[20px]  ml-[40px] text-[18px] leading-[25px] font-bold">{$t('应用')}</div>
-            <VirtuosoGrid
-                style={{ height: 'calc(100% - 45px)'}}
-                data={serviceList}
-                totalCount={serviceList.length}
-                itemContent={(index) => {
-                    const item = serviceList[index];
-                return (
-                <div className="pt-[20px]">{
-                item.type === 'addNewItem' ?<WithPermission access="team.application.application.add" showDisabled={false}><Card className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px]  transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{body:'h-[180px] flex items-center justify-center cursor-pointer'}} onClick={()=>{openModal('add')}}>
-                        <div className="flex items-center"><Icon icon="ic:baseline-add" width="18" height="18"/><span>{$t('添加应用')}</span></div>
-                  </Card></WithPermission> : <Card title={CardTitle(item)} className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px]  transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]" classNames={{header:'border-b-[0px] p-[20px] ', body:"pt-0"}} onClick={()=>{setAppName(item.name);navigateTo(`/tenantManagement/${teamId}/inside/${item.id}/service`)}}>
-                   <span className="line-clamp-3 break-all">{item.description || $t('暂无服务描述')}</span> 
-
-                    </Card>}</div>
-                );
-                }}
-                components={{
-                    List: forwardRef(({ style, children, ...props }, ref) => (
-                    <div
-                        ref={ref}
-                        {...props}
-                        style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                        columnGap: '20px',
-                        padding:'40px',
-                        ...style,
-                        paddingBottom:'40px'
-                    }}
-                    >
-                        {children}
-                    </div>
-                    )),
-                    Item: ({ children, ...props }) => (
-                    <>
-                        {children}</>
-                    )
-                }}
-            />
-        </div>
-    </div> :
+        <InsidePage 
+            className="overflow-y-auto pb-PAGE_INSIDE_B"
+            pageTitle={$t('消费者')}
+            description={$t('创建并管理自己的消费者实体，每个消费者可以订阅多个API服务，确保在调用之前已获得相应权限。你可以为消费者生成 API 密钥等鉴权方式，用于安全地调用 API 服务')} 
+            showBorder={false}
+            scrollPage={false}
+            contentClassName={dataShowType === 'list' ?  'pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B' :''}
+            customBtn={
+                <Radio.Group
+                  options={dataShowTypeOptions}
+                  onChange={(e)=>{setDataShowType(e.target.value); setTableHttpReload(true); if(e.target.value === 'block'){getServiceList(e.target.value)}}}
+                  value={dataShowType}
+                  optionType="button"
+                  buttonStyle="solid"
+                />}
+            >{
+                dataShowType === 'block' ? <BlockArea /> : <TableArea language={state.language} getServiceList={()=>getServiceList('list')} addNewApp={()=>openModal('add')} setTableHttpReload={setTableHttpReload} setTableSearchWord={setTableSearchWord} editApp={(row:ServiceHubAppListItem)=>{setAppName(row.name);navigateTo(`/consumer/${row.team.id}/inside/${row.id}/service`)}}/>
+            }
+    </InsidePage> :
         <Empty className="mt-[100px]" image={Empty.PRESENTED_IMAGE_SIMPLE} />
     }
     </>)
@@ -221,3 +314,38 @@ const CardTitle = (service:ServiceHubAppListItem)=>{
         </div>
     )
 }
+
+
+type TableAreaProps = {
+    language:string
+    getServiceList:()=>Promise<{data:ServiceHubAppListItem[], success:boolean}>
+    addNewApp:()=>Promise<void>
+    setTableHttpReload:(b:boolean)=>void
+    setTableSearchWord:(s:string)=>void
+    editApp:(item:ServiceHubAppListItem)=>void
+}
+
+const TableArea = memo(({language, getServiceList, addNewApp, setTableHttpReload, setTableSearchWord, editApp}:TableAreaProps)=>{
+    const columns = useMemo(()=>{
+        const res =  SERVICE_HUB_TABLE_COLUMNS.map(x=>{
+            return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
+        return res
+    },[language])
+    
+    return (
+    <PageList
+        id="service_hub_list"
+        columns={[...columns]}
+        request={()=>getServiceList()}
+        addNewBtnTitle={$t("添加消费者")}
+        searchPlaceholder={$t("输入名称、ID 查找消费者")}
+        onAddNewBtnClick={addNewApp}
+        onChange={() => {
+            setTableHttpReload(false)
+        }}
+        onSearchWordChange={(e) => {
+            setTableSearchWord(e.target.value)
+        }}
+        onRowClick={(row:ServiceHubAppListItem)=>editApp(row)}
+        />
+    )})

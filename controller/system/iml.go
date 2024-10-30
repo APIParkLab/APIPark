@@ -319,12 +319,12 @@ func (i *imlInitController) OnInit() {
 }
 func (i *imlInitController) createAIService(ctx context.Context, teamID string, input *service_dto.CreateService) error {
 
-	providerId := "openai"
-	err := i.providerModule.UpdateProviderConfig(ctx, "openai", &ai_dto.UpdateConfig{
-		Config: "{\n  \"openai_api_base\": \"API Base\",\n  \"openai_api_key\": \"API Key\",\n  \"openai_organization\": \"Organization\"\n}",
+	providerId := "fakegpt"
+	err := i.providerModule.UpdateProviderConfig(ctx, providerId, &ai_dto.UpdateConfig{
+		Config: "{\n  \"apikey\": \"xxx\" \n}",
 	})
 	if err != nil {
-		return fmt.Errorf("update openai config error: %v", err)
+		return fmt.Errorf("update %s config error: %v", providerId, err)
 	}
 	input.Provider = &providerId
 	if input.Id == "" {
@@ -381,8 +381,9 @@ func (i *imlInitController) createAIService(ctx context.Context, teamID string, 
 			Prompt: "You need to translate {{source_lang}} into {{target_lang}}, and the following is the content that needs to be translated.\n---\n{{text}}",
 		}
 		aiModel := &ai_api_dto.AiModel{
-			Id:     m.ID(),
-			Config: m.DefaultConfig(),
+			Id:       m.ID(),
+			Config:   m.DefaultConfig(),
+			Provider: providerId,
 		}
 		name := "Demo Translation API"
 		description := "A demo that shows you how to use a prompt to create a Translation API."

@@ -24,6 +24,7 @@ type AppItem struct {
 	Team               auto.Label     `json:"team" aolabel:"team"`
 	SubscribeNum       int64          `json:"subscribe_num"`
 	SubscribeVerifyNum int64          `json:"subscribe_verify_num"`
+	AuthNum            int64          `json:"auth_num"`
 	Description        string         `json:"description"`
 	CreateTime         auto.TimeLabel `json:"create_time"`
 	UpdateTime         auto.TimeLabel `json:"update_time"`
