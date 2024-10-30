@@ -6,6 +6,36 @@ import { useFetch } from "@common/hooks/http";
 import { RouteConfig } from "@businessEntry/components/aoplatform/RenderRoutes";
 import { routerMap } from "@businessEntry/consts/const";
 
+const mockData = {
+  buildAt:'2024-09-13T03:51:25Z',
+  build_user:'gitlab-runner',
+  git_commint:'6438d5aaff146dc560ed0d8563788e64a49640a5',
+  goversion:'go version go1.21.4 linux/amd64',
+  guide:true,
+  plugins:[
+    {
+      driver:'apipark.builtIn.component',
+      name:'guide',
+      router:[
+        {
+          path:'guide/*',
+          type:'normal'
+        }
+      ]
+    },
+    {
+      driver:'apipark.builtIn.component',
+      name:'team',
+      router:[
+        {
+          path:'team',
+          type:'normal'
+        }
+      ]
+    }
+  ]
+}
+
 const usePluginLoader = () => {
     const [modules, setModules] = useState(new Map());
     const [executeList, setExecuteList] = useState([]);
