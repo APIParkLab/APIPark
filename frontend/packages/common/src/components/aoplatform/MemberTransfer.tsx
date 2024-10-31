@@ -121,7 +121,6 @@ const generateTree = (
   return loop(dataSource);
   },[dataSource, state.language, searchWord])
 
-  console.log(dataSource)
 
   const getInitExpandKeys = (data:T[], expandKeys:string[] = [])=>{
     data.forEach((item)=>{
