@@ -89,10 +89,10 @@ const ServiceHubDetail = ()=>{
 
     const getMySelectList = ()=>{
         setMySystemOptionList([])
-        fetchData<BasicResponse<{ apps: SimpleSystemItem[] }>>('simple/apps/mine',{method:'GET'}).then(response=>{
+        fetchData<BasicResponse<{ apps: EntityItem[] }>>('apps/can_subscribe',{method:'GET'}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
-                setMySystemOptionList(data.apps?.map((x:SimpleSystemItem)=>{return {
+                setMySystemOptionList(data.apps?.map((x:EntityItem)=>{return {
                     label:x.name, value:x.id
                 }}))
             }else{
