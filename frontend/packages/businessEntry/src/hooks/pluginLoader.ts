@@ -32,6 +32,16 @@ const mockData = {
           type:'normal'
         }
       ]
+    },
+    {
+      driver:'apipark.builtIn.component',
+      name:'service',
+      router:[
+        {
+          path:'service',
+          type:'normal'
+        }
+      ]
     }
     // {
     //   "driver": "apipark.remote.normal",
@@ -210,105 +220,7 @@ const usePluginLoader = () => {
       return new Promise((resolve, reject) => {
         // fetchData('system/plugins',{method:'GET'}).then((resp) => {
           // if (resp.code === 0){
-          const resp = {data:{
-            "buildAt": "2024-09-13T03:51:25Z",
-            "build_user": "gitlab-runner",
-            "git_commint": "6438d5aaff146dc560ed0d8563788e64a49640a5",
-            "goversion": "go version go1.21.4 linux/amd64",
-            "guide": true,
-            "plugins": [
-              {
-                "driver": "apipark.builtIn.component",
-                "name": "guide",
-                "router": [
-                  {
-                    "path": "guide/*",
-                    "type": "normal"
-                  }
-                ]
-              },
-              {
-                "driver": "apipark.builtIn.component",
-                "name": "team",
-                "router": [
-                  {
-                    "path": "team",
-                    "type": "normal"
-                  }
-                ]
-              },
-              // {
-              //   "driver": "apipark.remote.normal",
-              //   "name": "remote",
-              //   "router": [
-              //     {
-              //       "path": "remote",
-              //       "type": "normal"
-              //     }
-              //   ]
-              // },
-              // {
-              //   "driver": "apipark.local.preload",
-              //   "name": "auth",
-              //   "router": [
-              //     {
-              //       "expose": "AppModule",
-              //       "path": "auth",
-              //       "type": "root"
-              //     },
-              //     {
-              //       "expose": "AuthInfoModule",
-              //       "path": "auth-info",
-              //       "type": "normal"
-              //     }
-              //   ]
-              // },
-              // {
-              //   "driver": "apipark.builtIn.component",
-              //   "name": "email",
-              //   "router": [
-              //     {
-              //       "path": "system/email",
-              //       "type": "normal"
-              //     }
-              //   ]
-              // },
-              // {
-              //   "driver": "apipark.builtIn.module",
-              //   "name": "open-api",
-              //   "router": [
-              //     {
-              //       "path": "system/ext-app",
-              //       "type": "normal"
-              //     }
-              //   ]
-              // },
-              // {
-              //   "driver": "apipark.local.router",
-              //   "name": "monitor",
-              //   "router": [
-              //     {
-              //       "expose": "AppModule",
-              //       "path": "monitor",
-              //       "type": "normal"
-              //     }
-              //   ]
-              // },
-              // {
-              //   "driver": "apipark.remote.normal",
-              //   "name": "apispace",
-              //   "router": [
-              //     {
-              //       "path": "remote/apispace",
-              //       "type": "normal"
-              //     }
-              //   ]
-              // }
-            ],
-            "powered": "Powered by https://eolink.com",
-            "product": "apipark",
-            "version": "6438d5aa"
-          }}
+          const resp = {data:mockData}
             dispatch({type:'UPDATE_VERSION',version:resp.data.version})
             dispatch({type:'UPDATE_DATE',updateDate:resp.data.buildAt})
             dispatch({type:'UPDATE_POWER',powered:resp.data.powered})
