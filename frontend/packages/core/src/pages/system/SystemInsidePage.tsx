@@ -84,19 +84,20 @@ const SystemInsidePage:FC = ()=> {
         const filterMenu = (menu:MenuItemGroupType<MenuItemType>[])=>{
             const newMenu = cloneDeep(menu)
             return newMenu!.filter((m:MenuItemGroupType )=>{
-                if(m.children && m.children.length > 0){
+                if(m&&m.children && m.children.length > 0){
                      m.children = m.children.filter(
-                        (c)=>(c&&(c as MenuItemType&{access:string} ).access ? 
+                        (c)=>{
+                            if(!c) return false
+                            return (((c as MenuItemType&{access:string} ).access ? 
                             checkPermission((c as MenuItemType&{access:string} ).access as keyof typeof PERMISSION_DEFINITION[0]): 
-                            true))
+                            true))})
                 }
                 return m.children && m.children.length > 0
             })
         }
         const filteredMenu = filterMenu(SYSTEM_PAGE_MENU_ITEMS as MenuItemGroupType<MenuItemType>[])
-        setActiveMenu((pre)=>{
-            return pre ?? 'route'
-        })
+        const menu = activeMenu ?? filteredMenu[0]?.children ? filteredMenu[0]?.children?.[0]?.key : filteredMenu[0]?.key
+        if(menu && currentUrl.split('/')[-1] !== menu) navigateTo(`/service/${teamId}/inside/${serviceId}/${menu}`)
         return  filteredMenu || []
     },[accessData,accessInit, SYSTEM_PAGE_MENU_ITEMS])
     
