@@ -1,4 +1,3 @@
-import { DashboardProvider } from '@core/contexts/DashboardContext';
 import { SystemProvider } from '@core/contexts/SystemContext';
 import { TeamProvider } from '@core/contexts/TeamContext';
 import Login from '@core/pages/Login';
@@ -59,32 +58,32 @@ import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
       type: 'module',
         path:'service',
         component:<SystemOutlet />,
-        key: 'restService',
+        key: 'service',
         provider: SystemProvider,
         children:[
             {
                 path:'',
-                key:'restServiceList',
+                key:'serviceList',
                 component:<Navigate to="list" />
             },
             {
                 path:'list',
-                key: 'restServiceList2',
+                key: 'serviceList2',
                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemList.tsx')),
             },
             {
                 path:'list/:teamId',
-                key: 'restServiceList3',
+                key: 'serviceList3',
                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemList.tsx')),
             },
             {
                 path:':teamId',
                 component:<Outlet/>,
-                key: 'restServiceInside',
+                key: 'serviceInside',
                 children:[
                     {
                         path:'inside/:serviceId',
-                        key: 'restServiceInside2',
+                        key: 'restServiceInside',
                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemInsidePage.tsx')),
                         children:[
                             {
@@ -142,13 +141,6 @@ import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
                                         key: 'restServiceInsideApprovalList2',
                                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/approval/SystemInsideApprovalList.tsx')),
                                     }
-                                ]
-                            },
-                            {
-                                path:'topology',
-                                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemTopology.tsx')),
-                                key: 'systemTopology',
-                                children:[
                                 ]
                             },
                             {
@@ -256,7 +248,7 @@ import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
                                 },
                                 {
                                     path:'setting',
-                                    key: uuidv4(),
+                                    key: 'aiServiceInsideSetting',
                                     lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemConfig.tsx')),
                                     children:[
 
@@ -307,34 +299,34 @@ import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/common/CommonPage.tsx')),
     }],
     
-     ['tenantManagement', { type: 'module',
+     ['consumer', { type: 'module',
       component:<Outlet />,
       provider:TenantManagementProvider,
-      key:'tenantManagement',
+      key:'consumer',
       children:[
           {
               path:'',
-              key:'tenantManagementList',
+              key:'consumerList',
               component:<Navigate to="list" />
           },
           {
               path:':teamId/inside/:appId',
-              key:'tenantManagementInside',
+              key:'consumerInside',
               lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@market/pages/serviceHub/management/ManagementInsidePage.tsx')),
               children:[
                   {
                       path:'service',
-                      key:'tenantManagementInsideService',
+                      key:'consumerInsideService',
                       lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@market/pages/serviceHub/management/ManagementInsideService.tsx')),
                   },
                   {
                       path:'authorization',
-                      key:'tenantManagementInsideAuthorization',
+                      key:'consumerInsideAuthorization',
                       lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@market/pages/serviceHub/management/ManagementInsideAuth.tsx')),
                   },
                   {
                       path:'setting',
-                      key:'tenantManagementSetting',
+                      key:'consumerSetting',
                       lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@market/pages/serviceHub/management/ManagementAppSetting.tsx')),
                   },
               ]
@@ -394,9 +386,6 @@ import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
               lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/role/RoleConfig.tsx')),
           }
       ]
-     }],
-     ['openapi', { type: 'module',
-      lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@openApi/pages/OpenApiList.tsx')),
      }],
      ['analytics', { type: 'module',
       lazy:lazy(() => import(/* webpackChunkName: "[request]" */  '@dashboard/pages/Dashboard.tsx')),
