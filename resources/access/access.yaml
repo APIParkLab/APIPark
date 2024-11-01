@@ -197,13 +197,6 @@ team:
             value: 'manager'
             dependents:
                 - team.service.subscription.view
-      - name: service
-        value: 'service'
-        children:
-          - name: manager
-            value: 'manager'
-            dependents:
-              - team.service.service.manager
   - name: consumer
     value: 'consumer'
     children:
@@ -230,11 +223,6 @@ team:
             value: 'manager'
             dependents:
               - team.consumer.authorization.view
-      - name: consumer
-        value: 'application'
-        children:
-          - name: manager
-            value: 'manager'
   - name: team
     value: 'team'
     children:
@@ -274,7 +262,6 @@ team:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
           - name: manager
             value: 'manager'
             apis:

@@ -31,3 +31,10 @@ if [ ! -d "./aoaccount" ]; then
 fi
 cd "./aoaccount" && git pull
 
+echo "更新go-common"
+cd "${BASEPATH}/"
+if [ ! -d "./go-common" ]; then
+   git clone http://gitlab.eolink.com/apinto/go-common.git
+fi
+cd "./go-common" && git pull
+
