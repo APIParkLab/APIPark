@@ -20,7 +20,7 @@ import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { $t } from "@common/locales/index.ts";
 
 export const getDepartmentWithMember = (department:(DepartmentListItem & {type?:'department'|'member'})[],departmentMap:Map<string, (MemberItem & {type:'department'|'member'})[]>) : (DepartmentWithMemberItem | undefined)[] =>{
-    return department.map((x:DepartmentListItem & {type?:'department'|'member'})=>{
+    return department?.map((x:DepartmentListItem & {type?:'department'|'member'})=>{
         const res =  ({
             ...x,
             key:x.id,
@@ -28,7 +28,7 @@ export const getDepartmentWithMember = (department:(DepartmentListItem & {type?:
             type: x.type || 'department',
             children:((x.type === 'member' || (!x.children||x.children.length === 0 )&& (!departmentMap.get(x.id) || departmentMap.get(x.id)!.length === 0))? undefined : [...(x.children && x.children.length > 0 ? getDepartmentWithMember(x.children,departmentMap) : []),...departmentMap.get(x.id) || []])
         });
-        return res}).filter(node=>node.type === 'member' ||( node.children && node.children.length > 0))
+        return res})?.filter(node=>node.type === 'member' ||( node.children && node.children.length > 0)) || []
 }
 
 export const addMemberToDepartment = (departmentMap: Map<string, (MemberItem & {type:'department'|'member'})[]>, departmentId: string, member: MemberItem) => {
@@ -84,6 +84,7 @@ const TeamInsideMember:FC = ()=>{
                 addMemberToDepartment(departmentMap, '_withoutDepartment', member);
               }
             });
+
           
             const finalData = departmentResponse.data.department 
               ? [
@@ -93,7 +94,7 @@ const TeamInsideMember:FC = ()=>{
                     name: departmentResponse.data.department.name, 
                     title:departmentResponse.data.department.name, 
                     children: [
-                      ...getDepartmentWithMember(departmentResponse.data.department.children, departmentMap),
+                      ...getDepartmentWithMember(departmentResponse.data.department?.children || [], departmentMap),
                       ...departmentMap.get('_withoutDepartment') || []
                     ]
                   }
@@ -115,7 +116,6 @@ const TeamInsideMember:FC = ()=>{
              if(departmentMap.get('_withoutDepartment')?.filter(x=>allMemberIds.indexOf(x)!==-1).length === 0 && allMemberSelectedFlag){
                 setAllMemberSelectedDepartIds((pre)=>[...pre, topDepartmentId])
              }
-
 
               return  {data:finalData, success: true}
         }).catch(()=>({data:[], success:false}))
@@ -218,7 +218,6 @@ const TeamInsideMember:FC = ()=>{
 
     
     const changeMemberInfo = (value:string[],entity:TeamMemberTableListItem )=>{
-        //console.log(value)
         return new Promise((resolve, reject) => {
             fetchData<BasicResponse<null>>(`team/member/role`, {method: 'PUT',eoBody:({roles:value, users:[entity.user.id]}), eoParams: {team:teamId}}).then(response => {
                 const {code, msg} = response
