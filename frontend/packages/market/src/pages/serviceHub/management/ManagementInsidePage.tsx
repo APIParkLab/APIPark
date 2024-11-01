@@ -48,7 +48,7 @@ export default function ManagementInsidePage(){
                     checkPermission((c as MenuItemType&{access:string} ).access as keyof typeof PERMISSION_DEFINITION[0]): 
                     true))
                 })}
-        const filteredMenu = filterMenu(TENANT_MANAGEMENT_APP_MENU as MenuItemGroupType<MenuItemType>[])
+        const filteredMenu = filterMenu(TENANT_MANAGEMENT_APP_MENU as (MenuItemType&{access:string})[])
         console.log(filteredMenu)
         const menu = activeMenu ?? filteredMenu[0]?.children ? filteredMenu[0]?.children?.[0]?.key : filteredMenu[0]?.key
         if(menu && currentUrl.split('/')[-1] !== menu) navigateTo(`/consumer/${teamId}/inside/${appId}/${menu}`)
