@@ -1,4 +1,5 @@
 
+import WithPermission from "@common/components/aoplatform/WithPermission";
 import { $t } from "@common/locales";
 import { Link } from "react-router-dom";
 
@@ -15,13 +16,13 @@ export default function DashboardInstruction({showClusterIns, showMonitorIns}:{s
                     {showClusterIns && <div className="h-[208px] w-[50%] max-w-[384px] flex flex-col items-center py-[32px] px-[24px] gap-[16px] rounded-DEFAULT bg-MENU_BG mr-[24px] justify-around">
                         <p className="text-[20px] font-medium leading-[32px] text-MAIN_TEXT">{$t('集群配置')}</p>
                         <p className="text-[12px] font-normal leading-[20px] text-DESC_TEXT">{$t('配置集群地址，以确保监控系统能够正确识别和连接到集群')}</p>
-                        <p><a href="/cluster" target="_blank">{$t('配置集群信息')}</a></p>
+                        <p><WithPermission access="system.settings.api_gateway.view" ><a href="/cluster" target="_blank">{$t('配置集群信息')}</a></WithPermission></p>
                     </div>}
                     {showMonitorIns &&
                         <div className="h-[208px] w-[50%] max-w-[384px] flex flex-col items-center py-[32px] px-[24px] gap-[16px] rounded-DEFAULT bg-MENU_BG  justify-around">
                             <p className="text-[20px] font-medium leading-[32px] text-MAIN_TEXT">{$t('监控设置')}</p>
                             <p className="text-[12px] font-normal leading-[20px] text-DESC_TEXT">{$t('设置监控报表的数据来源，设置完成之后即可获得详细的API调用统计图表。')}</p>
-                            <p><a href="/datasourcing" target="_blank">{$t('配置监控信息')}</a></p>
+                            <p><WithPermission access="system.settings.data_source.view" ><a href="/datasourcing" target="_blank">{$t('配置监控信息')}</a></WithPermission></p>
                         </div>
                     }
                     
