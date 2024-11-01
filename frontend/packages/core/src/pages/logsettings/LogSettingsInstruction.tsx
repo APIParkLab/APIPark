@@ -1,4 +1,5 @@
 
+import WithPermission from "@common/components/aoplatform/WithPermission";
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext";
 import { $t } from "@common/locales";
 import { useEffect } from "react";
@@ -24,7 +25,7 @@ export default function LogSettingsInstruction() {
             <div className="h-[208px] w-[384px] flex flex-col items-center py-[32px] px-[24px] gap-[16px] rounded-DEFAULT bg-MENU_BG mr-[24px]">
             <p className="text-[20px] font-medium leading-[32px] text-MAIN_TEXT">环境配置</p>
                         <p className="text-[12px] font-normal leading-[20px] text-DESC_TEXT">新增集群的地址、名称、描述和其他相关属性，以确保插件能够正确识别和连接到集群</p>
-                        <p><Link to="/cluster">添加集群地址</Link></p>
+                        <p><WithPermission access="system.settings.api_gateway.view" ><Link to="/cluster">添加集群地址</Link></WithPermission></p>
             </div>
         </div>
     </div></div>

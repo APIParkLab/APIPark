@@ -295,3 +295,8 @@ a{
     max-width: calc(100% - 60px);
     margin-right: 4px;
     }
+
+    a[disabled]:hover {
+      color: #BBB;
+      cursor: not-allowed;
+  }
