@@ -1,5 +1,5 @@
 import { MenuProps, Menu, App, Avatar, Card, Tooltip, Empty, Button, Radio } from "antd";
-import { useState, forwardRef, useEffect, useRef, useMemo, memo } from "react";
+import { useState, forwardRef, useEffect, useRef, useMemo, memo, Ref, useImperativeHandle } from "react";
 import { VirtuosoGrid } from "react-virtuoso";
 import { BasicResponse, DATA_SHOW_TYPE_OPTIONS, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { ServiceHubAppListItem } from "../../../const/serviceHub/type";
@@ -17,6 +17,7 @@ import WithPermission from "@common/components/aoplatform/WithPermission";
 import InsidePage from "@common/components/aoplatform/InsidePage";
 import PageList from "@common/components/aoplatform/PageList";
 import { SERVICE_HUB_TABLE_COLUMNS } from "@market/const/serviceHub/const";
+import { ActionType } from "@ant-design/pro-components";
 
 export default function ServiceHubManagement() {
     const { message ,modal} = App.useApp()
@@ -36,23 +37,24 @@ export default function ServiceHubManagement() {
     const [tableHttpReload, setTableHttpReload] = useState(true);
     const [tableListDataSource, setTableListDataSource] = useState<ServiceHubAppListItem[]>([]);
     const [tableSearchWord, setTableSearchWord] = useState<string>('')
+    const tableRef = useRef<TableAreaHandle>(null)
 
-const getServiceList = (dataType?:'block'|'list')=>{
-    dataType = dataType ?? dataShowType
-    if(!accessInit){
-        getGlobalAccessData()?.then?.(()=>{getServiceList(dataType)})
-        return Promise.resolve({data:[], success:false})
-    }
+    const getServiceList = (dataType?:'block'|'list')=>{
+        dataType = dataType ?? dataShowType
+        if(!accessInit){
+            getGlobalAccessData()?.then?.(()=>{getServiceList(dataType)})
+            return Promise.resolve({data:[], success:false})
+        }
+        
+        if(dataType === 'list' && !tableHttpReload){
+            setTableHttpReload(true)
+            return Promise.resolve({
+                data: tableListDataSource,
+                success: true,
+            });
+        }
     
-    if(dataType === 'list' && !tableHttpReload){
-        setTableHttpReload(true)
-        return Promise.resolve({
-            data: tableListDataSource,
-            success: true,
-        });
-    }
-    
-    setServiceLoading(true)
+        setServiceLoading(true)
         return fetchData<BasicResponse<{apps:ServiceHubAppListItem}>>(!checkPermission('system.workspace.application.view_all') ? 'my_apps':'apps',{method:'GET',eoParams:{ team: dataType === 'list' ? undefined : teamId,keyword:tableSearchWord},eoTransformKeys:['api_num','subscribe_num','subscribe_verify_num','auth_num','create_time','can_delete']}).then(response=>{
         const {code,data,msg} = response
         if(code === STATUS_CODE.SUCCESS){
@@ -142,13 +144,12 @@ const getServiceList = (dataType?:'block'|'list')=>{
   
   
   const openModal = async (type:'add'|'edit'|'delete')=>{
-
     let title:string = ''
     let content:string|React.ReactNode = ''
     switch (type){
         case 'add':
             title=$t('添加消费者')
-            content=<ManagementConfig ref={addManagementRef} type={type} teamId={teamId!} />
+            content=<ManagementConfig ref={addManagementRef}  dataShowType={dataShowType} type={type} teamId={teamId!} />
             break;
         // case 'edit':{
         //     title='配置 Open Api'
@@ -174,7 +175,15 @@ const getServiceList = (dataType?:'block'|'list')=>{
         onOk:()=> {
             switch (type){
                 case 'add':
-                    return addManagementRef.current?.save().then((res)=>{if(res === true) getTeamsList();getServiceList()})
+                    return addManagementRef.current?.save().then((res)=>{if(res === true) {
+                        getTeamsList();
+                        if(dataShowType === 'list'){
+                            setTableHttpReload(true)
+                            tableRef.current?.manualReloadTable()
+                        }else{
+                            getServiceList()
+                        }
+            }})
                 // case 'edit':
                 //     return editManagementRef.current?.save().then((res)=>{if(res === true) manualReloadTable()})
                 // case 'delete':
@@ -291,7 +300,7 @@ useEffect(() => {
                   buttonStyle="solid"
                 />}
             >{
-                dataShowType === 'block' ? <BlockArea /> : <TableArea language={state.language} getServiceList={()=>getServiceList('list')} addNewApp={()=>openModal('add')} setTableHttpReload={setTableHttpReload} setTableSearchWord={setTableSearchWord} editApp={(row:ServiceHubAppListItem)=>{setAppName(row.name);navigateTo(`/consumer/${row.team.id}/inside/${row.id}/service`)}}/>
+                dataShowType === 'block' ? <BlockArea /> : <TableArea language={state.language} getServiceList={()=>getServiceList('list')} ref={tableRef} addNewApp={()=>openModal('add')} setTableHttpReload={setTableHttpReload} setTableSearchWord={setTableSearchWord} editApp={(row:ServiceHubAppListItem)=>{setAppName(row.name);navigateTo(`/consumer/${row.team.id}/inside/${row.id}/service`)}}/>
             }
     </InsidePage> :
         <Empty className="mt-[100px]" image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -325,16 +334,31 @@ type TableAreaProps = {
     editApp:(item:ServiceHubAppListItem)=>void
 }
 
-const TableArea = memo(({language, getServiceList, addNewApp, setTableHttpReload, setTableSearchWord, editApp}:TableAreaProps)=>{
+type TableAreaHandle = {
+    manualReloadTable:()=>void
+}
+
+const TableArea = memo(forwardRef((props:TableAreaProps, ref:Ref<TableAreaHandle>)=>{
+    const {language, getServiceList, addNewApp, setTableHttpReload, setTableSearchWord, editApp} = props
+    const pageListRef = useRef<ActionType>(null);
     const columns = useMemo(()=>{
         const res =  SERVICE_HUB_TABLE_COLUMNS.map(x=>{
             return {...x,title:typeof x.title  === 'string' ? $t(x.title as string) : x.title}})
         return res
     },[language])
+
+    const manualReloadTable = ()=>{
+        pageListRef.current?.reload()
+    }
     
+    useImperativeHandle(ref, () =>({
+        manualReloadTable}))
+    
+
     return (
     <PageList
         id="service_hub_list"
+        ref={pageListRef}
         columns={[...columns]}
         request={()=>getServiceList()}
         addNewBtnTitle={$t("添加消费者")}
@@ -348,4 +372,4 @@ const TableArea = memo(({language, getServiceList, addNewApp, setTableHttpReload
         }}
         onRowClick={(row:ServiceHubAppListItem)=>editApp(row)}
         />
-    )})
+    )}))

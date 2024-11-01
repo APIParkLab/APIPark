@@ -39,7 +39,7 @@ const WithPermission = ({access, tooltip, children,disabled, showDisabled = true
             { cloneElement(children, {disabled:true})}
              </Tooltip>}
         {!editAccess && (children?.type !== Button && children?.type !== Upload && showDisabled) && <Tooltip  title={tooltip ?? $t("暂无操作权限，请联系管理员分配。")}> 
-            { cloneElement(children, {disabled:true,okButtonProps:{disabled:true}})}
+            { cloneElement(children, {disabled:true, onClick:(e)=>e.preventDefault(),okButtonProps:{disabled:true}})}
              </Tooltip>}
         
       </>
