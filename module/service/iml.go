@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
+
+	"github.com/eolinker/eosc/log"
 
 	"github.com/APIParkLab/APIPark/resources/access"
 
@@ -231,6 +234,7 @@ func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, 
 //}
 
 func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Service, error) {
+	now := time.Now()
 	serviceInfo, err := i.serviceService.Get(ctx, id)
 	if err != nil {
 		return nil, err
@@ -244,6 +248,7 @@ func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Ser
 	s.Tags = auto.List(utils.SliceToSlice(tags, func(p *service_tag.Tag) string {
 		return p.Tid
 	}))
+	log.Infof("get service cost %d ms", time.Since(now).Milliseconds())
 	return s, nil
 }
 
