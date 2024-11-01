@@ -9,7 +9,7 @@ import (
 
 func (p *plugin) catalogueApi() []pm3.Api {
 	return []pm3.Api{
-		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/catalogues", []string{"context", "query:keyword"}, []string{"catalogues", "tags"}, p.catalogueController.Search, access.SystemSettingsGeneralView),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/catalogues", []string{"context", "query:keyword"}, []string{"catalogues", "tags"}, p.catalogueController.Search, access.SystemSettingsGeneralView, access.SystemApiPortalApiPortalView),
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/catalogue", []string{"context", "body"}, nil, p.catalogueController.Create, access.SystemSettingsGeneralManager),
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/catalogue", []string{"context", "query:catalogue", "body"}, nil, p.catalogueController.Edit, access.SystemSettingsGeneralManager),
 		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/catalogue", []string{"context", "query:catalogue"}, nil, p.catalogueController.Delete, access.SystemSettingsGeneralManager),
