@@ -75,4 +75,6 @@ require (
 	gorm.io/driver/mysql v1.5.2 // indirect
 )
 
-replace github.com/eolinker/ap-account => ../aoaccount
+replace github.com/eolinker/ap-account => ../../eolinker/ap-account
+
+replace github.com/eolinker/go-common => ../../eolinker/go-common
