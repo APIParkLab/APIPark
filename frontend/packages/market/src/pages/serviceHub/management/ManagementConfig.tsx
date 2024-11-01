@@ -8,6 +8,9 @@ import { useFetch } from "@common/hooks/http";
 import { useNavigate } from "react-router-dom";
 import { useTenantManagementContext } from "@market/contexts/TenantManagementContext";
 import { $t } from "@common/locales";
+import Select, { DefaultOptionType } from "antd/es/select";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext";
+import { SimpleTeamItem, MemberItem } from "@common/const/type";
 
 export type ManagementConfigFieldType = {
     name:string
@@ -21,6 +24,7 @@ type ManagementConfigProps = {
     type:'add'|'edit'
     teamId:string
     appId?:string
+    dataShowType?:'block'|'list'
 }
 
 export type ManagementConfigHandle = {
@@ -30,16 +34,18 @@ export type ManagementConfigHandle = {
 
 const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps>((props, ref) => {
     const { message,modal } = App.useApp()
-    const {type,teamId,appId} = props
+    const {type,teamId,appId,dataShowType} = props
     const [form] = Form.useForm();
     const {fetchData} = useFetch()
     const [delBtnLoading, setDelBtnLoading] = useState<boolean>(false)
     const {setAppName} = type === 'edit' ? useTenantManagementContext():{setAppName:()=>{}}
     const navigate = type === 'edit' ? useNavigate() : ()=>{}
+    const [teamOptionList, setTeamOptionList] = useState<DefaultOptionType[]>()
+    const {checkPermission,accessInit, getGlobalAccessData} = useGlobalContext()
     const save:()=>Promise<boolean | string> =  ()=>{
         return new Promise((resolve, reject)=>{
             form.validateFields().then((value)=>{
-                fetchData<BasicResponse<{apps:ManagementConfigFieldType}>>(type === 'add'? 'team/app' : 'app/info',{method:type === 'add'? 'POST' : 'PUT',eoBody:(value), eoParams:type === 'add' ? {team:teamId}:{app:appId,team:teamId}}).then(response=>{
+                fetchData<BasicResponse<{apps:ManagementConfigFieldType}>>(type === 'add'? 'team/app' : 'app/info',{method:type === 'add'? 'POST' : 'PUT',eoBody:(value), eoParams:type === 'add' ? {team:dataShowType === 'list' ? value.team : teamId}:{app:appId,team:teamId}}).then(response=>{
                     const {code,data,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
                         message.success(msg || $t(RESPONSE_TIPS.success))
@@ -68,6 +74,24 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
         })
     };
     
+    const getTeamOptionList = ()=>{
+        setTeamOptionList([])
+
+        fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(!checkPermission('system.workspace.team.view_all') ?'simple/teams/mine' :'simple/teams',{method:'GET',eoTransformKeys:[]}).then(response=>{
+            const {code,data,msg} = response
+            if(code === STATUS_CODE.SUCCESS){
+                setTeamOptionList(data.teams?.map((x:MemberItem)=>{return {...x,
+                    label:x.name, value:x.id
+                }}))
+                if(form.getFieldValue('team') === undefined&&data.teams?.length){
+                    form.setFieldValue('team',data.teams[0].id); 
+                }
+            }else{
+                message.error(msg || $t(RESPONSE_TIPS.error))
+            }
+        })
+    }
+
     const deleteApplicationModal = async ()=>{
         setDelBtnLoading(true)
         modal.confirm({
@@ -112,7 +136,17 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
         if(type === 'edit'){
             appId && getApplicationInfo()
         }else{
-            form.setFieldValue('id',uuidv4())
+            form.setFieldsValue({
+                'id':uuidv4()})
+        }
+        if(type !== 'edit' && dataShowType === 'list'){
+            if(accessInit){
+                getTeamOptionList()
+            }else{
+                getGlobalAccessData()?.then?.(()=>{
+                    getTeamOptionList()
+                })
+            }
         }
     }, [appId]);
 
@@ -145,6 +179,16 @@ const ManagementConfig = forwardRef<ManagementConfigHandle,ManagementConfigProps
             >
                 <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} disabled={type === 'edit'}/>
             </Form.Item>
+
+
+            {dataShowType === 'list'  && <Form.Item<ManagementConfigFieldType>
+                            label={$t("所属团队")}
+                            name="team"
+                            rules={[{ required: true }]}
+                        >
+                            <Select className="w-INPUT_NORMAL" disabled={type === 'edit'} placeholder={$t(PLACEHOLDER.input)} options={teamOptionList} >
+                            </Select>
+                        </Form.Item>}
 
             <Form.Item
                 label={$t("描述")}
