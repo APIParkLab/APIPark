@@ -1,5 +1,5 @@
 
-import { TransferProps, TreeDataNode, Tree, Spin, Input } from "antd";
+import { TransferProps, TreeDataNode, Tree, Spin, Input, Empty } from "antd";
 import { DataNode } from "antd/es/tree";
 import {  Ref, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { ApartmentOutlined, LoadingOutlined, UserOutlined } from "@ant-design/icons";
@@ -149,10 +149,9 @@ const generateTree = (
     return (
         <div ref={parentRef}>
         <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} className=''>
-          <Input  placeholder={searchPlaceholder} onChange={(e)=>setSearchWord(e.target.value)} value={searchWord} />
-          <Tree
+          <Input className="mb-[10px]" placeholder={searchPlaceholder} onChange={(e)=>setSearchWord(e.target.value)} value={searchWord} />
+         <>{ translatedDataSource && translatedDataSource.length > 0 ? <Tree
             checkable
-            className="mt-[10px]"
             expandedKeys={expandedKeys}
             checkedKeys={targetKeys}
             selectable={false}
@@ -163,7 +162,7 @@ const generateTree = (
             blockNode 
             showIcon
           />
-
+            :  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/> }</> 
             </Spin>
         </div>
       );
