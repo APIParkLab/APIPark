@@ -148,7 +148,7 @@ const getServiceList = (dataType?:'block'|'list')=>{
     switch (type){
         case 'add':
             title=$t('添加消费者')
-            content=<ManagementConfig ref={addManagementRef} type={type} teamId={teamId!} />
+            content=<ManagementConfig ref={addManagementRef} dataShowType={dataShowType} type={type} teamId={teamId!} />
             break;
         // case 'edit':{
         //     title='配置 Open Api'
