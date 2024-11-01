@@ -60,7 +60,7 @@ interface PluginConfig {
 
 export interface CoreObj {
   routerConfig: RouteConfig[];
-  executeList: unknown[];
+  setExecuteList: (param:unknown[])=>void;
   pluginLoader: PluginLoaderService;
   pluginLifecycleGuard: PluginLifecycleGuard;
   pluginProvider: PluginProviderService;
@@ -174,7 +174,7 @@ export const ApiparkPluginDriver:{[key:string]:{[key:string]:(coreObj?:CoreObj, 
     },
     preload: (coreObj?:CoreObj, pluginConfig?:PluginConfig) => {
       if(!coreObj || !pluginConfig) return coreObj
-      coreObj.executeList.push({ ...pluginConfig, expose: 'Bootstrap', bootstrap: 'BootstrapModule.bootstrap' })
+      coreObj.setExecuteList(prev=>[...prev,{ ...pluginConfig, expose: 'Bootstrap', bootstrap: 'BootstrapModule.bootstrap' }])
       for (const pluginRouter of pluginConfig.router) {
         updateRouterConfigWithPlugin(coreObj, pluginRouter, pluginConfig)
       }

@@ -345,7 +345,7 @@ const usePluginLoader = () => {
         // resetRouterConfig(routerConfig);
         console.log(routerConfig)
         // setFinalRouterConfig(routerConfig)
-         installPlugin(routerConfig, executeList).then((res)=>{
+         installPlugin(routerConfig).then((res)=>{
           resolve(res)
          })
         // .then(async () => {
@@ -356,7 +356,7 @@ const usePluginLoader = () => {
       });
     };
   
-    const installPlugin = (routerConfig: any[], executeList: never[]) => {
+    const installPlugin = (routerConfig: any[]) => {
       return new Promise((resolve, reject) => {
         // fetchData('system/plugins',{method:'GET'}).then((resp) => {
           // if (resp.code === 0){
@@ -385,7 +385,7 @@ const usePluginLoader = () => {
                 }
                 console.log(driverName)
                 const driver = driverName.split('.').reduce((driverMethod: { [x: string]: any; }, driverName: string | number) => driverMethod[driverName], driverMethod);
-                driver({ routerConfig, executeList, pluginLoader, pluginProvider, pluginLifecycleGuard, builtInPluginLoader }, plugin);
+                driver({ routerConfig, setExecuteList, pluginLoader, pluginProvider, pluginLifecycleGuard, builtInPluginLoader }, plugin);
               } catch (err) {
                 console.warn('安装插件出错：', err);
               }
