@@ -201,7 +201,7 @@ curl -sSO https://download.apipark.com/install/quick-start.sh; bash quick-start.
 <br>
 
 # 📕文档
-访问 [APIPark文档](https://docs.apipark.com/docs/install) 获取详细的安装指南、API 参考和使用说明。
+访问 [APIPark文档](https://docs.apipark.com/docs/deploy) 获取详细的安装指南、API 参考和使用说明。
 
 <br>
 
