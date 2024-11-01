@@ -41,7 +41,6 @@ export default function ManagementInsidePage(){
     const menuData = useMemo(()=>{
         const filterMenu = (menu:(MenuItemType&{access:string})[])=>{
             const newMenu = cloneDeep(menu)
-            console.log(newMenu)
             return newMenu!.filter((c:MenuItemType&{access:string} )=>{
                     if(!c) return false
                     return (((c as MenuItemType&{access:string} ).access ? 
@@ -49,7 +48,6 @@ export default function ManagementInsidePage(){
                     true))
                 })}
         const filteredMenu = filterMenu(TENANT_MANAGEMENT_APP_MENU as (MenuItemType&{access:string})[])
-        console.log(filteredMenu)
         const menu = activeMenu ?? filteredMenu[0]?.children ? filteredMenu[0]?.children?.[0]?.key : filteredMenu[0]?.key
         if(menu && currentUrl.split('/')[-1] !== menu) navigateTo(`/consumer/${teamId}/inside/${appId}/${menu}`)
         return  filteredMenu || []
