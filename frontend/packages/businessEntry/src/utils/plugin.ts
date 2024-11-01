@@ -103,12 +103,7 @@ export const ApiparkPluginDriver:{[key:string]:{[key:string]:(coreObj?:CoreObj, 
     component: (coreObj?:CoreObj, pluginConfig?:PluginConfig) => {
       if(!coreObj || !pluginConfig) return coreObj
       for (const pluginRouter of pluginConfig.router) {
-        console.log(pluginRouter,{path: pluginRouter.path,component: routerMap.get(pluginConfig.name)?.component})
         const routerToChanged:RouteConfig[] = pluginRouter.type === 'root' ? coreObj.routerConfig : coreObj.routerConfig.find((router: RouteConfig) => router.path === '/' && router?.pathMatch !== 'full')!.children as RouteConfig[]
-        // coreObj.pluginProvider.setRouterConfig(pluginRouter.type === 'root', {
-        //   path: pluginRouter.path,
-        //   component: routerMap.get(pluginConfig.name)!.component
-        // }, coreObj.routerConfig)
         routerMap.get(pluginConfig.name) && routerToChanged.unshift({...routerMap.get(pluginConfig.name)!, key:pluginConfig.name, path:pluginRouter.path})
       }
       return coreObj
@@ -117,14 +112,6 @@ export const ApiparkPluginDriver:{[key:string]:{[key:string]:(coreObj?:CoreObj, 
       if(!coreObj || !pluginConfig) return coreObj
       for (const pluginRouter of pluginConfig.router) {
         const routerToChanged:RouteConfig[] = pluginRouter.type === 'root' ? coreObj.routerConfig : coreObj.routerConfig.find((router: RouteConfig) => router.path === '/' && router?.pathMatch !== 'full')!.children as RouteConfig[]
-        console.log(pluginConfig,pluginRouter,routerMap.get(pluginRouter.name), {
-          path: pluginRouter.path,
-        })
-        // coreObj.pluginProvider.setRouterConfig(pluginRouter.type === 'root', {
-        //   path: pluginRouter.path,
-        //   component: routerMap.get(pluginConfig.name)!.component,
-        //   children: coreObj.builtInPluginLoader(pluginConfig.name)
-        // }, coreObj.routerConfig)
         routerMap.get(pluginRouter.name) && routerToChanged.unshift({...routerMap.get(pluginRouter.name)!, key:pluginRouter.name, path:pluginRouter.path})
       }
       return coreObj
@@ -136,20 +123,15 @@ export const ApiparkPluginDriver:{[key:string]:{[key:string]:(coreObj?:CoreObj, 
   remote: {
     normal: (coreObj?:CoreObj, pluginConfig?:PluginConfig) => {
       if(!coreObj || !pluginConfig) return coreObj
-      const remoteRouter = coreObj.routerConfig.find((item:RouteConfig) => item?.data?.['type'] === 'remotePlugin')
-      if (!remoteRouter) {
-        // coreObj.pluginProvider.setRouterConfig(false, {
-        //   path: 'remote',
-        //   children: [
-        //     {
-        //       path: ':moduleName',
-        //       component: routerMap.get('remote').component
-        //     }
-        //   ],
-        //   data: {
-        //     type: 'remotePlugin'
-        //   }
-        // }, coreObj.routerConfig)
+        const routerToChanged:RouteConfig[] = coreObj.routerConfig.find((router: RouteConfig) => router.path === '/' && router?.pathMatch !== 'full')!.children as RouteConfig[]
+        const remoteRouter:RouteConfig[] = routerToChanged.find((item:RouteConfig) => item?.data?.['type'] === 'remotePlugin') as RouteConfig[]
+        if (!remoteRouter) {
+            routerMap.get('remote') && routerToChanged.unshift({
+              ...routerMap.get('remote')!, key:'remote', path:'remote',type:'remotePlugin',children:[{
+                path:':moduleName',
+                component: routerMap.get('remote')!.component}
+              ]
+            })
       }
       return coreObj
     }
@@ -158,6 +140,14 @@ export const ApiparkPluginDriver:{[key:string]:{[key:string]:(coreObj?:CoreObj, 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     normal: (coreObj?:CoreObj, pluginConfig?:PluginConfig) => {
       if(!coreObj || !pluginConfig) return coreObj
+      if(['logsettings','resourcesettings'].indexOf(pluginConfig.name) !== -1){
+        const routerToChanged:RouteConfig[] = coreObj.routerConfig.find((router: RouteConfig) => router.path === '/' && router?.pathMatch !== 'full')!.children as RouteConfig[]
+        const remoteRouter:RouteConfig[] = routerToChanged.find((item:RouteConfig) => item?.data?.['key'] === pluginConfig.name) as RouteConfig[]
+        if(!remoteRouter){
+          routerMap.get(pluginConfig.name) && routerToChanged.unshift({...routerMap.get(pluginConfig.name)!, key:pluginConfig.name, path:pluginConfig.path})
+        }
+        return
+      }
       const remoteRouter = coreObj.routerConfig.find((item:RouteConfig) => item?.data?.['type'] === 'intelligentPlugin')
       if (!remoteRouter) {
         // coreObj.pluginProvider.setRouterConfig(false, {
@@ -197,6 +187,11 @@ function updateRouterConfigWithPlugin (coreObj: CoreObj, pluginRouter: PluginRou
   if (!pluginRouter.expose) {
     throw new Error('pluginRouter.expose is required')
   } else {
+    for (const pluginRouter of pluginConfig.router) {
+      const routerToChanged:RouteConfig[] = pluginRouter.type === 'root' ? coreObj.routerConfig : coreObj.routerConfig.find((router: RouteConfig) => router.path === '/' && router?.pathMatch !== 'full')!.children as RouteConfig[]
+      routerMap.get(pluginConfig.name) && routerToChanged.unshift({...routerMap.get(pluginConfig.name)!, key:pluginConfig.name, path:pluginRouter.path})
+    }
+
     // coreObj.pluginProvider.setRouterConfig(pluginRouter.type === 'root', {
     //   path: pluginRouter.path,
     //   loadChildren: () => coreObj.pluginLoader.loadModule(

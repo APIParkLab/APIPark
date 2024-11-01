@@ -5,11 +5,11 @@ import SystemOutlet from '@core/pages/system/SystemOutlet';
 import { TenantManagementProvider } from '@market/contexts/TenantManagementContext';
 import { lazy } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import {ProtectedRoute} from '@businessEntry/components/aoplatform/RenderRoutes';
 import Guide from '@core/pages/guide/Guide';
 import { AiServiceProvider } from '@core/contexts/AiServiceContext';
 import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
+import React from 'react';
 
   // 内置插件与对应组件/模块
   export const routerMap:Map<string, unknown> = new Map([
@@ -260,16 +260,16 @@ import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
             }
         ]
      }],
-    ['datasourcing', { type: 'module',
+    ['datasourcing', { type: 'component',
       lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/partitions/PartitionInsideDashboardSetting.tsx'))
      }],
-     ['cluster', { type: 'module',
+     ['cluster', { type: 'component',
       lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/partitions/PartitionInsideCluster.tsx')),
      }],
-     ['aisetting', { type: 'module',
+     ['aisetting', { type: 'component',
       lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiSetting/AiSettingList.tsx')),
     }],
-     ['cert', { type: 'module',
+     ['cert', { type: 'component',
       lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/partitions/PartitionInsideCert.tsx')),
      }],
   
@@ -398,12 +398,12 @@ import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
         },
       ]
      }],
-     ['template/:moduleId', { type: 'module',
+     ['template', { type: 'module',
             lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@common/components/aoplatform/intelligent-plugin/IntelligentPluginList.tsx')),
      }],
-     ['logsettings/*', { type: 'module',
+     ['logsettings', { type: 'module',
         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/logsettings/LogSettings.tsx')),
-        key:'logSettings',
+        key:'logsettings',
         children:[
           {
               path:'template/:moduleId',
@@ -412,9 +412,9 @@ import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
           },
         ]
        }],
-     ['resourcesettings/*', { type: 'module',
+     ['resourcesettings', { type: 'module',
         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/resourcesettings/ResourceSettings.tsx')),
-        key:'resourceSettings',
+        key:'resourcesettings',
         children:[
           {
               path:'template/:moduleId',
