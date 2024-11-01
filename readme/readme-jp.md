@@ -198,7 +198,7 @@ curl -sSO https://download.apipark.com/install/quick-start.sh; bash quick-start.
 <br>
 
 # 📕ドキュメント
-詳細なインストールガイド、APIリファレンス、使用説明書については、[APIParkドキュメント](https://docs.apipark.com/docs/install) をご覧ください。
+詳細なインストールガイド、APIリファレンス、使用説明書については、[APIParkドキュメント](https://docs.apipark.com/docs/deploy) をご覧ください。
 
 <br>
 

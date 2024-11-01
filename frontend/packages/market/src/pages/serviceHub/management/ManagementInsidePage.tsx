@@ -14,7 +14,9 @@ import { ManagementConfigFieldType } from "./ManagementConfig";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 import { $t } from "@common/locales";
 import { getItem } from "@common/utils/navigation";
-import { MenuItemType } from "antd/es/menu/interface";
+import { MenuItemGroupType, MenuItemType } from "antd/es/menu/interface";
+import { PERMISSION_DEFINITION } from "@common/const/permissions";
+import { cloneDeep } from "lodash-es";
 
 export default function ManagementInsidePage(){
     const { message } = App.useApp()
@@ -27,17 +29,29 @@ export default function ManagementInsidePage(){
     const [openKeys, setOpenKeys] = useState<string[]>([])
     const [loading, setLoading] = useState<boolean>(false)
     const {appName,setAppName} = useTenantManagementContext()
-    const {getTeamAccessData,cleanTeamAccessData,state} = useGlobalContext()
+    const {getTeamAccessData,cleanTeamAccessData,state,accessData,checkPermission,accessInit} = useGlobalContext()
     
     const TENANT_MANAGEMENT_APP_MENU: MenuProps['items'] = useMemo(()=>[
-        getItem($t('订阅的服务'), 'service'),
-        getItem($t('访问授权'), 'authorization'),
-        getItem($t('消费者管理'), 'setting'),
+        getItem($t('订阅的服务'), 'service',undefined, undefined, undefined, 'team.application.subscription.view'),
+        getItem($t('访问授权'), 'authorization',undefined, undefined, undefined, 'team.consumer.authorization.view'),
+        getItem($t('消费者管理'), 'setting',undefined, undefined, undefined, 'team.application.application.view'),
     ],[state.language]) 
 
+    
     const menuData = useMemo(()=>{
-        return  TENANT_MANAGEMENT_APP_MENU
-    },[])
+        const filterMenu = (menu:(MenuItemType&{access:string})[])=>{
+            const newMenu = cloneDeep(menu)
+            return newMenu!.filter((c:MenuItemType&{access:string} )=>{
+                    if(!c) return false
+                    return (((c as MenuItemType&{access:string} ).access ? 
+                    checkPermission((c as MenuItemType&{access:string} ).access as keyof typeof PERMISSION_DEFINITION[0]): 
+                    true))
+                })}
+        const filteredMenu = filterMenu(TENANT_MANAGEMENT_APP_MENU as (MenuItemType&{access:string})[])
+        const menu = activeMenu ?? filteredMenu[0]?.children ? filteredMenu[0]?.children?.[0]?.key : filteredMenu[0]?.key
+        if(menu && currentUrl.split('/')[-1] !== menu) navigateTo(`/consumer/${teamId}/inside/${appId}/${menu}`)
+        return  filteredMenu || []
+    },[accessData,accessInit, TENANT_MANAGEMENT_APP_MENU])
 
     useEffect(()=>{
         setActiveMenu(currentUrl.split('/').pop() || 'service')

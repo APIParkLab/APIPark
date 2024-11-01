@@ -1,3 +1,4 @@
+import WithPermission from "@common/components/aoplatform/WithPermission";
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -24,7 +25,7 @@ export default function ResourceSettingsInstruction() {
             <div className="h-[208px] w-[384px] flex flex-col items-center py-[32px] px-[24px] gap-[16px] rounded-DEFAULT bg-MENU_BG mr-[24px]">
             <p className="text-[20px] font-medium leading-[32px] text-MAIN_TEXT">集群配置</p>
                         <p className="text-[12px] font-normal leading-[20px] text-DESC_TEXT">新增集群地址、描述和其他相关属性，以确保插件能够正确识别和连接到集群</p>
-                        <p><Link to="/cluster">配置集群地址</Link></p>
+                        <p><WithPermission access="system.settings.data_source.view" ><Link to="/cluster">配置集群地址</Link></WithPermission></p>
             </div>
         </div>
     </div></div>
