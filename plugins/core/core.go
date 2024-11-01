@@ -97,7 +97,7 @@ func (p *plugin) OnComplete() {
 	p.apis = append(p.apis, p.upstreamApis()...)
 	p.apis = append(p.apis, p.apiApis()...)
 	p.apis = append(p.apis, p.subscribeApis()...)
-	p.apis = append(p.apis, p.projectAuthorizationApis()...)
+	p.apis = append(p.apis, p.appAuthorizationApis()...)
 	p.apis = append(p.apis, p.releaseApis()...)
 	p.apis = append(p.apis, p.DynamicModuleApis()...)
 	p.apis = append(p.apis, p.monitorStatisticApis()...)

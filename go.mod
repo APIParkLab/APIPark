@@ -76,3 +76,5 @@ require (
 )
 
 replace github.com/eolinker/ap-account => ../aoaccount
+
+replace github.com/eolinker/go-common => ../go-common

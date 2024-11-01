@@ -32,6 +32,7 @@ func (i *imlServiceService) ServiceList(ctx context.Context, serviceIds ...strin
 		w["uuid"] = serviceIds
 	}
 	w["as_server"] = true
+	w["is_delete"] = false
 	list, err := i.store.List(ctx, w)
 	if err != nil {
 		return nil, err
@@ -46,6 +47,7 @@ func (i *imlServiceService) ServiceListByKind(ctx context.Context, kind Kind, se
 	}
 	w["as_server"] = true
 	w["kind"] = kind
+	w["is_delete"] = false
 	list, err := i.store.List(ctx, w)
 	if err != nil {
 		return nil, err
@@ -57,6 +59,7 @@ func (i *imlServiceService) SearchPublicServices(ctx context.Context, keyword st
 	w := map[string]interface{}{
 		"as_server":    true,
 		"service_type": PublicService.Int(),
+		"is_delete":    false,
 	}
 	list, err := i.store.Search(ctx, keyword, w)
 	if err != nil {
@@ -93,6 +96,7 @@ func (i *imlServiceService) AppList(ctx context.Context, appIds ...string) ([]*S
 		w["uuid"] = appIds
 	}
 	w["as_app"] = true
+	w["is_delete"] = false
 	list, err := i.store.List(ctx, w)
 	if err != nil {
 		return nil, err
