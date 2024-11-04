@@ -42,6 +42,7 @@ const AiServiceInsidePage:FC = ()=> {
 
     
     const getApiDefine = ()=>{
+        console.log('@@@@@@@')
         setApiPrefix('')
         setPrefixForce(false)
         fetchData<BasicResponse<{ prefix:string, force:boolean }>>('service/router/define',{method:'GET',eoParams:{service:serviceId,team:teamId}}).then(response=>{
@@ -119,7 +120,7 @@ const AiServiceInsidePage:FC = ()=> {
     }, [currentUrl]);
 
     useEffect(()=>{
-        if(accessData && accessData.get('team') && accessData.get('team')?.indexOf('team.service.router.view') !== -1){
+        if(accessData && checkPermission('team.service.router.view')){
             getApiDefine()
         }
     },[accessData])
