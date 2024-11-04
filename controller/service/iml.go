@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/eolinker/eosc/log"
 
 	application_authorization "github.com/APIParkLab/APIPark/module/application-authorization"
 	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
@@ -234,7 +237,12 @@ func (i *imlServiceController) SearchMyServices(ctx *gin.Context, teamId string,
 //}
 
 func (i *imlServiceController) Get(ctx *gin.Context, id string) (*service_dto.Service, error) {
+	now := time.Now()
+	defer func() {
+		log.Infof("get service %s cost %d ms", id, time.Since(now).Milliseconds())
+	}()
 	return i.module.Get(ctx, id)
+
 }
 
 func (i *imlServiceController) Search(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {

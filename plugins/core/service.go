@@ -22,7 +22,7 @@ func (p *plugin) ServiceApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/apps/mine", []string{"context", "query:keyword"}, []string{"apps"}, p.appController.MySimpleApps),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/my_apps", []string{"context", "query:team", "query:keyword"}, []string{"apps"}, p.appController.SearchMyApps),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/apps", []string{"context", "query:team", "query:keyword"}, []string{"apps"}, p.appController.Search, access.SystemWorkspaceApplicationViewAll),
-		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/apps/can_subscribe", []string{"context", "query:"}, []string{"app"}, p.appController.SearchCanSubscribe),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/apps/can_subscribe", []string{"context", "query:service"}, []string{"app"}, p.appController.SearchCanSubscribe),
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/app/info", []string{"context", "query:app", "body"}, []string{"app"}, p.appController.UpdateApp, access.SystemWorkspaceApplicationManagerAll, access.TeamTeamConsumerManager),
 
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/service/doc", []string{"context", "query:service"}, []string{"doc"}, p.serviceController.ServiceDoc, access.SystemWorkspaceServiceViewAll, access.TeamServiceServiceIntroView),

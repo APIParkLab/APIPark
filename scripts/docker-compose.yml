@@ -62,7 +62,7 @@ services:
     privileged: true
     restart: always
     ports:
-      - 6379:6379
+      - "6379:6379"
     command:
       - bash
       - -c
