@@ -263,7 +263,7 @@ const usePluginLoader = () => {
     const [redirectUrl, setRedirectUrl] = useState('');
     const {fetchData}  = useFetch();
     const pluginProvider = useGlobalContext();
-    const {state, dispatch,pluginEventHub,pluginSlotHubService:pluginSlotHub} = pluginProvider
+    const {state, dispatch,getMenuList,pluginEventHub,pluginSlotHubService:pluginSlotHub} = pluginProvider
     const { finalRouterConfig, setFinalRouterConfig} = useState<RouteConfig[]>([])
     const {message:messageService, modal:modalService} = App.useApp();
   
@@ -341,18 +341,12 @@ const usePluginLoader = () => {
       return new Promise((resolve) => {
         const routerConfig:  RouteConfig[] = [];
         apipark['builtIn'].default({ routerConfig } as CoreObj);
-        // Assuming you have a way to reset router config in React
-        // resetRouterConfig(routerConfig);
-        console.log(routerConfig)
-        // setFinalRouterConfig(routerConfig)
-         installPlugin(routerConfig).then((res)=>{
+         installPlugin(routerConfig).then(async (res)=>{
+          // reset route after loading executed plugins
+          // TODO 需要测试次式executeList是否已经更新，如果没有更新的话要修改executeList 更新的写法
+          await loadExecutedPlugin();
           resolve(res)
          })
-        // .then(async () => {
-        //   // resetRouterConfig(routerConfig);
-        //   await loadExecutedPlugin();
-        //   resolve(true);
-        // });
       });
     };
   
@@ -369,13 +363,9 @@ const usePluginLoader = () => {
             const pluginLoader = { loadModule };
             const pluginLifecycleGuard ={};
             const builtInPluginLoader = loadBuiltInModule;
-  
-            // pluginSlotHub.addSlot('renewMenu', () => {
-            // //   navigation.dataUpdated = true;
-            //   // Assuming you have a way to get menu list in React
-            //   // getMenuList().then(() => {});
-            // });
-            console.log('pluginConfigList', pluginConfigList)
+            pluginSlotHub.addSlot('renewMenu', () => {
+              getMenuList()
+            });
             for (const plugin of pluginConfigList) {
               try {
                 const driverName = plugin.driver;
@@ -383,16 +373,12 @@ const usePluginLoader = () => {
                   console.error('no driver name');
                   continue;
                 }
-                console.log(driverName)
                 const driver = driverName.split('.').reduce((driverMethod: { [x: string]: any; }, driverName: string | number) => driverMethod[driverName], driverMethod);
                 driver({ routerConfig, setExecuteList, pluginLoader, pluginProvider, pluginLifecycleGuard, builtInPluginLoader }, plugin);
               } catch (err) {
                 console.warn('安装插件出错：', err);
               }
             }
-            // resetRouterConfig(routerConfig);
-            console.log('get router', routerConfig)
-            // setFinalRouterConfig(routerConfig)
             resolve(routerConfig);
           // } else {
           //   messageService.error(resp.msg || '获取插件配置列表失败，请重试!');
