@@ -39,21 +39,15 @@ export default function ManagementInsidePage(){
 
     
     const menuData = useMemo(()=>{
-        const filterMenu = (menu:MenuItemGroupType<MenuItemType>[])=>{
+        const filterMenu = (menu:(MenuItemType&{access:string})[])=>{
             const newMenu = cloneDeep(menu)
-            return newMenu!.filter((m:MenuItemGroupType )=>{
-                if(m&&m.children && m.children.length > 0){
-                     m.children = m.children.filter(
-                        (c)=>{
-                            if(!c) return false
-                            return (((c as MenuItemType&{access:string} ).access ? 
-                            checkPermission((c as MenuItemType&{access:string} ).access as keyof typeof PERMISSION_DEFINITION[0]): 
-                            true))})
-                }
-                return m.children && m.children.length > 0
-            })
-        }
-        const filteredMenu = filterMenu(TENANT_MANAGEMENT_APP_MENU as MenuItemGroupType<MenuItemType>[])
+            return newMenu!.filter((c:MenuItemType&{access:string} )=>{
+                    if(!c) return false
+                    return (((c as MenuItemType&{access:string} ).access ? 
+                    checkPermission((c as MenuItemType&{access:string} ).access as keyof typeof PERMISSION_DEFINITION[0]): 
+                    true))
+                })}
+        const filteredMenu = filterMenu(TENANT_MANAGEMENT_APP_MENU as (MenuItemType&{access:string})[])
         const menu = activeMenu ?? filteredMenu[0]?.children ? filteredMenu[0]?.children?.[0]?.key : filteredMenu[0]?.key
         if(menu && currentUrl.split('/')[-1] !== menu) navigateTo(`/consumer/${teamId}/inside/${appId}/${menu}`)
         return  filteredMenu || []

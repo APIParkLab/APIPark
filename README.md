@@ -197,7 +197,7 @@ To achieve this goal, we plan to add new features to APIPark, including:
 <br>
 
 # 📕 Documentation
-Visit [APIPark Documentation](https://docs.apipark.com/docs/install) for detailed installation guides, API references, and usage instructions.
+Visit [APIPark Documentation](https://docs.apipark.com/docs/deploy) for detailed installation guides, API references, and usage instructions.
 
 <br>
 

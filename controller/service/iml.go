@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/eolinker/eosc/log"
 
 	application_authorization "github.com/APIParkLab/APIPark/module/application-authorization"
 	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
@@ -212,10 +215,7 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 		if err != nil {
 			return err
 		}
-		//_, err = i.upstreamModule.Save(ctx, info.Id, newAIUpstream(info.Id, *input.Provider, p.URI()))
-		//if err != nil {
-		//	return err
-		//}
+
 		return i.docModule.SaveServiceDoc(ctx, info.Id, &service_dto.SaveServiceDoc{
 			Doc: "The Translation API allows developers to translate text from one language to another. It supports multiple languages and enables easy integration of high-quality translation features into applications. With simple API requests, you can quickly translate content into different target languages.",
 		})
@@ -237,7 +237,12 @@ func (i *imlServiceController) SearchMyServices(ctx *gin.Context, teamId string,
 //}
 
 func (i *imlServiceController) Get(ctx *gin.Context, id string) (*service_dto.Service, error) {
+	now := time.Now()
+	defer func() {
+		log.Infof("get service %s cost %d ms", id, time.Since(now).Milliseconds())
+	}()
 	return i.module.Get(ctx, id)
+
 }
 
 func (i *imlServiceController) Search(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {
@@ -277,6 +282,10 @@ func (i *imlServiceController) SaveServiceDoc(ctx *gin.Context, id string, input
 type imlAppController struct {
 	module     service.IAppModule                             `autowired:""`
 	authModule application_authorization.IAuthorizationModule `autowired:""`
+}
+
+func (i *imlAppController) SearchCanSubscribe(ctx *gin.Context, serviceId string) ([]*service_dto.SimpleAppItem, error) {
+	return i.module.SearchCanSubscribe(ctx, serviceId)
 }
 
 func (i *imlAppController) Search(ctx *gin.Context, teamId string, keyword string) ([]*service_dto.AppItem, error) {

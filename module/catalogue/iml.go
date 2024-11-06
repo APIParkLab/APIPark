@@ -320,6 +320,7 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 	if err != nil {
 		return nil, err
 	}
+
 	serviceIds := utils.SliceToSlice(items, func(i *service.Service) string {
 		return i.Id
 	}, func(s *service.Service) bool {
@@ -330,6 +331,7 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 	if len(serviceIds) < 1 {
 		return nil, nil
 	}
+
 	commits, err := i.releaseService.GetRunningApiDocCommits(ctx, serviceIds...)
 	if err != nil {
 		return nil, err

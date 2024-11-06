@@ -117,7 +117,7 @@ const SystemInsidePage:FC = ()=> {
     }, [currentUrl]);
 
     useEffect(()=>{
-        if(accessData && accessData.get('team') && accessData.get('team')?.indexOf('team.service.router.view') !== -1){
+        if(accessData && checkPermission('team.service.router.view')){
             getApiDefine()
         }
     },[accessData])

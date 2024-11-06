@@ -75,11 +75,14 @@ type App struct {
 }
 
 func ToService(model *service.Service) *Service {
-
+	prefix := "/"
+	if model.Prefix != "" {
+		prefix = model.Prefix
+	}
 	s := &Service{
 		Id:           model.Id,
 		Name:         model.Name,
-		Prefix:       model.Prefix,
+		Prefix:       prefix,
 		Description:  model.Description,
 		Team:         auto.UUID(model.Team),
 		ServiceType:  model.ServiceType.String(),
