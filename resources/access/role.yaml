@@ -62,7 +62,6 @@ team:
   - name: team admin
     value: team_admin
     permits:
-      - team.consumer.application.manager
       - team.consumer.authorization.manager
       - team.consumer.authorization.view
       - team.consumer.subscription.manager_subscribed_services
@@ -74,7 +73,6 @@ team:
       - team.service.api_doc.view
       - team.service.release.manager
       - team.service.release.view
-      - team.service.service.manager
       - team.service.service_intro.manager
       - team.service.service_intro.view
       - team.service.subscription.manager
@@ -99,7 +97,6 @@ team:
       - team.service.api_doc.view
       - team.service.release.manager
       - team.service.release.view
-      - team.service.service.manager
       - team.service.service_intro.manager
       - team.service.service_intro.view
       - team.service.subscription.manager
@@ -134,7 +131,6 @@ team:
   - name: consumer admin
     value: consumer_admin
     permits:
-      - team.consumer.application.manager
       - team.consumer.authorization.manager
       - team.consumer.authorization.view
       - team.consumer.subscription.manager_subscribed_services

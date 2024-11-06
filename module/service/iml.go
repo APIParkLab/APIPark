@@ -6,6 +6,13 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
+
+	"github.com/eolinker/eosc/log"
+
+	"github.com/APIParkLab/APIPark/resources/access"
+
+	"github.com/eolinker/ap-account/service/role"
 
 	application_authorization "github.com/APIParkLab/APIPark/service/application-authorization"
 
@@ -227,6 +234,7 @@ func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, 
 //}
 
 func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Service, error) {
+	now := time.Now()
 	serviceInfo, err := i.serviceService.Get(ctx, id)
 	if err != nil {
 		return nil, err
@@ -240,6 +248,7 @@ func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Ser
 	s.Tags = auto.List(utils.SliceToSlice(tags, func(p *service_tag.Tag) string {
 		return p.Tid
 	}))
+	log.Infof("get service cost %d ms", time.Since(now).Milliseconds())
 	return s, nil
 }
 
@@ -539,7 +548,70 @@ type imlAppModule struct {
 	teamMemberService team_member.ITeamMemberService                  `autowired:""`
 	subscribeService  subscribe.ISubscribeService                     `autowired:""`
 	authService       application_authorization.IAuthorizationService `autowired:""`
+	roleService       role.IRoleService                               `autowired:""`
+	roleMemberService role.IRoleMemberService                         `autowired:""`
 	transaction       store.ITransaction                              `autowired:""`
+}
+
+func (i *imlAppModule) SearchCanSubscribe(ctx context.Context, serviceId string) ([]*service_dto.SimpleAppItem, error) {
+	apps, err := i.searchMyApps(ctx, "", "")
+	if err != nil {
+		return nil, err
+	}
+	list, err := i.roleService.ListByPermit(ctx, access.SystemWorkspaceApplicationManagerAll)
+	if err == nil && len(list) > 0 {
+		return utils.SliceToSlice(apps, func(p *service.Service) *service_dto.SimpleAppItem {
+			return &service_dto.SimpleAppItem{
+				Id:          p.Id,
+				Name:        p.Name,
+				Description: p.Description,
+				Team:        auto.UUID(p.Team),
+			}
+		}), nil
+	}
+	list, err = i.roleService.ListByPermit(ctx, access.TeamConsumerSubscriptionSubscribe)
+	if err != nil {
+		return nil, nil
+	}
+	roleIds := utils.SliceToSlice(list, func(p *role.RoleByPermit) string {
+		return p.Id
+	})
+	members, err := i.roleMemberService.ListByRoleIds(ctx, utils.UserId(ctx), roleIds...)
+	if err != nil {
+		return nil, err
+	}
+	if len(members) == 0 {
+		return nil, nil
+	}
+	subscribes, err := i.subscribeService.ListByServices(ctx, serviceId)
+	if err != nil {
+		return nil, err
+	}
+	subscribeMap := utils.SliceToMapO(subscribes, func(p *subscribe.Subscribe) (string, struct{}) {
+		return p.Application, struct{}{}
+	}, func(s *subscribe.Subscribe) bool {
+		return s.ApplyStatus == subscribe.ApplyStatusSubscribe
+	})
+	teamMap := utils.SliceToMapO(members, func(p *role.Member) (string, struct{}) {
+		return role.TrimTeamTarget(p.Target), struct{}{}
+	})
+	result := make([]*service_dto.SimpleAppItem, 0, len(apps))
+	for _, app := range apps {
+		if _, ok := teamMap[app.Team]; !ok {
+			continue
+		}
+		if _, ok := subscribeMap[app.Id]; ok {
+			continue
+		}
+		result = append(result, &service_dto.SimpleAppItem{
+			Id:          app.Id,
+			Name:        app.Name,
+			Description: app.Description,
+			Team:        auto.UUID(app.Team),
+		})
+	}
+
+	return result, nil
 }
 
 func (i *imlAppModule) ExportAll(ctx context.Context) ([]*service_dto.ExportApp, error) {

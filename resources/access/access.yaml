@@ -71,19 +71,6 @@ system:
             guest_allow: true
           - name: manager
             value: 'manager'
-            apis:
-              - "POST:/api/v1/user/account"
-              - "PUT:/api/v1/user/account"
-              - "DELETE:/api/v1/user/account"
-              - "POST:/api/v1/user/account/enable"
-              - "POST:/api/v1/user/account/disable"
-              - "POST:/api/v1/user/department"
-              - "PUT:/api/v1/user/department"
-              - "DELETE:/api/v1/user/department"
-              - "POST:/api/v1/user/department/member"
-              - "DELETE:/api/v1/user/department/member"
-              - "POST:/api/v1/user/department/member/remove"
-              - "POST:/api/v1/account/role"
             dependents:
               - system.settings.account.view
       - name: role
@@ -92,11 +79,6 @@ system:
           - name: view
             guest_allow: true
             value: 'view'
-            apis:
-              - "GET:/api/v1/system/roles"
-              - "GET:/api/v1/system/role"
-              - "GET:/api/v1/team/roles"
-              - "GET:/api/v1/team/role"
       - name: api gateway
         value: 'api_gateway'
         children:
@@ -104,27 +86,18 @@ system:
             cname: 查看
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/cluster/nodes"
           - name: manager
             value: 'manager'
-            apis:
-              - "PUT:/api/v1/cluster/reset"
-              - "POST:/api/v1/cluster/check"
+            dependents:
+              - system.settings.api_gateway.view
       - name: ai provider
         value: 'ai_provider'
         children:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/ai/providers"
-              - "GET:/api/v1/ai/provider/config"
           - name: manager
             value: 'manager'
-            apis:
-              - "PUT:/api/v1/ai/provider/config"
-              - "PUT:/api/v1/ai/provider/default-llm"
             dependents:
               - system.settings.ai_provider.view
       - name: ssl certificate
@@ -134,15 +107,8 @@ system:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/certificates"
-              - "GET:/api/v1/certificate"
           - name: manager
             value: 'manager'
-            apis:
-              - "POST:/api/v1/certificate"
-              - "PUT:/api/v1/certificate"
-              - "DELETE:/api/v1/certificate"
             dependents:
               - system.settings.ssl_certificate.view
       - name: data source
@@ -151,13 +117,8 @@ system:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/monitor/config"
           - name: manager
             value: 'manager'
-            apis:
-              - "POST:/api/v1/monitor/config"
-              - "PUT:/api/v1/monitor/config"
             dependents:
               - system.settings.data_source.view
       - name: log configuration
@@ -166,18 +127,8 @@ system:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/dynamic/{name}/info"
-              - "GET:/api/v1/dynamic/{name}/list"
-              - "GET:/api/v1/dynamic/{name}/render"
           - name: manager
             value: 'manager'
-            apis:
-              - "POST:/api/v1/dynamic/{name}"
-              - "PUT:/api/v1/dynamic/{name}/config"
-              - "DELETE:/api/v1/dynamic/{name}/batch"
-              - "PUT:/api/v1/dynamic/{name}/online"
-              - "PUT:/api/v1/dynamic/{name}/offline"
             dependents:
               - system.settings.log_configuration.view
 team:
@@ -190,17 +141,8 @@ team:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/service/routers"
-              - "GET:/api/v1/service/router/detail"
-              - "GET:/api/v1/service/router/detail/simple"
-              - "GET:/api/v1/service/router/define"
           - name: manager
             value: 'manager'
-            apis:
-              - "POST:/api/v1/service/router"
-              - "PUT:/api/v1/service/router"
-              - "DELETE:/api/v1/service/router"
             dependents:
                 - team.service.api.view
       - name: api doc
@@ -210,13 +152,8 @@ team:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/service/api_doc"
           - name: manager
             value: 'manager'
-            apis:
-              - "PUT:/api/v1/service/api_doc"
-              - "POST:/api/v1/service/api_doc/upload"
             dependents:
                 - team.service.api_doc.view
       - name: service intro
@@ -236,12 +173,8 @@ team:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/service/upstream"
           - name: manager
             value: 'manager'
-            apis:
-              - "PUT:/api/v1/service/upstream"
             dependents:
                 - team.service.upstream.view
       - name: release
@@ -250,18 +183,8 @@ team:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/service/releases"
-              - "GET:/api/v1/service/release"
-              - "GET:/api/v1/service/publishs"
-              - "GET:/api/v1/service/publish/check"
-              - "GET:/api/v1/service/release/preview"
-              - "GET:/api/v1/service/publish/status"
           - name: manager
             value: 'manager'
-            apis:
-              - "POST:/api/v1/service/publish/release/do"
-              - "DELETE:/api/v1/service/release"
             dependents:
               - team.service.release.view
       - name: subscription review
@@ -270,29 +193,10 @@ team:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/service/approval/subscribes"
-              - "GET:/api/v1/service/approval/subscribe"
-              - "GET:/api/v1/service/subscribers"
           - name: manager
             value: 'manager'
-            apis:
-              - "POST:/api/v1/service/approval/subscribe"
-              - "POST:/api/v1/service/subscriber"
-              - "DELETE:/api/v1/service/subscriber"
             dependents:
                 - team.service.subscription.view
-      - name: service
-        value: 'service'
-        children:
-          - name: manager
-            value: 'manager'
-            apis:
-              - "PUT:/api/v1/service/info"
-              - "POST:/api/v1/team/service"
-              - "DELETE:/api/v1/team/service"
-            dependents:
-              - team.service.service.manager
   - name: consumer
     value: 'consumer'
     children:
@@ -305,38 +209,20 @@ team:
           - name: view subscribed services
             value: 'view_subscribed_service'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/application/subscription"
           - name: manager subscribed services
             value: 'manager_subscribed_services'
-            apis:
-              - "POST:/api/v1/catalogue/service/subscribe"
-              - "POST:/api/v1/application/subscription/cancel"
-              - "POST:/api/v1/application/subscription/cancel_apply"
+            dependents:
+              - team.consumer.subscription.manager_subscribed_services
       - name: authorization
         value: 'authorization'
         children:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
-              - "GET:/api/v1/app/authorization"
-              - "GET:/api/v1/app/authorizations"
-              - "GET:/api/v1/app/authorization/details"
           - name: manager
             value: 'manager'
-            apis:
-              - "POST:/api/v1/app/authorization"
-              - "PUT:/api/v1/app/authorization"
-              - "DELETE:/api/v1/app/authorization"
-      - name: consumer
-        value: 'application'
-        children:
-          - name: manager
-            value: 'manager'
-            apis:
-              - "PUT:/api/v1/app/info"
-              - "POST:/api/v1/team/app"
+            dependents:
+              - team.consumer.authorization.view
   - name: team
     value: 'team'
     children:
@@ -376,7 +262,6 @@ team:
           - name: view
             value: 'view'
             guest_allow: true
-            apis:
           - name: manager
             value: 'manager'
             apis:
