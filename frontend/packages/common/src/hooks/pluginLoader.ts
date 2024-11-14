@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
-import { App } from "antd";
-import { ApiparkPluginDriver as apipark, CoreObj, generateRemoteModuleTemplate, loadRemoteModule, validateExportLifecycle } from "@businessEntry/utils/plugin";
+import { DEFAULT_LOCAL_PLUGIN_PATH, generateRemoteModuleTemplate, loadRemoteModule, validateExportLifecycle } from "@common/utils/plugin.tsx";
 import { useFetch } from "@common/hooks/http";
-import { RouteConfig } from "@businessEntry/components/aoplatform/RenderRoutes";
-import { routerMap } from "@businessEntry/consts/const";
+import {  PluginConfigType, RouteConfig } from "@common/const/type.ts";
+import { ApiparkPluginDriverType ,RouterMapConfig} from "@common/const/type";
+import { usePluginEventHub } from "@common/contexts/PluginEventHubContext";
+import { usePluginSlotHub } from "@common/contexts/PluginSlotHubContext";
+import { App } from "antd";
 
 const mockData = {
   buildAt:'2024-09-13T03:51:25Z',
@@ -182,7 +184,7 @@ const mockData = {
           type:'normal'
         }
       ]
-    }
+    },
     // {
     //   "driver": "apipark.remote.normal",
     //   "name": "remote",
@@ -230,12 +232,12 @@ const mockData = {
     //   ]
     // },
     // {
-    //   "driver": "apipark.local.router",
-    //   "name": "monitor",
+    //   "driver": "apipark.local.preload",
+    //   "name": "remote",
     //   "router": [
     //     {
-    //       "expose": "AppModule",
-    //       "path": "monitor",
+    //       "expose": "App",
+    //       "path": "router1/*",
     //       "type": "normal"
     //     }
     //   ]
@@ -256,17 +258,34 @@ const mockData = {
   version:'6438d5aa'
 }
 
-const usePluginLoader = () => {
+export type ExecutePluginType = PluginConfigType & {
+  expose:string,
+  bootstrap:string
+}
+
+const usePluginLoader = (apipark:ApiparkPluginDriverType,routerMap:Map<string, RouterMapConfig>) => {
     const [modules, setModules] = useState(new Map());
-    const [executeList, setExecuteList] = useState([]);
+    const [executeList, setExecuteList] = useState<ExecutePluginType[]>([]);
     const [baseHref, setBaseHref] = useState('');
-    const [redirectUrl, setRedirectUrl] = useState('');
+    const [pendingTasks, setPendingTasks] = useState(0);
     const {fetchData}  = useFetch();
     const pluginProvider = useGlobalContext();
-    const {state, dispatch,getMenuList,pluginEventHub,pluginSlotHubService:pluginSlotHub} = pluginProvider
-    const { finalRouterConfig, setFinalRouterConfig} = useState<RouteConfig[]>([])
-    const {message:messageService, modal:modalService} = App.useApp();
-  
+    const pluginEventHub = usePluginEventHub();
+    const pluginSlotHub = usePluginSlotHub();
+    const { getMenuList,dispatch} = pluginProvider
+    const { modal,message } = App.useApp()
+    const [startLoadExecutePlugin, setStartLoadExecutePlugin] = useState<boolean>(false)
+    const messageService = message;
+    const modalService = modal;
+    let startInstallPlugin = false
+
+    useEffect(()=>{
+      if (startLoadExecutePlugin && pendingTasks === 0 && executeList.length > 0) {
+        loadExecutedPlugin();
+      }
+    },[pendingTasks, executeList])
+    
+
     const getModule = (routerPrefix:string, specific = false) => {
       if (routerPrefix.startsWith('/')) {
         routerPrefix = routerPrefix.substring(1);
@@ -289,26 +308,34 @@ const usePluginLoader = () => {
     const loadModule = async (routerPrefix: string, pluginName: any, exposedModule: string , pluginPath: any) => {
       if (!modules.get(routerPrefix)) {
         try {
-          const Module = await loadRemoteModule(generateRemoteModuleTemplate(pluginName, exposedModule, pluginPath));
-          setModules(prevModules => new Map(prevModules).set(routerPrefix, Module));
+          const loadedModule = await loadRemoteModule(generateRemoteModuleTemplate(pluginName, exposedModule, pluginPath));
+          const Module = loadedModule.default ?? loadedModule
+          let ModuleBootstrap;
+          try {
+            ModuleBootstrap = await loadRemoteModule(generateRemoteModuleTemplate(pluginName, 'Bootstrap', pluginPath));
+          } catch (error) {
+            console.warn('Bootstrap module not found:', error);
+          }
+          setModules(prevModules => new Map(prevModules).set(routerPrefix,Module[exposedModule] ));
           if (!validateExportLifecycle(Module)) {
             console.error('需要导出插件生命周期函数');
             return;
           }
           await Module.bootstrap?.({
             pluginProvider,
-            pluginEventHub: pluginEventHub,
+            pluginEventHub,
             pluginSlotHub
           });
-          return Module[exposedModule];
+          return Module;
         } catch (error) {
           console.error('导入插件失败：', error);
         }
       }
-      return getModule(routerPrefix, true)[exposedModule];
+      return getModule(routerPrefix, true);
     };
   
     const loadExecutedPlugin = async () => {
+      setStartLoadExecutePlugin(true)
       for (const plugin of executeList) {
         try {
           const Module = await loadRemoteModule(generateRemoteModuleTemplate(plugin.name, plugin?.expose || 'Bootstrap', plugin.path || `${DEFAULT_LOCAL_PLUGIN_PATH}${plugin.name}/apipark.js`));
@@ -321,10 +348,8 @@ const usePluginLoader = () => {
               pluginSlotHub,
               pluginProvider,
               platformProvider:null,
-              closeModal,
               messageService,
               modalService,
-              apiService:fetchData
             });
           }
         } catch (error) {
@@ -333,24 +358,22 @@ const usePluginLoader = () => {
       }
     };
   
-    // TODO 暂未找到关闭弹窗的全局方法
-    const closeModal = () => {
-    };
   
     const loadPlugins = () => {
       return new Promise((resolve) => {
-        const routerConfig:  RouteConfig[] = [];
-        apipark['builtIn'].default({ routerConfig } as CoreObj);
-         installPlugin(routerConfig).then(async (res)=>{
+        if(startInstallPlugin) {
+          return  resolve(true)
+        }
+        startInstallPlugin = true
+        installPlugin().then(async (res)=>{
           // reset route after loading executed plugins
-          // TODO 需要测试次式executeList是否已经更新，如果没有更新的话要修改executeList 更新的写法
           await loadExecutedPlugin();
-          resolve(res)
+          return  resolve(res)
          })
       });
     };
   
-    const installPlugin = (routerConfig: any[]) => {
+    const installPlugin = () => {
       return new Promise((resolve, reject) => {
         // fetchData('system/plugins',{method:'GET'}).then((resp) => {
           // if (resp.code === 0){
@@ -374,12 +397,18 @@ const usePluginLoader = () => {
                   continue;
                 }
                 const driver = driverName.split('.').reduce((driverMethod: { [x: string]: any; }, driverName: string | number) => driverMethod[driverName], driverMethod);
-                driver({ routerConfig, setExecuteList, pluginLoader, pluginProvider, pluginLifecycleGuard, builtInPluginLoader }, plugin);
+                if(driverName.split('.')[2] === 'preload'){
+                  setPendingTasks(prev => prev + 1);
+                }
+                ;(driver as Function )?.({  setExecuteList:(callback:ExecutePluginType[]) => {
+                  setExecuteList(callback);
+                  setPendingTasks(prev => prev - 1);
+                }, pluginLoader, pluginProvider, pluginLifecycleGuard, builtInPluginLoader }, plugin);
               } catch (err) {
                 console.warn('安装插件出错：', err);
               }
             }
-            resolve(routerConfig);
+            resolve(true);
           // } else {
           //   messageService.error(resp.msg || '获取插件配置列表失败，请重试!');
           //   reject(new Error(resp.msg || '获取插件配置列表失败'));
@@ -391,7 +420,7 @@ const usePluginLoader = () => {
   
     const loadBuiltInModule = (pluginName: any) => {
       try {
-        const { module } = routerMap.get(pluginName);
+        const { module } = routerMap.get(pluginName)!;
         return module;
       } catch (err) {
         console.warn(`安装内置插件[${pluginName}]出错：`, err);
@@ -402,7 +431,6 @@ const usePluginLoader = () => {
       loadPlugins,
       loadModule,
       loadExecutedPlugin,
-      closeModal,
       setBaseHref,
       getModule
     };

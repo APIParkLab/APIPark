@@ -1,18 +1,19 @@
+import { RouterMapConfig } from '@common/const/type';
+import { ProtectedRoute } from '@core/components/aoplatform/RenderRoutes';
+import { AiServiceProvider } from '@core/contexts/AiServiceContext';
 import { SystemProvider } from '@core/contexts/SystemContext';
 import { TeamProvider } from '@core/contexts/TeamContext';
+import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
+import Guide from '@core/pages/guide/Guide';
 import Login from '@core/pages/Login';
 import SystemOutlet from '@core/pages/system/SystemOutlet';
 import { TenantManagementProvider } from '@market/contexts/TenantManagementContext';
 import { lazy } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
-import {ProtectedRoute} from '@businessEntry/components/aoplatform/RenderRoutes';
-import Guide from '@core/pages/guide/Guide';
-import { AiServiceProvider } from '@core/contexts/AiServiceContext';
-import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
-import React from 'react';
+
 
   // 内置插件与对应组件/模块
-  export const routerMap:Map<string, unknown> = new Map([
+  export const routerMap:Map<string, RouterMapConfig> = new Map([
     ['basicLayout', { type: 'component', component: <ProtectedRoute />}],
     ['navHidden', { type: 'component', component:  <ProtectedRoute /> }],
     ['login', { type: 'component', component: <Login /> }],
@@ -104,7 +105,7 @@ import React from 'react';
                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideRouterCreate')),
                             },
                             {
-                                path:'router',
+                                path:'route',
                                 key: 'restServiceInsideRoute',
                                 lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/api/SystemInsideRouterList')),
                             },

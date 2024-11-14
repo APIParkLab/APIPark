@@ -19,6 +19,7 @@ import { Icon } from '@iconify/react';
 import { $t } from '@common/locales';
 import { ProConfigProvider, ProLayout } from '@ant-design/pro-components';
 import LanguageSetting from './LanguageSetting';
+import { usePluginSlotHub } from '@common/contexts/PluginSlotHubContext';
 
 const APP_MODE = import.meta.env.VITE_APP_MODE;
 export type MenuItem = Required<MenuProps>['items'][number];
@@ -43,6 +44,7 @@ const themeToken = {
     const [pathname, setPathname] = useState(currentUrl); 
     const mainPage = project === 'core' ?'/service/list':'/serviceHub/list'
     const [menuItems, setMenuItems] = useState<MenuProps['items']>();
+    const pluginSlotHub = usePluginSlotHub()
 
    useEffect(()=>{
     const newMenu = transformMenuData(menuList)
@@ -145,6 +147,16 @@ const themeToken = {
     ].filter(Boolean), [userInfo]);
 
 
+    const actionRender =useMemo( ()=>{
+        return [
+            <LanguageSetting />,
+            <Button  className=" text-[#ffffffb3] hover:text-[#fff] border-none" type="default" ghost onClick={()=>{window.open('https://docs.apipark.com','_blank')}}>
+              <span className='flex items-center gap-[8px]'> <Icon icon="ic:baseline-help" width="14" height="14"/>{$t('文档')}</span>
+            </Button> ,
+            ...((pluginSlotHub.getSlot('basicLayoutAfterBtns') as unknown[] )||[] )
+          ]
+    },[pluginSlotHub.getSlot('basicLayoutAfterBtns') ])
+
 
     return(
         <div
@@ -195,12 +207,7 @@ const themeToken = {
                         actionsRender={(props) => {
                           if (props.isMobile) return [];
                           if (typeof window === 'undefined') return [];
-                          return [
-                            <LanguageSetting />,
-                            <Button  className=" text-[#ffffffb3] hover:text-[#fff] border-none" type="default" ghost onClick={()=>{window.open('https://docs.apipark.com','_blank')}}>
-                              <span className='flex items-center gap-[8px]'> <Icon icon="ic:baseline-help" width="14" height="14"/>{$t('文档')}</span>
-                            </Button> 
-                          ];
+                          return actionRender;
                         }}
                         headerTitleRender={() => (
                             <div className="w-[192px]  flex items-center">
