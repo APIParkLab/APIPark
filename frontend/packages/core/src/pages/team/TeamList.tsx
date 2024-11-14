@@ -31,7 +31,6 @@ const TeamList:FC = ()=>{
     const [curTeam, setCurTeam] = useState<TeamConfigFieldType>({} as TeamConfigFieldType)
     const [modalVisible, setModalVisible] = useState<boolean>(false)
     const [modalType, setModalType] = useState<'add'|'edit'>('add')
-
     const getTeamList = ()=>{
         if(!accessInit){
             getGlobalAccessData()?.then?.(()=>{getTeamList()})

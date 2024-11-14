@@ -1,5 +1,8 @@
+import { FC, ReactElement, ReactNode } from "react"
 import { PERMISSION_DEFINITION } from "./permissions"
 import { MatchPositionEnum, MatchTypeEnum } from "@core/const/system/const"
+import usePluginLoader from "@common/hooks/pluginLoader"
+import { useGlobalContext } from "@common/contexts/GlobalStateContext"
 
 export type UserInfoType = {
     username: string
@@ -8,7 +11,6 @@ export type UserInfoType = {
     phone: string
     avatar: string
     type:string
-
 }
 
 export type UserProfileProps = {
@@ -101,3 +103,86 @@ export type SimpleMemberItem = {
     department:string
     avatar:string
 }
+
+
+export type RouteConfig = {
+    path:string
+    pathPrefix?:string
+    component?:ReactElement
+    children?:(RouteConfig|false)[]
+    key:string
+    provider?:FC<{ children: ReactNode; }>
+    lazy?:unknown
+    data?:Record<string, string>
+    lifecycle?:{
+        canActivate?:()=>Promise<boolean>
+        canLoad?:()=>Promise<boolean>
+        canDeactivate?:()=>Promise<boolean>
+        deactivated?:()=>Promise<boolean>
+    }
+}
+
+export type RouterParams  = {
+    teamId:string
+    apiId:string
+    serviceId:string
+    clusterId:string;
+    memberGroupId:string
+    userGroupId:string
+    pluginName:string
+    moduleId:string
+    accessType:'project'|'team'|'service'
+    categoryId:string
+    tagId:string
+    dashboardType:string
+    dashboardDetailId:string
+    topologyId:string
+    appId:string
+    roleType:string 
+    roleId:string
+    routeId:string
+}
+
+
+export type PluginRouterConfig = {
+    name:string
+    path:string;
+    type:string;
+    expose?:string
+  }
+
+export type CoreObj = {
+routerConfig: RouteConfig[];
+setExecuteList: (param:unknown[])=>void;
+pluginLoader: {
+    loadModule: (path: string, name: string, expose: string, pluginPath: string) => Promise<any>;
+};
+pluginProvider: ReturnType<typeof useGlobalContext>
+// pluginLifecycleGuard: PluginLifecycleGuard;
+builtInPluginLoader: (name: string) => any;
+}
+
+export type PluginConfigType = {
+    name: string;
+    router: Array<PluginRouterConfig>;
+    path?: string;
+    driver:string
+  }
+
+
+export type  ApiparkPluginDriverType = {
+    [key:string]:{[key:string]:(coreObj?:CoreObj, pluginConfig?:PluginConfigType)=>(CoreObj|undefined)}
+  }
+
+  
+export type RouterMapConfig = {
+    type: 'component' | 'module',
+    component: ReactElement,
+    provider?: FC,
+    lazy?: FC
+    key?: string
+    children?: RouteConfig[]
+    data?:Record<string, string>
+    pathMatch?:string
+}
+  
