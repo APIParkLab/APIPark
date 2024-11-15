@@ -1,4 +1,6 @@
-import { STATUS_CODE } from "@common/const/const";
+import { BasicResponse, STATUS_CODE } from "@common/const/const";
+import { usePluginEventHub } from "@common/contexts/PluginEventHubContext";
+import EventEmitter from "events";
 
 const urlWhiteList = [/api.example.com\/users/, /api.example2.com\/products/]; // 正则白名单
 
@@ -137,7 +139,10 @@ type EoRequest = RequestInit & {eoParams?:{[k:string]:unknown},eoTransformKeys?:
 
 type EoHeaders = Headers  | {[k:string]:string}
 
-export function useFetch(){
+export function useFetch() {
+    // plugin cannot use usePluginEventHub directly, so we need to pass it as a parameter
+    const pluginEventHub =  usePluginEventHub()
+
     function fetchData<T>(url:string, options: EoRequest ) {
         // 合并传入的headers与默认headers
         const headers = { ...(options.body ?  {}:DEFAULT_HEADERS), ...options.headers };
@@ -184,8 +189,10 @@ export function useFetch(){
                 // 如果响应体为JSON且指定了转换键，则转换响应数据
                 if ( isJsonHttp(response.headers)) {
                     const data = await response.json();
-                    return shouldTransformKeys ?  keysToCamel(data,options.eoTransformKeys as string[]) as T:data
+                    const newData = await pluginEventHub.emit('httpResponse', {data,continue:true})  as Response;
+                    return shouldTransformKeys ?  keysToCamel(newData,options.eoTransformKeys as string[]) as T:data
                 }
+
 
                 return response;
             })

@@ -1,30 +1,16 @@
 
 import './App.css'
-import { ConfigProvider, ConfigProviderProps, Radio, RadioChangeEvent } from 'antd';
+import { ConfigProvider, App as AppAntd } from 'antd';
 import RenderRoutes from '@core/components/aoplatform/RenderRoutes';
 import {BreadcrumbProvider} from "@common/contexts/BreadcrumbContext.tsx";
-import { StyleProvider } from '@ant-design/cssinjs';
-import zhCN from 'antd/locale/zh_CN';
-import enUS from 'antd/locale/en_US';
-import zhTW from 'antd/locale/zh_TW';
-import jaJP from 'antd/locale/ja_JP';
 import useInitializeMonaco from "@common/hooks/useInitializeMonaco";
-import { useEffect, useMemo, useState } from 'react';
-import 'dayjs/locale/zh-cn';
-import 'dayjs/locale/zh-tw';
-import 'dayjs/locale/ja';
-import dayjs from 'dayjs';
-import { useGlobalContext } from '@common/contexts/GlobalStateContext';
+import { useMemo } from 'react';
+import { GlobalProvider } from '@common/contexts/GlobalStateContext';
 import { $t } from '@common/locales';
-
-type Locale = ConfigProviderProps['locale'];
-
-const languageMap: Record<string, Locale> = {
-  'zh-CN':zhCN,
-  'en-US':enUS,
-  'zh-TW':zhTW,
-  'ja-JP':jaJP
-}
+import { PluginEventHubProvider } from '@common/contexts/PluginEventHubContext';
+import { PluginSlotHubProvider } from '@common/contexts/PluginSlotHubContext';
+import { useLocaleContext } from '@common/contexts/LocaleContext';
+import { StyleProvider } from '@ant-design/cssinjs';
 
 
 const antdComponentThemeToken = {
@@ -150,33 +136,35 @@ const antdComponentThemeToken = {
 
 
 function App() {
-  const [locale, setLocal] = useState<Locale>();
+  const { locale } = useLocaleContext();
   useInitializeMonaco()
-  const { state} = useGlobalContext()
   
-
-  useEffect(() => {
-      dayjs.locale(state.language);
-      setLocal(languageMap[state.language]);
-  },[state.language])
   
   const validateMessages = useMemo(()=>({
     required: $t('必填项'),
     email:$t('不是有效邮箱地址')}
-  ),[state.language])
+  ),[locale])
   
   return (
-      <StyleProvider hashPriority={"high"}>
-        <ConfigProvider 
-          locale={locale}
-          wave={{disabled:true}}
-          theme={antdComponentThemeToken}
-          form={{validateMessages }}>
-                <BreadcrumbProvider>
-                    <RenderRoutes />
-                </BreadcrumbProvider>
-        </ConfigProvider>
-      </StyleProvider>
+    <StyleProvider hashPriority={"high"}>
+      <ConfigProvider 
+        locale={locale}
+        wave={{disabled:true}}
+        theme={antdComponentThemeToken}
+        form={{validateMessages }}>
+          <AppAntd className="h-full" message={{ maxCount: 1 }}>
+            <PluginEventHubProvider>
+              <PluginSlotHubProvider>
+                <GlobalProvider>
+                  <BreadcrumbProvider>
+                      <RenderRoutes />
+                  </BreadcrumbProvider>
+                  </GlobalProvider>
+              </PluginSlotHubProvider>
+          </PluginEventHubProvider>
+          </AppAntd>
+      </ConfigProvider>
+    </StyleProvider>
   );
 }
 
