@@ -74,11 +74,11 @@ const SystemInsidePage: FC = () => {
       ],
       'group'),
     getItem($t('管理'), 'mng', null,
-      [
-        APP_MODE === 'pro' ? getItem(<Link to="./topology">{$t('调用拓扑图')}</Link>, 'topology', undefined, undefined, undefined, 'project.mySystem.topology.view') : null,
-        getItem(<Link to="./setting">{$t('设置')}</Link>, 'setting', undefined, undefined, undefined, '')],
-      'group'),
-  ], [state.language])
+        [
+            // APP_MODE === 'pro' ? getItem(<Link to="./topology">{$t('调用拓扑图')}</Link>, 'topology',undefined,undefined,undefined,'project.mySystem.topology.view'):null,
+            getItem(<Link to="./setting">{$t('设置')}</Link>, 'setting',undefined,undefined,undefined,'')],
+        'group'),
+],[state.language])
 
 
   const menuData = useMemo(() => {

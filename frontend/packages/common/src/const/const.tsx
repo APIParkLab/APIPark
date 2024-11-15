@@ -1,10 +1,16 @@
+import { ProtectedRoute } from '@core/components/aoplatform/RenderRoutes'
+import { AiServiceProvider } from '@core/contexts/AiServiceContext'
+import { SystemProvider } from '@core/contexts/SystemContext'
+import { TeamProvider } from '@core/contexts/TeamContext'
+import { TenantManagementProvider } from '@market/contexts/TenantManagementContext'
+import { lazy } from 'react'
+import { Outlet, Navigate } from 'react-router-dom'
 
 export type BasicResponse<T> = {
     code:number
     data:T
     msg:string
 }
-
 
 export const STATUS_CODE = {
     SUCCESS:0,
@@ -29,6 +35,7 @@ export const routerKeyMap = new Map<string, string[]|string>([
     ['maintenanceCenter',['aisetting','datasourcing','cluster','cert','logsettings','resourcesettings','openapi']
   ]])
   
+
     
   export const COLUMNS_TITLE  = {
     operate : ''
