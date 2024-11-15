@@ -110,6 +110,7 @@ const DataMasking = (props: any) => {
     console.log('更改启动状态', enabled, entity);
     
     manualReloadTable()
+    // 待补充，请求接口更改状态，然后刷新表格
     // fetchData<BasicResponse<null>>(
     //   `external-app/${enabled ? 'disable' : 'enable'}`,
     //   {
