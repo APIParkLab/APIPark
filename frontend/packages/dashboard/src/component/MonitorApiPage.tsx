@@ -28,7 +28,7 @@ export type MonitorApiPageProps = {
     detailEntityName:string
 }
 
-export type MonitorApiQueryData = SearchBody & { path?:string, apis?:string[], projects?:string[] }
+export type MonitorApiQueryData = SearchBody & { path?:string, apis?:string[], services?:string[] }
 
 export default function MonitorApiPage(props:MonitorApiPageProps){
     const {fetchTableData,detailDrawerContent,fullScreen,setFullScreen,setDetailId,timeButton,setTimeButton,detailEntityName,setDetailEntityName} = props
@@ -51,7 +51,7 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
       }, []);
 
     const getApiList = (projectIds?:string[])=>{
-      return fetchData<{apis:EntityItem[]}>('simple/project/apis',{method:'POST',eoBody:({projects:projectIds || queryData?.projects})}).then((resp) => {
+      return fetchData<{apis:EntityItem[]}>('simple/service/apis',{method:'POST',eoBody:({services:projectIds || queryData?.services})}).then((resp) => {
         const {code,data,msg} = resp
         if(code === STATUS_CODE.SUCCESS){
             setApiOptionList(data.apis?.map((x:EntityItem)=>({label:x.name, value:x.id})))
@@ -65,10 +65,10 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
     }
 
     const getProjectList = ()=>{
-      return fetchData<{projects:EntityItem[]}>('simple/projects',{method:'GET'}).then((resp) => {
+      return fetchData<{services:EntityItem[]}>('simple/services',{method:'GET'}).then((resp) => {
         const {code,data,msg} = resp
         if(code === STATUS_CODE.SUCCESS){
-            setProjectOptionList(data.projects?.map((x:EntityItem)=>({label:x.name, value:x.id})))
+            setProjectOptionList(data.services?.map((x:EntityItem)=>({label:x.name, value:x.id})))
         }else{
             message.error(msg || $t(RESPONSE_TIPS.dataError))
             return setProjectOptionList([])
@@ -164,13 +164,13 @@ export default function MonitorApiPage(props:MonitorApiPageProps){
               <label className=" whitespace-nowrap inline-block">{$t('服务')}：</label>
               <Select
                 className="w-[346px]"
-                value={queryData?.projects}
+                value={queryData?.services}
                 options={projectOptionList}
                 mode="multiple"
                 allowClear
                 maxCount={3}
                 placeholder={$t("选择服务")}
-                onChange={(value)=>{setQueryData(prevData=>({...prevData || {}, projects:value}));getApiList(value)}}
+                onChange={(value)=>{setQueryData(prevData=>({...prevData || {}, services:value}));getApiList(value)}}
               />
               </div>
             <div className="flex flex-nowrap items-center  pt-btnybase mr-btnybase">
