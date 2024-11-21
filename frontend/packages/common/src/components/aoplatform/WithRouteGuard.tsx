@@ -13,9 +13,6 @@ const withRouteGuard = (WrappedComponent: ExoticComponent<any> | JSXElementConst
   return function RouteGuard(props: JSX.IntrinsicAttributes) {
     const [isActivated, setIsActivated] = useState<boolean>(false);
     const location = useLocation();
-    useEffect(()=>{
-      console.log('路由守卫')
-    },[])
     // check canActivate
     const startLifecycle = async ()=>{
       if(canActivate){
