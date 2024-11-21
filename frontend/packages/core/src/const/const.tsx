@@ -475,7 +475,7 @@ import { Outlet, Navigate } from 'react-router-dom';
            children:[
             {
                 path:'list',
-                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/GlobalPolicy')),
+                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/globalPolicy')),
                 key:'dataMaskingList'
             },
             {
