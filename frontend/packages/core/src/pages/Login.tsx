@@ -206,7 +206,7 @@ const Login:FC = ()=> {
 
                  <section className="flex flex-col items-center mt-[46px] text-SECOND_TEXT">
                     <p className="leading-[28px]">
-                        {$t('Version (0)-(1)',[state.version,state.updateDate])}, {$t(state.powered)}
+                        {$t('Version (0)-(1)',[state?.version,state?.updateDate])}, {$t(state?.powered || '-')}
                      </p>
                         <LanguageSetting mode="light"/>
                  </section>

@@ -78,7 +78,6 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
     
 
     useEffect(() => {
-        //console.log(data)
         if(type === 'edit' && data){
             form.setFieldsValue({...data,expireTime:data.expireTime === 0 ? '' : dayjs(data.expireTime * 1000)})
             forceUpdate({})

@@ -5,10 +5,12 @@ import path from 'path'
 import dynamicImportVars from '@rollup/plugin-dynamic-import-vars';
 import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
+import federation from "@originjs/vite-plugin-federation";
 
 export default defineConfig({
   cacheDir: './node_modules/.vite',
   build:{
+    target: 'esnext',
     outDir:'../../dist',
     sourcemap: false,
     chunkSizeWarningLimit: 50,
@@ -18,7 +20,7 @@ export default defineConfig({
         chunkFileNames: 'assets/eo-[name]-[hash].js',
       },
     },
-    },
+  },
   css: {
     postcss: {
       plugins: [
@@ -42,6 +44,17 @@ export default defineConfig({
         exclude:[],
         warnOnError:false
        }),
+       federation({
+        name:"container",
+        remotes:{
+          remoteApp: 'http://localhost:5001/assets/remoteEntry.js' // 远程项目的URL
+        },
+        shared:[
+          "react",
+          "react-dom",
+        ]
+      })
+
     ],
   resolve: {
     alias: [

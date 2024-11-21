@@ -42,7 +42,6 @@ const AiServiceInsidePage:FC = ()=> {
 
     
     const getApiDefine = ()=>{
-        console.log('@@@@@@@')
         setApiPrefix('')
         setPrefixForce(false)
         fetchData<BasicResponse<{ prefix:string, force:boolean }>>('service/router/define',{method:'GET',eoParams:{service:serviceId,team:teamId}}).then(response=>{

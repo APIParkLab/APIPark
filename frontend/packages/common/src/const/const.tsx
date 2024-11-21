@@ -1,10 +1,11 @@
+import { $t } from '@common/locales'
+import { StrategyStatusColorClass, StrategyStatusEnum } from './policy/consts'
 
 export type BasicResponse<T> = {
     code:number
     data:T
     msg:string
 }
-
 
 export const STATUS_CODE = {
     SUCCESS:0,
@@ -18,7 +19,7 @@ export const STATUS_COLOR = {
 }
 
 
-// avoid changing route within ths same category
+// TODO should be generated dynamically
 export const routerKeyMap = new Map<string, string[]|string>([
     ['workspace',['consumer','service','team','guide']],
     ['my',['consumer','service','team']],
@@ -29,6 +30,7 @@ export const routerKeyMap = new Map<string, string[]|string>([
     ['maintenanceCenter',['aisetting','datasourcing','cluster','cert','logsettings','resourcesettings','openapi']
   ]])
   
+
     
   export const COLUMNS_TITLE  = {
     operate : ''
@@ -45,6 +47,7 @@ export const routerKeyMap = new Map<string, string[]|string>([
     startWithAlphabet:('英文数字下划线任意一种，首字母必须为英文'),
     specialStartWithAlphabet:('支持字母开头、英文数字中横线下划线组合'),
     onlyAlphabet:('字符非法，仅支持英文'),
+    ipAndCidr:'请输入IP地址或CIDR范围，每条以换行分割'
   }
 
   export const FORM_ERROR_TIPS = {
@@ -74,3 +77,32 @@ export const routerKeyMap = new Map<string, string[]|string>([
     {label:'列表', value:'list'},
     {label:'块', value:'block'},
   ]
+
+  
+export const PolicyPublishColumns = [
+    
+  {
+    title: ('策略名称'),
+    dataIndex: 'name',
+    ellipsis: true,
+    width: 160
+  },
+  {
+    title: ('优先级'),
+    dataIndex: 'priority',
+    width: 140,
+    ellipsis: true
+  },
+  {
+    title: ('状态'),
+    dataIndex: 'status',
+    width: 140,
+    render:(text:string)=> <span className={StrategyStatusColorClass[text as keyof typeof StrategyStatusColorClass]}>{$t(StrategyStatusEnum[text as keyof typeof StrategyStatusEnum])}</span>,
+  },
+  {
+    title: ('更新时间'),
+    dataIndex: 'optTime',
+    width: 182,
+    ellipsis: true,
+  },
+]

@@ -10,8 +10,8 @@ import {OpenApiConfig, OpenApiConfigFieldType, OpenApiConfigHandle} from "./Open
 import { SimpleMemberItem } from "@common/const/type.ts";
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission.tsx";
 import { frontendTimeSorter } from "@common/utils/dataTransfer.ts"; 
-import { OPENAPI_LIST_COLUMNS } from "@market/consts/const.tsx";
-import { OpenApiTableListItem } from "@market/consts/type.ts";
+import { OPENAPI_LIST_COLUMNS } from "@openApi/consts/const.tsx";
+import { OpenApiTableListItem } from "@openApi/consts/type.ts";
 import { $t } from "@common/locales/index.ts";
 
 

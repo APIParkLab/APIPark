@@ -21,7 +21,7 @@
     "paths": {
       "@common/*": ["../common/src/*"],
       "@core/*": ["../core/src/*"],
-      "@market/*": ["./src/*"]
+      "@openApi/*": ["./src/*"]
     },
   },
   "include": ["src", "public/iconpark_eolink.js", "public/iconpark_apinto.js", "../common/src/component/aoplatform/EditableTableWithModal.tsx",  "../common/src/components/aoplatform/TreeWithMore.tsx", "../common/src/components/aoplatform/DatePicker.tsx", "../common/src/components/aoplatform/TimeRangeSelector.tsx", "../common/src/components/aoplatform/TimePicker.tsx", "../common/src/components/aoplatform/MemberTransfer.tsx", "../common/src/components/aoplatform/PageList.tsx",  "../common/src/components/aoplatform/ErrorBoundary.tsx", "../core/src/pages/serviceCategory/ServiceHubCategoryConfig.tsx"],
