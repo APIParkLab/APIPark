@@ -2,11 +2,10 @@
 import { Tabs, TabsProps } from "antd";
 import DashboardTotal from "./DashboardTotal";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
-import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
 import { useEffect, useState } from "react";
 import { $t } from "@common/locales";
+import { RouterParams } from "@common/const/type";
 
-const APP_MODE = import.meta.env.VITE_APP_MODE;
 
 export default function DashboardTabPage(){
     const { dashboardType} = useParams<RouterParams>()
@@ -41,10 +40,10 @@ export default function DashboardTabPage(){
     ]
     
     return (<>
-        {APP_MODE === 'pro' ? <Tabs activeKey={activeKey} onChange={(val)=>{
+       <Tabs activeKey={activeKey} onChange={(val)=>{
             setActiveKey(val);
             navigateTo(`/analytics/${val === 'total' ? val :`${val}/list`}`)
             }} 
-            items={monitorTabItems}  className="h-auto mt-[6px]" size="small"  tabBarStyle={{paddingLeft:'10px',marginTop:'0px',marginBottom:'0px'}} />
-   :  <Outlet />} </>)
+            items={monitorTabItems}  className="h-full overflow-hidden mt-[6px] [&>.ant-tabs-content-holder]:overflow-auto" size="small" tabBarStyle={{paddingLeft:'10px',marginTop:'0px',marginBottom:'0px'}} />
+   </>)
 }

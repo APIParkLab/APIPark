@@ -110,7 +110,7 @@ export default function ServiceHubManagement() {
                     }))
                 );
                 if (!teamId && data.teams?.[0]?.id) {
-                    navigateTo(data.teams[0].id);
+                    navigateTo(`/consumer/list/${data.teams[0].id}`);
                 }
             } else {
                 message.error(msg || $t(RESPONSE_TIPS.error));
