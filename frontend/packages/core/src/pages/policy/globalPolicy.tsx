@@ -1,6 +1,6 @@
 import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 import { $t } from "@common/locales/index.ts";
-import PolicyTabContainer from "./PolicyTabContainer.tsx";
+import PolicyTabContainer from "./policyTabContainer.tsx";
 import DataMasking from "./dataMasking/DataMasking.tsx";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 import { useMemo } from "react";
