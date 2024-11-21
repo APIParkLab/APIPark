@@ -10,6 +10,7 @@ import federation from "@originjs/vite-plugin-federation";
 export default defineConfig({
   cacheDir: './node_modules/.vite',
   build:{
+    target: 'esnext',
     outDir:'../../dist',
     sourcemap: false,
     chunkSizeWarningLimit: 50,
