@@ -3,9 +3,10 @@ import { Input, TabsProps } from "antd";
 import { MatchItem } from "@common/const/type";
 import { ConfigField } from "@common/components/aoplatform/EditableTableWithModal";
 import { frontendTimeSorter } from "@common/utils/dataTransfer";
-import { COLUMNS_TITLE } from "@common/const/const";
+import { COLUMNS_TITLE, PLACEHOLDER } from "@common/const/const";
 
 import { PageProColumns } from "@common/components/aoplatform/PageList";
+import { $t } from "@common/locales";
 
 export enum SubscribeEnum{
     Rejected = 0,
@@ -222,7 +223,7 @@ export const MATCH_CONFIG:ConfigField<MatchItem>[] = [
     }, {
         title:('参数名'),
         key: 'key',
-        component: <Input className="w-INPUT_NORMAL" />,
+        component: <Input className="w-INPUT_NORMAL"/>,
         renderText: (value: unknown) => value,
         required: true
     }, {
@@ -236,7 +237,7 @@ export const MATCH_CONFIG:ConfigField<MatchItem>[] = [
         title:('参数值'),
         key: 'pattern',
         unRender:(formValue)=>{return formValue?.matchType === 'NULL' || formValue?.matchType==='EXIST' || formValue?.matchType === 'UNEXIST'},
-        component: <Input className="w-INPUT_NORMAL"/>,
+        component: <Input className="w-INPUT_NORMAL" />,
         renderText: (value: string) => {
             return value
         },

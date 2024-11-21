@@ -3,6 +3,7 @@ import { PERMISSION_DEFINITION } from "./permissions"
 import { MatchPositionEnum, MatchTypeEnum } from "@core/const/system/const"
 import usePluginLoader from "@common/hooks/pluginLoader"
 import { useGlobalContext } from "@common/contexts/GlobalStateContext"
+import { StrategyStatusEnum } from "./policy/consts"
 
 export type UserInfoType = {
     username: string
@@ -141,6 +142,7 @@ export type RouterParams  = {
     roleType:string 
     roleId:string
     routeId:string
+    policyId:string
 }
 
 
@@ -186,3 +188,27 @@ export type RouterMapConfig = {
     pathMatch?:string
 }
   
+
+export type PolichPublishItemType = {
+    name:string
+    priority:number
+    status:keyof typeof StrategyStatusEnum
+    optTime:string
+}
+
+// 发布详情（版本）
+export type PolicyPublishInfoType = {
+    source:string
+    strategies:Array<PolichPublishItemType>
+    isPublish:boolean
+    versionName:string
+    unpublishMsg:string
+};
+
+export type PolicyPublishModalProps = {
+    data:PolicyPublishInfoType
+}
+
+export type PolicyPublishModalHandle = {
+    publish:()=>Promise<boolean|string|Record<string, unknown>>
+}

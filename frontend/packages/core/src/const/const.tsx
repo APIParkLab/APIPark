@@ -172,7 +172,7 @@ import { Outlet, Navigate } from 'react-router-dom';
                             {
                                 path:'servicepolicy',
                                 key: 'servicePolicy',
-                                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/servicePolicy')),
+                                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/ServicePolicy')),
                                 children:[
   
                                 ]
@@ -266,7 +266,7 @@ import { Outlet, Navigate } from 'react-router-dom';
                                 {
                                     path:'servicepolicy',
                                     key: 'servicePolicy',
-                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/servicePolicy')),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/ServicePolicy')),
                                     children:[
       
                                     ]
@@ -413,6 +413,23 @@ import { Outlet, Navigate } from 'react-router-dom';
             key:'analytics2',
             lazy:lazy(() => import(/* webpackChunkName: "[request]" */  '@dashboard/pages/DashboardTotal.tsx')),
         },
+        {
+            path:':dashboardType',
+            key:'analytics3',
+            component:<Outlet />,
+            children:[
+                {
+                    path:'list',
+                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@dashboard/pages/DashboardList.tsx')),
+                    key:'analyticsList'
+                },
+                {
+                    path:'detail/:dashboardDetailId',
+                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@dashboard/pages/DashboardDetail.tsx')),
+                    key:'analyticsDetail'
+                },
+            ]
+        }
       ]
      }],
      ['template', { type: 'module',
@@ -449,6 +466,28 @@ import { Outlet, Navigate } from 'react-router-dom';
           key:'changePsw'
       }]}],
       ['globalPolicy', { type: 'module',
-       lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/globalPolicy.tsx')),
-       key:'globalPolicy'}]
+        lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/GlobalPolicyLayout')),
+       key:'globalPolicy',
+       children:[{
+           path:'datamasking',
+           component:<Outlet />,
+           key:'dataMasking',
+           children:[
+            {
+                path:'list',
+                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/GlobalPolicy')),
+                key:'dataMaskingList'
+            },
+            {
+               path:'create',
+               lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/dataMasking/DataMaskingConfig')),
+               key:'dataMaskingAdd'
+           },
+           {
+              path:':policyId',
+              lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/dataMasking/DataMaskingConfig')),
+              key:'dataMaskingAdd'
+          }]
+       }]
+    }],
   ])

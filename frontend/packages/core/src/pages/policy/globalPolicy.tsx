@@ -1,20 +1,23 @@
 import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 import { $t } from "@common/locales/index.ts";
-import PolicyTabContainer from "./policyTabContainer.tsx";
-import DataMasking from "./dataMasking.tsx";
+import PolicyTabContainer from "./PolicyTabContainer.tsx";
+import DataMasking from "./dataMasking/DataMasking.tsx";
+import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
+import { useMemo } from "react";
 
 
 const PartitionInsideGlobalPolicy = () => {
+  const {state} = useGlobalContext()
   /**
    * tab列表
    */
-  const tabItems = [
+  const tabItems =useMemo(()=> [
     {
       key: 'dataMasking',
       label: $t('数据脱敏'),
       children: <div className="pr-[40px] preview-document h-full pb-[40px]"><DataMasking publishBtn rowOperation={['edit', 'logs', 'delete']} /></div>
     }
-  ]
+  ],[state.language])
 
   return (
     <>

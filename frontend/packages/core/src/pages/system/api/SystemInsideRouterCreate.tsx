@@ -1,18 +1,16 @@
 import {App, Button, Col, Form, Input, Row, Select, Space, Spin, Switch} from "antd";
 import  {forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
 import EditableTableWithModal from "@common/components/aoplatform/EditableTableWithModal.tsx";
-import styles from "./SystemInsideApi.module.css"
 import {BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { API_PATH_MATCH_RULES, API_PROTOCOL, HTTP_METHOD, MATCH_CONFIG, MatchPositionEnum, MatchTypeEnum } from "../../../const/system/const.tsx";
 import { SystemInsideRouterCreateHandle, SystemInsideRouterCreateProps, SystemApiProxyFieldType, SystemInsideApiProxyHandle } from "../../../const/system/type.ts";
-import { MatchItem } from "@common/const/type.ts";
+import { MatchItem, RouterParams } from "@common/const/type.ts";
 import { validateUrlSlash } from "@common/utils/validate.ts";
 import { $t } from "@common/locales/index.ts";
 import SystemInsideApiProxy from "@core/pages/system/api/SystemInsideApiProxy.tsx";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
-import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSystemContext } from "@core/contexts/SystemContext.tsx";
 import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
@@ -236,8 +234,6 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle,Syste
                                 configFields={translatedMatchConfig}
                             />
                         </Form.Item>
-                        {/* } */}
-
 
                         <Row className="mb-btnybase mt-[40px]"><Col  ><span className="font-bold mr-[13px]">{$t('转发规则设置')} </span></Col></Row>
                         <Form.Item<SystemApiProxyFieldType>

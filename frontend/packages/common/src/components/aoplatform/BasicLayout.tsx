@@ -75,21 +75,20 @@ const themeToken = {
             if (filteredRoutes.length === 0) {
               return false
             }
-            return { ...item, routes: filteredRoutes };
+            return { ...item,routes: filteredRoutes,name:$t(item.name) };
           }
           // 处理没有 routes 的菜单项
           if (item.access) {
-            return (item.access === 'all' || hasAccess(item.access)) ? item : null;
+            return (item.access === 'all' || hasAccess(item.access)) ? {...item,name:$t(item.name)} : null;
           }
-
                     // 如果没有 access 和 routes，则保留
-                    return item;
+                    return {...item,name:$t(item.name) };
                 })
                 .filter(x => x); // 过滤掉处理后为 null 的项
         };
     
         // 初始过滤操作
-        const res = [...(menuItems || [])]!.filter(x => x).map((x: any) => (x.routes ? { ...x, routes: filterMenu(x.routes) } : x));
+        const res = [...(menuItems || [])]!.filter(x => x).map((x: any) => (x.routes ? { ...x,name:$t(x.name), routes: filterMenu(x.routes) } : {...x,name:$t(x.name)}));
         // 返回处理后的数据
         return { path: '/', routes: res.map(x=> ({...x, routes: x.routes?.filter(x=> (x.access || x.routes?.length > 0))})).filter(x=> (x.access || x.routes?.length > 0)) };
     }, [accessData, state.language,menuItems]);
