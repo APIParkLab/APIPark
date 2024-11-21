@@ -30,7 +30,7 @@ import { $splitNodeContainingQuery } from '../../utils'
 import { useOptions } from './hooks'
 import type { PickerBlockMenuOption } from './menu'
 // import VarReferenceVars from '@/app/components/workflow/nodes/_base/components/variable/var-reference-vars'
-import { useEventEmitterContextContext } from '@common/contexts/event-emitter'
+import { useEventEmitterContextContext } from '@common/contexts/EventEmitterContext'
 
 type ComponentPickerProps = {
   triggerString: string

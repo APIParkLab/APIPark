@@ -14,7 +14,7 @@ import { DELETE_HISTORY_BLOCK_COMMAND } from './index'
 //   PortalToFollowElemContent,
 //   PortalToFollowElemTrigger,
 // } from '@/app/components/base/portal-to-follow-elem'
-import { useEventEmitterContextContext } from '@common/contexts/event-emitter'
+import { useEventEmitterContextContext } from '@common/contexts/EventEmitterContext'
 import { $t } from '@common/locales'
 
 type HistoryBlockComponentProps = {

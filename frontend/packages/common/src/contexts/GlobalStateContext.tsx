@@ -1,10 +1,17 @@
-import {createContext, Dispatch, FC, ReactNode, useContext, useReducer, useState} from "react";
+import {createContext, Dispatch, FC, ReactNode, useContext, useEffect, useReducer, useState} from "react";
 import { useFetch } from "@common/hooks/http";
 import { App } from "antd";
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { checkAccess } from "@common/utils/permission";
 import { PERMISSION_DEFINITION } from "@common/const/permissions";
 import { $t } from "@common/locales";
+import { MenuItem } from "@common/utils/navigation";
+import { ErrorBoundary } from "@ant-design/pro-components";
+import NotFound from "@common/components/aoplatform/NotFound";
+import { RouteConfig } from "@common/const/type";
+import { ProtectedRoute } from "@core/components/aoplatform/RenderRoutes";
+import Login from "@core/pages/Login";
+import { useLocaleContext } from "./LocaleContext";
 
 interface GlobalState {
     isAuthenticated: boolean;
@@ -31,6 +38,168 @@ export type GlobalAction =
     | { type: 'UPDATE_LANGUAGE'; language: string }
 
 
+    const mockData = [
+        {
+          "name": "工作空间",
+          "key": "workspace",
+          "path": "/guide/page",
+          "icon": "ic:baseline-space-dashboard",
+          "children": [
+            {
+              "name": "首页",
+              "key": "guide",
+              "path": "/guide/page",
+              "icon": "ic:baseline-home",
+              "access": "all"
+            },
+            {
+              "name": "服务",
+              "key": "service",
+              "path": "/service",
+              "icon": "ic:baseline-blinds-closed",
+              "access": "all"
+            },
+            {
+              "name": "消费者",
+              "key": "consumer",
+              "path": "/consumer",
+              "icon": "ic:baseline-apps",
+              "access": "all"
+            },
+            {
+              "name": "团队",
+              "key": "team",
+              "path": "/team",
+              "icon": "ic:baseline-people-alt",
+              "access": "all"
+            },
+            // {
+            //   "name": "路由组件",
+            //   "key": "router",
+            //   "path": "/router1",
+            //   "icon": "ic:baseline-people-alt",
+            //   "access": "all"
+            // }
+          ]
+        },
+        {
+          "name": "API 市场",
+          "key": "serviceHub",
+          "path": "/serviceHub",
+          "icon": "ic:baseline-hub",
+          "access": "system.api_portal.api_portal.view"
+        },
+        {
+          "name": "仪表盘",
+          "key": "analytics",
+          "path": "/analytics",
+          "icon": "ic:baseline-bar-chart",
+          "children": [
+            {
+              "name": "运行视图",
+              "key": "analytics",
+              "path": "/analytics",
+              "icon": "ic:baseline-bar-chart",
+              "access": "system.analysis.run_view.view"
+            }
+          ],
+          "access": "system.analysis.run_view.view"
+        },
+        {
+          "name": "系统设置",
+          "key": "operationCenter",
+          "path": "/commonsetting",
+          "icon": "ic:baseline-settings",
+          "children": [
+            {
+              "name": "系统",
+              "key": "serviceHubSetting",
+              "path": "/commonsetting",
+              "children": [
+                {
+                  "name": "常规",
+                  "key": "commonsetting",
+                  "path": "/commonsetting",
+                  "icon": "ic:baseline-hub",
+                  "access": "system.api_market.service_classification.view"
+                },
+                {
+                  "name": "API 网关",
+                  "key": "cluster",
+                  "path": "/cluster",
+                  "icon": "ic:baseline-device-hub",
+                  "access": "system.settings.api_gateway.view"
+                },
+                {
+                  "name": "AI 模型",
+                  "key": "aisetting",
+                  "path": "/aisetting",
+                  "icon": "hugeicons:ai-network",
+                  "access": "system.settings.ai_provider.view"
+                }
+              ],
+            },
+            {
+              "name": "用户",
+              "key": "organization",
+              "path": "/member",
+              "children": [
+                {
+                  "name": "账号",
+                  "key": "member",
+                  "path": "/member",
+                  "icon": "ic:baseline-people-alt",
+                  "access": "system.settings.account.view"
+                },
+                {
+                  "name": "角色",
+                  "key": "role",
+                  "path": "/role",
+                  "icon": "ic:baseline-verified-user",
+                  "access": "system.organization.role.view"
+                }
+              ]
+            },
+            {
+              "name": "集成",
+              "key": "maintenanceCenter",
+              "path": "/datasourcing",
+              "children": [
+                {
+                  "name": "数据源",
+                  "key": "datasourcing",
+                  "path": "/datasourcing",
+                  "icon": "ic:baseline-monitor-heart",
+                  "access": "system.settings.data_source.view"
+                },
+                {
+                  "name": "全局策略",
+                  "key": "globalpolicy",
+                  "path": "/globalpolicy",
+                  "icon": "uil:comment-shield",
+                  "access": "system.settings.data_source.view"
+                },
+                {
+                  "name": "证书",
+                  "key": "cert",
+                  "path": "/cert",
+                  "icon": "ic:baseline-security",
+                  "access": "system.settings.ssl_certificate.view"
+                },
+                {
+                  "name": "日志",
+                  "key": "logsettings",
+                  "path": "/logsettings",
+                  "icon": "ic:baseline-sticky-note-2",
+                  "access": "system.settings.log_configuration.view"
+                },
+              ]
+            }
+          ]
+        }
+      ]
+  
+      
 /*
     存储用户登录、信息、权限等数据
 */
@@ -39,9 +208,11 @@ export const GlobalContext = createContext<{
     dispatch: Dispatch<GlobalAction>;
     accessData:Map<string,string[]>;
     pluginAccessDictionary:{[k:string]:string};
+    menuList:MenuItem[];
     getGlobalAccessData:()=>Promise<{ access:string[]}>;
     getTeamAccessData:(teamId:string)=>void;
     getPluginAccessDictionary:(pluginData:{[k:string]:string})=>void
+    getMenuList:()=>void
     resetAccess:()=>void
     cleanTeamAccessData:()=>void
     checkPermission:(access:keyof typeof PERMISSION_DEFINITION[0] | Array<keyof typeof PERMISSION_DEFINITION[0]>)=>boolean
@@ -49,6 +220,11 @@ export const GlobalContext = createContext<{
     accessInit:boolean
     aiConfigFlushed:boolean
     setAiConfigFlushed:(flush:boolean)=>void
+    routeConfig: RouteConfig[];
+    setRouterConfig: (isRoot: boolean, config: RouteConfig) => void;
+    addRouteConfig: (parentRoute: RouteConfig, config: RouteConfig) => void;
+    fetchData: ReturnType<typeof useFetch>['fetchData'];
+    $t: typeof $t;
 } | undefined>(undefined);
 
 const globalReducer = (state: GlobalState, action: GlobalAction): GlobalState => {
@@ -99,10 +275,18 @@ const globalReducer = (state: GlobalState, action: GlobalAction): GlobalState =>
     }
 };
 
+
+export const DefaultRouteConfig = [
+  { path: '/', pathMatch: 'full', component: <Login /> ,key:'root',},
+  { path: '/login', component: <Login /> ,key:'login'},
+  { path: '/', pathMatch:'prefix',component:<ProtectedRoute /> ,key:'basciLayout',children:[
+    { path: '*', component: <ErrorBoundary><NotFound/></ErrorBoundary>, key: 'errorBoundary' }
+  ]}
+]
 // Create a context provider component
 export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
-    const {fetchData} = useFetch()
     const { message } = App.useApp()
+    const { setLocale } = useLocaleContext();
     const [state, dispatch] = useReducer(globalReducer, {
         isAuthenticated: true, //mock用
         userData: null,
@@ -118,6 +302,43 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
     const [accessInit, setAccessInit] = useState<boolean>(false)
     const [aiConfigFlushed, setAiConfigFlushed] = useState<boolean>(false)
     let getGlobalAccessPromise: Promise<BasicResponse<{ access:string[] }>> | null = null
+    const [menuList, setMenuList] = useState<MenuItem[]>(mockData);
+    const [routeConfig, setRouteConfigState] = useState<RouteConfig[]>(DefaultRouteConfig)
+
+    useEffect(() => {
+      setLocale(state.language);
+    }, [state.language, setLocale]);
+    
+    const { fetchData } = useFetch();
+  
+    const setRouterConfig = (isRoot: boolean, config: RouteConfig) => {
+      setRouteConfigState(prevConfig => {
+        if (isRoot) {
+          return [config,...prevConfig];
+        } else {
+          const rootRoute = prevConfig.find(route => route.path === '/' && route?.pathMatch === 'prefix') ;
+          if (rootRoute ) {
+            rootRoute.children = rootRoute.children ? [config, ...rootRoute.children] : [config];
+          }
+          return [...prevConfig];
+        }
+      });
+    };
+  
+    const addRouteConfig = (parentRoute: RouteConfig, config: RouteConfig) => {
+      const addConfigToParent = (routes: RouteConfig[]): RouteConfig[] => {
+        return routes.map(route => {
+          if (route.key === parentRoute.key) {
+            route.children = route.children ? [...route.children, config] : [config];
+          } else if (route.children) {
+            route.children = addConfigToParent(route.children);
+          }
+          return route;
+        });
+      };
+  
+      setRouteConfigState(prevConfig => addConfigToParent(prevConfig));
+    };
 
     const getGlobalAccessData = ()=>{
         if(getGlobalAccessPromise){
@@ -151,6 +372,18 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
             })
         }
 
+    const getMenuList = ()=>{
+        // TODO 等待对接后端接口
+        // fetchData<BasicResponse<{ access:string[]}>>('profile/permission/team',{method:'GET',eoParams:{team:teamId}},).then(response=>{
+        //     const {code,data,msg} = response
+        //     if(code === STATUS_CODE.SUCCESS){
+        //         setMenuList(data.menus)
+        //     }else{
+        //         message.error(msg || $t(RESPONSE_TIPS.error))
+        //     }
+        //     })
+        }
+
     const cleanTeamAccessData = ()=>{
         setTeamDataFlushed(false)
         setAccessData(prevData => prevData.set('team',[]))
@@ -176,15 +409,26 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
         return revs
     }
 
+
+
     return (
         <GlobalContext.Provider value={
-            { state, dispatch,accessData,pluginAccessDictionary,
+            { state, dispatch,
+              accessData,
+              pluginAccessDictionary,
             getGlobalAccessData,
             getPluginAccessDictionary,
-            getTeamAccessData,teamDataFlushed,
+            getTeamAccessData,teamDataFlushed,getMenuList,menuList,
             cleanTeamAccessData,
-            resetAccess ,checkPermission,accessInit,
-            aiConfigFlushed, setAiConfigFlushed}}>
+            resetAccess ,checkPermission,
+            accessInit,
+            aiConfigFlushed,
+            setAiConfigFlushed,
+            routeConfig,
+            setRouterConfig,
+            addRouteConfig,
+            fetchData,
+            $t:$t,}}>
             {children}
         </GlobalContext.Provider>
     );

@@ -18,6 +18,7 @@ export type ServiceBasicInfoType = {
     invokeAddress:string
     approvalType:'auto'|'manual'
     serviceKind:'ai'|'rest'
+    sitePrefix?:string
 }
 
 export type ServiceDetailType = {
