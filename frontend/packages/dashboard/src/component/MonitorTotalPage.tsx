@@ -1,13 +1,11 @@
 
-import { App, Select, Button, Tabs, TabsProps, Empty, Drawer, Spin } from "antd";
+import { App, Button, Tabs, TabsProps, Empty, Drawer, Spin } from "antd";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useState, useEffect, useRef, useReducer } from "react";
-import { useParams } from "react-router-dom";
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { SummaryPieData, SearchBody, PieData, MonitorApiData, MonitorSubscriberData, InvokeData, MessageData } from "@dashboard/const/type";
 import { getTime, getTimeUnit, changeNumberUnit } from "../utils/dashboard";
-import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
 import ScrollableSection from "@common/components/aoplatform/ScrollableSection";
 import { RangeValue, TimeRange } from "@common/components/aoplatform/TimeRangeSelector";
 import TimeRangeSelector from "@common/components/aoplatform/TimeRangeSelector";
@@ -19,7 +17,6 @@ import DashboardDetail from "@dashboard/pages/DashboardDetail";
 import { $t } from "@common/locales";
 
 dayjs.extend(customParseFormat);
-const APP_MODE = import.meta.env.VITE_APP_MODE;
 
 export type MonitorTotalPageProps = {
     fetchPieData:(body:SearchBody)=>Promise<BasicResponse<PieData>>
@@ -209,17 +206,17 @@ const MonitorTotalPage = (props:MonitorTotalPageProps) => {
       {
           label:$t('API 请求量 Top10'),
           key:'api',
-          children:<MonitorTable className="py-[10px]" ref={monitorApiTableRef} type='api' id="dashboard_top10_api" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorApiData,'api')}} request={()=>getTablesData(queryData||{},'api')}/>
+          children:<MonitorTable className="py-[10px]" ref={monitorApiTableRef} type='api' id="dashboard_top10_api" onRowClick={(record)=>{ getDetailData(record as MonitorApiData,'api')}} request={()=>getTablesData(queryData||{},'api')}/>
       },
       {
           label:$t('消费者调用量 Top10'),
           key:'subscribers',
-          children:<MonitorTable className="py-[10px]"  ref={monitorSubTableRef} type='subscribers'  id="dashboard_top10_subscriber" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorSubscriberData,'subscriber')}}  request={()=>getTablesData(queryData||{},'subscriber')} />
+          children:<MonitorTable className="py-[10px]"  ref={monitorSubTableRef} type='subscribers'  id="dashboard_top10_subscriber" onRowClick={(record)=>{getDetailData(record as MonitorSubscriberData,'subscriber')}}  request={()=>getTablesData(queryData||{},'subscriber')} />
       },
       {
           label:$t('服务被调用量 Top10'),
           key:'providers',
-          children:<MonitorTable className="py-[10px]"  ref={monitorSubTableRef} type='provider'  id="dashboard_top10_provider" onRowClick={(record)=>{APP_MODE !== 'pro' ? null : getDetailData(record as MonitorSubscriberData,'provider')}}  request={()=>getTablesData(queryData||{},'provider')} />
+          children:<MonitorTable className="py-[10px]"  ref={monitorSubTableRef} type='provider'  id="dashboard_top10_provider" onRowClick={(record)=>{getDetailData(record as MonitorSubscriberData,'provider')}}  request={()=>getTablesData(queryData||{},'provider')} />
       }
     ]
 

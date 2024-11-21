@@ -3,8 +3,7 @@ import {StrictMode} from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import {GlobalProvider} from "@common/contexts/GlobalStateContext.tsx";
-
+import { LocaleProvider } from '@common/contexts/LocaleContext.tsx';
 async function initializeApp() {
   try {
     // 初始化行为
@@ -13,9 +12,9 @@ async function initializeApp() {
     // 异步操作完成后，渲染React消费者
     ReactDOM.createRoot(document.getElementById('root')!).render(
       <StrictMode>
-        <GlobalProvider>
+        <LocaleProvider>
           <App />
-        </GlobalProvider>
+        </LocaleProvider>
        </StrictMode>,
     );
   } catch (error) {

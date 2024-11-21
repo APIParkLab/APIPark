@@ -58,7 +58,7 @@ import {
   UPDATE_DATASETS_EVENT_EMITTER,
   UPDATE_HISTORY_EVENT_EMITTER,
 } from './constants'
-import { useEventEmitterContextContext } from '@common/contexts/event-emitter'
+import { useEventEmitterContextContext } from '@common/contexts/EventEmitterContext'
 
 export type PromptEditorProps = {
   instanceId?: string
