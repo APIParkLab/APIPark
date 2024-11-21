@@ -300,3 +300,10 @@ a{
       color: #BBB;
       cursor: not-allowed;
   }
+
+  .ant-input-group-addon{
+    height:32px !important;
+    .ant-btn.ant-btn-default{
+      height:32px !important;
+    }
+  }

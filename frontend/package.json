@@ -9,11 +9,9 @@
   "scripts": {
     "test": "jest",
     "build": "set NODE_OPTIONS=--max-old-space-size=4096  && lerna run build --scope=core --stream  --verbose ",
-    "build:pro": "set NODE_OPTIONS=--max-old-space-size=4096 && lerna run build --scope=business-entry --stream  --verbose ",
     "serve": "lerna run preview --parallel",
     "serve:remotes": "lerna run serve --scope=remote --parallel",
     "dev": "lerna run dev --scope=core --stream",
-    "dev:pro": "lerna run dev --scope=business-entry --stream",
     "stop": "kill-port --port 5000",
     "scan": "i18next-scanner --config i18next-scanner.config.js"
   },

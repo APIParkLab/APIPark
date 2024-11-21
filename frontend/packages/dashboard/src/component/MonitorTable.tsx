@@ -16,8 +16,6 @@ const  TableType = {
     provider :SERVICE_TABLE_GLOBAL_COLUMNS_CONFIG,
     subscribers :APPLICATION_TABLE_GLOBAL_COLUMNS_CONFIG
 }
-const APP_MODE = import.meta.env.VITE_APP_MODE;
-
 
 type MonitorTableProps<T> = {
     type:'api'|'subscribers'|'provider'
@@ -77,13 +75,12 @@ const MonitorTable = forwardRef<MonitorTableHandler, MonitorTableProps<unknown>>
         {
             title: COLUMNS_TITLE.operate,
             key: 'option',
-            btnNums:2,
+            btnNums:1,
             fixed:'right',
             hideInSetting:true,
             valueType: 'option',
             render: (_: React.ReactNode, entity: unknown) => [
-            // <TableBtnWithPermission  access="system.dashboard.self.view" key="view" onClick={()=>onRowClick(entity)} btnTitle="查看"/>,
-            APP_MODE === 'pro' ? <TableBtnWithPermission  access="" key="view" btnType="view"  onClick={()=>onRowClick(entity)} btnTitle="查看"/> : null
+            <TableBtnWithPermission  access="" key="view" btnType="view"  onClick={()=>onRowClick(entity)} btnTitle="查看"/> 
             ],
         }
     ]

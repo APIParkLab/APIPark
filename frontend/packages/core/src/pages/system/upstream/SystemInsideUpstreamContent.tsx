@@ -79,7 +79,7 @@ const SystemInsideUpstreamContent= forwardRef<SystemInsideUpstreamContentHandle>
             if(code === STATUS_CODE.SUCCESS){
                 setTimeout(()=>{
                     form.setFieldsValue({...DEFAULT_FORM_VALUE,...data.upstream})
-                    setFormShowHost(data.upstream.passHost === 'rewrite')
+                    setFormShowHost(data.upstream?.passHost === 'rewrite')
                 },0)
             }else{
                 message.error(msg || $t(RESPONSE_TIPS.error))
