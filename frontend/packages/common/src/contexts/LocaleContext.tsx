@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, FC, ReactNode } from 'react';
 import { ConfigProviderProps } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
@@ -21,12 +21,9 @@ const languageMap: Record<string, Locale> = {
 const LocaleContext = createContext<{
   locale: Locale;
   setLocale: (locale: string) => void;
-}>({
-  locale: zhCN,
-  setLocale: () => {},
-});
+}|undefined>(undefined);
 
-export const LocaleProvider: React.FC = ({ children }) => {
+export const LocaleProvider: FC<{children:ReactNode}> = ({ children }) => {
   const [locale, setLocaleState] = useState<Locale>(zhCN);
 
   const setLocale = (language: string) => {
@@ -41,4 +38,10 @@ export const LocaleProvider: React.FC = ({ children }) => {
   );
 };
 
-export const useLocaleContext = () => useContext(LocaleContext);
+export const useLocaleContext = () => {
+    const context = useContext(LocaleContext);
+    if (!context) {
+        throw new Error('useLocaleContext must be used within a LocaleContext');
+    }
+    return context;
+};

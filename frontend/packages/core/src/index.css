@@ -321,6 +321,11 @@ p{
   }
 }
 
+.ant-table-body {
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+}
+
 
 ::-webkit-scrollbar {
   width: 10px;
@@ -664,7 +669,7 @@ p{
 .ant-pro-table-list-toolbar-setting-items{
   position:absolute;
   top:18px;
-  right:16px;
+  right:22px;
   z-index:9;
   .ant-pro-table-list-toolbar-setting-item{
     font-size:14px;

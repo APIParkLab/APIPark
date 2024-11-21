@@ -91,14 +91,14 @@ export type GlobalAction =
         },
         {
           "name": "仪表盘",
-          "key": "mainPage",
+          "key": "analytics",
           "path": "/analytics",
           "icon": "ic:baseline-bar-chart",
           "children": [
             {
               "name": "运行视图",
               "key": "analytics",
-              "path": "/analytics/total",
+              "path": "/analytics",
               "icon": "ic:baseline-bar-chart",
               "access": "system.analysis.run_view.view"
             }

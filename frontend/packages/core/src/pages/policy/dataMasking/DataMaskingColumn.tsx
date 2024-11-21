@@ -2,16 +2,14 @@
 import { PageProColumns } from "@common/components/aoplatform/PageList";
 import { frontendTimeSorter } from "@common/utils/dataTransfer";
 import { $t } from "@common/locales";
+import { StrategyStatusEnum, StrategyStatusColorClass } from "@common/const/policy/consts";
+
 
 export const DATA_MASSKING_TABLE_COLUMNS: PageProColumns<any>[] = [
   {
     title: ('策略名称'),
     dataIndex: 'name',
     ellipsis: true,
-    filters: true,
-    onFilter: true,
-    valueType: 'select',
-    filterSearch: true,
     width: 160
   },
   {
@@ -25,46 +23,47 @@ export const DATA_MASSKING_TABLE_COLUMNS: PageProColumns<any>[] = [
   },
   {
     title: ('发布状态'),
-    dataIndex: 'status',
+    dataIndex: 'publishStatus',
     filters: true,
-    onFilter: true,
+    onFilter: false ,
     width: 140,
-    valueEnum: new Map([
-      [true, <span className="text-status_success">{$t('已发布')}</span>],
-      [false, <span className="text-status_fail">{$t('未发布')}</span>]
-    ])
+    valueEnum: new Map(
+      Object.keys(StrategyStatusEnum).map(key=>
+        [key,
+        <span className={StrategyStatusColorClass[key as keyof typeof StrategyStatusColorClass]}>{$t(StrategyStatusEnum[key as keyof typeof StrategyStatusEnum])}</span>
+      ]))
   },
   {
     title: ('启用'),
-    dataIndex: 'enabled',
+    dataIndex: 'isStop',
     filters: true,
-    onFilter: true,
+    onFilter: false ,
     valueEnum: {
-      true: { text: <span className="text-status_success">{$t('启用')}</span> },
-      false: { text: <span className="text-status_fail">{$t('禁用')}</span> }
+      false: { text: <span className="text-status_success">{$t('启用')}</span> },
+      true: { text: <span className="text-status_fail">{$t('禁用')}</span> }
     }
   },
   {
     title: ('筛选条件'),
-    dataIndex: 'condition',
+    dataIndex: 'filters',
     ellipsis: true
   },
   {
     title: ('处理数'),
-    dataIndex: 'treatmentNumber',
+    dataIndex: 'processedTotal',
     ellipsis: true
   },
   {
     title: ('更新者'),
-    dataIndex: 'updater',
+    dataIndex: 'operator',
     width: 140,
     ellipsis: true
   },
   {
     title: ('更新时间'),
-    dataIndex: 'createTime',
+    dataIndex: 'updateTime',
     width: 182,
     ellipsis: true,
-    sorter: (a, b) => frontendTimeSorter(a, b, 'createTime')
+    sorter: (a, b) => frontendTimeSorter(a, b, 'updateTime')
   },
 ];

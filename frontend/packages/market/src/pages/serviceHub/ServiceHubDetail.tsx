@@ -1,18 +1,16 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
 import { App, Avatar, Button, Descriptions, Divider, Tabs } from "antd";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useBreadcrumb } from "@common/contexts/BreadcrumbContext.tsx";
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const.tsx";
 import { useFetch } from "@common/hooks/http.ts";
 import { DefaultOptionType } from "antd/es/cascader";
 import { ApplyServiceHandle, ServiceBasicInfoType, ServiceDetailType } from "../../const/serviceHub/type.ts";
-import { EntityItem } from "@common/const/type.ts";
+import { EntityItem, RouterParams } from "@common/const/type.ts";
 import { ApplyServiceModal } from "./ApplyServiceModal.tsx";
 import ServiceHubApiDocument from "./ServiceHubApiDocument.tsx";
 import Integrate from "./integrate.tsx";
 import { ApiFilled, ArrowLeftOutlined, BgColorsOutlined } from "@ant-design/icons";
-import { SimpleSystemItem } from "@core/const/system/type.ts";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import DOMPurify from 'dompurify';
 import { $t } from "@common/locales/index.ts";
@@ -54,7 +52,7 @@ const ServiceHubDetail = () => {
   }
 
   const getServiceBasicInfo = () => {
-    fetchData<BasicResponse<{ service: ServiceDetailType }>>('catalogue/service', { method: 'GET', eoParams: { service: serviceId }, eoTransformKeys: ['app_num', 'api_num', 'update_time', 'api_doc', 'invoke_address', 'approval_type', 'service_kind'] }).then(response => {
+    fetchData<BasicResponse<{ service: ServiceDetailType }>>('catalogue/service', { method: 'GET', eoParams: { service: serviceId }, eoTransformKeys: ['app_num', 'api_num', 'update_time', 'api_doc', 'invoke_address', 'approval_type', 'service_kind','site_prefix'] }).then(response => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         setService({ ...data.service, apiDoc: modifyApiDoc(data.service.apiDoc, data.service.basic?.invokeAddress) })
