@@ -172,7 +172,7 @@ import { Outlet, Navigate } from 'react-router-dom';
                             {
                                 path:'servicepolicy',
                                 key: 'servicePolicy',
-                                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/ServicePolicy')),
+                                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/servicePolicy')),
                                 children:[
   
                                 ]
@@ -266,7 +266,7 @@ import { Outlet, Navigate } from 'react-router-dom';
                                 {
                                     path:'servicepolicy',
                                     key: 'servicePolicy',
-                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/ServicePolicy')),
+                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/servicePolicy')),
                                     children:[
       
                                     ]

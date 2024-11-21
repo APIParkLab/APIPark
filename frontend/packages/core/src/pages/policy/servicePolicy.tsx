@@ -1,6 +1,6 @@
 import { $t } from "@common/locales/index.ts";
 import DataMasking from "./dataMasking/DataMasking";
-import PolicyTabContainer from "./PolicyTabContainer";
+import PolicyTabContainer from "./policyTabContainer";
 
 const servicePolicy = () => {
   /**
