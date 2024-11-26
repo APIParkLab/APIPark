@@ -17,6 +17,70 @@ type imlMonitorStatisticController struct {
 	module monitor.IMonitorStatisticModule `autowired:""`
 }
 
+func (i *imlMonitorStatisticController) Statistics(ctx *gin.Context, dataType string, input *monitor_dto.StatisticInput) (interface{}, error) {
+	switch dataType {
+	case monitor_dto.DataTypeApi:
+		return i.module.ApiStatistics(ctx, input)
+	case monitor_dto.DataTypeProvider:
+		return i.module.ProviderStatistics(ctx, input)
+	case monitor_dto.DataTypeSubscriber:
+		return i.module.SubscriberStatistics(ctx, input)
+	default:
+		return nil, fmt.Errorf("unsupported data type: %s", dataType)
+	}
+}
+
+func (i *imlMonitorStatisticController) InvokeTrend(ctx *gin.Context, dataType string, id string, input *monitor_dto.CommonInput) (*monitor_dto.MonInvokeCountTrend, string, error) {
+	switch dataType {
+	case monitor_dto.DataTypeApi:
+		return i.module.APITrend(ctx, id, input)
+	case monitor_dto.DataTypeProvider:
+		return i.module.ProviderTrend(ctx, id, input)
+	case monitor_dto.DataTypeSubscriber:
+		return i.module.SubscriberTrend(ctx, id, input)
+	default:
+		return nil, "", fmt.Errorf("unsupported data type: %s", dataType)
+	}
+}
+
+func (i *imlMonitorStatisticController) InvokeTrendInner(ctx *gin.Context, dataType string, typ string, api string, provider string, subscriber string, input *monitor_dto.CommonInput) (*monitor_dto.MonInvokeCountTrend, string, error) {
+	if dataType == monitor_dto.DataTypeApi && typ == monitor_dto.DataTypeSubscriber || dataType == monitor_dto.DataTypeSubscriber && typ == monitor_dto.DataTypeApi {
+		return i.module.InvokeTrendWithSubscriberAndApi(ctx, api, subscriber, input)
+	} else if dataType == monitor_dto.DataTypeApi && typ == monitor_dto.DataTypeProvider || dataType == monitor_dto.DataTypeProvider && typ == monitor_dto.DataTypeApi {
+		return i.module.InvokeTrendWithProviderAndApi(ctx, provider, api, input)
+	}
+	return nil, "", fmt.Errorf("unsupported detail type: %s, data type is %s", typ, dataType)
+}
+
+func (i *imlMonitorStatisticController) StatisticsInner(ctx *gin.Context, dataType string, typ string, id string, input *monitor_dto.StatisticInput) (interface{}, error) {
+	switch dataType {
+	case monitor_dto.DataTypeApi:
+		switch typ {
+		case monitor_dto.DataTypeProvider:
+			return i.module.ProviderStatisticsOnApi(ctx, id, input)
+		case monitor_dto.DataTypeSubscriber:
+			return i.module.SubscriberStatisticsOnApi(ctx, id, input)
+		default:
+			return nil, fmt.Errorf("unsupported detail type: %s, data type is %s", typ, dataType)
+		}
+	case monitor_dto.DataTypeProvider:
+		switch typ {
+		case monitor_dto.DataTypeApi:
+			return i.module.ApiStatisticsOnProvider(ctx, id, input)
+		default:
+			return nil, fmt.Errorf("unsupported detail type: %s, data type is %s", typ, dataType)
+		}
+	case monitor_dto.DataTypeSubscriber:
+		switch typ {
+		case monitor_dto.DataTypeApi:
+			return i.module.ApiStatisticsOnSubscriber(ctx, id, input)
+		default:
+			return nil, fmt.Errorf("unsupported detail type: %s, data type is %s", typ, dataType)
+		}
+	}
+	return nil, fmt.Errorf("unsupported data type: %s", dataType)
+}
+
 func (i *imlMonitorStatisticController) OverviewMessageTrend(ctx *gin.Context, input *monitor_dto.CommonInput) ([]time.Time, []float64, []float64, string, error) {
 	trend, timeInterval, err := i.module.MessageTrend(ctx, input)
 	if err != nil {

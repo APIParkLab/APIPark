@@ -17,8 +17,9 @@ type IStrategyModule interface {
 	Edit(ctx context.Context, id string, i *strategy_dto.Edit) error
 	Enable(ctx context.Context, id string) error
 	Disable(ctx context.Context, id string) error
-	Publish(ctx context.Context, scope string, target string) error
+	Publish(ctx context.Context, driver string, scope string, target string) error
 	Delete(ctx context.Context, id string) error
+	ToPublish(ctx context.Context, driver string) ([]*strategy_dto.ToPublishItem, error)
 }
 
 func init() {

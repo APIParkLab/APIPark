@@ -21,12 +21,12 @@ type ApiStatisticBasicItem struct {
 	*MonCommonData
 }
 
-type ProjectStatisticItem struct {
-	*ProjectStatisticBasicItem
+type ServiceStatisticItem struct {
+	*ServiceStatisticBasicItem
 	IsRed bool `json:"is_red"` //是否标红
 }
 
-type ProjectStatisticBasicItem struct {
+type ServiceStatisticBasicItem struct {
 	Id   string `json:"id"`   //订阅方ID
 	Name string `json:"name"` //订阅方名称
 	*MonCommonData

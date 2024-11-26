@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	upstream_dto "github.com/APIParkLab/APIPark/module/upstream/dto"
+
 	"github.com/eolinker/eosc/log"
 
 	application_authorization "github.com/APIParkLab/APIPark/module/application-authorization"
@@ -25,7 +27,6 @@ import (
 	"github.com/APIParkLab/APIPark/module/service"
 	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
 	"github.com/APIParkLab/APIPark/module/upstream"
-	upstream_dto "github.com/APIParkLab/APIPark/module/upstream/dto"
 	"github.com/eolinker/go-common/store"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -47,24 +48,12 @@ type imlServiceController struct {
 	transaction    store.ITransaction        `autowired:""`
 }
 
-func newAIUpstream(id string, provider string, uri model_runtime.IProviderURI) *upstream_dto.Upstream {
-	return &upstream_dto.Upstream{
-		Type:            "http",
-		Balance:         "round-robin",
-		Timeout:         300000,
-		Retry:           0,
-		Remark:          fmt.Sprintf("auto create by ai service %s,provider is %s", id, provider),
-		LimitPeerSecond: 0,
-		ProxyHeaders:    nil,
-		Scheme:          uri.Scheme(),
-		PassHost:        "node",
-		Nodes: []*upstream_dto.NodeConfig{
-			{
-				Address: uri.Host(),
-				Weight:  100,
-			},
-		},
-	}
+func (i *imlServiceController) Simple(ctx *gin.Context) ([]*service_dto.SimpleServiceItem, error) {
+	return i.module.Simple(ctx)
+}
+
+func (i *imlServiceController) MySimple(ctx *gin.Context) ([]*service_dto.SimpleServiceItem, error) {
+	return i.module.MySimple(ctx)
 }
 
 func (i *imlServiceController) editAIService(ctx *gin.Context, id string, input *service_dto.EditService) (*service_dto.Service, error) {
@@ -228,21 +217,12 @@ func (i *imlServiceController) SearchMyServices(ctx *gin.Context, teamId string,
 	return i.module.SearchMyServices(ctx, teamId, keyword)
 }
 
-//func (i *imlServiceController) Simple(ctx *gin.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
-//	return i.module.Simple(ctx, keyword)
-//}
-//
-//func (i *imlServiceController) MySimple(ctx *gin.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
-//	return i.module.MySimple(ctx, keyword)
-//}
-
 func (i *imlServiceController) Get(ctx *gin.Context, id string) (*service_dto.Service, error) {
 	now := time.Now()
 	defer func() {
 		log.Infof("get service %s cost %d ms", id, time.Since(now).Milliseconds())
 	}()
 	return i.module.Get(ctx, id)
-
 }
 
 func (i *imlServiceController) Search(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {
@@ -335,4 +315,24 @@ func (i *imlAppController) GetApp(ctx *gin.Context, appId string) (*service_dto.
 
 func (i *imlAppController) DeleteApp(ctx *gin.Context, appId string) error {
 	return i.module.DeleteApp(ctx, appId)
+}
+
+func newAIUpstream(id string, provider string, uri model_runtime.IProviderURI) *upstream_dto.Upstream {
+	return &upstream_dto.Upstream{
+		Type:            "http",
+		Balance:         "round-robin",
+		Timeout:         300000,
+		Retry:           0,
+		Remark:          fmt.Sprintf("auto create by ai service %s,provider is %s", id, provider),
+		LimitPeerSecond: 0,
+		ProxyHeaders:    nil,
+		Scheme:          uri.Scheme(),
+		PassHost:        "node",
+		Nodes: []*upstream_dto.NodeConfig{
+			{
+				Address: uri.Host(),
+				Weight:  100,
+			},
+		},
+	}
 }
