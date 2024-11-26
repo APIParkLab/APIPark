@@ -102,3 +102,7 @@ type ListInput struct {
 type UpdateDoc struct {
 	Content string `json:"content"`
 }
+
+type InputSimpleAPI struct {
+	Services []string `json:"services"`
+}

@@ -1,18 +1,23 @@
 package router
 
 import (
+	"io"
+
 	api_doc "github.com/APIParkLab/APIPark/module/api-doc"
 	api_doc_dto "github.com/APIParkLab/APIPark/module/api-doc/dto"
 	"github.com/APIParkLab/APIPark/module/router"
 	router_dto "github.com/APIParkLab/APIPark/module/router/dto"
 	"github.com/gin-gonic/gin"
-	"io"
 )
 
 var _ IRouterController = (*imlAPIController)(nil)
 
 type imlAPIController struct {
 	module router.IRouterModule `autowired:""`
+}
+
+func (i *imlAPIController) Simple(ctx *gin.Context, input *router_dto.InputSimpleAPI) ([]*router_dto.SimpleItem, error) {
+	return i.module.SimpleAPIs(ctx, input)
 }
 
 func (i *imlAPIController) Detail(ctx *gin.Context, serviceId string, apiId string) (*router_dto.Detail, error) {
