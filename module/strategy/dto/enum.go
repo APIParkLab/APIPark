@@ -1,7 +1,7 @@
 package strategy_dto
 
 const (
-	ScopeSystem  = "system"
+	ScopeGlobal  = "global"
 	ScopeTeam    = "team"
 	ScopeService = "service"
 
@@ -16,13 +16,13 @@ type Scope int
 func (s Scope) String() string {
 	switch s {
 	case 0:
-		return ScopeSystem
+		return ScopeGlobal
 	case 1:
 		return ScopeTeam
 	case 2:
 		return ScopeService
 	default:
-		return ScopeSystem
+		return ScopeGlobal
 	}
 }
 
@@ -32,7 +32,7 @@ func (s Scope) Int() int {
 
 func ToScope(s string) Scope {
 	switch s {
-	case ScopeSystem:
+	case ScopeGlobal:
 		return 0
 	case ScopeTeam:
 		return 1

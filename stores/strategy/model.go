@@ -6,7 +6,7 @@ type Strategy struct {
 	Id       int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
 	UUID     string    `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
 	Name     string    `gorm:"type:varchar(100);not null;column:name;comment:name"`
-	Priority int       `gorm:"type:tinyint(4);not null;column:priority;comment:优先级"`
+	Priority int       `gorm:"type:int(11);not null;column:priority;comment:优先级"`
 	Desc     string    `gorm:"type:text;null;column:desc;comment:描述"`
 	Filters  string    `gorm:"type:mediumtext;null;column:filters;comment:筛选条件"`
 	Config   string    `gorm:"type:mediumtext;null;column:config;comment:配置"`

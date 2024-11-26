@@ -7,6 +7,7 @@ import (
 
 type InputSetting struct {
 	InvokeAddress string `json:"invoke_address" key:"system.node.invoke_address"`
+	SitePrefix    string `json:"site_prefix" key:"system.setting.site_prefix"`
 }
 
 func (i *InputSetting) Validate() error {

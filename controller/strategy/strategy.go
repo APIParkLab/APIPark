@@ -11,7 +11,7 @@ import (
 type IStrategyController interface {
 	GlobalStrategyList(ctx *gin.Context, keyword string, driver string, page string, pageSize string, order string, sort string, filters string) ([]*strategy_dto.StrategyItem, int64, error)
 	CreateGlobalStrategy(ctx *gin.Context, driver string, input *strategy_dto.Create) error
-	PublishGlobalStrategy(ctx *gin.Context) error
+	PublishGlobalStrategy(ctx *gin.Context, driver string) error
 
 	ServiceStrategyList(ctx *gin.Context, keyword string, serviceId string, driver string, page string, pageSize string, order string, sort string, filters string) ([]*strategy_dto.StrategyItem, int64, error)
 	CreateServiceStrategy(ctx *gin.Context, serviceId string, driver string, input *strategy_dto.Create) error
@@ -22,6 +22,14 @@ type IStrategyController interface {
 	DisableStrategy(ctx *gin.Context, id string) error
 
 	DeleteStrategy(ctx *gin.Context, id string) error
+
+	FilterGlobalOptions(ctx *gin.Context) ([]*strategy_dto.FilterOption, error)
+	FilterServiceOptions(ctx *gin.Context) ([]*strategy_dto.FilterOption, error)
+
+	FilterGlobalRemote(ctx *gin.Context, name string) ([]*strategy_dto.Title, []any, int64, string, string, error)
+	FilterServiceRemote(ctx *gin.Context, serviceId string, name string) ([]*strategy_dto.Title, []any, int64, string, string, error)
+
+	ToPublish(ctx *gin.Context, driver string) ([]*strategy_dto.ToPublishItem, string, string, bool, error)
 }
 
 type IStrategyCommonController interface {

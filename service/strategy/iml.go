@@ -22,12 +22,26 @@ type imlStrategyService struct {
 	universally.IServiceEdit[Edit]
 }
 
-func (i *imlStrategyService) AllByScope(ctx context.Context, scope int, target string) ([]*Strategy, error) {
+func (i *imlStrategyService) SearchAll(ctx context.Context, keyword string, driver string, scope int, target string) ([]*Strategy, error) {
 	w := make(map[string]interface{})
 	w["scope"] = scope
 	if target != "" {
 		w["target"] = target
 	}
+	list, err := i.store.Search(ctx, keyword, w, "update_at")
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(list, FromEntity), nil
+}
+
+func (i *imlStrategyService) AllByScope(ctx context.Context, driver string, scope int, target string) ([]*Strategy, error) {
+	w := make(map[string]interface{})
+	w["scope"] = scope
+	if target != "" {
+		w["target"] = target
+	}
+	w["driver"] = driver
 	list, err := i.store.List(ctx, w)
 	if err != nil {
 		return nil, err
@@ -152,11 +166,13 @@ func createEntityHandler(i *Create) *strategy.Strategy {
 		Desc:     i.Desc,
 		Filters:  i.Filters,
 		Config:   i.Config,
+		Driver:   i.Driver,
 		Scope:    i.Scope,
 		Target:   i.Target,
 		CreateAt: now,
 		UpdateAt: now,
-		IsStop:   true,
+		IsStop:   false,
+		IsDelete: false,
 	}
 }
 func updateHandler(e *strategy.Strategy, i *Edit) {
