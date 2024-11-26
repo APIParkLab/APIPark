@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/APIParkLab/APIPark/service/universally/commit"
 	"github.com/eolinker/go-common/utils"
 
@@ -34,7 +35,7 @@ type imlUpstreamModule struct {
 }
 
 func (i *imlUpstreamModule) ExportAll(ctx context.Context) ([]*upstream_dto.ExportUpstream, error) {
-	latestCommits, err := i.upstreamService.ListLatestCommit(ctx)
+	latestCommits, err := i.upstreamService.ListLatestCommit(ctx, cluster.DefaultClusterID)
 	if err != nil {
 		return nil, err
 	}

@@ -17,9 +17,11 @@ type IAPIService interface {
 	CountMapByService(ctx context.Context, service ...string) (map[string]int64, error)
 	Exist(ctx context.Context, aid string, api *Exist) error
 	ListForService(ctx context.Context, serviceId string) ([]*API, error)
+	ListForServices(ctx context.Context, serviceIds ...string) ([]*API, error)
 	GetInfo(ctx context.Context, aid string) (*Info, error)
 	ListInfo(ctx context.Context, aids ...string) ([]*Info, error)
 	ListInfoForService(ctx context.Context, serviceId string) ([]*Info, error)
+	ListInfoForServices(ctx context.Context, serviceIds ...string) ([]*Info, error)
 
 	ListLatestCommitProxy(ctx context.Context, aid ...string) ([]*commit.Commit[Proxy], error)
 	LatestProxy(ctx context.Context, aid string) (*commit.Commit[Proxy], error)

@@ -41,6 +41,7 @@ type ServiceBasic struct {
 	ApprovalType  string         `json:"approval_type"`
 	ServiceKind   string         `json:"service_kind"`
 	InvokeAddress string         `json:"invoke_address"`
+	SitePrefix    string         `json:"site_prefix"`
 }
 
 type ServiceApiBasic struct {

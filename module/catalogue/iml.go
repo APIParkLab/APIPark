@@ -284,6 +284,7 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 		serviceDoc = commit.Data.Content
 	}
 	invokeAddress, _ := i.settingService.Get(ctx, setting.KeyInvokeAddress)
+	sitePrefix, _ := i.settingService.Get(ctx, setting.KeySitePrefix)
 
 	return &catalogue_dto.ServiceDetail{
 		Name:        s.Name,
@@ -301,6 +302,7 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 			ApprovalType:  s.ApprovalType.String(),
 			ServiceKind:   s.Kind.String(),
 			InvokeAddress: invokeAddress,
+			SitePrefix:    sitePrefix,
 		},
 		APIDoc: apiDoc,
 	}, nil

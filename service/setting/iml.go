@@ -14,6 +14,7 @@ var (
 
 const (
 	KeyInvokeAddress = "system.node.invoke_address"
+	KeySitePrefix    = "system.setting.site_prefix"
 )
 
 type imlSettingService struct {
