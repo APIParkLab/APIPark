@@ -1,8 +1,9 @@
 package router
 
 import (
-	api_doc_dto "github.com/APIParkLab/APIPark/module/api-doc/dto"
 	"reflect"
+
+	api_doc_dto "github.com/APIParkLab/APIPark/module/api-doc/dto"
 
 	"github.com/gin-gonic/gin"
 
@@ -24,6 +25,7 @@ type IRouterController interface {
 	Delete(ctx *gin.Context, serviceId string, apiId string) error
 	// Prefix 获取API前缀
 	Prefix(ctx *gin.Context, serviceId string) (string, bool, error)
+	Simple(ctx *gin.Context, input *router_dto.InputSimpleAPI) ([]*router_dto.SimpleItem, error)
 }
 
 type IAPIDocController interface {

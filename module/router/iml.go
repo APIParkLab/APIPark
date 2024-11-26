@@ -46,6 +46,28 @@ type imlRouterModule struct {
 	transaction     store.ITransaction        `autowired:""`
 }
 
+func (i *imlRouterModule) SimpleAPIs(ctx context.Context, input *router_dto.InputSimpleAPI) ([]*router_dto.SimpleItem, error) {
+	list, err := i.apiService.ListForServices(ctx, input.Services...)
+	if err != nil {
+		return nil, err
+	}
+	apiInfos, err := i.apiService.ListInfo(ctx, utils.SliceToSlice(list, func(s *api.API) string {
+		return s.UUID
+	})...)
+	if err != nil {
+		return nil, err
+	}
+
+	return utils.SliceToSlice(apiInfos, func(item *api.Info) *router_dto.SimpleItem {
+		return &router_dto.SimpleItem{
+			Id:      item.UUID,
+			Name:    item.Name,
+			Methods: item.Methods,
+			Path:    item.Path,
+		}
+	}), nil
+}
+
 func (i *imlRouterModule) ExportAll(ctx context.Context) ([]*router_dto.Export, error) {
 
 	apiList, err := i.apiService.ListInfo(ctx)
