@@ -31,6 +31,7 @@ type IRouterModule interface {
 	// Prefix 获取API前缀
 	Prefix(ctx context.Context, serviceId string) (string, error)
 
+	SimpleAPIs(ctx context.Context, input *router_dto.InputSimpleAPI) ([]*router_dto.SimpleItem, error)
 	//ExportAll(ctx context.Context) ([]*router_dto.Export, error)
 }
 
