@@ -37,13 +37,13 @@ const InsidePage:FC<InsidePageProps> = ({showBanner=true,pageTitle,tagList,showB
         // <div className="h-full flex flex-col flex-1 overflow-hidden bg-[#f7f8fa]">
         <div className={`h-full flex flex-col flex-1 overflow-hidden  ${className}`}>
             { showBanner &&  <div className={`border-[0px] mr-PAGE_INSIDE_X ${showBorder ? 'border-b-[1px] border-solid border-BORDER' : ''} ${headerClassName}`}>
-                <div className="mb-[30px]">
+                {!pageTitle && !description && !backUrl &&!customBtn ? <></>: <div className="mb-[30px]">
                     {backUrl &&<div className="text-[18px] leading-[25px] mb-[12px]">
                             <Button type="text" onClick={goBack}><ArrowLeftOutlined className="max-h-[14px]" />{$t('返回')}</Button>
                         </div>}
                     <div className="flex justify-between mb-[20px] items-center ">
                         <div className="flex items-center  gap-TAG_LEFT ">
-                            <p className="text-theme text-[26px] ">{pageTitle}</p>
+                            <div className="text-theme text-[26px] ">{pageTitle}</div>
                             {tagList && tagList?.length > 0 && tagList?.map((tag)=>{
                                 return ( <Tag key={tag.label as string} bordered={false} >{tag.label}</Tag>)
                             })}
@@ -53,10 +53,10 @@ const InsidePage:FC<InsidePageProps> = ({showBanner=true,pageTitle,tagList,showB
                         }}>{btnTitle}</Button></WithPermission>}
                         {customBtn}
                     </div>
-                    <p >
+                    <div >
                         {description}
-                    </p>
-                </div>
+                    </div>
+                </div>}
             </div>}
             <div className={`h-full  ${scrollPage ? 'overflow-hidden' : 'overflow-auto'} ${contentClassName || ''}`}>{children}</div>
         </div>

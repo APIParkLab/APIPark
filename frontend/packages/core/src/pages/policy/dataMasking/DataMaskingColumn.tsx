@@ -55,7 +55,7 @@ export const DATA_MASSKING_TABLE_COLUMNS: PageProColumns<any>[] = [
   },
   {
     title: ('更新者'),
-    dataIndex: 'operator',
+    dataIndex: ['updater','name'],
     width: 140,
     ellipsis: true
   },

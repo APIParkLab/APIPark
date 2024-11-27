@@ -7,7 +7,7 @@ import {debounce} from "lodash-es";
 import {DownOutlined, SearchOutlined} from "@ant-design/icons";
 import TreeWithMore from "@common/components/aoplatform/TreeWithMore.tsx";
 import {useFetch} from "@common/hooks/http.ts";
-import {BasicResponse, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
+import {BasicResponse, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE} from "@common/const/const.tsx";
 import { DepartmentListItem, MemberDropdownModalHandle } from "../../const/member/type.ts";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
@@ -77,7 +77,7 @@ const MemberPage = ()=>{
                     break;
                 case 'delete':
                     title=$t('删除')
-                    content=$t('该数据删除后将无法找回，请确认是否删除？')
+                    content=DELETE_TIPS.default
                     break;
             }
             modal.confirm({
