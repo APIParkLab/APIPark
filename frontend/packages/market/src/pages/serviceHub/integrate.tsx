@@ -14,7 +14,7 @@ const Integrate = ({ service }: { service: ServiceDetailType }) => {
   const {fetchData} = useFetch()
   
   useEffect(()=>{
-    setUrl(`${service?.basic?.sitePrefix || window.location?.origin}/${serviceId}/swagger` )
+    setUrl(`${service?.basic?.sitePrefix || window.location?.origin}/api/v1/service/swagger/${serviceId}` )
   },[service])
   /**
    * Agent 平台地址
@@ -60,7 +60,7 @@ const Integrate = ({ service }: { service: ServiceDetailType }) => {
           <Button type="primary" onClick={copyURL}>{$t('复制 URL')}</Button>
         </Space.Compact>
         <span className="text-[14px] font-bold">OR</span>
-         <Button onClick={onDownload}>{$t('下载 Json 文件')}</Button>
+         <Button href={`/api/v1/export/openapi/${serviceId}`} target="_blank">{$t('下载 Json 文件')}</Button>
       </div>
       <p className={stepClass}>{$t('步骤三：配置 API 密钥')}</p>
       <div className='my-[10px]'>{$t('在')}<a href={consumerAddress} target="_blank"> {$t('消费者')} </a>{$t('菜单中，选择已通过本 API 服务申请的消费者，')}</div>

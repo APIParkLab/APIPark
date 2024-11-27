@@ -47,7 +47,6 @@ export const PolicyPublishModalContent = forwardRef<PolicyPublishModalHandle,Pol
     title: typeof x.title === 'string' ? $t(x.title) : x.title,
 })),[state.language])
 
-console.log(translatedPolicyColumns,data.strategies)
 
     return (
         <>

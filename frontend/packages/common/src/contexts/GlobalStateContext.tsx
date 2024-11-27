@@ -232,13 +232,11 @@ export const GlobalContext = createContext<{
 const globalReducer = (state: GlobalState, action: GlobalAction): GlobalState => {
     switch (action.type) {
         case 'LOGIN':
-          console.log('login')
             return {
                 ...state,
                 isAuthenticated: true,
             };
         case 'LOGOUT':
-          console.log('login')
             return {
                 ...state,
                 isAuthenticated: false,
