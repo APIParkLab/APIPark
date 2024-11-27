@@ -174,7 +174,7 @@ func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, 
 //func (i *imlServiceModule) SimpleAPPS(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
 //	w := make(map[string]interface{})
 //	w["as_app"] = true
-//	services, err := i.serviceService.Search(ctx, keyword, w)
+//	services, err := i.serviceService.SearchByDriver(ctx, keyword, w)
 //	if err != nil {
 //		return nil, err
 //	}
