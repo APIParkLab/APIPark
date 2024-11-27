@@ -7,6 +7,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/eolinker/go-common/pm3"
+
+	"github.com/APIParkLab/APIPark/module/system"
+
+	"github.com/getkin/kin-openapi/openapi3"
+
+	api_doc "github.com/APIParkLab/APIPark/module/api-doc"
+
 	upstream_dto "github.com/APIParkLab/APIPark/module/upstream/dto"
 
 	"github.com/eolinker/eosc/log"
@@ -43,9 +51,62 @@ type imlServiceController struct {
 	docModule      service.IServiceDocModule `autowired:""`
 	aiAPIModule    ai_api.IAPIModule         `autowired:""`
 	routerModule   router.IRouterModule      `autowired:""`
+	apiDocModule   api_doc.IAPIDocModule     `autowired:""`
 	providerModule ai.IProviderModule        `autowired:""`
 	upstreamModule upstream.IUpstreamModule  `autowired:""`
+	settingModule  system.ISettingModule     `autowired:""`
 	transaction    store.ITransaction        `autowired:""`
+}
+
+var (
+	loader = openapi3.NewLoader()
+)
+
+func (i *imlServiceController) Swagger(ctx *gin.Context) {
+	id, has := ctx.Params.Get("id")
+	if !has {
+		ctx.JSON(200, &pm3.Response{
+			Code:    -1,
+			Success: "fail",
+			Message: fmt.Sprintf("id is required"),
+		})
+		return
+
+	}
+	doc, err := i.apiDocModule.GetDoc(ctx, id)
+	if err != nil {
+		ctx.JSON(200, &pm3.Response{
+			Code:    -1,
+			Success: "fail",
+			Message: err.Error(),
+		})
+		return
+	}
+	tmp, err := loader.LoadFromData([]byte(doc.Content))
+	if err != nil {
+		ctx.JSON(200, &pm3.Response{
+			Code:    -1,
+			Success: "fail",
+			Message: err.Error(),
+		})
+		return
+	}
+	cfg := i.settingModule.Get(ctx)
+
+	tmp.AddServer(&openapi3.Server{
+		URL: cfg.InvokeAddress,
+	})
+	data, err := tmp.MarshalJSON()
+	if err != nil {
+		ctx.JSON(200, &pm3.Response{
+			Code:    -1,
+			Success: "fail",
+			Message: err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, string(data))
+	return
 }
 
 func (i *imlServiceController) Simple(ctx *gin.Context) ([]*service_dto.SimpleServiceItem, error) {
