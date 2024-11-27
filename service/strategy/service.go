@@ -14,9 +14,10 @@ import (
 type IStrategyService interface {
 	universally.IServiceCreate[Create]
 	universally.IServiceEdit[Edit]
-	AllByScope(ctx context.Context, driver string, scope int, target string) ([]*Strategy, error)
-	Search(ctx context.Context, keyword string, driver string, scope int, target string, page int, pageSize int, filters []string, order ...string) ([]*Strategy, int64, error)
-	SearchAll(ctx context.Context, keyword string, driver string, scope int, target string) ([]*Strategy, error)
+	All(ctx context.Context, scope int, target string) ([]*Strategy, error)
+	AllByDriver(ctx context.Context, driver string, scope int, target string) ([]*Strategy, error)
+	SearchByDriver(ctx context.Context, keyword string, driver string, scope int, target string, page int, pageSize int, filters []string, order ...string) ([]*Strategy, int64, error)
+	SearchAllByDriver(ctx context.Context, keyword string, driver string, scope int, target string) ([]*Strategy, error)
 	Get(ctx context.Context, id string) (*Strategy, error)
 	SortDelete(ctx context.Context, id string) error
 	Delete(ctx context.Context, id ...string) error

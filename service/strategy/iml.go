@@ -22,12 +22,25 @@ type imlStrategyService struct {
 	universally.IServiceEdit[Edit]
 }
 
+func (i *imlStrategyService) All(ctx context.Context, scope int, target string) ([]*Strategy, error) {
+	w := make(map[string]interface{})
+	w["scope"] = scope
+	if target != "" {
+		w["target"] = target
+	}
+	list, err := i.store.List(ctx, w)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(list, FromEntity), nil
+}
+
 func (i *imlStrategyService) Restore(ctx context.Context, id string) error {
 	_, err := i.store.UpdateWhere(ctx, map[string]interface{}{"uuid": id}, map[string]interface{}{"is_delete": false})
 	return err
 }
 
-func (i *imlStrategyService) SearchAll(ctx context.Context, keyword string, driver string, scope int, target string) ([]*Strategy, error) {
+func (i *imlStrategyService) SearchAllByDriver(ctx context.Context, keyword string, driver string, scope int, target string) ([]*Strategy, error) {
 	w := make(map[string]interface{})
 	w["scope"] = scope
 	if target != "" {
@@ -40,7 +53,7 @@ func (i *imlStrategyService) SearchAll(ctx context.Context, keyword string, driv
 	return utils.SliceToSlice(list, FromEntity), nil
 }
 
-func (i *imlStrategyService) AllByScope(ctx context.Context, driver string, scope int, target string) ([]*Strategy, error) {
+func (i *imlStrategyService) AllByDriver(ctx context.Context, driver string, scope int, target string) ([]*Strategy, error) {
 	w := make(map[string]interface{})
 	w["scope"] = scope
 	if target != "" {
@@ -100,7 +113,7 @@ func (i *imlStrategyService) ListStrategyCommit(ctx context.Context, commitIds .
 	return i.commitService.List(ctx, commitIds...)
 }
 
-func (i *imlStrategyService) Search(ctx context.Context, keyword string, driver string, scope int, target string, page int, pageSize int, filters []string, order ...string) ([]*Strategy, int64, error) {
+func (i *imlStrategyService) SearchByDriver(ctx context.Context, keyword string, driver string, scope int, target string, page int, pageSize int, filters []string, order ...string) ([]*Strategy, int64, error) {
 	w := map[string]interface{}{
 		"scope":  scope,
 		"driver": driver,
