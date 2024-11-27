@@ -53,7 +53,7 @@ func (i *imlStrategyModule) DeleteServiceStrategy(ctx context.Context, serviceId
 
 func (i *imlStrategyModule) ToPublish(ctx context.Context, driver string) ([]*strategy_dto.ToPublishItem, error) {
 	scope := strategy_dto.ToScope(strategy_dto.ScopeGlobal)
-	list, err := i.strategyService.SearchAll(ctx, "", driver, scope.Int(), "")
+	list, err := i.strategyService.SearchAllByDriver(ctx, "", driver, scope.Int(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (i *imlStrategyModule) ToPublish(ctx context.Context, driver string) ([]*st
 }
 
 func (i *imlStrategyModule) Search(ctx context.Context, keyword string, driver string, scope strategy_dto.Scope, target string, page int, pageSize int, filters []string, order ...string) ([]*strategy_dto.StrategyItem, int64, error) {
-	list, total, err := i.strategyService.Search(ctx, keyword, driver, scope.Int(), target, page, pageSize, filters, order...)
+	list, total, err := i.strategyService.SearchByDriver(ctx, keyword, driver, scope.Int(), target, page, pageSize, filters, order...)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -213,7 +213,7 @@ func (i *imlStrategyModule) Disable(ctx context.Context, id string) error {
 }
 
 func (i *imlStrategyModule) Publish(ctx context.Context, driver string, scope string, target string) error {
-	list, err := i.strategyService.AllByScope(ctx, driver, strategy_dto.ToScope(scope).Int(), target)
+	list, err := i.strategyService.AllByDriver(ctx, driver, strategy_dto.ToScope(scope).Int(), target)
 	if err != nil {
 		return err
 	}

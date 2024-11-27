@@ -28,6 +28,7 @@ type IServiceController interface {
 	MySimple(ctx *gin.Context) ([]*service_dto.SimpleServiceItem, error)
 
 	Swagger(ctx *gin.Context)
+	ExportSwagger(ctx *gin.Context)
 }
 
 type IAppController interface {
