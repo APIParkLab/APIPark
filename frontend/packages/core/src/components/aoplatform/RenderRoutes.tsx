@@ -15,7 +15,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 
 const RenderRoutes = ()=> {
     const { loadPlugins,loadExecutedPlugin } = usePluginLoader(ApiparkPluginDriver(routerMap), routerMap)
-    const { routeConfig } = useGlobalContext();
+    const { routeConfig,dispatch,state } = useGlobalContext();
     const [router, setRouter] = useState<unknown>(null);
     
     useEffect(()=>{
@@ -28,10 +28,11 @@ const RenderRoutes = ()=> {
         if (routeConfig && routeConfig.length > 0) {
             const routerInstance = createBrowserRouter(generateRoutes(routeConfig));
             setRouter(routerInstance);
+            dispatch({ type: 'SET_PLUGINS_LOADED', pluginsLoaded: true });
         }
     }, [routeConfig]);
 
-    if (!router) {
+    if (!router ||  !state?.pluginsLoaded) {
         return <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={true} className='w-full h-full flex items-center justify-center'></Spin>;
     }
 
@@ -77,7 +78,9 @@ const generateRoutes = (routerConfig: RouteConfig[]):RouteObject[] => {
                   {
                     path: route.path,
                     element: <ErrorBoundary>{routeElement}</ErrorBoundary> ,
-                    children: route.children ? generateRoutes(route.children as RouteConfig[]) : undefined,}
+                    children: route.children ? generateRoutes(route.children as RouteConfig[]) : undefined,
+                    exact:route?.pathMatch === 'full'
+                }
                 );
               }
         )
@@ -85,8 +88,8 @@ const generateRoutes = (routerConfig: RouteConfig[]):RouteObject[] => {
 
 // 保护的路由组件
 export function ProtectedRoute() {
-    const {state} = useGlobalContext()
-    return state.isAuthenticated? <BasicLayout project="core" /> : <Navigate to="/login" />;
+    // return state.isAuthenticated? <BasicLayout project="core" /> : <Navigate to="/login" />;
+    return <BasicLayout project="core" /> 
   }
 
 export default RenderRoutes

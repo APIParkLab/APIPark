@@ -1,5 +1,6 @@
 import { DefaultOptionType } from "antd/es/select";
 import { StrategyStatusEnum } from "./consts";
+import { EntityItem } from "../type";
 
 export type DataMaskRuleTableProps = {
     disabled?: boolean;
@@ -58,18 +59,18 @@ export type DataMaskStrategyItem = {
     name:string
     priority:number
     isStop:boolean
-    isDeleted:boolean
+    isDelete:boolean
     publishStatus:keyof typeof StrategyStatusEnum
     filters:string
     conf:string
-    operator:string
+    updater:EntityItem
     updateTime:string
   }
 
   
 export type FilterFormField= {
     name: string;
-    value:string[] |string;
+    values:string[] |string;
     label:string
     title:string
   }
@@ -92,7 +93,8 @@ export type FilterFormField= {
   
 export type FilterFormType = {
     name:string
-    value:unknown
+    values:unknown
+    type?:string
   }
   
   export type FilterFormProps =  {
@@ -102,6 +104,7 @@ export type FilterFormType = {
     disabled: boolean;
     onFilterFormChange: (form: FilterFormType) => void;
     setFormCanSubmit:(canSubmit:boolean)=>void
+    serviceId?:string
   }
   
   export type FilterFormHandle = {
@@ -115,6 +118,7 @@ export type FilterFormType = {
     disabled:boolean
     option:unknown
     onShowValueChange?:(value:string)=>void
+    serviceId?:string
   }
   
   export type RemoteTitleType = {

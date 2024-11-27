@@ -169,7 +169,7 @@ export const DASHBOARD_BASE_COLUMNS_CONFIG:(PageProColumns<MonitorData>&{eoTitle
     {
         title:('所属服务'),
         eoTitle:('所属服务'),
-        dataIndex: ['project','name'],
+        dataIndex: ['service','name'],
         ellipsis:true,
         width: 80
       },
