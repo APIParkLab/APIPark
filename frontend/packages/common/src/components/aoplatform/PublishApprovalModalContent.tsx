@@ -6,7 +6,7 @@ import {BasicResponse, FORM_ERROR_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE,
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { SYSTEM_PUBLISH_ONLINE_COLUMNS } from "@core/const/system/const.tsx";
 import { $t } from "@common/locales";
-import { ApprovalRouteColumns, ApprovalStatusColorClass, ApprovalUpstreamColumns, ChangeTypeEnum } from "@common/const/approval/const";
+import { ApprovalPolicyColumns, ApprovalRouteColumns, ApprovalStatusColorClass, ApprovalUpstreamColumns, ChangeTypeEnum } from "@common/const/approval/const";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
 import { LoadingOutlined } from "@ant-design/icons";
 import { SystemInsidePublishOnlineItems } from "@core/pages/system/publish/SystemInsidePublishOnline";
@@ -140,6 +140,19 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
         }
     }),[state.language])
 
+    
+    const translatedPolicyColumns = useMemo(()=>ApprovalPolicyColumns.map((x)=>{
+        return {
+            ...x,
+            title: typeof x.title === 'string' ? $t(x.title) : x.title,
+            ...(x.dataIndex === 'status' ? {
+                render:(_,entity)=>(
+                    entity.status === 0 ? '正常' : '无效')
+            }:{})
+        }
+    }),[state.language])
+
+
     return (
         <>
             {!insidePage && <>
@@ -219,6 +232,16 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
                                     /></Row>
                             </>
                         }
+                    <Row className="mt-mbase pb-[8px] h-[32px] font-bold" ><span >{$t('策略列表')}：</span></Row>
+                    <Row  className="mb-mbase ">
+                        <Table
+                            bordered={true}
+                            columns={translatedPolicyColumns}
+                            size="small"
+                            rowKey="id"
+                            dataSource={data.diffs?.strategies || []}
+                            pagination={false}
+                        /></Row>
                 {/* <Form.Item
                     label={$t("备注")}
                     name="remark"
