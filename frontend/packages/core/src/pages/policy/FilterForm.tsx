@@ -6,9 +6,10 @@ import { validateApiPath, validateIPorCIDR } from '@common/utils/validate';
 import { $t } from '@common/locales';
 import { FilterFormItemProps, RemoteTitleType, FilterFormHandle, FilterFormProps } from '@common/const/policy/type';
 import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const';
+import { v4 as uuidv4 } from 'uuid'
 
 const RemoteFormItem: React.FC<FilterFormItemProps> = (props) =>{
-  const {value, onChange, disabled,option, onShowValueChange} = props
+  const {value, onChange, disabled,option, onShowValueChange,serviceId} = props
   const [remoteList, setRemoteList] = useState<unknown[]>([])
   const [remoteTableColumns, setRemoteTableColumns] = useState<TableColumnsType>([])
   const [loading, setLoading] = useState<boolean>(false)
@@ -24,23 +25,22 @@ const RemoteFormItem: React.FC<FilterFormItemProps> = (props) =>{
     fetchData<BasicResponse<{
       key:string, 
       list:Record<string,unknown>[],
-      target:string, 
       titles:Array<RemoteTitleType>,
       total:number
       value:string
-    }>>(`strategy/filter-REMOTE/${option?.name}`,{method:'GET', eoParams:{keyword:searchWord}}).then(response=>{
+    }>>(`strategy/${serviceId === undefined ? '' : 'service/'}filter-remote/${option?.name}`,{method:'GET', eoParams:{keyword:searchWord}}).then(response=>{
       const {code,data, msg} = response
       if(code === STATUS_CODE.SUCCESS){
-        setRemoteList(data[data.target as string] as unknown[])
+        setRemoteList(data.list as unknown[])
         setRowKey(data.key as string)
         setRemoteTableColumns(data.titles.map((x:RemoteTitleType)=>({
           title: x.title,dataIndex:x.field,key:x.field,ellipsis:true
         })))
         setRemoteCounts(data.total)
     if(!searchWord){
-      setOriginRemoteList(data[data.target as string])
+      setOriginRemoteList(data.list)
       if(value?.length === 1 && value[0] === 'ALL'){
-          const totalDataArr = data[data.target as string]?.map((x:Record<string,unknown>)=>x[data.key as string])
+          const totalDataArr = data.list?.map((x:Record<string,unknown>)=>x[data.key as string])
           onChange?.(totalDataArr)
           onShowValueChange?.(totalDataArr.join(','))
       }
@@ -81,7 +81,8 @@ const RemoteFormItem: React.FC<FilterFormItemProps> = (props) =>{
           type: 'checkbox', 
           onChange: (selectedRowKeys: React.Key[]) => {
             onChange?.(selectedRowKeys as string[]);
-            onShowValueChange?.(selectedRowKeys.length === remoteCounts? $t('所有(0)',[title]) : originRemoteList.filter(x=>selectedRowKeys?.indexOf(x[option.target]))?.map(x=>x.title).join(' , ')) 
+            console.log(originRemoteList)
+            onShowValueChange?.(selectedRowKeys.length === remoteCounts? $t('所有(0)',[title]) : originRemoteList.filter(x=>selectedRowKeys?.indexOf(x[option.key]))?.map(x=>x.title).join(' , ')) 
           },
           selectedRowKeys: value,
           // getCheckboxProps: (record: unknown) => ({
@@ -93,15 +94,18 @@ const RemoteFormItem: React.FC<FilterFormItemProps> = (props) =>{
             onClick:()=>{
               if(value === undefined){
                 onChange?.([record[rowKey]])
-                onShowValueChange?.(record.title)
+                console.log(record[rowKey],record)
+                onShowValueChange?.(remoteCounts === 1 ? $t('所有(0)',[option?.title]) : record.name)
               }else if(value?.indexOf(record[rowKey])!== -1){
                 const newSelectedKeys = value?.filter(x=>x!==record[rowKey])
                 onChange?.(newSelectedKeys!)
-                onShowValueChange?.(newSelectedKeys.length === remoteCounts? $t('所有(0)',[option?.title]) : originRemoteList.filter(x=>newSelectedKeys.indexOf(x[rowKey]) !== -1)?.map(x=>x.title)?.join(' , ')) 
+                console.log(newSelectedKeys,newSelectedKeys.length === remoteCounts? $t('所有(0)',[option?.title]) : originRemoteList.filter(x=>newSelectedKeys.indexOf(x[rowKey]) !== -1)?.map(x=>x.name)?.join(' , '))
+                onShowValueChange?.(newSelectedKeys.length === remoteCounts? $t('所有(0)',[option?.title]) : originRemoteList.filter(x=>newSelectedKeys.indexOf(x[rowKey]) !== -1)?.map(x=>x.name)?.join(' , ')) 
               }else{
                 const newSelectedKeys = [...value,record[rowKey]]
                 onChange?.(newSelectedKeys)
-                onShowValueChange?.(newSelectedKeys.length === remoteCounts? $t('所有(0)',[option?.title]) : originRemoteList.filter(x=>newSelectedKeys.indexOf(x[rowKey]) !== -1)?.map(x=>x.title)?.join(' , ')) 
+                console.log(newSelectedKeys,originRemoteList,rowKey,remoteCounts,newSelectedKeys.length === remoteCounts? $t('所有(0)',[option?.title]) : originRemoteList.filter(x=>newSelectedKeys.indexOf(x[rowKey]) !== -1)?.map(x=>x.name)?.join(' , '))
+                onShowValueChange?.(newSelectedKeys.length === remoteCounts? $t('所有(0)',[option?.title]) : originRemoteList.filter(x=>newSelectedKeys.indexOf(x[rowKey]) !== -1)?.map(x=>x.name)?.join(' , ')) 
           }
             }
           })}
@@ -155,7 +159,8 @@ const FilterForm = forwardRef<FilterFormHandle,FilterFormProps>(({
   filterOptions,
   selectedOptionNameSet,
   disabled,
-  setFormCanSubmit},ref)=> {
+  setFormCanSubmit,
+  serviceId},ref)=> {
   const [form] = Form.useForm();
   const [filterType, setFilterType] = useState<'remote'|'static'|'pattern'>();
   const [curOption, setCurOption] = useState<unknown>()
@@ -167,10 +172,12 @@ const FilterForm = forwardRef<FilterFormHandle,FilterFormProps>(({
     },
     save:()=>form.validateFields().then((res)=>{
       const selectedOption = filterOptions.filter(x=>x.name === res.name)[0]
+      console.log('??',res,selectedOption,filterType,label)
       return Promise.resolve({
         ...res,
-        label:filterType === 'pattern' ? res.value : label,
-        title:selectedOption.label
+        label:filterType === 'pattern' ? res.values : label,
+        title:selectedOption.label,
+        _eoKey:uuidv4()
       })
     }).catch((errorInfo)=>Promise.reject(errorInfo))
   })
@@ -181,8 +188,8 @@ const FilterForm = forwardRef<FilterFormHandle,FilterFormProps>(({
       setFormCanSubmit(false)
       return
     }
-    if(allValues.value instanceof Array){
-      setFormCanSubmit(allValues.value.length > 0)
+    if(allValues.values instanceof Array){
+      setFormCanSubmit(allValues.values.length > 0)
       return
     }
     setFormCanSubmit(true)
@@ -190,7 +197,7 @@ const FilterForm = forwardRef<FilterFormHandle,FilterFormProps>(({
 
 
   const handleTypeChange = (value:string)=>{
-    form.setFieldValue('value',filterForm?.name === value ? filterForm.value : undefined)
+    form.setFieldValue('values',filterForm?.name === value ? filterForm.values : undefined)
     const selectedOption = filterOptions?.filter(item=>item.name === value)[0]
     setFilterType(selectedOption?.type)
     setCurOption(selectedOption)
@@ -205,10 +212,14 @@ const FilterForm = forwardRef<FilterFormHandle,FilterFormProps>(({
 
   useEffect(()=>{
     if(filterForm?.name){
-      form.setFieldsValue(filterForm)
+      form.setFieldsValue({
+        ...filterForm, 
+        values: filterForm?.type === 'pattern' ? 
+          (filterForm.name === 'ip' ? (filterForm.values as string[])?.join('\n') : (filterForm.values as string[])?.[0] ) :filterForm.values})
       const selectedOption = filterOptions.filter(x=>x.name === filterForm?.name)[0]
       setFilterType(selectedOption?.type )
       setCurOption(selectedOption)
+      setFormCanSubmit(filterForm?.values && filterForm?.values?.length >0)
   }else{
       const firstOption = filterOptions.filter(x=>!selectedOptionNameSet.has(x.name))[0]
       form.setFieldValue('name',firstOption?.name)
@@ -227,10 +238,10 @@ const FilterForm = forwardRef<FilterFormHandle,FilterFormProps>(({
       <Form.Item name="name" label={$t('属性名称')} rules={[{ required: true }]}>
         <Select disabled={disabled} onChange={handleTypeChange} options={filterOptionsList} />
       </Form.Item>
-        <Form.Item name="value" label={$t('属性值')} rules={
+        <Form.Item name="values" label={$t('属性值')} rules={
           (filterType === 'pattern' ? ( [{validator:form.getFieldValue('name')  === 'ip'  ? validateIPorCIDR : validateApiPath}]):[])
         }>
-        {filterType === 'remote' && <RemoteFormItem option={curOption}  disabled={disabled} onShowValueChange={setLabel}/>}
+        {filterType === 'remote' && <RemoteFormItem serviceId={serviceId} option={curOption}  disabled={disabled} onShowValueChange={setLabel}/>}
 
           {filterType === 'pattern' && form.getFieldValue('name') !== 'ip' && (
             <Input

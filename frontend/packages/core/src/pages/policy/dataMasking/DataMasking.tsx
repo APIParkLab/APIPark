@@ -1,10 +1,10 @@
 import { ActionType } from "@ant-design/pro-components";
-import { useMemo, useRef, useState } from "react";
-import { Button, message, Switch } from 'antd'
+import { useEffect, useMemo, useRef, useState } from "react";
+import { App, Button, message, Switch } from 'antd'
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList";
 import { $t } from "@common/locales";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
-import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const.tsx";
+import { BasicResponse, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const.tsx";
 import { useFetch } from "@common/hooks/http";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission";
@@ -14,6 +14,7 @@ import { PolicyPublishInfoType, PolicyPublishModalHandle, RouterParams } from "@
 import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter";
 import { DataMaskStrategyItem } from "@common/const/policy/type";
 import {PolicyPublishModalContent} from '@common/components/aoplatform/PolicyPublishModalContent'
+import { checkAccess } from "@common/utils/permission";
 
 const DataMasking = (props: any) => {
 
@@ -24,12 +25,15 @@ const DataMasking = (props: any) => {
     rowOperation = []
   } = props;
   const { serviceId, teamId } = useParams<RouterParams>()
-  const { state } = useGlobalContext()
+  const { state,accessData } = useGlobalContext()
   const navigator = useNavigate()
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false)
   const [drawerData, setDrawerData] = useState<PolicyPublishInfoType >()
   const [isOkToPublish, setIsOkToPublish] = useState<boolean>(false)
   const drawerRef = useRef<PolicyPublishModalHandle>(null)
+  const { modal } = App.useApp()
+
+  useEffect(()=>{console.log(props, publishBtn)},[publishBtn])
     /**
    * 列表ref
    */
@@ -52,7 +56,7 @@ const DataMasking = (props: any) => {
     const res = DATA_MASSKING_TABLE_COLUMNS.map(x => {
       // 启动列渲染
       if (x.dataIndex === 'isStop') {
-        x.render = (text: any, record: any) => <Switch checked={!record.isStop} onChange={(e) => { changeOpenApiStatus(e, record) }} />
+        x.render = (text: any, record: any) => <WithPermission access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`} ><Switch checked={!record.isStop} onChange={(e) => { changeOpenApiStatus(e, record) }} /></WithPermission>
       }
       // 处理数列渲染
       if (x.dataIndex === 'treatmentNumber') {
@@ -77,11 +81,11 @@ const DataMasking = (props: any) => {
       fixed: 'right',
       valueType: 'option',
       render: (_: React.ReactNode, entity: any) => [
-        ...(rowOperation.length && rowOperation.find((item: string) => item === 'edit') ? [<TableBtnWithPermission access="system.organization.member.edit" key="edit" btnType="edit" onClick={() => { openEditModal(entity) }} btnTitle="编辑" />] : []),
-        // ...(rowOperation.length && rowOperation.find((item: string) => item === 'logs') ? [<TableBtnWithPermission access="system.organization.member.edit" key="logs" btnType="logs" onClick={() => { openLogsModal(entity) }} btnTitle="详情" />] : []),
+        ...(rowOperation.length && rowOperation.find((item: string) => item === 'edit') ? [<TableBtnWithPermission access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`} key="edit" btnType="edit" onClick={() => { openEditModal(entity) }} btnTitle="编辑" />] : []),
+        // ...(rowOperation.length && rowOperation.find((item: string) => item === 'logs') ? [<TableBtnWithPermission access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.view`} key="logs" btnType="logs" onClick={() => { openLogsModal(entity) }} btnTitle="详情" />] : []),
         ...(rowOperation.length && rowOperation.find((item: string) => item === 'delete') ? [
-          entity.isDeleted ? <TableBtnWithPermission access="system.organization.member.edit" key="refresh" btnType="refresh" onClick={() => { restorePolicy(entity) }} btnTitle="恢复" /> : 
-          <TableBtnWithPermission access="system.organization.member.edit" key="delete" btnType="delete" onClick={() => { deletePolicy(entity) }} btnTitle="删除" />
+          entity.isDelete ? <TableBtnWithPermission access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`} key="refresh" btnType="refresh" onClick={() => { restorePolicy(entity) }} btnTitle="恢复" /> : 
+          <TableBtnWithPermission access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.delete`} key="delete" btnType="delete" onClick={() => { openModal('delete',entity) }} btnTitle="删除" />
             ] : []),
       ],
     }
@@ -100,10 +104,11 @@ const DataMasking = (props: any) => {
    * @param entity 行数据
    */
   const changeOpenApiStatus = (enabled: boolean, entity: any) => {
+    console.log(enabled)
     fetchData<BasicResponse<null>>(
-      `strategy/${serviceId === undefined? 'global':'service'}/data-masking/${enabled ? 'disable' : 'enable'}`,
+      `strategy/${serviceId === undefined? 'global':'service'}/data-masking/${enabled ? 'enable' :'disable' }`,
       {
-        method: 'PUT',
+        method: 'PATCH',
         eoParams: {
           service:serviceId,
           team:teamId,
@@ -159,14 +164,14 @@ const DataMasking = (props: any) => {
           keyword: searchWord,
           service:serviceId,
           team:teamId,},
-        eoTransformKeys: ['is_stop', 'is_deleted', 'update_time','publish_status','processed_total']
+        eoTransformKeys: ['is_stop', 'is_delete', 'update_time','publish_status','processed_total']
       }
     ).then(response => {
       const { code,data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         // 保存数据
         return {
-          data:data.strategies,
+          data:data.list,
           total:data.total,
           success: true
         }
@@ -186,7 +191,7 @@ const DataMasking = (props: any) => {
    * @param type 
    */
   const addPolicy = () => {
-    navigator('/globalpolicy/datamasking/create')
+    navigator('../create')
   }
 
   /**
@@ -213,7 +218,7 @@ const DataMasking = (props: any) => {
    * 编辑
    */
   const openEditModal = (entity: any) => {
-    navigator(`/globalpolicy/datamasking/${entity.id}`)
+    navigator(`../${entity.id}`)
   }
 
   /**
@@ -224,12 +229,47 @@ const DataMasking = (props: any) => {
     console.log('日志', entity);
   }
 
+
+  
+  const openModal =async (type:'delete',entity?:DataMaskStrategyItem)=>{
+    if(entity?.publishStatus === 'online'){
+      return deletePolicy(entity!).then((res)=>{if(res === true) manualReloadTable()})
+    }
+    let title:string = ''
+    let content:string|React.ReactNode = ''
+    switch (type){
+        case 'delete':
+            title=$t('删除')
+            content=$t(DELETE_TIPS.default)
+            break;
+    }
+
+    modal.confirm({
+        title,
+        content,
+        onOk:()=>{
+            switch (type){
+                case 'delete':
+                    return deletePolicy(entity!).then((res)=>{if(res === true) manualReloadTable()})
+            }
+        },
+        width:600,
+        okText:$t('确认'),
+        okButtonProps:{
+            disabled : !checkAccess( `${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`, accessData)
+        },
+        cancelText:$t('取消'),
+        closable:true,
+        icon:<></>,
+    })
+}
+
   /**
    * 删除
    * @param entity 
    */
   const deletePolicy = (entity: DataMaskStrategyItem) => {
-    fetchData<BasicResponse<null>>(
+    return fetchData<BasicResponse<null>>(
       `strategy/${serviceId === undefined? 'global':'service'}/data-masking`,
       {
         method: 'DELETE',
@@ -242,11 +282,12 @@ const DataMasking = (props: any) => {
       const { code, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         message.success(msg || $t(RESPONSE_TIPS.success))
-        manualReloadTable()
+        return Promise.resolve(true)
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
+        return Promise.reject(msg || $t(RESPONSE_TIPS.error))
       }
-    })
+    }).catch((errorInfo)=> Promise.reject(errorInfo))
   }
 
   /**
@@ -295,11 +336,11 @@ const DataMasking = (props: any) => {
         sort:Record<string, string>,
         filter:Record<string, string>) => getPolicyList(params,sort, filter)}
         addNewBtnTitle={$t("添加策略")}
-        addNewBtnAccess="system.organization.member.edit"
+        addNewBtnAccess={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`}
         onAddNewBtnClick={() => { addPolicy() }}
         searchPlaceholder={$t("输入名称、筛选条件查找")}
         afterNewBtn={
-          publishBtn && [<WithPermission key="removeFromDepPermission" access="system.organization.member.edit">
+          publishBtn && [<WithPermission key="removeFromDepPermission" access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.publish`} >
             <Button className="mr-btnbase" key="removeFromDep" onClick={() => publish()}>{$t('发布')}</Button>
             </WithPermission>]
         }
@@ -316,7 +357,7 @@ const DataMasking = (props: any) => {
               okBtnTitle={$t('发布')}
               open={drawerVisible}
               submitDisabled={!isOkToPublish}
-              submitAccess={`team.service.release.add`}
+              submitAccess={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.publish`}
               onSubmit={onSubmit}
               >
                 <PolicyPublishModalContent 

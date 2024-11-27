@@ -95,8 +95,8 @@ const DataMaskRuleForm: React.FC<DataMaskRuleFormProps> = ({ editData, ruleList,
       case 'shuffling':
         break;
       default:
-        submitData.mask.begin = formData.mask.begin;
-        submitData.mask.length = formData.mask.length;
+        submitData.mask.begin = Number(formData.mask.begin) || 0;
+        submitData.mask.length = Number(formData.mask.length) || 0;
         break;
     }
     return submitData;
