@@ -212,5 +212,5 @@ func updateHandler(e *strategy.Strategy, i *Edit) {
 	if i.IsStop != nil {
 		e.IsStop = *i.IsStop
 	}
-
+	e.UpdateAt = time.Now()
 }
