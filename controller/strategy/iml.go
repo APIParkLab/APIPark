@@ -197,7 +197,7 @@ func (i *imlStrategyController) CreateServiceStrategy(ctx *gin.Context, serviceI
 }
 
 func (i *imlStrategyController) EditStrategy(ctx *gin.Context, id string, input *strategy_dto.Edit) error {
-	return i.EditStrategy(ctx, id, input)
+	return i.strategyModule.Edit(ctx, id, input)
 }
 
 func (i *imlStrategyController) EnableStrategy(ctx *gin.Context, id string) error {

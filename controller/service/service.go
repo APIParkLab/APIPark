@@ -26,6 +26,8 @@ type IServiceController interface {
 	SaveServiceDoc(ctx *gin.Context, id string, input *service_dto.SaveServiceDoc) error
 	Simple(ctx *gin.Context) ([]*service_dto.SimpleServiceItem, error)
 	MySimple(ctx *gin.Context) ([]*service_dto.SimpleServiceItem, error)
+
+	Swagger(ctx *gin.Context)
 }
 
 type IAppController interface {
