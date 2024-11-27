@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Button, Table, Modal, App, Divider } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { $t } from '@common/locales';
@@ -8,6 +8,8 @@ import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPe
 import { FilterFormField, FilterTableProps, FilterOptionType, FilterFormHandle } from '@common/const/policy/type.ts';
 import FilterForm from './FilterForm';
 import { BasicResponse, COLUMNS_TITLE, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const';
+import { useParams } from 'react-router-dom';
+import { RouterParams } from '@common/const/type';
 
 
 const FilterTable: React.FC<FilterTableProps> = ({
@@ -25,13 +27,13 @@ const FilterTable: React.FC<FilterTableProps> = ({
   const formRef = useRef<FilterFormHandle>(null);
   const [formCanSubmit,setFormCanSubmit] = useState(false)
   const [selectedOptionNameSet, setSelectedOptionNameSet] = useState<Set<string>>(new Set());
+  const {serviceId} = useParams<RouterParams>()
     const openDrawer = (type: string, data?: FilterFormField) => {
     switch (type) {
       case 'addFilter':
         setFilterForm(undefined)
         break;
       case 'editFilter':
-        console.log(data)
         setFilterForm(data)
     }
     setIsModalVisible(true);
@@ -51,24 +53,24 @@ const FilterTable: React.FC<FilterTableProps> = ({
     formPromise?.then?.((res)=>{
         const newFilterForm = {
           name:res.name,
-          value:res.value instanceof Array ? res.value : [res.value],
+          values:res.values instanceof Array ? res.values : [res.values],
           label:res.label,
           title:res.title
         }
+        console.log(res, newFilterForm, value)
         onChange?.([newFilterForm, ...(value?.filter(x=>!filterForm?.name|| x.name!==filterForm.name) || [])])
-        setSelectedOptionNameSet(prev=>{filterForm?.name &&prev.delete(filterForm?.name); prev.add(res.name); return prev})
         closeDrawer()
     })
   };
 
-  const handleDeleteFilter = (item: FilterFormField) => {
-      setSelectedOptionNameSet(prev=>{prev.delete(item?.name); return prev})
-      const newFilterShowList = value.filter((filter) => filter !== item);
-      onChange?.(newFilterShowList);
-  };
+  const handleDeleteFilter =  useCallback((item: FilterFormField) => {
+    console.log(item, value, isModalVisible);
+    const newFilterShowList = value?.filter((filter) => filter._eoKey !== item._eoKey) || [];
+    onChange?.(newFilterShowList);
+  }, [value, onChange]);
 
   const getFilterOptions = ()=>{
-    fetchData<BasicResponse<{options:FilterOptionType[]}>>('strategy/filter-options',{method:'GET'}).then(response=>{
+    fetchData<BasicResponse<{options:FilterOptionType[]}>>(`strategy/${serviceId === undefined ? 'global' : 'service'}/filter-options`,{method:'GET'}).then(response=>{
       const {code,data,msg} = response
       if(code === STATUS_CODE.SUCCESS){
         setFilterOptions(data.options)
@@ -99,12 +101,16 @@ const FilterTable: React.FC<FilterTableProps> = ({
           <Divider type="vertical" className="mx-0"  key="div2"/>
           <TableBtnWithPermission   key="delete"  btnType="delete"  onClick={()=>{handleDeleteFilter(record)}} btnTitle={$t("删除")}/></div>)
     }
-  ],[state.language]) 
+  ],[state.language,handleDeleteFilter]) 
 
   useEffect(()=>{
     getFilterOptions()
   },[state.language])
 
+  useEffect(()=>{
+    setSelectedOptionNameSet(new Set(value?.map(x=>x.name) || []))
+    console.log('valuechange',value)
+  },[value])
   return (
     <div>
       {
@@ -116,7 +122,7 @@ const FilterTable: React.FC<FilterTableProps> = ({
         className={`mt-btnybase border-solid border-[1px] border-BORDER border-b-0 rounded ${disabled ? '' : 'mt-btnbase'}`}
         pagination={false}
         size='small'
-        columns={columns} dataSource={value} rowKey='id' /> }
+        columns={columns} dataSource={value} rowKey='_eoKey' /> }
       <div role="alert" className="ant-form-item-explain-error">
       </div>
       <Modal
@@ -135,6 +141,7 @@ const FilterTable: React.FC<FilterTableProps> = ({
           selectedOptionNameSet={selectedOptionNameSet}
           disabled={disabled}
           setFormCanSubmit={setFormCanSubmit}
+          serviceId={serviceId}
         />
       </Modal>
     </div>

@@ -239,6 +239,31 @@ export const PERMISSION_DEFINITION = [
           "anyOf": [{ "backend": ["system.settings.log_configuration.manager"] }]
         }
       },
+      "system.devops.policy.view": {
+        "granted": {
+          "anyOf": [{ "backend": ["system.settings.strategy.view"] }]
+        }
+      },
+      "system.devops.policy.add": {
+        "granted": {
+          "anyOf": [{ "backend": ["system.settings.strategy.manager"] }]
+        }
+      },
+      "system.devops.policy.edit": {
+        "granted": {
+          "anyOf": [{ "backend": ["system.settings.strategy.manager"] }]
+        }
+      },
+      "system.devops.policy.publish": {
+        "granted": {
+          "anyOf": [{ "backend": ["system.settings.strategy.manager"] }]
+        }
+      },
+      "system.devops.policy.delete": {
+        "granted": {
+          "anyOf": [{ "backend": ["system.settings.strategy.manager"] }]
+        }
+      },
       "system.workspace.application.view_all": {
         "granted": {
           "anyOf": [{ "backend": ["system.workspace.application.view_all"] }]
@@ -427,6 +452,31 @@ export const PERMISSION_DEFINITION = [
       "team.service.service.delete": {
         "granted": {
           "anyOf": [{ "backend": ["system.workspace.service.manager_all","team.team.service.manager","team.service.service.manager"] }]
+        }
+      },
+      "team.service.policy.view": {
+        "granted": {
+          "anyOf": [{ "backend": ["team.service.strategy.view"] }]
+        }
+      },
+      "team.service.policy.add": {
+        "granted": {
+          "anyOf": [{ "backend": ["team.service.strategy.manager"] }]
+        }
+      },
+      "team.service.policy.edit": {
+        "granted": {
+          "anyOf": [{ "backend": ["team.service.strategy.manager"] }]
+        }
+      },
+      "team.service.policy.publish": {
+        "granted": {
+          "anyOf": [{ "backend": ["team.service.strategy.manager"] }]
+        }
+      },
+      "team.service.policy.delete": {
+        "granted": {
+          "anyOf": [{ "backend": ["team.service.strategy.manager"] }]
         }
       },
       "team.application.subscription.view": {

@@ -1,3 +1,4 @@
+import component from '@common/components/aoplatform/prompt-editor/plugins/workflow-variable-block/component';
 import { RouterMapConfig } from '@common/const/type';
 import { ProtectedRoute } from '@core/components/aoplatform/RenderRoutes';
 import { AiServiceProvider } from '@core/contexts/AiServiceContext';
@@ -6,6 +7,7 @@ import { TeamProvider } from '@core/contexts/TeamContext';
 import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet';
 import Guide from '@core/pages/guide/Guide';
 import Login from '@core/pages/Login';
+import ServicePolicyLayout from '@core/pages/policy/ServicePolicyLayout';
 import SystemOutlet from '@core/pages/system/SystemOutlet';
 import { TenantManagementProvider } from '@market/contexts/TenantManagementContext';
 import { lazy } from 'react';
@@ -171,10 +173,29 @@ import { Outlet, Navigate } from 'react-router-dom';
                             },
                             {
                                 path:'servicepolicy',
-                                key: 'servicePolicy',
-                                lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/servicePolicy')),
-                                children:[
-  
+                                key: 'servicepolicy',
+                                component:<ServicePolicyLayout />,
+                                children:[{
+                                    path:'datamasking',
+                                    component:<Outlet />,
+                                    key:'dataMasking',
+                                    children:[
+                                     {
+                                         path:'list',
+                                         lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/servicePolicy')),
+                                         key:'dataMaskingList'
+                                     },
+                                     {
+                                        path:'create',
+                                        lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/dataMasking/DataMaskingConfig')),
+                                        key:'dataMaskingAdd'
+                                    },
+                                    {
+                                       path:':policyId',
+                                       lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/dataMasking/DataMaskingConfig')),
+                                       key:'dataMaskingAdd'
+                                   }]
+                                }
                                 ]
                             },
                         ]
@@ -265,11 +286,30 @@ import { Outlet, Navigate } from 'react-router-dom';
                                 },
                                 {
                                     path:'servicepolicy',
-                                    key: 'servicePolicy',
-                                    lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/servicePolicy')),
-                                    children:[
-      
-                                    ]
+                                    key: 'servicepolicy',
+                                    component:<ServicePolicyLayout />,
+                                    children:[{
+                                        path:'datamasking',
+                                        component:<Outlet />,
+                                        key:'dataMasking',
+                                        children:[
+                                        {
+                                            path:'list',
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/servicePolicy')),
+                                            key:'dataMaskingList'
+                                        },
+                                        {
+                                            path:'create',
+                                            lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/dataMasking/DataMaskingConfig')),
+                                            key:'dataMaskingAdd'
+                                        },
+                                        {
+                                        path:':policyId',
+                                        lazy:lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/policy/dataMasking/DataMaskingConfig')),
+                                        key:'dataMaskingAdd'
+                                    }]
+                                    }
+                                ]
                                 },
                             ]
                         }
