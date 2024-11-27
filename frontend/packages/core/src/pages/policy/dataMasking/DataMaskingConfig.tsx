@@ -11,8 +11,9 @@ import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "r
 import { useParams, useNavigate } from "react-router-dom"
 import DataMaskRuleTable from "./DataMaskingRuleTable"
 import FilterTable from "../FilterTable"
-import { DataMaskingConfigHandle ,DataMaskingConfigFieldType} from "@common/const/policy/type"
+import { DataMaskingConfigHandle ,DataMaskingConfigFieldType, PolicyMatchType} from "@common/const/policy/type"
 import {PolicyOptions} from '@common/const/policy/consts'
+import {v4 as uuidv4} from 'uuid'
 
 const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
     const { message,modal } = App.useApp()
@@ -37,7 +38,8 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
                 setTimeout(()=>{
                     form.setFieldsValue({
                         ...data.strategy,
-                        type:'data-masking'
+                        type:'data-masking',
+                        filters:data.strategy.filters.map((x)=>{x._eoKey = uuidv4(); return x})
                     })
                 },0)
             }else{
@@ -48,16 +50,22 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
 
     const onFinish:()=>Promise<boolean|string> = () => {
         return form.validateFields().then((value)=>{
+            if(value.filters){
+                value.filters = value.filters.map((x:PolicyMatchType)=>({
+                    ...x, 
+                    values:x.name === 'ip' ? x.values?.[0].split('\n'): (x.values.indexOf('ALL')!== -1 ? ['ALL']:x.values)}))
+            }
             return fetchData<BasicResponse<{service:{id:string}}>>(
                 `strategy/${serviceId === undefined? 'global':'service'}/data-masking`,
                 {
                     method:policyId === undefined? 'POST' : 'PUT',
-                    eoParams: {service:serviceId,team:teamId, policyId:policyId},
+                    eoParams: {service:serviceId,team:teamId, strategy:policyId},
                     eoBody:({...value})
                 }).then(response=>{
                     const {code,data,msg} = response
                     if(code === STATUS_CODE.SUCCESS){
                         message.success(msg || $t(RESPONSE_TIPS.success))
+                        navigator('../list')
                         return Promise.resolve(true)
                     }else{
                         message.error(msg || $t(RESPONSE_TIPS.error))
@@ -84,14 +92,13 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
 
     return (
        
-        <InsidePage pageTitle={ $t('编辑策略')|| '-'} 
+        <InsidePage pageTitle={serviceId ? undefined: $t('编辑策略')} 
             showBorder={false}
             scrollPage={false}
             className="overflow-y-auto"
             >
             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} wrapperClassName=' pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X'>
-               
-                <WithPermission access={onEdit ? ['team.service.service.edit'] :''}>
+                <WithPermission access={onEdit ? [`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`] :''}>
                     <Form
                         layout='vertical'
                         labelAlign='left'
@@ -120,7 +127,6 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
                                 </Select>
                             </Form.Item>
 
-
                             <Form.Item<DataMaskingConfigFieldType>
                                 label={$t("优先级")}
                                 name={'priority'}
@@ -145,19 +151,19 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
 
                             <Form.Item<DataMaskingConfigFieldType>
                                 label={$t("数据脱敏规则")}
-                                name="rules"
+                                name={["config","rules"]}
                                 rules={[{required: true}]}
                             >
                                 <DataMaskRuleTable />
                             </Form.Item>
 
                             <Row className="mb-[10px]">
-                                <WithPermission access={onEdit ? ['team.service.service.edit'] :''}>
+                                <WithPermission access={onEdit ? [`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`] :''}>
                                     <Button type="primary" htmlType="submit">
                                         {$t('保存')}
                                     </Button>
                                 </WithPermission>
-                                <Button className="ml-btnrbase" type="default" onClick={() =>  navigator('/globalpolicy/datamasking/list')}>
+                                <Button className="ml-btnrbase" type="default" onClick={() =>  navigator('../list')}>
                                         {$t('取消')}
                                 </Button>
                             </Row>

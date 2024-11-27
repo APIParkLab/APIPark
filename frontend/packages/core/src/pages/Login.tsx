@@ -1,5 +1,5 @@
 import {FC, useCallback, useEffect, useRef, useState} from "react";
-import {App, Button, Divider, Form, FormInstance, Input, Tooltip} from "antd";
+import {App, Button, Divider, Form, FormInstance, Input, Spin, Tooltip} from "antd";
 import {useGlobalContext} from "@common/contexts/GlobalStateContext.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import {BasicResponse, STATUS_CODE} from "@common/const/const.tsx";
@@ -9,6 +9,7 @@ import Logo from '@common/assets/layout-logo.png'
 import { $t } from "@common/locales";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import LanguageSetting from "@common/components/aoplatform/LanguageSetting";
+import { LoadingOutlined } from "@ant-design/icons";
 
 const Login:FC = ()=> {
      const {state, dispatch} = useGlobalContext()
@@ -17,20 +18,21 @@ const Login:FC = ()=> {
     const navigate = useNavigate();
     const formRef = useRef<FormInstance>(null);
     const [loading,setLoading] = useState<boolean>()
-    // const { encryptByEnAES } = useCrypto();
     const [allowGuest, setAllowGuest] = useState<boolean>(false)
+    const [spinning,setSpinning] = useState<boolean>(false)
 
 
     const check = useCallback(()=>{
+        state.isAuthenticated &&setSpinning(true)
         fetchData<BasicResponse<{channel:Array<{name:string}>, status:string}>>('account/login',{method:'GET'}).then(response=>{
             const {code,data} = response
-            
             if(code === STATUS_CODE.SUCCESS && data.status !== 'anonymous'){
                 dispatch({type:'LOGIN'})
-                navigate(state.mainPage)
+                navigate(state.mainPage,{replace:true})
             }else{
                 dispatch({type:'LOGOUT'})
                 setAllowGuest(data.channel.filter(x=>x.name === 'guest_access').length > 0)
+                setSpinning(false)
             }
         })
     },[])
@@ -100,6 +102,8 @@ const Login:FC = ()=> {
     }, []);
 
      return (
+        spinning?
+        <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={spinning} className='w-full h-full flex items-center justify-center'></Spin> :
          <div className="h-full w-full flex flex-col  items-center overflow-auto min-h-[490px] bg-[#0d1117]">
             <div id="glow-background" className="background-container">
                 <svg className="background-pattern" aria-hidden="true">

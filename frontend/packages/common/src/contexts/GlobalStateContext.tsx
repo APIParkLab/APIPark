@@ -12,7 +12,7 @@ import { RouteConfig } from "@common/const/type";
 import { ProtectedRoute } from "@core/components/aoplatform/RenderRoutes";
 import Login from "@core/pages/Login";
 import { useLocaleContext } from "./LocaleContext";
-
+import Root from "@core/pages/Root"
 interface GlobalState {
     isAuthenticated: boolean;
     userData: UserData | null;
@@ -21,6 +21,7 @@ interface GlobalState {
     powered:string;
     mainPage:string;
     language:string;
+    pluginsLoaded:boolean
 }
 
 interface UserData {
@@ -36,6 +37,7 @@ export type GlobalAction =
     | { type: 'UPDATE_POWER'; powered: string }
     | { type: 'UPDATE_MAIN_PAGE'; mainPage: string }
     | { type: 'UPDATE_LANGUAGE'; language: string }
+    | { type: 'SET_PLUGINS_LOADED'; pluginsLoaded: boolean }
 
 
     const mockData = [
@@ -270,6 +272,11 @@ const globalReducer = (state: GlobalState, action: GlobalAction): GlobalState =>
                 ...state,
                 language: action.language,
             };
+        case 'SET_PLUGINS_LOADED':
+            return {
+                ...state,
+                pluginsLoaded: action.pluginsLoaded,
+            };
         default:
             return state;
     }
@@ -277,7 +284,7 @@ const globalReducer = (state: GlobalState, action: GlobalAction): GlobalState =>
 
 
 export const DefaultRouteConfig = [
-  { path: '/', pathMatch: 'full', component: <Login /> ,key:'root',},
+  { path: '/', pathMatch: 'full', component: <Root /> ,key:'root',},
   { path: '/login', component: <Login /> ,key:'login'},
   { path: '/', pathMatch:'prefix',component:<ProtectedRoute /> ,key:'basciLayout',children:[
     { path: '*', component: <ErrorBoundary><NotFound/></ErrorBoundary>, key: 'errorBoundary' }
@@ -288,13 +295,14 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
     const { message } = App.useApp()
     const { setLocale } = useLocaleContext();
     const [state, dispatch] = useReducer(globalReducer, {
-        isAuthenticated: true, //mock用
+        isAuthenticated: false, //mock用
         userData: null,
         version: '1.0.0',
         updateDate: '2024-07-01',
         powered:'Powered by https://apipark.com',
         mainPage:'/guide/page',
-        language:'en-US'
+        language:'en-US',
+        pluginsLoaded:false
     });
     const [accessData,setAccessData] = useState<Map<string,string[]>>(new Map())
     const [pluginAccessDictionary, setPluginAccessDictionary] = useState<{[k:string]:string}>({})
