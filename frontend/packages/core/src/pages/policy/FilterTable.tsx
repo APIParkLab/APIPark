@@ -57,14 +57,12 @@ const FilterTable: React.FC<FilterTableProps> = ({
           label:res.label,
           title:res.title
         }
-        console.log(res, newFilterForm, value)
         onChange?.([newFilterForm, ...(value?.filter(x=>!filterForm?.name|| x.name!==filterForm.name) || [])])
         closeDrawer()
     })
   };
 
   const handleDeleteFilter =  useCallback((item: FilterFormField) => {
-    console.log(item, value, isModalVisible);
     const newFilterShowList = value?.filter((filter) => filter._eoKey !== item._eoKey) || [];
     onChange?.(newFilterShowList);
   }, [value, onChange]);
@@ -109,7 +107,6 @@ const FilterTable: React.FC<FilterTableProps> = ({
 
   useEffect(()=>{
     setSelectedOptionNameSet(new Set(value?.map(x=>x.name) || []))
-    console.log('valuechange',value)
   },[value])
   return (
     <div>

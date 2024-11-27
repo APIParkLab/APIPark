@@ -241,6 +241,26 @@ export const ApprovalRouteColumns = [
     }
 ]
 
+
+export const ApprovalPolicyColumns = [
+    {
+        title:('名称'),
+        dataIndex:'name',
+        ellipsis:true,
+    },
+    {
+        title:('优先级'),
+        dataIndex:'priority',
+        ellipsis:true
+    },
+    {
+        title:('状态'),
+        dataIndex:'status',
+          
+    }
+]
+
+
 export const ApprovalUpstreamColumns = [
     {
         title:('上游类型'),

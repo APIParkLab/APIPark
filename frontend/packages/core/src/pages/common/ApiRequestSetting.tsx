@@ -10,6 +10,7 @@ type ApiRequestSettingFieldType = {
     siteLogo:string
     invokeAddress:string
     platformName:string
+    sitePrefix:string
 }
 
 export default function ApiRequestSetting(){
@@ -20,7 +21,7 @@ export default function ApiRequestSetting(){
     
     const onFinish = () => {
          form.validateFields().then((value)=>{
-            return fetchData<BasicResponse<null>>('system/general',{method:'POST',eoBody:(value),eoTransformKeys:['invokeAddress','siteName','siteLogo','platformName']}).then(response=>{
+            return fetchData<BasicResponse<null>>('system/general',{method:'POST',eoBody:(value),eoTransformKeys:['invokeAddress','siteName','siteLogo','platformName','sitePrefix']}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
                     message.success(msg || $t(RESPONSE_TIPS.success))
@@ -37,7 +38,7 @@ export default function ApiRequestSetting(){
     };
 
     const getSystemSetting = ()=>{
-        fetchData<BasicResponse<{ general: ApiRequestSettingFieldType }>>('system/general',{method:'GET',eoTransformKeys:['site_name', 'site_logo','invoke_address','platform_name']}).then(response=>{
+        fetchData<BasicResponse<{ general: ApiRequestSettingFieldType }>>('system/general',{method:'GET',eoTransformKeys:['site_name', 'site_logo','invoke_address','platform_name','site_prefix']}).then(response=>{
             const {code,data,msg} = response
             if(code === STATUS_CODE.SUCCESS){
                 form.setFieldsValue(data.general)
@@ -74,6 +75,14 @@ export default function ApiRequestSetting(){
                             <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                         </Form.Item>
 
+                        <Form.Item<ApiRequestSettingFieldType>
+                            label={$t("集成地址")}
+                            name="sitePrefix"
+                            rules={[{ required: true,whitespace:true  }]}
+                            extra={$t("与外部平台集成时，获取 API 市场中文档信息的域名")}
+                        >
+                            <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
+                        </Form.Item>
 
                     <Row className="mb-[10px]" 
                     >
