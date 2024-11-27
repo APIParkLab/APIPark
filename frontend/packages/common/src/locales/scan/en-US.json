@@ -744,5 +744,8 @@
     "K8457ea34": "All (0)",
     "K7ca9a795": "Attribute Name",
     "Kc4391744": "Attribute Value",
-    "K678e13fc": "Configure (0)"
+    "K678e13fc": "Configure (0)",
+    "K508d8bf4": "Integration Address",
+    "K67f4e9bb": "The domain name for obtaining API market documentation information when integrating with external platforms"
+  
 }

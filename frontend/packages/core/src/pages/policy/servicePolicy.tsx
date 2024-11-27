@@ -1,6 +1,6 @@
 import { $t } from "@common/locales/index.ts";
 import DataMasking from "./dataMasking/DataMasking";
-import PolicyTabContainer from "./globalPolicy.tsx";
+import PolicyTabContainer from "./policyTabContainer.tsx";
 
 const servicePolicy = () => {
   /**
@@ -10,9 +10,10 @@ const servicePolicy = () => {
     {
       key: 'dataMasking',
       label: $t('数据脱敏'),
-      children: <div className="pr-[40px] h-full preview-document mb-PAGE_INSIDE_B"><DataMasking rowOperation={['edit', 'logs', 'delete']} /></div>
+      children: <div className="pr-[40px] h-full preview-document mb-PAGE_INSIDE_B"><DataMasking publishBtn={false} rowOperation={['edit', 'logs', 'delete']} /></div>
     }
   ]
+
   return (
     <>
       <PolicyTabContainer tabs={tabItems} />
