@@ -29,5 +29,6 @@ func (p *plugin) ServiceApis() []pm3.Api {
 
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/service/doc", []string{"context", "query:service"}, []string{"doc"}, p.serviceController.ServiceDoc, access.SystemWorkspaceServiceViewAll, access.TeamServiceServiceIntroView),
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/service/doc", []string{"context", "query:service", "body"}, nil, p.serviceController.SaveServiceDoc, access.SystemWorkspaceServiceManagerAll, access.TeamServiceServiceIntroManager),
+		pm3.CreateApiSimple(http.MethodGet, "/swagger/:id", p.serviceController.Swagger),
 	}
 }
