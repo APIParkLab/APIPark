@@ -20,6 +20,9 @@ type IStrategyModule interface {
 	Publish(ctx context.Context, driver string, scope string, target string) error
 	Delete(ctx context.Context, id string) error
 	ToPublish(ctx context.Context, driver string) ([]*strategy_dto.ToPublishItem, error)
+	Restore(ctx context.Context, id string) error
+
+	DeleteServiceStrategy(ctx context.Context, serviceId string, id string) error
 }
 
 func init() {

@@ -19,6 +19,8 @@ system:
       - system.settings.role.view
       - system.settings.ssl_certificate.manager
       - system.settings.ssl_certificate.view
+      - system.settings.strategy.view
+      - system.settings.strategy.manager
       - system.workspace.application.manager_all
       - system.workspace.application.view_all
       - system.workspace.service.manager_all
@@ -49,6 +51,8 @@ system:
       - system.settings.log_configuration.view
       - system.settings.ssl_certificate.manager
       - system.settings.ssl_certificate.view
+      - system.settings.strategy.view
+      - system.settings.strategy.manager
       - system.workspace.application.view_all
       - system.workspace.service.view_all
       - system.workspace.team.view_all
@@ -75,6 +79,8 @@ team:
       - team.service.release.view
       - team.service.service_intro.manager
       - team.service.service_intro.view
+      - team.service.strategy.view
+      - team.service.strategy.manager
       - team.service.subscription.manager
       - team.service.subscription.view
       - team.service.upstream.manager
@@ -99,6 +105,8 @@ team:
       - team.service.release.view
       - team.service.service_intro.manager
       - team.service.service_intro.view
+      - team.service.strategy.view
+      - team.service.strategy.manager
       - team.service.subscription.manager
       - team.service.subscription.view
       - team.service.upstream.manager
@@ -120,7 +128,7 @@ team:
       - team.service.service.manager
       - team.service.service_intro.manager
       - team.service.service_intro.view
-      - team.service.subscription.manager
+      - team.service.strategy.view
       - team.service.subscription.view
       - team.service.upstream.manager
       - team.service.upstream.view

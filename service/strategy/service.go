@@ -21,6 +21,8 @@ type IStrategyService interface {
 	SortDelete(ctx context.Context, id string) error
 	Delete(ctx context.Context, id ...string) error
 
+	Restore(ctx context.Context, id string) error
+
 	CommitStrategy(ctx context.Context, scope string, target string, strategyId string, data *Strategy) error
 	GetStrategyCommit(ctx context.Context, commitId string) (*commit.Commit[StrategyCommit], error)
 	LatestStrategyCommit(ctx context.Context, scope string, target string, strategyId string) (*commit.Commit[StrategyCommit], error)

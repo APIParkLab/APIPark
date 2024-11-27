@@ -22,6 +22,9 @@ type IStrategyController interface {
 	DisableStrategy(ctx *gin.Context, id string) error
 
 	DeleteStrategy(ctx *gin.Context, id string) error
+	DeleteServiceStrategy(ctx *gin.Context, serviceId string, id string) error
+
+	Restore(ctx *gin.Context, id string) error
 
 	FilterGlobalOptions(ctx *gin.Context) ([]*strategy_dto.FilterOption, error)
 	FilterServiceOptions(ctx *gin.Context) ([]*strategy_dto.FilterOption, error)
