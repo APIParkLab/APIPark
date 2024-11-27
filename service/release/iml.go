@@ -281,7 +281,7 @@ func (s *imlReleaseService) SetRunning(ctx context.Context, service string, id s
 
 }
 
-func (s *imlReleaseService) CreateRelease(ctx context.Context, service string, version string, remark string, apiRequestCommit, apisProxyCommits map[string]string, apiDocCommit, serviceDocCommit string, upstreams map[string]map[string]string) (*Release, error) {
+func (s *imlReleaseService) CreateRelease(ctx context.Context, service, version, remark string, apiRequestCommit, apisProxyCommits map[string]string, apiDocCommits, serviceDocCommits string, upstreams map[string]map[string]string, strategies map[string]string) (*Release, error) {
 	operator := utils.UserId(ctx)
 	releaseId := uuid.NewString()
 	commits := make([]*release.Commit, 0, len(apisProxyCommits)+len(upstreams)+2)
@@ -315,23 +315,32 @@ func (s *imlReleaseService) CreateRelease(ctx context.Context, service string, v
 			})
 		}
 	}
-	if apiDocCommit != "" {
+	if apiDocCommits != "" {
 		commits = append(commits, &release.Commit{
 			Type:    CommitApiDocument,
 			Target:  service,
 			Release: releaseId,
 			Key:     CommitApiDocument,
-			Commit:  apiDocCommit,
+			Commit:  apiDocCommits,
 		})
 	}
 
-	if serviceDocCommit != "" {
+	if serviceDocCommits != "" {
 		commits = append(commits, &release.Commit{
 			Type:    CommitServiceDoc,
 			Target:  service,
 			Release: releaseId,
 			Key:     CommitServiceDoc,
-			Commit:  serviceDocCommit,
+			Commit:  serviceDocCommits,
+		})
+	}
+	for key, value := range strategies {
+		commits = append(commits, &release.Commit{
+			Type:    CommitStrategy,
+			Target:  key,
+			Release: releaseId,
+			Key:     CommitStrategy,
+			Commit:  value,
 		})
 	}
 

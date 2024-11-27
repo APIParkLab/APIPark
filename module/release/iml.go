@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/APIParkLab/APIPark/service/strategy"
+
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	service_doc "github.com/APIParkLab/APIPark/service/service-doc"
 
@@ -40,9 +42,37 @@ type imlReleaseModule struct {
 	serviceDocService service_doc.IDocService        `autowired:""`
 	upstreamService   upstream.IUpstreamService      `autowired:""`
 	publishService    publish.IPublishService        `autowired:""`
+	strategyService   strategy.IStrategyService      `autowired:""`
 	transaction       store.ITransaction             `autowired:""`
 	projectService    service.IServiceService        `autowired:""`
 	clusterService    cluster.IClusterService        `autowired:""`
+}
+
+func (m *imlReleaseModule) latestStrategyCommits(ctx context.Context, serviceId string) ([]*commit.Commit[strategy.StrategyCommit], error) {
+	list, err := m.strategyService.All(ctx, 2, serviceId)
+	if err != nil {
+		return nil, fmt.Errorf("get latest strategy failed:%w", err)
+	}
+
+	return utils.SliceToSlice(list, func(s *strategy.Strategy) *commit.Commit[strategy.StrategyCommit] {
+		key := fmt.Sprintf("service-%s", s.Id)
+		return &commit.Commit[strategy.StrategyCommit]{
+			Target: s.Id,
+			Key:    key,
+			Data: &strategy.StrategyCommit{
+				Id:       s.Id,
+				Name:     s.Name,
+				Priority: s.Priority,
+				Filters:  s.Filters,
+				Config:   s.Config,
+				Driver:   s.Driver,
+				IsStop:   s.IsStop,
+				Version:  s.UpdateAt.Format("20060102150405"),
+			},
+		}
+	}, func(s *strategy.Strategy) bool {
+		return !s.IsDelete
+	}), nil
 }
 
 func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *dto.CreateInput) (string, error) {
@@ -103,6 +133,13 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 			return c.Key, c.UUID
 		})
 	})
+	strategies, err := m.latestStrategyCommits(ctx, serviceId)
+	if err != nil {
+		return "", err
+	}
+	strategyCommits := utils.SliceToMapO(strategies, func(c *commit.Commit[strategy.StrategyCommit]) (string, string) {
+		return c.Target, c.UUID
+	})
 
 	var newRelease *release.Release
 	err = m.transaction.Transaction(ctx, func(ctx context.Context) error {
@@ -161,7 +198,7 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 		requestCommitMap := utils.SliceToMapO(requestCommits, func(c *commit.Commit[api.Request]) (string, string) {
 			return c.Target, c.UUID
 		})
-		newRelease, err = m.releaseService.CreateRelease(ctx, serviceId, input.Version, input.Remark, requestCommitMap, apiProxyCommits, docCommit.UUID, serviceDocCommit.UUID, upstreamCommitsForUKC)
+		newRelease, err = m.releaseService.CreateRelease(ctx, serviceId, input.Version, input.Remark, requestCommitMap, apiProxyCommits, docCommit.UUID, serviceDocCommit.UUID, upstreamCommitsForUKC, strategyCommits)
 		return err
 	})
 	if err != nil {
