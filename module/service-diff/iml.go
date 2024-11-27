@@ -153,7 +153,7 @@ func (m *imlServiceDiff) DiffForLatest(ctx context.Context, serviceId string, ba
 		return nil, false, err
 	}
 
-	upstreamCommits, err := m.upstreamService.ListLatestCommit(ctx, serviceId)
+	upstreamCommits, err := m.upstreamService.ListLatestCommit(ctx, cluster.DefaultClusterID, serviceId)
 	if err != nil {
 		return nil, false, err
 	}
