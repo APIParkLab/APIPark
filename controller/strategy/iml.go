@@ -25,6 +25,14 @@ type imlStrategyController struct {
 	serviceModule  service.IServiceModule   `autowired:""`
 }
 
+func (i *imlStrategyController) Restore(ctx *gin.Context, id string) error {
+	return i.strategyModule.Restore(ctx, id)
+}
+
+func (i *imlStrategyController) DeleteServiceStrategy(ctx *gin.Context, serviceId string, id string) error {
+	return i.strategyModule.DeleteServiceStrategy(ctx, serviceId, id)
+}
+
 func (i *imlStrategyController) ToPublish(ctx *gin.Context, driver string) ([]*strategy_dto.ToPublishItem, string, string, bool, error) {
 	list, err := i.strategyModule.ToPublish(ctx, driver)
 	if err != nil {
