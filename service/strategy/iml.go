@@ -22,6 +22,11 @@ type imlStrategyService struct {
 	universally.IServiceEdit[Edit]
 }
 
+func (i *imlStrategyService) Restore(ctx context.Context, id string) error {
+	_, err := i.store.UpdateWhere(ctx, map[string]interface{}{"uuid": id}, map[string]interface{}{"is_delete": false})
+	return err
+}
+
 func (i *imlStrategyService) SearchAll(ctx context.Context, keyword string, driver string, scope int, target string) ([]*Strategy, error) {
 	w := make(map[string]interface{})
 	w["scope"] = scope

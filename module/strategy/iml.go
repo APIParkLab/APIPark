@@ -35,6 +35,22 @@ type imlStrategyModule struct {
 	transaction     store.ITransaction        `autowired:""`
 }
 
+func (i *imlStrategyModule) Restore(ctx context.Context, id string) error {
+	return i.strategyService.Restore(ctx, id)
+}
+
+func (i *imlStrategyModule) DeleteServiceStrategy(ctx context.Context, serviceId string, id string) error {
+	_, err := i.strategyService.LatestStrategyCommit(ctx, strategy_dto.ScopeService, serviceId, id)
+	if err != nil {
+		// 判断是否已经发布，如果未发布则直接删除
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+		return i.strategyService.Delete(ctx, id)
+	}
+	return i.strategyService.SortDelete(ctx, id)
+}
+
 func (i *imlStrategyModule) ToPublish(ctx context.Context, driver string) ([]*strategy_dto.ToPublishItem, error) {
 	scope := strategy_dto.ToScope(strategy_dto.ScopeGlobal)
 	list, err := i.strategyService.SearchAll(ctx, "", driver, scope.Int(), "")
@@ -46,7 +62,7 @@ func (i *imlStrategyModule) ToPublish(ctx context.Context, driver string) ([]*st
 	if err != nil {
 		return nil, err
 	}
-	commitMap := utils.SliceToMapO(commits, func(c *commit.Commit[strategy.StrategyCommit]) (string, string) { return c.Key, c.Data.Version })
+	commitMap := utils.SliceToMapO(commits, func(c *commit.Commit[strategy.StrategyCommit]) (string, string) { return c.Data.Id, c.Data.Version })
 	items := make([]*strategy_dto.ToPublishItem, 0, len(list))
 	for _, l := range list {
 		status := strategy_dto.StrategyStatus(l, commitMap[l.Id])
@@ -73,7 +89,7 @@ func (i *imlStrategyModule) Search(ctx context.Context, keyword string, driver s
 	if err != nil {
 		return nil, 0, err
 	}
-	commitMap := utils.SliceToMapO(commits, func(c *commit.Commit[strategy.StrategyCommit]) (string, string) { return c.Key, c.Data.Version })
+	commitMap := utils.SliceToMapO(commits, func(c *commit.Commit[strategy.StrategyCommit]) (string, string) { return c.Data.Id, c.Data.Version })
 	items := make([]*strategy_dto.StrategyItem, 0, len(list))
 	for _, l := range list {
 		fs := make([]*strategy_dto.Filter, 0)
@@ -210,6 +226,9 @@ func (i *imlStrategyModule) Publish(ctx context.Context, driver string, scope st
 				}
 			}
 
+			if l.IsStop {
+				continue
+			}
 			// TODO:同步到网关
 			err = i.strategyService.CommitStrategy(txCtx, scope, target, l.Id, l)
 			if err != nil {
