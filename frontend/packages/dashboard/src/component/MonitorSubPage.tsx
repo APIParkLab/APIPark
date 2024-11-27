@@ -15,7 +15,7 @@ import { CloseOutlined, ExpandOutlined } from "@ant-design/icons";
 import { useFetch } from "@common/hooks/http";
 import { $t } from "@common/locales";
 
-export type MonitorSubQueryData = SearchBody & { projects?:string[] ,type?:'subscriber'|'provider'}
+export type MonitorSubQueryData = SearchBody & { services?:string[] , apps?:string[],type?:'subscriber'|'provider'}
 
 
 export type MonitorSubPageProps = {
@@ -60,10 +60,10 @@ export default function MonitorSubPage(props:MonitorSubPageProps){
     };
 
     const getProjectList = ()=>{
-      return fetchData<{projects:EntityItem[]}>('simple/projects',{method:'GET'}).then((resp) => {
+      return fetchData<{services:EntityItem[]}>('simple/services',{method:'GET'}).then((resp) => {
         const {code,data,msg} = resp
         if(code === STATUS_CODE.SUCCESS){
-          setListOfProjects(data.projects?.map((x:EntityItem)=>({label:x.name, value:x.id})))
+          setListOfProjects(data.services?.map((x:EntityItem)=>({label:x.name, value:x.id})))
         }else{
             message.error(msg || $t(RESPONSE_TIPS.dataError))
             return setListOfProjects([])
@@ -154,9 +154,9 @@ export default function MonitorSubPage(props:MonitorSubPageProps){
                   mode="multiple"
                   maxTagCount={1}
                   placeholder={$t("请选择服务")}
-                  value={queryData?.projects}
+                  value={queryData?.services}
                   options={listOfProjects}
-                  onChange={(value)=>{setQueryData(prevData=>({...prevData || {}, projects:value}))}}
+                  onChange={(value)=>{setQueryData(prevData=>({...prevData || {}, services:value}))}}
                 />
               </div>
               <div>

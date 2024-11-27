@@ -56,10 +56,10 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
     };
 
     const getAppList = ()=>{
-      return fetchData<{projects:EntityItem[]}>('simple/apps/mine',{method:'GET'}).then((resp) => {
+      return fetchData<{apps:EntityItem[]}>('simple/apps/mine',{method:'GET'}).then((resp) => {
         const {code,data,msg} = resp
         if(code === STATUS_CODE.SUCCESS){
-          setListOfApps(data.projects?.map((x:EntityItem)=>({label:x.name, value:x.id})))
+          setListOfApps(data.apps?.map((x:EntityItem)=>({label:x.name, value:x.id})))
         }else{
             message.error(msg || $t(RESPONSE_TIPS.dataError))
             return setListOfApps([])
@@ -151,9 +151,9 @@ export default function MonitorAppPage(props:MonitorAppPageProps){
                   maxTagCount={1}
                   // maxTagPlaceholder={(selectedList) => `and ${selectedList.length} more selected`}
                   placeholder={$t("请选择消费者")}
-                  value={queryData?.projects}
+                  value={queryData?.apps}
                   options={listOfApps}
-                  onChange={(value)=>{setQueryData(prevData=>({...prevData || {}, projects:value}))}}
+                  onChange={(value)=>{setQueryData(prevData=>({...prevData || {},apps :value}))}}
                 />
               </div>
               <div>
