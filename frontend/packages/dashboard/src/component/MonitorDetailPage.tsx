@@ -98,7 +98,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
       setTimeButton('hour');
       setDatePickerValue(null)
       setQueryData(null);
-      monitorTableRef.current?.reload()
+      // monitorTableRef.current?.reload()
     };
 
     const openModal = (entity:MonitorApiData|MonitorSubscriberData) => {

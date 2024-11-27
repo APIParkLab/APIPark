@@ -67,6 +67,7 @@ export type PublishApprovalInfoType = {
     diffs:{
         apis:PublishApprovalApiItem[]
         upstreams:PublishApprovalUpstreamItem[]
+        strategies:Array<{name:string, priority:number,statues:0|1}>
     }
     clusterPublishStatus?:SystemInsidePublishOnlineItems[],
     error:string

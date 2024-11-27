@@ -33,7 +33,6 @@ const DataMasking = (props: any) => {
   const drawerRef = useRef<PolicyPublishModalHandle>(null)
   const { modal } = App.useApp()
 
-  useEffect(()=>{console.log(props, publishBtn)},[publishBtn])
     /**
    * 列表ref
    */
@@ -104,7 +103,6 @@ const DataMasking = (props: any) => {
    * @param entity 行数据
    */
   const changeOpenApiStatus = (enabled: boolean, entity: any) => {
-    console.log(enabled)
     fetchData<BasicResponse<null>>(
       `strategy/${serviceId === undefined? 'global':'service'}/data-masking/${enabled ? 'enable' :'disable' }`,
       {
