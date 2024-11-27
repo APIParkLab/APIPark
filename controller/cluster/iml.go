@@ -45,8 +45,8 @@ func (p *imlCluster) Check(ctx *gin.Context, input *cluster_dto.CheckCluster) ([
 //	return id, nil
 //}
 //
-//func (p *imlCluster) Search(ctx *gin.Context, keyword string) ([]*parition_dto.Item, error) {
-//	return p.module.Search(ctx, keyword)
+//func (p *imlCluster) SearchByDriver(ctx *gin.Context, keyword string) ([]*parition_dto.Item, error) {
+//	return p.module.SearchByDriver(ctx, keyword)
 //}
 //
 //func (p *imlCluster) Simple(ctx *gin.Context) ([]*parition_dto.Simple, error) {

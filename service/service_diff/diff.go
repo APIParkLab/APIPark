@@ -39,8 +39,17 @@ type UpstreamDiff struct {
 	Status StatusType       `json:"status,omitempty"`
 }
 
+type StrategyDiff struct {
+	Strategy string     `json:"strategy,omitempty"`
+	Name     string     `json:"name"`
+	Priority int        `json:"priority"`
+	Change   ChangeType `json:"change,omitempty"`
+	Status   StatusType `json:"status,omitempty"`
+}
+
 type Diff struct {
-	Clusters  []string        `json:"clusters,omitempty"`
-	Apis      []*ApiDiff      `json:"apis"`
-	Upstreams []*UpstreamDiff `json:"upstreams"`
+	Clusters   []string        `json:"clusters,omitempty"`
+	Apis       []*ApiDiff      `json:"apis"`
+	Upstreams  []*UpstreamDiff `json:"upstreams"`
+	Strategies []*StrategyDiff `json:"strategies"`
 }

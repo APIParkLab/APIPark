@@ -62,6 +62,62 @@ var (
 	loader = openapi3.NewLoader()
 )
 
+func (i *imlServiceController) swagger(ctx *gin.Context, id string) (*openapi3.T, error) {
+	doc, err := i.apiDocModule.GetDoc(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	tmp, err := loader.LoadFromData([]byte(doc.Content))
+	if err != nil {
+		return nil, err
+	}
+	cfg := i.settingModule.Get(ctx)
+
+	tmp.AddServer(&openapi3.Server{
+		URL: cfg.InvokeAddress,
+	})
+	return tmp, nil
+}
+
+func (i *imlServiceController) ExportSwagger(ctx *gin.Context) {
+	id, has := ctx.Params.Get("id")
+	if !has {
+		ctx.JSON(200, &pm3.Response{
+			Code:    -1,
+			Success: "fail",
+			Message: fmt.Sprintf("id is required"),
+		})
+		return
+	}
+	s, err := i.module.Get(ctx, id)
+	if err != nil {
+		ctx.JSON(200, &pm3.Response{
+			Code:    -1,
+			Success: "fail",
+			Message: err.Error(),
+		})
+		return
+	}
+	tmp, err := i.swagger(ctx, id)
+	if err != nil {
+		ctx.JSON(200, &pm3.Response{
+			Code:    -1,
+			Success: "fail",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	data, _ := tmp.MarshalJSON()
+	ctx.Status(200)
+	// 设置响应头
+	ctx.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s.json", strings.Replace(s.Name, " ", "_", -1)))
+	ctx.Header("Content-Type", "application/octet-stream")
+	ctx.Header("Content-Transfer-Encoding", "binary")
+	ctx.Writer.Write(data)
+	return
+}
+
 func (i *imlServiceController) Swagger(ctx *gin.Context) {
 	id, has := ctx.Params.Get("id")
 	if !has {
@@ -71,9 +127,8 @@ func (i *imlServiceController) Swagger(ctx *gin.Context) {
 			Message: fmt.Sprintf("id is required"),
 		})
 		return
-
 	}
-	doc, err := i.apiDocModule.GetDoc(ctx, id)
+	tmp, err := i.swagger(ctx, id)
 	if err != nil {
 		ctx.JSON(200, &pm3.Response{
 			Code:    -1,
@@ -82,30 +137,7 @@ func (i *imlServiceController) Swagger(ctx *gin.Context) {
 		})
 		return
 	}
-	tmp, err := loader.LoadFromData([]byte(doc.Content))
-	if err != nil {
-		ctx.JSON(200, &pm3.Response{
-			Code:    -1,
-			Success: "fail",
-			Message: err.Error(),
-		})
-		return
-	}
-	cfg := i.settingModule.Get(ctx)
-
-	tmp.AddServer(&openapi3.Server{
-		URL: cfg.InvokeAddress,
-	})
-	data, err := tmp.MarshalJSON()
-	if err != nil {
-		ctx.JSON(200, &pm3.Response{
-			Code:    -1,
-			Success: "fail",
-			Message: err.Error(),
-		})
-		return
-	}
-	ctx.JSON(200, string(data))
+	ctx.JSON(200, tmp)
 	return
 }
 
