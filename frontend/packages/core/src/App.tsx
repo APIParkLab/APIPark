@@ -152,8 +152,8 @@ function App() {
         wave={{disabled:true}}
         theme={antdComponentThemeToken}
         form={{validateMessages }}>
-          <AppAntd className="h-full" message={{ maxCount: 1 }}>
-            <PluginEventHubProvider>
+          <PluginEventHubProvider>
+            <AppAntd className="h-full" message={{ maxCount: 1 }}>
               <PluginSlotHubProvider>
                 <GlobalProvider>
                   <BreadcrumbProvider>
@@ -161,8 +161,8 @@ function App() {
                   </BreadcrumbProvider>
                   </GlobalProvider>
               </PluginSlotHubProvider>
-          </PluginEventHubProvider>
           </AppAntd>
+        </PluginEventHubProvider>
       </ConfigProvider>
     </StyleProvider>
   );
