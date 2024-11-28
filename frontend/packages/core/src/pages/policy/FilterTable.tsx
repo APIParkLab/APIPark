@@ -27,7 +27,7 @@ const FilterTable: React.FC<FilterTableProps> = ({
   const formRef = useRef<FilterFormHandle>(null);
   const [formCanSubmit,setFormCanSubmit] = useState(false)
   const [selectedOptionNameSet, setSelectedOptionNameSet] = useState<Set<string>>(new Set());
-  const {serviceId} = useParams<RouterParams>()
+  const {serviceId,teamId} = useParams<RouterParams>()
     const openDrawer = (type: string, data?: FilterFormField) => {
     switch (type) {
       case 'addFilter':
@@ -68,7 +68,7 @@ const FilterTable: React.FC<FilterTableProps> = ({
   }, [value, onChange]);
 
   const getFilterOptions = ()=>{
-    fetchData<BasicResponse<{options:FilterOptionType[]}>>(`strategy/${serviceId === undefined ? 'global' : 'service'}/filter-options`,{method:'GET'}).then(response=>{
+    fetchData<BasicResponse<{options:FilterOptionType[]}>>(`strategy/${serviceId === undefined ? 'global' : 'service'}/filter-options`,{method:'GET', eoParams:{...(serviceId ? {team:teamId, service:serviceId} : {})}}).then(response=>{
       const {code,data,msg} = response
       if(code === STATUS_CODE.SUCCESS){
         setFilterOptions(data.options)
@@ -139,6 +139,7 @@ const FilterTable: React.FC<FilterTableProps> = ({
           disabled={disabled}
           setFormCanSubmit={setFormCanSubmit}
           serviceId={serviceId}
+          teamId={teamId}
         />
       </Modal>
     </div>
