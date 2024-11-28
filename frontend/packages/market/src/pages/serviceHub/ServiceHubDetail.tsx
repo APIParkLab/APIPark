@@ -137,7 +137,7 @@ const ServiceHubDetail = () => {
       key: 'api-integrate',
       label: $t('集成'),
       children: <div className={`p-btnbase  ${serviceBasicInfo?.serviceKind?.toLocaleLowerCase() === 'ai' ? 'ai-service-api-preview' : ''}`}><Integrate service={service!} /></div>,
-      icon: <BgColorsOutlined />
+      icon: <Icon icon="icon-park-solid:whole-site-accelerator" width="15" height="15" />,
     }
   ]
 
