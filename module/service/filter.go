@@ -27,7 +27,7 @@ func (i *imlAppFilter) Name() string {
 }
 
 func (i *imlAppFilter) Title() string {
-	return "消费者"
+	return "consumer"
 }
 
 func (i *imlAppFilter) Labels(values ...string) []string {
@@ -36,7 +36,7 @@ func (i *imlAppFilter) Labels(values ...string) []string {
 	}
 	if values[0] == strategy_filter.ValuesALL {
 		return []string{
-			"全部消费者",
+			"all consumer",
 		}
 	}
 	apps, err := i.service.AppList(context.Background(), values...)
