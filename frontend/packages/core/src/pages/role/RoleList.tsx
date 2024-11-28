@@ -125,9 +125,10 @@ const RoleList = ()=>{
             pageTitle={$t('角色')} 
             description={$t("设置角色的权限范围。")}
             showBorder={false}
-            scrollPage={false}
+            scrollPage={true}
             >
-            <div className="pr-PAGE_INSIDE_X">
+            <div className="pr-PAGE_INSIDE_X overflow-y-scroll h-full">
+                <div>
                 <h3 className="mt-0">{$t('系统级别角色')}</h3>
                     <PageList
                         id="global_role"
@@ -145,6 +146,8 @@ const RoleList = ()=>{
                         onRowClick={(row:RoleTableListItem)=>  navigateTo(`/role/system/config/${row.id}`)}
                         tableClickAccess="system.organization.role.system.edit"
                     />
+                    </div>
+                    <div>
                 <h3 className=" pt-btnbase ">{$t('团队级别角色')}</h3>
                 <PageList
                     id="global_role"
@@ -162,6 +165,7 @@ const RoleList = ()=>{
                     onRowClick={(row:RoleTableListItem)=>  navigateTo(`/role/team/config/${row.id}`)}
                     tableClickAccess="system.organization.role.team.edit"
                 />
+                </div>
                 </div>
         </InsidePage>
     </>)

@@ -147,7 +147,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
             title: typeof x.title === 'string' ? $t(x.title) : x.title,
             ...(x.dataIndex === 'status' ? {
                 render:(_,entity)=>(
-                    entity.status === 0 ? '正常' : '无效')
+                    entity.status === 0 ? $t('正常') : $t('无效'))
             }:{})
         }
     }),[state.language])
