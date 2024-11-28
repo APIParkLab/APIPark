@@ -1,7 +1,6 @@
 
 import { FC, useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
 import { App, Menu, MenuProps } from "antd";
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const.tsx";
 import { useFetch } from "@common/hooks/http.ts";
@@ -15,11 +14,12 @@ import { ItemType, MenuItemGroupType, MenuItemType } from "antd/es/menu/hooks/us
 import { cloneDeep } from "lodash-es";
 import { $t } from "@common/locales/index.ts";
 import { getItem } from "@common/utils/navigation.tsx";
+import { RouterParams } from "@common/const/type.ts";
 const APP_MODE = import.meta.env.VITE_APP_MODE;
 
 const SystemInsidePage: FC = () => {
   const { message } = App.useApp()
-  const { teamId, serviceId, apiId, routeId } = useParams<RouterParams>();
+  const { teamId, serviceId, apiId, routeId,policyId } = useParams<RouterParams>();
   const location = useLocation()
   const currentUrl = location.pathname
   const { fetchData } = useFetch()
@@ -107,8 +107,9 @@ const SystemInsidePage: FC = () => {
     setActiveMenu(key)
   };
 
-  useEffect(() => {
-    setShowMenu(!routeId && !currentUrl.includes('route/create'))
+  useEffect(() => { 
+    // route edit and policy edit page don't need to show menu
+      setShowMenu(!routeId && !currentUrl.includes('route/create') && !policyId && !currentUrl.includes('servicepolicy/datamasking/create'))
     if (apiId !== undefined) {
       setActiveMenu('api')
     } else if(currentUrl.includes('servicepolicy')){
