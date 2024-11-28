@@ -232,13 +232,11 @@ export const GlobalContext = createContext<{
 const globalReducer = (state: GlobalState, action: GlobalAction): GlobalState => {
     switch (action.type) {
         case 'LOGIN':
-          console.log('login')
             return {
                 ...state,
                 isAuthenticated: true,
             };
         case 'LOGOUT':
-          console.log('login')
             return {
                 ...state,
                 isAuthenticated: false,
@@ -448,7 +446,40 @@ export const GlobalProvider: FC<{children:ReactNode}> = ({ children }) => {
 export const useGlobalContext = () => {
     const context = useContext(GlobalContext);
     if (!context) {
-        throw new Error('useGlobalContext must be used within a GlobalProvider');
+       
+      console.warn('useGlobalContext must be used within a GlobalProvider. Returning default context.');
+      return {
+          state: {
+              isAuthenticated: false,
+              userData: null,
+              version: '1.0.0',
+              updateDate: '',
+              powered: '',
+              mainPage: '',
+              language: 'en-US',
+              pluginsLoaded: false,
+          },
+          dispatch: () => {},
+          accessData: new Map(),
+          pluginAccessDictionary: {},
+          menuList: [],
+          getGlobalAccessData: async () => ({ access: [] }),
+          getTeamAccessData: () => {},
+          getPluginAccessDictionary: () => {},
+          getMenuList: () => {},
+          resetAccess: () => {},
+          cleanTeamAccessData: () => {},
+          checkPermission: () => false,
+          teamDataFlushed: false,
+          accessInit: false,
+          aiConfigFlushed: false,
+          setAiConfigFlushed: () => {},
+          routeConfig: [],
+          setRouterConfig: () => {},
+          addRouteConfig: () => {},
+          fetchData: async () => ({}),
+          $t: (key: string) => key,
+      };
     }
     return context;
 };
