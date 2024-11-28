@@ -119,6 +119,9 @@ func (m *imlServiceDiff) DiffForLatest(ctx context.Context, serviceId string, ba
 	if err != nil {
 		return nil, false, err
 	}
+	if len(apis) < 1 {
+		return nil, false, fmt.Errorf("api not found")
+	}
 
 	apiIds := utils.SliceToSlice(apis, func(i *api.API) string {
 		return i.UUID
