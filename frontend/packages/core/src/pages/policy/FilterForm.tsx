@@ -81,7 +81,6 @@ const RemoteFormItem: React.FC<FilterFormItemProps> = (props) =>{
           type: 'checkbox', 
           onChange: (selectedRowKeys: React.Key[]) => {
             onChange?.(selectedRowKeys as string[]);
-            console.log(originRemoteList)
             onShowValueChange?.(selectedRowKeys.length === remoteCounts? $t('所有(0)',[title]) : originRemoteList.filter(x=>selectedRowKeys?.indexOf(x[option.key]))?.map(x=>x.title).join(' , ')) 
           },
           selectedRowKeys: value,
@@ -94,17 +93,14 @@ const RemoteFormItem: React.FC<FilterFormItemProps> = (props) =>{
             onClick:()=>{
               if(value === undefined){
                 onChange?.([record[rowKey]])
-                console.log(record[rowKey],record)
                 onShowValueChange?.(remoteCounts === 1 ? $t('所有(0)',[option?.title]) : record.name)
               }else if(value?.indexOf(record[rowKey])!== -1){
                 const newSelectedKeys = value?.filter(x=>x!==record[rowKey])
                 onChange?.(newSelectedKeys!)
-                console.log(newSelectedKeys,newSelectedKeys.length === remoteCounts? $t('所有(0)',[option?.title]) : originRemoteList.filter(x=>newSelectedKeys.indexOf(x[rowKey]) !== -1)?.map(x=>x.name)?.join(' , '))
                 onShowValueChange?.(newSelectedKeys.length === remoteCounts? $t('所有(0)',[option?.title]) : originRemoteList.filter(x=>newSelectedKeys.indexOf(x[rowKey]) !== -1)?.map(x=>x.name)?.join(' , ')) 
               }else{
                 const newSelectedKeys = [...value,record[rowKey]]
                 onChange?.(newSelectedKeys)
-                console.log(newSelectedKeys,originRemoteList,rowKey,remoteCounts,newSelectedKeys.length === remoteCounts? $t('所有(0)',[option?.title]) : originRemoteList.filter(x=>newSelectedKeys.indexOf(x[rowKey]) !== -1)?.map(x=>x.name)?.join(' , '))
                 onShowValueChange?.(newSelectedKeys.length === remoteCounts? $t('所有(0)',[option?.title]) : originRemoteList.filter(x=>newSelectedKeys.indexOf(x[rowKey]) !== -1)?.map(x=>x.name)?.join(' , ')) 
           }
             }
@@ -172,7 +168,6 @@ const FilterForm = forwardRef<FilterFormHandle,FilterFormProps>(({
     },
     save:()=>form.validateFields().then((res)=>{
       const selectedOption = filterOptions.filter(x=>x.name === res.name)[0]
-      console.log('??',res,selectedOption,filterType,label)
       return Promise.resolve({
         ...res,
         label:filterType === 'pattern' ? res.values : label,

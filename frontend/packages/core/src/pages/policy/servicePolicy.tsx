@@ -14,7 +14,6 @@ const servicePolicy = () => {
     }
   ]
 
-  console.log('publish',false)
   return (
     <>
       <PolicyTabContainer tabs={tabItems} />
