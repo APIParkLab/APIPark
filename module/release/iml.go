@@ -163,6 +163,9 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 
 		doc, err := m.apiDocService.GetDoc(ctx, serviceId)
 		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("api doc not found")
+			}
 			return err
 		}
 		err = m.apiDocService.CommitDoc(ctx, serviceId, doc)
@@ -188,7 +191,7 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 		}
 		serviceDocCommit, err := m.serviceDocService.LatestDocCommit(ctx, serviceId)
 		if err != nil {
-
+			return err
 		}
 		if !m.releaseService.Completeness(utils.SliceToSlice(clusters, func(s *cluster.Cluster) string {
 			return s.Uuid
