@@ -113,7 +113,7 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 		return "", errors.New("api or document not found")
 	}
 
-	upstreams, err := m.upstreamService.ListLatestCommit(ctx, serviceId)
+	upstreams, err := m.upstreamService.ListLatestCommit(ctx, cluster.DefaultClusterID, serviceId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", errors.New("api  config or  document not found")
