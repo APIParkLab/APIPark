@@ -178,7 +178,7 @@ export type GlobalAction =
                   "name": "全局策略",
                   "key": "globalpolicy",
                   "path": "/globalpolicy",
-                  "icon": "uil:comment-shield",
+                  "icon": "icon-park-solid:exchange-three",
                   "access": "system.settings.data_source.view"
                 },
                 {
