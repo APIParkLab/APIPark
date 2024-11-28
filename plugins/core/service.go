@@ -3,11 +3,14 @@ package core
 import (
 	"net/http"
 
+	"github.com/eolinker/go-common/ignore"
+
 	"github.com/APIParkLab/APIPark/resources/access"
 	"github.com/eolinker/go-common/pm3"
 )
 
 func (p *plugin) ServiceApis() []pm3.Api {
+	ignore.IgnorePath("login", http.MethodGet, "/api/v1/service/swagger/:id")
 	return []pm3.Api{
 		// 项目
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/service/info", []string{"context", "query:service"}, []string{"service"}, p.serviceController.Get, access.SystemWorkspaceServiceViewAll, access.TeamTeamServiceView),
