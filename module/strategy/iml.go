@@ -226,9 +226,6 @@ func (i *imlStrategyModule) Publish(ctx context.Context, driver string, scope st
 				}
 			}
 
-			if l.IsStop {
-				continue
-			}
 			// TODO:同步到网关
 			err = i.strategyService.CommitStrategy(txCtx, scope, target, l.Id, l)
 			if err != nil {
