@@ -96,6 +96,7 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
             showBorder={false}
             scrollPage={false}
             className="overflow-y-auto"
+            backUrl={serviceId ? '../list' : undefined}
             >
             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} wrapperClassName=' pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X'>
                 <WithPermission access={onEdit ? [`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`] :''}>
