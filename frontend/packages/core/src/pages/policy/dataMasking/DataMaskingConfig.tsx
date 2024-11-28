@@ -39,7 +39,7 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
                     form.setFieldsValue({
                         ...data.strategy,
                         type:'data-masking',
-                        filters:data.strategy.filters.map((x)=>{x._eoKey = uuidv4(); return x})
+                        filters:data.strategy.filters?.map((x)=>{x._eoKey = uuidv4(); return x})
                     })
                 },0)
             }else{
