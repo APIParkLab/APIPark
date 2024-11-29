@@ -14,7 +14,7 @@ type IUpstreamService interface {
 	Delete(ctx context.Context, id string) error
 	List(ctx context.Context, serviceIds ...string) ([]*Upstream, error)
 	LatestCommit(ctx context.Context, uid string, clusterId string) (*commit.Commit[Config], error)
-	ListLatestCommit(ctx context.Context, serviceIds ...string) ([]*commit.Commit[Config], error)
+	ListLatestCommit(ctx context.Context, clusterId string, serviceIds ...string) ([]*commit.Commit[Config], error)
 	SaveCommit(ctx context.Context, uid string, partition string, cfg *Config) error
 	GetCommit(ctx context.Context, uuid string) (*commit.Commit[Config], error)
 	ListCommit(ctx context.Context, uuid ...string) ([]*commit.Commit[Config], error)

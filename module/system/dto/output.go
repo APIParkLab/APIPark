@@ -7,6 +7,7 @@ import (
 
 type Setting struct {
 	InvokeAddress string `json:"invoke_address" key:"system.node.invoke_address"`
+	SitePrefix    string `json:"site_prefix" key:"system.setting.site_prefix"`
 }
 
 func MapStringToStruct[T any](m map[string]string) *T {

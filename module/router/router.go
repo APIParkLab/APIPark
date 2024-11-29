@@ -2,8 +2,10 @@ package router
 
 import (
 	"context"
-	"github.com/APIParkLab/APIPark/module/system"
 	"reflect"
+
+	"github.com/APIParkLab/APIPark/module/system"
+	strategy_filter "github.com/APIParkLab/APIPark/strategy-filter"
 
 	"github.com/eolinker/go-common/autowire"
 
@@ -29,6 +31,7 @@ type IRouterModule interface {
 	// Prefix 获取API前缀
 	Prefix(ctx context.Context, serviceId string) (string, error)
 
+	SimpleAPIs(ctx context.Context, input *router_dto.InputSimpleAPI) ([]*router_dto.SimpleItem, error)
 	//ExportAll(ctx context.Context) ([]*router_dto.Export, error)
 }
 
@@ -45,4 +48,8 @@ func init() {
 	autowire.Auto[IExportRouterModule](func() reflect.Value {
 		return reflect.ValueOf(apiModule)
 	})
+
+	filter := new(imlRouterFilter)
+	autowire.Autowired(filter)
+	strategy_filter.RegisterRemoteFilter(filter)
 }

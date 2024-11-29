@@ -109,9 +109,7 @@ func (i *imlServiceModule) ExportAll(ctx context.Context) ([]*service_dto.Export
 			Catalogue:   s.Catalogue,
 			Logo:        s.Logo,
 		}
-		//if v, ok := docMap[s.Id]; ok {
-		//	info.Doc = v.Doc
-		//}
+
 		if tags, ok := serviceTagMap[s.Id]; ok {
 			info.Tags = tags
 		}
@@ -176,7 +174,7 @@ func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, 
 //func (i *imlServiceModule) SimpleAPPS(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
 //	w := make(map[string]interface{})
 //	w["as_app"] = true
-//	services, err := i.serviceService.Search(ctx, keyword, w)
+//	services, err := i.serviceService.SearchByDriver(ctx, keyword, w)
 //	if err != nil {
 //		return nil, err
 //	}
@@ -191,47 +189,47 @@ func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, 
 //	}), nil
 //}
 
-//func (i *imlServiceModule) Simple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
-//	w := make(map[string]interface{})
-//	w["as_server"] = true
-//
-//	services, err := i.serviceService.Search(ctx, keyword, w)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	items := make([]*service_dto.SimpleServiceItem, 0, len(services))
-//	for _, p := range services {
-//
-//		items = append(items, &service_dto.SimpleServiceItem{
-//			Id:          p.Id,
-//			Name:        p.Name,
-//			Description: p.Description,
-//			Team:        auto.UUID(p.Team),
-//		})
-//	}
-//	return items, nil
-//}
-//
-//func (i *imlServiceModule) MySimple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
-//	services, err := i.searchMyServices(ctx, "", keyword)
-//
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	items := make([]*service_dto.SimpleServiceItem, 0, len(services))
-//	for _, p := range services {
-//
-//		items = append(items, &service_dto.SimpleServiceItem{
-//			Id:          p.Id,
-//			Name:        p.Name,
-//			Description: p.Description,
-//			Team:        auto.UUID(p.Team),
-//		})
-//	}
-//	return items, nil
-//}
+func (i *imlServiceModule) Simple(ctx context.Context) ([]*service_dto.SimpleServiceItem, error) {
+	w := make(map[string]interface{})
+	w["as_server"] = true
+
+	services, err := i.serviceService.Search(ctx, "", w)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*service_dto.SimpleServiceItem, 0, len(services))
+	for _, p := range services {
+
+		items = append(items, &service_dto.SimpleServiceItem{
+			Id:          p.Id,
+			Name:        p.Name,
+			Description: p.Description,
+			Team:        auto.UUID(p.Team),
+		})
+	}
+	return items, nil
+}
+
+func (i *imlServiceModule) MySimple(ctx context.Context) ([]*service_dto.SimpleServiceItem, error) {
+	services, err := i.searchMyServices(ctx, "", "")
+
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*service_dto.SimpleServiceItem, 0, len(services))
+	for _, p := range services {
+
+		items = append(items, &service_dto.SimpleServiceItem{
+			Id:          p.Id,
+			Name:        p.Name,
+			Description: p.Description,
+			Team:        auto.UUID(p.Team),
+		})
+	}
+	return items, nil
+}
 
 func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Service, error) {
 	now := time.Now()

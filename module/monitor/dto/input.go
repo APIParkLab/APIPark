@@ -24,7 +24,7 @@ type CommonInput struct {
 
 type StatisticInput struct {
 	Apis     []string `json:"apis"`
-	Projects []string `json:"projects"`
+	Services []string `json:"services"`
 	Path     string   `json:"path"`
 	*CommonInput
 }
