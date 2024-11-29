@@ -19,7 +19,7 @@ const APP_MODE = import.meta.env.VITE_APP_MODE;
 
 const AiServiceInsidePage:FC = ()=> {
     const { message } = App.useApp()
-    const { teamId,serviceId,apiId, routeId } = useParams<RouterParams>();
+    const { teamId,serviceId,apiId, routeId,policyId } = useParams<RouterParams>();
     const location = useLocation()
     const currentUrl = location.pathname
     const {fetchData} = useFetch()
@@ -109,7 +109,9 @@ const AiServiceInsidePage:FC = ()=> {
     };
     
     useEffect(() => {
-        setShowMenu(!routeId && !currentUrl.includes('route/create'))
+        // route edit and policy edit page don't need to show menu
+        setShowMenu(!routeId && !currentUrl.includes('route/create') && !policyId &&!currentUrl.includes('servicepolicy/datamasking/create'))
+
         if(apiId !== undefined){
             setActiveMenu('api')
         } else if(currentUrl.includes('servicepolicy')){

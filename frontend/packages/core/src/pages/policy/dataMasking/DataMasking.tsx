@@ -79,7 +79,7 @@ const DataMasking = (props: any) => {
     {
       title: '',
       key: 'option',
-      btnNums: rowOperation.length,
+      btnNums: rowOperation.length -1,
       fixed: 'right',
       valueType: 'option',
       render: (_: React.ReactNode, entity: any) => [
