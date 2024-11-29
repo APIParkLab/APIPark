@@ -44,13 +44,13 @@ export type GlobalAction =
         {
           "name": "工作空间",
           "key": "workspace",
-          "path": "/guide/page",
+          "path": "/guide",
           "icon": "ic:baseline-space-dashboard",
           "children": [
             {
               "name": "首页",
               "key": "guide",
-              "path": "/guide/page",
+              "path": "/guide",
               "icon": "ic:baseline-home",
               "access": "all"
             },
