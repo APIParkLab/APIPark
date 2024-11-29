@@ -975,7 +975,7 @@ p{
 .ant-drawer-content-wrapper{
   min-width: 820px !important;
   .ant-table:not(.ant-table-bordered){
-    border:1px solid var(--border-color) !important;
+    /* border:1px solid var(--border-color) !important; */
     border-top:0px !important;
   }
   .ant-table:not(.ant-table-borderer){
@@ -1001,7 +1001,7 @@ p{
 .ant-modal-wrap:not(.height-fixed-modal){
 .ant-modal-body{
   .ant-table:not(.ant-table-bordered){
-    border:1px solid var(--border-color) !important;
+    /* border:1px solid var(--border-color) !important; */
     border-top:0px !important;
   }
   .ant-table:not(.ant-table-borderer){
