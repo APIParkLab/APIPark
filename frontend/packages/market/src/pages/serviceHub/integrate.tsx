@@ -55,8 +55,8 @@ const Integrate = ({ service }: { service: ServiceDetailType }) => {
       <p className={stepClass}>{$t('步骤二：导入 API 文档数据')}</p>
       <div className='my-[10px]'>{$t('可通过以下 URL 或 下载 Json 文件，导入 API 文档数据到 Agent 平台中。')}</div>
       <div className="flex w-full items-center gap-[30px]">
-        <Space.Compact className=" flex-1 ">
-          <Input disabled value={url} />
+        <Space.Compact className="w-[700px]">
+          <Input className="truncate" disabled title={url} value={url} />
           <Button type="primary" onClick={copyURL}>{$t('复制 URL')}</Button>
         </Space.Compact>
         <span className="text-[14px] font-bold">OR</span>

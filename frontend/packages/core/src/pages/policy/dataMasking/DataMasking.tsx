@@ -63,7 +63,7 @@ const DataMasking = (props: any) => {
       }
       return {
         ...x,
-        title: typeof x.title === 'string' ? $t(x.title as string) : x.title
+        title: (<span title={$t(x.title as string)}>{$t(x.title as string)}</span>)
       }
     })
     return res
