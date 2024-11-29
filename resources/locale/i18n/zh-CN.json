@@ -5,12 +5,19 @@
   "api": "API",
   "api doc": "API文档",
   "api gateway": "API网关",
+  "api method": "API请求方法",
+  "api name": "API名称",
+  "api path": "API路径",
+  "all consumer": "所有消费者",
+  "all method": "全部请求方式",
   "api portal": "API门户",
   "authorization": "访问授权",
   "consumer": "消费者",
+  "consumer id": "消费者ID",
   "consumer admin": "消费者管理员",
   "consumer developer": "消费者开发者",
   "create": "创建",
+  "description": "描述",
   "data source": "数据源",
   "devops admin": "运维管理员",
   "general": "常规设置",
@@ -42,5 +49,7 @@
   "view all service": "查看所有服务",
   "view all team": "查看所有团队",
   "view subscribed services": "查看已经订阅的服务",
-  "workspace": "工作空间"
+  "workspace": "工作空间",
+  "request path": "请求路径",
+  "methods": "请求方法"
 }

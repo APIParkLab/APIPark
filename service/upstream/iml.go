@@ -50,7 +50,7 @@ func (i *imlUpstreamService) ListCommit(ctx context.Context, uuid ...string) ([]
 	return i.commitService.List(ctx, uuid...)
 }
 
-func (i *imlUpstreamService) ListLatestCommit(ctx context.Context, serviceIds ...string) ([]*commit.Commit[Config], error) {
+func (i *imlUpstreamService) ListLatestCommit(ctx context.Context, clusterId string, serviceIds ...string) ([]*commit.Commit[Config], error) {
 	w := make(map[string]interface{})
 	if len(serviceIds) > 0 {
 		w["service"] = serviceIds
@@ -67,7 +67,7 @@ func (i *imlUpstreamService) ListLatestCommit(ctx context.Context, serviceIds ..
 	targetId := utils.SliceToSlice(upstreams, func(u *upstream.Upstream) string {
 		return u.UUID
 	})
-	return i.commitService.ListLatest(ctx, targetId...)
+	return i.commitService.ListLatest(ctx, clusterId, targetId...)
 
 }
 

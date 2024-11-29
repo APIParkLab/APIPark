@@ -41,6 +41,30 @@ type imlAPIService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlAPIService) ListForServices(ctx context.Context, serviceIds ...string) ([]*API, error) {
+	w := map[string]interface{}{}
+	if len(serviceIds) > 0 {
+		w["service"] = serviceIds
+	}
+	list, err := i.store.List(ctx, w)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(list, FromEntity), nil
+}
+
+func (i *imlAPIService) ListInfoForServices(ctx context.Context, serviceIds ...string) ([]*Info, error) {
+	w := map[string]interface{}{}
+	if len(serviceIds) > 0 {
+		w["service"] = serviceIds
+	}
+	list, err := i.apiInfoStore.List(ctx, w)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(list, FromEntityInfo), nil
+}
+
 func (i *imlAPIService) ListLatestCommitRequest(ctx context.Context, aid ...string) ([]*commit.Commit[Request], error) {
 	return i.requestCommitService.ListLatest(ctx, aid...)
 }

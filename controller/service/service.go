@@ -24,12 +24,11 @@ type IServiceController interface {
 	Delete(ctx *gin.Context, id string) error
 	ServiceDoc(ctx *gin.Context, id string) (*service_dto.ServiceDoc, error)
 	SaveServiceDoc(ctx *gin.Context, id string, input *service_dto.SaveServiceDoc) error
+	Simple(ctx *gin.Context) ([]*service_dto.SimpleServiceItem, error)
+	MySimple(ctx *gin.Context) ([]*service_dto.SimpleServiceItem, error)
 
-	//createAIService(ctx *gin.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error)
-	//editAIService(ctx *gin.Context, id string, input *service_dto.EditService) (*service_dto.Service, error)
-	//DeleteAIService(ctx *gin.Context, id string) error
-	//SearchMyAIServices(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error)
-	//SearchAIServices(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error)
+	Swagger(ctx *gin.Context)
+	ExportSwagger(ctx *gin.Context)
 }
 
 type IAppController interface {

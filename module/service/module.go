@@ -4,6 +4,8 @@ import (
 	"context"
 	"reflect"
 
+	strategy_filter "github.com/APIParkLab/APIPark/strategy-filter"
+
 	"github.com/APIParkLab/APIPark/module/system"
 
 	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
@@ -25,11 +27,11 @@ type IServiceModule interface {
 	// Delete 删除项目
 	Delete(ctx context.Context, id string) error
 
-	// Simple 获取简易项目列表
-	//Simple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
+	//Simple 获取简易项目列表
+	Simple(ctx context.Context) ([]*service_dto.SimpleServiceItem, error)
 
-	// MySimple 获取我的简易项目列表
-	//MySimple(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error)
+	//MySimple 获取我的简易项目列表
+	MySimple(ctx context.Context) ([]*service_dto.SimpleServiceItem, error)
 }
 
 type IServiceDocModule interface {
@@ -82,5 +84,9 @@ func init() {
 	autowire.Auto[IServiceDocModule](func() reflect.Value {
 		return reflect.ValueOf(serviceDocModule)
 	})
+
+	filter := new(imlAppFilter)
+	autowire.Autowired(filter)
+	strategy_filter.RegisterRemoteFilter(filter)
 
 }

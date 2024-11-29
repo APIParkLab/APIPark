@@ -14,7 +14,7 @@ type IReleaseService interface {
 	// GetRelease 获取发布信息
 	GetRelease(ctx context.Context, id string) (*Release, error)
 	// CreateRelease 创建发布
-	CreateRelease(ctx context.Context, service string, version string, remark string, apiRequestCommit, apisProxyCommits map[string]string, apiDocCommits, serviceDocCommits string, upstreams map[string]map[string]string) (*Release, error)
+	CreateRelease(ctx context.Context, service, version, remark string, apiRequestCommit, apisProxyCommits map[string]string, apiDocCommits, serviceDocCommits string, upstreams map[string]map[string]string, strategies map[string]string) (*Release, error)
 	// DeleteRelease 删除发布
 	DeleteRelease(ctx context.Context, id string) error
 	List(ctx context.Context, service string) ([]*Release, error)

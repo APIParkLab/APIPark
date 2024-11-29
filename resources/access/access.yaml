@@ -131,6 +131,16 @@ system:
             value: 'manager'
             dependents:
               - system.settings.log_configuration.view
+      - name: global strategy
+        value: "strategy"
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+              - system.settings.strategy.view
 team:
   - name: service
     value: 'service'
@@ -197,6 +207,16 @@ team:
             value: 'manager'
             dependents:
                 - team.service.subscription.view
+      - name: service strategy
+        value: 'strategy'
+        children:
+            - name: view
+              value: 'view'
+              guest_allow: true
+            - name: manager
+              value: 'manager'
+              dependents:
+                - team.service.strategy.view
   - name: consumer
     value: 'consumer'
     children:

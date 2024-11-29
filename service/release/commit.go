@@ -8,4 +8,5 @@ const (
 	CommitUpstream    CommitType = "upstream"
 	CommitApiProxy    CommitType = "api_proxy"
 	CommitServiceDoc  CommitType = "service_doc"
+	CommitStrategy    CommitType = "strategy"
 )

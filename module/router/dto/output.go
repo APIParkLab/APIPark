@@ -26,6 +26,7 @@ type Item struct {
 type SimpleItem struct {
 	Id      string   `json:"id"`
 	Methods []string `json:"methods"`
+	Name    string   `json:"name"`
 	Path    string   `json:"request_path"`
 }
 

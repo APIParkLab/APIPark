@@ -145,8 +145,8 @@ func (m *imlClusterModule) ClusterNodes(ctx context.Context, clusterId string) (
 //	return m.Get(ctx, create.Id)
 //}
 //
-//func (m *imlClusterModule) Search(ctx context.Context, keyword string) ([]*paritiondto.Item, error) {
-//	partitions, err := m.partitionService.Search(ctx, keyword, nil)
+//func (m *imlClusterModule) SearchByDriver(ctx context.Context, keyword string) ([]*paritiondto.Item, error) {
+//	partitions, err := m.partitionService.SearchByDriver(ctx, keyword, nil)
 //	if err != nil {
 //		return nil, err
 //	}
@@ -185,7 +185,7 @@ func (m *imlClusterModule) ClusterNodes(ctx context.Context, clusterId string) (
 //	if err != nil {
 //		return nil, err
 //	}
-//	//oDetails, err := m.organizationService.Search(ctx, "")
+//	//oDetails, err := m.organizationService.SearchByDriver(ctx, "")
 //	//if err != nil {
 //	//	return nil, err
 //	//}
@@ -248,7 +248,7 @@ func (m *imlClusterModule) ClusterNodes(ctx context.Context, clusterId string) (
 //}
 //
 //func (m *imlClusterModule) Simple(ctx context.Context) ([]*paritiondto.Simple, error) {
-//	pm, err := m.partitionService.Search(ctx, "", nil)
+//	pm, err := m.partitionService.SearchByDriver(ctx, "", nil)
 //	if err != nil {
 //		return nil, err
 //	}
@@ -262,7 +262,7 @@ func (m *imlClusterModule) ClusterNodes(ctx context.Context, clusterId string) (
 //}
 //
 //func (m *imlClusterModule) SimpleByIds(ctx context.Context, ids []string) ([]*paritiondto.Simple, error) {
-//	pm, err := m.partitionService.Search(ctx, "", map[string]interface{}{
+//	pm, err := m.partitionService.SearchByDriver(ctx, "", map[string]interface{}{
 //		"uuid": ids,
 //	})
 //	if err != nil {
@@ -278,7 +278,7 @@ func (m *imlClusterModule) ClusterNodes(ctx context.Context, clusterId string) (
 //
 //}
 //func (m *imlClusterModule) SimpleWithCluster(ctx context.Context) ([]*paritiondto.SimpleWithCluster, error) {
-//	pm, err := m.partitionService.Search(ctx, "", nil)
+//	pm, err := m.partitionService.SearchByDriver(ctx, "", nil)
 //	if err != nil {
 //		return nil, err
 //	}

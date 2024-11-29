@@ -9,6 +9,7 @@ import (
 
 func (p *plugin) apiApis() []pm3.Api {
 	return []pm3.Api{
+		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/simple/service/apis", []string{"context", "body"}, []string{"apis"}, p.routerController.Simple),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/service/routers", []string{"context", "query:keyword", "query:service"}, []string{"routers"}, p.routerController.Search, access.SystemWorkspaceServiceViewAll, access.TeamServiceApiView),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/service/router/detail", []string{"context", "query:service", "query:router"}, []string{"router"}, p.routerController.Detail, access.SystemWorkspaceServiceViewAll, access.TeamServiceApiView),
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/service/router", []string{"context", "query:service", "body"}, []string{"router"}, p.routerController.Create, access.SystemWorkspaceServiceManagerAll, access.TeamServiceApiManager),

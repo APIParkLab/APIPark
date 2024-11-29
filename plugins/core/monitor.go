@@ -17,5 +17,10 @@ func (p *plugin) monitorStatisticApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/monitor/config", []string{"context", "body"}, []string{"info"}, p.monitorConfigController.SaveMonitorConfig, access.SystemSettingsDataSourceManager),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/monitor/config", []string{"context"}, []string{"info"}, p.monitorConfigController.GetMonitorConfig, access.SystemSettingsDataSourceView),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/monitor/clusters", []string{"context"}, []string{"clusters"}, p.monitorConfigController.GetMonitorCluster),
+
+		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/monitor/:data_type", []string{"context", "rest:data_type", "body"}, []string{"statistics"}, p.monitorStatisticController.Statistics),
+		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/monitor/:data_type/trend", []string{"context", "rest:data_type", "query:id", "body"}, []string{"tendency", "time_interval"}, p.monitorStatisticController.InvokeTrend),
+		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/monitor/:data_type/trend/:typ", []string{"context", "rest:data_type", "rest:typ", "query:api", "query:provider", "query:subscriber", "body"}, []string{"tendency", "time_interval"}, p.monitorStatisticController.InvokeTrendInner),
+		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/monitor/:data_type/statistics/:typ", []string{"context", "rest:data_type", "rest:typ", "query:id", "body"}, []string{"statistics"}, p.monitorStatisticController.StatisticsInner),
 	}
 }

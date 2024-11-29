@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
+	"time"
+
 	"github.com/APIParkLab/APIPark/gateway"
 	"github.com/eolinker/eosc/log"
 	"github.com/eolinker/go-common/auto"
 	"github.com/eolinker/go-common/store"
 	"github.com/eolinker/go-common/utils"
 	"gorm.io/gorm"
-	"sort"
-	"time"
 
 	"github.com/APIParkLab/APIPark/service/service"
 
@@ -40,6 +41,442 @@ type imlMonitorStatisticModule struct {
 	clusterService               cluster.IClusterService         `autowired:""`
 	monitorService               monitor.IMonitorService         `autowired:""`
 	apiService                   api.IAPIService                 `autowired:""`
+}
+
+func (i *imlMonitorStatisticModule) ApiStatistics(ctx context.Context, input *monitor_dto.StatisticInput) ([]*monitor_dto.ApiStatisticBasicItem, error) {
+	clusterId := cluster.DefaultClusterID
+	_, err := i.clusterService.Get(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	wm := make(map[string]interface{})
+	if len(input.Apis) > 0 {
+		wm["uuid"] = input.Apis
+		wheres = append(wheres, monitor.MonWhereItem{
+			Key:       "api",
+			Operation: "in",
+			Values:    input.Apis,
+		})
+	}
+	if len(input.Services) > 0 {
+		wm["service"] = input.Services
+		wheres = append(wheres, monitor.MonWhereItem{
+			Key:       "project",
+			Operation: "in",
+			Values:    input.Services,
+		})
+	}
+	// 查询符合条件的API
+	apis, err := i.apiService.Search(ctx, input.Path, wm)
+	if err != nil {
+		return nil, err
+	}
+	if len(apis) < 1 {
+		// 没有符合条件的API
+		return make([]*monitor_dto.ApiStatisticBasicItem, 0), nil
+	}
+	apiIds := utils.SliceToSlice(apis, func(t *api.API) string {
+		return t.UUID
+	})
+
+	apiInfos, err := i.apiService.ListInfo(ctx, apiIds...)
+	if err != nil {
+		return nil, err
+	}
+	return i.apiStatistics(ctx, clusterId, apiInfos, formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres, 0)
+}
+
+func (i *imlMonitorStatisticModule) apiStatistics(ctx context.Context, clusterId string, apiInfos []*api.Info, start time.Time, end time.Time, wheres []monitor.MonWhereItem, limit int) ([]*monitor_dto.ApiStatisticBasicItem, error) {
+	statisticMap, err := i.statistics(ctx, clusterId, "api", start, end, wheres, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*monitor_dto.ApiStatisticBasicItem, 0, len(statisticMap))
+	for _, item := range apiInfos {
+
+		statisticItem := &monitor_dto.ApiStatisticBasicItem{
+			Id:            item.UUID,
+			Name:          item.Name,
+			Path:          item.Path,
+			Service:       auto.UUID(item.Service),
+			MonCommonData: new(monitor_dto.MonCommonData),
+		}
+		if val, ok := statisticMap[item.UUID]; ok {
+			statisticItem.MonCommonData = monitor_dto.ToMonCommonData(val)
+			delete(statisticMap, item.UUID)
+		}
+		result = append(result, statisticItem)
+	}
+	for key, item := range statisticMap {
+		statisticItem := &monitor_dto.ApiStatisticBasicItem{
+			Id:            key,
+			Name:          "未知API-" + key,
+			MonCommonData: monitor_dto.ToMonCommonData(item),
+		}
+
+		if key == "-" {
+			statisticItem.Name = "无API"
+		}
+		result = append(result, statisticItem)
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].RequestTotal > result[j].RequestTotal
+	})
+	return result, nil
+}
+
+func (i *imlMonitorStatisticModule) SubscriberStatistics(ctx context.Context, input *monitor_dto.StatisticInput) ([]*monitor_dto.ServiceStatisticBasicItem, error) {
+	clusterId := cluster.DefaultClusterID
+	_, err := i.clusterService.Get(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	apps, err := i.serviceService.AppList(ctx, input.Services...)
+	if err != nil {
+		return nil, err
+	}
+	appIds := utils.SliceToSlice(apps, func(p *service.Service) string {
+		return p.Id
+	})
+
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(appIds) > 0 {
+		wheres = append(wheres, monitor.MonWhereItem{
+			Key:       "app",
+			Operation: "in",
+			Values:    appIds,
+		})
+	}
+
+	return i.serviceStatistics(ctx, clusterId, apps, "app", formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres, 0)
+}
+
+func (i *imlMonitorStatisticModule) serviceStatistics(ctx context.Context, clusterId string, services []*service.Service, groupBy string, start time.Time, end time.Time, wheres []monitor.MonWhereItem, limit int) ([]*monitor_dto.ServiceStatisticBasicItem, error) {
+	statisticMap, err := i.statistics(ctx, clusterId, groupBy, start, end, wheres, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*monitor_dto.ServiceStatisticBasicItem, 0, len(statisticMap))
+	for _, item := range services {
+		statisticItem := &monitor_dto.ServiceStatisticBasicItem{
+			Id:            item.Id,
+			Name:          item.Name,
+			MonCommonData: new(monitor_dto.MonCommonData),
+		}
+		if val, ok := statisticMap[item.Id]; ok {
+			statisticItem.MonCommonData = monitor_dto.ToMonCommonData(val)
+			delete(statisticMap, item.Id)
+		}
+		result = append(result, statisticItem)
+	}
+	for key, item := range statisticMap {
+		statisticItem := &monitor_dto.ServiceStatisticBasicItem{
+			Id:            key,
+			Name:          "未知-" + key,
+			MonCommonData: monitor_dto.ToMonCommonData(item),
+		}
+
+		if key == "-" {
+			statisticItem.Name = "-"
+		}
+		result = append(result, statisticItem)
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].RequestTotal > result[j].RequestTotal
+	})
+	return result, nil
+}
+
+func (i *imlMonitorStatisticModule) ProviderStatistics(ctx context.Context, input *monitor_dto.StatisticInput) ([]*monitor_dto.ServiceStatisticBasicItem, error) {
+	clusterId := cluster.DefaultClusterID
+	_, err := i.clusterService.Get(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	services, err := i.serviceService.ServiceList(ctx, input.Services...)
+	if err != nil {
+		return nil, err
+	}
+
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(input.Services) > 0 {
+		wheres = append(wheres, monitor.MonWhereItem{
+			Key:       "provider",
+			Operation: "in",
+			Values:    input.Services,
+		})
+	}
+
+	return i.serviceStatistics(ctx, clusterId, services, "provider", formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres, 0)
+}
+
+func (i *imlMonitorStatisticModule) APITrend(ctx context.Context, apiId string, input *monitor_dto.CommonInput) (*monitor_dto.MonInvokeCountTrend, string, error) {
+	clusterId := cluster.DefaultClusterID
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, "", err
+	}
+	wheres = append(wheres, monitor.MonWhereItem{
+		Key:       "api",
+		Operation: "=",
+		Values:    []string{apiId},
+	})
+	executor, err := i.getExecutor(ctx, clusterId)
+	if err != nil {
+		return nil, "", err
+	}
+	result, timeInterval, err := executor.InvokeTrend(ctx, formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres)
+	if err != nil {
+		return nil, "", err
+	}
+	return monitor_dto.ToMonInvokeCountTrend(result), timeInterval, nil
+}
+
+func (i *imlMonitorStatisticModule) ProviderTrend(ctx context.Context, providerId string, input *monitor_dto.CommonInput) (*monitor_dto.MonInvokeCountTrend, string, error) {
+	clusterId := cluster.DefaultClusterID
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, "", err
+	}
+	wheres = append(wheres, monitor.MonWhereItem{
+		Key:       "provider",
+		Operation: "=",
+		Values:    []string{providerId},
+	})
+	executor, err := i.getExecutor(ctx, clusterId)
+	if err != nil {
+		return nil, "", err
+	}
+	result, timeInterval, err := executor.InvokeTrend(ctx, formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres)
+	if err != nil {
+		return nil, "", err
+	}
+	return monitor_dto.ToMonInvokeCountTrend(result), timeInterval, nil
+}
+
+func (i *imlMonitorStatisticModule) SubscriberTrend(ctx context.Context, subscriberId string, input *monitor_dto.CommonInput) (*monitor_dto.MonInvokeCountTrend, string, error) {
+	clusterId := cluster.DefaultClusterID
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, "", err
+	}
+	wheres = append(wheres, monitor.MonWhereItem{
+		Key:       "app",
+		Operation: "=",
+		Values:    []string{subscriberId},
+	})
+	executor, err := i.getExecutor(ctx, clusterId)
+	if err != nil {
+		return nil, "", err
+	}
+	result, timeInterval, err := executor.InvokeTrend(ctx, formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres)
+	if err != nil {
+		return nil, "", err
+	}
+	return monitor_dto.ToMonInvokeCountTrend(result), timeInterval, nil
+}
+
+func (i *imlMonitorStatisticModule) InvokeTrendWithSubscriberAndApi(ctx context.Context, apiId string, subscriberId string, input *monitor_dto.CommonInput) (*monitor_dto.MonInvokeCountTrend, string, error) {
+	clusterId := cluster.DefaultClusterID
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, "", err
+	}
+	wheres = append(wheres, monitor.MonWhereItem{
+		Key:       "api",
+		Operation: "=",
+		Values:    []string{apiId},
+	}, monitor.MonWhereItem{
+		Key:       "app",
+		Operation: "=",
+		Values:    []string{subscriberId},
+	})
+	executor, err := i.getExecutor(ctx, clusterId)
+	if err != nil {
+		return nil, "", err
+	}
+	result, timeInterval, err := executor.InvokeTrend(ctx, formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres)
+	if err != nil {
+		return nil, "", err
+	}
+	return monitor_dto.ToMonInvokeCountTrend(result), timeInterval, nil
+}
+
+func (i *imlMonitorStatisticModule) InvokeTrendWithProviderAndApi(ctx context.Context, providerId string, apiId string, input *monitor_dto.CommonInput) (*monitor_dto.MonInvokeCountTrend, string, error) {
+	clusterId := cluster.DefaultClusterID
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, "", err
+	}
+	wheres = append(wheres, monitor.MonWhereItem{
+		Key:       "api",
+		Operation: "=",
+		Values:    []string{apiId},
+	}, monitor.MonWhereItem{
+		Key:       "provider",
+		Operation: "=",
+		Values:    []string{providerId},
+	})
+	executor, err := i.getExecutor(ctx, clusterId)
+	if err != nil {
+		return nil, "", err
+	}
+	result, timeInterval, err := executor.InvokeTrend(ctx, formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres)
+	if err != nil {
+		return nil, "", err
+	}
+	return monitor_dto.ToMonInvokeCountTrend(result), timeInterval, nil
+}
+
+func (i *imlMonitorStatisticModule) statisticOnApi(ctx context.Context, clusterId string, apiId string, groupBy string, input *monitor_dto.StatisticInput) ([]*monitor_dto.ServiceStatisticBasicItem, error) {
+	_, err := i.clusterService.Get(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+	var service []*service.Service
+	switch groupBy {
+	case "app":
+		service, err = i.serviceService.AppList(ctx)
+	case "provider":
+		service, err = i.serviceService.ServiceList(ctx)
+	default:
+		return nil, errors.New("invalid group by")
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+	wheres = append(wheres, monitor.MonWhereItem{
+		Key:       "api",
+		Operation: "=",
+		Values:    []string{apiId},
+	})
+
+	statisticMap, err := i.statistics(ctx, clusterId, groupBy, formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*monitor_dto.ServiceStatisticBasicItem, 0, len(statisticMap))
+	for _, item := range service {
+
+		statisticItem := &monitor_dto.ServiceStatisticBasicItem{
+			Id:            item.Id,
+			Name:          item.Name,
+			MonCommonData: new(monitor_dto.MonCommonData),
+		}
+		if val, ok := statisticMap[item.Id]; ok {
+			statisticItem.MonCommonData = monitor_dto.ToMonCommonData(val)
+			delete(statisticMap, item.Id)
+		}
+		result = append(result, statisticItem)
+	}
+	for key, item := range statisticMap {
+		statisticItem := &monitor_dto.ServiceStatisticBasicItem{
+			Id:            key,
+			Name:          "未知-" + key,
+			MonCommonData: monitor_dto.ToMonCommonData(item),
+		}
+
+		if key == "-" {
+			statisticItem.Name = "-"
+		}
+		result = append(result, statisticItem)
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].RequestTotal > result[j].RequestTotal
+	})
+	return result, nil
+}
+
+func (i *imlMonitorStatisticModule) ProviderStatisticsOnApi(ctx context.Context, apiId string, input *monitor_dto.StatisticInput) ([]*monitor_dto.ServiceStatisticBasicItem, error) {
+	clusterId := cluster.DefaultClusterID
+	return i.statisticOnApi(ctx, clusterId, apiId, "provider", input)
+}
+
+func (i *imlMonitorStatisticModule) ApiStatisticsOnProvider(ctx context.Context, providerId string, input *monitor_dto.StatisticInput) ([]*monitor_dto.ApiStatisticBasicItem, error) {
+	clusterId := cluster.DefaultClusterID
+	_, err := i.clusterService.Get(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	apiInfos, err := i.apiService.ListInfoForService(ctx, providerId)
+	if err != nil {
+		return nil, err
+	}
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+	wheres = append(wheres, monitor.MonWhereItem{
+		Key:       "provider",
+		Operation: "=",
+		Values:    []string{providerId},
+	})
+
+	return i.apiStatistics(ctx, clusterId, apiInfos, formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres, 0)
+}
+
+func (i *imlMonitorStatisticModule) ApiStatisticsOnSubscriber(ctx context.Context, subscriberId string, input *monitor_dto.StatisticInput) ([]*monitor_dto.ApiStatisticBasicItem, error) {
+	clusterId := cluster.DefaultClusterID
+	_, err := i.clusterService.Get(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+	// 根据订阅ID查询订阅的服务列表
+	subscriptions, err := i.subscribeService.MySubscribeServices(ctx, subscriberId, nil)
+	if err != nil {
+		return nil, err
+	}
+	serviceIds := utils.SliceToSlice(subscriptions, func(t *subscribe.Subscribe) string {
+		return t.Service
+	})
+	if len(serviceIds) < 1 {
+		return nil, nil
+	}
+	apiInfos, err := i.apiService.ListInfoForServices(ctx, serviceIds...)
+	if err != nil {
+		return nil, err
+	}
+
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+	wheres = append(wheres, monitor.MonWhereItem{
+		Key:       "app",
+		Operation: "=",
+		Values:    []string{subscriberId},
+	})
+
+	return i.apiStatistics(ctx, clusterId, apiInfos, formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres, 0)
+}
+
+func (i *imlMonitorStatisticModule) SubscriberStatisticsOnApi(ctx context.Context, apiId string, input *monitor_dto.StatisticInput) ([]*monitor_dto.ServiceStatisticBasicItem, error) {
+	clusterId := cluster.DefaultClusterID
+	return i.statisticOnApi(ctx, clusterId, apiId, "app", input)
 }
 
 func (i *imlMonitorStatisticModule) MessageTrend(ctx context.Context, input *monitor_dto.CommonInput) (*monitor_dto.MonMessageTrend, string, error) {
@@ -173,7 +610,7 @@ func (i *imlMonitorStatisticModule) TopAPIStatistics(ctx context.Context, limit 
 
 }
 
-func (i *imlMonitorStatisticModule) TopSubscriberStatistics(ctx context.Context, limit int, input *monitor_dto.CommonInput) ([]*monitor_dto.ProjectStatisticItem, error) {
+func (i *imlMonitorStatisticModule) TopSubscriberStatistics(ctx context.Context, limit int, input *monitor_dto.CommonInput) ([]*monitor_dto.ServiceStatisticItem, error) {
 	clusterId := cluster.DefaultClusterID
 	_, err := i.clusterService.Get(ctx, clusterId)
 	if err != nil {
@@ -182,7 +619,7 @@ func (i *imlMonitorStatisticModule) TopSubscriberStatistics(ctx context.Context,
 	return i.topProjectStatistics(ctx, clusterId, "app", input, limit)
 }
 
-func (i *imlMonitorStatisticModule) TopProviderStatistics(ctx context.Context, limit int, input *monitor_dto.CommonInput) ([]*monitor_dto.ProjectStatisticItem, error) {
+func (i *imlMonitorStatisticModule) TopProviderStatistics(ctx context.Context, limit int, input *monitor_dto.CommonInput) ([]*monitor_dto.ServiceStatisticItem, error) {
 	clusterId := cluster.DefaultClusterID
 	_, err := i.clusterService.Get(ctx, clusterId)
 	if err != nil {
@@ -191,12 +628,12 @@ func (i *imlMonitorStatisticModule) TopProviderStatistics(ctx context.Context, l
 	return i.topProjectStatistics(ctx, clusterId, "provider", input, limit)
 }
 
-func (i *imlMonitorStatisticModule) topProjectStatistics(ctx context.Context, partitionId string, groupBy string, input *monitor_dto.CommonInput, limit int) ([]*monitor_dto.ProjectStatisticItem, error) {
-	wheres, err := i.genCommonWheres(ctx, partitionId)
+func (i *imlMonitorStatisticModule) topProjectStatistics(ctx context.Context, clusterId string, groupBy string, input *monitor_dto.CommonInput, limit int) ([]*monitor_dto.ServiceStatisticItem, error) {
+	wheres, err := i.genCommonWheres(ctx, clusterId)
 	if err != nil {
 		return nil, err
 	}
-	statisticMap, err := i.statistics(ctx, partitionId, groupBy, formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres, limit)
+	statisticMap, err := i.statistics(ctx, clusterId, groupBy, formatTimeByMinute(input.Start), formatTimeByMinute(input.End), wheres, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -216,10 +653,10 @@ func (i *imlMonitorStatisticModule) topProjectStatistics(ctx context.Context, pa
 		return t.Id
 	})
 
-	result := make([]*monitor_dto.ProjectStatisticItem, 0, len(statisticMap))
+	result := make([]*monitor_dto.ServiceStatisticItem, 0, len(statisticMap))
 	for key, item := range statisticMap {
-		statisticItem := &monitor_dto.ProjectStatisticItem{
-			ProjectStatisticBasicItem: &monitor_dto.ProjectStatisticBasicItem{
+		statisticItem := &monitor_dto.ServiceStatisticItem{
+			ServiceStatisticBasicItem: &monitor_dto.ServiceStatisticBasicItem{
 				Id:            key,
 				MonCommonData: monitor_dto.ToMonCommonData(item),
 			},
@@ -407,7 +844,6 @@ func (m *imlMonitorConfig) GetMonitorConfig(ctx context.Context) (*monitor_dto.M
 		Driver: info.Driver,
 		Config: cfg,
 	}, nil
-	return nil, nil
 }
 
 func (m *imlMonitorConfig) GetMonitorCluster(ctx context.Context) ([]*monitor_dto.MonitorCluster, error) {
