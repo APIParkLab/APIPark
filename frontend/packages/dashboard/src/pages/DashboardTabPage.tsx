@@ -44,6 +44,6 @@ export default function DashboardTabPage(){
             setActiveKey(val);
             navigateTo(`/analytics/${val === 'total' ? val :`${val}/list`}`)
             }} 
-            items={monitorTabItems}  className="h-full overflow-hidden mt-[6px] [&>.ant-tabs-content-holder]:overflow-auto" size="small" tabBarStyle={{paddingLeft:'10px',marginTop:'0px',marginBottom:'0px'}} />
+            items={monitorTabItems}  className="h-full overflow-hidden mt-[6px] [&>.ant-tabs-content-holder]:overflow-auto  [&>.ant-tabs-content-holder]:pr-PAGE_INSIDE_X  [&>.ant-tabs-content-holder>.ant-tabs-content]:h-full [&>.ant-tabs-content-holder>.ant-tabs-content>.ant-tabs-tabpane]:h-full" size="small" tabBarStyle={{paddingLeft:'10px',marginTop:'0px',marginBottom:'0px'}} />
    </>)
 }

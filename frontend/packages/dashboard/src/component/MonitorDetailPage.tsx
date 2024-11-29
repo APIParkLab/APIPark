@@ -130,7 +130,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
     };
 
   return (
-    <div className="pb-[20px] h-full box-border">
+    <div className="pb-[20px] h-full box-border flex flex-col">
       <div className="pl-btnbase pr-btnrbase pb-btnybase sticky top-[0] bg-[#fff] z-[10] shadow-SCROLL_TOP ">
         <div className="flex flex-nowrap items-center mr-btnybase">
             <TimeRangeSelector  
@@ -147,7 +147,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
             </Button>
         </div>
       </div>
-      <div className={`h-[calc(100%-59px)] flex flex-col flex-1 overflow-y-hidden`}>
+      <div className={` flex flex-col flex-1 overflow-y-hidden`}>
         <div className="line-block eo-ng-monitor-detail-pie">
           {/* 这里应该添加图表组件 */}
           {invokeStaticError ? <Empty className="mt-[20%]" image={Empty.PRESENTED_IMAGE_SIMPLE}/>: <MonitorLineGraph
@@ -157,7 +157,7 @@ export default function MonitorDetailPage(props:MonitorDetailPageProps){
               type="invoke"
             />}
         </div>
-        <div className="table-block not-lr-border monitor-table">
+        <div className="table-block not-lr-border monitor-table flex-1">
             <MonitorTable  inModal ref={monitorTableRef} type={tableType} id={tableId} onRowClick={(record)=>{openModal(record as MonitorApiData | MonitorSubscriberData)}} request={()=>getTablesData({...queryData||{}})} noTop={true} minVirtualHeight={300}/>
         </div>
       </div>
