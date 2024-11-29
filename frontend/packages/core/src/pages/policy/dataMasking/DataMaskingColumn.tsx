@@ -5,7 +5,7 @@ import { $t } from "@common/locales";
 import { StrategyStatusEnum, StrategyStatusColorClass } from "@common/const/policy/consts";
 
 
-export const DATA_MASSKING_TABLE_COLUMNS: PageProColumns<any>[] = [
+export const DATA_MASKING_TABLE_COLUMNS: PageProColumns<any>[] = [
   {
     title: ('策略名称'),
     dataIndex: 'name',
@@ -67,3 +67,41 @@ export const DATA_MASSKING_TABLE_COLUMNS: PageProColumns<any>[] = [
     sorter: (a, b) => frontendTimeSorter(a, b, 'updateTime')
   },
 ];
+export const DATA_MASKING_TABLE_LOG_COLUMNS: PageProColumns<any>[] = [
+  {
+    title: ('服务'),
+    dataIndex: ['service', 'name'],
+    ellipsis: true,
+    width: 80
+  },
+  {
+    title: ('调用地址'),
+    dataIndex: 'url',
+    ellipsis: true,
+    width: 200
+  },
+  {
+    title: ('消费者IP'),
+    dataIndex: 'remote_ip',
+    ellipsis: true,
+    width: 150
+  },
+  {
+    title: ('消费者'),
+    dataIndex: ['consumer', 'name'],
+    ellipsis: true,
+    width: 80
+  },
+  {
+    title: ('鉴权名称'),
+    dataIndex: 'authorization',
+    ellipsis: true,
+    width: 100
+  },
+  {
+    title: ('时间'),
+    dataIndex: 'record_time',
+    width: 150,
+    ellipsis: true
+  },
+]
