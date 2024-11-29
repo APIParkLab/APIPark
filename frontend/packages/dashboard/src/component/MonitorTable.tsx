@@ -90,7 +90,6 @@ const MonitorTable = forwardRef<MonitorTableHandler, MonitorTableProps<unknown>>
         <PageList
             id={id}
             minVirtualHeight={minVirtualHeight ? minVirtualHeight : ( id.includes('top')?438:undefined)}
-            besidesTableHeight={inModal ? 64+56+258: undefined}
             ref={tableRef}
             showPagination={showPagination}
             columns = {[...columns,...operation]}
