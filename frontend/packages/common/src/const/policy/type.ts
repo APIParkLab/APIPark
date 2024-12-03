@@ -66,6 +66,22 @@ export type DataMaskStrategyItem = {
     updater:EntityItem
     updateTime:string
   }
+export type DataMaskLogItem = {
+    id:string
+    service: {
+      id:string
+      name:string
+    }
+    method:string
+    url:string
+    remote_ip:string
+    consumer: {
+      id:string
+      name:string
+    }
+    authorization:string
+    record_time:string
+  }
 
   
 export type FilterFormField= {
@@ -105,6 +121,7 @@ export type FilterFormType = {
     onFilterFormChange: (form: FilterFormType) => void;
     setFormCanSubmit:(canSubmit:boolean)=>void
     serviceId?:string
+    teamId?:string
   }
   
   export type FilterFormHandle = {
@@ -119,6 +136,7 @@ export type FilterFormType = {
     option:unknown
     onShowValueChange?:(value:string)=>void
     serviceId?:string
+    teamId?:string
   }
   
   export type RemoteTitleType = {
