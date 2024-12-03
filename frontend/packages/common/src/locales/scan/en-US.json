@@ -684,7 +684,7 @@
   "K35f23b64": "Follow these steps for integration:",
   "Kf5cd608b": "Step 1: Create a custom plugin on the Agent platform",
   "K4c81c7b6": "For details on the operations of different Agent platforms, refer to",
-  "K275f7ffa": "the 'Agent Integration Manual'",
+  "K275f7ffa": "the Agent Integration Manual",
   "K49b81d06": "Step 2: Import API documentation data",
   "K4a3b62be": "You can import API documentation data to the Agent platform via the following URL or by downloading the JSON file.",
   "K42697e11": "Copy URL",

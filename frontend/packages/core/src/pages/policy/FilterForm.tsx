@@ -9,7 +9,7 @@ import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE } from '@common/
 import { v4 as uuidv4 } from 'uuid'
 
 const RemoteFormItem: React.FC<FilterFormItemProps> = (props) =>{
-  const {value, onChange, disabled,option, onShowValueChange,serviceId} = props
+  const {value, onChange, disabled,option, onShowValueChange,serviceId, teamId} = props
   const [remoteList, setRemoteList] = useState<unknown[]>([])
   const [remoteTableColumns, setRemoteTableColumns] = useState<TableColumnsType>([])
   const [loading, setLoading] = useState<boolean>(false)
@@ -28,7 +28,7 @@ const RemoteFormItem: React.FC<FilterFormItemProps> = (props) =>{
       titles:Array<RemoteTitleType>,
       total:number
       value:string
-    }>>(`strategy/${serviceId === undefined ? '' : 'service/'}filter-remote/${option?.name}`,{method:'GET', eoParams:{keyword:searchWord}}).then(response=>{
+    }>>(`strategy/${serviceId === undefined ? '' : 'service/'}filter-remote/${option?.name}`,{method:'GET', eoParams:{keyword:searchWord,...(serviceId ? {team:teamId, service:serviceId} : {})}}).then(response=>{
       const {code,data, msg} = response
       if(code === STATUS_CODE.SUCCESS){
         setRemoteList(data.list as unknown[])
@@ -156,7 +156,7 @@ const FilterForm = forwardRef<FilterFormHandle,FilterFormProps>(({
   selectedOptionNameSet,
   disabled,
   setFormCanSubmit,
-  serviceId},ref)=> {
+  serviceId,teamId},ref)=> {
   const [form] = Form.useForm();
   const [filterType, setFilterType] = useState<'remote'|'static'|'pattern'>();
   const [curOption, setCurOption] = useState<unknown>()
@@ -236,7 +236,7 @@ const FilterForm = forwardRef<FilterFormHandle,FilterFormProps>(({
         <Form.Item name="values" label={$t('属性值')} rules={
           (filterType === 'pattern' ? ( [{validator:form.getFieldValue('name')  === 'ip'  ? validateIPorCIDR : validateApiPath}]):[])
         }>
-        {filterType === 'remote' && <RemoteFormItem serviceId={serviceId} option={curOption}  disabled={disabled} onShowValueChange={setLabel}/>}
+        {filterType === 'remote' && <RemoteFormItem serviceId={serviceId} teamId={teamId} option={curOption}  disabled={disabled} onShowValueChange={setLabel}/>}
 
           {filterType === 'pattern' && form.getFieldValue('name') !== 'ip' && (
             <Input

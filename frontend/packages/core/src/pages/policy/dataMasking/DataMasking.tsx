@@ -1,6 +1,6 @@
 import { ActionType } from "@ant-design/pro-components";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { App, Button, message, Switch } from 'antd'
+import { App, Button, message, Switch, Modal } from 'antd'
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList";
 import { $t } from "@common/locales";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext";
@@ -8,14 +8,14 @@ import { BasicResponse, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from "@common/
 import { useFetch } from "@common/hooks/http";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import TableBtnWithPermission from "@common/components/aoplatform/TableBtnWithPermission";
-import { DATA_MASSKING_TABLE_COLUMNS } from "./DataMaskingColumn";
+import { DATA_MASKING_TABLE_COLUMNS } from "./DataMaskingColumn";
 import { useNavigate, useParams } from "react-router-dom";
 import { PolicyPublishInfoType, PolicyPublishModalHandle, RouterParams } from "@common/const/type";
 import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter";
 import { DataMaskStrategyItem } from "@common/const/policy/type";
-import {PolicyPublishModalContent} from '@common/components/aoplatform/PolicyPublishModalContent'
+import { PolicyPublishModalContent } from '@common/components/aoplatform/PolicyPublishModalContent'
 import { checkAccess } from "@common/utils/permission";
-
+import DataMaskingLogModal from "./DataMaskingLogModal.tsx";
 const DataMasking = (props: any) => {
 
   const {
@@ -25,19 +25,21 @@ const DataMasking = (props: any) => {
     rowOperation = []
   } = props;
   const { serviceId, teamId } = useParams<RouterParams>()
-  const { state,accessData } = useGlobalContext()
+  const { state, accessData } = useGlobalContext()
   const navigator = useNavigate()
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false)
-  const [drawerData, setDrawerData] = useState<PolicyPublishInfoType >()
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+
+  const [drawerData, setDrawerData] = useState<PolicyPublishInfoType>()
   const [isOkToPublish, setIsOkToPublish] = useState<boolean>(false)
   const drawerRef = useRef<PolicyPublishModalHandle>(null)
   const { modal } = App.useApp()
 
-    /**
-   * 列表ref
-   */
+  /**
+ * 列表ref
+ */
   const pageListRef = useRef<ActionType>(null);
-  
+
   /**
    * 请求数据
    */
@@ -47,27 +49,28 @@ const DataMasking = (props: any) => {
    * 搜索关键字
    */
   const [searchWord, setSearchWord] = useState<string>('')
+  const [strategy, setStrategy] = useState<string>('')
 
   /**
    * 获取列数据，国际化变化时重新获取
    */
   const columns = useMemo(() => {
-    const res = DATA_MASSKING_TABLE_COLUMNS.map(x => {
+    const res = DATA_MASKING_TABLE_COLUMNS.map(x => {
       // 启动列渲染
       if (x.dataIndex === 'isStop') {
-        x.render = (text: any, record: any) => <WithPermission access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`} ><Switch checked={!record.isStop} onChange={(e) => { changeOpenApiStatus(e, record) }} /></WithPermission>
+        x.render = (text: any, record: any) => <WithPermission access={`${serviceId === undefined ? 'system.devops' : 'team.service'}.policy.edit`} ><Switch checked={!record.isStop} onChange={(e) => { changeOpenApiStatus(e, record) }} /></WithPermission>
       }
       // 处理数列渲染
       if (x.dataIndex === 'treatmentNumber') {
-        x.render = (text: any, record: any) => <span className="w-full block cursor-pointer [&>.ant-typography]:text-theme" onClick={(e) => { openLogsModal(record) }} >{ text }</span>
+        x.render = (text: any, record: any) => <span className="w-full block cursor-pointer [&>.ant-typography]:text-theme" onClick={(e) => { openLogsModal(record) }} >{text}</span>
       }
       return {
         ...x,
-        title: typeof x.title === 'string' ? $t(x.title as string) : x.title
+        title: <span title={$t(x.title as string)}>{$t(x.title as string)}</span>
       }
     })
     return res
-  }, [ state.language])
+  }, [state.language])
 
   /**
    * 操作列
@@ -76,20 +79,25 @@ const DataMasking = (props: any) => {
     {
       title: '',
       key: 'option',
-      btnNums: rowOperation.length,
+      btnNums: rowOperation.length -1,
       fixed: 'right',
       valueType: 'option',
       render: (_: React.ReactNode, entity: any) => [
-        ...(rowOperation.length && rowOperation.find((item: string) => item === 'edit') ? [<TableBtnWithPermission access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`} key="edit" btnType="edit" onClick={() => { openEditModal(entity) }} btnTitle="编辑" />] : []),
-        // ...(rowOperation.length && rowOperation.find((item: string) => item === 'logs') ? [<TableBtnWithPermission access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.view`} key="logs" btnType="logs" onClick={() => { openLogsModal(entity) }} btnTitle="详情" />] : []),
+        ...(rowOperation.length && rowOperation.find((item: string) => item === 'edit') ? [<TableBtnWithPermission access={`${serviceId === undefined ? 'system.devops' : 'team.service'}.policy.edit`} key="edit" btnType="edit" onClick={() => { openEditModal(entity) }} btnTitle="编辑" />] : []),
+        ...(rowOperation.length && rowOperation.find((item: string) => item === 'logs') ? [<TableBtnWithPermission access={`${serviceId === undefined ? 'system.devops' : 'team.service'}.policy.view`} key="logs" btnType="logs" onClick={() => { openLogsModal(entity) }} btnTitle="日志" />] : []),
         ...(rowOperation.length && rowOperation.find((item: string) => item === 'delete') ? [
-          entity.isDelete ? <TableBtnWithPermission access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`} key="refresh" btnType="refresh" onClick={() => { restorePolicy(entity) }} btnTitle="恢复" /> : 
-          <TableBtnWithPermission access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.delete`} key="delete" btnType="delete" onClick={() => { openModal('delete',entity) }} btnTitle="删除" />
-            ] : []),
+          entity.isDelete ? <TableBtnWithPermission access={`${serviceId === undefined ? 'system.devops' : 'team.service'}.policy.edit`} key="refresh" btnType="refresh" onClick={() => { restorePolicy(entity) }} btnTitle="恢复" /> :
+            <TableBtnWithPermission access={`${serviceId === undefined ? 'system.devops' : 'team.service'}.policy.delete`} key="delete" btnType="delete" onClick={() => { openModal('delete', entity) }} btnTitle="删除" />
+        ] : []),
       ],
     }
   ] : []
-
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    // setDetailInvokeError(false)
+    // setDetailInvokeStatic(undefined)
+    // setCompareTotal(false)
+  };
   /**
    * 手动刷新表格数据
    */
@@ -104,12 +112,12 @@ const DataMasking = (props: any) => {
    */
   const changeOpenApiStatus = (enabled: boolean, entity: any) => {
     fetchData<BasicResponse<null>>(
-      `strategy/${serviceId === undefined? 'global':'service'}/data-masking/${enabled ? 'enable' :'disable' }`,
+      `strategy/${serviceId === undefined ? 'global' : 'service'}/data-masking/${enabled ? 'enable' : 'disable'}`,
       {
         method: 'PATCH',
         eoParams: {
-          service:serviceId,
-          team:teamId,
+          service: serviceId,
+          team: teamId,
           strategy: entity.id
         }
       }
@@ -133,44 +141,45 @@ const DataMasking = (props: any) => {
     pageSize: number;
     current: number;
   },
-  sort:Record<string, string>,
-  filter:Record<string, string>) => {
+    sort: Record<string, string>,
+    filter: Record<string, string>) => {
     let filters
-    if(filter){
+    if (filter) {
       filters = []
-      if(filter.isStop){
-          if(filter.isStop.indexOf('true')!== -1){
-              filters.push('enable')
-          }
-          if(filter.isStop.indexOf('false')!== -1){
-              filters.push('disable')
-          }
-          if(filter.publishStatus?.length > 0){
-            filters = [...filters, ...filter.publishStatus]
-          }
+      if (filter.isStop) {
+        if (filter.isStop.indexOf('true') !== -1) {
+          filters.push('enable')
+        }
+        if (filter.isStop.indexOf('false') !== -1) {
+          filters.push('disable')
+        }
+        if (filter.publishStatus?.length > 0) {
+          filters = [...filters, ...filter.publishStatus]
+        }
       }
     }
-
-    return fetchData<BasicResponse<{list:DataMaskStrategyItem[], total:number}>>(
-      `strategy/${serviceId === undefined? 'global':'service'}/data-masking/list`,
+    
+    return fetchData<BasicResponse<{ list: DataMaskStrategyItem[], total: number }>>(
+      `strategy/${serviceId === undefined ? 'global' : 'service'}/data-masking/list`,
       {
         method: 'GET',
-        eoParams: { 
-          order:Object.keys(sort)?.[0],
-          sort:Object.keys(sort)?.length > 0 ? Object.values(sort)?.[0] === 'descend' ? 'desc' : 'asc' : undefined,
-          filters:JSON.stringify(filters),
+        eoParams: {
+          order: Object.keys(sort)?.[0],
+          sort: Object.keys(sort)?.length > 0 ? Object.values(sort)?.[0] === 'descend' ? 'desc' : 'asc' : undefined,
+          filters: JSON.stringify(filters),
           keyword: searchWord,
-          service:serviceId,
-          team:teamId,},
-        eoTransformKeys: ['is_stop', 'is_delete', 'update_time','publish_status','processed_total']
+          service: serviceId,
+          team: teamId,
+        },
+        eoTransformKeys: ['is_stop', 'is_delete', 'update_time', 'publish_status', 'processed_total']
       }
     ).then(response => {
-      const { code,data, msg } = response
+      const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         // 保存数据
         return {
-          data:data.list,
-          total:data.total,
+          data: data.list,
+          total: data.total,
           success: true
         }
       } else {
@@ -181,7 +190,7 @@ const DataMasking = (props: any) => {
       return { data: [], success: false }
     })
 
-    
+
   }
 
   /**
@@ -198,17 +207,17 @@ const DataMasking = (props: any) => {
   const publish = async () => {
     message.loading($t(RESPONSE_TIPS.loading));
     const { code, data, msg } = await fetchData<BasicResponse<PolicyPublishInfoType>>(
-        'strategy/global/data-masking/to-publishs',
-        { method: 'GET',eoTransformKeys:['opt_time','is_publish','version_name','unpublish_msg'] }
+      'strategy/global/data-masking/to-publishs',
+      { method: 'GET', eoTransformKeys: ['opt_time', 'is_publish', 'version_name', 'unpublish_msg'] }
     );
     message.destroy();
     if (code === STATUS_CODE.SUCCESS) {
-        setDrawerVisible(true)
-        setDrawerData(data)
-        setIsOkToPublish(data.isPublish??true)
+      setDrawerVisible(true)
+      setDrawerData(data)
+      setIsOkToPublish(data.isPublish ?? true)
     } else {
-        message.error(msg || $t(RESPONSE_TIPS.error));
-        return
+      message.error(msg || $t(RESPONSE_TIPS.error));
+      return
     }
   }
 
@@ -225,42 +234,44 @@ const DataMasking = (props: any) => {
    */
   const openLogsModal = (entity: any) => {
     console.log('日志', entity);
+    setStrategy(entity.id)
+    setModalVisible(true)
   }
 
 
-  
-  const openModal =async (type:'delete',entity?:DataMaskStrategyItem)=>{
-    if(entity?.publishStatus === 'online'){
-      return deletePolicy(entity!).then((res)=>{if(res === true) manualReloadTable()})
+
+  const openModal = async (type: 'delete', entity?: DataMaskStrategyItem) => {
+    if (entity?.publishStatus === 'online') {
+      return deletePolicy(entity!).then((res) => { if (res === true) manualReloadTable() })
     }
-    let title:string = ''
-    let content:string|React.ReactNode = ''
-    switch (type){
-        case 'delete':
-            title=$t('删除')
-            content=$t(DELETE_TIPS.default)
-            break;
+    let title: string = ''
+    let content: string | React.ReactNode = ''
+    switch (type) {
+      case 'delete':
+        title = $t('删除')
+        content = $t(DELETE_TIPS.default)
+        break;
     }
 
     modal.confirm({
-        title,
-        content,
-        onOk:()=>{
-            switch (type){
-                case 'delete':
-                    return deletePolicy(entity!).then((res)=>{if(res === true) manualReloadTable()})
-            }
-        },
-        width:600,
-        okText:$t('确认'),
-        okButtonProps:{
-            disabled : !checkAccess( `${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`, accessData)
-        },
-        cancelText:$t('取消'),
-        closable:true,
-        icon:<></>,
+      title,
+      content,
+      onOk: () => {
+        switch (type) {
+          case 'delete':
+            return deletePolicy(entity!).then((res) => { if (res === true) manualReloadTable() })
+        }
+      },
+      width: 600,
+      okText: $t('确认'),
+      okButtonProps: {
+        disabled: !checkAccess(`${serviceId === undefined ? 'system.devops' : 'team.service'}.policy.edit`, accessData)
+      },
+      cancelText: $t('取消'),
+      closable: true,
+      icon: <></>,
     })
-}
+  }
 
   /**
    * 删除
@@ -268,13 +279,14 @@ const DataMasking = (props: any) => {
    */
   const deletePolicy = (entity: DataMaskStrategyItem) => {
     return fetchData<BasicResponse<null>>(
-      `strategy/${serviceId === undefined? 'global':'service'}/data-masking`,
+      `strategy/${serviceId === undefined ? 'global' : 'service'}/data-masking`,
       {
         method: 'DELETE',
-        eoParams: { 
-          service:serviceId,
-          team:teamId,
-          strategy:entity.id},
+        eoParams: {
+          service: serviceId,
+          team: teamId,
+          strategy: entity.id
+        },
       }
     ).then(response => {
       const { code, msg } = response
@@ -285,7 +297,7 @@ const DataMasking = (props: any) => {
         message.error(msg || $t(RESPONSE_TIPS.error))
         return Promise.reject(msg || $t(RESPONSE_TIPS.error))
       }
-    }).catch((errorInfo)=> Promise.reject(errorInfo))
+    }).catch((errorInfo) => Promise.reject(errorInfo))
   }
 
   /**
@@ -294,13 +306,14 @@ const DataMasking = (props: any) => {
    */
   const restorePolicy = (entity: any) => {
     fetchData<BasicResponse<null>>(
-      `strategy/${serviceId === undefined? 'global':'service'}/data-masking/restore`,
+      `strategy/${serviceId === undefined ? 'global' : 'service'}/data-masking/restore`,
       {
         method: 'PATCH',
-        eoParams: { 
-          service:serviceId,
-          team:teamId,
-          strategy:entity.id},
+        eoParams: {
+          service: serviceId,
+          team: teamId,
+          strategy: entity.id
+        },
       }
     ).then(response => {
       const { code, msg } = response
@@ -313,13 +326,13 @@ const DataMasking = (props: any) => {
     })
   }
 
-  
+
   const onSubmit = () => {
-        return drawerRef.current?.publish()?.then((res) => {
-            manualReloadTable();
-            return res;
-        });
-    }
+    return drawerRef.current?.publish()?.then((res) => {
+      manualReloadTable();
+      return res;
+    });
+  }
 
   return (
     <>
@@ -331,38 +344,51 @@ const DataMasking = (props: any) => {
           pageSize: number;
           current: number;
         },
-        sort:Record<string, string>,
-        filter:Record<string, string>) => getPolicyList(params,sort, filter)}
+          sort: Record<string, string>,
+          filter: Record<string, string>) => getPolicyList(params, sort, filter)}
         addNewBtnTitle={$t("添加策略")}
-        addNewBtnAccess={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`}
+        addNewBtnAccess={`${serviceId === undefined ? 'system.devops' : 'team.service'}.policy.edit`}
         onAddNewBtnClick={() => { addPolicy() }}
         searchPlaceholder={$t("输入名称、筛选条件查找")}
         afterNewBtn={
-          publishBtn && [<WithPermission key="removeFromDepPermission" access={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.publish`} >
+          publishBtn && [<WithPermission key="removeFromDepPermission" access={`${serviceId === undefined ? 'system.devops' : 'team.service'}.policy.publish`} >
             <Button className="mr-btnbase" key="removeFromDep" onClick={() => publish()}>{$t('发布')}</Button>
-            </WithPermission>]
+          </WithPermission>]
         }
         onSearchWordChange={(e) => {
           setSearchWord(e.target.value)
         }}
         manualReloadTable={manualReloadTable}
       />
-       <DrawerWithFooter 
-              destroyOnClose={true} 
-              title={$t('申请发布')}
-              width={'60%'}
-              onClose={()=>{setDrawerVisible(false)}}
-              okBtnTitle={$t('发布')}
-              open={drawerVisible}
-              submitDisabled={!isOkToPublish}
-              submitAccess={`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.publish`}
-              onSubmit={onSubmit}
-              >
-                <PolicyPublishModalContent 
-                    ref={drawerRef}
-                    data={drawerData! }
-                     />
-          </DrawerWithFooter>
+      <DrawerWithFooter
+        destroyOnClose={true}
+        title={$t('申请发布')}
+        width={'60%'}
+        onClose={() => { setDrawerVisible(false) }}
+        okBtnTitle={$t('发布')}
+        open={drawerVisible}
+        submitDisabled={!isOkToPublish}
+        submitAccess={`${serviceId === undefined ? 'system.devops' : 'team.service'}.policy.publish`}
+        onSubmit={onSubmit}
+      >
+        <PolicyPublishModalContent
+          ref={drawerRef}
+          data={drawerData!}
+        />
+      </DrawerWithFooter>
+      <Modal
+        title={$t('处理日志')}
+        visible={modalVisible}
+        onCancel={handleCloseModal}
+        footer={null}
+        wrapClassName="modal-without-footer"
+        width={1000}
+        maskClosable={true}
+      >
+        <div className="pb-btnybase flex flex-nowrap flex-col h-full w-full items-center justify-between">
+        <DataMaskingLogModal strategy={strategy}></DataMaskingLogModal>
+        </div>
+      </Modal>
     </>
   )
 }
