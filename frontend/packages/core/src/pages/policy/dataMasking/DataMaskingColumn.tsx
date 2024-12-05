@@ -86,7 +86,7 @@ export const DATA_MASKING_TABLE_LOG_COLUMNS: PageProColumns<any>[] = [
     title: ('消费者IP'),
     dataIndex: 'remote_ip',
     ellipsis: true,
-    width: 150
+    width: 100
   },
   {
     title: ('消费者'),
@@ -96,7 +96,7 @@ export const DATA_MASKING_TABLE_LOG_COLUMNS: PageProColumns<any>[] = [
   },
   {
     title: ('鉴权名称'),
-    dataIndex: 'authorization',
+    dataIndex: ['authorization', 'name'],
     ellipsis: true,
     width: 100
   },

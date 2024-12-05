@@ -1,13 +1,12 @@
-import { Codebox } from "@common/components/postcat/api/Codebox";
+import { Codebox, codeBoxLanguagesType } from "@common/components/postcat/api/Codebox";
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
-import { RouterParams } from "@common/const/type";
 import { $t } from "@common/locales";
-import { App, Button, message, Switch, Modal, Spin } from 'antd'
+import { message, Spin } from 'antd'
 import { useFetch } from "@common/hooks/http";
 import { useEffect, useState } from "react";
 import { LoadingOutlined } from "@ant-design/icons";
-
 import { useParams } from "react-router-dom";
+import { contentTypeToLanguageMap } from "@common/const/policy/consts";
 type LogItems = {
   id: string;
   origin: string;
@@ -18,7 +17,15 @@ const DataMaskingCompare = () => {
   const { fetchData } = useFetch()
   const [loading, setLoading] = useState(false)
   const [originValue, setOriginValue] = useState('')
-  const [targetValue, settTargetValue] = useState('')
+  const [targetValue, setTargetValue] = useState('')
+  const [language, setLanguage] = useState<codeBoxLanguagesType>('json')
+  const getMonacoEditorLanguage = (contentType: string): codeBoxLanguagesType => {
+    // 提取主类型，忽略参数（如 "; charset=utf-8"）
+    const mainType = contentType.split(";")[0].trim().toLowerCase();
+
+    // 根据映射表获取语言，默认返回 "plaintext"
+    return contentTypeToLanguageMap[mainType] || "json";
+  };
   const getLogData = () => {
     setLoading(true)
     return fetchData<BasicResponse<{ log: LogItems }>>(`strategy/${serviceId === undefined ? 'global' : 'service'}/data-masking/log`,
@@ -33,8 +40,10 @@ const DataMaskingCompare = () => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           const { log } = data
-          setOriginValue(log.origin || '')
-          settTargetValue(log.target || '')
+          const docLanguage = getMonacoEditorLanguage(log.content_type)
+          setLanguage(docLanguage)
+          setOriginValue(docLanguage === 'json' ? JSON.stringify(JSON.parse(log.origin || ''), null, 2) : log.origin || '')
+          setTargetValue(docLanguage === 'json' ? JSON.stringify(JSON.parse(log.target || ''), null, 2) : log.target || '')
           setLoading(false)
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
@@ -42,17 +51,6 @@ const DataMaskingCompare = () => {
       }).catch(() => {
         return { data: [], success: false }
       }).finally(() => {
-        const aa = `{
-          "code": {
-              "gg": "gg",
-              "gg1": "gg",
-              "gg2": "gg",
-              "gg3": "gg",
-              "gg4": "gg"
-          }
-      }`
-        setOriginValue(JSON.stringify(JSON.parse(aa), null, 2))
-        settTargetValue(JSON.stringify(JSON.parse(aa), null, 2))
         setLoading(false)
       })
   }
@@ -68,10 +66,12 @@ const DataMaskingCompare = () => {
           </div>
           <div style={{ height: 'calc(100vh - 50px)' }}>
             <Codebox
-              language='json'
+              language={language}
               height="100%"
               width="100%"
               value={originValue}
+              sx={{ whiteSpace: 'nowrap' }}
+              readOnly
             />
           </div>
         </div>
@@ -81,7 +81,7 @@ const DataMaskingCompare = () => {
           </div>
           <div style={{ height: 'calc(100vh - 50px)' }}>
             <Codebox
-              language='json'
+              language={language}
               width="100%"
               height="100%"
               value={targetValue}
