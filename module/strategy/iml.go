@@ -152,6 +152,9 @@ func (i *imlStrategyModule) ToPublish(ctx context.Context, driver string) ([]*st
 			OptTime:  l.UpdateAt,
 		})
 	}
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Priority < items[j].Priority
+	})
 	return items, nil
 }
 
