@@ -159,6 +159,7 @@ func (s *imlClusterService) Create(ctx context.Context, name string, resume stri
 		UUID:     apintoInfo.Cluster,
 		Name:     name,
 		Resume:   resume,
+		Cluster:  apintoInfo.Cluster,
 		Creator:  operator,
 		Updater:  operator,
 		CreateAt: time.Now(),
@@ -285,13 +286,15 @@ func (s *imlClusterService) UpdateAddress(ctx context.Context, id string, addres
 			return nil, err
 		}
 		cv = &cluster.Cluster{
-			UUID:     id,
-			Name:     "默认集群",
-			Resume:   "默认集群",
+			UUID:   id,
+			Name:   "默认集群",
+			Resume: "默认集群",
+
 			Creator:  operator,
 			CreateAt: now,
 		}
 	}
+	cv.Cluster = info.Cluster
 
 	// check node
 	nodeIds := utils.SliceToSlice(info.Nodes, func(i *admin.Node) string {

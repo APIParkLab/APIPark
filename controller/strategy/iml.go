@@ -211,3 +211,47 @@ func (i *imlStrategyController) DisableStrategy(ctx *gin.Context, id string) err
 func (i *imlStrategyController) DeleteStrategy(ctx *gin.Context, id string) error {
 	return i.strategyModule.Delete(ctx, id)
 }
+
+func (i *imlStrategyController) GetStrategyLogs(ctx *gin.Context, keyword string, strategyId string, start string, end string, limit string, offset string) ([]*strategy_dto.LogItem, int64, error) {
+	now := time.Now()
+	s, err := time.ParseInLocation("2006-01-02 15:04:05", start, time.Local)
+	if err != nil {
+		if start == "" {
+			s = now.Add(-time.Hour * 24 * 30)
+		} else {
+			return nil, 0, fmt.Errorf("start time error: %s", err)
+		}
+	}
+	e, err := time.ParseInLocation("2006-01-02 15:04:05", end, time.Local)
+	if err != nil {
+		if end == "" {
+			e = now
+		} else {
+			return nil, 0, fmt.Errorf("end time error: %s", err)
+		}
+	}
+	if s.After(e) {
+		return nil, 0, fmt.Errorf("start time must be less than end time")
+	}
+	l, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil && limit != "" {
+
+		return nil, 0, err
+	}
+	o, err := strconv.ParseInt(offset, 10, 64)
+	if err != nil && offset != "" {
+		return nil, 0, err
+	}
+	if l < 1 {
+		l = 15
+	}
+	if o < 1 {
+		o = 1
+	}
+	return i.strategyModule.GetStrategyLogs(ctx, keyword, strategyId, s, e, l, o)
+}
+
+func (i *imlStrategyController) LogInfo(ctx *gin.Context, id string) (*strategy_dto.LogInfo, error) {
+
+	return i.strategyModule.StrategyLogInfo(ctx, id)
+}

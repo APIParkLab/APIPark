@@ -3,10 +3,10 @@ package cluster
 import "time"
 
 type Cluster struct {
-	Id   int64  `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
-	UUID string `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
-	Name string `gorm:"type:varchar(100);not null;column:name;comment:name"`
-	//Cluster string    `gorm:"type:varchar(36);not null;column:partition;comment:partition"`
+	Id       int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
+	UUID     string    `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
+	Name     string    `gorm:"type:varchar(100);not null;column:name;comment:name"`
+	Cluster  string    `gorm:"type:varchar(36);not null;column:cluster;comment:cluster id"`
 	Resume   string    `gorm:"type:varchar(255);not null;column:resume;comment:resume"`
 	Creator  string    `gorm:"type:varchar(36);not null;column:creator;comment:creator" aovalue:"creator"`
 	Updater  string    `gorm:"type:varchar(36);not null;column:updater;comment:updater" aovalue:"updater"`

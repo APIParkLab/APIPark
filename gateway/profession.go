@@ -5,6 +5,7 @@ const (
 	ProfessionCertificate = "certificate"
 	ProfessionRouter      = "router"
 	ProfessionApplication = "app"
+	ProfessionStrategy    = "strategy"
 	ProfessionService     = "service"
 	ProfessionAIProvider  = "ai-provider"
 )
