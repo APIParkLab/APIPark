@@ -94,7 +94,7 @@ func (d *Driver) LogCount(clusterId string, conditions map[string]string, spendH
 		tmpCondition = "|" + strings.Join(cs, "|")
 	}
 	queries := url.Values{}
-	queries.Set("query", fmt.Sprintf("sum(count_over_time({cluster=\"%s\"} %s [%dh])) by (%s)", clusterId, tmpCondition, spendHour, group))
+	queries.Set("query", fmt.Sprintf("sum(count_over_time({cluster=\"%s\"} | json %s [%dh])) by (%s)", clusterId, tmpCondition, spendHour, group))
 	list, err := send[LogCount](http.MethodGet, fmt.Sprintf("%s/loki/api/v1/query", d.url), d.headers, queries, "")
 	if err != nil {
 		return nil, err
@@ -220,7 +220,7 @@ func (d *Driver) logCount(clusterId string, conditions map[string]string, start 
 	if len(conditions) > 0 {
 		tmpCondition = "|" + strings.Join(cs, "|")
 	}
-	queries.Set("query", fmt.Sprintf("sum(count_over_time({cluster=\"%s\"} %s [720h]))", clusterId, tmpCondition))
+	queries.Set("query", fmt.Sprintf("sum(count_over_time({cluster=\"%s\"} | json %s [720h]))", clusterId, tmpCondition))
 	list, err := send[LogCount](http.MethodGet, fmt.Sprintf("%s/loki/api/v1/query", d.url), d.headers, queries, "")
 	if err != nil {
 		return 0, err

@@ -69,8 +69,10 @@ func (a *ApplicationClient) toApinto(app *gateway.ApplicationRelease) interface{
 					Expire:         info.Expire,
 					Pattern:        driver.ToPattern(info.Config),
 					HideCredential: info.HideCredential,
+					Labels:         info.Label,
 				},
 			},
+			Labels: info.Label,
 		})
 	}
 	labels := make(map[string]string)
