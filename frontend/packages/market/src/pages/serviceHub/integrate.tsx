@@ -5,6 +5,7 @@ import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useParams } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { RouterParams } from "@common/const/type"
+import useCopyToClipboard from "@common/hooks/copy.ts";
 import { useFetch } from "@common/hooks/http"
 
 const Integrate = ({ service }: { service: ServiceDetailType }) => {
@@ -12,6 +13,7 @@ const Integrate = ({ service }: { service: ServiceDetailType }) => {
   const [url, setUrl] = useState('');
   const { serviceId} = useParams<RouterParams>()
   const {fetchData} = useFetch()
+  const { copyToClipboard } = useCopyToClipboard();
   
   useEffect(()=>{
     setUrl(`${service?.basic?.sitePrefix || window.location?.origin}/api/v1/service/swagger/${serviceId}` )
@@ -28,8 +30,7 @@ const Integrate = ({ service }: { service: ServiceDetailType }) => {
    * 复制代码
    */
   const copyURL = async (): Promise<void> => {
-    await navigator.clipboard.writeText(url)
-    message.success($t(RESPONSE_TIPS.copySuccess))
+    copyToClipboard(url)
   }
   /**
    * 下载文件
@@ -55,8 +56,8 @@ const Integrate = ({ service }: { service: ServiceDetailType }) => {
       <p className={stepClass}>{$t('步骤二：导入 API 文档数据')}</p>
       <div className='my-[10px]'>{$t('可通过以下 URL 或 下载 Json 文件，导入 API 文档数据到 Agent 平台中。')}</div>
       <div className="flex w-full items-center gap-[30px]">
-        <Space.Compact className=" flex-1 ">
-          <Input disabled value={url} />
+        <Space.Compact className="w-[700px]">
+          <Input className="truncate" disabled title={url} value={url} />
           <Button type="primary" onClick={copyURL}>{$t('复制 URL')}</Button>
         </Space.Compact>
         <span className="text-[14px] font-bold">OR</span>

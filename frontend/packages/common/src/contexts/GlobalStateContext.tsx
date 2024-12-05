@@ -45,13 +45,13 @@ export type GlobalAction =
         {
           "name": "工作空间",
           "key": "workspace",
-          "path": "/guide/page",
+          "path": "/guide",
           "icon": "ic:baseline-space-dashboard",
           "children": [
             {
               "name": "首页",
               "key": "guide",
-              "path": "/guide/page",
+              "path": "/guide",
               "icon": "ic:baseline-home",
               "access": "all"
             },
@@ -179,7 +179,7 @@ export type GlobalAction =
                   "name": "全局策略",
                   "key": "globalpolicy",
                   "path": "/globalpolicy",
-                  "icon": "uil:comment-shield",
+                  "icon": "icon-park-solid:exchange-three",
                   "access": "system.settings.data_source.view"
                 },
                 {
