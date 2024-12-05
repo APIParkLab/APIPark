@@ -10,12 +10,12 @@ func TestLoki(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create driver: %v", err)
 	}
-	logCountResult, err := d.LogCount("apinto", nil, 720, "block_name")
+	logCountResult, err := d.LogCount("apinto", nil, 720, "strategy")
 	if err != nil {
 		t.Fatalf("failed to get log count: %v", err)
 	}
 	t.Log(logCountResult)
-	logs, count, err := d.Logs("apinto", map[string]string{"block_name": "03899736-5d79-4f26-bd6a-c312a5880780"}, time.Now().Add(-time.Hour*24), time.Now(), 1, 1)
+	logs, count, err := d.Logs("apinto", map[string]string{"strategy": "03899736-5d79-4f26-bd6a-c312a5880780"}, time.Now().Add(-time.Hour*24), time.Now(), 1, 1)
 	if err != nil {
 		t.Fatalf("failed to get logs: %v", err)
 	}
@@ -57,7 +57,7 @@ func TestLoki(t *testing.T) {
 //	headers["Content-Type"] = "application/json"
 //	headers["X-Scope-OrgID"] = "tenant1"
 //	queries := url.Values{}
-//	//queries.Set("query", "sum(count_over_time({cluster=\"apinto\"}[24h])) by (block_name)")
+//	//queries.Set("query", "sum(count_over_time({cluster=\"apinto\"}[24h])) by (strategy)")
 //	queries.Set("query", "sum(count_over_time({cluster=\"apinto\"}[24h]))")
 //	result, err := send[LogCount](http.MethodGet, "http://localhost:3100/loki/api/v1/query", headers, queries, "")
 //	if err != nil {
@@ -75,7 +75,7 @@ func TestLoki(t *testing.T) {
 //	headers["Content-Type"] = "application/json"
 //	headers["X-Scope-OrgID"] = "tenant1"
 //	queries := url.Values{}
-//	queries.Set("query", "{cluster=\"apinto\"} | json | block_name=\"03899736-5d79-4f26-bd6a-c312a5880780\"")
+//	queries.Set("query", "{cluster=\"apinto\"} | json | strategy=\"03899736-5d79-4f26-bd6a-c312a5880780\"")
 //	now := time.Now()
 //	start := now.Add(-time.Hour * 24 * 30)
 //	queries.Set("start", strconv.FormatInt(start.UnixNano(), 10))
