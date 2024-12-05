@@ -231,7 +231,7 @@ func (i *imlStrategyController) GetStrategyLogs(ctx *gin.Context, keyword string
 	if err != nil {
 		return nil, 0, fmt.Errorf("start time error: %s", err)
 	}
-	e, err := genTime(start, now)
+	e, err := genTime(end, now)
 	if err != nil {
 
 		return nil, 0, fmt.Errorf("end time error: %s", err)
