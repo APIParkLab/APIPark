@@ -77,7 +77,7 @@ func (i *imlLogService) UpdateLogSource(ctx context.Context, driver string, inpu
 		}
 
 	} else {
-		if input.Config == nil || *input.Config == "" {
+		if input.Config != nil && *input.Config != "" {
 			s.Config = *input.Config
 		}
 		s.Updater = utils.UserId(ctx)

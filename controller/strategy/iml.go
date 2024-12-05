@@ -212,23 +212,29 @@ func (i *imlStrategyController) DeleteStrategy(ctx *gin.Context, id string) erro
 	return i.strategyModule.Delete(ctx, id)
 }
 
+func genTime(t string, defaultValue time.Time) (time.Time, error) {
+	if t == "" {
+		return defaultValue, nil
+	}
+
+	s, err := strconv.ParseInt(t, 10, 64)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return time.Unix(s, 0), nil
+}
+
 func (i *imlStrategyController) GetStrategyLogs(ctx *gin.Context, keyword string, strategyId string, start string, end string, limit string, offset string) ([]*strategy_dto.LogItem, int64, error) {
 	now := time.Now()
-	s, err := time.ParseInLocation("2006-01-02 15:04:05", start, time.Local)
+
+	s, err := genTime(start, now.Add(-time.Hour*24*30))
 	if err != nil {
-		if start == "" {
-			s = now.Add(-time.Hour * 24 * 30)
-		} else {
-			return nil, 0, fmt.Errorf("start time error: %s", err)
-		}
+		return nil, 0, fmt.Errorf("start time error: %s", err)
 	}
-	e, err := time.ParseInLocation("2006-01-02 15:04:05", end, time.Local)
+	e, err := genTime(start, now)
 	if err != nil {
-		if end == "" {
-			e = now
-		} else {
-			return nil, 0, fmt.Errorf("end time error: %s", err)
-		}
+
+		return nil, 0, fmt.Errorf("end time error: %s", err)
 	}
 	if s.After(e) {
 		return nil, 0, fmt.Errorf("start time must be less than end time")
