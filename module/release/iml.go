@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
+
 	"github.com/APIParkLab/APIPark/service/strategy"
 
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
@@ -48,18 +50,19 @@ type imlReleaseModule struct {
 	clusterService    cluster.IClusterService        `autowired:""`
 }
 
-func (m *imlReleaseModule) latestStrategyCommits(ctx context.Context, serviceId string) ([]*commit.Commit[strategy.StrategyCommit], error) {
+func (m *imlReleaseModule) latestStrategyCommits(ctx context.Context, serviceId string) ([]*commit.Commit[strategy.Commit], error) {
 	list, err := m.strategyService.All(ctx, 2, serviceId)
 	if err != nil {
 		return nil, fmt.Errorf("get latest strategy failed:%w", err)
 	}
 
-	return utils.SliceToSlice(list, func(s *strategy.Strategy) *commit.Commit[strategy.StrategyCommit] {
+	return utils.SliceToSlice(list, func(s *strategy.Strategy) *commit.Commit[strategy.Commit] {
 		key := fmt.Sprintf("service-%s", s.Id)
-		return &commit.Commit[strategy.StrategyCommit]{
+		return &commit.Commit[strategy.Commit]{
+			UUID:   uuid.NewString(),
 			Target: s.Id,
 			Key:    key,
-			Data: &strategy.StrategyCommit{
+			Data: &strategy.Commit{
 				Id:       s.Id,
 				Name:     s.Name,
 				Priority: s.Priority,
@@ -137,7 +140,7 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 	if err != nil {
 		return "", err
 	}
-	strategyCommits := utils.SliceToMapO(strategies, func(c *commit.Commit[strategy.StrategyCommit]) (string, string) {
+	strategyCommits := utils.SliceToMapO(strategies, func(c *commit.Commit[strategy.Commit]) (string, string) {
 		return c.Target, c.UUID
 	})
 
@@ -193,6 +196,7 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 		if err != nil {
 			return err
 		}
+
 		if !m.releaseService.Completeness(utils.SliceToSlice(clusters, func(s *cluster.Cluster) string {
 			return s.Uuid
 		}), apiUUIDS, requestCommits, apiProxy, upstreams) {

@@ -3,6 +3,7 @@ package strategy
 import (
 	"context"
 	"reflect"
+	"time"
 
 	"github.com/eolinker/go-common/autowire"
 
@@ -23,6 +24,9 @@ type IStrategyModule interface {
 	Restore(ctx context.Context, id string) error
 
 	DeleteServiceStrategy(ctx context.Context, serviceId string, id string) error
+
+	StrategyLogInfo(ctx context.Context, id string) (*strategy_dto.LogInfo, error)
+	GetStrategyLogs(ctx context.Context, keyword string, strategyID string, start time.Time, end time.Time, limit int64, offset int64) ([]*strategy_dto.LogItem, int64, error)
 }
 
 func init() {

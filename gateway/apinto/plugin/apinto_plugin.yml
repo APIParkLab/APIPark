@@ -63,6 +63,13 @@
   rely: eolinker.com:apinto:plugin_app
   config:
     cache: redis@output
+
+- id: eolinker.com:apinto:strategy-plugin-data_mask
+  name: strategy_data_mask
+  status: global
+  rely: eolinker.com:apinto:plugin_app
+  config:
+    cache: redis@output
 -
   id: eolinker.com:apinto:ai_prompt
   name: ai_prompt
