@@ -50,7 +50,7 @@ type LogInfo struct {
 type LogDetail struct {
 	Api               string `json:"api"`
 	Application       string `json:"application"`
-	BlockName         string `json:"block_name"`
+	Strategy          string `json:"strategy"`
 	ContentType       string `json:"content_type"`
 	Cluster           string `json:"cluster"`
 	Msec              string `json:"msec"`
@@ -66,7 +66,7 @@ type LogDetail struct {
 	ProxyResponseBody string `json:"proxy_response_body"`
 	Service           string `json:"service"`
 	Provider          string `json:"provider"`
-	Auth              string `json:"auth"`
+	Authorization     string `json:"authorization"`
 	SrcIp             string `json:"src_ip"`
 	Status            string `json:"status"`
 }
