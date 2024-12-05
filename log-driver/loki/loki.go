@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -142,7 +143,7 @@ func (d *Driver) Logs(clusterId string, conditions map[string]string, start time
 	}
 	cs := make([]string, 0, len(conditions))
 	for k, v := range conditions {
-		if strings.HasPrefix(v, "#") {
+		if strings.HasPrefix(k, "#") {
 			cs = append(cs, v)
 			continue
 		}
@@ -151,6 +152,7 @@ func (d *Driver) Logs(clusterId string, conditions map[string]string, start time
 	queries := url.Values{}
 	queries.Set("query", fmt.Sprintf("{cluster=\"%s\"} | json | %s", clusterId, strings.Join(cs, " | ")))
 	queries.Set("limit", strconv.FormatInt(limit, 10))
+	queries.Set("direction", "backward")
 	queries.Set("start", strconv.FormatInt(start.UnixNano(), 10))
 	logs, err := d.recuseLogs(queries, end, offset)
 	if err != nil {
@@ -200,6 +202,9 @@ func (d *Driver) recuseLogs(queries url.Values, end time.Time, offset int64) ([]
 			RecordTime:    time.UnixMilli(msec),
 		})
 	}
+	sort.Slice(logs, func(i, j int) bool {
+		return logs[i].RecordTime.After(logs[j].RecordTime)
+	})
 	return logs, nil
 }
 
