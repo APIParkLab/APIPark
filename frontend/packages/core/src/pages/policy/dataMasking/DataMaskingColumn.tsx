@@ -15,7 +15,7 @@ export const DATA_MASKING_TABLE_COLUMNS: PageProColumns<any>[] = [
   {
     title: ('优先级'),
     dataIndex: 'priority',
-    width: 140,
+    width: 90,
     ellipsis: true,
     sorter: (a: any, b: any) => {
       return (a.priority as number) - (b.priority as number)
@@ -26,6 +26,7 @@ export const DATA_MASKING_TABLE_COLUMNS: PageProColumns<any>[] = [
     dataIndex: 'publishStatus',
     filters: true,
     onFilter: false ,
+    ellipsis: true,
     width: 140,
     valueEnum: new Map(
       Object.keys(StrategyStatusEnum).map(key=>
@@ -38,6 +39,7 @@ export const DATA_MASKING_TABLE_COLUMNS: PageProColumns<any>[] = [
     dataIndex: 'isStop',
     filters: true,
     onFilter: false ,
+    ellipsis: true,
     valueEnum: {
       false: { text: <span className="text-status_success">{$t('启用')}</span> },
       true: { text: <span className="text-status_fail">{$t('禁用')}</span> }
