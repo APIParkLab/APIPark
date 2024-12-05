@@ -65,7 +65,7 @@ func (i *imlAuthorizationService) OnComplete() {
 	i.IServiceCreate = universally.NewCreator[Create, service.Authorization](i.store, "project_authorization", createEntityHandler, uniquestHandler, labelHandler)
 
 	i.IServiceEdit = universally.NewEdit[Edit, service.Authorization](i.store, updateHandler, labelHandler)
-	auto.RegisterService("project_authorization", i)
+	auto.RegisterService("service_authorization", i)
 }
 
 func labelHandler(e *service.Authorization) []string {
