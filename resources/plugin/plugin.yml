@@ -1,4 +1,4 @@
-version: v6
+version: v7
 sort:
   - "access_log"
   - "monitor"
@@ -72,6 +72,12 @@ plugin:
   strategy_cache:
     id: eolinker.com:apinto:strategy-plugin-cache
     name: strategy_cache
+    status: global
+    config:
+      cache: redis@output
+  strategy_data_mask:
+    id: eolinker.com:apinto:strategy-plugin-data_mask
+    name: strategy_data_mask
     status: global
     config:
       cache: redis@output

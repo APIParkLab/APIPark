@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/eolinker/eosc"
+
 	"github.com/APIParkLab/APIPark/model/plugin_model"
 )
 
@@ -14,6 +16,8 @@ type IApplicationClient IResourceClient[ApplicationRelease]
 type IServiceClient IResourceClient[ServiceRelease]
 
 type ISubscribeClient IResourceClient[SubscribeRelease]
+
+type IStrategyClient IResourceClient[eosc.Base[StrategyRelease]]
 
 type IResourceClient[T any] interface {
 	Online(ctx context.Context, resources ...*T) error
@@ -27,10 +31,11 @@ type IDynamicClient interface {
 }
 
 type ProjectRelease struct {
-	Id       string           `json:"id"`
-	Version  string           `json:"version"`
-	Apis     []*ApiRelease    `json:"apis"`
-	Upstream *UpstreamRelease `json:"upstreams"`
+	Id         string                        `json:"id"`
+	Version    string                        `json:"version"`
+	Apis       []*ApiRelease                 `json:"apis"`
+	Upstream   *UpstreamRelease              `json:"upstreams"`
+	Strategies []*eosc.Base[StrategyRelease] `json:"strategies"`
 }
 
 type ApiRelease struct {
@@ -71,6 +76,15 @@ type UpstreamRelease struct {
 	Balance string
 	Timeout int
 	Labels  map[string]string
+}
+
+type StrategyRelease struct {
+	Name     string              `json:"name"`
+	Desc     string              `json:"description"`
+	Driver   string              `json:"driver"`
+	Priority int                 `json:"priority"`
+	Filters  map[string][]string `json:"filters"`
+	IsDelete bool                `json:"-"`
 }
 
 type MatchRule struct {

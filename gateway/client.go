@@ -21,6 +21,7 @@ type IClientDriver interface {
 	Application() IApplicationClient
 	Service() IServiceClient
 	Subscribe() ISubscribeClient
+	Strategy() IStrategyClient
 	Dynamic(resource string) (IDynamicClient, error)
 	PluginSetting() IPluginSetting
 	Commit(ctx context.Context) error

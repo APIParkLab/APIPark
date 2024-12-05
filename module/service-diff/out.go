@@ -46,5 +46,5 @@ type projectInfo struct {
 	apiProxyCommits   []*commit.Commit[api.Proxy]
 	apiDocCommits     []*commit.Commit[api_doc.DocCommit]
 	upstreamCommits   []*commit.Commit[upstream.Config]
-	strategyCommits   []*commit.Commit[strategy.StrategyCommit]
+	strategyCommits   []*commit.Commit[strategy.Commit]
 }

@@ -3,7 +3,7 @@ package apinto
 import (
 	"context"
 	"strings"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
 	admin_client "github.com/eolinker/eosc/process-admin/client"
 )
@@ -12,6 +12,10 @@ var _ gateway.IClientDriver = (*ClientDriver)(nil)
 
 type ClientDriver struct {
 	client admin_client.Client
+}
+
+func (c *ClientDriver) Strategy() gateway.IStrategyClient {
+	return NewStrategyClient(c.client)
 }
 
 func (c *ClientDriver) Close(ctx context.Context) error {
@@ -74,7 +78,7 @@ func NewClientDriver(cfg *gateway.ClientConfig) (*ClientDriver, error) {
 }
 
 func genWorkerID(id string, profession string) string {
-	
+
 	suffix := "@" + profession
 	if strings.HasSuffix(id, suffix) {
 		return id

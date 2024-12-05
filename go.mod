@@ -6,7 +6,7 @@ go 1.21
 
 require (
 	github.com/eolinker/ap-account v1.0.15
-	github.com/eolinker/eosc v0.17.3
+	github.com/eolinker/eosc v0.18.3
 	github.com/eolinker/go-common v1.1.1
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/getkin/kin-openapi v0.127.0
@@ -74,6 +74,10 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/mysql v1.5.2 // indirect
 )
+
+//replace (
+//	github.com/eolinker/eosc => ../../eolinker/eosc
+//)
 
 //replace github.com/eolinker/ap-account => ../aoaccount
 //

@@ -25,15 +25,15 @@ type IStrategyService interface {
 	Restore(ctx context.Context, id string) error
 
 	CommitStrategy(ctx context.Context, scope string, target string, strategyId string, data *Strategy) error
-	GetStrategyCommit(ctx context.Context, commitId string) (*commit.Commit[StrategyCommit], error)
-	LatestStrategyCommit(ctx context.Context, scope string, target string, strategyId string) (*commit.Commit[StrategyCommit], error)
-	ListLatestStrategyCommit(ctx context.Context, scope string, target string, strategyIds ...string) ([]*commit.Commit[StrategyCommit], error)
-	ListStrategyCommit(ctx context.Context, commitIds ...string) ([]*commit.Commit[StrategyCommit], error)
+	GetStrategyCommit(ctx context.Context, commitId string) (*commit.Commit[Commit], error)
+	LatestStrategyCommit(ctx context.Context, scope string, target string, strategyId string) (*commit.Commit[Commit], error)
+	ListLatestStrategyCommit(ctx context.Context, scope string, target string, strategyIds ...string) ([]*commit.Commit[Commit], error)
+	ListStrategyCommit(ctx context.Context, commitIds ...string) ([]*commit.Commit[Commit], error)
 }
 
 func init() {
 	autowire.Auto[IStrategyService](func() reflect.Value {
 		return reflect.ValueOf(new(imlStrategyService))
 	})
-	commit.InitCommitService[StrategyCommit]("strategy")
+	commit.InitCommitService[Commit]("strategy")
 }

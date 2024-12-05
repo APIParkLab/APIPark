@@ -5,11 +5,22 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
+	"time"
 
-	"gorm.io/gorm"
+	"github.com/APIParkLab/APIPark/service/service"
 
+	"github.com/eolinker/go-common/auto"
+
+	"github.com/APIParkLab/APIPark/service/cluster"
+
+	"github.com/APIParkLab/APIPark/gateway"
+	"github.com/eolinker/eosc"
+
+	log2 "github.com/APIParkLab/APIPark/service/log"
 	"github.com/eolinker/eosc/log"
+	"gorm.io/gorm"
 
 	strategy_filter "github.com/APIParkLab/APIPark/strategy-filter"
 
@@ -32,7 +43,72 @@ var _ IStrategyModule = (*imlStrategyModule)(nil)
 
 type imlStrategyModule struct {
 	strategyService strategy.IStrategyService `autowired:""`
+	appService      service.IServiceService   `autowired:""`
+	logService      log2.ILogService          `autowired:""`
+	clusterService  cluster.IClusterService   `autowired:""`
 	transaction     store.ITransaction        `autowired:""`
+}
+
+func (i *imlStrategyModule) StrategyLogInfo(ctx context.Context, id string) (*strategy_dto.LogInfo, error) {
+	c, err := i.clusterService.Get(ctx, cluster.DefaultClusterID)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s not found", cluster.DefaultClusterID)
+	}
+
+	info, err := i.logService.LogInfo(ctx, "loki", c.Cluster, id)
+	if err != nil {
+		return nil, err
+	}
+	return &strategy_dto.LogInfo{
+		ID:                info.ID,
+		ContentType:       info.ContentType,
+		ProxyResponseBody: info.ProxyResponseBody,
+		ResponseBody:      info.ResponseBody,
+	}, nil
+}
+
+func (i *imlStrategyModule) GetStrategyLogs(ctx context.Context, keyword string, strategyID string, start time.Time, end time.Time, limit int64, offset int64) ([]*strategy_dto.LogItem, int64, error) {
+	conditions := map[string]string{
+		"block_name": strategyID,
+	}
+	if keyword != "" {
+		// 查询符合条件的应用ID
+		apps, err := i.appService.Search(ctx, keyword, map[string]interface{}{
+			"as_app": true,
+		})
+		if err != nil {
+			return nil, 0, err
+		}
+		orCondition := fmt.Sprintf("request_uri =~ \"*%s*\"", keyword)
+		if len(apps) > 0 {
+			appIds := utils.SliceToSlice(apps, func(a *service.Service) string { return a.Id })
+			orCondition = fmt.Sprintf("%s or application =~ \"%s\"", orCondition, strings.Join(appIds, "|"))
+		}
+		conditions["#1"] = orCondition
+	}
+
+	c, err := i.clusterService.Get(ctx, cluster.DefaultClusterID)
+	if err != nil {
+		return nil, 0, fmt.Errorf("cluster %s not found", cluster.DefaultClusterID)
+	}
+	items, total, err := i.logService.Logs(ctx, "loki", c.Cluster, conditions, start, end, limit, offset)
+	if err != nil {
+		return nil, 0, err
+	}
+	result := make([]*strategy_dto.LogItem, 0, len(items))
+	for _, item := range items {
+		result = append(result, &strategy_dto.LogItem{
+			ID:            item.ID,
+			Service:       auto.UUID(item.Service),
+			Method:        item.Method,
+			Url:           item.Url,
+			RemoteIP:      item.RemoteIP,
+			Consumer:      auto.UUID(item.Consumer),
+			Authorization: auto.UUID(item.Authorization),
+			RecordTime:    auto.TimeLabel(item.RecordTime),
+		})
+	}
+	return result, total, nil
 }
 
 func (i *imlStrategyModule) Restore(ctx context.Context, id string) error {
@@ -62,7 +138,7 @@ func (i *imlStrategyModule) ToPublish(ctx context.Context, driver string) ([]*st
 	if err != nil {
 		return nil, err
 	}
-	commitMap := utils.SliceToMapO(commits, func(c *commit.Commit[strategy.StrategyCommit]) (string, string) { return c.Data.Id, c.Data.Version })
+	commitMap := utils.SliceToMapO(commits, func(c *commit.Commit[strategy.Commit]) (string, string) { return c.Data.Id, c.Data.Version })
 	items := make([]*strategy_dto.ToPublishItem, 0, len(list))
 	for _, l := range list {
 		status := strategy_dto.StrategyStatus(l, commitMap[l.Id])
@@ -84,13 +160,28 @@ func (i *imlStrategyModule) Search(ctx context.Context, keyword string, driver s
 	if err != nil {
 		return nil, 0, err
 	}
+	if len(list) < 1 {
+		return nil, 0, nil
+	}
 	strategyIds := utils.SliceToSlice(list, func(l *strategy.Strategy) string { return l.Id })
 	commits, err := i.strategyService.ListLatestStrategyCommit(ctx, scope.String(), target, strategyIds...)
 	if err != nil {
 		return nil, 0, err
 	}
-	commitMap := utils.SliceToMapO(commits, func(c *commit.Commit[strategy.StrategyCommit]) (string, string) { return c.Data.Id, c.Data.Version })
+	commitMap := utils.SliceToMapO(commits, func(c *commit.Commit[strategy.Commit]) (string, string) { return c.Data.Id, c.Data.Version })
 	items := make([]*strategy_dto.StrategyItem, 0, len(list))
+	countMap := make(map[string]int64)
+	c, err := i.clusterService.Get(ctx, cluster.DefaultClusterID)
+	if err == nil {
+		countMap, err = i.logService.LogCount(ctx, "loki", c.Cluster, map[string]string{
+			"#1": fmt.Sprintf("block_name =~ \"%s\"", strings.Join(strategyIds, "|")),
+		}, 720,
+			"block_name")
+		if err != nil {
+			log.Errorf("get log count error: %v", err)
+		}
+	}
+
 	for _, l := range list {
 		fs := make([]*strategy_dto.Filter, 0)
 
@@ -104,9 +195,12 @@ func (i *imlStrategyModule) Search(ctx context.Context, keyword string, driver s
 			}
 			filterList = append(filterList, fmt.Sprintf("[%s:%s]", info.Title, info.Label))
 		}
-		item := strategy_dto.ToStrategyItem(l, commitMap[l.Id], strings.Join(filterList, ";"))
+		item := strategy_dto.ToStrategyItem(l, commitMap[l.Id], strings.Join(filterList, ";"), countMap[l.Id])
 		items = append(items, item)
 	}
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Priority < items[j].Priority
+	})
 	return items, total, nil
 }
 
@@ -213,11 +307,17 @@ func (i *imlStrategyModule) Disable(ctx context.Context, id string) error {
 }
 
 func (i *imlStrategyModule) Publish(ctx context.Context, driver string, scope string, target string) error {
+	d, has := strategy_driver.GetDriver(driver)
+	if !has {
+		return fmt.Errorf("driver not found: %s", driver)
+	}
 	list, err := i.strategyService.AllByDriver(ctx, driver, strategy_dto.ToScope(scope).Int(), target)
 	if err != nil {
 		return err
 	}
+
 	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		publishStrategies := make([]*eosc.Base[gateway.StrategyRelease], 0, len(list))
 		for _, l := range list {
 			if l.IsDelete {
 				err = i.strategyService.Delete(ctx, l.Id)
@@ -225,14 +325,21 @@ func (i *imlStrategyModule) Publish(ctx context.Context, driver string, scope st
 					return err
 				}
 			}
+			publishStrategies = append(publishStrategies, d.ToRelease(strategy_dto.ToStrategy(l), nil, 0))
 
-			// TODO:同步到网关
 			err = i.strategyService.CommitStrategy(txCtx, scope, target, l.Id, l)
 			if err != nil {
 				return err
 			}
 		}
-		return nil
+		client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			_ = client.Close(ctx)
+		}()
+		return client.Strategy().Online(ctx, publishStrategies...)
 	})
 }
 
