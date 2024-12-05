@@ -1,6 +1,7 @@
 
 import { RESPONSE_TIPS } from '@common/const/const';
 import { message } from 'antd';
+import { $t } from "@common/locales"
 import { useEffect, useState } from 'react';
 
 const useCopyToClipboard = () => {
