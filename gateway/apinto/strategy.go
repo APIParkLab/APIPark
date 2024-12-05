@@ -19,11 +19,7 @@ func (s *StrategyClient) Online(ctx context.Context, resources ...*eosc.Base[gat
 	s.client.Begin(ctx)
 	for _, r := range resources {
 		if r.Config.IsDelete {
-			err := s.client.Del(ctx, genWorkerID(r.Config.Name, gateway.ProfessionStrategy))
-			if err != nil {
-				s.client.Rollback(ctx)
-				return err
-			}
+			s.client.Del(ctx, genWorkerID(r.Config.Name, gateway.ProfessionStrategy))
 			continue
 		}
 		err := s.client.Set(ctx, genWorkerID(r.Config.Name, gateway.ProfessionStrategy), r)
