@@ -196,7 +196,7 @@ func (d *Driver) recuseLogs(queries url.Values, end time.Time, offset int64) ([]
 			Url:           detail.RequestUri,
 			RemoteIP:      detail.SrcIp,
 			Consumer:      detail.Application,
-			Authorization: detail.Auth,
+			Authorization: detail.Authorization,
 			RecordTime:    time.UnixMilli(msec),
 		})
 	}

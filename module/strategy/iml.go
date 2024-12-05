@@ -69,7 +69,7 @@ func (i *imlStrategyModule) StrategyLogInfo(ctx context.Context, id string) (*st
 
 func (i *imlStrategyModule) GetStrategyLogs(ctx context.Context, keyword string, strategyID string, start time.Time, end time.Time, limit int64, offset int64) ([]*strategy_dto.LogItem, int64, error) {
 	conditions := map[string]string{
-		"block_name": strategyID,
+		"strategy": strategyID,
 	}
 	if keyword != "" {
 		// 查询符合条件的应用ID
@@ -174,9 +174,9 @@ func (i *imlStrategyModule) Search(ctx context.Context, keyword string, driver s
 	c, err := i.clusterService.Get(ctx, cluster.DefaultClusterID)
 	if err == nil {
 		countMap, err = i.logService.LogCount(ctx, "loki", c.Cluster, map[string]string{
-			"#1": fmt.Sprintf("block_name =~ \"%s\"", strings.Join(strategyIds, "|")),
+			"#1": fmt.Sprintf("strategy =~ \"%s\"", strings.Join(strategyIds, "|")),
 		}, 720,
-			"block_name")
+			"strategy")
 		if err != nil {
 			log.Errorf("get log count error: %v", err)
 		}
