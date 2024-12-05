@@ -68,6 +68,9 @@ func (i *imlStrategyModule) StrategyLogInfo(ctx context.Context, id string) (*st
 }
 
 func (i *imlStrategyModule) GetStrategyLogs(ctx context.Context, keyword string, strategyID string, start time.Time, end time.Time, limit int64, offset int64) ([]*strategy_dto.LogItem, int64, error) {
+	if strategyID == "" {
+		return nil, 0, errors.New("strategy id required")
+	}
 	conditions := map[string]string{
 		"strategy": strategyID,
 	}
@@ -79,7 +82,7 @@ func (i *imlStrategyModule) GetStrategyLogs(ctx context.Context, keyword string,
 		if err != nil {
 			return nil, 0, err
 		}
-		orCondition := fmt.Sprintf("request_uri =~ \"*%s*\"", keyword)
+		orCondition := fmt.Sprintf("request_uri =~ \".*%s.*\"", keyword)
 		if len(apps) > 0 {
 			appIds := utils.SliceToSlice(apps, func(a *service.Service) string { return a.Id })
 			orCondition = fmt.Sprintf("%s or application =~ \"%s\"", orCondition, strings.Join(appIds, "|"))
