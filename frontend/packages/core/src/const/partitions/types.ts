@@ -2,114 +2,133 @@
 import { EntityItem } from "@common/const/type";
 
 export type PartitionConfigFieldType = {
-    name?: string;
-    id?: string;
-    description?: string;
-    prefix?:string
-    url?:string 
-    managerAddress?:string
-    canDelete?:boolean
+  name?: string;
+  id?: string;
+  description?: string;
+  prefix?: string
+  url?: string
+  managerAddress?: string
+  canDelete?: boolean
 };
 
 export type PartitionCertTableListItem = {
-    id:string;
-    name: string;
-    domains:string[];
-    notAfter:string;
-    notBefore:string;
-    updater:EntityItem;
-    updateTime:string;
+  id: string;
+  name: string;
+  domains: string[];
+  notAfter: string;
+  notBefore: string;
+  updater: EntityItem;
+  updateTime: string;
 };
 
 export type PartitionCertConfigFieldType = {
-    id?:string
-    key:string
-    pem:string
+  id?: string
+  key: string
+  pem: string
 };
 
 export type PartitionCertConfigProps = {
-   type:'add'|'edit'
-   entity?:PartitionCertConfigFieldType
+  type: 'add' | 'edit'
+  entity?: PartitionCertConfigFieldType
 }
 
 export type PartitionCertConfigHandle = {
-   save:()=>Promise<boolean|string>
+  save: () => Promise<boolean | string>
 }
 
 export type PartitionClusterFieldType = {
-    name?: string;
-    id?: string;
-    description?: string;
-    address?:string;
-    protocol?:'http'|'https'
+  name?: string;
+  id?: string;
+  description?: string;
+  address?: string;
+  protocol?: 'http' | 'https'
 };
 
 export type ClusterConfigProps = {
-    mode:'config' | 'retry' | 'result' | 'edit',
-    clusterId?:string
-    initFormValue?:{[k:string]:string|number}
+  mode: 'config' | 'retry' | 'result' | 'edit',
+  clusterId?: string
+  initFormValue?: { [k: string]: string | number }
 }
 
 export type ClusterConfigHandle = {
-    save:()=>Promise<boolean|string>
-    check:()=>Promise<boolean>
+  save: () => Promise<boolean | string>
+  check: () => Promise<boolean>
 }
 
 export type PartitionClusterTableListItem = {
-    id:string;
-    name: string;
-    status:0|1;
-    description:string;
+  id: string;
+  name: string;
+  status: 0 | 1;
+  description: string;
 };
 
 export type PartitionClusterNodeTableListItem = {
-    id:string;
-    name: string;
-    managerAddress:string[];
-    serviceAddress:string[];
-    peerAddress:string[];
-    status:0|1;
+  id: string;
+  name: string;
+  managerAddress: string[];
+  serviceAddress: string[];
+  peerAddress: string[];
+  status: 0 | 1;
 };
 
 export type PartitionClusterNodeModalTableListItem = {
-    id: string,
-    name: string,
-    managerAddress: [],
-    serviceAddress: [],
-    peerAddress: string,
-    status: string
+  id: string,
+  name: string,
+  managerAddress: [],
+  serviceAddress: [],
+  peerAddress: string,
+  status: string
 }
 
 export type NodeModalFieldType = {
-    address:string
+  address: string
 }
 
 
 export type NodeModalHandle = {
-    save:()=>void
+  save: () => void
 }
 export type NodeModalPropsType = {
-    changeStatus:(status:ClusterPageShowStatus)=>void
-    getClusterInfo:()=>void
-    status:ClusterPageShowStatus
+  changeStatus: (status: ClusterPageShowStatus) => void
+  getClusterInfo: () => void
+  status: ClusterPageShowStatus
 }
 
-export type ClusterPageShowStatus = 'view'|'preview'|'edit'
+export type ClusterPageShowStatus = 'view' | 'preview' | 'edit'
 export type PartitionTableListItem = {
-    id:string;
-    name: string;
-    clusterNum:number;
-    updater:EntityItem;
-    updateTime:string;
+  id: string;
+  name: string;
+  clusterNum: number;
+  updater: EntityItem;
+  updateTime: string;
 };
 
-export type SimplePartition = EntityItem & { clusters: (EntityItem & {description:string})[] }
+export type SimplePartition = EntityItem & { clusters: (EntityItem & { description: string })[] }
 
 export type PartitionDashboardConfigFieldType = {
-    driver:string
-    config:{
-        org:string
-        token:string
-        addr:string
+  driver: string
+  config: {
+    org: string
+    token: string
+    addr: string
+  }
+}
+export type PartitionDataLogConfigFieldType = {
+  create_time: string
+  id: string
+  update_time: string
+  updater: {
+    id: string
+    name: string
+  }
+  creator: {
+    id: string
+    name: string
+  }
+  config: {
+    headers: {
+      [k: string]: string
     }
+    url: string
+  }
 }

@@ -1,40 +1,57 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { DataMaskLogItem } from "@common/const/policy/type";
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList";
 import { $t } from "@common/locales";
-import { App, Button, message, DatePicker, Modal } from 'antd'
+import { Button, message } from 'antd'
 
-import { DATA_MASKING_TABLE_LOG_COLUMNS, DATA_MASKING_TABLE_COLUMNS } from './DataMaskingColumn';
+import { DATA_MASKING_TABLE_LOG_COLUMNS } from './DataMaskingColumn';
 import { useGlobalContext } from '@common/contexts/GlobalStateContext';
 import { ActionType } from '@ant-design/pro-components';
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const';
 import { useParams } from 'react-router-dom';
 import { RouterParams } from '@common/const/type';
 import { useFetch } from '@common/hooks/http';
-import WithPermission from '@common/components/aoplatform/WithPermission';
 import TimeRangeSelector, { TimeRange } from '@common/components/aoplatform/TimeRangeSelector';
 import { SearchBody } from '@dashboard/const/type';
 import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission';
-const { RangePicker } = DatePicker;
+import { getTime } from '@dashboard/utils/dashboard';
 const DataMaskingLogModal = (props: any) => {
   const { strategy } = props;
   const { state, accessData } = useGlobalContext()
   const { serviceId, teamId } = useParams<RouterParams>()
   const [datePickerValue, setDatePickerValue] = useState<any>();
-  const [queryData, setQueryData] = useState<SearchBody>({})
-
+  const defaultTime = getTime('hour', datePickerValue)
+  const [queryData, setQueryData] = useState<SearchBody>({
+    start: defaultTime.startTime,
+    end: defaultTime.endTime
+  })
   /**
    * 请求数据
    */
   const { fetchData } = useFetch()
   /**
-* 列表ref
-*/
+  * 列表ref
+  */
   const pageListRef = useRef<ActionType>(null);
   /**
    * 搜索关键字
    */
   const [searchWord, setSearchWord] = useState<string>('')
+  /**
+   * 重置时间范围
+   */
+  let resetTimeRange = () => {}
+  /**
+   * 时间按钮
+   */
+  const [timeButton, setTimeButton] = useState<'' | 'hour' | 'day' | 'threeDays' | 'sevenDays'>('hour');
+  /**
+   * 绑定时间范围组件
+   * @param instance
+   */
+  const bindRef = (instance: any) => {
+    resetTimeRange = instance.reset
+  };
   /**
    * 操作列
    */
@@ -54,7 +71,7 @@ const DataMaskingLogModal = (props: any) => {
           url += `/${teamId}`
         }
         return [
-          <TableBtnWithPermission access={`${serviceId === undefined ? 'system.devops' : 'team.service'}.policy.view`} key="view" btnType="view" onClick={() => { window.open(url,'_blank') }} btnTitle="查看" />
+          <TableBtnWithPermission access={`${serviceId === undefined ? 'system.devops' : 'team.service'}.policy.view`} key="view" btnType="view" onClick={() => { window.open(url, '_blank') }} btnTitle="查看" />
         ]
       }
     }
@@ -88,7 +105,7 @@ const DataMaskingLogModal = (props: any) => {
     current: number;
   }) => {
     return fetchData<BasicResponse<{ logs: DataMaskLogItem[], total: number }>>(
-      `strategy/${serviceId === undefined ? 'global' : 'service'}/data-masking/list`,
+      `strategy/${serviceId === undefined ? 'global' : 'service'}/data-masking/logs`,
       {
         method: 'GET',
         eoParams: {
@@ -106,204 +123,9 @@ const DataMaskingLogModal = (props: any) => {
     ).then(response => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
-        const mockData: any = [
-          {
-            id: '12334',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:12',
-          },
-          {
-            id: 'fff1',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:12',
-          },
-          {
-            id: 'fff2',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:12',
-          },
-          {
-            id: 'fff3',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:12',
-          },
-          {
-            id: 'fff4',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:12',
-          },
-          {
-            id: 'fff5',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:12',
-          },
-          {
-            id: 'fff6',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:12',
-          },
-          {
-            id: 'fff7',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:12',
-          },
-          {
-            id: 'fff8',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:12',
-          },
-          {
-            id: 'fff9',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:12',
-          },
-          {
-            id: 'fff11',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:12',
-          },
-          {
-            id: 'fff22',
-            service: {
-              id: 'xxx',
-              name: 'xxx'
-            },
-            url: 'url',
-            remote_ip: '9234923',
-            consumer: {
-              id: 'yyy',
-              name: 'yyy'
-            },
-            method: 'GET',
-            authorization: 'authorization',
-            record_time: '2021-09-09 12:12:11',
-          }
-
-        ]
         // 保存数据
         return {
-          data: mockData,
+          data: data.logs || [],
           total: data.total,
           success: true
         }
@@ -320,24 +142,13 @@ const DataMaskingLogModal = (props: any) => {
   const handleTimeRangeChange = (timeRange: TimeRange) => {
     setQueryData(pre => ({ ...pre, ...timeRange } as SearchBody))
     manualReloadTable()
-    
+
   };
-  const handleDatePickerChange = (dates: any) => {
-    if (dates && Array.isArray(dates) && dates.length === 2) {
-      const [startDate, endDate] = dates;
-      const start = startDate!.startOf('day').unix(); // 开始日期的00:00:00
-      const end = endDate!.endOf('day').unix(); // 结束日期的23:59:59
-      handleTimeRangeChange({ start, end });
-    } else {
-      handleTimeRangeChange({ start: null, end: null})
-    }
-  }
 
   const resetQuery = () => {
-    setDatePickerValue(null)
-    handleTimeRangeChange({ start: null, end: null})
-
+    resetTimeRange()
   };
+
   return (
     <>
       <div className="w-full h-full p-[20px]">
@@ -348,11 +159,15 @@ const DataMaskingLogModal = (props: any) => {
           columns={[...columns, ...operation]}
           afterNewBtn={
             [<div className="flex items-center flex-wrap p-[10px] px-btnbase content-before bg-MAIN_BG ">
-              <RangePicker
-                onChange={handleDatePickerChange}
-                value={datePickerValue} />
-              <div className="flex [&>.reset-btn]:!h-auto flex-nowrap items-center ml-[10px]">
-                <Button className="reset-btn" onClick={resetQuery}>{$t('重置')}</Button>
+              <TimeRangeSelector
+                labelSize="small"
+                bindRef={bindRef}
+                initialTimeButton={timeButton}
+                onTimeButtonChange={setTimeButton}
+                initialDatePickerValue={datePickerValue}
+                onTimeRangeChange={handleTimeRangeChange} />
+              <div className="flex flex-nowrap items-center  pt-btnybase">
+                <Button onClick={resetQuery}>{$t('重置')}</Button>
               </div>
             </div>]
           }
