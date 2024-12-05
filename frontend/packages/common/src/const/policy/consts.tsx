@@ -1,3 +1,4 @@
+import { codeBoxLanguagesType } from "@common/components/postcat/api/Codebox";
 
 export const MatchRules = [
     { value: 'inner', label: '数据格式' },
@@ -54,4 +55,34 @@ export const StrategyStatusEnum = {
     "offline":'text-status_fail',
     "delete":'text-status_offline',
   }
+
+  export const contentTypeToLanguageMap: Record<string, codeBoxLanguagesType> = {
+    // JSON
+    "application/json": "json",
+  
+    // XML
+    "application/xml": "xml",
+    "text/xml": "xml",
+  
+    // HTML
+    "text/html": "html",
+  
+    // Plain text
+    "text/plain": "plaintext",
+  
+    // JavaScript
+    "application/javascript": "javascript",
+    "text/javascript": "javascript",
+  
+    // CSS
+    "text/css": "css",
+  
+    // YAML
+    "application/x-yaml": "yaml",
+    "text/yaml": "yaml",
+  
+    // Others (fallback)
+    "*/*": "plaintext", // 任意类型默认处理为普通文本
+  };
+  
   

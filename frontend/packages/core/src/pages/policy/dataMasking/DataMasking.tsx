@@ -79,7 +79,7 @@ const DataMasking = (props: any) => {
     {
       title: '',
       key: 'option',
-      btnNums: rowOperation.length -1,
+      btnNums: rowOperation.length,
       fixed: 'right',
       valueType: 'option',
       render: (_: React.ReactNode, entity: any) => [
@@ -379,10 +379,11 @@ const DataMasking = (props: any) => {
       <Modal
         title={$t('处理日志')}
         visible={modalVisible}
+        destroyOnClose={true}
         onCancel={handleCloseModal}
         footer={null}
         wrapClassName="modal-without-footer"
-        width={1000}
+        width={1100}
         maskClosable={true}
       >
         <div className="pb-btnybase flex flex-nowrap flex-col h-full w-full items-center justify-between">

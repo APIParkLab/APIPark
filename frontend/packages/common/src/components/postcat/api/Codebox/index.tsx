@@ -13,6 +13,7 @@ export interface CodeboxApiRef {
   formatCode: () => void
 }
 
+export type codeBoxLanguagesType = 'html' | 'json' | 'xml' | 'javascript' | 'css' | 'plaintext'|'yaml'
 interface CodeboxProps {
   options?: MonacoEditor.IStandaloneEditorConstructionOptions
   value?: string
@@ -22,7 +23,7 @@ interface CodeboxProps {
   height?: string | null
   readOnly?: boolean
   apiRef?: RefObject<CodeboxApiRef>
-  language?: 'html' | 'json' | 'xml' | 'javascript' | 'css' | 'plaintext'|'yaml'
+  language?: codeBoxLanguagesType
   extraContent?:React.ReactNode
   sx?:Record<string,unknown>
   editorTheme?:'vs' | 'vs-dark' | 'hc-black'
