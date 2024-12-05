@@ -2,7 +2,7 @@ package cluster
 
 import (
 	"time"
-	
+
 	"github.com/APIParkLab/APIPark/stores/cluster"
 )
 
@@ -10,6 +10,7 @@ type Cluster struct {
 	Uuid       string
 	Name       string
 	Resume     string
+	Cluster    string
 	Creator    string
 	Updater    string
 	Status     int
@@ -22,6 +23,7 @@ func FromEntity(entity *cluster.Cluster) *Cluster {
 		Uuid:       entity.UUID,
 		Name:       entity.Name,
 		Resume:     entity.Resume,
+		Cluster:    entity.Cluster,
 		Creator:    entity.Creator,
 		Updater:    entity.Updater,
 		CreateTime: entity.CreateAt,

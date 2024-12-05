@@ -83,18 +83,18 @@ func (m *imlServiceDiff) getBaseInfo(ctx context.Context, serviceId, baseRelease
 	return base, nil
 }
 
-func (m *imlServiceDiff) latestStrategyCommits(ctx context.Context, serviceId string) ([]*commit.Commit[strategy.StrategyCommit], error) {
+func (m *imlServiceDiff) latestStrategyCommits(ctx context.Context, serviceId string) ([]*commit.Commit[strategy.Commit], error) {
 	list, err := m.strategyService.All(ctx, 2, serviceId)
 	if err != nil {
 		return nil, fmt.Errorf("get latest strategy failed:%w", err)
 	}
 
-	return utils.SliceToSlice(list, func(s *strategy.Strategy) *commit.Commit[strategy.StrategyCommit] {
+	return utils.SliceToSlice(list, func(s *strategy.Strategy) *commit.Commit[strategy.Commit] {
 		key := fmt.Sprintf("service-%s", s.Id)
-		return &commit.Commit[strategy.StrategyCommit]{
+		return &commit.Commit[strategy.Commit]{
 			Target: s.Id,
 			Key:    key,
-			Data: &strategy.StrategyCommit{
+			Data: &strategy.Commit{
 				Id:       s.Id,
 				Name:     s.Name,
 				Priority: s.Priority,
@@ -252,11 +252,11 @@ func (m *imlServiceDiff) getReleaseInfo(ctx context.Context, releaseId string) (
 	}, nil
 }
 
-func (m *imlServiceDiff) diffStrategies(base, target []*commit.Commit[strategy.StrategyCommit]) []*service_diff.StrategyDiff {
-	baseStrategy := utils.SliceToMap(base, func(i *commit.Commit[strategy.StrategyCommit]) string {
+func (m *imlServiceDiff) diffStrategies(base, target []*commit.Commit[strategy.Commit]) []*service_diff.StrategyDiff {
+	baseStrategy := utils.SliceToMap(base, func(i *commit.Commit[strategy.Commit]) string {
 		return i.Target
 	})
-	targetStrategy := utils.SliceToMap(target, func(i *commit.Commit[strategy.StrategyCommit]) string {
+	targetStrategy := utils.SliceToMap(target, func(i *commit.Commit[strategy.Commit]) string {
 		return i.Target
 	})
 	out := make([]*service_diff.StrategyDiff, 0, len(target))

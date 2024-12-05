@@ -3,6 +3,8 @@ package core
 import (
 	"net/http"
 
+	"github.com/APIParkLab/APIPark/controller/log"
+
 	"github.com/APIParkLab/APIPark/controller/strategy"
 
 	"github.com/APIParkLab/APIPark/controller/ai"
@@ -87,6 +89,7 @@ type plugin struct {
 	aiProviderController        ai.IProviderController                             `autowired:""`
 	settingController           system.ISettingController                          `autowired:""`
 	initController              system.IInitController                             `autowired:""`
+	logController               log.ILogController                                 `autowired:""`
 	apis                        []pm3.Api
 }
 
@@ -109,6 +112,7 @@ func (p *plugin) OnComplete() {
 	p.apis = append(p.apis, p.systemApis()...)
 	p.apis = append(p.apis, p.aiAPIs()...)
 	p.apis = append(p.apis, p.strategyApis()...)
+	p.apis = append(p.apis, p.logApis()...)
 }
 
 func (p *plugin) Name() string {

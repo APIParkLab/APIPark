@@ -65,13 +65,14 @@ type Edit struct {
 	IsStop   *bool
 }
 
-type StrategyCommit struct {
+type Commit struct {
 	Id       string
 	Name     string
 	Priority int
 	Filters  string
 	Config   string
 	Driver   string
+	IsDelete bool
 	IsStop   bool
 	Version  string
 }

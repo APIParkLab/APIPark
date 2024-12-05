@@ -2,9 +2,17 @@ package publish
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
+
+	strategy_driver "github.com/APIParkLab/APIPark/module/strategy/driver"
+	strategy_dto "github.com/APIParkLab/APIPark/module/strategy/dto"
+
+	"github.com/eolinker/eosc"
+
+	"github.com/APIParkLab/APIPark/service/strategy"
 
 	"github.com/eolinker/go-common/store"
 
@@ -43,6 +51,7 @@ type imlPublishModule struct {
 	publishService    publish.IPublishService        `autowired:""`
 	apiService        api.IAPIService                `autowired:""`
 	upstreamService   upstream.IUpstreamService      `autowired:""`
+	strategyService   strategy.IStrategyService      `autowired:""`
 	releaseService    release.IReleaseService        `autowired:""`
 	clusterService    cluster.IClusterService        `autowired:""`
 	serviceService    service.IServiceService        `autowired:""`
@@ -59,7 +68,7 @@ func (m *imlPublishModule) initGateway(ctx context.Context, partitionId string, 
 		return p.Id
 	})
 	for _, projectId := range projectIds {
-		releaseInfo, err := m.getProjectRelease(ctx, projectId, partitionId)
+		releaseInfo, err := m.GetProjectRelease(ctx, projectId, partitionId)
 		if err != nil {
 			return err
 		}
@@ -75,22 +84,15 @@ func (m *imlPublishModule) initGateway(ctx context.Context, partitionId string, 
 	return nil
 }
 
-func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID string, partitionId string) (*gateway.ProjectRelease, error) {
-
-	releaseInfo, err := m.releaseService.GetRunning(ctx, projectID)
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, err
-		}
-		return nil, nil
-	}
-	commits, err := m.releaseService.GetCommits(ctx, releaseInfo.UUID)
+func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID string, commitId string) (*gateway.ProjectRelease, error) {
+	commits, err := m.releaseService.GetCommits(ctx, commitId)
 	if err != nil {
 		return nil, err
 	}
 	apiIds := make([]string, 0, len(commits))
 	apiProxyCommitIds := make([]string, 0, len(commits))
 	upstreamCommitIds := make([]string, 0, len(commits))
+	strategyCommitIds := make([]string, 0, len(commits))
 	for _, c := range commits {
 		switch c.Type {
 		case release.CommitApiProxy:
@@ -98,6 +100,8 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 			apiProxyCommitIds = append(apiProxyCommitIds, c.Commit)
 		case release.CommitUpstream:
 			upstreamCommitIds = append(upstreamCommitIds, c.Commit)
+		case release.CommitStrategy:
+			strategyCommitIds = append(strategyCommitIds, c.Commit)
 		}
 	}
 
@@ -114,99 +118,11 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 		return c.Target, c.Data
 	})
 
-	upstreamCommits, err := m.upstreamService.ListCommit(ctx, upstreamCommitIds...)
-	if err != nil {
-		return nil, err
+	version := commitId
+	r := &gateway.ProjectRelease{
+		Id:      projectID,
+		Version: version,
 	}
-	version := releaseInfo.UUID
-	apis := make([]*gateway.ApiRelease, 0, len(apiInfos))
-	for _, a := range apiInfos {
-		apiInfo := &gateway.ApiRelease{
-			BasicItem: &gateway.BasicItem{
-				ID:          a.UUID,
-				Description: a.Description,
-				Version:     version,
-			},
-			Path:    a.Path,
-			Methods: a.Methods,
-			Service: a.Service,
-		}
-		proxy, ok := proxyCommitMap[a.UUID]
-		if ok {
-			apiInfo.ProxyPath = proxy.Path
-			apiInfo.ProxyHeaders = utils.SliceToSlice(proxy.Headers, func(h *api.Header) *gateway.ProxyHeader {
-				return &gateway.ProxyHeader{
-					Key:   h.Key,
-					Value: h.Value,
-				}
-			})
-			apiInfo.Retry = proxy.Retry
-			apiInfo.Timeout = proxy.Timeout
-		}
-		apis = append(apis, apiInfo)
-	}
-	var upstreamRelease *gateway.UpstreamRelease
-	for _, c := range upstreamCommits {
-		if c.Key != partitionId {
-			continue
-		}
-		upstreamRelease = &gateway.UpstreamRelease{
-			BasicItem: &gateway.BasicItem{
-				ID:      c.Target,
-				Version: version,
-				MatchLabels: map[string]string{
-					"serviceId": projectID,
-				},
-			},
-			PassHost: c.Data.PassHost,
-			Scheme:   c.Data.Scheme,
-			Balance:  c.Data.Balance,
-			Timeout:  c.Data.Timeout,
-			Nodes: utils.SliceToSlice(c.Data.Nodes, func(n *upstream.NodeConfig) string {
-				return fmt.Sprintf("%s weight=%d", n.Address, n.Weight)
-			}),
-		}
-	}
-
-	return &gateway.ProjectRelease{
-		Id:       projectID,
-		Version:  version,
-		Apis:     apis,
-		Upstream: upstreamRelease,
-	}, nil
-}
-
-func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releaseId, version string, clusterIds []string) (map[string]*gateway.ProjectRelease, error) {
-	commits, err := m.releaseService.GetCommits(ctx, releaseId)
-	if err != nil {
-		return nil, err
-	}
-	apiIds := make([]string, 0, len(commits))
-	apiProxyCommitIds := make([]string, 0, len(commits))
-	upstreamCommitIds := make([]string, 0, len(commits))
-	for _, c := range commits {
-		switch c.Type {
-		case release.CommitApiProxy:
-			apiIds = append(apiIds, c.Target)
-			apiProxyCommitIds = append(apiProxyCommitIds, c.Commit)
-		case release.CommitUpstream:
-			upstreamCommitIds = append(upstreamCommitIds, c.Commit)
-		}
-	}
-
-	apiInfos, err := m.apiService.ListInfo(ctx, apiIds...)
-	if err != nil {
-		return nil, err
-	}
-
-	proxyCommits, err := m.apiService.ListProxyCommit(ctx, apiProxyCommitIds...)
-	if err != nil {
-		return nil, err
-	}
-	proxyCommitMap := utils.SliceToMapO(proxyCommits, func(c *commit.Commit[api.Proxy]) (string, *api.Proxy) {
-		return c.Target, c.Data
-	})
-
 	apis := make([]*gateway.ApiRelease, 0, len(apiInfos))
 	for _, a := range apiInfos {
 		apiInfo := &gateway.ApiRelease{
@@ -240,44 +156,93 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 		}
 		apis = append(apis, apiInfo)
 	}
-	projectReleaseMap := make(map[string]*gateway.ProjectRelease)
-	upstreamReleaseMap := make(map[string]*gateway.UpstreamRelease)
+	r.Apis = apis
+	var upstreamRelease *gateway.UpstreamRelease
 	if len(upstreamCommitIds) > 0 {
 		upstreamCommits, err := m.upstreamService.ListCommit(ctx, upstreamCommitIds...)
 		if err != nil {
 			return nil, err
 		}
 		for _, c := range upstreamCommits {
-			for _, partitionId := range clusterIds {
-				upstreamRelease := &gateway.UpstreamRelease{
-					BasicItem: &gateway.BasicItem{
-						ID:      c.Target,
-						Version: version,
-						MatchLabels: map[string]string{
-							"serviceId": projectID,
-						},
+			upstreamRelease = &gateway.UpstreamRelease{
+				BasicItem: &gateway.BasicItem{
+					ID:      c.Target,
+					Version: version,
+					MatchLabels: map[string]string{
+						"serviceId": projectID,
 					},
-					PassHost: c.Data.PassHost,
-					Scheme:   c.Data.Scheme,
-					Balance:  c.Data.Balance,
-					Timeout:  c.Data.Timeout,
-					Nodes: utils.SliceToSlice(c.Data.Nodes, func(n *upstream.NodeConfig) string {
-						return fmt.Sprintf("%s weight=%d", n.Address, n.Weight)
-					}),
-				}
-
-				upstreamReleaseMap[partitionId] = upstreamRelease
+				},
+				PassHost: c.Data.PassHost,
+				Scheme:   c.Data.Scheme,
+				Balance:  c.Data.Balance,
+				Timeout:  c.Data.Timeout,
+				Nodes: utils.SliceToSlice(c.Data.Nodes, func(n *upstream.NodeConfig) string {
+					return fmt.Sprintf("%s weight=%d", n.Address, n.Weight)
+				}),
 			}
 		}
-
+		r.Upstream = upstreamRelease
+	}
+	if len(strategyCommitIds) > 0 {
+		strategyCommits, err := m.strategyService.ListStrategyCommit(ctx, strategyCommitIds...)
+		if err != nil {
+			return nil, err
+		}
+		strategyReleases := make([]*eosc.Base[gateway.StrategyRelease], 0, len(strategyCommits))
+		for _, c := range strategyCommits {
+			s := c.Data
+			driver, has := strategy_driver.GetDriver(c.Data.Driver)
+			if !has {
+				continue
+			}
+			filters := make([]*strategy_dto.Filter, 0)
+			json.Unmarshal([]byte(s.Filters), &filters)
+			var cfg interface{}
+			json.Unmarshal([]byte(s.Config), &cfg)
+			strategyReleases = append(strategyReleases, driver.ToRelease(&strategy_dto.Strategy{
+				Id:       fmt.Sprintf("%s-%s", projectID, s.Id),
+				Name:     s.Name,
+				Priority: s.Priority,
+				Filters:  filters,
+				Config:   cfg,
+				IsDelete: s.IsDelete || s.IsStop,
+			}, map[string][]string{
+				"provider": {projectID},
+			}, 5000))
+		}
+		r.Strategies = strategyReleases
 	}
 
+	return r, nil
+}
+
+func (m *imlPublishModule) GetProjectRelease(ctx context.Context, projectID string, partitionId string) (*gateway.ProjectRelease, error) {
+
+	releaseInfo, err := m.releaseService.GetRunning(ctx, projectID)
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+		return nil, nil
+	}
+
+	return m.getProjectRelease(ctx, projectID, releaseInfo.UUID)
+}
+
+func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releaseId, version string, clusterIds []string) (map[string]*gateway.ProjectRelease, error) {
+	projectRelease, err := m.getProjectRelease(ctx, projectID, releaseId)
+	if err != nil {
+		return nil, err
+	}
+
+	projectReleaseMap := make(map[string]*gateway.ProjectRelease)
 	for _, clusterId := range clusterIds {
 		projectReleaseMap[clusterId] = &gateway.ProjectRelease{
-			Id:       projectID,
-			Version:  version,
-			Apis:     apis,
-			Upstream: upstreamReleaseMap[clusterId],
+			Id:         projectID,
+			Version:    version,
+			Apis:       projectRelease.Apis,
+			Upstream:   projectRelease.Upstream,
+			Strategies: projectRelease.Strategies,
 		}
 	}
 	return projectReleaseMap, nil

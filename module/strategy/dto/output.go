@@ -25,7 +25,7 @@ func StrategyStatus(s *strategy.Strategy, publishVersion string) string {
 	return publishStatus
 }
 
-func ToStrategyItem(s *strategy.Strategy, publishVersion string, filters string) *StrategyItem {
+func ToStrategyItem(s *strategy.Strategy, publishVersion string, filters string, processedTotal int64) *StrategyItem {
 	publishStatus := PublishStatusOffline
 	if publishVersion != "" {
 		if s.IsDelete {
@@ -48,7 +48,7 @@ func ToStrategyItem(s *strategy.Strategy, publishVersion string, filters string)
 		Filters:        filters,
 		Updater:        auto.UUID(s.Updater),
 		UpdateTime:     auto.TimeLabel(s.UpdateAt),
-		ProcessedTotal: 0,
+		ProcessedTotal: processedTotal,
 		PublishStatus:  publishStatus,
 		IsStop:         s.IsStop,
 		IsDelete:       s.IsDelete,
@@ -67,6 +67,7 @@ func ToStrategy(s *strategy.Strategy) *Strategy {
 		Desc:     s.Desc,
 		Filters:  filters,
 		Config:   cfg,
+		IsDelete: s.IsDelete || s.IsStop,
 	}
 }
 
@@ -77,6 +78,7 @@ type Strategy struct {
 	Desc     string      `json:"desc"`
 	Filters  []*Filter   `json:"filters"`
 	Config   interface{} `json:"config"`
+	IsDelete bool        `json:"is_delete"`
 }
 
 type StrategyItem struct {
@@ -87,7 +89,7 @@ type StrategyItem struct {
 	Filters        string         `json:"filters"`
 	Updater        auto.Label     `json:"updater" aolabel:"user"`
 	UpdateTime     auto.TimeLabel `json:"update_time"`
-	ProcessedTotal int            `json:"processed_total"`
+	ProcessedTotal int64          `json:"processed_total"`
 	PublishStatus  string         `json:"publish_status"`
 	IsStop         bool           `json:"is_stop"`
 	IsDelete       bool           `json:"is_delete"`
@@ -111,4 +113,22 @@ type ToPublishItem struct {
 	Priority int       `json:"priority"`
 	Status   string    `json:"status"`
 	OptTime  time.Time `json:"opt_time"`
+}
+
+type LogItem struct {
+	ID            string         `json:"id"`
+	Service       auto.Label     `json:"service" aolabel:"service"`
+	Method        string         `json:"method"`
+	Url           string         `json:"url"`
+	RemoteIP      string         `json:"remote_ip"`
+	Consumer      auto.Label     `json:"consumer" aolabel:"service"`
+	Authorization auto.Label     `json:"authorization" aolabel:"authorization"`
+	RecordTime    auto.TimeLabel `json:"record_time"`
+}
+
+type LogInfo struct {
+	ID                string `json:"id"`
+	ContentType       string `json:"content_type"`
+	ProxyResponseBody string `json:"origin"`
+	ResponseBody      string `json:"target"`
 }

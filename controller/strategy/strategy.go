@@ -33,6 +33,9 @@ type IStrategyController interface {
 	FilterServiceRemote(ctx *gin.Context, serviceId string, name string) ([]*strategy_dto.Title, []any, int64, string, string, error)
 
 	ToPublish(ctx *gin.Context, driver string) ([]*strategy_dto.ToPublishItem, string, string, bool, error)
+
+	GetStrategyLogs(ctx *gin.Context, keyword string, strategyId string, start string, end string, limit string, offset string) ([]*strategy_dto.LogItem, int64, error)
+	LogInfo(ctx *gin.Context, id string) (*strategy_dto.LogInfo, error)
 }
 
 type IStrategyCommonController interface {

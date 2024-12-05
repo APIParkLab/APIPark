@@ -66,6 +66,22 @@ export type DataMaskStrategyItem = {
     updater:EntityItem
     updateTime:string
   }
+export type DataMaskLogItem = {
+    id:string
+    service: {
+      id:string
+      name:string
+    }
+    method:string
+    url:string
+    remote_ip:string
+    consumer: {
+      id:string
+      name:string
+    }
+    authorization:string
+    record_time:string
+  }
 
   
 export type FilterFormField= {

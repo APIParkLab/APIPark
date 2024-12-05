@@ -1,6 +1,7 @@
 #!/bin/sh
 curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/access_log > eolinker_com_apinto_access_log.json
 curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/strategy-plugin-visit > eolinker_com_apinto_strategy-plugin-visit.json
+curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/strategy-plugin-data_mask > eolinker_com_apinto_strategy-plugin-data_mask.json
 curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/plugin_app > eolinker_com_apinto_plugin_app.json
 curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/monitor > eolinker_com_apinto_monitor.json
 curl -s http://127.0.0.1:9400/extender/eolinker.com:apinto/http_to_dubbo2 > eolinker_com_apinto_http_to_dubbo2.json

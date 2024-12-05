@@ -16,8 +16,8 @@ import (
 var _ IStrategyService = (*imlStrategyService)(nil)
 
 type imlStrategyService struct {
-	store         strategy.IStrategyStore               `autowired:""`
-	commitService commit.ICommitService[StrategyCommit] `autowired:""`
+	store         strategy.IStrategyStore       `autowired:""`
+	commitService commit.ICommitService[Commit] `autowired:""`
 	universally.IServiceCreate[Create]
 	universally.IServiceEdit[Edit]
 }
@@ -73,23 +73,24 @@ func (i *imlStrategyService) CommitStrategy(ctx context.Context, scope string, t
 		key = fmt.Sprintf("%s-%s", scope, target)
 	}
 
-	return i.commitService.Save(ctx, strategyId, key, &StrategyCommit{
+	return i.commitService.Save(ctx, strategyId, key, &Commit{
 		Id:       data.Id,
 		Name:     data.Name,
 		Priority: data.Priority,
 		Filters:  data.Filters,
 		Config:   data.Config,
 		Driver:   data.Driver,
+		IsDelete: data.IsDelete,
 		IsStop:   data.IsStop,
 		Version:  data.UpdateAt.Format("20060102150405"),
 	})
 }
 
-func (i *imlStrategyService) GetStrategyCommit(ctx context.Context, commitId string) (*commit.Commit[StrategyCommit], error) {
+func (i *imlStrategyService) GetStrategyCommit(ctx context.Context, commitId string) (*commit.Commit[Commit], error) {
 	return i.commitService.Get(ctx, commitId)
 }
 
-func (i *imlStrategyService) LatestStrategyCommit(ctx context.Context, scope string, target string, strategyId string) (*commit.Commit[StrategyCommit], error) {
+func (i *imlStrategyService) LatestStrategyCommit(ctx context.Context, scope string, target string, strategyId string) (*commit.Commit[Commit], error) {
 	key := scope
 	if target != "" {
 		key = fmt.Sprintf("%s-%s", scope, target)
@@ -97,7 +98,7 @@ func (i *imlStrategyService) LatestStrategyCommit(ctx context.Context, scope str
 	return i.commitService.Latest(ctx, strategyId, key)
 }
 
-func (i *imlStrategyService) ListLatestStrategyCommit(ctx context.Context, scope string, target string, strategyIds ...string) ([]*commit.Commit[StrategyCommit], error) {
+func (i *imlStrategyService) ListLatestStrategyCommit(ctx context.Context, scope string, target string, strategyIds ...string) ([]*commit.Commit[Commit], error) {
 	key := scope
 	if target != "" {
 		key = fmt.Sprintf("%s-%s", scope, target)
@@ -105,7 +106,7 @@ func (i *imlStrategyService) ListLatestStrategyCommit(ctx context.Context, scope
 	return i.commitService.ListLatest(ctx, key, strategyIds...)
 }
 
-func (i *imlStrategyService) ListStrategyCommit(ctx context.Context, commitIds ...string) ([]*commit.Commit[StrategyCommit], error) {
+func (i *imlStrategyService) ListStrategyCommit(ctx context.Context, commitIds ...string) ([]*commit.Commit[Commit], error) {
 	if len(commitIds) < 1 {
 		return nil, fmt.Errorf("commit ids is empty")
 	}

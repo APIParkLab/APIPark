@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/APIParkLab/APIPark/gateway"
+	"github.com/eolinker/eosc"
+
 	strategy_driver "github.com/APIParkLab/APIPark/module/strategy/driver"
 
 	strategy_dto "github.com/APIParkLab/APIPark/module/strategy/dto"
@@ -22,20 +25,30 @@ func (d *strategyDriver) Driver() string {
 	return "data-masking"
 }
 
-func (d *strategyDriver) ToApinto(s strategy_dto.Strategy) interface{} {
+func (d *strategyDriver) ToRelease(s *strategy_dto.Strategy, labels map[string][]string, initStep int) *eosc.Base[gateway.StrategyRelease] {
 	filters := make(map[string][]string)
 
 	for _, f := range s.Filters {
 		filters[f.Name] = f.Values
 	}
-
-	return map[string]interface{}{
-		"name":        s.Filters,
-		"description": s.Desc,
-		"priority":    s.Priority,
-		"filters":     filters,
-		d.confName:    s.Config,
+	for key, value := range labels {
+		filters[key] = value
 	}
+
+	base := eosc.NewBase[gateway.StrategyRelease]()
+	base.Config = &gateway.StrategyRelease{
+		Name:     s.Id,
+		Desc:     s.Name,
+		Driver:   "data_mask",
+		Priority: initStep + s.Priority,
+		Filters:  filters,
+		IsDelete: s.IsDelete,
+	}
+	cfg := make(map[string]interface{})
+	cfg[d.confName] = s.Config
+	base.Append = cfg
+	return base
+
 }
 
 func (d *strategyDriver) Check(config interface{}) error {

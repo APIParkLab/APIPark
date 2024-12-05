@@ -13,6 +13,7 @@ import { ProtectedRoute } from "@core/components/aoplatform/RenderRoutes";
 import Login from "@core/pages/Login";
 import { useLocaleContext } from "./LocaleContext";
 import Root from "@core/pages/Root"
+import DataMaskingCompare from "@core/pages/policy/dataMasking/DataMaskingCompare";
 interface GlobalState {
     isAuthenticated: boolean;
     userData: UserData | null;
@@ -286,6 +287,7 @@ const globalReducer = (state: GlobalState, action: GlobalAction): GlobalState =>
 export const DefaultRouteConfig = [
   { path: '/', pathMatch: 'full', component: <Root /> ,key:'root',},
   { path: '/login', component: <Login /> ,key:'login'},
+  { path: '/dataMaskCompare/:logId/:serviceId?/:teamId?', component: <DataMaskingCompare /> ,key:'dataMaskCompare'},
   { path: '/', pathMatch:'prefix',component:<ProtectedRoute /> ,key:'basciLayout',children:[
     { path: '*', component: <ErrorBoundary><NotFound/></ErrorBoundary>, key: 'errorBoundary' }
   ]}
