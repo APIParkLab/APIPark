@@ -122,7 +122,7 @@ type LogItem struct {
 	Url           string         `json:"url"`
 	RemoteIP      string         `json:"remote_ip"`
 	Consumer      auto.Label     `json:"consumer" aolabel:"service"`
-	Authorization auto.Label     `json:"authorization" aolabel:"authorization"`
+	Authorization auto.Label     `json:"authorization" aolabel:"service_authorization"`
 	RecordTime    auto.TimeLabel `json:"record_time"`
 }
 
