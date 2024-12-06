@@ -1,4 +1,6 @@
 
+import { PageProColumns } from "@common/components/aoplatform/PageList";
+import { COLUMNS_TITLE } from "@common/const/const";
 import { EntityItem } from "@common/const/type";
 
 export type PartitionConfigFieldType = {
@@ -113,22 +115,43 @@ export type PartitionDashboardConfigFieldType = {
     addr: string
   }
 }
-export type PartitionDataLogConfigFieldType = {
-  create_time: string
-  id: string
-  update_time: string
-  updater: {
-    id: string
-    name: string
-  }
-  creator: {
-    id: string
-    name: string
-  }
-  config: {
-    headers: {
-      [k: string]: string
-    }
-    url: string
-  }
+export type PartitionDataLogHeaderListFieldType = {
+  key: string
+  value: string
+
 }
+export type PartitionDataLogConfigFieldType = {
+  headers: PartitionDataLogHeaderListFieldType[]
+  url: string
+}
+
+export const PARTITION_DATA_LOG_CONFIG_TABLE_COLUMNS: PageProColumns<PartitionDataLogConfigFieldType & { _id: string }>[] = [
+  {
+    title: ('标签'),
+    dataIndex: 'key',
+    formItemProps: {
+      className: 'p-0 bg-transparent border-none',
+      rootClassName: 'test',
+      rules: [
+        {
+          required: true,
+          whitespace: true
+        },
+      ],
+    },
+    ellipsis: true
+  },
+  {
+    title: ('内容'),
+    dataIndex: 'value',
+    formItemProps: {
+      className: 'p-0 bg-transparent border-none'
+    }
+  },
+  {
+    title: COLUMNS_TITLE.operate,
+    valueType: 'option',
+    btnNums: 2,
+    render: () => null
+  },
+];

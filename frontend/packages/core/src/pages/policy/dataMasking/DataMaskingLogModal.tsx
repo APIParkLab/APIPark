@@ -57,7 +57,7 @@ const DataMaskingLogModal = (props: any) => {
    */
   const operation: PageProColumns<any>[] = [
     {
-      title: '操作',
+      title: '',
       key: 'option',
       btnNums: 1,
       fixed: 'right',
@@ -89,7 +89,7 @@ const DataMaskingLogModal = (props: any) => {
       }
       return {
         ...x,
-        title: typeof x.title === 'string' ? $t(x.title as string) : x.title
+        title: (<span title={$t(x.title as string)}>{$t(x.title as string)}</span>)
       }
     })
     return res

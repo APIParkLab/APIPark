@@ -146,8 +146,20 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
             ...x,
             title: typeof x.title === 'string' ? $t(x.title) : x.title,
             ...(x.dataIndex === 'status' ? {
-                render:(_,entity)=>(
-                    entity.status === 0 ? $t('正常') : $t('无效'))
+                render:(_,entity)=> {
+                    switch(entity.change){
+                        case 'none':
+                            return '-'
+                        case 'new':
+                            return $t('新建')
+                        case 'update':
+                            return $t('更新')
+                        case 'delete':
+                            return $t('删除')
+                        default:
+                            return '-'
+                    }
+                }
             }:{})
         }
     }),[state.language])
