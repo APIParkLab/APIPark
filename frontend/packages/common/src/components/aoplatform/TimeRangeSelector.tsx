@@ -38,33 +38,32 @@ const TimeRangeSelector = (props: TimeRangeSelectorProps) => {
   }, [bindRef])
   // 根据选择的时间范围计算开始和结束时间
   const calculateTimeRange = (curBtn: 'hour' | 'day' | 'threeDays' | 'sevenDays') => {
-    const currentSecond = new Date().getTime() // 当前毫秒数时间戳
-    const currentMin = currentSecond - (currentSecond % (60 * 1000)) // 当前分钟数时间戳
-    let startMin = currentMin - 60 * 60 * 1000
+    const currentSecond = Math.floor(Date.now() / 1000); // 当前秒级时间戳
+    let startMin = currentSecond - 60 * 60
     switch (curBtn) {
       case 'hour': {
-        startMin = currentMin - 60 * 60 * 1000
+        startMin = currentSecond - 60 * 60
         break
       }
       case 'day': {
-        startMin = currentMin - 24 * 60 * 60 * 1000
+        startMin = currentSecond - 24 * 60 * 60
         break
       }
       case 'threeDays': {
         startMin =
-          new Date(new Date().setHours(0, 0, 0, 0)).getTime() -
-          2 * 24 * 60 * 60 * 1000
+          Math.floor(new Date().setHours(0, 0, 0, 0) / 1000) -
+          2 * 24 * 60 * 60
         break
       }
       case 'sevenDays': {
         startMin =
-          new Date(new Date().setHours(0, 0, 0, 0)).getTime() -
-          6 * 24 * 60 * 60 * 1000
+          Math.floor(new Date().setHours(0, 0, 0, 0) / 1000) -
+          6 * 24 * 60 * 60
         break
       }
     }
     if (onTimeRangeChange) {
-      onTimeRangeChange({ start: startMin / 1000, end: currentMin / 1000 });
+      onTimeRangeChange({ start: startMin, end: currentSecond });
     }
   };
 
