@@ -239,7 +239,7 @@ export const SystemSubscriberConfig = forwardRef<SystemSubscriberConfigHandle,Sy
         getSystemList()
     }, [serviceId]);
 
-    return  (<WithPermission access="team.service.subscription.add">
+    return  (<WithPermission access="">
         <Form
             layout='vertical'
             labelAlign='left'
