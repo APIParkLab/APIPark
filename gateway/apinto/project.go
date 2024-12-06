@@ -59,27 +59,11 @@ func (p *ProjectClient) online(ctx context.Context, project *gateway.ProjectRele
 		"project": project.Id,
 	}
 	if project.Upstream != nil {
-		//upstreams, err := matchLabels[entity.Service](ctx, p.client, gateway.ProfessionService, matches)
-		//if err != nil {
-		//	if !errors.Is(err, proto.Nil) {
-		//		return err
-		//	}
-		//}
-		//upstreamMap := utils.SliceToMap(upstreams, func(t *entity.Service) string {
-		//	return t.ID
-		//})
-
 		upstreamId := genWorkerID(project.Upstream.ID, gateway.ProfessionService)
 		err := p.client.Set(ctx, upstreamId, entity.ToService(project.Upstream, project.Version, matches))
 		if err != nil {
 			return err
 		}
-		//for id := range upstreamMap {
-		//	err = p.client.Del(ctx, id)
-		//	if err != nil {
-		//		return err
-		//	}
-		//}
 	}
 
 	routers, err := matchLabels[entity.Router](ctx, p.client, gateway.ProfessionRouter, matches)
@@ -105,6 +89,17 @@ func (p *ProjectClient) online(ctx context.Context, project *gateway.ProjectRele
 			return err
 		}
 		delete(routerMap, id)
+	}
+	// 发布策略
+	for _, s := range project.Strategies {
+		if s.Config.IsDelete {
+			p.client.Del(ctx, genWorkerID(s.Config.Name, gateway.ProfessionStrategy))
+			continue
+		}
+		err := p.client.Set(ctx, genWorkerID(s.Config.Name, gateway.ProfessionStrategy), s)
+		if err != nil {
+			return err
+		}
 	}
 	// 删除多余配置
 	for _, v := range routerMap {

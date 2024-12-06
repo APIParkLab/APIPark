@@ -331,7 +331,7 @@ func (i *imlStrategyModule) Publish(ctx context.Context, driver string, scope st
 					return err
 				}
 			}
-			publishStrategies = append(publishStrategies, d.ToRelease(strategy_dto.ToStrategy(l), nil, 0))
+			publishStrategies = append(publishStrategies, d.ToRelease(strategy_dto.ToStrategy(l), nil, 5000))
 
 			err = i.strategyService.CommitStrategy(txCtx, scope, target, l.Id, l)
 			if err != nil {
