@@ -62,7 +62,7 @@ const DataMaskingCompare = () => {
       <div className="flex h-full overflow-hidden">
         <div className="w-1/2 p-2  h-full">
           <div className="h-[30px] bg-gray-200 mb-2 flex items-center justify-center">
-            脱敏前
+            {$t('脱敏前')}
           </div>
           <div style={{ height: 'calc(100vh - 50px)' }}>
             <Codebox
@@ -77,7 +77,7 @@ const DataMaskingCompare = () => {
         </div>
         <div className="w-1/2 p-2 h-full">
           <div className="h-[30px] bg-green-100 mb-2 flex items-center justify-center">
-            脱敏后
+            {$t('脱敏后')}
           </div>
           <div style={{ height: 'calc(100vh - 50px)' }}>
             <Codebox
