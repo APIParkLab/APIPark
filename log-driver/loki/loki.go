@@ -45,9 +45,13 @@ func NewDriver(config string) (*Driver, error) {
 	if err != nil {
 		return nil, err
 	}
+	headers := map[string]string{}
+	for _, h := range cfg.Header {
+		headers[h.Key] = h.Value
+	}
 	return &Driver{
 		url:     cfg.URL,
-		headers: cfg.Header,
+		headers: headers,
 	}, nil
 }
 
