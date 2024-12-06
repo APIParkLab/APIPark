@@ -34,6 +34,8 @@ func (p *plugin) strategyApis() []pm3.Api {
 
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/strategy/global/:driver/to-publishs", []string{"context", "rest:driver"}, []string{"strategies", "source", "version_name", "is_publish"}, p.strategyController.ToPublish),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/strategy/global/:driver/logs", []string{"context", "query:keyword", "query:strategy", "query:begin", "query:end", "query:page_size", "query:page"}, []string{"logs", "total"}, p.strategyController.GetStrategyLogs),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/strategy/service/:driver/logs", []string{"context", "query:keyword", "query:strategy", "query:begin", "query:end", "query:page_size", "query:page"}, []string{"logs", "total"}, p.strategyController.GetStrategyLogs),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/strategy/global/:driver/log", []string{"context", "query:log"}, []string{"log"}, p.strategyController.LogInfo),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/strategy/service/:driver/log", []string{"context", "query:log"}, []string{"log"}, p.strategyController.LogInfo),
 	}
 }
