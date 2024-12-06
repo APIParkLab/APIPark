@@ -26,9 +26,11 @@ type TimeRangeSelectorProps = {
   onTimeButtonChange: (time: TimeRangeButton) => void
   labelSize?: 'small' | 'default'
   bindRef?: any
+  hideBtns?: TimeRangeButton[]
+  defaultTimeButton?: TimeRangeButton
 }
 const TimeRangeSelector = (props: TimeRangeSelectorProps) => {
-  const { initialTimeButton, initialDatePickerValue, onTimeRangeChange, hideTitle, onTimeButtonChange, labelSize = 'default', bindRef } = props
+  const { initialTimeButton, initialDatePickerValue, onTimeRangeChange, hideTitle, onTimeButtonChange, labelSize = 'default', bindRef, hideBtns = [], defaultTimeButton = 'hour' } = props
   const [timeButton, setTimeButton] = useState(initialTimeButton || '');
   const [datePickerValue, setDatePickerValue] = useState<RangeValue>(initialDatePickerValue || [null, null]);
   useEffect(() => {
@@ -37,7 +39,7 @@ const TimeRangeSelector = (props: TimeRangeSelectorProps) => {
     }
   }, [bindRef])
   // 根据选择的时间范围计算开始和结束时间
-  const calculateTimeRange = (curBtn: 'hour' | 'day' | 'threeDays' | 'sevenDays') => {
+  const calculateTimeRange = (curBtn: TimeRangeButton) => {
     const currentSecond = Math.floor(Date.now() / 1000); // 当前秒级时间戳
     let startMin = currentSecond - 60 * 60
     switch (curBtn) {
@@ -75,15 +77,15 @@ const TimeRangeSelector = (props: TimeRangeSelectorProps) => {
     calculateTimeRange(e.target.value);
   };
   const reset = () => {
-    setTimeButton('hour')
-    calculateTimeRange('hour')
+    setTimeButton(defaultTimeButton)
+    calculateTimeRange(defaultTimeButton)
     setDatePickerValue(null)
   }
 
   // 处理日期选择器的变化
   const handleDatePickerChange = (dates: RangeValue) => {
-    setTimeButton(dates ? '' : 'hour')
-    onTimeButtonChange?.(dates ? '' : 'hour')
+    setTimeButton(dates ? '' : defaultTimeButton)
+    onTimeButtonChange?.(dates ? '' : defaultTimeButton)
     setDatePickerValue(dates);
     if (dates && Array.isArray(dates) && dates.length === 2) {
       const [startDate, endDate] = dates;
@@ -94,7 +96,7 @@ const TimeRangeSelector = (props: TimeRangeSelectorProps) => {
       }
     }
     if (!dates) {
-      calculateTimeRange('hour')
+      calculateTimeRange(defaultTimeButton)
     }
   };
 
@@ -109,10 +111,10 @@ const TimeRangeSelector = (props: TimeRangeSelectorProps) => {
     <div className="flex flex-nowrap items-center  pt-btnybase mr-btnybase">
       {!hideTitle && <label className={`whitespace-nowrap `}>{$t('时间')}：</label>}
       <Radio.Group className="whitespace-nowrap" value={timeButton} onChange={handleRadioChange} buttonStyle="solid">
-        <Radio.Button value="hour">{$t('近1小时')}</Radio.Button>
-        <Radio.Button value="day">{$t('近24小时')}</Radio.Button>
-        <Radio.Button value="threeDays">{$t('近3天')}</Radio.Button>
-        <Radio.Button className="rounded-e-none" value="sevenDays">{$t('近7天')}</Radio.Button>
+        {hideBtns?.length && hideBtns.includes('hour') ? null : <Radio.Button value="hour">{$t('近1小时')}</Radio.Button>}
+        {hideBtns?.length && hideBtns.includes('day') ? null : <Radio.Button value="day">{$t('近24小时')}</Radio.Button>}
+        {hideBtns?.length && hideBtns.includes('threeDays') ? null : <Radio.Button value="threeDays">{$t('近3天')}</Radio.Button>}
+        {hideBtns?.length && hideBtns.includes('sevenDays') ? null : <Radio.Button className="rounded-e-none" value="sevenDays">{$t('近7天')}</Radio.Button>}
       </Radio.Group>
       <DatePicker.RangePicker
         value={datePickerValue}
