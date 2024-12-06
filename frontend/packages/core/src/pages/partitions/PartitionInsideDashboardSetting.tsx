@@ -8,7 +8,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import InsidePage from "@common/components/aoplatform/InsidePage.tsx";
 import { $t } from "@common/locales/index.ts";
 import DashboardSettingEdit, { DashboardPageShowStatus } from "./DashboardSettingEdit.tsx";
-import { PartitionDashboardConfigFieldType, PartitionDataLogConfigFieldType } from "@core/const/partitions/types.ts";
+import { PARTITION_DATA_LOG_CONFIG_TABLE_COLUMNS, PartitionDashboardConfigFieldType, PartitionDataLogConfigFieldType } from "@core/const/partitions/types.ts";
 import PageList from "@common/components/aoplatform/PageList.tsx";
 import DataLogSettingEdit from "./DataLogSettingEdit.tsx";
 
@@ -43,10 +43,11 @@ const PartitionInsideDashboardSetting: FC = () => {
     setDataLogLoading(true)
     return fetchData<BasicResponse<{ nodes: PartitionDataLogConfigFieldType[] }>>('log/loki', { method: 'GET', eoTransformKeys: [] }).then(response => {
       const { code, data, msg } = response
-      console.log('data====', data);
-
       if (code === STATUS_CODE.SUCCESS) {
-        data?.info && setDataLogData(data.info)
+        data?.info && setDataLogData({
+          url: data.info?.config?.url || '',
+          headers: data.info?.config?.headers  || []
+        })
         setShowDataLogStatus('view')
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
@@ -66,10 +67,17 @@ const PartitionInsideDashboardSetting: FC = () => {
     getDataLogSettingInfo()
   }, []);
 
-  const setDashboardSettingBtn = (type: string) => {
+  const setDashboardSettingBtn = () => {
     return (<>
       {showGraphStatus === 'view' && <WithPermission access="system.devops.data_source.edit" key="changeClusterConfig">
-        <Button type="primary" onClick={() => type === 'graph' ? setShowGraphStatus('edit') : setShowDataLogStatus('edit')}>{$t('修改配置')}</Button>
+        <Button type="primary" onClick={() => setShowGraphStatus('edit')}>{$t('修改配置')}</Button>
+      </WithPermission>}</>
+    )
+  }
+  const setDataLogSettingBtn = () => {
+    return (<>
+      {showDataLogStatus === 'view' && <WithPermission access="system.devops.data_source.edit" key="changeClusterConfig">
+        <Button type="primary" onClick={() => setShowDataLogStatus('edit')}>{$t('修改配置')}</Button>
       </WithPermission>}</>
     )
   }
@@ -94,7 +102,7 @@ const PartitionInsideDashboardSetting: FC = () => {
                   {!loading && !data?.driver && <Tag color='#f50'>{$t('未配置')}
                   </Tag>}</div>}
 
-                extra={setDashboardSettingBtn('graph')}>
+                extra={setDashboardSettingBtn()}>
                 {showGraphStatus === 'view' && data && data.driver && DashboardConfigPreview(data)}
                 {showGraphStatus !== 'view' && <DashboardSettingEdit data={data} changeStatus={setShowGraphStatus} refreshData={getDashboardSettingInfo} />}
               </Card>
@@ -111,7 +119,7 @@ const PartitionInsideDashboardSetting: FC = () => {
                   {!dataLogLoading && !dataLogData && <Tag color='#f50'>{$t('未配置')}
                   </Tag>}</div>}
 
-                extra={setDashboardSettingBtn('log')}>
+                extra={setDataLogSettingBtn()}>
                 {showDataLogStatus === 'view' && dataLogData && DataLogConfigPreview(dataLogData)}
                 {showDataLogStatus !== 'view' && <DataLogSettingEdit data={dataLogData} changeStatus={setShowDataLogStatus} refreshData={getDataLogSettingInfo} />}
               </Card>
@@ -131,39 +139,29 @@ export function DashboardConfigPreview(x: PartitionDashboardConfigFieldType) {
   </div>
 }
 export function DataLogConfigPreview(x: PartitionDataLogConfigFieldType) {
-  const columns = [
-    {
-      title: '标签',
-      dataIndex: 'tag',
-    },
-    {
-      title: '内容',
-      dataIndex: 'content'
+  const columns = PARTITION_DATA_LOG_CONFIG_TABLE_COLUMNS.map(x => {
+    return {
+      ...x,
+      title: (<span title={$t(x.title as string)}>{$t(x.title as string)}</span>)
     }
-  ]
+  })
   const getTableList = () => {
     return new Promise((resolve, reject) => {
       resolve({
-        data: x?.config?.headers ? Object.keys(x?.config?.headers).map((key) => {
-          return {
-            tag: key,
-            content: x?.config?.headers[key]
-          }
-        }) : [],
+        data: x?.headers || [],
         success: true
       })
     })
   }
-  console.log(getTableList());
 
   return <div className="flex flex-col gap-[4px] ">
-    <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('请求前缀')}：</Col><Col>{x?.config?.url}</Col></Row>
+    <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('请求前缀')}：</Col><Col>{x?.url}</Col></Row>
     <Row className=""><Col className="font-bold text-right pr-[4px]">{$t('HTTP 头部')}：</Col><Col className="w-full">
       <div className="w-full h-full p-[20px]">
         <PageList
           id="global_role"
           tableClass="role_table  mb-btnrbase"
-          primaryKey="'tag'"
+          primaryKey="'key'"
           columns={[...columns]}
           request={() => getTableList()}
           showPagination={false}

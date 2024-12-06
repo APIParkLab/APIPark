@@ -233,7 +233,6 @@ const DataMasking = (props: any) => {
    * @param entity 
    */
   const openLogsModal = (entity: any) => {
-    console.log('日志', entity);
     setStrategy(entity.id)
     setModalVisible(true)
   }

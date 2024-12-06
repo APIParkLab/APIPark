@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { PartitionDashboardConfigFieldType } from "../../const/partitions/types";
 import { DASHBOARD_SETTING_DRIVER_OPTION_LIST } from "../../const/partitions/const";
 import WithPermission from "@common/components/aoplatform/WithPermission";
-import { BasicResponse, PLACEHOLDER, STATUS_CODE, VALIDATE_MESSAGE } from "@common/const/const";
+import { BasicResponse, PLACEHOLDER, STATUS_CODE } from "@common/const/const";
 import { useFetch } from "@common/hooks/http";
 import { $t } from "@common/locales";
 
@@ -29,10 +29,10 @@ export type DashboardSettingEditProps = {
             fetchData<BasicResponse<{info: PartitionDashboardConfigFieldType}>>('monitor/config',{method: 'POST',body:JSON.stringify(value),eoParams:{}}).then(response=>{
                 const {code,msg} = response
                 if(code === STATUS_CODE.SUCCESS){
-                    message.success(msg || '操作成功，即将刷新页面')
+                    message.success(msg || $t('操作成功，即将刷新页面'))
                     refreshData?.()
                 }else{
-                    message.error(msg || '操作失败')
+                    message.error(msg || $t('操作失败'))
                 }
             })
         })
