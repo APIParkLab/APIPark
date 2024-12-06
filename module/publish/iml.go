@@ -200,7 +200,7 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 			var cfg interface{}
 			json.Unmarshal([]byte(s.Config), &cfg)
 			strategyReleases = append(strategyReleases, driver.ToRelease(&strategy_dto.Strategy{
-				Id:       fmt.Sprintf("%s-%s", projectID, s.Id),
+				Id:       fmt.Sprintf("%s", s.Id),
 				Name:     s.Name,
 				Priority: s.Priority,
 				Filters:  filters,
