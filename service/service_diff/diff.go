@@ -25,8 +25,8 @@ type ApiDiff struct {
 	Protocol []string   `json:"protocol,omitempty"`
 	Disable  bool       `json:"disable,omitempty"`
 	Path     string     `json:"path,omitempty"`
-	Change   ChangeType `json:"change,omitempty"`
-	Status   Status     `json:"status,omitempty"`
+	Change   ChangeType `json:"change"`
+	Status   Status     `json:"status"`
 }
 type UpstreamConfig struct {
 	Addr []string `json:"addr"`
@@ -35,16 +35,16 @@ type UpstreamDiff struct {
 	Upstream string `json:"upstream,omitempty" `
 	//Cluster string           `json:"partition,omitempty"`
 	Data   *upstream.Config `json:"data,omitempty"`
-	Change ChangeType       `json:"change,omitempty"`
-	Status StatusType       `json:"status,omitempty"`
+	Change ChangeType       `json:"change"`
+	Status StatusType       `json:"status"`
 }
 
 type StrategyDiff struct {
 	Strategy string     `json:"strategy,omitempty"`
 	Name     string     `json:"name"`
 	Priority int        `json:"priority"`
-	Change   ChangeType `json:"change,omitempty"`
-	Status   StatusType `json:"status,omitempty"`
+	Change   ChangeType `json:"change"`
+	Status   StatusType `json:"status"`
 }
 
 type Diff struct {
