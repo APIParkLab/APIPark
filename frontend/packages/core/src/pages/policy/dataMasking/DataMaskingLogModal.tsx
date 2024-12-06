@@ -21,7 +21,7 @@ const DataMaskingLogModal = (props: any) => {
   const [datePickerValue, setDatePickerValue] = useState<any>();
   const currentSecond = Math.floor(Date.now() / 1000); // 当前秒级时间戳
   const [queryData, setQueryData] = useState<SearchBody>({
-    start: currentSecond - 60 * 60,
+    start: currentSecond - 24 * 60 * 60,
     end: currentSecond
   })
   /**
@@ -43,7 +43,7 @@ const DataMaskingLogModal = (props: any) => {
   /**
    * 时间按钮
    */
-  const [timeButton, setTimeButton] = useState<'' | 'hour' | 'day' | 'threeDays' | 'sevenDays'>('hour');
+  const [timeButton, setTimeButton] = useState<'' | 'hour' | 'day' | 'threeDays' | 'sevenDays'>('day');
   /**
    * 绑定时间范围组件
    * @param instance
@@ -84,7 +84,7 @@ const DataMaskingLogModal = (props: any) => {
   const columns = useMemo(() => {
     const res = DATA_MASKING_TABLE_LOG_COLUMNS.map(x => {
       if (x.dataIndex === 'url') {
-        x.render = (text: any, record: any) => <><span className='text-green-500'>{record.method}</span>&nbsp;<span>{text}</span></>
+        x.render = (text: any, record: any) => <><div className='w-full'><span className='text-green-500'>{record.method}</span>&nbsp;<span className='w-[calc(100%-25px)] text-ellipsis overflow-hidden whitespace-nowrap inline-block align-top'>{text}</span></div></>
       }
       return {
         ...x,
@@ -161,6 +161,8 @@ const DataMaskingLogModal = (props: any) => {
               <TimeRangeSelector
                 labelSize="small"
                 bindRef={bindRef}
+                hideBtns={['hour']}
+                defaultTimeButton="day"
                 initialTimeButton={timeButton}
                 onTimeButtonChange={setTimeButton}
                 initialDatePickerValue={datePickerValue}
