@@ -6,8 +6,13 @@ import (
 )
 
 type DriverConfig struct {
-	URL    string            `json:"url"`
-	Header map[string]string `json:"headers"`
+	URL    string   `json:"url"`
+	Header []*Param `json:"headers"`
+}
+
+type Param struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 func (d *DriverConfig) Check() error {
