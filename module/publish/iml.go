@@ -208,7 +208,7 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 				IsDelete: s.IsDelete || s.IsStop,
 			}, map[string][]string{
 				"provider": {projectID},
-			}, 5000))
+			}, 0))
 		}
 		r.Strategies = strategyReleases
 	}

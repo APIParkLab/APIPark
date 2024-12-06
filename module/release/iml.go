@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
+	strategy_dto "github.com/APIParkLab/APIPark/module/strategy/dto"
 
 	"github.com/APIParkLab/APIPark/service/strategy"
 
@@ -55,27 +55,13 @@ func (m *imlReleaseModule) latestStrategyCommits(ctx context.Context, serviceId 
 	if err != nil {
 		return nil, fmt.Errorf("get latest strategy failed:%w", err)
 	}
-
-	return utils.SliceToSlice(list, func(s *strategy.Strategy) *commit.Commit[strategy.Commit] {
-		key := fmt.Sprintf("service-%s", s.Id)
-		return &commit.Commit[strategy.Commit]{
-			UUID:   uuid.NewString(),
-			Target: s.Id,
-			Key:    key,
-			Data: &strategy.Commit{
-				Id:       s.Id,
-				Name:     s.Name,
-				Priority: s.Priority,
-				Filters:  s.Filters,
-				Config:   s.Config,
-				Driver:   s.Driver,
-				IsStop:   s.IsStop,
-				Version:  s.UpdateAt.Format("20060102150405"),
-			},
+	for _, s := range list {
+		err = m.strategyService.CommitStrategy(ctx, strategy_dto.ScopeService, serviceId, s.Id, s)
+		if err != nil {
+			return nil, err
 		}
-	}, func(s *strategy.Strategy) bool {
-		return !s.IsDelete
-	}), nil
+	}
+	return m.strategyService.ListLatestStrategyCommit(ctx, strategy_dto.ScopeService, serviceId)
 }
 
 func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *dto.CreateInput) (string, error) {
@@ -136,13 +122,6 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 			return c.Key, c.UUID
 		})
 	})
-	strategies, err := m.latestStrategyCommits(ctx, serviceId)
-	if err != nil {
-		return "", err
-	}
-	strategyCommits := utils.SliceToMapO(strategies, func(c *commit.Commit[strategy.Commit]) (string, string) {
-		return c.Target, c.UUID
-	})
 
 	var newRelease *release.Release
 	err = m.transaction.Transaction(ctx, func(ctx context.Context) error {
@@ -196,6 +175,14 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 		if err != nil {
 			return err
 		}
+
+		strategies, err := m.latestStrategyCommits(ctx, serviceId)
+		if err != nil {
+			return err
+		}
+		strategyCommits := utils.SliceToMapO(strategies, func(c *commit.Commit[strategy.Commit]) (string, string) {
+			return c.Target, c.UUID
+		})
 
 		if !m.releaseService.Completeness(utils.SliceToSlice(clusters, func(s *cluster.Cluster) string {
 			return s.Uuid
