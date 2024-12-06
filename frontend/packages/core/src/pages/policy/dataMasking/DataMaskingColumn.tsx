@@ -27,7 +27,7 @@ export const DATA_MASKING_TABLE_COLUMNS: PageProColumns<any>[] = [
     filters: true,
     onFilter: false ,
     ellipsis: true,
-    width: 140,
+    width: 110,
     valueEnum: new Map(
       Object.keys(StrategyStatusEnum).map(key=>
         [key,
@@ -40,6 +40,7 @@ export const DATA_MASKING_TABLE_COLUMNS: PageProColumns<any>[] = [
     filters: true,
     onFilter: false ,
     ellipsis: true,
+    width: 90,
     valueEnum: {
       false: { text: <span className="text-status_success">{$t('启用')}</span> },
       true: { text: <span className="text-status_fail">{$t('禁用')}</span> }
@@ -53,7 +54,8 @@ export const DATA_MASKING_TABLE_COLUMNS: PageProColumns<any>[] = [
   {
     title: ('处理数'),
     dataIndex: 'processedTotal',
-    ellipsis: true
+    ellipsis: true,
+    width: 80,
   },
   {
     title: ('更新者'),

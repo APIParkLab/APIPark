@@ -37,6 +37,8 @@ const TableIconName = {
 const TableBtnWithPermission = ({ btnTitle, access, tooltip, disabled, navigateTo, onClick, className, btnType }: TableBtnWithPermissionProps) => {
 
   const [btnAccess, setBtnAccess] = useState<boolean>(false)
+  const [btnStatus, setBtnStatus] = useState<boolean>(false)
+  const [closeToolTip, setCloseToolTip] = useState<boolean>(false)
   const { accessData, checkPermission, accessInit } = useGlobalContext()
   const navigate = useNavigate()
   const lastAccess = useMemo(() => {
@@ -52,16 +54,27 @@ const TableBtnWithPermission = ({ btnTitle, access, tooltip, disabled, navigateT
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
+    setTimeout(() => {
+      setBtnStatus(false)
+      setCloseToolTip(true)
+    })
+    
     navigateTo ? navigate(navigateTo) : onClick?.()
   }, [navigateTo, navigate, onClick])
-
+  const changeTooltipStatus = (open: boolean) => {
+    setBtnStatus(open)
+    if (closeToolTip) {
+      setBtnStatus(false)
+      setCloseToolTip(false)
+    }
+  }
   return (<>{
     !btnAccess || (disabled && tooltip) ?
       <Tooltip placement="top" title={tooltip ?? $t('暂无(0)权限，请联系管理员分配。', [$t(btnTitle).toLowerCase()])}>
         <Button type="text" disabled={true} className={`h-[22px] border-none p-0 flex items-center bg-transparent ${className}`} key={btnType} icon={<Icon icon={TableIconName[btnType as keyof typeof TableIconName]} width="18" height="18" />} >{ }</Button>
       </Tooltip>
       :
-      <Tooltip placement="top" title={$t(btnTitle)}>
+      <Tooltip placement="top" title={$t(btnTitle)} trigger='hover' open={btnStatus} onOpenChange={changeTooltipStatus}>
         <Button type="text" disabled={disabled} className={`h-[22px] border-none p-0 flex items-center bg-transparent ${className} `} key={btnType} icon={<Icon icon={TableIconName[btnType as keyof typeof TableIconName]} width="18" height="18" />} onClick={handleClick}>{ }</Button>
       </Tooltip>
 
