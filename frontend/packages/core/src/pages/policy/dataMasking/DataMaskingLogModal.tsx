@@ -14,16 +14,15 @@ import { useFetch } from '@common/hooks/http';
 import TimeRangeSelector, { TimeRange } from '@common/components/aoplatform/TimeRangeSelector';
 import { SearchBody } from '@dashboard/const/type';
 import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission';
-import { getTime } from '@dashboard/utils/dashboard';
 const DataMaskingLogModal = (props: any) => {
   const { strategy } = props;
   const { state, accessData } = useGlobalContext()
   const { serviceId, teamId } = useParams<RouterParams>()
   const [datePickerValue, setDatePickerValue] = useState<any>();
-  const defaultTime = getTime('hour', datePickerValue)
+  const currentSecond = Math.floor(Date.now() / 1000); // 当前秒级时间戳
   const [queryData, setQueryData] = useState<SearchBody>({
-    start: defaultTime.startTime,
-    end: defaultTime.endTime
+    start: currentSecond - 60 * 60,
+    end: currentSecond
   })
   /**
    * 请求数据
