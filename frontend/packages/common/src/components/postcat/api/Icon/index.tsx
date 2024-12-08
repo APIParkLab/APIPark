@@ -295,7 +295,7 @@ export interface IconParkIconElement extends HTMLElement {
       | 'apispace'
       | 'auto-generate-api'
       | 'compare-api'
-      | 'multi-protocal'
+      | 'multi-protocol'
       | 'read-good'
       | 'richdoc'
       | 'mockapi'
