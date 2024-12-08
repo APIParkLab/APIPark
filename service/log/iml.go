@@ -35,7 +35,7 @@ func (i *imlLogService) OnComplete() {
 		if err != nil {
 			continue
 		}
-		driver, err := factory.Create(s.Config)
+		driver, _, err := factory.Create(s.Config)
 		if err != nil {
 			continue
 		}
@@ -45,10 +45,6 @@ func (i *imlLogService) OnComplete() {
 }
 
 func (i *imlLogService) UpdateLogSource(ctx context.Context, driver string, input *Save) error {
-	factory, has := log_driver.GetFactory(driver)
-	if !has {
-		return errors.New("driver not found")
-	}
 	s, err := i.store.First(ctx, map[string]interface{}{"driver": driver})
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -83,15 +79,7 @@ func (i *imlLogService) UpdateLogSource(ctx context.Context, driver string, inpu
 		s.Updater = utils.UserId(ctx)
 		s.UpdateAt = time.Now()
 	}
-	newDriver, err := factory.Create(s.Config)
-	if err != nil {
-		return err
-	}
-	err = i.store.Save(ctx, s)
-	if err != nil {
-		return err
-	}
-	log_driver.SetDriver(driver, newDriver)
+
 	return nil
 }
 
