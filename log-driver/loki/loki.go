@@ -21,7 +21,7 @@ func init() {
 type factory struct {
 }
 
-func (f *factory) Create(config string) (log_driver.ILogDriver, error) {
+func (f *factory) Create(config string) (log_driver.ILogDriver, map[string]interface{}, error) {
 
 	return NewDriver(config)
 }
@@ -35,24 +35,27 @@ type Driver struct {
 	headers map[string]string
 }
 
-func NewDriver(config string) (*Driver, error) {
+func NewDriver(config string) (*Driver, map[string]interface{}, error) {
 	cfg := new(DriverConfig)
 	err := json.Unmarshal([]byte(config), cfg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	err = cfg.Check()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	headers := map[string]string{}
 	for _, h := range cfg.Header {
 		headers[h.Key] = h.Value
 	}
 	return &Driver{
-		url:     cfg.URL,
-		headers: headers,
-	}, nil
+			url:     cfg.URL,
+			headers: headers,
+		}, map[string]interface{}{
+			"url":     cfg.URL,
+			"headers": headers,
+		}, nil
 }
 
 func (d *Driver) LogInfo(clusterId string, id string) (*log_driver.LogInfo, error) {
