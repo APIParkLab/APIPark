@@ -25,23 +25,7 @@ type imlLogService struct {
 }
 
 func (i *imlLogService) OnComplete() {
-	drivers := log_driver.Drivers()
-	for _, d := range drivers {
-		factory, has := log_driver.GetFactory(d)
-		if !has {
-			continue
-		}
-		s, err := i.GetLogSource(context.Background(), d)
-		if err != nil {
-			continue
-		}
-		driver, _, err := factory.Create(s.Config)
-		if err != nil {
-			continue
-		}
-		log_driver.SetDriver(d, driver)
 
-	}
 }
 
 func (i *imlLogService) UpdateLogSource(ctx context.Context, driver string, input *Save) error {
@@ -78,6 +62,11 @@ func (i *imlLogService) UpdateLogSource(ctx context.Context, driver string, inpu
 		}
 		s.Updater = utils.UserId(ctx)
 		s.UpdateAt = time.Now()
+	}
+
+	err = i.store.Save(ctx, s)
+	if err != nil {
+		return err
 	}
 
 	return nil
