@@ -85,7 +85,7 @@ func (i *imlLogModule) Save(ctx context.Context, driver string, input *log_dto.S
 		cfg = &tmp
 	}
 	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		err := i.service.UpdateLogSource(ctx, driver, &log.Save{
+		err := i.service.UpdateLogSource(txCtx, driver, &log.Save{
 			ID:      input.ID,
 			Cluster: &input.Cluster,
 			Config:  cfg,
@@ -93,7 +93,7 @@ func (i *imlLogModule) Save(ctx context.Context, driver string, input *log_dto.S
 		if err != nil {
 			return err
 		}
-		info, err := i.service.GetLogSource(ctx, driver)
+		info, err := i.service.GetLogSource(txCtx, driver)
 		if err != nil {
 			return err
 		}
@@ -102,10 +102,11 @@ func (i *imlLogModule) Save(ctx context.Context, driver string, input *log_dto.S
 			return err
 		}
 
-		client, err := i.clusterService.GatewayClient(ctx, input.Cluster)
+		client, err := i.clusterService.GatewayClient(txCtx, input.Cluster)
 		if err != nil {
 			return err
 		}
+		defer client.Close(txCtx)
 		dynamicClient, err := client.Dynamic(driver)
 		if err != nil {
 			return err
@@ -118,7 +119,7 @@ func (i *imlLogModule) Save(ctx context.Context, driver string, input *log_dto.S
 		for k, v := range c {
 			attr[k] = v
 		}
-		err = dynamicClient.Online(ctx, &gateway.DynamicRelease{
+		err = dynamicClient.Online(txCtx, &gateway.DynamicRelease{
 			BasicItem: &gateway.BasicItem{
 				ID:          driver,
 				Description: "collect access log",
@@ -158,4 +159,54 @@ func (i *imlLogModule) Get(ctx context.Context, driver string) (*log_dto.LogSour
 		CreateAt: auto.TimeLabel(info.CreateAt),
 		UpdateAt: auto.TimeLabel(info.UpdateAt),
 	}, nil
+}
+
+func (i *imlLogModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
+	drivers := log_driver.Drivers()
+	if len(drivers) < 1 {
+		return nil
+	}
+
+	for _, driver := range drivers {
+		factory, has := log_driver.GetFactory(driver)
+		if !has {
+			continue
+		}
+		info, err := i.service.GetLogSource(ctx, driver)
+		if err != nil {
+			continue
+		}
+		d, c, err := factory.Create(info.Config)
+		if err != nil {
+			continue
+		}
+
+		dynamicClient, err := clientDriver.Dynamic(driver)
+		if err != nil {
+			continue
+		}
+		attr := make(map[string]interface{})
+		attr["driver"] = driver
+		attr["formatter"] = logFormatter
+		attr["labels"] = labels
+		attr["method"] = "POST"
+		for k, v := range c {
+			attr[k] = v
+		}
+		err = dynamicClient.Online(ctx, &gateway.DynamicRelease{
+			BasicItem: &gateway.BasicItem{
+				ID:          driver,
+				Description: "collect access log",
+				Version:     time.Now().Format("20060102150405"),
+				Resource:    gateway.ProfessionOutput,
+			},
+			Attr: attr,
+		})
+		if err != nil {
+			continue
+		}
+		log_driver.SetDriver(driver, d)
+	}
+
+	return nil
 }

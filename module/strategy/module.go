@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/APIParkLab/APIPark/gateway"
+
 	"github.com/eolinker/go-common/autowire"
 
 	_ "github.com/APIParkLab/APIPark/module/strategy/driver/data-masking"
@@ -32,6 +34,7 @@ type IStrategyModule interface {
 func init() {
 	strategyModule := new(imlStrategyModule)
 	autowire.Auto[IStrategyModule](func() reflect.Value {
+		gateway.RegisterInitHandleFunc(strategyModule.initGateway)
 		return reflect.ValueOf(strategyModule)
 	})
 }
