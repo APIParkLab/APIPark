@@ -57,7 +57,7 @@ const CertConfigModal = forwardRef<PartitionCertConfigHandle,PartitionCertConfig
         }
     }, []);
 
-    return (<WithPermission access={type === 'edit' ? 'system.devops.ssl_certificate.edit':'system.devops.ssl_certificate.add'}>
+    return (<WithPermission access=''>
         <Form
             layout='vertical'
             labelAlign='left'
@@ -187,7 +187,7 @@ const PartitionInsideCert:FC = ()=>{
         switch (type){
             case 'add':
                 title=$t('添加证书')
-                content= <CertConfigModal   ref={addRef} type="add"/>
+                content= <WithPermission access='system.devops.ssl_certificate.add'><CertConfigModal   ref={addRef} type="add"/></WithPermission>
                 break;
             case 'edit':{
                 title=$t('修改证书')
@@ -195,7 +195,7 @@ const PartitionInsideCert:FC = ()=>{
                 const {code,data,msg} = await fetchData<BasicResponse<{cert:{key:string, pem:string}}>>('certificate',{method:'GET',eoParams:{id:entity!.id}})
                 message.destroy()
                 if(code === STATUS_CODE.SUCCESS){
-                    content= <CertConfigModal ref={editRef}  type="edit" entity={{...data.cert,id:entity!.id}}/>
+                    content= <WithPermission access={'system.devops.ssl_certificate.edit'}><CertConfigModal ref={editRef}  type="edit" entity={{...data.cert,id:entity!.id}}/></WithPermission>
                 }else{
                     message.error(msg || $t(RESPONSE_TIPS.error))
                     return
