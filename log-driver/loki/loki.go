@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/eolinker/eosc/log"
+
 	log_driver "github.com/APIParkLab/APIPark/log-driver"
 )
 
@@ -69,6 +71,8 @@ func (d *Driver) LogInfo(clusterId string, id string) (*log_driver.LogInfo, erro
 	queries.Set("start", strconv.FormatInt(start.UnixNano(), 10))
 	queries.Set("end", strconv.FormatInt(now.UnixNano(), 10))
 	queries.Set("limit", "1")
+	log.Debug("query is ", queries.Get("query"))
+
 	list, err := send[LogInfo](http.MethodGet, fmt.Sprintf("%s/loki/api/v1/query_range", d.url), d.headers, queries, "")
 	if err != nil {
 		return nil, err
@@ -103,10 +107,13 @@ func (d *Driver) LogCount(clusterId string, conditions map[string]string, spendH
 	}
 	queries := url.Values{}
 	queries.Set("query", fmt.Sprintf("sum(count_over_time({cluster=\"%s\"} | json %s [%dh])) by (%s)", clusterId, tmpCondition, spendHour, group))
+	sendRequestTime := time.Now()
 	list, err := send[LogCount](http.MethodGet, fmt.Sprintf("%s/loki/api/v1/query", d.url), d.headers, queries, "")
 	if err != nil {
 		return nil, err
 	}
+	log.DebugF("send request spend time: %v", time.Now().Sub(sendRequestTime))
+	log.Debug("query is ", queries.Get("query"))
 	result := make(map[string]int64)
 	for _, l := range list {
 		if len(l.Value) != 2 {
@@ -161,6 +168,7 @@ func (d *Driver) Logs(clusterId string, conditions map[string]string, start time
 	queries.Set("limit", strconv.FormatInt(limit, 10))
 	queries.Set("direction", "backward")
 	queries.Set("start", strconv.FormatInt(start.UnixNano(), 10))
+	log.Debug("query is ", queries.Get("query"))
 	logs, err := d.recuseLogs(queries, end, offset)
 	if err != nil {
 		return nil, 0, err
@@ -262,10 +270,13 @@ func send[T any](method string, uri string, headers map[string]string, queries u
 	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
+	log.DebugF("do request: %s", uri)
+	doRequestTime := time.Now()
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
+	log.DebugF("do request spend time: %v", time.Now().Sub(doRequestTime))
 	defer resp.Body.Close()
 	respData, err := io.ReadAll(resp.Body)
 	if err != nil {

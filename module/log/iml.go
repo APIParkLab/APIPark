@@ -20,6 +20,7 @@ import (
 
 	log_dto "github.com/APIParkLab/APIPark/module/log/dto"
 	"github.com/APIParkLab/APIPark/service/log"
+	log_print "github.com/eolinker/eosc/log"
 )
 
 var _ ILogModule = (*imlLogModule)(nil)
@@ -116,6 +117,8 @@ func (i *imlLogModule) Save(ctx context.Context, driver string, input *log_dto.S
 		attr["formatter"] = logFormatter
 		attr["labels"] = labels
 		attr["method"] = "POST"
+		attr["scopes"] = []string{"access_log"}
+		attr["type"] = "json"
 		for k, v := range c {
 			attr[k] = v
 		}
@@ -161,6 +164,32 @@ func (i *imlLogModule) Get(ctx context.Context, driver string) (*log_dto.LogSour
 	}, nil
 }
 
+func (i *imlLogModule) OnComplete() {
+	drivers := log_driver.Drivers()
+	if len(drivers) < 1 {
+		return
+	}
+	ctx := context.Background()
+	for _, driver := range drivers {
+		factory, has := log_driver.GetFactory(driver)
+		if !has {
+			log_print.Errorf("driver %s not found", driver)
+			continue
+		}
+		info, err := i.service.GetLogSource(ctx, driver)
+		if err != nil {
+			log_print.Errorf("get log source %s error: %s", driver, err)
+			continue
+		}
+		d, _, err := factory.Create(info.Config)
+		if err != nil {
+			log_print.Errorf("create driver %s error: %s,config: %s", driver, err, info.Config)
+			continue
+		}
+		log_driver.SetDriver(driver, d)
+	}
+}
+
 func (i *imlLogModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
 	drivers := log_driver.Drivers()
 	if len(drivers) < 1 {
@@ -170,19 +199,23 @@ func (i *imlLogModule) initGateway(ctx context.Context, clusterId string, client
 	for _, driver := range drivers {
 		factory, has := log_driver.GetFactory(driver)
 		if !has {
+			log_print.Errorf("driver %s not found", driver)
 			continue
 		}
 		info, err := i.service.GetLogSource(ctx, driver)
 		if err != nil {
+			log_print.Errorf("get log source %s error: %s", driver, err)
 			continue
 		}
 		d, c, err := factory.Create(info.Config)
 		if err != nil {
+			log_print.Errorf("create driver %s error: %s,config: %s", driver, err, info.Config)
 			continue
 		}
-
+		log_driver.SetDriver(driver, d)
 		dynamicClient, err := clientDriver.Dynamic(driver)
 		if err != nil {
+			log_print.Errorf("get dynamic client %s error: %s", driver, err)
 			continue
 		}
 		attr := make(map[string]interface{})
@@ -203,9 +236,10 @@ func (i *imlLogModule) initGateway(ctx context.Context, clusterId string, client
 			Attr: attr,
 		})
 		if err != nil {
+			log_print.Errorf("online driver %s error: %s", driver, err)
 			continue
 		}
-		log_driver.SetDriver(driver, d)
+
 	}
 
 	return nil
