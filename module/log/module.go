@@ -6,6 +6,7 @@ import (
 
 	"github.com/eolinker/go-common/autowire"
 
+	"github.com/APIParkLab/APIPark/gateway"
 	log_dto "github.com/APIParkLab/APIPark/module/log/dto"
 )
 
@@ -15,7 +16,11 @@ type ILogModule interface {
 }
 
 func init() {
+	logModule := new(imlLogModule)
+
 	autowire.Auto[ILogModule](func() reflect.Value {
-		return reflect.ValueOf(new(imlLogModule))
+
+		gateway.RegisterInitHandleFunc(logModule.initGateway)
+		return reflect.ValueOf(logModule)
 	})
 }

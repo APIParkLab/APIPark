@@ -25,30 +25,10 @@ type imlLogService struct {
 }
 
 func (i *imlLogService) OnComplete() {
-	drivers := log_driver.Drivers()
-	for _, d := range drivers {
-		factory, has := log_driver.GetFactory(d)
-		if !has {
-			continue
-		}
-		s, err := i.GetLogSource(context.Background(), d)
-		if err != nil {
-			continue
-		}
-		driver, err := factory.Create(s.Config)
-		if err != nil {
-			continue
-		}
-		log_driver.SetDriver(d, driver)
 
-	}
 }
 
 func (i *imlLogService) UpdateLogSource(ctx context.Context, driver string, input *Save) error {
-	factory, has := log_driver.GetFactory(driver)
-	if !has {
-		return errors.New("driver not found")
-	}
 	s, err := i.store.First(ctx, map[string]interface{}{"driver": driver})
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -83,15 +63,12 @@ func (i *imlLogService) UpdateLogSource(ctx context.Context, driver string, inpu
 		s.Updater = utils.UserId(ctx)
 		s.UpdateAt = time.Now()
 	}
-	newDriver, err := factory.Create(s.Config)
-	if err != nil {
-		return err
-	}
+
 	err = i.store.Save(ctx, s)
 	if err != nil {
 		return err
 	}
-	log_driver.SetDriver(driver, newDriver)
+
 	return nil
 }
 
