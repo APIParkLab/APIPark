@@ -34,7 +34,7 @@ func newAIUpstream(provider string, uri model_runtime.IProviderURI) *gateway.Dyn
 			"driver":    "http",
 			"balance":   "round-robin",
 			"nodes":     []string{fmt.Sprintf("%s weight=100", uri.Host())},
-			"pass_node": "node",
+			"pass_host": "node",
 			"scheme":    uri.Scheme(),
 			"timeout":   300000,
 		},
