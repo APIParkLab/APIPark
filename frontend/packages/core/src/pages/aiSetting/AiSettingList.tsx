@@ -106,9 +106,9 @@ const AiSettingList = ()=>{
                             </a>
                             <div>
                             <CancelBtn/>
-                            <WithPermission access="system.devops.ai_provider.edit" showDisabled={false}>
-                                <OkBtn/>
-                            </WithPermission>
+                            {
+                                checkAccess('system.devops.ai_provider.edit', accessData) ? <OkBtn/> : null
+                            }
                             </div>
                         </div>
                 );
