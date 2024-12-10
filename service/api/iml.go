@@ -162,6 +162,9 @@ func (i *imlAPIService) Save(ctx context.Context, id string, model *Edit) error 
 		if model.Disable != nil {
 			ev.Disable = *model.Disable
 		}
+		if model.Upstream != nil {
+			ev.Upstream = *model.Upstream
+		}
 
 		e := i.apiInfoStore.Save(ctx, ev)
 		if e != nil {
