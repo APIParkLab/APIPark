@@ -27,7 +27,7 @@ type imlAPIController struct {
 }
 
 func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_api_dto.CreateAPI) (*ai_api_dto.API, error) {
-	info, err := i.serviceModule.Get(ctx, serviceId)
+	_, err := i.serviceModule.Get(ctx, serviceId)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 			plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
 					"model":    input.AiModel.Id,
-					"provider": fmt.Sprintf("%s@ai-provider", info.Provider.Id),
+					"provider": fmt.Sprintf("%s@ai-provider", input.AiModel.Provider),
 					"config":   input.AiModel.Config,
 				},
 			}
@@ -73,7 +73,7 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 				Retry:   input.Retry,
 				Plugins: plugins,
 			},
-			Upstream: info.Provider.Id,
+			Upstream: input.AiModel.Provider,
 			Disable:  false,
 		})
 
@@ -86,7 +86,7 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 }
 
 func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string, input *ai_api_dto.EditAPI) (*ai_api_dto.API, error) {
-	info, err := i.serviceModule.Get(ctx, serviceId)
+	_, err := i.serviceModule.Get(ctx, serviceId)
 	if err != nil {
 		return nil, err
 	}
@@ -106,11 +106,11 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 			proxy.Plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
 					"model":    input.AiModel.Id,
-					"provider": fmt.Sprintf("%s@ai-provider", info.Provider.Id),
+					"provider": fmt.Sprintf("%s@ai-provider", input.AiModel.Provider),
 					"config":   input.AiModel.Config,
 				},
 			}
-			upstream = &info.Provider.Id
+			upstream = &input.AiModel.Provider
 		}
 
 		if input.AiPrompt != nil {
