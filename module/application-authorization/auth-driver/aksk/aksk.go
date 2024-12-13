@@ -3,9 +3,9 @@ package aksk
 import (
 	"encoding/json"
 	"fmt"
-	
+
 	auth_driver "github.com/APIParkLab/APIPark/module/application-authorization/auth-driver"
-	
+
 	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
 )
 
@@ -26,8 +26,7 @@ type Config struct {
 }
 
 func (a *Config) ID() string {
-	//TODO implement me
-	panic("implement me")
+	return a.Ak
 }
 
 func (a *Config) Valid() ([]byte, error) {
