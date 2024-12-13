@@ -77,7 +77,8 @@ export default defineConfig({
         target: 'http://172.18.166.219:8288/',
         changeOrigin: true,
       }
-    }
+    },
+    open: true
   },
   logLevel:'info'
 })
