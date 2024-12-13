@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	log_print "github.com/eolinker/eosc/log"
+
 	"github.com/google/uuid"
 
 	log_driver "github.com/APIParkLab/APIPark/log-driver"
@@ -26,29 +28,31 @@ type imlLogService struct {
 
 func (i *imlLogService) OnComplete() {
 	drivers := log_driver.Drivers()
-	for _, d := range drivers {
-		factory, has := log_driver.GetFactory(d)
+	if len(drivers) < 1 {
+		return
+	}
+	ctx := context.Background()
+	for _, driver := range drivers {
+		factory, has := log_driver.GetFactory(driver)
 		if !has {
+			log_print.Errorf("driver %s not found", driver)
 			continue
 		}
-		s, err := i.GetLogSource(context.Background(), d)
+		info, err := i.GetLogSource(ctx, driver)
 		if err != nil {
+			log_print.Errorf("get log source %s error: %s", driver, err)
 			continue
 		}
-		driver, err := factory.Create(s.Config)
+		d, _, err := factory.Create(info.Config)
 		if err != nil {
+			log_print.Errorf("create driver %s error: %s,config: %s", driver, err, info.Config)
 			continue
 		}
-		log_driver.SetDriver(d, driver)
-
+		log_driver.SetDriver(driver, d)
 	}
 }
 
 func (i *imlLogService) UpdateLogSource(ctx context.Context, driver string, input *Save) error {
-	factory, has := log_driver.GetFactory(driver)
-	if !has {
-		return errors.New("driver not found")
-	}
 	s, err := i.store.First(ctx, map[string]interface{}{"driver": driver})
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -83,15 +87,12 @@ func (i *imlLogService) UpdateLogSource(ctx context.Context, driver string, inpu
 		s.Updater = utils.UserId(ctx)
 		s.UpdateAt = time.Now()
 	}
-	newDriver, err := factory.Create(s.Config)
-	if err != nil {
-		return err
-	}
+
 	err = i.store.Save(ctx, s)
 	if err != nil {
 		return err
 	}
-	log_driver.SetDriver(driver, newDriver)
+
 	return nil
 }
 

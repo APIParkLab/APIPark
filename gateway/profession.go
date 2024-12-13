@@ -57,42 +57,10 @@ var dynamicResourceMap = map[string]Worker{
 		Profession: ProfessionCertificate,
 		Driver:     "server",
 	},
-	//"openai": {
-	//	Profession: ProfessionAIProvider,
-	//	Driver:     "openai",
-	//},
-	//"google": {
-	//	Profession: ProfessionAIProvider,
-	//	Driver:     "google",
-	//},
-	//"anthropic": {
-	//	Profession: ProfessionAIProvider,
-	//	Driver:     "anthropic",
-	//},
-	//"moonshot": {
-	//	Profession: ProfessionAIProvider,
-	//	Driver:     "moonshot",
-	//},
-	//"tongyi": {
-	//	Profession: ProfessionAIProvider,
-	//	Driver:     "tongyi",
-	//},
-	//"zhipuai": {
-	//	Profession: ProfessionAIProvider,
-	//	Driver:     "zhipuai",
-	//},
-	//"fireworks": {
-	//	Profession: ProfessionAIProvider,
-	//	Driver:     "fireworks",
-	//},
-	//"novita": {
-	//	Profession: ProfessionAIProvider,
-	//	Driver:     "novita",
-	//},
-	//"mistralai": {
-	//	Profession: ProfessionAIProvider,
-	//	Driver:     "mistralai",
-	//},
+	"loki": {
+		Profession: ProfessionOutput,
+		Driver:     "loki",
+	},
 }
 
 type Worker struct {

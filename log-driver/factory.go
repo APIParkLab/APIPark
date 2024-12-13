@@ -7,7 +7,7 @@ var (
 )
 
 type IFactory interface {
-	Create(config string) (ILogDriver, error)
+	Create(config string) (ILogDriver, map[string]interface{}, error)
 }
 
 type factoryManager struct {
