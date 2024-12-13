@@ -486,17 +486,17 @@ export const PERMISSION_DEFINITION = [
       },
       "team.application.subscription.add": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.subscription.subscribe"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all","team.consumer.subscription.subscribe"] }]
         }
       },
       "team.application.subscription.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.subscription.manager_subscribed_services"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all","team.consumer.subscription.manager_subscribed_services"] }]
         }
       },
       "team.application.subscription.delete": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.team.consumer.subscription.manager_subscribed_services"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all","team.team.consumer.subscription.manager_subscribed_services"] }]
         }
       },
       "team.application.application.view": {
@@ -506,47 +506,47 @@ export const PERMISSION_DEFINITION = [
       },
       "team.application.application.add": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al",'team.team.consumer.manager',"team.consumer.application.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all",'team.team.consumer.manager',"team.consumer.application.manager"] }]
         }
       },
       "team.application.application.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al",'team.team.consumer.manager',"team.consumer.application.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all",'team.team.consumer.manager',"team.consumer.application.manager"] }]
         }
       },
       "team.application.application.delete": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al",'team.team.consumer.manager',"team.consumer.application.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all",'team.team.consumer.manager',"team.consumer.application.manager"] }]
         }
       },
       "team.consumer.authorization.view": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al","system.workspace.application.view_all","team.consumer.authorization.view"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all","system.workspace.application.view_all","team.consumer.authorization.view"] }]
         }
       },
       "team.application.authorization.add": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.authorization.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all","team.consumer.authorization.manager"] }]
         }
       },
       "team.application.authorization.edit": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.authorization.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all","team.consumer.authorization.manager"] }]
         }
       },
       "team.application.authorization.delete": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.authorization.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all","team.consumer.authorization.manager"] }]
         }
       },
       "team.application.authorization.cancelSubApply": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.authorization.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all","team.consumer.authorization.manager"] }]
         }
       },
       "team.application.authorization.cancelSub": {
         "granted": {
-          "anyOf": [{ "backend": ["system.workspace.application.manager_al","team.consumer.authorization.manager"] }]
+          "anyOf": [{ "backend": ["system.workspace.application.manager_all","team.consumer.authorization.manager"] }]
         }
       },
       "team.team.team.view": {
