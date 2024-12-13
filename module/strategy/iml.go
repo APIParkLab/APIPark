@@ -359,3 +359,36 @@ func (i *imlStrategyModule) Delete(ctx context.Context, id string) error {
 	}
 	return i.strategyService.SortDelete(ctx, id)
 }
+
+func (i *imlStrategyModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
+	commits, err := i.strategyService.ListLatestStrategyCommit(ctx, strategy_dto.ScopeGlobal, "")
+	if err != nil {
+		return err
+	}
+	publishStrategies := make([]*eosc.Base[gateway.StrategyRelease], 0, len(commits))
+	for _, c := range commits {
+		l := c.Data
+		if l.IsDelete {
+			err = i.strategyService.Delete(ctx, l.Id)
+			if err != nil {
+				return err
+			}
+		}
+		d, has := strategy_driver.GetDriver(l.Driver)
+		if !has {
+			continue
+		}
+		publishStrategies = append(publishStrategies, d.ToRelease(strategy_dto.ToStrategy(&strategy.Strategy{
+			Id:       l.Id,
+			Name:     l.Name,
+			Priority: l.Priority,
+			Filters:  l.Filters,
+			Config:   l.Config,
+			Driver:   l.Driver,
+			IsStop:   l.IsStop,
+			IsDelete: l.IsDelete,
+		}), nil, 5000))
+	}
+
+	return clientDriver.Strategy().Online(ctx, publishStrategies...)
+}

@@ -20,7 +20,6 @@ func NewDynamicClient(client admin_client.Client, resource string) (*DynamicClie
 	cfg, has := gateway.GetDynamicResourceDriver(resource)
 	if !has {
 		return nil, errors.New("resource not found")
-
 	}
 
 	return &DynamicClient{client: client, profession: cfg.Profession, driver: cfg.Driver}, nil
