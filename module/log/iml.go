@@ -165,29 +165,7 @@ func (i *imlLogModule) Get(ctx context.Context, driver string) (*log_dto.LogSour
 }
 
 func (i *imlLogModule) OnComplete() {
-	drivers := log_driver.Drivers()
-	if len(drivers) < 1 {
-		return
-	}
-	ctx := context.Background()
-	for _, driver := range drivers {
-		factory, has := log_driver.GetFactory(driver)
-		if !has {
-			log_print.Errorf("driver %s not found", driver)
-			continue
-		}
-		info, err := i.service.GetLogSource(ctx, driver)
-		if err != nil {
-			log_print.Errorf("get log source %s error: %s", driver, err)
-			continue
-		}
-		d, _, err := factory.Create(info.Config)
-		if err != nil {
-			log_print.Errorf("create driver %s error: %s,config: %s", driver, err, info.Config)
-			continue
-		}
-		log_driver.SetDriver(driver, d)
-	}
+
 }
 
 func (i *imlLogModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
