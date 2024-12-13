@@ -146,20 +146,11 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
             ...x,
             title: typeof x.title === 'string' ? $t(x.title) : x.title,
             ...(x.dataIndex === 'status' ? {
-                render:(_,entity)=> {
-                    switch(entity.change){
-                        case 'none':
-                            return '-'
-                        case 'new':
-                            return $t('新建')
-                        case 'update':
-                            return $t('更新')
-                        case 'delete':
-                            return $t('删除')
-                        default:
-                            return '-'
-                    }
-                }
+                render:(_,entity)=> (
+                    <span className={`${ApprovalStatusColorClass[entity.change as keyof typeof ApprovalStatusColorClass]} truncate block`}>
+                    {$t(ChangeTypeEnum[entity.change as (keyof typeof ChangeTypeEnum)] || '-')}
+                    </span>
+                )
             }:{})
         }
     }),[state.language])

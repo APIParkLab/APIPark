@@ -88,7 +88,7 @@ const PartitionInsideDashboardSetting: FC = () => {
         pageTitle={$t('数据源')}
         description={$t("设置监控报表的数据来源，设置完成之后即可获得详细的API调用统计图表。")}
         showBorder={false}
-        scrollPage={true}
+        scrollPage={false}
       >
         <div className="flex flex-col overflow-auto pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X">
           <Spin wrapperClassName="flex-1" indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading}>
