@@ -11,7 +11,7 @@ import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
 import { SimpleTeamItem } from "@common/const/type";
 import { useTenantManagementContext } from "../../../contexts/TenantManagementContext";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { useGlobalContext } from "@common/contexts/GlobalStateContext";
+import { GlobalProvider, useGlobalContext } from "@common/contexts/GlobalStateContext";
 import { $t } from "@common/locales";
 import WithPermission from "@common/components/aoplatform/WithPermission";
 import InsidePage from "@common/components/aoplatform/InsidePage";
@@ -149,7 +149,7 @@ export default function ServiceHubManagement() {
     switch (type){
         case 'add':
             title=$t('添加消费者')
-            content=<ManagementConfig ref={addManagementRef}  dataShowType={dataShowType} type={type} teamId={teamId!} />
+            content=<GlobalProvider><ManagementConfig ref={addManagementRef}  dataShowType={dataShowType} type={type} teamId={teamId!} /></GlobalProvider>
             break;
         // case 'edit':{
         //     title='配置 Open Api'
