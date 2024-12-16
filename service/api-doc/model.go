@@ -5,6 +5,7 @@ import "time"
 type UpdateDoc struct {
 	ID      string
 	Content string
+	Prefix  string
 }
 
 type Doc struct {

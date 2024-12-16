@@ -326,7 +326,33 @@ func (i *imlServiceController) Create(ctx *gin.Context, teamID string, input *se
 	if input.Kind == "ai" {
 		return i.createAIService(ctx, teamID, input)
 	}
-	return i.module.Create(ctx, teamID, input)
+	var err error
+	var info *service_dto.Service
+	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		info, err = i.module.Create(txCtx, teamID, input)
+		if err != nil {
+			return err
+		}
+		path := fmt.Sprintf("/%s/", strings.Trim(input.Prefix, "/"))
+		_, err = i.routerModule.Create(txCtx, info.Id, &router_dto.Create{
+			Id:          uuid.New().String(),
+			Name:        "",
+			Path:        path + "*",
+			Methods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodPatch, http.MethodOptions},
+			Description: "auto create by create service",
+			Protocols:   []string{"http", "https"},
+			MatchRules:  nil,
+			Upstream:    "",
+			Proxy: &router_dto.InputProxy{
+				Path:    path,
+				Timeout: 30000,
+				Retry:   0,
+			},
+			Disable: false,
+		})
+		return err
+	})
+	return info, err
 }
 
 func (i *imlServiceController) Edit(ctx *gin.Context, id string, input *service_dto.EditService) (*service_dto.Service, error) {
