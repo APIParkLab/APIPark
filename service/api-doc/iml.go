@@ -76,6 +76,17 @@ func (i *imlAPIDocService) UpdateDoc(ctx context.Context, serviceId string, inpu
 	if err := doc.Valid(); err != nil {
 		return err
 	}
+	if input.Prefix != "" {
+		err = doc.AddPrefixInAll(input.Prefix)
+		if err != nil {
+			return err
+		}
+	}
+	data, err := doc.Marshal()
+	if err != nil {
+		return err
+	}
+	input.Content = string(data)
 
 	info, err := i.store.First(ctx, map[string]interface{}{
 		"service": serviceId,
@@ -94,9 +105,9 @@ func (i *imlAPIDocService) UpdateDoc(ctx context.Context, serviceId string, inpu
 			APICount: doc.APICount(),
 		})
 	}
+	info.Content = input.Content
 	info.Updater = operator
 	info.UpdateAt = time.Now()
-	info.Content = input.Content
 	info.APICount = doc.APICount()
 	return i.store.Save(ctx, info)
 }
