@@ -265,7 +265,8 @@ func (i *imlInitController) OnInit() {
 				return fmt.Errorf("create default team error: %v", err)
 			}
 			// 创建Rest服务
-			_, err = i.serviceModule.Create(ctx, info.Id, &service_dto.CreateService{
+			restPath := "/rest-demo"
+			serviceInfo, err := i.serviceModule.Create(ctx, info.Id, &service_dto.CreateService{
 				Name:         "REST Demo Service",
 				Prefix:       "/rest-demo",
 				Description:  "Auto created By APIPark",
@@ -276,6 +277,26 @@ func (i *imlInitController) OnInit() {
 			})
 			if err != nil {
 				return fmt.Errorf("create default service error: %v", err)
+			}
+			path := fmt.Sprintf("/%s/", strings.Trim(restPath, "/"))
+			_, err = i.routerModule.Create(ctx, serviceInfo.Id, &router_dto.Create{
+				Id:          uuid.NewString(),
+				Name:        "",
+				Path:        path + "*",
+				Methods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodPatch, http.MethodOptions},
+				Description: "auto create by create service",
+				Protocols:   []string{"http", "https"},
+				MatchRules:  nil,
+				Upstream:    "",
+				Proxy: &router_dto.InputProxy{
+					Path:    path,
+					Timeout: 30000,
+					Retry:   0,
+				},
+				Disable: false,
+			})
+			if err != nil {
+				return fmt.Errorf("create default router error: %v", err)
 			}
 			// 创建AI服务
 			err = i.createAIService(ctx, info.Id, &service_dto.CreateService{
