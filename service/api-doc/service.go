@@ -3,10 +3,14 @@ package api_doc
 import (
 	"context"
 	"fmt"
+	"reflect"
+	"strings"
+
+	yaml "gopkg.in/yaml.v3"
+
 	"github.com/APIParkLab/APIPark/service/universally/commit"
 	"github.com/eolinker/go-common/autowire"
 	"github.com/getkin/kin-openapi/openapi3"
-	"reflect"
 )
 
 type IAPIDocService interface {
@@ -65,15 +69,6 @@ func (d *DocLoader) Valid() error {
 	if d.openAPI3Doc.Paths == nil {
 		return fmt.Errorf("openAPI3Doc.Paths is nil")
 	}
-	//err := d.openAPI3Doc.Validate(openapi3Loader.Context)
-	//if err != nil {
-	//	openAPI2Doc, err := openapi2conv.FromV3(d.openAPI3Doc)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	validate.
-	//
-	//}
 	return nil
 }
 
@@ -109,4 +104,31 @@ func (d *DocLoader) APICount() int64 {
 		}
 	}
 	return count
+}
+
+func (d *DocLoader) AddPrefixInAll(prefix string) error {
+	prefix = strings.TrimSpace(prefix)
+	if prefix == "" || d.openAPI3Doc == nil || d.openAPI3Doc.Paths == nil {
+		return nil
+	}
+
+	prefix = fmt.Sprintf("/%s/", strings.Trim(prefix, "/"))
+	for path, item := range d.openAPI3Doc.Paths.Map() {
+		path = strings.TrimSpace(path)
+		if strings.HasPrefix(path, prefix) {
+			continue
+		}
+		newPath := fmt.Sprintf("%s%s", prefix, strings.TrimPrefix(path, "/"))
+		d.openAPI3Doc.Paths.Delete(path)
+		d.openAPI3Doc.Paths.Set(newPath, item)
+	}
+	return nil
+}
+
+func (d *DocLoader) Marshal() ([]byte, error) {
+	result, err := d.openAPI3Doc.MarshalYAML()
+	if err != nil {
+		return nil, err
+	}
+	return yaml.Marshal(result)
 }
