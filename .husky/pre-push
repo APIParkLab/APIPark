@@ -1,34 +1,23 @@
 #!/usr/bin/env sh
 
-# 如果是由我们的脚本触发的push，直接返回
-if [ "$PUSHING_TO_GITHUB" = "1" ]; then
-    exit 0
-fi
-
 # 获取当前分支名
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-# 如果是从 feature 分支推送
-if [[ $BRANCH == feature/* || $BRANCH == fix/* ]]; then
-    # 获取远程仓库列表
-    REMOTES=$(git remote)
+# 获取远程仓库列表
+REMOTES=$(git remote)
 
-    # 检查是否存在 gitlab 远程仓库
-    if ! echo "$REMOTES" | grep -q "gitlab"; then
-        echo "Error: GitLab remote repository not found"
-        exit 1
-    fi
-
-    echo "Pushing $BRANCH to GitLab..."
-
-    # 如果存在 github 远程仓库，推送到 GitHub
-    if echo "$REMOTES" | grep -q "github"; then
-        echo "Pushing $BRANCH to GitHub..."
-        PUSHING_TO_GITHUB=1 git push github $BRANCH
-    fi
-
-    exit 0
-else
-    echo "Error: Can only push feature/* or fix/* branches"
+# 检查是否存在 gitlab 远程仓库
+if ! echo "$REMOTES" | grep -q "gitlab"; then
+    echo "Error: GitLab remote repository not found"
     exit 1
 fi
+
+echo "Pushing $BRANCH to GitLab..."
+
+# 如果存在 github 远程仓库，推送到 GitHub
+if echo "$REMOTES" | grep -q "github"; then
+    echo "Pushing $BRANCH to GitHub..."
+    git push github $BRANCH
+fi
+
+git push gitlab $BRANCH
