@@ -21,3 +21,6 @@ if echo "$REMOTES" | grep -q "github"; then
 fi
 
 git push gitlab $BRANCH
+
+# 防止 push 触发狗子
+exit 0
