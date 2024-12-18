@@ -2,7 +2,7 @@
 
 # 获取当前分支名
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-
+echo "post"
 # 如果是从 feature 分支推送
 if [[ $BRANCH == feature/* || $BRANCH == fix/* ]]; then
     # 获取远程仓库列表
