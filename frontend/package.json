@@ -14,7 +14,7 @@
     "dev": "lerna run dev --scope=core --stream",
     "stop": "kill-port --port 5000",
     "scan": "i18next-scanner --config i18next-scanner.config.js",
-    "prepare": "husky"
+    "prepare": "cd .. && husky install .husky"
   },
   "keywords": [],
   "author": "",
