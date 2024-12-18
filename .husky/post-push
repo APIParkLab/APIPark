@@ -4,7 +4,6 @@
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # 如果是从 feature 分支推送
-echo $BRANCH
 if [[ $BRANCH == feature/* || $BRANCH == fix/* ]]; then
     # 获取远程仓库列表
     REMOTES=$(git remote)
@@ -13,11 +12,5 @@ if [[ $BRANCH == feature/* || $BRANCH == fix/* ]]; then
     if echo "$REMOTES" | grep -q "gitlab"; then
         echo "Pushing $BRANCH to GitLab..."
         git push gitlab $BRANCH
-    fi
-
-    # 只有在明确要求时才推送到 GitHub
-    if echo "$REMOTES" | grep -q "github"; then
-        echo "Pushing $BRANCH to GitHub..."
-        git push github $BRANCH
     fi
 fi
