@@ -1,11 +1,11 @@
 import { Box, Grow, Tab, Tabs, Typography, useTheme } from '@mui/material'
-import { ReactNode, SyntheticEvent, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { ReactNode, SyntheticEvent, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { MessageDataGrid, MessageDataGridApi } from '../MessageDataGrid'
-import {ApiBodyType, BodyParamsType, HeaderParamsType} from "@common/const/api-detail";
-import {Indicator} from "../../../../Indicator";
-import { v4 as uuidv4} from 'uuid'
-import { ApiMessageBody, ApiMessageBodyApi } from '../ApiMessageBody';
-import { $t } from '@common/locales';
+import { ApiBodyType, BodyParamsType, HeaderParamsType } from '@common/const/api-detail'
+import { Indicator } from '../../../../Indicator'
+import { v4 as uuidv4 } from 'uuid'
+import { ApiMessageBody, ApiMessageBodyApi } from '../ApiMessageBody'
+import { $t } from '@common/locales'
 
 interface ApiRequestEditorTab {
   label: string
@@ -23,7 +23,13 @@ export interface ApiResponseEditorApi {
   }
 }
 
-export function ApiResponseEditor({ editorRef ,apiInfo=null, loaded}: { editorRef?: React.RefObject<ApiResponseEditorApi> }) {
+export function ApiResponseEditor({
+  editorRef,
+  apiInfo = null,
+  loaded
+}: {
+  editorRef?: React.RefObject<ApiResponseEditorApi>
+}) {
   const [apiHeaders, setApiHeaders] = useState<HeaderParamsType[] | null>([])
   const [innerLoaded, setInnerLoaded] = useState<boolean>(false)
   const headersRef = useRef<MessageDataGridApi>(null)
@@ -40,16 +46,17 @@ export function ApiResponseEditor({ editorRef ,apiInfo=null, loaded}: { editorRe
     getData: () => {
       const bodyData = bodyRef.current?.getBodyMeta()
       const uuid = uuidv4()
-      return ([{
-        id:uuid,
-        responseUuid:uuid,
-        httpCode:bodyData?.contentType,
-        responseParams:{
-          bodyParams: bodyData?.bodyParams,
-          headerParams: (headersRef.current?.getEditMeta() as HeaderParamsType[]) || []
+      return [
+        {
+          id: uuid,
+          responseUuid: uuid,
+          httpCode: bodyData?.contentType,
+          responseParams: {
+            bodyParams: bodyData?.bodyParams,
+            headerParams: (headersRef.current?.getEditMeta() as HeaderParamsType[]) || []
+          }
         }
-      }
-      ])
+      ]
     }
   }))
 
@@ -70,8 +77,7 @@ export function ApiResponseEditor({ editorRef ,apiInfo=null, loaded}: { editorRe
     },
     {
       label: $t('返回值'),
-      element: <ApiMessageBody bodyApiRef={bodyRef} mode="response"  apiInfo={apiInfo}
-      loaded={innerLoaded} />,
+      element: <ApiMessageBody bodyApiRef={bodyRef} mode="response" apiInfo={apiInfo} loaded={innerLoaded} />,
       dirty: false
     }
   ]
@@ -88,17 +94,21 @@ export function ApiResponseEditor({ editorRef ,apiInfo=null, loaded}: { editorRe
   const tabHeight = '30px'
 
   return (
-    <Box sx={{
-      //  borderBottom: 1,
-        borderColor: 'divider' }}>
+    <Box
+      sx={{
+        //  borderBottom: 1,
+        borderColor: 'divider'
+      }}
+    >
       <Tabs
         value={tabValue}
         onChange={handleChange}
-        aria-label={$t("api request editor")}
+        aria-label={$t('api request editor')}
         sx={{
           minHeight: tabHeight,
           height: tabHeight,
-          borderBottom: 1, borderColor: 'divider',
+          borderBottom: 1,
+          borderColor: 'divider',
           '& .MuiTabs-flexContainer': {
             minHeight: tabHeight,
             height: tabHeight
@@ -111,7 +121,7 @@ export function ApiResponseEditor({ editorRef ,apiInfo=null, loaded}: { editorRe
             value={tab.label}
             label={
               <Box key={tab.label} display="flex" alignItems="center" pr={tab.dirty ? 0.5 : 0}>
-                <Typography sx={{fontSize:'14px'}}>{tab.label}</Typography>
+                <Typography sx={{ fontSize: '14px' }}>{tab.label}</Typography>
                 <Grow in={tab.dirty}>
                   <Box>
                     <Indicator

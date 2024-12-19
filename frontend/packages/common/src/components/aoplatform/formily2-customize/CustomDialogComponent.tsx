@@ -1,5 +1,4 @@
-
-import {forwardRef,useImperativeHandle} from 'react'
+import { forwardRef, useImperativeHandle } from 'react'
 import { createSchemaField } from '@formily/react'
 import {
   FormItem,
@@ -82,57 +81,53 @@ const SchemaField = createSchemaField({
   }
 })
 
-export const CustomDialogComponent = forwardRef(
-  (props: { [k: string]: unknown }, ref) => {
-    const { onChange, title, value, render } = props
-    useImperativeHandle(ref, () => ({}))
-    let editPage: boolean = false
-    try {
-      editPage = Object.keys(JSON.parse(JSON.stringify(value))).length > 0
-    } catch {}
+export const CustomDialogComponent = forwardRef((props: { [k: string]: unknown }, ref) => {
+  const { onChange, title, value, render } = props
+  useImperativeHandle(ref, () => ({}))
+  let editPage: boolean = false
+  try {
+    editPage = Object.keys(JSON.parse(JSON.stringify(value))).length > 0
+  } catch {}
 
-    return (
-      <FormDialog.Portal>
-        <span
-          className="ant-formily-array-base-config"
-          onClick={() => {
-            const dialog = FormDialog(
-              editPage ? $t('编辑(0)',[title||'']) : $t('添加(0)',[title||'']),
-              () => {
-                return (
-                  <FormLayout
-                  //  labelCol={6} 
-                  layout={'vertical'}
-                  scrollToFirstError
-                  name="CustomDialogComponent"
-                  // wrapperCol={10} 
-                  form={value}>
-                    <SchemaField schema={JSON.parse(render)} />
-                  </FormLayout>
-                )
-              }
+  return (
+    <FormDialog.Portal>
+      <span
+        className="ant-formily-array-base-config"
+        onClick={() => {
+          const dialog = FormDialog(editPage ? $t('编辑(0)', [title || '']) : $t('添加(0)', [title || '']), () => {
+            return (
+              <FormLayout
+                //  labelCol={6}
+                layout={'vertical'}
+                scrollToFirstError
+                name="CustomDialogComponent"
+                // wrapperCol={10}
+                form={value}
+              >
+                <SchemaField schema={JSON.parse(render)} />
+              </FormLayout>
             )
-            dialog
-              .forOpen((payload, next) => {
-                next({
-                  initialValues: value
-                })
+          })
+          dialog
+            .forOpen((payload, next) => {
+              next({
+                initialValues: value
               })
-              .forConfirm((payload, next) => {
-                next(payload)
-              })
-              .forCancel((payload, next) => {
-                next(payload)
-              })
-              .open()
-              .then(onChange)
-          }}
-        >
-          <svg style={{ width: '16px', height: '16px' }}>
-            <use href="#tool"></use>
-          </svg>
-        </span>
-      </FormDialog.Portal>
-    )
-  }
-)
+            })
+            .forConfirm((payload, next) => {
+              next(payload)
+            })
+            .forCancel((payload, next) => {
+              next(payload)
+            })
+            .open()
+            .then(onChange)
+        }}
+      >
+        <svg style={{ width: '16px', height: '16px' }}>
+          <use href="#tool"></use>
+        </svg>
+      </span>
+    </FormDialog.Portal>
+  )
+})

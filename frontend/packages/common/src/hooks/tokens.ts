@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 type BasicInfoType = {
-  selected_X_apibee_token: string,
+  selected_X_apibee_token: string
   tokenId: number | string
 }
 

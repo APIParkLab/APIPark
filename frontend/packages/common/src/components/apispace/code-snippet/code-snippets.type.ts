@@ -1,14 +1,6 @@
-import { $t } from "@common/locales"
+import { $t } from '@common/locales'
 
-export type PARAM_TYPE =
-  | 'string'
-  | 'float'
-  | 'integer'
-  | 'boolean'
-  | 'date'
-  | 'time'
-  | 'datatime'
-  | string
+export type PARAM_TYPE = 'string' | 'float' | 'integer' | 'boolean' | 'date' | 'time' | 'datatime' | string
 export type PARAM_KEY_REF_TYPE = {
   key: string
   type: string
@@ -17,7 +9,7 @@ export type PARAM_KEY_REF_TYPE = {
   attribute?: string
   description?: string
   filter?: string
-  arrayItemKey?:string
+  arrayItemKey?: string
 }
 export type PARAM_TYPE_REF_TYPE = {
   [key: string | number]: PARAM_TYPE

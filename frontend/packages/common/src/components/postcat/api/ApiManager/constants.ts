@@ -1,14 +1,15 @@
-import {generateId} from "@common/utils/postcat.tsx";
+import { generateId } from '@common/utils/postcat.tsx'
 import {
   ApiBodyType,
   BodyParamsType,
   HeaderParamsType,
-  QueryParamsType, ResponseList,
+  QueryParamsType,
+  ResponseList,
   RestParamsType
-} from "@common/const/api-detail";
-import {Protocol} from "../RequestMethod";
+} from '@common/const/api-detail'
+import { Protocol } from '../RequestMethod'
 
-type SafeAny  = unknown
+type SafeAny = unknown
 type Timestamp = number
 
 declare interface HttpRequestMessage {

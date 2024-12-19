@@ -1,12 +1,12 @@
 import { Box, LinearProgress, useTheme } from '@mui/material'
 import { DataGridPro, GridColDef, useGridApiRef } from '@mui/x-data-grid-pro'
 import { useEffect, useMemo } from 'react'
-import {ApiBodyType, ApiParamsType, BodyParamsType} from "@common/const/api-detail";
-import {collapseTableSx, PreviewGridActionsCellItem, previewTableHoverSx} from "../../../PreviewTable";
-import {Collapse} from "../../../Collapse";
-import { PreviewBodyBinary } from './components/Binary';
-import { PreviewBodyRaw } from './components/Raw';
-import { $t } from '@common/locales';
+import { ApiBodyType, ApiParamsType, BodyParamsType } from '@common/const/api-detail'
+import { collapseTableSx, PreviewGridActionsCellItem, previewTableHoverSx } from '../../../PreviewTable'
+import { Collapse } from '../../../Collapse'
+import { PreviewBodyBinary } from './components/Binary'
+import { PreviewBodyRaw } from './components/Raw'
+import { $t } from '@common/locales'
 
 export interface RenderMessageBody extends BodyParamsType {
   path: string[]
@@ -41,7 +41,6 @@ export default function MessageBodyComponent({
     }
   }, [borderRadius])
 
-
   useEffect(() => {
     rows.forEach((row) => {
       row?.childList?.length && apiRef.current.setRowChildrenExpansion(row.id, true)
@@ -70,7 +69,7 @@ export default function MessageBodyComponent({
     },
     {
       field: 'paramAttr',
-      headerName:$t('示例'),
+      headerName: $t('示例'),
       valueGetter: (params) => params.row.paramAttr?.example,
       flex: 1
     },
@@ -83,10 +82,10 @@ export default function MessageBodyComponent({
       hideable: true,
       getActions: (params) => [
         <PreviewGridActionsCellItem
-            icon="more"
-            label={$t("More")}
-            key="more"
-            onClick={() => onMoreSettingChange?.(params.row)}
+          icon="more"
+          label={$t('More')}
+          key="more"
+          onClick={() => onMoreSettingChange?.(params.row)}
         />
       ]
     }
@@ -95,39 +94,41 @@ export default function MessageBodyComponent({
   return (
     <Collapse title={title} tag={typeof contentType === 'number' ? ApiBodyType[contentType] : ''}>
       <Box width="100%">
-        {contentType !==  ApiBodyType.Binary && contentType !== ApiBodyType.Raw &&<DataGridPro
-          apiRef={apiRef}
-          autoHeight
-          treeData
-          rows={rows}
-          sx={hoverSx}
-          columns={columns}
-          columnHeaderHeight={40}
-          rowHeight={40}
-          pagination={false}
-          groupingColDef={{
-            headerName: $t('参数名'),
-            sortable:true,
-            width: 200,
-            hideable: false,
-            hideDescendantCount: true
-          }}
-          getTreeDataPath={(row) => row.path}
-          hideFooter
-          disableColumnMenu={true}
-          disableColumnReorder={true}
-          disableColumnPinning={true}
-          autosizeOptions={{
-            expand: true,
-            includeHeaders: false
-          }}
-          loading={loading}
-          slots={{
-            loadingOverlay: LinearProgress
-          }}
-        />}
-        { contentType ===ApiBodyType.Binary && <PreviewBodyBinary value={rows?.[0].binaryRawData} /> } 
-        { contentType === ApiBodyType.Raw && <PreviewBodyRaw value={rows?.[0].binaryRawData}  />}
+        {contentType !== ApiBodyType.Binary && contentType !== ApiBodyType.Raw && (
+          <DataGridPro
+            apiRef={apiRef}
+            autoHeight
+            treeData
+            rows={rows}
+            sx={hoverSx}
+            columns={columns}
+            columnHeaderHeight={40}
+            rowHeight={40}
+            pagination={false}
+            groupingColDef={{
+              headerName: $t('参数名'),
+              sortable: true,
+              width: 200,
+              hideable: false,
+              hideDescendantCount: true
+            }}
+            getTreeDataPath={(row) => row.path}
+            hideFooter
+            disableColumnMenu={true}
+            disableColumnReorder={true}
+            disableColumnPinning={true}
+            autosizeOptions={{
+              expand: true,
+              includeHeaders: false
+            }}
+            loading={loading}
+            slots={{
+              loadingOverlay: LinearProgress
+            }}
+          />
+        )}
+        {contentType === ApiBodyType.Binary && <PreviewBodyBinary value={rows?.[0].binaryRawData} />}
+        {contentType === ApiBodyType.Raw && <PreviewBodyRaw value={rows?.[0].binaryRawData} />}
       </Box>
     </Collapse>
   )

@@ -1,34 +1,32 @@
-import { FC } from 'react';
-import { Table } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { $t } from '@common/locales';
+import { FC } from 'react'
+import { Table } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
+import { $t } from '@common/locales'
 
 interface DataType {
-  httpStatusCode: string;
-  systemStatusCode: string;
-  description: string;
-
+  httpStatusCode: string
+  systemStatusCode: string
+  description: string
 }
 
 const columns: ColumnsType<DataType> = [
   {
-    title:$t('HTTP 状态码'),
+    title: $t('HTTP 状态码'),
     dataIndex: 'httpStatusCode',
-    key: 'httpStatusCode',
+    key: 'httpStatusCode'
   },
   {
-    title:$t('系统状态码'),
+    title: $t('系统状态码'),
     dataIndex: 'systemStatusCode',
-    key: 'systemStatusCode',
+    key: 'systemStatusCode'
   },
   {
     title: $t('描述'),
     dataIndex: 'description',
     key: 'description',
-    ellipsis:true
-  },
-  
-];
+    ellipsis: true
+  }
+]
 
 const data: DataType[] = [
   // {
@@ -44,12 +42,12 @@ const data: DataType[] = [
   {
     httpStatusCode: '413',
     systemStatusCode: '10003',
-    description:  '请求频率过高',
+    description: '请求频率过高'
   },
   {
     httpStatusCode: '403',
     systemStatusCode: '10004',
-    description: '请求来源非法，不在白名单中',
+    description: '请求来源非法，不在白名单中'
   },
   // {
   //   httpStatusCode: '416',
@@ -59,7 +57,7 @@ const data: DataType[] = [
   {
     httpStatusCode: '504',
     systemStatusCode: '10006',
-    description: '网关超时',
+    description: '网关超时'
   },
   // {
   //   httpStatusCode: '504',
@@ -69,7 +67,7 @@ const data: DataType[] = [
   {
     httpStatusCode: '404',
     systemStatusCode: '10007',
-    description: '接口不存在',
+    description: '接口不存在'
   },
   // {
   //   httpStatusCode: '416',
@@ -84,42 +82,43 @@ const data: DataType[] = [
   {
     httpStatusCode: '400',
     systemStatusCode: '10010',
-    description: '无法识别请求内容，请检查请求体是否正确',
+    description: '无法识别请求内容，请检查请求体是否正确'
   },
   {
     httpStatusCode: '400',
     systemStatusCode: '10011',
-    description: '请求头部缺少 Content-Type 字段',
+    description: '请求头部缺少 Content-Type 字段'
   },
   {
     httpStatusCode: '400',
     systemStatusCode: '10011',
-    description: '请求头部 Content-Type 字段错误',
+    description: '请求头部 Content-Type 字段错误'
   },
   {
     httpStatusCode: '400',
     systemStatusCode: '10014',
-    description: '批量参数超出单次批量数量的最大限制',
+    description: '批量参数超出单次批量数量的最大限制'
   },
   {
     httpStatusCode: '400',
     systemStatusCode: '10016',
-    description: '参数缺少内容',
+    description: '参数缺少内容'
   },
   {
     httpStatusCode: '500',
     systemStatusCode: '10017',
-    description: '参数类型错误',
-  },
-];
+    description: '参数类型错误'
+  }
+]
 
-const CodePage: FC = () => 
-  <Table 
+const CodePage: FC = () => (
+  <Table
     size="small"
-    columns={columns} 
-    className='table-border border-b-0 rounded'
-    dataSource={data?.map((item, index) => ({...item, key: index})) || []} 
+    columns={columns}
+    className="table-border border-b-0 rounded"
+    dataSource={data?.map((item, index) => ({ ...item, key: index })) || []}
     pagination={false}
-  />;
+  />
+)
 
-export default CodePage;
+export default CodePage

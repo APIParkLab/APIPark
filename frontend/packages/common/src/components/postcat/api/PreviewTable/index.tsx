@@ -1,4 +1,3 @@
-
 import { GridActionsCellItem } from '@mui/x-data-grid-pro'
 import type { ReactNode } from 'react'
 import type { SxProps, Theme } from '@mui/material'
@@ -28,8 +27,7 @@ export function PreviewGridActionsCellItem({ icon, label, onClick }: PreviewGrid
 }
 
 export function previewTableHoverSx(): SxProps<Theme> {
-  return {...commonTableSx
-  }
+  return { ...commonTableSx }
 }
 
 export function collapseTableSx(borderRadius: string | number): SxProps<Theme> {

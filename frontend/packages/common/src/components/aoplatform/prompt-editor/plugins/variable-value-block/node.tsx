@@ -1,13 +1,5 @@
-import type {
-  EditorConfig,
-  LexicalNode,
-  NodeKey,
-  SerializedTextNode,
-} from 'lexical'
-import {
-  $applyNodeReplacement,
-  TextNode,
-} from 'lexical'
+import type { EditorConfig, LexicalNode, NodeKey, SerializedTextNode } from 'lexical'
+import { $applyNodeReplacement, TextNode } from 'lexical'
 
 export class VariableValueBlockNode extends TextNode {
   static getType(): string {
@@ -24,7 +16,15 @@ export class VariableValueBlockNode extends TextNode {
 
   createDOM(config: EditorConfig): HTMLElement {
     const element = super.createDOM(config)
-    element.classList.add('inline-flex', 'items-center', 'px-0.5', 'h-[22px]', 'text-[#155EEF]', 'rounded-[5px]', 'align-middle')
+    element.classList.add(
+      'inline-flex',
+      'items-center',
+      'px-0.5',
+      'h-[22px]',
+      'text-[#155EEF]',
+      'rounded-[5px]',
+      'align-middle'
+    )
     return element
   }
 
@@ -45,7 +45,7 @@ export class VariableValueBlockNode extends TextNode {
       style: this.getStyle(),
       text: this.getTextContent(),
       type: 'variable-value-block',
-      version: 1,
+      version: 1
     }
   }
 
@@ -58,8 +58,6 @@ export function $createVariableValueBlockNode(text = ''): VariableValueBlockNode
   return $applyNodeReplacement(new VariableValueBlockNode(text))
 }
 
-export function $isVariableValueNodeBlock(
-  node: LexicalNode | null | undefined,
-): node is VariableValueBlockNode {
+export function $isVariableValueNodeBlock(node: LexicalNode | null | undefined): node is VariableValueBlockNode {
   return node instanceof VariableValueBlockNode
 }

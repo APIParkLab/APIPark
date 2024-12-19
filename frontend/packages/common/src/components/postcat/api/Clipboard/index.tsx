@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { Box } from '@mui/material'
 import { IconButton } from '../IconButton'
-import useCopyToClipboard from "@common/hooks/copy.ts";
-import { $t } from '@common/locales';
+import useCopyToClipboard from '@common/hooks/copy.ts'
+import { $t } from '@common/locales'
 
 export interface ClipboardProps {
   text: string
@@ -17,7 +16,7 @@ export function Clipboard(props: ClipboardProps): JSX.Element {
   const { text, children, onError, onSuccess } = props
   const DefaultText = $t('复制')
   const [buttonTitle, setButtonTitle] = useState(DefaultText)
-  const { copyToClipboard } = useCopyToClipboard();
+  const { copyToClipboard } = useCopyToClipboard()
   const handleCopy = (): void => {
     copyToClipboard(text)
   }
@@ -32,7 +31,7 @@ export function Clipboard(props: ClipboardProps): JSX.Element {
 
   return (
     <Box component="div" onClick={handleCopy}>
-      {children || <IconButton sx={{borderRadius:'4px', padding:'4px 8px'}} name="copy" title={buttonTitle} />}
+      {children || <IconButton sx={{ borderRadius: '4px', padding: '4px 8px' }} name="copy" title={buttonTitle} />}
     </Box>
   )
 }

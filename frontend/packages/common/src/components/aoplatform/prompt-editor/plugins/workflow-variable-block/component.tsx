@@ -1,12 +1,6 @@
-import {
-  memo,
-  useEffect,
-  useState,
-} from 'react'
+import { memo, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  COMMAND_PRIORITY_EDITOR,
-} from 'lexical'
+import { COMMAND_PRIORITY_EDITOR } from 'lexical'
 import { mergeRegister } from '@lexical/utils'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 // import {
@@ -15,10 +9,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useSelectOrDelete } from '../../hooks'
 import type { WorkflowNodesMap } from './node'
 import { WorkflowVariableBlockNode } from './node'
-import {
-  DELETE_WORKFLOW_VARIABLE_BLOCK_COMMAND,
-  UPDATE_WORKFLOW_NODES_MAP,
-} from './index'
+import { DELETE_WORKFLOW_VARIABLE_BLOCK_COMMAND, UPDATE_WORKFLOW_NODES_MAP } from './index'
 // import cn from '@/utils/classnames'
 // import { Variable02 } from '@/app/components/base/icons/src/vender/solid/development'
 // import { BubbleX, Env } from '@/app/components/base/icons/src/vender/line/others'
@@ -36,7 +27,7 @@ type WorkflowVariableBlockComponentProps = {
 const WorkflowVariableBlockComponent = ({
   nodeKey,
   variables,
-  workflowNodesMap = {},
+  workflowNodesMap = {}
 }: WorkflowVariableBlockComponentProps) => {
   const { t } = useTranslation()
   const [editor] = useLexicalComposerContext()
@@ -66,14 +57,14 @@ const WorkflowVariableBlockComponent = ({
 
           return true
         },
-        COMMAND_PRIORITY_EDITOR,
-      ),
+        COMMAND_PRIORITY_EDITOR
+      )
     )
   }, [editor])
 
   const Item = (
     <div
-      className={`mx-0.5 relative group/wrap flex items-center h-[18px] pl-0.5 pr-[3px] rounded-[5px] border select-none ${isSelected ? 'border-[#84ADFF] bg-[#F5F8FF]' : 'border-black/5 bg-white'}` }
+      className={`mx-0.5 relative group/wrap flex items-center h-[18px] pl-0.5 pr-[3px] rounded-[5px] border select-none ${isSelected ? 'border-[#84ADFF] bg-[#F5F8FF]' : 'border-black/5 bg-white'}`}
       ref={ref}
     >
       {/* {!isEnv && !isChatVar && (
@@ -93,7 +84,7 @@ const WorkflowVariableBlockComponent = ({
           <Line3 className='mr-0.5 text-gray-300'></Line3>
         </div>
       )} */}
-      <div className='flex items-center text-primary-600'>
+      <div className="flex items-center text-primary-600">
         {/* {!isEnv && !isChatVar && <Variable02 className='shrink-0 w-3.5 h-3.5' />}
         {isEnv && <Env className='shrink-0 w-3.5 h-3.5 text-util-colors-violet-violet-600' />}
         {isChatVar && <BubbleX className='w-3.5 h-3.5 text-util-colors-teal-teal-700' />}
@@ -106,7 +97,6 @@ const WorkflowVariableBlockComponent = ({
       </div>
     </div>
   )
-
 
   return Item
 }

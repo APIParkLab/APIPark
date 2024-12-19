@@ -1,33 +1,43 @@
-
-import { Autocomplete, Box, LinearProgress, TextField, ThemeProvider, Tooltip, createTheme, useTheme } from '@mui/material'
 import {
-  DataGridPro, GridCallbackDetails,
+  Autocomplete,
+  Box,
+  LinearProgress,
+  TextField,
+  ThemeProvider,
+  Tooltip,
+  createTheme,
+  useTheme
+} from '@mui/material'
+import {
+  DataGridPro,
   GridColDef,
   GridRenderEditCellParams,
   GridRowId,
   GridRowModes,
   GridRowModesModel,
-  GridRowParams, GridRowSelectionModel,
+  GridRowParams,
+  GridRowSelectionModel,
   useGridApiRef
 } from '@mui/x-data-grid-pro'
 import { RefObject, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
-import {Example,ApiParamsType, BodyParamsType, FileExample} from "@common/const/api-detail";
-import {ContentType} from "../ApiRequestTester/TestBody/const.ts";
-import {ImportMessageChangeType, ImportMessageOption} from "../ApiRequestTester/ImportMessage";
-import {generateNumberId, getActionColWidth, traverse} from "@common/utils/postcat.tsx";
-import {collapseTableSx} from "../../../PreviewTable";
-import {IconButton} from "../../../IconButton";
-import {RequestHeaders} from "../../../ApiManager/components/ApiRequestEditor/components/constants.ts";
+import { Example, ApiParamsType, BodyParamsType, FileExample } from '@common/const/api-detail'
+import { ContentType } from '../ApiRequestTester/TestBody/const.ts'
+import { ImportMessageChangeType, ImportMessageOption } from '../ApiRequestTester/ImportMessage'
+import { generateNumberId, getActionColWidth, traverse } from '@common/utils/postcat.tsx'
+import { collapseTableSx } from '../../../PreviewTable'
+import { IconButton } from '../../../IconButton'
+import { RequestHeaders } from '../../../ApiManager/components/ApiRequestEditor/components/constants.ts'
 import {
   AutoCompleteOption,
   DataGridAutoCompleteProps,
-  DataGridTextFieldProps, EditableDataGridSx
-} from "../../../ApiManager/components/EditableDataGrid";
-import {Icon} from "../../../Icon";
-import {ApiParamsTypeOptions} from "../../../ApiManager/components/ApiMessageBody/constants.ts";
-import {UploadButton} from "../../../UploadButton";
-import {isNil} from "lodash-es";
-import { $t } from '@common/locales/index.ts';
+  DataGridTextFieldProps,
+  EditableDataGridSx
+} from '../../../ApiManager/components/EditableDataGrid'
+import { Icon } from '../../../Icon'
+import { ApiParamsTypeOptions } from '../../../ApiManager/components/ApiMessageBody/constants.ts'
+import { UploadButton } from '../../../UploadButton'
+import { isNil } from 'lodash-es'
+import { $t } from '@common/locales/index.ts'
 
 type SafeAny = unknown
 export interface RenderBodyParamsType extends BodyParamsType {
@@ -57,7 +67,7 @@ interface TestMessageDataGridProps<T = SafeAny> {
   disabledContentType?: boolean
 }
 
-export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsType&{_checked?:boolean}>) {
+export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsType & { _checked?: boolean }>) {
   const {
     onChange,
     initialRows,
@@ -70,9 +80,9 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
     onValueChange
   } = props
 
-  const [rows, setRows] = useState<(BodyParamsType&{_checked?:boolean})[]>([])
+  const [rows, setRows] = useState<(BodyParamsType & { _checked?: boolean })[]>([])
 
-  const [renderRows, setRenderRows] = useState<(RenderBodyParamsType&{_checked?:boolean})[]>([])
+  const [renderRows, setRenderRows] = useState<(RenderBodyParamsType & { _checked?: boolean })[]>([])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
 
   const [dirty, setDirty] = useState(false)
@@ -91,7 +101,7 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
         id,
         name,
         dataType,
-        _checked:true,
+        _checked: true,
         isRequired: 1,
         description: '',
         paramAttr: {
@@ -112,7 +122,7 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
     //     }
     //   }
     // },500)
-  }, []);
+  }, [])
 
   useEffect(() => {
     dirty && onDirty?.()
@@ -123,7 +133,7 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
   useEffect(() => {
     if (initialRows) {
       const newRow = EmptyRow()
-      const updateRows = [...(initialRows||[]).map(x=>({...x,_checked:true})),newRow]
+      const updateRows = [...(initialRows || []).map((x) => ({ ...x, _checked: true })), newRow]
       setRows(updateRows)
       setRowSelectionModel(updateRows.map((row) => row.id))
       setDirty(false)
@@ -134,7 +144,7 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
   useEffect(() => {
     const neoRenderRows = rows.map((row, rowIndex) => ({ ...row, __globalIndex__: rowIndex, __levelIndex__: rowIndex }))
     setRenderRows(neoRenderRows)
-    setRowSelectionModel(neoRenderRows.filter(x=>x._checked).map((x)=>x.id))
+    setRowSelectionModel(neoRenderRows.filter((x) => x._checked).map((x) => x.id))
     setRowModesModel(neoRenderRows.reduce((acc, cur) => ({ ...acc, [cur.id]: { mode: GridRowModes.Edit } }), {}))
   }, [rows])
 
@@ -168,7 +178,6 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
     [handleRowDelete, renderRows.length]
   )
 
-
   const columns: (GridColDef<RenderBodyParamsType> | false)[] = [
     messageType === 'Headers' && {
       field: 'name',
@@ -191,13 +200,13 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
                 <TextField {...DataGridTextFieldProps} {...inputParams} autoComplete="off" placeholder="Key" />
               )}
               renderOption={AutoCompleteOption}
-              onInputChange ={(e, v) => {
+              onInputChange={(e, v) => {
                 params.api.setEditCellValue({ id: params.id, field: params.field, value: v }, e)
                 const rowIndex = params.row.__globalIndex__ as number
-                if (renderRows.length === rowIndex + 1 && e.target?.value?.length === 1 ) {
+                if (renderRows.length === rowIndex + 1 && e.target?.value?.length === 1) {
                   const newRow = EmptyRow()
-                  setRows(prevRow => [...prevRow, newRow]);
-                  setRowSelectionModel(prevRowS => [...prevRowS, newRow.id]);
+                  setRows((prevRow) => [...prevRow, newRow])
+                  setRowSelectionModel((prevRowS) => [...prevRowS, newRow.id])
                 }
               }}
             />
@@ -215,7 +224,7 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
     },
     messageType !== 'Headers' && {
       field: 'name',
-      headerName:$t('参数名'),
+      headerName: $t('参数名'),
       width: 200,
       editable: true,
       sortable: false,
@@ -386,7 +395,6 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
         })
     } else {
       setRows(rows.filter((row) => row.id !== id))
-
     }
   }
 
@@ -413,8 +421,8 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
     }
   }
 
-  const handleSelectionChange = ( rowSelectionModel: GridRowSelectionModel)=>{
-    setRows((prevRow)=>(prevRow.map((x)=>({...x,_checked:rowSelectionModel.indexOf(x.id)!== -1}))))
+  const handleSelectionChange = (rowSelectionModel: GridRowSelectionModel) => {
+    setRows((prevRow) => prevRow.map((x) => ({ ...x, _checked: rowSelectionModel.indexOf(x.id) !== -1 })))
     setRowSelectionModel(rowSelectionModel)
   }
 
@@ -425,7 +433,7 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
         })
       : [EmptyRow()]
     setRows(newRows)
-    setRowSelectionModel(newRows.filter(x=>x._checked)?.map((row) => row.id))
+    setRowSelectionModel(newRows.filter((x) => x._checked)?.map((row) => row.id))
   }
 
   useImperativeHandle(apiRef, () => ({
@@ -441,55 +449,57 @@ export function TestMessageDataGrid(props: TestMessageDataGridProps<BodyParamsTy
         height: '100%',
         border: `1px solid #EDEDED`,
         borderRadius: `${theme.shape.borderRadius}px`,
-        boxSizing:'border-box'
+        boxSizing: 'border-box'
       }}
     >
-    <ThemeProvider theme={createTheme({
-      components: {
-        MuiDataGrid: {
-          styleOverrides: {
-            columnHeader: {
-              // 调整表头字体大小
-              fontSize: '16px',
-              lineHeight:'24px'
-            },
-          },
-        },
-      },
-    })
-  }>
-      <DataGridPro
-        apiRef={tableApiRef}
-        editMode="row"
-        rows={renderRows}
-        rowModesModel={rowModesModel}
-        sx={{
-          ...EditableDataGridSx,
-          ...hoverSx
-        }}
-        checkboxSelection
-        rowHeight={40}
-        columnHeaderHeight={40}
-        initialState={{ pinnedColumns: { right: ['actions'] } }}
-        columns={columns.filter((col) => col) as GridColDef<RenderBodyParamsType>[]}
-        defaultGroupingExpansionDepth={-1}
-        pagination={false}
-        hideFooter
-        rowSelectionModel={rowSelectionModel}
-        onRowSelectionModelChange={handleSelectionChange}
-        autosizeOptions={{
-          expand: true,
-          includeHeaders: false
-        }}
-        loading={loading}
-        slots={{
-          loadingOverlay: LinearProgress
-        }}
-        disableColumnMenu={true}
-        disableColumnReorder={true}
-        disableColumnPinning={true}
-        disableColumnSorting={true}
-      /></ThemeProvider>
+      <ThemeProvider
+        theme={createTheme({
+          components: {
+            MuiDataGrid: {
+              styleOverrides: {
+                columnHeader: {
+                  // 调整表头字体大小
+                  fontSize: '16px',
+                  lineHeight: '24px'
+                }
+              }
+            }
+          }
+        })}
+      >
+        <DataGridPro
+          apiRef={tableApiRef}
+          editMode="row"
+          rows={renderRows}
+          rowModesModel={rowModesModel}
+          sx={{
+            ...EditableDataGridSx,
+            ...hoverSx
+          }}
+          checkboxSelection
+          rowHeight={40}
+          columnHeaderHeight={40}
+          initialState={{ pinnedColumns: { right: ['actions'] } }}
+          columns={columns.filter((col) => col) as GridColDef<RenderBodyParamsType>[]}
+          defaultGroupingExpansionDepth={-1}
+          pagination={false}
+          hideFooter
+          rowSelectionModel={rowSelectionModel}
+          onRowSelectionModelChange={handleSelectionChange}
+          autosizeOptions={{
+            expand: true,
+            includeHeaders: false
+          }}
+          loading={loading}
+          slots={{
+            loadingOverlay: LinearProgress
+          }}
+          disableColumnMenu={true}
+          disableColumnReorder={true}
+          disableColumnPinning={true}
+          disableColumnSorting={true}
+        />
+      </ThemeProvider>
     </Box>
   )
 }

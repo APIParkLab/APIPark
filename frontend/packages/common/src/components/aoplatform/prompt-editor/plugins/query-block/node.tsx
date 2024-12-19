@@ -40,7 +40,7 @@ export class QueryBlockNode extends DecoratorNode<JSX.Element> {
   exportJSON(): SerializedNode {
     return {
       type: 'query-block',
-      version: 1,
+      version: 1
     }
   }
 
@@ -52,8 +52,6 @@ export function $createQueryBlockNode(): QueryBlockNode {
   return new QueryBlockNode()
 }
 
-export function $isQueryBlockNode(
-  node: QueryBlockNode | LexicalNode | null | undefined,
-): node is QueryBlockNode {
+export function $isQueryBlockNode(node: QueryBlockNode | LexicalNode | null | undefined): node is QueryBlockNode {
   return node instanceof QueryBlockNode
 }

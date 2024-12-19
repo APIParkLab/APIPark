@@ -1,8 +1,7 @@
-
 import { Box, Chip, Stack, Typography, Skeleton } from '@mui/material'
-import {HTTPMethod, Protocol,RequestMethod} from "../../../RequestMethod";
-import {Clipboard} from "../../../Clipboard"
-import { $t } from '@common/locales';
+import { HTTPMethod, Protocol, RequestMethod } from '../../../RequestMethod'
+import { Clipboard } from '../../../Clipboard'
+import { $t } from '@common/locales'
 
 interface ApiBasicInfoDisplayProps {
   apiName: string
@@ -39,15 +38,19 @@ export default function ApiBasicInfoDisplay(props: Partial<ApiBasicInfoDisplayPr
       <Box display="flex">
         <Stack direction="row" spacing={1} alignItems="center">
           <Chip
-            label={$t("HTTP")}
+            label={$t('HTTP')}
             sx={{
-              height:'22px',
+              height: '22px',
               borderRadius: '4px',
               color: '#fff',
               backgroundColor: '#067ddb'
             }}
           />
-          <RequestMethod variant="filled" protocol={protocol ?? Protocol.HTTP} method={method ?? 'GET' as (keyof typeof HTTPMethod)} />
+          <RequestMethod
+            variant="filled"
+            protocol={protocol ?? Protocol.HTTP}
+            method={method ?? ('GET' as keyof typeof HTTPMethod)}
+          />
           <Typography>
             {/*{selectedEnv ? selectedEnv.hostUri : ''}*/}
             {uri}

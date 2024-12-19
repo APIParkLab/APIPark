@@ -1,8 +1,4 @@
-import {
-  memo,
-  useCallback,
-  useEffect,
-} from 'react'
+import { memo, useCallback, useEffect } from 'react'
 import type { TextNode } from 'lexical'
 import { $applyNodeReplacement } from 'lexical'
 import { mergeRegister } from '@lexical/utils'
@@ -16,10 +12,7 @@ import { WorkflowVariableBlockNode } from './index'
 
 export const REGEX = /\{\{(#[a-zA-Z0-9_-]{1,50}(\.[a-zA-Z_][a-zA-Z0-9_]{0,29}){1,10}#)\}\}/gi
 
-const WorkflowVariableBlockReplacementBlock = ({
-  workflowNodesMap,
-  onInsert,
-}: WorkflowVariableBlockType) => {
+const WorkflowVariableBlockReplacementBlock = ({ workflowNodesMap, onInsert }: WorkflowVariableBlockType) => {
   const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
@@ -27,37 +20,39 @@ const WorkflowVariableBlockReplacementBlock = ({
       throw new Error('WorkflowVariableBlockNodePlugin: WorkflowVariableBlockNode not registered on editor')
   }, [editor])
 
-  const createWorkflowVariableBlockNode = useCallback((textNode: TextNode): WorkflowVariableBlockNode => {
-    if (onInsert)
-      onInsert()
+  const createWorkflowVariableBlockNode = useCallback(
+    (textNode: TextNode): WorkflowVariableBlockNode => {
+      if (onInsert) onInsert()
 
-    const nodePathString = textNode.getTextContent().slice(3, -3)
-    return $applyNodeReplacement($createWorkflowVariableBlockNode(nodePathString.split('.'), workflowNodesMap))
-  }, [onInsert, workflowNodesMap])
+      const nodePathString = textNode.getTextContent().slice(3, -3)
+      return $applyNodeReplacement($createWorkflowVariableBlockNode(nodePathString.split('.'), workflowNodesMap))
+    },
+    [onInsert, workflowNodesMap]
+  )
 
   const getMatch = useCallback((text: string) => {
     const matchArr = REGEX.exec(text)
 
-    if (matchArr === null)
-      return null
+    if (matchArr === null) return null
 
     const startOffset = matchArr.index
     const endOffset = startOffset + matchArr[0].length
     return {
       end: endOffset,
-      start: startOffset,
+      start: startOffset
     }
   }, [])
 
-  const transformListener = useCallback((textNode: any) => {
-    return decoratorTransform(textNode, getMatch, createWorkflowVariableBlockNode)
-  }, [createWorkflowVariableBlockNode, getMatch])
+  const transformListener = useCallback(
+    (textNode: any) => {
+      return decoratorTransform(textNode, getMatch, createWorkflowVariableBlockNode)
+    },
+    [createWorkflowVariableBlockNode, getMatch]
+  )
 
   useEffect(() => {
     REGEX.lastIndex = 0
-    return mergeRegister(
-      editor.registerNodeTransform(CustomTextNode, transformListener),
-    )
+    return mergeRegister(editor.registerNodeTransform(CustomTextNode, transformListener))
   }, [])
 
   return null
