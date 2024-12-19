@@ -44,8 +44,7 @@ export function InputDialog(props: InputDialogProps): JSX.Element {
 
   return (
     <BaseDialog open={open} onClose={onClose} actionRender={null} title={title} onAnimationEnd={onAnimationEnd}>
-      <form 
-            onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent sx={{ paddingTop: 0.5, minWidth: '300px' }}>
           <FormControl error={Boolean(errors.value)} variant="standard" fullWidth>
             <Controller

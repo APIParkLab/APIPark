@@ -1,8 +1,17 @@
 import { cloneDeep } from 'lodash-es'
-import { parseFormData, parseFileValue, parseFileType, parseHeaders, parseRequestBodyToString, parseUri, payloadStr, goCodeParseFormData } from './transform'
+import {
+  parseFormData,
+  parseFileValue,
+  parseFileType,
+  parseHeaders,
+  parseRequestBodyToString,
+  parseUri,
+  payloadStr,
+  goCodeParseFormData
+} from './transform'
 // import { getJson } from '../.@common/utils/';
-import { ApiBodyType } from '@common/const/api-detail';
-import { $t } from '@common/locales';
+import { ApiBodyType } from '@common/const/api-detail'
+import { $t } from '@common/locales'
 
 function sameNameToParams(params: unknown) {
   params = cloneDeep(params)
@@ -54,9 +63,9 @@ function enrichParams(params: unknown) {
 export function generateCode(
   type: string,
   multipart: boolean,
-  { protocol, URL, headers, params, method, requestType, apiRequestParamJsonType, raw }: unknown,
+  { protocol, URL, headers, params, method, requestType, apiRequestParamJsonType, raw }: unknown
 ) {
-  requestType=ApiBodyType[requestType]
+  requestType = ApiBodyType[requestType]
   let code: string = ''
   const indent = '    '
   let urlObj: unknown = {}
@@ -243,9 +252,7 @@ export function generateCode(
         `${indent}"headers": {\r\n` +
         `${langTmp.headerStr ? `${langTmp.headerStr}\r\n` : ''}` +
         `${indent}},\r\n` +
-        `${
-          multipart ? `${indent}"processData": false,\r\n${indent}"contentType": false,\r\n` : ''
-        }` +
+        `${multipart ? `${indent}"processData": false,\r\n${indent}"contentType": false,\r\n` : ''}` +
         `${indent}"data": data,\r\n` +
         `${indent}"crossDomain": true\r\n` +
         '})\r\n' +
@@ -334,14 +341,10 @@ export function generateCode(
           'var requestInfo={\r\n' +
           `${indent}"method": "${method}",\r\n` +
           `${urlObj.hostname ? `${indent}"hostname": "${urlObj.hostname}",\r\n` : ''}` +
-          `${
-            urlObj.port ? `${indent}"port": "${urlObj.port}",\r\n` : ''
-          }` +
+          `${urlObj.port ? `${indent}"port": "${urlObj.port}",\r\n` : ''}` +
           `${
             urlObj.pathname || urlObj.search
-              ? `${indent}"path": "${urlObj.pathname || ''}${
-                urlObj.search || ''
-                }",\r\n`
+              ? `${indent}"path": "${urlObj.pathname || ''}${urlObj.search || ''}",\r\n`
               : ''
           }` +
           `${indent}"headers": {\r\n` +
@@ -366,19 +369,11 @@ export function generateCode(
           `var http = require("${urlObj.protocol.replace(':', '')}");\r\n` +
           'var requestInfo={\r\n' +
           `${indent}"method": "${method}",\r\n` +
-          `${
-            urlObj.hostname
-              ? `${indent}"hostname": "${urlObj.hostname}",\r\n`
-              : ''
-          }` +
-          `${
-            urlObj.port ? `${indent}"port": "${urlObj.port}",\r\n` : ''
-          }` +
+          `${urlObj.hostname ? `${indent}"hostname": "${urlObj.hostname}",\r\n` : ''}` +
+          `${urlObj.port ? `${indent}"port": "${urlObj.port}",\r\n` : ''}` +
           `${
             urlObj.pathname || urlObj.search
-              ? `${indent}"path": "${urlObj.pathname || ''}${
-                  urlObj.search || ''
-                }",\r\n`
+              ? `${indent}"path": "${urlObj.pathname || ''}${urlObj.search || ''}",\r\n`
               : ''
           }` +
           `${indent}"headers": {\r\n` +
@@ -439,11 +434,7 @@ export function generateCode(
         }
       }
       code =
-        `${
-          (requestType || 'FORMDATA') === 'FORMDATA' && multipart
-            ? 'var fs = require("fs");\r\n'
-            : ''
-        }` +
+        `${(requestType || 'FORMDATA') === 'FORMDATA' && multipart ? 'var fs = require("fs");\r\n' : ''}` +
         'var request = require("request");\r\n' +
         'var requestInfo={\r\n' +
         `   method: "${method}",\r\n` +
@@ -472,7 +463,7 @@ export function generateCode(
             params = sameNameToParams(params)
             let tmpOutput: unknown = ''
             params.map((val: unknown, key: number) => {
-              if(val.data_type === 'file') {
+              if (val.data_type === 'file') {
                 tmpOutput +=
                   `  "${val.name}" =>array(\r\n` +
                   `       "type" => "${parseFileType(val.value)}",\r\n` +
@@ -481,11 +472,9 @@ export function generateCode(
                   `  )${key === params.length - 1 ? '' : ','}\r\n`
               } else {
                 tmpOutput += `  ${JSON.stringify(val.name)} => ${JSON.stringify(val.value)}\r`
-
               }
             })
-            langTmp.paramsStr =
-            'addForm(' + `${tmpOutput.length ? `array(\r\n${tmpOutput})` : ''}` + '\r\n);'
+            langTmp.paramsStr = 'addForm(' + `${tmpOutput.length ? `array(\r\n${tmpOutput})` : ''}` + '\r\n);'
             langTmp.fileValue = parseFileValue(params)
           } else {
             langTmp.paramsStr = `append(new http\\QueryString(array({\r\n${parseFormData(params, {
@@ -516,9 +505,7 @@ export function generateCode(
       const tmpOutput: unknown = []
       urlObj.searchParams.forEach((val: unknown, key: unknown) => {
         tmpOutput.push(`  ${JSON.stringify(key)} => ${JSON.stringify(val)}`)
-        langTmp.queryStr = `$request->setQuery(new http\\QueryString(array(\r\n${tmpOutput.join(
-          ',\r\n'
-        )}\r\n)));`
+        langTmp.queryStr = `$request->setQuery(new http\\QueryString(array(\r\n${tmpOutput.join(',\r\n')}\r\n)));`
       })
       if (multipart) {
         code =
@@ -534,7 +521,7 @@ export function generateCode(
           '$request->setBody($body);\r\n\r\n' +
           `$request->getBody()->${langTmp.paramsStr}\r\n\r\n` +
           '$request->setHeaders(array(\r\n' +
-        `${langTmp.headerStr ?  `${langTmp.headerStr}\r\n` : ''}` +
+          `${langTmp.headerStr ? `${langTmp.headerStr}\r\n` : ''}` +
           '  "Content-Type":"multipart/form-data"\r\n' +
           '));\r\n\r\n' +
           '$client->enqueue($request)->send();\r\n' +
@@ -552,7 +539,7 @@ export function generateCode(
           '$request->setBody($body);\r\n\r\n' +
           `${langTmp.queryStr ? `${langTmp.queryStr}\r\n\r\n` : ''}` +
           '$request->setHeaders(array(\r\n' +
-          `${langTmp.headerStr ?  `${langTmp.headerStr}\r\n` : ''}` +
+          `${langTmp.headerStr ? `${langTmp.headerStr}\r\n` : ''}` +
           '));\r\n\r\n' +
           '$client->enqueue($request)->send();\r\n' +
           '$response = $client->getResponse();\r\n\r\n' +
@@ -572,9 +559,7 @@ export function generateCode(
             let tmpOutput = ''
             params.map((val: unknown, key: number) => {
               if (val.data_type === 'file') {
-                tmpOutput += `    "${val.name}" => new CURLFile($file_path)${
-                  key === params.length - 1 ? '' : ','
-                }\r\n`
+                tmpOutput += `    "${val.name}" => new CURLFile($file_path)${key === params.length - 1 ? '' : ','}\r\n`
               } else {
                 tmpOutput += `    ${JSON.stringify(val.name)} => ${JSON.stringify(val.value)}\r`
               }
@@ -614,7 +599,7 @@ export function generateCode(
           `  CURLOPT_CUSTOMREQUEST => "${method}",\r\n` +
           `  CURLOPT_POSTFIELDS => ${langTmp.paramsStr},\r\n` +
           '  CURLOPT_HTTPHEADER => array(\r\n' +
-          `${langTmp.headerStr ?  `${langTmp.headerStr},\r\n` : ''}` +
+          `${langTmp.headerStr ? `${langTmp.headerStr},\r\n` : ''}` +
           '    "Content-Type:multipart/form-data"' +
           '\r\n  ),\r\n' +
           '));\r\n\r\n' +
@@ -769,36 +754,33 @@ export function generateCode(
         tmpOutput.push(`${JSON.stringify(key)} : ${JSON.stringify(val)}`)
         // langTmp.querystring = `querystring={${tmpOutput.join(',')}};`
         langTmp.querystring = `{${tmpOutput.join(',')}}`
-
       })
-      if(multipart) {
-        code = 
-        'import requests \r\n\r\n' +
-            'headers = {\r\n' +
-            `${langTmp.headerStr}\r\n` +
-            '}\r\n' +
-            `url = "${method === 'GET' ? urlObj.origin + urlObj.pathname :  urlObj.href}"\r\n` +
-            '//获取文件,需填路径 \r\n' +
-            "file_path = '' \r\n" +
-            `filename = "${langTmp.fileValue}" \r\n` +
-            `filetype = "${langTmp.fileType}" \r\n` +
-            'data = { \r\n' +
-            `${langTmp.paramsStr}\r\n` +
-            '} \r\n' +
-            'files = {"file": (filename, open(file_path, "rb"), filetype)} \r\n' +
-            `response=requests.${method.toLowerCase()}(url, files=files, headers=headers, data=data)\r\n` +
-            'print(response.text)\r\n'
+      if (multipart) {
+        code =
+          'import requests \r\n\r\n' +
+          'headers = {\r\n' +
+          `${langTmp.headerStr}\r\n` +
+          '}\r\n' +
+          `url = "${method === 'GET' ? urlObj.origin + urlObj.pathname : urlObj.href}"\r\n` +
+          '//获取文件,需填路径 \r\n' +
+          "file_path = '' \r\n" +
+          `filename = "${langTmp.fileValue}" \r\n` +
+          `filetype = "${langTmp.fileType}" \r\n` +
+          'data = { \r\n' +
+          `${langTmp.paramsStr}\r\n` +
+          '} \r\n' +
+          'files = {"file": (filename, open(file_path, "rb"), filetype)} \r\n' +
+          `response=requests.${method.toLowerCase()}(url, files=files, headers=headers, data=data)\r\n` +
+          'print(response.text)\r\n'
       } else {
-        code = 
-        'import requests\r\n\r\n' +
-        `url = "${method === 'GET' ? urlObj.origin + urlObj.pathname :  urlObj.href}"\r\n\r\n` +
-        `payload = ${
-          langTmp.querystring ? langTmp.querystring : langTmp.paramsStr
-        }\r\n\r\n` +
-        `headers = {\r\n${langTmp.headerStr}` +
-        '\r\n}\r\n\r\n' +
-        `response=requests.request("${method}", url, ${payloadStr(method, headers)}, headers=headers)\r\n\r\n` +
-        'print(response.text)\r\n'
+        code =
+          'import requests\r\n\r\n' +
+          `url = "${method === 'GET' ? urlObj.origin + urlObj.pathname : urlObj.href}"\r\n\r\n` +
+          `payload = ${langTmp.querystring ? langTmp.querystring : langTmp.paramsStr}\r\n\r\n` +
+          `headers = {\r\n${langTmp.headerStr}` +
+          '\r\n}\r\n\r\n' +
+          `response=requests.request("${method}", url, ${payloadStr(method, headers)}, headers=headers)\r\n\r\n` +
+          'print(response.text)\r\n'
       }
       break
     }
@@ -815,9 +797,7 @@ export function generateCode(
             let tmpOutput = ''
             params.map((val: unknown, key: number) => {
               if (val.data_type === 'file') {
-                tmpOutput += `    "${val.name}" => new CURLFile($file_path)${
-                  key === params.length - 1 ? '' : ','
-                }\r\n`
+                tmpOutput += `    "${val.name}" => new CURLFile($file_path)${key === params.length - 1 ? '' : ','}\r\n`
               } else {
                 tmpOutput += `    ${JSON.stringify(val.name)} => ${JSON.stringify(val.value)}\r`
               }
@@ -847,7 +827,7 @@ export function generateCode(
         `request = Net::HTTP::${method.toLowerCase().replace(/^\S/, (s: string) => {
           return s?.toUpperCase()
         })}.new(url)\r\n` +
-        `${langTmp.headerStr ?  `${langTmp.headerStr}\r\n` : ''}` +
+        `${langTmp.headerStr ? `${langTmp.headerStr}\r\n` : ''}` +
         `request.body = ${langTmp.paramsStr}\r\n\r\n` +
         'response = http.request(request)\r\n' +
         'puts response.read_body'
@@ -883,25 +863,19 @@ export function generateCode(
         }
       }
       code =
-        `${
-          requestType === 'JSON' ? `printf '${langTmp.paramsStr}'|` : ''
-        } http  ${
-          (requestType || 'FORMDATA').toString() === 'FORMDATA' &&
-          !multipart
+        `${requestType === 'JSON' ? `printf '${langTmp.paramsStr}'|` : ''} http  ${
+          (requestType || 'FORMDATA').toString() === 'FORMDATA' && !multipart
             ? '--form'
-            : (requestType || 'JSON').toString() === 'JSON' &&
-              !multipart
-            ? '--follow'
-            : ''
+            : (requestType || 'JSON').toString() === 'JSON' && !multipart
+              ? '--follow'
+              : ''
         } ${multipart ? '--ignore-stdin --form --follow' : ''}  ${method}  '${
           urlObj.href
         }' ${multipart ? '\\\r' : '\\'}` +
         `${multipart ? langTmp.paramsStr : ''}\r` +
         `${langTmp.headerStr}` +
         `${
-          (requestType || 'FORMDATA').toString() === 'FORMDATA' &&
-          !multipart &&
-          langTmp.paramsStr
+          (requestType || 'FORMDATA').toString() === 'FORMDATA' && !multipart && langTmp.paramsStr
             ? ` \\\r\n${langTmp.paramsStr}`
             : ''
         }`
@@ -923,7 +897,6 @@ export function generateCode(
               }
             })
             langTmp.paramsStr = tmpOutput
-           
           } else {
             const tmpOutput = parseFormData(params, {
               format: '${name}=${value}',
@@ -1024,7 +997,7 @@ export function generateCode(
               '    if err != nil {\r\n' +
               '      return nil, err\r\n' +
               '    }\r\n' +
-              `${langTmp.headerStr ?  `${langTmp.headerStr}\r\n` : ''}` +
+              `${langTmp.headerStr ? `${langTmp.headerStr}\r\n` : ''}` +
               '    req.Header.Add("Content-Type", writer.FormDataContentType())\r\n\r\n' +
               '    client := &http.Client{}\r\n' +
               '    resp, err := client.Do(req)\r\n' +
@@ -1071,7 +1044,7 @@ export function generateCode(
         }
         default: {
           langTmp.paramsStr = requestParam ? JSON.stringify(requestParam) : ''
-          code = 
+          code =
             'package main\r\n\r\n' +
             'import (\r\n' +
             '    "bytes"\r\n' +
@@ -1091,7 +1064,7 @@ export function generateCode(
             'func request() ([]byte, error) {\r\n' +
             `    uri := "${urlObj.href}"\r\n\r\n` +
             `  ${
-               langTmp.paramsStr
+              langTmp.paramsStr
                 ? `  payload := map[string]interface{}${langTmp.paramsStr}`
                 : '  payload := strings.NewReader("")'
             }\r\n\r\n` +
@@ -1116,7 +1089,7 @@ export function generateCode(
         map: stringifyHeaders
       })
       let mediaType = 'application/octet-stream'
-      switch ( (requestType || 'FORMDATA').toUpperCase()) {
+      switch ((requestType || 'FORMDATA').toUpperCase()) {
         case 'FORMDATA': {
           if (multipart) {
             mediaType = 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
@@ -1154,8 +1127,8 @@ export function generateCode(
           break
         }
       }
-      if(multipart) {
-        code = 
+      if (multipart) {
+        code =
           'OkHttpClient client = new OkHttpClient();\r\n\r\n' +
           '//获取文件,需填路径 \r\n' +
           'File file = new File(""); \r\n\r\n' +
@@ -1175,11 +1148,7 @@ export function generateCode(
         code =
           'OkHttpClient client = new OkHttpClient().newBuilder().build();\r\n' +
           `MediaType mediaType = MediaType.parse("${mediaType}");\r\n` +
-          `${
-            method === 'GET'
-              ? ''
-              : `RequestBody body = RequestBody.create(mediaType, ${langTmp.paramsStr});\r\n`
-          }` +
+          `${method === 'GET' ? '' : `RequestBody body = RequestBody.create(mediaType, ${langTmp.paramsStr});\r\n`}` +
           'Request request = new Request.Builder()\r\n' +
           `  .url("${urlObj.href}")\r\n` +
           `  .method("${method}",${method === 'GET' ? 'null' : 'body'})\r\n` +
@@ -1188,7 +1157,7 @@ export function generateCode(
           'Response response = client.newCall(request).execute();\r\n' +
           'System.out.println(response.body().string());\r\n'
       }
-      
+
       break
     }
 
@@ -1233,9 +1202,7 @@ export function generateCode(
         `${indent}"header": {\r\n` +
         `${langTmp.headerStr}\r\n` +
         `${indent}},\r\n` +
-        `${
-          multipart ? `${indent}"processData": false,\r\n${indent}"contentType": false,\r\n` : ''
-        }` +
+        `${multipart ? `${indent}"processData": false,\r\n${indent}"contentType": false,\r\n` : ''}` +
         `${langTmp.paramsStr ? `${indent}"data": data,\r\n` : ''}` +
         `${indent}"success": (response)=> {\r\n` +
         `${indent + indent}console.log(response.data)\r\n` +

@@ -1,7 +1,7 @@
 import { Box } from '@mui/material'
 import { DataGridPro, GridColDef, useGridApiRef } from '@mui/x-data-grid-pro'
 import { useEffect, useMemo } from 'react'
-import {previewTableHoverSx } from '../../PreviewTable'
+import { previewTableHoverSx } from '../../PreviewTable'
 import { $t } from '@common/locales'
 
 interface ParamPreviewProps {
@@ -27,7 +27,6 @@ export function ParamPreview(props: ParamPreviewProps) {
     ]
   }, [name, type, required, description])
 
-
   useEffect(() => {
     // setTimeout(()=>{
     //   const element = document.querySelectorAll('.MuiDataGrid-main');
@@ -37,14 +36,13 @@ export function ParamPreview(props: ParamPreviewProps) {
     //     }
     //   }
     // },500)
-  }, []);
+  }, [])
 
   const hoverSx = useMemo(() => {
     return {
       ...previewTableHoverSx()
     }
   }, [])
-
 
   const columns: GridColDef[] = [
     {

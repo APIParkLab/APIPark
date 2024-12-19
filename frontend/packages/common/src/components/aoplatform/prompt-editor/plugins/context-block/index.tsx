@@ -1,19 +1,9 @@
-import {
-  memo,
-  useEffect,
-} from 'react'
-import {
-  $insertNodes,
-  COMMAND_PRIORITY_EDITOR,
-  createCommand,
-} from 'lexical'
+import { memo, useEffect } from 'react'
+import { $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand } from 'lexical'
 import { mergeRegister } from '@lexical/utils'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import type { ContextBlockType } from '../../types'
-import {
-  $createContextBlockNode,
-  ContextBlockNode,
-} from './node'
+import { $createContextBlockNode, ContextBlockNode } from './node'
 
 export const INSERT_CONTEXT_BLOCK_COMMAND = createCommand('INSERT_CONTEXT_BLOCK_COMMAND')
 export const DELETE_CONTEXT_BLOCK_COMMAND = createCommand('DELETE_CONTEXT_BLOCK_COMMAND')
@@ -24,49 +14,43 @@ export type Dataset = {
   type: string
 }
 
-const ContextBlock = memo(({
-  datasets = [],
-  onAddContext = () => {},
-  onInsert,
-  onDelete,
-  canNotAddContext,
-}: ContextBlockType) => {
-  const [editor] = useLexicalComposerContext()
+const ContextBlock = memo(
+  ({ datasets = [], onAddContext = () => {}, onInsert, onDelete, canNotAddContext }: ContextBlockType) => {
+    const [editor] = useLexicalComposerContext()
 
-  useEffect(() => {
-    if (!editor.hasNodes([ContextBlockNode]))
-      throw new Error('ContextBlockPlugin: ContextBlock not registered on editor')
+    useEffect(() => {
+      if (!editor.hasNodes([ContextBlockNode]))
+        throw new Error('ContextBlockPlugin: ContextBlock not registered on editor')
 
-    return mergeRegister(
-      editor.registerCommand(
-        INSERT_CONTEXT_BLOCK_COMMAND,
-        () => {
-          const contextBlockNode = $createContextBlockNode(datasets, onAddContext, canNotAddContext)
+      return mergeRegister(
+        editor.registerCommand(
+          INSERT_CONTEXT_BLOCK_COMMAND,
+          () => {
+            const contextBlockNode = $createContextBlockNode(datasets, onAddContext, canNotAddContext)
 
-          $insertNodes([contextBlockNode])
+            $insertNodes([contextBlockNode])
 
-          if (onInsert)
-            onInsert()
+            if (onInsert) onInsert()
 
-          return true
-        },
-        COMMAND_PRIORITY_EDITOR,
-      ),
-      editor.registerCommand(
-        DELETE_CONTEXT_BLOCK_COMMAND,
-        () => {
-          if (onDelete)
-            onDelete()
+            return true
+          },
+          COMMAND_PRIORITY_EDITOR
+        ),
+        editor.registerCommand(
+          DELETE_CONTEXT_BLOCK_COMMAND,
+          () => {
+            if (onDelete) onDelete()
 
-          return true
-        },
-        COMMAND_PRIORITY_EDITOR,
-      ),
-    )
-  }, [editor, datasets, onAddContext, onInsert, onDelete, canNotAddContext])
+            return true
+          },
+          COMMAND_PRIORITY_EDITOR
+        )
+      )
+    }, [editor, datasets, onAddContext, onInsert, onDelete, canNotAddContext])
 
-  return null
-})
+    return null
+  }
+)
 ContextBlock.displayName = 'ContextBlock'
 
 export { ContextBlock }

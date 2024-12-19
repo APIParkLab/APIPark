@@ -1,149 +1,134 @@
-import { ProConfigProvider, ProLayout } from '@ant-design/pro-components';
-import AvatarPic from '@common/assets/default-avatar.png';
-import Logo from '@common/assets/layout-logo.png';
-import { BasicResponse, RESPONSE_TIPS, routerKeyMap, STATUS_CODE } from '@common/const/const.tsx';
-import { PERMISSION_DEFINITION } from '@common/const/permissions.ts';
-import { UserInfoType } from '@common/const/type.ts';
-import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx';
-import { usePluginSlotHub } from '@common/contexts/PluginSlotHubContext';
-import { useFetch } from '@common/hooks/http.ts';
-import { $t } from '@common/locales';
-import { transformMenuData } from '@common/utils/navigation';
-import { Icon } from '@iconify/react';
-import { App, Button, ConfigProvider, Dropdown, MenuProps } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import LanguageSetting from './LanguageSetting';
+import { ProConfigProvider, ProLayout } from '@ant-design/pro-components'
+import AvatarPic from '@common/assets/default-avatar.png'
+import Logo from '@common/assets/layout-logo.png'
+import { BasicResponse, RESPONSE_TIPS, routerKeyMap, STATUS_CODE } from '@common/const/const.tsx'
+import { PERMISSION_DEFINITION } from '@common/const/permissions.ts'
+import { UserInfoType } from '@common/const/type.ts'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
+import { usePluginSlotHub } from '@common/contexts/PluginSlotHubContext'
+import { useFetch } from '@common/hooks/http.ts'
+import { $t } from '@common/locales'
+import { transformMenuData } from '@common/utils/navigation'
+import { Icon } from '@iconify/react'
+import { App, Button, ConfigProvider, Dropdown, MenuProps } from 'antd'
+import { useEffect, useMemo, useState } from 'react'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import LanguageSetting from './LanguageSetting'
 
-const APP_MODE = import.meta.env.VITE_APP_MODE;
-export type MenuItem = Required<MenuProps>['items'][number];
+const APP_MODE = import.meta.env.VITE_APP_MODE
+export type MenuItem = Required<MenuProps>['items'][number]
 
 const themeToken = {
   bgLayout: '#17163E;',
   header: {
-    heightLayoutHeader: 72,
+    heightLayoutHeader: 72
   },
   pageContainer: {
     paddingBlockPageContainerContent: 0,
-    paddingInlinePageContainerContent: 0,
-  },
-};
+    paddingInlinePageContainerContent: 0
+  }
+}
 
 function BasicLayout({ project = 'core' }: { project: string }) {
-  const navigator = useNavigate();
-  const location = useLocation();
-  const currentUrl = location.pathname;
-  const {
-    state,
-    accessData,
-    checkPermission,
-    accessInit,
-    dispatch,
-    resetAccess,
-    getGlobalAccessData,
-    menuList,
-  } = useGlobalContext();
-  const [pathname, setPathname] = useState(currentUrl);
-  const mainPage = project === 'core' ? '/service/list' : '/serviceHub/list';
-  const [menuItems, setMenuItems] = useState<MenuProps['items']>();
-  const pluginSlotHub = usePluginSlotHub();
+  const navigator = useNavigate()
+  const location = useLocation()
+  const currentUrl = location.pathname
+  const { state, accessData, checkPermission, accessInit, dispatch, resetAccess, getGlobalAccessData, menuList } =
+    useGlobalContext()
+  const [pathname, setPathname] = useState(currentUrl)
+  const mainPage = project === 'core' ? '/service/list' : '/serviceHub/list'
+  const [menuItems, setMenuItems] = useState<MenuProps['items']>()
+  const pluginSlotHub = usePluginSlotHub()
 
   useEffect(() => {
-    const newMenu = transformMenuData(menuList);
-    setMenuItems(newMenu);
-  }, [menuList, state.language, accessInit]);
+    const newMenu = transformMenuData(menuList)
+    setMenuItems(newMenu)
+  }, [menuList, state.language, accessInit])
 
   useEffect(() => {
     if (currentUrl === '/') {
-      navigator(mainPage);
+      navigator(mainPage)
     }
-  }, [currentUrl]);
+  }, [currentUrl])
 
   const headerMenuData = useMemo(() => {
     // 判断权限
-    const hasAccess = (access: unknown) =>
-      checkPermission(access as keyof (typeof PERMISSION_DEFINITION)[0]);
+    const hasAccess = (access: unknown) => checkPermission(access as keyof (typeof PERMISSION_DEFINITION)[0])
 
     // 过滤菜单项
     const filterMenu = (menu: Array<{ [k: string]: unknown }>) => {
       return [...menu]
-        .filter(x => x) // 过滤掉空数据
+        .filter((x) => x) // 过滤掉空数据
         .map((item: any) => {
           if (item.routes && item.routes.length > 0) {
             // 递归处理子菜单
-            const filteredRoutes: Array<{ [k: string]: unknown }> = filterMenu(item.routes);
+            const filteredRoutes: Array<{ [k: string]: unknown }> = filterMenu(item.routes)
 
             if (filteredRoutes.length === 0) {
-              return false;
+              return false
             }
-            return { ...item, routes: filteredRoutes, name: $t(item.name) };
+            return { ...item, routes: filteredRoutes, name: $t(item.name) }
           }
           // 处理没有 routes 的菜单项
           if (item.access) {
-            return item.access === 'all' || hasAccess(item.access)
-              ? { ...item, name: $t(item.name) }
-              : null;
+            return item.access === 'all' || hasAccess(item.access) ? { ...item, name: $t(item.name) } : null
           }
           // 如果没有 access 和 routes，则保留
-          return { ...item, name: $t(item.name) };
+          return { ...item, name: $t(item.name) }
         })
-        .filter(x => x); // 过滤掉处理后为 null 的项
-    };
+        .filter((x) => x) // 过滤掉处理后为 null 的项
+    }
 
     // 初始过滤操作
     const res = [...(menuItems || [])]!
-      .filter(x => x)
+      .filter((x) => x)
       .map((x: any) =>
-        x.routes
-          ? { ...x, name: $t(x.name), routes: filterMenu(x.routes) }
-          : { ...x, name: $t(x.name) }
-      );
+        x.routes ? { ...x, name: $t(x.name), routes: filterMenu(x.routes) } : { ...x, name: $t(x.name) }
+      )
     // 返回处理后的数据
     return {
       path: '/',
       routes: res
-        .map(x => ({ ...x, routes: x.routes?.filter(x => x.access || x.routes?.length > 0) }))
-        .filter(x => x.access || x.routes?.length > 0),
-    };
-  }, [accessData, state.language, menuItems]);
+        .map((x) => ({ ...x, routes: x.routes?.filter((x) => x.access || x.routes?.length > 0) }))
+        .filter((x) => x.access || x.routes?.length > 0)
+    }
+  }, [accessData, state.language, menuItems])
 
-  const { message } = App.useApp();
-  const [userInfo, setUserInfo] = useState<UserInfoType>();
-  const { fetchData } = useFetch();
-  const navigate = useNavigate();
+  const { message } = App.useApp()
+  const [userInfo, setUserInfo] = useState<UserInfoType>()
+  const { fetchData } = useFetch()
+  const navigate = useNavigate()
 
   const getUserInfo = () => {
-    fetchData<BasicResponse<{ profile: UserInfoType }>>('account/profile', { method: 'GET' }).then(
-      response => {
-        const { code, data, msg } = response;
-        if (code === STATUS_CODE.SUCCESS) {
-          setUserInfo(data.profile);
-          dispatch({ type: 'UPDATE_USERDATA', userData: data.profile });
-        } else {
-          message.error(msg || $t(RESPONSE_TIPS.error));
-        }
+    fetchData<BasicResponse<{ profile: UserInfoType }>>('account/profile', { method: 'GET' }).then((response) => {
+      const { code, data, msg } = response
+      if (code === STATUS_CODE.SUCCESS) {
+        setUserInfo(data.profile)
+        dispatch({ type: 'UPDATE_USERDATA', userData: data.profile })
+      } else {
+        message.error(msg || $t(RESPONSE_TIPS.error))
       }
-    );
-  };
+    })
+  }
 
   useEffect(() => {
-    getUserInfo();
-    getGlobalAccessData();
-  }, []);
+    getUserInfo()
+    getGlobalAccessData()
+  }, [])
 
   const logOut = () => {
-    fetchData<BasicResponse<null>>('account/logout', { method: 'GET' }).then(response => {
-      const { code, msg } = response;
+    fetchData<BasicResponse<null>>('account/logout', { method: 'GET' }).then((response) => {
+      const { code, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
-        dispatch({ type: 'LOGOUT' });
-        resetAccess();
+        dispatch({ type: 'LOGOUT' })
+        resetAccess()
         // message.success(msg || $t(RESPONSE_TIPS.logoutSuccess))
-        navigate('/login');
+        navigate('/login')
       } else {
-        message.error(msg || $t(RESPONSE_TIPS.error));
+        message.error(msg || $t(RESPONSE_TIPS.error))
       }
-    });
-  };
+    })
+  }
 
   const items: MenuProps['items'] = useMemo(
     () =>
@@ -159,7 +144,7 @@ function BasicLayout({ project = 'core' }: { project: string }) {
             >
               {$t('账号设置')}
             </Button>
-          ),
+          )
         },
         {
           key: '3',
@@ -172,11 +157,11 @@ function BasicLayout({ project = 'core' }: { project: string }) {
             >
               {$t('退出登录')}
             </Button>
-          ),
-        },
+          )
+        }
       ].filter(Boolean),
     [userInfo]
-  );
+  )
 
   const actionRender = useMemo(() => {
     return [
@@ -186,7 +171,7 @@ function BasicLayout({ project = 'core' }: { project: string }) {
         type="default"
         ghost
         onClick={() => {
-          window.open('https://docs.apipark.com', '_blank');
+          window.open('https://docs.apipark.com', '_blank')
         }}
       >
         <span className="flex items-center gap-[8px]">
@@ -195,28 +180,28 @@ function BasicLayout({ project = 'core' }: { project: string }) {
           {$t('文档')}
         </span>
       </Button>,
-      ...((pluginSlotHub.getSlot('basicLayoutAfterBtns') as unknown[]) || []),
-    ];
-  }, [pluginSlotHub.getSlot('basicLayoutAfterBtns')]);
+      ...((pluginSlotHub.getSlot('basicLayoutAfterBtns') as unknown[]) || [])
+    ]
+  }, [pluginSlotHub.getSlot('basicLayoutAfterBtns')])
 
   return (
     <div
       id="test-pro-layout"
       style={{
         height: '100vh',
-        overflow: 'auto',
+        overflow: 'auto'
       }}
     >
       <ProConfigProvider hashed={false}>
         <ConfigProvider
           getTargetContainer={() => {
-            return document.getElementById('test-pro-layout') || document.body;
+            return document.getElementById('test-pro-layout') || document.body
           }}
         >
           <ProLayout
             prefixCls="apipark-layout"
             location={{
-              pathname,
+              pathname
             }}
             siderWidth={220}
             breakpoint={'lg'}
@@ -225,7 +210,7 @@ function BasicLayout({ project = 'core' }: { project: string }) {
             siderMenuType="group"
             menu={{
               type: 'group',
-              collapsedShowGroupTitle: true,
+              collapsedShowGroupTitle: true
             }}
             disableMobile={true}
             avatarProps={{
@@ -236,32 +221,28 @@ function BasicLayout({ project = 'core' }: { project: string }) {
                 return (
                   <Dropdown
                     menu={{
-                      items,
+                      items
                     }}
                   >
                     <div className="avatar-dom">{dom}</div>
                   </Dropdown>
-                );
-              },
+                )
+              }
             }}
-            actionsRender={props => {
-              if (props.isMobile) return [];
-              if (typeof window === 'undefined') return [];
-              return actionRender;
+            actionsRender={(props) => {
+              if (props.isMobile) return []
+              if (typeof window === 'undefined') return []
+              return actionRender
             }}
             headerTitleRender={() => (
               <div className="w-[192px]  flex items-center">
-                <img
-                  className="h-[20px] cursor-pointer "
-                  src={Logo}
-                  onClick={() => navigator(mainPage)}
-                />
+                <img className="h-[20px] cursor-pointer " src={Logo} onClick={() => navigator(mainPage)} />
               </div>
             )}
             logo={Logo}
             pageTitleRender={() => $t('APIPark')}
-            menuFooterRender={props => {
-              if (props?.collapsed) return undefined;
+            menuFooterRender={(props) => {
+              if (props?.collapsed) return undefined
             }}
             menuItemRender={(item, dom) => (
               <div
@@ -273,16 +254,16 @@ function BasicLayout({ project = 'core' }: { project: string }) {
                     routerKeyMap.get(item.key).length > 0 &&
                     routerKeyMap.get(item.key)?.indexOf(pathname.split('/')[1]) !== -1
                   ) {
-                    return;
+                    return
                   }
                   if (item.key === pathname.split('/')[1]) {
-                    return;
+                    return
                   }
 
                   if (item.path) {
-                    navigator(item.path);
+                    navigator(item.path)
                   }
-                  setPathname(item.path || '');
+                  setPathname(item.path || '')
                 }}
               >
                 {dom}
@@ -305,6 +286,6 @@ function BasicLayout({ project = 'core' }: { project: string }) {
         </ConfigProvider>
       </ProConfigProvider>
     </div>
-  );
+  )
 }
-export default BasicLayout;
+export default BasicLayout

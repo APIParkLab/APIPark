@@ -1,7 +1,6 @@
-
 import { ChangeEvent, useEffect, useState } from 'react'
 import { FormControl, TextField, Box } from '@mui/material'
-import { $t } from '@common/locales';
+import { $t } from '@common/locales'
 
 interface ParamLimitProps {
   min: number | null
@@ -22,11 +21,11 @@ export function ParamLimit({ min, max, onChange, minLabel = 'Minimum', maxLabel 
     }
 
     if (isNaN(maxVal) || maxVal < 0) {
-      return $t('The (0) must not be negative.',[maxLabel])
+      return $t('The (0) must not be negative.', [maxLabel])
     }
 
     if (minVal > maxVal) {
-      return $t('The (0) must be greater than or equal to the (1).',[maxLabel, minLabel])
+      return $t('The (0) must be greater than or equal to the (1).', [maxLabel, minLabel])
     }
 
     return null
@@ -64,15 +63,15 @@ export function ParamLimit({ min, max, onChange, minLabel = 'Minimum', maxLabel 
                   '& .MuiOutlinedInput-notchedOutline': {
                     border: '1px solid #EDEDED'
                   },
-                  '& .Mui-focused .MuiOutlinedInput-notchedOutline':{
-                    border:'1px solid #3D46F2'
+                  '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: '1px solid #3D46F2'
                   },
-                  '& .MuiInputLabel-root.Mui-focused':{
-                    color:'#3D46F2'
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: '#3D46F2'
                   },
-                  '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline':{
-                    borderColor:'#3D46F2'
-                    }
+                  '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#3D46F2'
+                  }
                 }}
                 value={minValue}
                 onChange={handleMinChange}
@@ -90,15 +89,15 @@ export function ParamLimit({ min, max, onChange, minLabel = 'Minimum', maxLabel 
                   '& .MuiOutlinedInput-notchedOutline': {
                     border: '1px solid #EDEDED'
                   },
-                  '& .Mui-focused .MuiOutlinedInput-notchedOutline':{
-                    border:'1px solid #3D46F2'
+                  '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: '1px solid #3D46F2'
                   },
-                  '& .MuiInputLabel-root.Mui-focused':{
-                    color:'#3D46F2'
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: '#3D46F2'
                   },
-                  '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline':{
-                    borderColor:'#3D46F2'
-                    }
+                  '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#3D46F2'
+                  }
                 }}
                 onChange={handleMaxChange}
                 type="number"
