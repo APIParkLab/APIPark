@@ -1,4 +1,3 @@
-
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import type { ButtonProps } from '@mui/material'
@@ -6,7 +5,7 @@ import { Button, DialogActions as MuiDialogActions, DialogContent } from '@mui/m
 import { type ReactNode } from 'react'
 import type { LoadingButtonProps } from '@mui/lab'
 import { LoadingButton } from '@mui/lab'
-import {renderComponent} from "@common/utils/postcat.tsx";
+import { renderComponent } from '@common/utils/postcat.tsx'
 import { $t } from '@common/locales'
 
 export interface BaseDialogProps extends DialogActionProps {
@@ -23,7 +22,11 @@ export function BaseDialog(props: BaseDialogProps): JSX.Element {
 
   return (
     <Dialog open={open} onClose={onClose} onAnimationEnd={onAnimationEnd} maxWidth={false}>
-      {title ? <DialogTitle fontSize="medium" sx={{fontWeight:'bold',color:'#333'}}>{title}</DialogTitle> : null}
+      {title ? (
+        <DialogTitle fontSize="medium" sx={{ fontWeight: 'bold', color: '#333' }}>
+          {title}
+        </DialogTitle>
+      ) : null}
       {children ? (
         children
       ) : (
@@ -56,7 +59,6 @@ interface DialogActionProps {
 }
 
 export function DialogActions(props: DialogActionProps): JSX.Element {
-
   const CancelText = $t('取消')
   const ConfirmText = $t('确定')
   const {

@@ -1,5 +1,4 @@
-
-const CODE_LANG =  [
+const CODE_LANG = [
   {
     label: 'Java(OK HTTP)',
     value: 20

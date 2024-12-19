@@ -1,15 +1,15 @@
-import { useTheme, Box } from "@mui/material"
-import { GridColDef, DataGridPro } from "@mui/x-data-grid-pro"
-import {  Descriptions } from "antd"
-import { useState, useMemo, useEffect } from "react"
-import { SystemApiProxyType, ProxyHeaderItem } from "@core/const/system/type"
-import { previewTableHoverSx, collapseTableSx } from "../../../PreviewTable"
-import { RenderMessageBody } from "../MessageBody"
-import { Collapse } from "../../../Collapse"
-import { $t } from "@common/locales"
+import { useTheme, Box } from '@mui/material'
+import { GridColDef, DataGridPro } from '@mui/x-data-grid-pro'
+import { Descriptions } from 'antd'
+import { useState, useMemo, useEffect } from 'react'
+import { SystemApiProxyType, ProxyHeaderItem } from '@core/const/system/type'
+import { previewTableHoverSx, collapseTableSx } from '../../../PreviewTable'
+import { RenderMessageBody } from '../MessageBody'
+import { Collapse } from '../../../Collapse'
+import { $t } from '@common/locales'
 
 interface HeaderFieldsProps {
-  proxyInfo:SystemApiProxyType
+  proxyInfo: SystemApiProxyType
   loading?: boolean
   validating?: boolean
   title: string
@@ -18,7 +18,7 @@ interface HeaderFieldsProps {
 
 export default function ApiProxy({ proxyInfo, title, loading = false, onMoreSettingChange }: HeaderFieldsProps) {
   const theme = useTheme()
-  const [rows,setRows] = useState<[]>([])
+  const [rows, setRows] = useState<[]>([])
   const borderRadius = theme.shape.borderRadius
 
   const hoverSx = useMemo(() => {
@@ -38,14 +38,14 @@ export default function ApiProxy({ proxyInfo, title, loading = false, onMoreSett
     {
       field: 'optType',
       headerName: $t('操作类型'),
-      valueGetter: (params) => params.row.optType === 'ADD'?$t('新增或修改'):$t('删除'),
+      valueGetter: (params) => (params.row.optType === 'ADD' ? $t('新增或修改') : $t('删除')),
       width: 200
     },
     {
       field: 'value',
       headerName: $t('匹配参数值'),
       flex: 1
-    },
+    }
   ]
 
   const getBasicInfo = useMemo(() => {
@@ -54,13 +54,13 @@ export default function ApiProxy({ proxyInfo, title, loading = false, onMoreSett
         key: 'path',
         label: $t('转发上游路径'),
         children: proxyInfo?.path,
-        style: {paddingBottom: '10px'},
+        style: { paddingBottom: '10px' }
       },
       {
         key: 'timeout',
         label: $t('请求超时时间'),
         children: proxyInfo?.timeout,
-        style: {paddingBottom: '10px'},
+        style: { paddingBottom: '10px' }
       },
       // {
       //   key: 'upstream',
@@ -72,27 +72,38 @@ export default function ApiProxy({ proxyInfo, title, loading = false, onMoreSett
         key: 'retry',
         label: $t('重试时间'),
         children: proxyInfo?.retry,
-        style: {paddingBottom: '10px'},
+        style: { paddingBottom: '10px' }
       },
-      ...(proxyInfo.headers.length > 0 ? [{
-        key: 'headers',
-        label: $t('转发上游请求头'),
-        children: '',
-        style: {paddingBottom: '10px'},
-      }]:[])
-    ];
-  }, [proxyInfo]);
+      ...(proxyInfo.headers.length > 0
+        ? [
+            {
+              key: 'headers',
+              label: $t('转发上游请求头'),
+              children: '',
+              style: { paddingBottom: '10px' }
+            }
+          ]
+        : [])
+    ]
+  }, [proxyInfo])
 
   useEffect(() => {
     setRows(proxyInfo?.headers || [])
-  }, [proxyInfo]);
+  }, [proxyInfo])
 
   return (
     <Collapse title={title}>
       <Box width="100%">
-        <Descriptions className={`bg-bar-theme p-btnbase ${proxyInfo?.headers?.length > 0 ? 'border-0 border-b border-solid border-b-BORDER': ''} `}  title="" items={getBasicInfo} column={2} labelStyle={{width:'120px',justifyContent:'flex-end',fontWeight:'bold'}}  contentStyle={{color:'#333'}}/>
+        <Descriptions
+          className={`bg-bar-theme p-btnbase ${proxyInfo?.headers?.length > 0 ? 'border-0 border-b border-solid border-b-BORDER' : ''} `}
+          title=""
+          items={getBasicInfo}
+          column={2}
+          labelStyle={{ width: '120px', justifyContent: 'flex-end', fontWeight: 'bold' }}
+          contentStyle={{ color: '#333' }}
+        />
 
-        {proxyInfo?.headers?.length > 0 &&
+        {proxyInfo?.headers?.length > 0 && (
           <DataGridPro
             autoHeight
             rows={rows}
@@ -111,7 +122,7 @@ export default function ApiProxy({ proxyInfo, title, loading = false, onMoreSett
               includeHeaders: false
             }}
           />
-        }
+        )}
       </Box>
     </Collapse>
   )

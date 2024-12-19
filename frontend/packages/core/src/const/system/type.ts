@@ -1,6 +1,6 @@
 
-import { FormInstance, UploadFile } from "antd";
 import { EntityItem, MatchItem } from "@common/const/type";
+import { FormInstance, UploadFile } from "antd";
 import { SubscribeEnum, SubscribeFromEnum } from "./const";
 
 export type SystemTableListItem = {
