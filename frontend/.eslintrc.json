@@ -18,7 +18,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["react", "@typescript-eslint", "prettier"],
+  "plugins": ["react", "@typescript-eslint", "prettier", "unused-imports"],
   "rules": {
     "react/react-in-jsx-scope": "off",
     "prettier/prettier": "error",

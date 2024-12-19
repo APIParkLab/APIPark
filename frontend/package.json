@@ -67,6 +67,7 @@
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "file-saver": "^2.0.5",
     "i18next-scanner": "^4.5.0",
     "jest": "^29.7.0",

@@ -5,5 +5,8 @@
         "Apipark",
         "logsettings",
         "resourcesettings"
-    ]
+    ],
+    "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+    }
 }
