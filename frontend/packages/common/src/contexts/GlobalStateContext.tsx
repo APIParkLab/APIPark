@@ -1,19 +1,20 @@
-import { createContext, Dispatch, FC, ReactNode, useContext, useEffect, useReducer, useState } from 'react'
-import { useFetch } from '@common/hooks/http'
-import { App } from 'antd'
-import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
-import { checkAccess } from '@common/utils/permission'
-import { PERMISSION_DEFINITION } from '@common/const/permissions'
-import { $t } from '@common/locales'
-import { MenuItem } from '@common/utils/navigation'
 import { ErrorBoundary } from '@ant-design/pro-components'
 import NotFound from '@common/components/aoplatform/NotFound'
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
+import { PERMISSION_DEFINITION } from '@common/const/permissions'
 import { RouteConfig } from '@common/const/type'
+import { useFetch } from '@common/hooks/http'
+import { $t } from '@common/locales'
+import { MenuItem } from '@common/utils/navigation'
+import { checkAccess } from '@common/utils/permission'
 import { ProtectedRoute } from '@core/components/aoplatform/RenderRoutes'
 import Login from '@core/pages/Login'
-import { useLocaleContext } from './LocaleContext'
 import Root from '@core/pages/Root'
+import Playground from '@core/pages/playground'
 import DataMaskingCompare from '@core/pages/policy/dataMasking/DataMaskingCompare'
+import { App } from 'antd'
+import { createContext, Dispatch, FC, ReactNode, useContext, useEffect, useReducer, useState } from 'react'
+import { useLocaleContext } from './LocaleContext'
 interface GlobalState {
   isAuthenticated: boolean
   userData: UserData | null
@@ -306,7 +307,8 @@ export const DefaultRouteConfig = [
         key: 'errorBoundary'
       }
     ]
-  }
+  },
+  { path: '/playground', component: <Playground />, key: 'playground' }
 ]
 // Create a context provider component
 export const GlobalProvider: FC<{ children: ReactNode }> = ({ children }) => {
