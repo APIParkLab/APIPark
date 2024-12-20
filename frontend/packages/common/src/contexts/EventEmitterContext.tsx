@@ -5,7 +5,7 @@ import { useEventEmitter } from 'ahooks'
 import type { EventEmitter } from 'ahooks/lib/useEventEmitter'
 
 const EventEmitterContext = createContext<{ eventEmitter: EventEmitter<string> | null }>({
-  eventEmitter: null,
+  eventEmitter: null
 })
 
 export const useEventEmitterContextContext = () => useContext(EventEmitterContext)
@@ -13,16 +13,10 @@ export const useEventEmitterContextContext = () => useContext(EventEmitterContex
 type EventEmitterContextProviderProps = {
   children: React.ReactNode
 }
-export const EventEmitterContextProvider = ({
-  children,
-}: EventEmitterContextProviderProps) => {
+export const EventEmitterContextProvider = ({ children }: EventEmitterContextProviderProps) => {
   const eventEmitter = useEventEmitter<string>()
 
-  return (
-    <EventEmitterContext.Provider value={{ eventEmitter }}>
-      {children}
-    </EventEmitterContext.Provider>
-  )
+  return <EventEmitterContext.Provider value={{ eventEmitter }}>{children}</EventEmitterContext.Provider>
 }
 
 export default EventEmitterContext

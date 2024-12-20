@@ -8,7 +8,7 @@ import type {
   HistoryBlockType,
   QueryBlockType,
   VariableBlockType,
-  WorkflowVariableBlockType,
+  WorkflowVariableBlockType
 } from '../../types'
 import { INSERT_CONTEXT_BLOCK_COMMAND } from '../context-block'
 import { INSERT_HISTORY_BLOCK_COMMAND } from '../history-block'
@@ -32,32 +32,35 @@ import { $t } from '@common/locales'
 export const usePromptOptions = (
   contextBlock?: ContextBlockType,
   queryBlock?: QueryBlockType,
-  historyBlock?: HistoryBlockType,
+  historyBlock?: HistoryBlockType
 ) => {
   const [editor] = useLexicalComposerContext()
 
   const promptOptions: PickerBlockMenuOption[] = []
   if (contextBlock?.show) {
-    promptOptions.push(new PickerBlockMenuOption({
-      key: $t('上下文'),
-      group: 'prompt context',
-      render: ({ isSelected, onSelect, onSetHighlight }) => {
-        return <PromptMenuItem
-          title={$t('上下文')}
-          icon={<></>}
-          // icon={<File05 className='w-4 h-4 text-[#6938EF]' />}
-          disabled={!contextBlock.selectable}
-          isSelected={isSelected}
-          onClick={onSelect}
-          onMouseEnter={onSetHighlight}
-        />
-      },
-      onSelect: () => {
-        if (!contextBlock?.selectable)
-          return
-        editor.dispatchCommand(INSERT_CONTEXT_BLOCK_COMMAND, undefined)
-      },
-    }))
+    promptOptions.push(
+      new PickerBlockMenuOption({
+        key: $t('上下文'),
+        group: 'prompt context',
+        render: ({ isSelected, onSelect, onSetHighlight }) => {
+          return (
+            <PromptMenuItem
+              title={$t('上下文')}
+              icon={<></>}
+              // icon={<File05 className='w-4 h-4 text-[#6938EF]' />}
+              disabled={!contextBlock.selectable}
+              isSelected={isSelected}
+              onClick={onSelect}
+              onMouseEnter={onSetHighlight}
+            />
+          )
+        },
+        onSelect: () => {
+          if (!contextBlock?.selectable) return
+          editor.dispatchCommand(INSERT_CONTEXT_BLOCK_COMMAND, undefined)
+        }
+      })
+    )
   }
 
   if (queryBlock?.show) {
@@ -79,11 +82,10 @@ export const usePromptOptions = (
           )
         },
         onSelect: () => {
-          if (!queryBlock?.selectable)
-            return
+          if (!queryBlock?.selectable) return
           editor.dispatchCommand(INSERT_QUERY_BLOCK_COMMAND, undefined)
-        },
-      }),
+        }
+      })
     )
   }
 
@@ -98,8 +100,7 @@ export const usePromptOptions = (
               title={$t('会话历史')}
               icon={<></>}
               // icon={<MessageClockCircle className='w-4 h-4 text-[#DD2590]' />}
-              disabled={!historyBlock.selectable
-              }
+              disabled={!historyBlock.selectable}
               isSelected={isSelected}
               onClick={onSelect}
               onMouseEnter={onSetHighlight}
@@ -107,11 +108,10 @@ export const usePromptOptions = (
           )
         },
         onSelect: () => {
-          if (!historyBlock?.selectable)
-            return
+          if (!historyBlock?.selectable) return
           editor.dispatchCommand(INSERT_HISTORY_BLOCK_COMMAND, undefined)
-        },
-      }),
+        }
+      })
     )
   }
   return promptOptions
@@ -119,16 +119,15 @@ export const usePromptOptions = (
 
 export const useVariableOptions = (
   variableBlock?: VariableBlockType,
-  queryString?: string,
+  queryString?: string
 ): PickerBlockMenuOption[] => {
   const { t } = useTranslation()
   const [editor] = useLexicalComposerContext()
 
   const options = useMemo(() => {
-    if (!variableBlock?.variables)
-      return []
+    if (!variableBlock?.variables) return []
 
-    const baseOptions = (variableBlock.variables).map((item) => {
+    const baseOptions = variableBlock.variables.map((item) => {
       return new PickerBlockMenuOption({
         key: item.value,
         group: 'prompt variable',
@@ -147,15 +146,14 @@ export const useVariableOptions = (
         },
         onSelect: () => {
           editor.dispatchCommand(INSERT_VARIABLE_VALUE_BLOCK_COMMAND, `{{${item.value}}}`)
-        },
+        }
       })
     })
-    if (!queryString)
-      return baseOptions
+    if (!queryString) return baseOptions
 
     const regex = new RegExp(queryString, 'i')
 
-    return baseOptions.filter(option => regex.test(option.key))
+    return baseOptions.filter((option) => regex.test(option.key))
   }, [editor, queryString, variableBlock])
 
   const addOption = useMemo(() => {
@@ -182,7 +180,7 @@ export const useVariableOptions = (
           $insertNodes([prefixNode, suffixNode])
           prefixNode.select()
         })
-      },
+      }
     })
   }, [editor, t])
 
@@ -191,17 +189,13 @@ export const useVariableOptions = (
   }, [options, addOption, variableBlock?.show])
 }
 
-export const useExternalToolOptions = (
-  externalToolBlockType?: ExternalToolBlockType,
-  queryString?: string,
-) => {
+export const useExternalToolOptions = (externalToolBlockType?: ExternalToolBlockType, queryString?: string) => {
   const { t } = useTranslation()
   const [editor] = useLexicalComposerContext()
 
   const options = useMemo(() => {
-    if (!externalToolBlockType?.externalTools)
-      return []
-    const baseToolOptions = (externalToolBlockType.externalTools).map((item) => {
+    if (!externalToolBlockType?.externalTools) return []
+    const baseToolOptions = externalToolBlockType.externalTools.map((item) => {
       return new PickerBlockMenuOption({
         key: item.name,
         group: 'external tool',
@@ -217,7 +211,7 @@ export const useExternalToolOptions = (
               //     background={item.icon_background}
               //   />
               // }
-              extraElement={<div className='text-xs text-gray-400'>{item.variableName}</div>}
+              extraElement={<div className="text-xs text-gray-400">{item.variableName}</div>}
               queryString={queryString}
               isSelected={isSelected}
               onClick={onSelect}
@@ -227,15 +221,14 @@ export const useExternalToolOptions = (
         },
         onSelect: () => {
           editor.dispatchCommand(INSERT_VARIABLE_VALUE_BLOCK_COMMAND, `{{${item.variableName}}}`)
-        },
+        }
       })
     })
-    if (!queryString)
-      return baseToolOptions
+    if (!queryString) return baseToolOptions
 
     const regex = new RegExp(queryString, 'i')
 
-    return baseToolOptions.filter(option => regex.test(option.key))
+    return baseToolOptions.filter((option) => regex.test(option.key))
   }, [editor, queryString, externalToolBlockType])
 
   const addOption = useMemo(() => {
@@ -257,7 +250,7 @@ export const useExternalToolOptions = (
       },
       onSelect: () => {
         externalToolBlockType?.onAddExternalTool?.()
-      },
+      }
     })
   }, [externalToolBlockType, t])
 
@@ -273,14 +266,13 @@ export const useOptions = (
   variableBlock?: VariableBlockType,
   externalToolBlockType?: ExternalToolBlockType,
   workflowVariableBlockType?: WorkflowVariableBlockType,
-  queryString?: string,
+  queryString?: string
 ) => {
   const promptOptions = usePromptOptions(contextBlock, queryBlock, historyBlock)
   const variableOptions = useVariableOptions(variableBlock, queryString)
   const externalToolOptions = useExternalToolOptions(externalToolBlockType, queryString)
   const workflowVariableOptions = useMemo(() => {
-    if (!workflowVariableBlockType?.show)
-      return []
+    if (!workflowVariableBlockType?.show) return []
 
     return workflowVariableBlockType.variables || []
   }, [workflowVariableBlockType])
@@ -288,7 +280,7 @@ export const useOptions = (
   return useMemo(() => {
     return {
       workflowVariableOptions,
-      allFlattenOptions: [...promptOptions, ...variableOptions, ...externalToolOptions],
+      allFlattenOptions: [...promptOptions, ...variableOptions, ...externalToolOptions]
     }
   }, [promptOptions, variableOptions, externalToolOptions, workflowVariableOptions])
 }

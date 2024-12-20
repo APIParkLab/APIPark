@@ -3,7 +3,6 @@ import {
   RefObject,
   SyntheticEvent,
   useCallback,
-  useContext,
   useEffect,
   useImperativeHandle,
   useMemo,
@@ -12,11 +11,11 @@ import {
 } from 'react'
 import { TestBody, TestBodyApi, TestBodyType } from './TestBody'
 import { ContentType } from './TestBody/const'
-import {throttle} from 'lodash-es'
+import { throttle } from 'lodash-es'
 import { ImportMessage, ImportMessageChangeType, ImportMessageOption } from './ImportMessage'
-import {ApiBodyType, ApiDetail, ParseCurlResult, TestApiBodyType} from "@common/const/api-detail";
-import {TestMessageDataGrid, TestMessageDataGridApi} from "../TestMessageDataGrid";
-import {Indicator} from "../../../../Indicator";
+import { ApiBodyType, ApiDetail, ParseCurlResult, TestApiBodyType } from '@common/const/api-detail'
+import { TestMessageDataGrid, TestMessageDataGridApi } from '../TestMessageDataGrid'
+import { Indicator } from '../../../../Indicator'
 import { $t } from '@common/locales'
 
 export interface ApiRequestTesterApi {
@@ -40,11 +39,11 @@ export interface ApiRequestTesterApi {
 interface ApiRequestTesterProps {
   apiRef: RefObject<ApiRequestTesterApi>
   onQueryChange: (query: ApiBodyType[]) => void
-  apiInfo:ApiDetail
-  loaded:boolean
+  apiInfo: ApiDetail
+  loaded: boolean
 }
 
-export function ApiRequestTester({ apiRef, onQueryChange ,apiInfo, loaded=true}: ApiRequestTesterProps) {
+export function ApiRequestTester({ apiRef, onQueryChange, apiInfo, loaded = true }: ApiRequestTesterProps) {
   const [apiHeaders, setApiHeaders] = useState<ApiBodyType[] | null>(null)
   const [apiQuery, setApiQuery] = useState<ApiBodyType[] | null>(null)
   const [apiRest, setApiRest] = useState<ApiBodyType[] | null>(null)
@@ -59,7 +58,7 @@ export function ApiRequestTester({ apiRef, onQueryChange ,apiInfo, loaded=true}:
       headers: headersApiRef.current?.getEditMeta() || null,
       body: bodyApiRef.current?.getBodyMeta(),
       query: queryApiRef.current?.getEditMeta() || null,
-      rest: restApiRef.current?.getEditMeta() || null,
+      rest: restApiRef.current?.getEditMeta() || null
     }
   }
 
@@ -185,7 +184,7 @@ export function ApiRequestTester({ apiRef, onQueryChange ,apiInfo, loaded=true}:
               minHeight: tabHeight,
               height: tabHeight
             },
-            fontSize:'14px'
+            fontSize: '14px'
           }}
         >
           {tabs.map((tab) => (
@@ -194,7 +193,7 @@ export function ApiRequestTester({ apiRef, onQueryChange ,apiInfo, loaded=true}:
               value={tab.label}
               label={
                 <Box key={tab.label} display="flex" alignItems="center" pr={tab.dirty ? 0.5 : 0}>
-                  <Typography sx={{fontSize:'14px'}}>{tab.label}</Typography>
+                  <Typography sx={{ fontSize: '14px' }}>{tab.label}</Typography>
                   <Grow in={tab.dirty}>
                     <Box>
                       <Indicator
@@ -212,7 +211,7 @@ export function ApiRequestTester({ apiRef, onQueryChange ,apiInfo, loaded=true}:
                 padding: theme.spacing(1),
                 minWidth: 'auto',
                 minHeight: tabHeight,
-                fontSize:'14px'
+                fontSize: '14px'
               }}
             />
           ))}

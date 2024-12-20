@@ -1,5 +1,4 @@
-
-import { ApiBodyType, ApiParamsType } from "@common/const/api-detail"
+import { ApiBodyType, ApiParamsType } from '@common/const/api-detail'
 
 export type ApiBodyTypeLabel = 'Form-Data' | 'JSON' | 'XML' | 'Raw' | 'Binary'
 

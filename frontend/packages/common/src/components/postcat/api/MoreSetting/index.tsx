@@ -6,9 +6,9 @@ import { useEffect, useRef, useState } from 'react'
 import { ValueEnum, ValueEnumApi } from './components/ValueEnum'
 import { Example } from './components/Example'
 import { ParamLimit } from './components/ParamLimit'
-import {ParamAttrType} from "@common/const/api-detail";
-import { BaseDialog} from "../Dialog/base-dialog.tsx";
-import {ApiParamsTypeOptions} from "../ApiManager/components/ApiMessageBody/constants.ts";
+import { ParamAttrType } from '@common/const/api-detail'
+import { BaseDialog } from '../Dialog/base-dialog.tsx'
+import { ApiParamsTypeOptions } from '../ApiManager/components/ApiMessageBody/constants.ts'
 import { $t } from '@common/locales/index.ts'
 
 interface MoreSettingProps {
@@ -26,7 +26,7 @@ interface MoreSettingProps {
   }
 }
 
-export function MoreSetting({ open, readOnly,onClose, param, onChange, hiddenConfig }: MoreSettingProps) {
+export function MoreSetting({ open, readOnly, onClose, param, onChange, hiddenConfig }: MoreSettingProps) {
   const [previewType, setPreviewType] = useState<string>('')
   const [valueEnumList, setValueEnumList] = useState<ValueEnum[]>([])
 
@@ -105,9 +105,15 @@ export function MoreSetting({ open, readOnly,onClose, param, onChange, hiddenCon
               onChange={handleParamValueChange}
             />
           ) : null}
-          {!hiddenConfig?.valueEnum ? <ValueEnum data={valueEnumList} apiRef={valueEnumApiRef} readOnly={readOnly} /> : null}
+          {!hiddenConfig?.valueEnum ? (
+            <ValueEnum data={valueEnumList} apiRef={valueEnumApiRef} readOnly={readOnly} />
+          ) : null}
           {!hiddenConfig?.example ? (
-            <Example code={(param?.paramAttr?.example as string) || ''} readOnly={readOnly} onChange={handleExampleChange} />
+            <Example
+              code={(param?.paramAttr?.example as string) || ''}
+              readOnly={readOnly}
+              onChange={handleExampleChange}
+            />
           ) : null}
         </Stack>
       </Box>

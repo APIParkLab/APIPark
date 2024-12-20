@@ -1,7 +1,7 @@
 import { Box, Chip, Typography } from '@mui/material'
-import {IconButton} from "../../../../IconButton";
-import {byteToString} from "@common/utils/postcat.tsx";
-import { $t } from '@common/locales';
+import { IconButton } from '../../../../IconButton'
+import { byteToString } from '@common/utils/postcat.tsx'
+import { $t } from '@common/locales'
 
 interface ResponseIndicatorProps {
   statusCode: number

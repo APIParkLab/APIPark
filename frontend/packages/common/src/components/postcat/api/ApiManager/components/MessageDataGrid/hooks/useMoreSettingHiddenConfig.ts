@@ -1,6 +1,6 @@
-import {MessageType, RenderMessageBody} from "../index.tsx";
-import {isNil} from "@common/utils/postcat.tsx";
-import {ApiParamsType} from "@common/const/api-detail";
+import { MessageType, RenderMessageBody } from '../index.tsx'
+import { isNil } from '@common/utils/postcat.tsx'
+import { ApiParamsType } from '@common/const/api-detail'
 
 interface UseMoreSettingHiddenConfigProps {
   param: RenderMessageBody

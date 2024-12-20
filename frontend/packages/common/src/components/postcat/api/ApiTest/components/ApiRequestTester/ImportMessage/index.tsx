@@ -1,10 +1,10 @@
 import { Box, Button, DialogContent, Paper, Typography, useTheme } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { IconButton } from '../../../../IconButton'
-import {BaseDialog} from "../../../../Dialog";
-import {Icon} from "../../../../Icon";
-import {Codebox} from "../../../../Codebox";
-import { $t } from '@common/locales';
+import { BaseDialog } from '../../../../Dialog'
+import { Icon } from '../../../../Icon'
+import { Codebox } from '../../../../Codebox'
+import { $t } from '@common/locales'
 
 export type ImportMessageChangeType = 'replace-all' | 'insert-end' | 'replace-changed'
 
@@ -90,7 +90,7 @@ export function ImportMessage({ type, onChange }: ImportMessageDialogProps) {
             {$t('取消')}
           </Button>
           <Button variant="outlined" onClick={() => handleChange('replace-all')}>
-            {$t('全量替换')} 
+            {$t('全量替换')}
           </Button>
           <Button variant="outlined" onClick={() => handleChange('insert-end')}>
             {$t('在末端插入')}

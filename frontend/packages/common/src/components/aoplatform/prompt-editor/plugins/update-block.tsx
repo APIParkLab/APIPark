@@ -11,9 +11,7 @@ export const PROMPT_EDITOR_INSERT_QUICKLY = 'PROMPT_EDITOR_INSERT_QUICKLY'
 type UpdateBlockProps = {
   instanceId?: string
 }
-const UpdateBlock = ({
-  instanceId,
-}: UpdateBlockProps) => {
+const UpdateBlock = ({ instanceId }: UpdateBlockProps) => {
   const { eventEmitter } = useEventEmitterContextContext()
   const [editor] = useLexicalComposerContext()
 

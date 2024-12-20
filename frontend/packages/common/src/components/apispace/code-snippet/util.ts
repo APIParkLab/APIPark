@@ -1,19 +1,25 @@
-import {Random} from 'mockjs'
-import { PARAM_KEY_REF_TYPE, PARAM_LIST_TYPE, PARAM_LIS_ITEM_TYPE, PARAM_TYPE, PARAM_TYPE_REF_TYPE } from "./code-snippets.type"
+import { Random } from 'mockjs'
+import {
+  PARAM_KEY_REF_TYPE,
+  PARAM_LIST_TYPE,
+  PARAM_LIS_ITEM_TYPE,
+  PARAM_TYPE,
+  PARAM_TYPE_REF_TYPE
+} from './code-snippets.type'
 const DEFAULT_PARAM_KEY_REF: PARAM_KEY_REF_TYPE = {
   key: 'key',
   type: 'type',
   value: 'value'
 }
 
- /**
-   * 将自定义列表转换为 xml
-   * @param list 列表
-   * @param keyRefs 关键词映射
-   * @param random 是否随机值
-   * @returns xml 字符串
-   */
- export function tranformXml(
+/**
+ * 将自定义列表转换为 xml
+ * @param list 列表
+ * @param keyRefs 关键词映射
+ * @param random 是否随机值
+ * @returns xml 字符串
+ */
+export function tranformXml(
   list: PARAM_LIST_TYPE,
   keyRefs: PARAM_KEY_REF_TYPE = DEFAULT_PARAM_KEY_REF,
   typeRefs: PARAM_TYPE_REF_TYPE = {},
@@ -74,40 +80,40 @@ export function tranformJson(
   return `{${result.join(',')}}`
 }
 
-  /**
-   * 将自定义列表转换为地址栏参数
-   * @param list 列表
-   * @param keyRefs 关键词映射
-   * @param random 是否随机值
-   * @returns key-value 结构字符串
-   */
-  export function tranformUrlParam(
-    list: PARAM_LIST_TYPE,
-    keyRefs: PARAM_KEY_REF_TYPE = DEFAULT_PARAM_KEY_REF,
-    typeRefs: PARAM_TYPE_REF_TYPE = {},
-    random: boolean = false
-  ) {
-    const { key, value, filter, type } = keyRefs
-    const result: string[] = []
-    list.forEach((item: unknown) => {
-      if (filter && item[filter]) return
-      const tab: string = item[key]
-      if (!tab) return
-      const itemType: PARAM_TYPE = typeRefs[item[type]]
+/**
+ * 将自定义列表转换为地址栏参数
+ * @param list 列表
+ * @param keyRefs 关键词映射
+ * @param random 是否随机值
+ * @returns key-value 结构字符串
+ */
+export function tranformUrlParam(
+  list: PARAM_LIST_TYPE,
+  keyRefs: PARAM_KEY_REF_TYPE = DEFAULT_PARAM_KEY_REF,
+  typeRefs: PARAM_TYPE_REF_TYPE = {},
+  random: boolean = false
+) {
+  const { key, value, filter, type } = keyRefs
+  const result: string[] = []
+  list.forEach((item: unknown) => {
+    if (filter && item[filter]) return
+    const tab: string = item[key]
+    if (!tab) return
+    const itemType: PARAM_TYPE = typeRefs[item[type]]
 
-      const text: string = random === true ? getRandomDataByType(itemType) : item[value]
-      result.push(`${tab}=${text}`)
-    })
-    return result.join('&') //分隔符为&
-  }
- /**
-   * 将自定义列表转换为 key-value 结构
-   * @param list 列表
-   * @param keyRefs 关键词映射
-   * @param random 是否随机值
-   * @returns
-   */
- export function tranformKeyValue(
+    const text: string = random === true ? getRandomDataByType(itemType) : item[value]
+    result.push(`${tab}=${text}`)
+  })
+  return result.join('&') //分隔符为&
+}
+/**
+ * 将自定义列表转换为 key-value 结构
+ * @param list 列表
+ * @param keyRefs 关键词映射
+ * @param random 是否随机值
+ * @returns
+ */
+export function tranformKeyValue(
   list: PARAM_LIST_TYPE,
   keyRefs: PARAM_KEY_REF_TYPE = DEFAULT_PARAM_KEY_REF,
   typeRefs: PARAM_TYPE_REF_TYPE = {},

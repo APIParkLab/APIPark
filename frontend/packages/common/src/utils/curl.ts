@@ -71,9 +71,12 @@ export class ParseCurl {
    * @param curlStr curl 字符串
    * @param options 配置项
    */
-  constructor(curlStr: string, options?:  {
-    ignoreDisabledHeaders: boolean;
-}) {
+  constructor(
+    curlStr: string,
+    options?: {
+      ignoreDisabledHeaders: boolean
+    }
+  ) {
     this.curlStr = curlStr
     this.options = options || this.options
     this.validateCurl()
@@ -198,11 +201,12 @@ export class ParseCurl {
          */
         case !!arg:
           switch (state) {
-            case 'header':{
+            case 'header': {
               const field = parseField(arg)
               result.headers[field[0]] = field[1]
               state = ''
-              break}
+              break
+            }
             case 'user-agent':
               result.headers['User-Agent'] = arg
               state = ''

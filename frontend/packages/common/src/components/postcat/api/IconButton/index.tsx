@@ -4,7 +4,6 @@ import type { ReactNode } from 'react'
 import { LoadingButton } from '@mui/lab'
 import { Icon, IconParkIconElement } from '../Icon'
 import { RotatingWrapper } from '../RotatingWrapper'
-import {useEffect} from "react";
 
 interface IconButtonProps extends ButtonProps {
   /** tooltip title */

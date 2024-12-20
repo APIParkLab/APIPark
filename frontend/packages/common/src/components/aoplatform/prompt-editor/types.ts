@@ -4,14 +4,12 @@ import type { RoleName } from './plugins/history-block/index'
 //   Node,
 // } from '@/app/components/workflow/types'
 
-
 export type NodeOutPutVar = {
   nodeId: string
   title: string
   vars: Var[]
   isStartNode?: boolean
 }
-
 
 export type Option = {
   value: string

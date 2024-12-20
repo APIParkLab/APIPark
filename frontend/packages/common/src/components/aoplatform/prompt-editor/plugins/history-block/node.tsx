@@ -40,11 +40,7 @@ export class HistoryBlockNode extends DecoratorNode<JSX.Element> {
 
   decorate(): JSX.Element {
     return (
-      <HistoryBlockComponent
-        nodeKey={this.getKey()}
-        roleName={this.getRoleName()}
-        onEditRole={this.getOnEditRole()}
-      />
+      <HistoryBlockComponent nodeKey={this.getKey()} roleName={this.getRoleName()} onEditRole={this.getOnEditRole()} />
     )
   }
 
@@ -71,7 +67,7 @@ export class HistoryBlockNode extends DecoratorNode<JSX.Element> {
       type: 'history-block',
       version: 1,
       roleName: this.getRoleName(),
-      onEditRole: this.getOnEditRole,
+      onEditRole: this.getOnEditRole
     }
   }
 
@@ -83,8 +79,6 @@ export function $createHistoryBlockNode(roleName: RoleName, onEditRole: () => vo
   return new HistoryBlockNode(roleName, onEditRole)
 }
 
-export function $isHistoryBlockNode(
-  node: HistoryBlockNode | LexicalNode | null | undefined,
-): node is HistoryBlockNode {
+export function $isHistoryBlockNode(node: HistoryBlockNode | LexicalNode | null | undefined): node is HistoryBlockNode {
   return node instanceof HistoryBlockNode
 }

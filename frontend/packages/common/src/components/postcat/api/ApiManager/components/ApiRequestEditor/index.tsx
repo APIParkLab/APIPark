@@ -1,16 +1,17 @@
 import { Box, Grow, Tab, Tabs, Typography, useTheme } from '@mui/material'
-import {ReactNode, SyntheticEvent, useEffect, useImperativeHandle, useRef, useState} from 'react'
+import { ReactNode, SyntheticEvent, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import {
-  ApiBodyType, ApiDetail,
+  ApiBodyType,
+  ApiDetail,
   BodyParamsType,
   HeaderParamsType,
   QueryParamsType,
   RestParamsType
-} from "@common/const/api-detail";
-import {MessageDataGrid, MessageDataGridApi} from "../MessageDataGrid";
-import {Indicator} from "../../../../Indicator";
-import { ApiMessageBody, ApiMessageBodyApi } from '../ApiMessageBody';
-import { $t } from '@common/locales';
+} from '@common/const/api-detail'
+import { MessageDataGrid, MessageDataGridApi } from '../MessageDataGrid'
+import { Indicator } from '../../../../Indicator'
+import { ApiMessageBody, ApiMessageBodyApi } from '../ApiMessageBody'
+import { $t } from '@common/locales'
 
 export interface ApiRequestEditorApi {
   getData: () => {
@@ -30,21 +31,31 @@ interface ApiRequestEditorTab {
   dirty: boolean
 }
 
-export function ApiRequestEditor({ editorRef ,apiInfo=null,loaded}: { editorRef?: React.RefObject<ApiRequestEditorApi> ,apiInfo:ApiDetail,loaded:boolean}) {
-  const [apiHeaders, setApiHeaders] = useState<HeaderParamsType[] >([])
-  const [apiQuery, setApiQuery] = useState<QueryParamsType[] >([])
-  const [apiRest, setApiRest] = useState<RestParamsType[] >([])
+export function ApiRequestEditor({
+  editorRef,
+  apiInfo = null,
+  loaded
+}: {
+  editorRef?: React.RefObject<ApiRequestEditorApi>
+  apiInfo: ApiDetail
+  loaded: boolean
+}) {
+  const [apiHeaders, setApiHeaders] = useState<HeaderParamsType[]>([])
+  const [apiQuery, setApiQuery] = useState<QueryParamsType[]>([])
+  const [apiRest, setApiRest] = useState<RestParamsType[]>([])
 
   const headersRef = useRef<MessageDataGridApi>(null)
   const bodyRef = useRef<ApiMessageBodyApi>(null)
   const queryRef = useRef<MessageDataGridApi>(null)
   const restRef = useRef<MessageDataGridApi>(null)
 
-  const [innerLoaded,setInnerLoaded] = useState<boolean>(false)
+  const [innerLoaded, setInnerLoaded] = useState<boolean>(false)
   useImperativeHandle(editorRef, () => ({
     getData: () => {
       return {
-        bodyParams: bodyRef.current?.getBodyMeta()?.bodyParams.map((x)=>({...x,contentType:bodyRef.current?.getBodyMeta().contentType})),
+        bodyParams: bodyRef.current
+          ?.getBodyMeta()
+          ?.bodyParams.map((x) => ({ ...x, contentType: bodyRef.current?.getBodyMeta().contentType })),
         headerParams: (headersRef.current?.getEditMeta() as HeaderParamsType[]) || [],
         queryParams: (queryRef.current?.getEditMeta() as QueryParamsType[]) || [],
         restParams: (restRef.current?.getEditMeta() as RestParamsType[]) || []
@@ -77,8 +88,8 @@ export function ApiRequestEditor({ editorRef ,apiInfo=null,loaded}: { editorRef?
       dirty: false
     },
     {
-      label:$t('请求体'),
-      element: <ApiMessageBody bodyApiRef={bodyRef} mode="request" apiInfo={apiInfo} loaded={innerLoaded}/>,
+      label: $t('请求体'),
+      element: <ApiMessageBody bodyApiRef={bodyRef} mode="request" apiInfo={apiInfo} loaded={innerLoaded} />,
       dirty: false
     },
     {
@@ -123,12 +134,15 @@ export function ApiRequestEditor({ editorRef ,apiInfo=null,loaded}: { editorRef?
   const tabHeight = '30px'
 
   return (
-    <Box sx={{ 
-       borderColor: 'divider' }}>
+    <Box
+      sx={{
+        borderColor: 'divider'
+      }}
+    >
       <Tabs
         value={tabValue}
         onChange={handleChange}
-        aria-label={$t("api request editor")}
+        aria-label={$t('api request editor')}
         sx={{
           minHeight: tabHeight,
           height: tabHeight,
@@ -144,7 +158,7 @@ export function ApiRequestEditor({ editorRef ,apiInfo=null,loaded}: { editorRef?
             value={tab.label}
             label={
               <Box key={tab.label} display="flex" alignItems="center" pr={tab.dirty ? 0.5 : 0}>
-                <Typography sx={{fontSize:'14px'}}>{tab.label}</Typography>
+                <Typography sx={{ fontSize: '14px' }}>{tab.label}</Typography>
                 <Grow in={tab.dirty}>
                   <Box>
                     <Indicator

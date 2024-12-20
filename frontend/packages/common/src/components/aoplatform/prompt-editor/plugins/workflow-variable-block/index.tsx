@@ -1,19 +1,9 @@
-import {
-  memo,
-  useEffect,
-} from 'react'
-import {
-  $insertNodes,
-  COMMAND_PRIORITY_EDITOR,
-  createCommand,
-} from 'lexical'
+import { memo, useEffect } from 'react'
+import { $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand } from 'lexical'
 import { mergeRegister } from '@lexical/utils'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import type { WorkflowVariableBlockType } from '../../types'
-import {
-  $createWorkflowVariableBlockNode,
-  WorkflowVariableBlockNode,
-} from './node'
+import { $createWorkflowVariableBlockNode, WorkflowVariableBlockNode } from './node'
 // import type { Node } from '@/app/components/workflow/types'
 
 export const INSERT_WORKFLOW_VARIABLE_BLOCK_COMMAND = createCommand('INSERT_WORKFLOW_VARIABLE_BLOCK_COMMAND')
@@ -26,11 +16,7 @@ export type WorkflowVariableBlockProps = {
   onInsert?: () => void
   onDelete?: () => void
 }
-const WorkflowVariableBlock = memo(({
-  workflowNodesMap,
-  onInsert,
-  onDelete,
-}: WorkflowVariableBlockType) => {
+const WorkflowVariableBlock = memo(({ workflowNodesMap, onInsert, onDelete }: WorkflowVariableBlockType) => {
   const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
@@ -51,23 +37,21 @@ const WorkflowVariableBlock = memo(({
           const workflowVariableBlockNode = $createWorkflowVariableBlockNode(variables, workflowNodesMap)
 
           $insertNodes([workflowVariableBlockNode])
-          if (onInsert)
-            onInsert()
+          if (onInsert) onInsert()
 
           return true
         },
-        COMMAND_PRIORITY_EDITOR,
+        COMMAND_PRIORITY_EDITOR
       ),
       editor.registerCommand(
         DELETE_WORKFLOW_VARIABLE_BLOCK_COMMAND,
         () => {
-          if (onDelete)
-            onDelete()
+          if (onDelete) onDelete()
 
           return true
         },
-        COMMAND_PRIORITY_EDITOR,
-      ),
+        COMMAND_PRIORITY_EDITOR
+      )
     )
   }, [editor, onInsert, onDelete, workflowNodesMap])
 
