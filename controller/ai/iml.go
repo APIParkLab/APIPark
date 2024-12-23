@@ -3,6 +3,7 @@ package ai
 import (
 	"github.com/APIParkLab/APIPark/module/ai"
 	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
+	"github.com/eolinker/go-common/auto"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,12 +15,16 @@ type imlProviderController struct {
 	module ai.IProviderModule `autowired:""`
 }
 
-func (i *imlProviderController) SimpleProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, error) {
-	return i.module.SimpleProviders(ctx)
+func (i *imlProviderController) ConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ConfiguredProviderItem, *auto.Label, error) {
+	return i.module.ConfiguredProviders(ctx)
 }
 
-func (i *imlProviderController) Providers(ctx *gin.Context) ([]*ai_dto.ProviderItem, error) {
-	return i.module.Providers(ctx)
+func (i *imlProviderController) UnConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ProviderItem, error) {
+	return i.module.UnConfiguredProviders(ctx)
+}
+
+func (i *imlProviderController) SimpleProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, error) {
+	return i.module.SimpleProviders(ctx)
 }
 
 func (i *imlProviderController) Provider(ctx *gin.Context, id string) (*ai_dto.Provider, error) {

@@ -79,6 +79,7 @@ type AiAPIInfo struct {
 	Timeout          int       `gorm:"type:int(11);not null;column:timeout;comment:超时时间"`
 	Retry            int       `gorm:"type:int(11);not null;column:retry;comment:重试次数"`
 	Model            string    `gorm:"size:255;not null;column:model;comment:模型"`
+	Provider         string    `gorm:"size:36;not null;column:provider;comment:提供者;index:provider"`
 	Creator          string    `gorm:"size:36;not null;column:creator;comment:创建人;index:creator" aovalue:"creator"`
 	CreateAt         time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
 	Updater          string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"`
