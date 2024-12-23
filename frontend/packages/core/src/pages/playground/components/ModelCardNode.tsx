@@ -46,19 +46,6 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
       <Handle type="target" position={Position.Left} />
       <Handle type="source" position={Position.Right} />
 
-      {/* Drag Handle - Only visible on hover */}
-      <div
-        className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full transition-opacity duration-200 
-        ${isHovered ? 'opacity-100' : 'opacity-0'}`}
-      >
-        <div
-          className="w-6 h-10 flex items-center justify-center cursor-grab bg-white rounded-l-md border border-r-0 border-gray-200 hover:border-[--primary-color] hover:text-[--primary-color]"
-          onMouseDown={onDragHandleMouseDown}
-        >
-          <Icon icon="mdi:drag" className="text-xl" />
-        </div>
-      </div>
-
       <div className="flex justify-between items-center">
         <div className="flex gap-2 items-center">
           <Icon icon="mdi:robot" className="text-xl text-[--primary-color]" />

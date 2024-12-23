@@ -58,7 +58,7 @@ const initialNodes = [
   })),
   {
     id: 'openai-keys',
-    type: 'keyStatus',
+    type: 'keyCard',
     position: calculateNodePositions(modelData)['openai-keys'],
     data: {
       title: 'API Keys',
@@ -88,7 +88,7 @@ const initialNodes = [
   },
   {
     id: 'anthropic-keys',
-    type: 'keyStatus',
+    type: 'keyCard',
     position: calculateNodePositions(modelData)['anthropic-keys'],
     data: {
       title: 'API Keys',
@@ -100,7 +100,7 @@ const initialNodes = [
   },
   {
     id: 'gemini-keys',
-    type: 'keyStatus',
+    type: 'keyCard',
     position: calculateNodePositions(modelData)['gemini-keys'],
     data: {
       title: 'API Keys',
@@ -114,7 +114,7 @@ const initialNodes = [
   },
   {
     id: 'mistral-keys',
-    type: 'keyStatus',
+    type: 'keyCard',
     position: calculateNodePositions(modelData)['mistral-keys'],
     data: {
       title: 'API Keys',
@@ -123,7 +123,7 @@ const initialNodes = [
   },
   {
     id: 'cohere-keys',
-    type: 'keyStatus',
+    type: 'keyCard',
     position: calculateNodePositions(modelData)['cohere-keys'],
     data: {
       title: 'API Keys',
@@ -136,7 +136,7 @@ const initialNodes = [
   },
   {
     id: 'azure-keys',
-    type: 'keyStatus',
+    type: 'keyCard',
     position: calculateNodePositions(modelData)['azure-keys'],
     data: {
       title: 'API Keys',
@@ -218,7 +218,7 @@ const Playground = () => {
       // Update positions of connected nodes during drag
       setNodes((nds) => {
         return nds.map((n) => {
-          if (n.type === 'keyStatus' && n.id === `${node.id}-keys`) {
+          if (n.type === 'keyCard' && n.id === `${node.id}-keys`) {
             return {
               ...n,
               position: {
@@ -252,7 +252,7 @@ const Playground = () => {
               }
             }
           }
-          if (n.type === 'keyStatus') {
+          if (n.type === 'keyCard') {
             const modelId = n.id.replace('-keys', '')
             const modelNode = sortedNodes.find((mn) => mn.id === modelId)
             if (modelNode) {
