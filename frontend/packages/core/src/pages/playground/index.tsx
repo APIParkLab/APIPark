@@ -2,7 +2,7 @@
 
 import { Icon } from '@iconify/react'
 import type { Edge, Node } from '@xyflow/react'
-import { addEdge, Background, Controls, ReactFlow, useEdgesState, useNodesState } from '@xyflow/react'
+import { addEdge, Background, Controls, Handle, Position, ReactFlow, useEdgesState, useNodesState } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import React, { useCallback } from 'react'
 import './styles.css'
@@ -15,7 +15,9 @@ interface ModelCardProps {
 }
 
 const ModelCard: React.FC<ModelCardProps> = ({ title, status, defaultModel, onSettingClick }) => (
-  <div className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[280px]">
+  <div className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[280px] relative">
+    <Handle type="target" position={Position.Left} />
+    <Handle type="source" position={Position.Right} />
     <div className="flex justify-between items-center">
       <div className="flex gap-2 items-center">
         <Icon icon="mdi:robot" className="text-xl text-[--primary-color]" />
@@ -43,7 +45,8 @@ interface KeyStatusCardProps {
 }
 
 const KeyStatusCard: React.FC<KeyStatusCardProps> = ({ keys, title }) => (
-  <div className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[280px]">
+  <div className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[280px] relative">
+    <Handle type="target" position={Position.Left} />
     <div className="mb-3 text-sm text-gray-900">{title}</div>
     <div className="grid grid-cols-4 gap-2">
       {keys.map((status, index) => (
@@ -62,7 +65,8 @@ const KeyStatusCard: React.FC<KeyStatusCardProps> = ({ keys, title }) => (
 )
 
 const ServiceCard: React.FC = () => (
-  <div className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[200px]">
+  <div className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[200px] relative">
+    <Handle type="source" position={Position.Right} />
     <div className="flex flex-col gap-2 items-center">
       <Icon icon="mdi:robot" className="text-3xl text-[--primary-color]" />
       <span className="text-base text-gray-900">AI Service</span>
@@ -133,24 +137,24 @@ const initialEdges: Edge[] = [
     source: 'service',
     target: 'openai',
     animated: true,
-    label: 'Connected',
-    style: { stroke: '#3d46f2' }
+    label: 'apis',
+    style: { stroke: '#3d46f2', cursor: 'pointer' }
   },
   {
     id: 'service-anthropic',
     source: 'service',
     target: 'anthropic',
     animated: true,
-    label: 'Connected',
-    style: { stroke: '#3d46f2' }
+    label: 'apis',
+    style: { stroke: '#3d46f2', cursor: 'pointer' }
   },
   {
     id: 'service-gemini',
     source: 'service',
     target: 'gemini',
     animated: true,
-    label: 'Disconnected',
-    style: { stroke: '#3d46f2' }
+    label: 'apis',
+    style: { stroke: '#3d46f2', cursor: 'pointer' }
   },
   {
     id: 'openai-keys',

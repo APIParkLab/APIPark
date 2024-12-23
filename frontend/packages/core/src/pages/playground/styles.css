@@ -3,6 +3,8 @@
   padding: 0;
   border-radius: 8px;
   min-width: 150px;
+  width: auto;
+  max-width: 100%;
 }
 
 .react-flow__edge-path {
