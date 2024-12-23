@@ -1,10 +1,12 @@
 package ai_api
 
 import (
+	"context"
 	"encoding/json"
+	"time"
+
 	"github.com/APIParkLab/APIPark/service/universally"
 	"github.com/APIParkLab/APIPark/stores/api"
-	"time"
 )
 
 var _ IAPIService = (*imlAPIService)(nil)
@@ -16,6 +18,10 @@ type imlAPIService struct {
 	universally.IServiceCreate[Create]
 	universally.IServiceEdit[Edit]
 	universally.IServiceDelete
+}
+
+func (i *imlAPIService) CountMapByProvider(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error) {
+	return i.store.CountByGroup(ctx, keyword, conditions, "provider")
 }
 
 func (i *imlAPIService) OnComplete() {
@@ -43,6 +49,7 @@ func createEntityHandler(i *Create) *api.AiAPIInfo {
 		Timeout:          i.Timeout,
 		Retry:            i.Retry,
 		Model:            i.Model,
+		Provider:         i.Provider,
 		CreateAt:         now,
 		UpdateAt:         now,
 		AdditionalConfig: string(cfg),
@@ -66,6 +73,9 @@ func updateHandler(e *api.AiAPIInfo, i *Edit) {
 	}
 	if i.Model != nil {
 		e.Model = *i.Model
+	}
+	if i.Provider != nil {
+		e.Provider = *i.Provider
 	}
 	if i.AdditionalConfig != nil {
 		cfg, _ := json.Marshal(i.AdditionalConfig)
