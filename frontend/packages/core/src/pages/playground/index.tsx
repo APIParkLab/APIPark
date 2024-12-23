@@ -213,6 +213,66 @@ const Playground = () => {
 
   const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges])
 
+  const onNodeDrag = useCallback(
+    (_: any, node: any) => {
+      // Update positions of connected nodes during drag
+      setNodes((nds) => {
+        return nds.map((n) => {
+          if (n.type === 'keyStatus' && n.id === `${node.id}-keys`) {
+            return {
+              ...n,
+              position: {
+                x: 750,
+                y: node.position.y
+              }
+            }
+          }
+          return n
+        })
+      })
+    },
+    [setNodes]
+  )
+
+  const onNodeDragStop = useCallback(
+    (_: any, node: any) => {
+      // Reorder nodes based on vertical position
+      setNodes((nds) => {
+        const modelNodes = nds.filter((n) => n.type === 'modelCard')
+        const sortedNodes = [...modelNodes].sort((a, b) => a.position.y - b.position.y)
+
+        return nds.map((n) => {
+          if (n.type === 'modelCard') {
+            const index = sortedNodes.findIndex((sn) => sn.id === n.id)
+            return {
+              ...n,
+              position: {
+                x: 400,
+                y: 50 + index * 120
+              }
+            }
+          }
+          if (n.type === 'keyStatus') {
+            const modelId = n.id.replace('-keys', '')
+            const modelNode = sortedNodes.find((mn) => mn.id === modelId)
+            if (modelNode) {
+              const index = sortedNodes.findIndex((sn) => sn.id === modelId)
+              return {
+                ...n,
+                position: {
+                  x: 750,
+                  y: 50 + index * 120
+                }
+              }
+            }
+          }
+          return n
+        })
+      })
+    },
+    [setNodes]
+  )
+
   return (
     <div className="w-full h-screen bg-gray-50">
       <ReactFlow
@@ -221,6 +281,8 @@ const Playground = () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDrag={onNodeDrag}
+        onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={{
           type: 'step',
@@ -228,7 +290,7 @@ const Playground = () => {
           animated: true
         }}
         fitView
-        nodesDraggable={false}
+        nodesDraggable={true}
         nodesConnectable={false}
         zoomOnScroll={false}
         zoomOnPinch={false}
