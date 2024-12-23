@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/eolinker/eosc/log"
+
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
@@ -114,6 +116,7 @@ func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_a
 			Timeout:     input.Timeout,
 			Retry:       input.Retry,
 			Model:       input.AiModel.Id,
+			Provider:    input.AiModel.Provider,
 			AdditionalConfig: map[string]interface{}{
 				"ai_prompt": input.AiPrompt,
 				"ai_model":  input.AiModel,
@@ -148,8 +151,10 @@ func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string,
 			return err
 		}
 		var modelId *string
+		var providerId *string
 		if input.AiModel != nil {
 			modelId = &input.AiModel.Id
+			providerId = &input.AiModel.Provider
 		}
 		if input.AiPrompt != nil {
 			apiInfo.AdditionalConfig["ai_prompt"] = input.AiPrompt
@@ -164,6 +169,7 @@ func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string,
 			Timeout:          input.Timeout,
 			Retry:            input.Retry,
 			Model:            modelId,
+			Provider:         providerId,
 			AdditionalConfig: &apiInfo.AdditionalConfig,
 		})
 	})
@@ -303,4 +309,28 @@ func (i *imlAPIModule) Prefix(ctx context.Context, serviceId string) (string, er
 		}
 	}
 	return strings.TrimSuffix(pInfo.Prefix, "/"), nil
+}
+
+func (i *imlAPIModule) OnInit() {
+	ctx := context.Background()
+	list, err := i.aiAPIService.List(ctx)
+	if err != nil {
+		return
+	}
+	for _, item := range list {
+		if item.Provider == "" {
+			aiModel, err := ConvertStruct[ai_api_dto.AiModel](item.AdditionalConfig["ai_model"])
+			if err != nil {
+				log.Errorf("convert ai model error:%v", err)
+				continue
+			}
+			err = i.aiAPIService.Save(ctx, item.ID, &ai_api.Edit{
+				Provider: &aiModel.Provider,
+			})
+			if err != nil {
+				log.Errorf("update ai api provider error:%v", err)
+				continue
+			}
+		}
+	}
 }
