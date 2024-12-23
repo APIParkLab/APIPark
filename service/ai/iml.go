@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"time"
+
 	"github.com/APIParkLab/APIPark/service/universally"
 	"github.com/APIParkLab/APIPark/stores/ai"
 	"github.com/eolinker/go-common/auto"
 	"github.com/eolinker/go-common/utils"
 	"gorm.io/gorm"
-	"time"
 )
 
 var _ IProviderService = (*imlProviderService)(nil)
@@ -17,6 +18,14 @@ var _ IProviderService = (*imlProviderService)(nil)
 type imlProviderService struct {
 	universally.IServiceGet[Provider]
 	store ai.IProviderStore `autowired:""`
+}
+
+func (i *imlProviderService) MaxPriority(ctx context.Context) (int, error) {
+	t, err := i.store.First(ctx, nil, "priority desc")
+	if err != nil {
+		return 0, err
+	}
+	return t.Priority, nil
 }
 
 func (i *imlProviderService) Save(ctx context.Context, id string, cfg *SetProvider) error {
@@ -30,9 +39,19 @@ func (i *imlProviderService) Save(ctx context.Context, id string, cfg *SetProvid
 		if cfg.Name == nil || cfg.Config == nil || cfg.DefaultLLM == nil {
 			return errors.New("invalid params")
 		}
-		status := false
+		status := 1
 		if cfg.Status != nil {
 			status = *cfg.Status
+		}
+		priority := 1
+		if cfg.Priority == nil {
+			count, err := i.store.Count(ctx, "", nil)
+			if err != nil {
+				return err
+			}
+			priority = int(count) + 1
+		} else {
+			priority = *cfg.Priority
 		}
 		info = &ai.Provider{
 			UUID:       id,
@@ -42,6 +61,7 @@ func (i *imlProviderService) Save(ctx context.Context, id string, cfg *SetProvid
 			Status:     status,
 			Creator:    userId,
 			Updater:    userId,
+			Priority:   priority,
 			CreateAt:   now,
 			UpdateAt:   now,
 		}
@@ -57,6 +77,9 @@ func (i *imlProviderService) Save(ctx context.Context, id string, cfg *SetProvid
 		}
 		if cfg.Status != nil {
 			info.Status = *cfg.Status
+		}
+		if cfg.Priority != nil {
+			info.Priority = *cfg.Priority
 		}
 		info.Updater = userId
 		info.UpdateAt = now
