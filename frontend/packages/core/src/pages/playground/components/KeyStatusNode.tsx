@@ -8,16 +8,17 @@ interface KeyStatus {
   priority?: number
 }
 
-interface KeyStatusCardProps {
-  keys: KeyStatus[]
+interface KeyStatusNodeData {
   title: string
+  keys: KeyStatus[]
 }
 
 const KEY_SIZE = '1.25rem' // 20px
 const KEY_GAP = '0.25rem' // 4px
 const MAX_KEYS = 10
 
-const KeyStatusCard: React.FC<KeyStatusCardProps> = ({ keys = [], title }) => {
+export const KeyStatusNode: React.FC<{ data: KeyStatusNodeData }> = ({ data }) => {
+  const { title, keys = [] } = data
   const totalKeys = keys.length
   const keyWidth = totalKeys > 5 ? `calc((100% - ${(totalKeys - 1) * 0.25}rem) / ${totalKeys})` : KEY_SIZE
 
@@ -54,5 +55,3 @@ const KeyStatusCard: React.FC<KeyStatusCardProps> = ({ keys = [], title }) => {
     </div>
   )
 }
-
-export default KeyStatusCard
