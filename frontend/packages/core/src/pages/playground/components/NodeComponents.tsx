@@ -29,7 +29,7 @@ const KEY_SIZE = '1.25rem' // 20px
 const KEY_GAP = '0.25rem' // 4px
 const MAX_KEYS = 10
 
-export const KeyStatusNode: React.FC<NodeProps<KeyStatusNodeData>> = ({ data }) => {
+export const KeyStatusNode: React.FC<{ data: KeyStatusNodeData }> = ({ data }) => {
   const { title, keys = [] } = data
   const totalKeys = keys.length
   const keyWidth = totalKeys > 5 ? `calc((100% - ${(totalKeys - 1) * 0.25}rem) / ${totalKeys})` : KEY_SIZE
@@ -68,7 +68,7 @@ export const KeyStatusNode: React.FC<NodeProps<KeyStatusNodeData>> = ({ data }) 
   )
 }
 
-export const ModelCardNode: React.FC<NodeProps<ModelCardNodeData>> = ({ data }) => {
+export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) => {
   const { title, status, defaultModel } = data
   return (
     <div className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[280px] relative">

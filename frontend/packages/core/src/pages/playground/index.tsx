@@ -1,6 +1,6 @@
 'use client'
 
-import { addEdge, Background, Controls, ReactFlow, useEdgesState, useNodesState } from '@xyflow/react'
+import { addEdge, NodeTypes, ReactFlow, useEdgesState, useNodesState } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useCallback } from 'react'
 import { KeyStatusNode, ModelCardNode, ServiceCardNode } from './components/NodeComponents'
@@ -30,11 +30,11 @@ const calculateNodePositions = (models: ModelData[], startY = 50, gap = 150) => 
   )
 }
 
-const nodeTypes = {
+const nodeTypes: NodeTypes = {
   modelCard: ModelCardNode,
   keyStatus: KeyStatusNode,
   serviceCard: ServiceCardNode
-}
+} as const
 
 const initialNodes = [
   {
@@ -128,10 +128,12 @@ const Playground = () => {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         fitView
-      >
-        <Background />
-        <Controls />
-      </ReactFlow>
+        nodesDraggable={false}
+        nodesConnectable={false}
+        zoomOnScroll={false}
+        zoomOnPinch={false}
+        zoomOnDoubleClick={false}
+      />
     </div>
   )
 }
