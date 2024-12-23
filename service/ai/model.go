@@ -2,8 +2,9 @@ package ai
 
 import (
 	"encoding/base64"
-	"github.com/APIParkLab/APIPark/stores/ai"
 	"time"
+
+	"github.com/APIParkLab/APIPark/stores/ai"
 )
 
 type Provider struct {
@@ -13,7 +14,8 @@ type Provider struct {
 	Config     string
 	Creator    string
 	Updater    string
-	Status     bool
+	Status     int
+	Priority   int
 	CreateAt   time.Time
 	UpdateAt   time.Time
 }
@@ -22,7 +24,8 @@ type SetProvider struct {
 	Name       *string
 	DefaultLLM *string
 	Config     *string
-	Status     *bool
+	Status     *int
+	Priority   *int
 }
 
 func FromEntity(e *ai.Provider) *Provider {
@@ -40,5 +43,6 @@ func FromEntity(e *ai.Provider) *Provider {
 		CreateAt:   e.CreateAt,
 		UpdateAt:   e.UpdateAt,
 		Status:     e.Status,
+		Priority:   e.Priority,
 	}
 }

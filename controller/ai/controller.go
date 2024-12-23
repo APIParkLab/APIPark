@@ -1,14 +1,18 @@
 package ai
 
 import (
+	"reflect"
+
+	"github.com/eolinker/go-common/auto"
+
 	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
 	"github.com/eolinker/go-common/autowire"
 	"github.com/gin-gonic/gin"
-	"reflect"
 )
 
 type IProviderController interface {
-	Providers(ctx *gin.Context) ([]*ai_dto.ProviderItem, error)
+	ConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ConfiguredProviderItem, *auto.Label, error)
+	UnConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ProviderItem, error)
 	SimpleProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, error)
 	Provider(ctx *gin.Context, id string) (*ai_dto.Provider, error)
 	LLMs(ctx *gin.Context, driver string) ([]*ai_dto.LLMItem, *ai_dto.ProviderItem, error)
