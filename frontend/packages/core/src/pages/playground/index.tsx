@@ -35,7 +35,7 @@ const calculateNodePositions = (models: ModelData[], startY = 50, gap = 120) => 
 
 const nodeTypes: NodeTypes = {
   modelCard: ModelCardNode,
-  keyStatus: KeyStatusNode,
+  keyCard: KeyStatusNode,
   serviceCard: ServiceCardNode
 } as const
 
@@ -155,7 +155,7 @@ const initialEdges = [
     source: 'service',
     target: 'openai',
     label: 'apis(12)',
-    style: { stroke: '#3d46f2', cursor: 'pointer' },
+    style: { stroke: '#ddd', cursor: 'pointer' },
     labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
   },
   {
@@ -163,7 +163,7 @@ const initialEdges = [
     source: 'service',
     target: 'anthropic',
     label: 'apis(8)',
-    style: { stroke: '#3d46f2', cursor: 'pointer' },
+    style: { stroke: '#ddd', cursor: 'pointer' },
     labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
   },
   {
@@ -171,7 +171,7 @@ const initialEdges = [
     source: 'service',
     target: 'gemini',
     label: 'apis(5)',
-    style: { stroke: '#3d46f2', cursor: 'pointer' },
+    style: { stroke: '#ddd', cursor: 'pointer' },
     labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
   },
   {
@@ -179,7 +179,7 @@ const initialEdges = [
     source: 'service',
     target: 'mistral',
     label: 'apis(4)',
-    style: { stroke: '#3d46f2', cursor: 'pointer' },
+    style: { stroke: '#ddd', cursor: 'pointer' },
     labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
   },
   {
@@ -187,7 +187,7 @@ const initialEdges = [
     source: 'service',
     target: 'cohere',
     label: 'apis(6)',
-    style: { stroke: '#3d46f2', cursor: 'pointer' },
+    style: { stroke: '#ddd', cursor: 'pointer' },
     labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
   },
   {
@@ -195,7 +195,7 @@ const initialEdges = [
     source: 'service',
     target: 'azure',
     label: 'apis(10)',
-    style: { stroke: '#3d46f2', cursor: 'pointer' },
+    style: { stroke: '#ddd', cursor: 'pointer' },
     labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
   },
   ...modelData.map((model) => ({
@@ -203,7 +203,7 @@ const initialEdges = [
     source: model.id,
     target: `${model.id}-keys`,
     animated: true,
-    style: { stroke: '#3d46f2' }
+    style: { stroke: '#ddd' }
   }))
 ]
 
@@ -215,6 +215,8 @@ const Playground = () => {
 
   const onNodeDrag = useCallback(
     (_: any, node: any) => {
+      if (node.type !== 'modelCard') return
+
       // Update positions of connected nodes during drag
       setNodes((nds) => {
         return nds.map((n) => {
@@ -236,6 +238,8 @@ const Playground = () => {
 
   const onNodeDragStop = useCallback(
     (_: any, node: any) => {
+      if (node.type !== 'modelCard') return
+
       // Reorder nodes based on vertical position
       setNodes((nds) => {
         const modelNodes = nds.filter((n) => n.type === 'modelCard')
@@ -274,7 +278,7 @@ const Playground = () => {
   )
 
   return (
-    <div className="w-full h-screen bg-gray-50">
+    <div className="w-full h-screen">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -286,11 +290,11 @@ const Playground = () => {
         nodeTypes={nodeTypes}
         defaultEdgeOptions={{
           type: 'step',
-          style: { stroke: '#3d46f2', strokeWidth: 2 },
+          style: { stroke: '#000', strokeWidth: 2 },
           animated: true
         }}
         fitView
-        nodesDraggable={true}
+        nodesDraggable={(node) => node.type === 'modelCard'}
         nodesConnectable={false}
         zoomOnScroll={false}
         zoomOnPinch={false}
