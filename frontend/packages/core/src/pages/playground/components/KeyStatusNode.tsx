@@ -23,7 +23,10 @@ export const KeyStatusNode: React.FC<{ data: KeyStatusNodeData }> = ({ data }) =
   const keyWidth = totalKeys > 5 ? `calc((100% - ${(totalKeys - 1) * 0.25}rem) / ${totalKeys})` : KEY_SIZE
 
   return (
-    <div className="relative p-4 bg-white rounded-lg shadow-sm node-card">
+    <div
+      className="relative p-4 bg-white rounded-lg shadow-sm node-card nodrag"
+      style={{ border: '1px solid var(--border-color)' }}
+    >
       <Handle type="target" position={Position.Left} />
       <div className="flex flex-col gap-2">
         <div className="text-sm text-gray-900">{title}</div>
