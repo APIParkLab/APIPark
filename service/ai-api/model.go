@@ -16,6 +16,7 @@ type API struct {
 	Timeout          int
 	Retry            int
 	Model            string
+	Provider         string
 	CreateAt         time.Time
 	UpdateAt         time.Time
 	Creator          string
@@ -33,6 +34,7 @@ type Create struct {
 	Timeout          int
 	Retry            int
 	Model            string
+	Provider         string
 	AdditionalConfig map[string]interface{}
 }
 
@@ -42,6 +44,7 @@ type Edit struct {
 	Description      *string
 	Timeout          *int
 	Retry            *int
+	Provider         *string
 	Model            *string
 	AdditionalConfig *map[string]interface{}
 }

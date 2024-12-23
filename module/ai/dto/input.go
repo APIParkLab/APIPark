@@ -7,4 +7,6 @@ type UpdateLLM struct {
 type UpdateConfig struct {
 	DefaultLLM string `json:"default_llm"`
 	Config     string `json:"config"`
+	Priority   *int   `json:"priority"`
+	Enable     *bool  `json:"enable"`
 }

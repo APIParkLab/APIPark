@@ -1,9 +1,11 @@
 package ai_api
 
 import (
+	"context"
+	"reflect"
+
 	"github.com/APIParkLab/APIPark/service/universally"
 	"github.com/eolinker/go-common/autowire"
-	"reflect"
 )
 
 type IAPIService interface {
@@ -11,6 +13,7 @@ type IAPIService interface {
 	universally.IServiceCreate[Create]
 	universally.IServiceEdit[Edit]
 	universally.IServiceDelete
+	CountMapByProvider(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error)
 
 	//ListByServices(ctx context.Context, serviceIds ...string) ([]*API, error)
 }
