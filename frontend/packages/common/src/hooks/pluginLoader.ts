@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react'
+import { ApiparkPluginDriverType, RouterMapConfig } from '@common/const/type'
+import { PluginConfigType } from '@common/const/type.ts'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext'
+import { usePluginEventHub } from '@common/contexts/PluginEventHubContext'
+import { usePluginSlotHub } from '@common/contexts/PluginSlotHubContext'
+import { useFetch } from '@common/hooks/http'
 import {
   DEFAULT_LOCAL_PLUGIN_PATH,
   generateRemoteModuleTemplate,
   loadRemoteModule,
   validateExportLifecycle
 } from '@common/utils/plugin.tsx'
-import { useFetch } from '@common/hooks/http'
-import { PluginConfigType } from '@common/const/type.ts'
-import { ApiparkPluginDriverType, RouterMapConfig } from '@common/const/type'
-import { usePluginEventHub } from '@common/contexts/PluginEventHubContext'
-import { usePluginSlotHub } from '@common/contexts/PluginSlotHubContext'
 import { App } from 'antd'
+import { useEffect, useState } from 'react'
 
 const mockData = {
   buildAt: '2024-09-13T03:51:25Z',
@@ -76,6 +76,26 @@ const mockData = {
       router: [
         {
           path: 'aisetting',
+          type: 'normal'
+        }
+      ]
+    },
+    {
+      driver: 'apipark.builtIn.component',
+      name: 'keysetting',
+      router: [
+        {
+          path: 'keysetting',
+          type: 'normal'
+        }
+      ]
+    },
+    {
+      driver: 'apipark.builtIn.component',
+      name: 'aiapis',
+      router: [
+        {
+          path: 'aiapis',
           type: 'normal'
         }
       ]

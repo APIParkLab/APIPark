@@ -26,7 +26,10 @@ export const routerKeyMap = new Map<string, string[] | string>([
   ['operationCenter', ['member', 'user', 'role', 'common']],
   ['organization', ['member', 'user', 'role']],
   ['serviceHubSetting', ['common']],
-  ['maintenanceCenter', ['aisetting', 'datasourcing', 'cluster', 'cert', 'logsettings', 'resourcesettings', 'openapi']]
+  [
+    'maintenanceCenter',
+    ['aisetting', 'keysetting', 'datasourcing', 'cluster', 'cert', 'logsettings', 'resourcesettings', 'openapi']
+  ]
 ])
 
 export const COLUMNS_TITLE = {
