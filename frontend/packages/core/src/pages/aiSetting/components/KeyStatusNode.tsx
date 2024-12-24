@@ -16,7 +16,6 @@ export const KeyStatusNode: React.FC<{ data: KeyStatusNodeData }> = ({ data }) =
   const { title, keys = [] } = data
   const totalKeys = keys.length
   const keyWidth = totalKeys > 5 ? `calc((100% - ${(totalKeys - 1) * 0.25}rem) / ${totalKeys})` : KEY_SIZE
-
   return (
     <div
       className="relative p-4 bg-white rounded-lg shadow-sm node-card nodrag"

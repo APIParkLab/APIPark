@@ -114,17 +114,17 @@ const AIFlowChart = () => {
           title: 'API Keys',
           keys: model.keys.map((key, index) => ({
             id: key.id,
-            status: key.status === 'normal' ? 'enabled' : 'disable',
+            status: key.status,
             priority: index + 1
           }))
         }
       }))
     ]
 
-    const newEdges = [
+    const newEdges: any = [
       ...modelData.map((model) => ({
         id: `service-${model.id}`,
-        source: 'service',
+        source: 'apiService',
         target: model.id,
         label: `apis(${model.api_count})`,
         style: { stroke: '#ddd', cursor: 'pointer' },
