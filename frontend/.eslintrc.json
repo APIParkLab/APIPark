@@ -18,13 +18,18 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["react", "@typescript-eslint", "prettier"],
+  "plugins": ["react", "@typescript-eslint", "prettier", "unused-imports"],
   "rules": {
     "react/react-in-jsx-scope": "off",
     "prettier/prettier": "error",
     "@typescript-eslint/no-explicit-any": "warn",
     "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": ["warn"]
+    "@typescript-eslint/no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      { "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }
+    ]
   },
   "settings": {
     "react": {

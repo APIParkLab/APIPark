@@ -1,4 +1,3 @@
-
 import { Chip, Skeleton } from '@mui/material'
 import { useEffect, useState } from 'react'
 
@@ -90,7 +89,7 @@ export function RequestMethod({
   const transparent = 'transparent'
 
   const chipStyle = {
-    height:'22px',
+    height: '22px',
     borderRadius: '4px',
     color: methodColorMapping[method]?.color || '#333',
     backgroundColor: variant === 'default' ? transparent : methodColorMapping[method]?.bgColor

@@ -1,6 +1,6 @@
 import { Box, Typography, useTheme } from '@mui/material'
-import {Codebox} from "../../Codebox";
-import { $t } from '@common/locales';
+import { Codebox } from '../../Codebox'
+import { $t } from '@common/locales'
 
 interface ExampleProps {
   code: string
@@ -9,20 +9,21 @@ interface ExampleProps {
 }
 
 export function Example({ code, onChange, readOnly = false }: ExampleProps) {
-
   const theme = useTheme()
   return (
-    <Box  sx={{
-      border: `1px solid #EDEDED`,
-      borderRadius: `${theme.shape.borderRadius}px`,
-      overflow: 'hidden'
-    }}>
+    <Box
+      sx={{
+        border: `1px solid #EDEDED`,
+        borderRadius: `${theme.shape.borderRadius}px`,
+        overflow: 'hidden'
+      }}
+    >
       <Box
         height="40px"
         width="100%"
         display="flex"
         alignItems="center"
-        bgcolor='#f7f8fa'
+        bgcolor="#f7f8fa"
         sx={{
           borderBottom: `1px solid #EDEDED`,
           borderRadius: `${theme.shape.borderRadius}px`,

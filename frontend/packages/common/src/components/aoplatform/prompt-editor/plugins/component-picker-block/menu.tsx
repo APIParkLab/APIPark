@@ -20,12 +20,14 @@ export class PickerBlockMenuOption extends MenuOption {
       group?: string
       onSelect?: () => void
       render: (menuRenderProps: MenuOptionRenderProps) => JSX.Element
-    },
+    }
   ) {
     super(data.key)
     this.group = data.group
   }
 
   public onSelectMenuOption = () => this.data.onSelect?.()
-  public renderMenuOption = (menuRenderProps: MenuOptionRenderProps) => <Fragment key={this.data.key}>{this.data.render(menuRenderProps)}</Fragment>
+  public renderMenuOption = (menuRenderProps: MenuOptionRenderProps) => (
+    <Fragment key={this.data.key}>{this.data.render(menuRenderProps)}</Fragment>
+  )
 }

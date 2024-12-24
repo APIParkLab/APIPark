@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@tinymce/tinymce-react": "^4.3.2",
+    "@xyflow/react": "^12.3.6",
     "fs-extra": "^11.2.0",
     "highlight.js": "^11.9.0",
     "tinymce": "^6.8.1"

@@ -1,11 +1,11 @@
-import { Box, LinearProgress, useTheme } from "@mui/material"
+import { Box, LinearProgress, useTheme } from '@mui/material'
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro'
 import { useMemo } from 'react'
 import { RenderMessageBody } from '../MessageBody'
-import {HeaderParamsType} from "@common/const/api-detail";
-import {collapseTableSx, PreviewGridActionsCellItem, previewTableHoverSx} from "../../../PreviewTable";
-import {Collapse} from "../../../Collapse";
-import { $t } from "@common/locales";
+import { HeaderParamsType } from '@common/const/api-detail'
+import { collapseTableSx, PreviewGridActionsCellItem, previewTableHoverSx } from '../../../PreviewTable'
+import { Collapse } from '../../../Collapse'
+import { $t } from '@common/locales'
 
 interface HeaderFieldsProps {
   rows?: HeaderParamsType[]
@@ -58,7 +58,7 @@ export default function HeaderFields({ rows = [], title, loading = false, onMore
       getActions: (params) => [
         <PreviewGridActionsCellItem
           icon="more"
-          label={$t("More")}
+          label={$t('More')}
           key="more"
           onClick={() => onMoreSettingChange?.(params.row as unknown as RenderMessageBody)}
         />

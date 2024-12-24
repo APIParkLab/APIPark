@@ -37,13 +37,12 @@ export class CustomTextNode extends TextNode {
       style: this.getStyle(),
       text: this.getTextContent(),
       type: 'custom-text',
-      version: 1,
+      version: 1
     }
   }
 
   isSimpleText() {
-    return (
-      (this.__type === 'text' || this.__type === 'custom-text') && this.__mode === 0)
+    return (this.__type === 'text' || this.__type === 'custom-text') && this.__mode === 0
   }
 }
 

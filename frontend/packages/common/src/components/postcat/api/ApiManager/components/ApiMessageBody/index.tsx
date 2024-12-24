@@ -1,11 +1,20 @@
-import {Box, FormControl, FormControlLabel, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent} from '@mui/material'
-import {ApiBodyTypeOption} from './constants'
-import {ChangeEvent, SetStateAction, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react'
-import {RequestBodyRaw} from './components/Raw'
-import {RequestBodyBinary} from './components/Binary'
-import {ApiBodyType, BodyParamsType} from "@common/const/api-detail";
-import {generateId} from "@common/utils/postcat.tsx";
-import {MessageDataGrid, MessageDataGridApi} from "../MessageDataGrid";
+import {
+  Box,
+  FormControl,
+  FormControlLabel,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  SelectChangeEvent
+} from '@mui/material'
+import { ApiBodyTypeOption } from './constants'
+import { ChangeEvent, SetStateAction, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { RequestBodyRaw } from './components/Raw'
+import { RequestBodyBinary } from './components/Binary'
+import { ApiBodyType, BodyParamsType } from '@common/const/api-detail'
+import { generateId } from '@common/utils/postcat.tsx'
+import { MessageDataGrid, MessageDataGridApi } from '../MessageDataGrid'
 
 export interface ApiMessageBodyApi {
   getBodyMeta: () => {
@@ -43,7 +52,7 @@ export function RawParams(value: string) {
   }
 }
 
-export function ApiMessageBody({ apiInfo=null, loaded, mode, bodyApiRef }: ApiBodyParamsTypeProps) {
+export function ApiMessageBody({ apiInfo = null, loaded, mode, bodyApiRef }: ApiBodyParamsTypeProps) {
   const [apiBodyTypeValue, setApiBodyTypeValue] = useState<ApiBodyType>(ApiBodyType.JSON)
 
   const [apiFormData, setApiFormData] = useState<BodyParamsType[] | null>([])
@@ -67,7 +76,9 @@ export function ApiMessageBody({ apiInfo=null, loaded, mode, bodyApiRef }: ApiBo
         }[apiBodyTypeValue as ApiBodyType.JSON | ApiBodyType.FormData | ApiBodyType.XML]
         bodyParams.push(...(targetRef.current?.getEditMeta() as BodyParamsType[]))
       } else if ([ApiBodyType.Raw, ApiBodyType.Binary].includes(apiBodyTypeValue)) {
-        bodyParams.push(RawParams(apiBodyTypeValue === ApiBodyType.Raw ? apiRaw : apiBinary) as unknown as BodyParamsType)
+        bodyParams.push(
+          RawParams(apiBodyTypeValue === ApiBodyType.Raw ? apiRaw : apiBinary) as unknown as BodyParamsType
+        )
       }
 
       return {
@@ -86,7 +97,7 @@ export function ApiMessageBody({ apiInfo=null, loaded, mode, bodyApiRef }: ApiBo
     //     }
     //   }
     // },500)
-  }, []);
+  }, [])
 
   useEffect(() => {
     if (loaded && (apiInfo || apiInfo === null)) {
@@ -193,14 +204,12 @@ export function ApiMessageBody({ apiInfo=null, loaded, mode, bodyApiRef }: ApiBo
       {
         key: 'Raw',
         value: ApiBodyType.Raw,
-        element: <RequestBodyRaw value={apiRaw} onChange={setApiRaw} 
-        loaded={loaded} />
+        element: <RequestBodyRaw value={apiRaw} onChange={setApiRaw} loaded={loaded} />
       },
       {
         key: 'Binary',
         value: ApiBodyType.Binary,
-        element: <RequestBodyBinary value={apiBinary} onChange={setApiBinary} 
-        loaded={loaded}/>
+        element: <RequestBodyBinary value={apiBinary} onChange={setApiBinary} loaded={loaded} />
       }
     ].filter((type) => type) as ApiBodyTypeOption[]
   }, [apiBinary, apiFormData, apiJson, apiRaw, apiXml, mode])
@@ -214,23 +223,23 @@ export function ApiMessageBody({ apiInfo=null, loaded, mode, bodyApiRef }: ApiBo
   }
 
   return (
-    <Box >
-      <Box sx={{display:'flex',alignItems:'CENTER',paddingY:'4px'}}>
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'CENTER', paddingY: '4px' }}>
         <FormControl>
           <RadioGroup
             row
             name="api-body-type-radio-buttons-group"
             value={apiBodyTypeValue}
             onChange={handleApiBodyTypeValueChange}
-            sx={{ height: '30px' ,paddingLeft:'8px',marginLeft:'8px',fontSize:'12px'}}
+            sx={{ height: '30px', paddingLeft: '8px', marginLeft: '8px', fontSize: '12px' }}
           >
             {apiBodyTypeList.map((apiBodyType) => (
               <FormControlLabel
-              sx={{ paddingRight:'10px' ,'& .MuiFormControlLabel-label': { fontSize: '12px' }, }}
+                sx={{ paddingRight: '10px', '& .MuiFormControlLabel-label': { fontSize: '12px' } }}
                 key={apiBodyType.value}
                 value={apiBodyType.value}
                 checked={apiBodyType.value === apiBodyTypeValue}
-                control={<Radio  sx={{ height: '30px',width:'22px',marginRight:'4px',color:'#EDEDED' }} />}
+                control={<Radio sx={{ height: '30px', width: '22px', marginRight: '4px', color: '#EDEDED' }} />}
                 label={apiBodyType.key}
               />
             ))}
@@ -243,8 +252,7 @@ export function ApiMessageBody({ apiInfo=null, loaded, mode, bodyApiRef }: ApiBo
               onChange={handleJsonTypeChange}
               sx={{
                 height: '30px',
-                borderColor:'#EDEDED'
-                
+                borderColor: '#EDEDED'
               }}
             >
               <MenuItem value={ApiBodyType.JSON}>Object</MenuItem>

@@ -18,10 +18,10 @@ import { Raw } from './Raw'
 import { Binary } from './Binary'
 import { ContentType, FormContentTypes, MimeTypes } from './const'
 import { ImportMessage, ImportMessageChangeType, ImportMessageOption } from '../ImportMessage'
-import {ApiBodyType, BodyParamsType, TestApiBodyType} from "@common/const/api-detail";
-import {mapContentTypeToApiBodyType} from "@common/utils/postcat.tsx";
-import {ParseCurlResult} from "@common/utils/curl.ts";
-import {TestMessageDataGridApi} from "../../TestMessageDataGrid";
+import { ApiBodyType, BodyParamsType, TestApiBodyType } from '@common/const/api-detail'
+import { mapContentTypeToApiBodyType } from '@common/utils/postcat.tsx'
+import { ParseCurlResult } from '@common/utils/curl.ts'
+import { TestMessageDataGridApi } from '../../TestMessageDataGrid'
 
 export interface TestBodyApi {
   getBodyMeta: () => {
@@ -183,7 +183,7 @@ export function TestBody({ bodyApiRef, onContentTypeChange }: TestBodyProps) {
                 key={apiBodyType.value}
                 value={apiBodyType.value}
                 checked={apiBodyType.value === apiBodyTypeValue}
-                control={<Radio sx={{ height: '30px', color:'#EDEDED' }} />}
+                control={<Radio sx={{ height: '30px', color: '#EDEDED' }} />}
                 label={apiBodyType.key}
               />
             ))}
@@ -199,8 +199,8 @@ export function TestBody({ bodyApiRef, onContentTypeChange }: TestBodyProps) {
                 onChange={handleContentTypeChange}
                 sx={{
                   height: '24px',
-                  fontSize: '12px', 
-                  color:'#EDEDED'
+                  fontSize: '12px',
+                  color: '#EDEDED'
                 }}
               >
                 {apiBodyTypeValue === ApiBodyType.Raw
