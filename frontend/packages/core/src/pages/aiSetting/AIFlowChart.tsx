@@ -188,6 +188,20 @@ const AIFlowChart = () => {
               }
             }
           }
+          if (n.type === 'keyCard') {
+            const modelId = n.id.replace('-keys', '')
+            const modelNode = sortedNodes.find((mn) => mn.id === modelId)
+            if (modelNode) {
+              const index = sortedNodes.findIndex((sn) => sn.id === modelId)
+              return {
+                ...n,
+                position: {
+                  x: LAYOUT.KEY_NODE_X,
+                  y: LAYOUT.NODE_START_Y + index * LAYOUT.NODE_GAP
+                }
+              }
+            }
+          }
           return n
         })
       })
