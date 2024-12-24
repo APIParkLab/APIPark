@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"sort"
 	"time"
 
@@ -59,6 +60,32 @@ type imlProviderModule struct {
 	transaction     store.ITransaction      `autowired:""`
 }
 
+func (i *imlProviderModule) Sort(ctx context.Context, input *ai_dto.Sort) error {
+	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		list, err := i.providerService.List(ctx)
+		if err != nil {
+			return err
+		}
+		providerMap := utils.SliceToMap(list, func(e *ai.Provider) string {
+			return e.Id
+		})
+		for index, id := range input.Providers {
+			_, has := providerMap[id]
+			if !has {
+				continue
+			}
+			priority := index + 1
+			err = i.providerService.Save(txCtx, id, &ai.SetProvider{
+				Priority: &priority,
+			})
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
 func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.ConfiguredProviderItem, *auto.Label, error) {
 	// 获取已配置的AI服务商
 	list, err := i.providerService.List(ctx)
@@ -71,6 +98,28 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.
 	}
 	providers := make([]*ai_dto.ConfiguredProviderItem, 0, len(list))
 	for _, l := range list {
+		// 检查是否有默认Key
+		_, err = i.aiKeyService.DefaultKey(ctx, l.Id)
+		if err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil, nil, err
+			}
+			err = i.aiKeyService.Create(ctx, &ai_key.Create{
+				ID:         l.Id,
+				Name:       l.Name,
+				Config:     l.Config,
+				Provider:   l.Id,
+				Priority:   1,
+				Status:     1,
+				ExpireTime: 0,
+				UseToken:   0,
+				Default:    true,
+			})
+			if err != nil {
+				return nil, nil, fmt.Errorf("create default key error:%v", err)
+			}
+		}
+
 		p, has := model_runtime.GetProvider(l.Id)
 		if !has {
 			continue
@@ -80,7 +129,7 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.
 			return nil, nil, fmt.Errorf("get provider keys error:%v", err)
 		}
 
-		keysStatus := make([]string, 0, len(keys))
+		keysStatus := make([]*ai_dto.KeyStatus, 0, len(keys))
 		for _, k := range keys {
 			status := ai_key_dto.ToKeyStatus(k.Status)
 			switch status {
@@ -88,11 +137,13 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.
 			default:
 				status = ai_key_dto.KeyError
 			}
-			keysStatus = append(keysStatus, status.String())
+			keysStatus = append(keysStatus, &ai_dto.KeyStatus{
+				Id:     k.ID,
+				Name:   k.Name,
+				Status: status.String(),
+			})
 		}
-		if len(keysStatus) == 0 {
-			keysStatus = []string{ai_key_dto.KeyNormal.String()}
-		}
+
 		providers = append(providers, &ai_dto.ConfiguredProviderItem{
 			Id:         l.Id,
 			Name:       l.Name,
@@ -143,12 +194,14 @@ func (i *imlProviderModule) SimpleProviders(ctx context.Context) ([]*ai_dto.Simp
 	items := make([]*ai_dto.SimpleProviderItem, 0, len(providers))
 	for _, v := range providers {
 		item := &ai_dto.SimpleProviderItem{
-			Id:   v.ID(),
-			Name: v.Name(),
-			Logo: v.Logo(),
+			Id:     v.ID(),
+			Name:   v.Name(),
+			Logo:   v.Logo(),
+			Status: ai_dto.ProviderDisabled,
 		}
-		if _, has := providerMap[v.ID()]; has {
+		if info, has := providerMap[v.ID()]; has {
 			item.Configured = true
+			item.Status = ai_dto.ToProviderStatus(info.Status)
 		}
 		items = append(items, item)
 	}
@@ -403,7 +456,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		}
 		pInfo := &ai.SetProvider{
 			Name:       &info.Name,
-			DefaultLLM: &info.DefaultLLM,
+			DefaultLLM: &input.DefaultLLM,
 			Config:     &input.Config,
 			Priority:   input.Priority,
 		}
@@ -567,4 +620,89 @@ func (i *imlProviderModule) syncGateway(ctx context.Context, clusterId string, r
 	}
 
 	return nil
+}
+
+var _ IAIAPIModule = (*imlAIApiModule)(nil)
+
+type imlAIApiModule struct {
+	aiAPIService    ai_api.IAPIService    `autowired:""`
+	aiAPIUseService ai_api.IAPIUseService `autowired:""`
+}
+
+func (i *imlAIApiModule) APIs(ctx context.Context, keyword string, providerId string, start int64, end int64, page int, pageSize int, sortCondition string, asc bool) ([]*ai_dto.APIItem, int64, error) {
+	sortRule := "desc"
+	if asc {
+		sortRule = "asc"
+	}
+	switch sortCondition {
+	default:
+		apis, err := i.aiAPIService.Search(ctx, keyword, map[string]interface{}{
+			"provider": providerId,
+		}, "update_at desc")
+		if err != nil {
+			return nil, 0, err
+		}
+
+		if len(apis) <= 0 {
+			return nil, 0, nil
+		}
+		apiMap := make(map[string]*ai_api.API)
+		apiIds := make([]string, 0, len(apis))
+		for _, a := range apis {
+			apiMap[a.ID] = a
+			apiIds = append(apiIds, a.ID)
+		}
+		offset := (page - 1) * pageSize
+		results, _, err := i.aiAPIUseService.SumByApisPage(ctx, providerId, start, end, offset, pageSize, fmt.Sprintf("total_token %s", sortRule), apiIds...)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		apiItems := utils.SliceToSlice(results, func(e *ai_api.APIUse) *ai_dto.APIItem {
+			info := apiMap[e.API]
+
+			delete(apiMap, e.API)
+			return &ai_dto.APIItem{
+				Id:          e.API,
+				Name:        info.Name,
+				Service:     auto.UUID(info.Service),
+				Method:      http.MethodPost,
+				RequestPath: info.Path,
+				Model: auto.Label{
+					Id:   info.Model,
+					Name: info.Model,
+				},
+				UpdateTime: auto.TimeLabel(info.UpdateAt),
+				UseToken:   e.TotalToken,
+				Disable:    info.Disable,
+			}
+		})
+		sortApis := make([]*ai_dto.APIItem, 0, len(apiMap))
+		for _, a := range apiMap {
+			sortApis = append(sortApis, &ai_dto.APIItem{
+				Id:          a.ID,
+				Name:        a.Name,
+				Service:     auto.UUID(a.Service),
+				Method:      http.MethodPost,
+				RequestPath: a.Path,
+				Model: auto.Label{
+					Id:   a.Model,
+					Name: a.Model,
+				},
+				UpdateTime: auto.TimeLabel(a.UpdateAt),
+				UseToken:   0,
+				Disable:    a.Disable,
+			})
+		}
+		// 排序
+		sort.Slice(sortApis, func(i, j int) bool {
+			return time.Time(sortApis[i].UpdateTime).After(time.Time(sortApis[j].UpdateTime))
+		})
+		size := pageSize - len(apiItems)
+		for i := offset; i < offset+size && i < len(sortApis); i++ {
+			apiItems = append(apiItems, sortApis[i])
+		}
+		total := int64(len(apis))
+		return apiItems, total, nil
+	}
 }

@@ -76,6 +76,7 @@ type plugin struct {
 	upstreamController          upstream.IUpstreamController                       `autowired:""`
 	routerController            router.IRouterController                           `autowired:""`
 	aiAPIController             ai_api.IAPIController                              `autowired:""`
+	aiStatisticController       ai.IStatisticController                            `autowired:""`
 	aiKeyController             ai_key.IKeyController                              `autowired:""`
 	apiDocController            router.IAPIDocController                           `autowired:""`
 	subscribeController         subscribe.ISubscribeController                     `autowired:""`

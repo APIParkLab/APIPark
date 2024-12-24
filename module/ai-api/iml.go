@@ -112,6 +112,7 @@ func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_a
 			Name:        input.Name,
 			Service:     serviceId,
 			Path:        input.Path,
+			Disable:     input.Disable,
 			Description: input.Description,
 			Timeout:     input.Timeout,
 			Retry:       input.Retry,
@@ -171,6 +172,7 @@ func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string,
 			Model:            modelId,
 			Provider:         providerId,
 			AdditionalConfig: &apiInfo.AdditionalConfig,
+			Disable:          input.Disable,
 		})
 	})
 }

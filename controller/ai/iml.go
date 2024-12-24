@@ -1,6 +1,8 @@
 package ai
 
 import (
+	"strconv"
+
 	"github.com/APIParkLab/APIPark/module/ai"
 	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
 	"github.com/eolinker/go-common/auto"
@@ -13,6 +15,10 @@ var (
 
 type imlProviderController struct {
 	module ai.IProviderModule `autowired:""`
+}
+
+func (i *imlProviderController) Sort(ctx *gin.Context, input *ai_dto.Sort) error {
+	return i.module.Sort(ctx, input)
 }
 
 func (i *imlProviderController) ConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ConfiguredProviderItem, *auto.Label, error) {
@@ -49,4 +55,39 @@ func (i *imlProviderController) UpdateProviderConfig(ctx *gin.Context, id string
 
 func (i *imlProviderController) UpdateProviderDefaultLLM(ctx *gin.Context, id string, input *ai_dto.UpdateLLM) error {
 	return i.module.UpdateProviderDefaultLLM(ctx, id, input)
+}
+
+var _ IStatisticController = (*imlStatisticController)(nil)
+
+type imlStatisticController struct {
+	module ai.IAIAPIModule `autowired:""`
+}
+
+func (i *imlStatisticController) APIs(ctx *gin.Context, keyword string, providerId string, start string, end string, page string, pageSize string, sortCondition string, asc string) ([]*ai_dto.APIItem, int64, error) {
+	s, err := strconv.ParseInt(start, 10, 64)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	e, err := strconv.ParseInt(end, 10, 64)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	p, err := strconv.Atoi(page)
+	if err != nil {
+		if page != "" {
+			return nil, 0, err
+		}
+		p = 1
+	}
+
+	ps, err := strconv.Atoi(pageSize)
+	if err != nil {
+		if pageSize != "" {
+			return nil, 0, err
+		}
+		ps = 15
+	}
+	return i.module.APIs(ctx, keyword, providerId, s, e, p, ps, sortCondition, asc == "true")
 }
