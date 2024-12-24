@@ -77,19 +77,6 @@ const AiSettingList = () => {
       .finally(() => setLoading(false))
   }
 
-  // 第一期暂时隐藏
-  // const updateModalList = ()=>{
-  //     setUpdateLoading(true)
-  //     return fetchData<BasicResponse<{roles:AiSettingListItem[]}>>(`aisetting`,{method:'GET'}).then(response=>{
-  //         const {code,msg} = response
-  //         if(code === STATUS_CODE.SUCCESS){
-  //             getAiSettingList()
-  //         }else{
-  //             message.error(msg || $t(RESPONSE_TIPS.error))
-  //         }
-  //     }).finally(()=>setUpdateLoading(false))
-  // }
-
   const openModal = async (entity: AiSettingListItem) => {
     message.loading($t(RESPONSE_TIPS.loading))
     const { code, data, msg } = await fetchData<BasicResponse<{ provider: AiProviderConfig }>>('ai/provider/config', {
@@ -223,7 +210,7 @@ const AiSettingList = () => {
     <>
       <InsidePage
         className="overflow-y-auto pb-PAGE_INSIDE_B"
-        pageTitle={$t('AI 模型管理')}
+        pageTitle={$t('AI 模型')}
         description={$t('配置好 AI 模型后，你可以使用对应的大模型来创建 AI 服务')}
         showBorder={false}
         scrollPage={false}

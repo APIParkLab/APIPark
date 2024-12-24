@@ -132,13 +132,34 @@ const mockData = [
             path: '/cluster',
             icon: 'ic:baseline-device-hub',
             access: 'system.settings.api_gateway.view'
-          },
+          }
+        ]
+      },
+      {
+        name: 'AI',
+        key: 'aiSettings',
+        path: '/aisetting',
+        children: [
           {
             name: 'AI 模型',
-            key: 'aisetting',
+            key: 'aiProviders',
             path: '/aisetting',
             icon: 'hugeicons:ai-network',
             access: 'system.settings.ai_provider.view'
+          },
+          {
+            name: 'APIKey 资源池',
+            key: 'aiKeys',
+            path: '/keysetting',
+            icon: 'ic:baseline-key'
+            // access: 'system.settings.ai_key_resource.view'
+          },
+          {
+            name: 'AI API',
+            key: 'aiApiList',
+            path: '/aiapis',
+            icon: 'ic:baseline-api'
+            // access: 'system.settings.ai_api.view'
           }
         ]
       },

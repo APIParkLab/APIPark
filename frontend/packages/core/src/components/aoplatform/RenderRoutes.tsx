@@ -12,10 +12,7 @@ import React, { createElement, Suspense, useEffect, useState } from 'react'
 import { createBrowserRouter, RouteObject, RouterProvider } from 'react-router-dom'
 
 const RenderRoutes = () => {
-  const { loadPlugins, loadExecutedPlugin } = usePluginLoader(
-    ApiparkPluginDriver(routerMap),
-    routerMap
-  )
+  const { loadPlugins, loadExecutedPlugin } = usePluginLoader(ApiparkPluginDriver(routerMap), routerMap)
   const { routeConfig, dispatch, state } = useGlobalContext()
   const [router, setRouter] = useState<unknown>(null)
 
@@ -54,9 +51,7 @@ const generateRoutes = (routerConfig: RouteConfig[]): RouteObject[] => {
       if (typeof route.lazy === 'function') {
         const result = route.lazy()
         if (result instanceof Promise) {
-          LazyComponent = React.lazy(() =>
-            result.then(module => ({ default: module.default || module }))
-          )
+          LazyComponent = React.lazy(() => result.then((module) => ({ default: module.default || module })))
         } else {
           LazyComponent = result
         }
@@ -77,17 +72,11 @@ const generateRoutes = (routerConfig: RouteConfig[]): RouteObject[] => {
             </div>
           }
         >
-          {route.provider ? (
-            createElement(route.provider, {}, <GuardedComponent />)
-          ) : (
-            <GuardedComponent />
-          )}
+          {route.provider ? createElement(route.provider, {}, <GuardedComponent />) : <GuardedComponent />}
         </Suspense>
       )
     } else {
-      routeElement = route.provider
-        ? createElement(route.provider, {}, route.component)
-        : route.component
+      routeElement = route.provider ? createElement(route.provider, {}, route.component) : route.component
     }
 
     return {
