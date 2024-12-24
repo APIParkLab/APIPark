@@ -3,5 +3,5 @@ export const LAYOUT = {
   NODE_START_Y: 50,
   NODE_GAP: 120,
   MODEL_NODE_X: 500,
-  KEY_NODE_X: 850,
+  KEY_NODE_X: 900,
 } as const;

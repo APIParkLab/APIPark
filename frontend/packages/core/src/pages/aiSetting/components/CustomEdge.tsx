@@ -35,7 +35,7 @@ export default function CustomEdge({
             target="_blank"
             style={{
               position: 'absolute',
-              transform: `translate(${targetX - 80}px,${targetY}px)`,
+              transform: `translate(${targetX - 80}px,${targetY - 20}px)`,
               borderRadius: '4px',
               fontSize: 12,
               fontWeight: 500,

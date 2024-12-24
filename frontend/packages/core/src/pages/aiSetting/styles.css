@@ -6,39 +6,6 @@
   width: auto;
   max-width: 100%;
 }
-.react-flow__edge-path {
-  stroke: var(--primary-color);
-  stroke-width: 2;
-}
-
-.react-flow__edge-text {
-  font-size: 12px;
-  fill: #666;
-}
-
-.react-flow__controls {
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ededed;
-}
-
-.react-flow__controls-button {
-  border: none;
-  background: white;
-  border-bottom: 1px solid #ededed;
-  box-sizing: content-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  user-select: none;
-  padding: 5px;
-}
-
-.react-flow__controls-button:hover {
-  background: #f8f8f8;
-}
 
 /* Custom Node Styles */
 .custom-node {
