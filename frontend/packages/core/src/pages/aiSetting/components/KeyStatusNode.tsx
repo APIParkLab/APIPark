@@ -3,6 +3,7 @@ import React from 'react'
 import { KeyData } from './types'
 
 interface KeyStatusNodeData {
+  id: string
   title: string
   keys: KeyData[]
 }
@@ -40,7 +41,7 @@ export const KeyStatusNode: React.FC<{ data: KeyStatusNodeData }> = ({ data }) =
               }}
               className={`
                   rounded-md flex-shrink-0
-                  ${key.status === 'normal' ? 'bg-green-500' : 'bg-red-500'}
+                  ${key.status === 'enabled' || key.status === 'normal' ? 'bg-green-500' : 'bg-red-500'}
                   transition-all duration-200 hover:opacity-80
                 `}
             />

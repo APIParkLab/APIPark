@@ -1,6 +1,7 @@
 import { Icon } from '@iconify/react'
 import { Handle, Position } from '@xyflow/react'
 import { Avatar } from 'antd'
+import { t } from 'i18next'
 import React from 'react'
 import { ModelStatus } from './types'
 
@@ -18,7 +19,6 @@ type ModelCardNodeData = ModelCardData & {
 
 export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) => {
   const { title, status, defaultModel, logo } = data
-
   return (
     <div
       className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[280px] relative group"
@@ -32,7 +32,7 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
             <Avatar
               shape="square"
               size={50}
-              className={`rounded-[12px] border-none rounded-[12px] ${logo ? 'bg-[linear-gradient(135deg,white,#f0f0f0)]' : 'bg-theme'}`}
+              className={`rounded-[12px] border-none  ${logo ? 'bg-[linear-gradient(135deg,white,#f0f0f0)]' : 'bg-theme'}`}
               src={
                 logo ? (
                   <img
@@ -42,6 +42,7 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
                   />
                 ) : undefined
               }
+              // TODO use https://www.npmjs.com/package/@icon-park/react
               icon={logo ? '' : <iconpark-icon name="auto-generate-api"></iconpark-icon>}
             >
               {' '}
@@ -58,11 +59,14 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
             <Icon
               icon="mdi:cog"
               className="text-xl text-gray-400 cursor-pointer hover:text-[--primary-color]"
-              onClick={() => console.log('Settings', data.id)}
+              onClick={() => console.log('Default:', data.id)}
             />
           </div>
         </div>
-        <div className="mt-2 text-sm text-gray-500">{defaultModel}</div>
+        <div className="mt-2 text-sm text-gray-500">
+          {t('默认：')}
+          {defaultModel}
+        </div>
       </div>
     </div>
   )

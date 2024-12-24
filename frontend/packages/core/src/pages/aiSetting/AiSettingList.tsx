@@ -9,6 +9,7 @@ import { checkAccess } from '@common/utils/permission'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { App, Button, Card, Divider, Empty, Spin, Tag } from 'antd'
 import { memo, useEffect, useRef, useState } from 'react'
+import AIFlowChart from './AIFlowChart'
 import AiSettingModalContent, { AiSettingModalContentHandle } from './AiSettingModal'
 
 export type AiSettingListItem = {
@@ -54,10 +55,11 @@ const AiSettingList = () => {
 
   const getAiSettingList = () => {
     setLoading(true)
-    return fetchData<
-      BasicResponse<{ providers: Omit<AiSettingListItem, 'availableLlms' | 'llmListStatus'>[] }>
-    >(`ai/providers`, { method: 'GET', eoTransformKeys: ['default_llm', 'default_llm_logo'] })
-      .then(response => {
+    return fetchData<BasicResponse<{ providers: Omit<AiSettingListItem, 'availableLlms' | 'llmListStatus'>[] }>>(
+      `ai/providers`,
+      { method: 'GET', eoTransformKeys: ['default_llm', 'default_llm_logo'] }
+    )
+      .then((response) => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           setAiSettingList(
@@ -90,10 +92,11 @@ const AiSettingList = () => {
 
   const openModal = async (entity: AiSettingListItem) => {
     message.loading($t(RESPONSE_TIPS.loading))
-    const { code, data, msg } = await fetchData<BasicResponse<{ provider: AiProviderConfig }>>(
-      'ai/provider/config',
-      { method: 'GET', eoParams: { provider: entity!.id }, eoTransformKeys: ['get_apikey_url'] }
-    )
+    const { code, data, msg } = await fetchData<BasicResponse<{ provider: AiProviderConfig }>>('ai/provider/config', {
+      method: 'GET',
+      eoParams: { provider: entity!.id },
+      eoTransformKeys: ['get_apikey_url']
+    })
     message.destroy()
     if (code !== STATUS_CODE.SUCCESS) {
       message.error(msg || $t(RESPONSE_TIPS.error))
@@ -109,7 +112,7 @@ const AiSettingList = () => {
         />
       ),
       onOk: () => {
-        return modalRef.current?.save().then(res => {
+        return modalRef.current?.save().then((res) => {
           if (res === true) setAiConfigFlushed(true)
           getAiSettingList()
         })
@@ -193,13 +196,7 @@ const AiSettingList = () => {
     )
   })
 
-  const ModelCardArea = ({
-    modelList,
-    className
-  }: {
-    modelList: AiSettingListItem[]
-    className?: string
-  }) => {
+  const ModelCardArea = ({ modelList, className }: { modelList: AiSettingListItem[]; className?: string }) => {
     return (
       <>
         {modelList.length > 0 ? (
@@ -230,20 +227,8 @@ const AiSettingList = () => {
         description={$t('配置好 AI 模型后，你可以使用对应的大模型来创建 AI 服务')}
         showBorder={false}
         scrollPage={false}
-        // customBtn={
-        // <WithPermission access="system.devops.ai_provider.edit">
-        // <Button
-        //     icon={<Icon icon="ic:baseline-refresh" width={20} height={20} />}
-        //     type="text"
-        //     iconPosition={'start'}
-        //     classNames={{icon:'h-[20px]'}}
-        //     loading={updateLoading}
-        //     onClick={updateModalList}>
-        //     {$t('同步最新模型')}
-        // </Button>
-        // </WithPermission>
-        // }
       >
+        <AIFlowChart />
         <Spin
           className="h-full"
           wrapperClassName="h-full pr-PAGE_INSIDE_X"
@@ -252,18 +237,11 @@ const AiSettingList = () => {
         >
           {aiSettingList && aiSettingList.length > 0 ? (
             <div>
-              <p className="text-[14px] text-[#666] mb-[4px] font-bold">{$t('已配置')}</p>
-              <ModelCardArea
-                className="mb-[20px]"
-                modelList={aiSettingList.filter(item => item.configured) || []}
-              />
-              {aiSettingList.filter(item => !item.configured).length > 0 && (
+              {aiSettingList.filter((item) => !item.configured).length > 0 && (
                 <>
                   <Divider style={{ margin: '20px 0 !important;' }} />
-                  <p className="text-[14px] text-[#666]  mb-[4px] mt-[20px]  font-bold">
-                    {$t('未配置')}
-                  </p>
-                  <ModelCardArea modelList={aiSettingList.filter(item => !item.configured) || []} />
+                  <p className="text-[14px] text-[#666]  mb-[4px] mt-[20px]  font-bold">{$t('未配置')}</p>
+                  <ModelCardArea modelList={aiSettingList.filter((item) => !item.configured) || []} />
                 </>
               )}
             </div>
