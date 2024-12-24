@@ -4,7 +4,9 @@ import { useFetch } from '@common/hooks/http'
 import {
   addEdge,
   Connection,
+  ConnectionMode,
   Edge,
+  EdgeTypes,
   Node,
   NodeTypes,
   PanOnScrollMode,
@@ -14,6 +16,7 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useCallback, useEffect, useState } from 'react'
+import CustomEdge from './components/CustomEdge'
 import { KeyStatusNode } from './components/KeyStatusNode'
 import { ModelCardNode } from './components/ModelCardNode'
 import { ServiceCardNode } from './components/NodeComponents'
@@ -31,18 +34,6 @@ interface ApiResponse {
   }
   code: number
   success: string
-}
-
-interface NodeData {
-  title?: string
-  status?: string
-  defaultModel?: string
-  logo?: string
-  keys?: Array<{
-    id: string
-    status: string
-    priority: number
-  }>
 }
 
 const calculateNodePositions = (models: ModelData[], startY = LAYOUT.NODE_START_Y, gap = LAYOUT.NODE_GAP) => {
@@ -67,6 +58,10 @@ const nodeTypes: NodeTypes = {
   keyCard: KeyStatusNode,
   serviceCard: ServiceCardNode
 } as const
+
+const edgeTypes: EdgeTypes = {
+  custom: CustomEdge
+}
 
 const AIFlowChart = () => {
   const [modelData, setModelData] = useState<ModelData[]>([])
@@ -127,14 +122,11 @@ const AIFlowChart = () => {
         source: 'apiService',
         target: model.id,
         label: `apis(${model.api_count})`,
-        style: { stroke: '#ddd', cursor: 'pointer' },
-        type: 'smoothstep',
-        markerEnd: { type: 'arrow' }
+        style: { stroke: '#ddd', cursor: 'pointer' }
       })),
       ...modelData.map((model) => ({
-        id: `${model.id}-keys`,
+        id: `${model.id}-keys-edge`,
         source: model.id,
-        type: 'smoothstep',
         target: `${model.id}-keys`,
         animated: true,
         style: { stroke: '#ddd' }
@@ -170,7 +162,7 @@ const AIFlowChart = () => {
   )
 
   const onNodeDragStop: any = useCallback(
-    (_, node: Node<any>) => {
+    (_: any, node: Node<any>) => {
       if (node.type !== 'modelCard') return
 
       setNodes((nds) => {
@@ -220,6 +212,7 @@ const AIFlowChart = () => {
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         maxZoom={1}
         minZoom={1}
         zoomOnScroll={false}
@@ -227,6 +220,11 @@ const AIFlowChart = () => {
         zoomOnDoubleClick={false}
         panOnScroll={true}
         panOnScrollMode={PanOnScrollMode.Vertical}
+        defaultEdgeOptions={{
+          type: 'custom'
+        }}
+        connectionMode={ConnectionMode.Loose}
+        fitView
       />
     </div>
   )
