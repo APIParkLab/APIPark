@@ -6,7 +6,6 @@
   width: auto;
   max-width: 100%;
 }
-
 .react-flow__edge-path {
   stroke: var(--primary-color);
   stroke-width: 2;
