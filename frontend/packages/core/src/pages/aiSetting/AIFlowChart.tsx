@@ -5,6 +5,7 @@ import {
   addEdge,
   Connection,
   ConnectionMode,
+  CoordinateExtent,
   Edge,
   EdgeTypes,
   Node,
@@ -148,6 +149,17 @@ const AIFlowChart = () => {
     setEdges(newEdges)
   }, [modelData])
 
+  const calculateExtent = useCallback(() => {
+    const minX = LAYOUT.SERVICE_NODE_X - 50 // Add some padding
+    const maxX = LAYOUT.KEY_NODE_X + 300 // Add space for key node width
+    const minY = 0
+    const maxY = (modelData.length + 1) * LAYOUT.NODE_GAP // Add extra space at bottom
+    return [
+      [minX, minY],
+      [maxX, maxY]
+    ] as CoordinateExtent
+  }, [modelData.length])
+
   const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges])
 
   const onNodeDrag: any = useCallback(
@@ -236,6 +248,7 @@ const AIFlowChart = () => {
           type: 'custom'
         }}
         connectionMode={ConnectionMode.Loose}
+        translateExtent={calculateExtent()}
       />
     </div>
   )
