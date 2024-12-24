@@ -7,7 +7,7 @@ go 1.21
 require (
 	github.com/eolinker/ap-account v1.0.15
 	github.com/eolinker/eosc v0.18.3
-	github.com/eolinker/go-common v1.1.1
+	github.com/eolinker/go-common v1.1.3
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/getkin/kin-openapi v0.127.0
 	github.com/gin-gonic/gin v1.10.0
@@ -81,4 +81,4 @@ require (
 
 //replace github.com/eolinker/ap-account => ../aoaccount
 //
-replace github.com/eolinker/go-common => ../../eolinker/go-common
+//replace github.com/eolinker/go-common => ../../eolinker/go-common
