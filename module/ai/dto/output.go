@@ -1,5 +1,9 @@
 package ai_dto
 
+import (
+	"github.com/eolinker/go-common/auto"
+)
+
 type Provider struct {
 	Id               string         `json:"id"`
 	Name             string         `json:"name"`
@@ -19,8 +23,14 @@ type ConfiguredProviderItem struct {
 	Status     ProviderStatus `json:"status"`
 	APICount   int64          `json:"api_count"`
 	KeyCount   int            `json:"key_count"`
-	KeyStatus  []string       `json:"key_status"`
+	KeyStatus  []*KeyStatus   `json:"key_status"`
 	Priority   int            `json:"priority"`
+}
+
+type KeyStatus struct {
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
 }
 
 type ProviderItem struct {
@@ -32,10 +42,11 @@ type ProviderItem struct {
 }
 
 type SimpleProviderItem struct {
-	Id         string `json:"id"`
-	Name       string `json:"name"`
-	Logo       string `json:"logo"`
-	Configured bool   `json:"configured"`
+	Id         string         `json:"id"`
+	Name       string         `json:"name"`
+	Logo       string         `json:"logo"`
+	Configured bool           `json:"configured"`
+	Status     ProviderStatus `json:"status"`
 }
 
 type LLMItem struct {
@@ -43,4 +54,16 @@ type LLMItem struct {
 	Logo   string   `json:"logo"`
 	Config string   `json:"config"`
 	Scopes []string `json:"scopes"`
+}
+
+type APIItem struct {
+	Id          string         `json:"id"`
+	Name        string         `json:"name"`
+	Service     auto.Label     `json:"service" aolabel:"service"`
+	Method      string         `json:"method"`
+	RequestPath string         `json:"request_path"`
+	Model       auto.Label     `json:"model"`
+	UpdateTime  auto.TimeLabel `json:"update_time"`
+	UseToken    int            `json:"use_token"`
+	Disable     bool           `json:"disable"`
 }

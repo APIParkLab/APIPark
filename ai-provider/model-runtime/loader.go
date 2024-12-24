@@ -40,7 +40,14 @@ func (c *Config) Check(cfg string) error {
 }
 
 func (c *Config) GenConfig(target string, origin string) (string, error) {
+	if target == "" {
+		target = "{}"
+	}
+	if origin == "" {
+		origin = "{}"
+	}
 	var targetData map[string]interface{}
+
 	err := json.Unmarshal([]byte(target), &targetData)
 	if err != nil {
 		return "", err

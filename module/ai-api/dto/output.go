@@ -30,6 +30,19 @@ type APIItem struct {
 	Model       ModelItem      `json:"model"`
 }
 
+type AIAPIItem struct {
+	Id          string         `json:"id"`
+	Name        string         `json:"name"`
+	Service     auto.Label     `json:"service" aolabel:"service"`
+	Method      string         `json:"method"`
+	RequestPath string         `json:"request_path"`
+	Model       ModelItem      `json:"model"`
+	Provider    ProviderItem   `json:"provider"`
+	UpdateTime  auto.TimeLabel `json:"update_time"`
+	UseToken    int64          `json:"use_token"`
+	Disable     bool           `json:"disable"`
+}
+
 type ModelItem struct {
 	Id   string `json:"id"`
 	Logo string `json:"logo"`
