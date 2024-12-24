@@ -14,4 +14,13 @@ Create detailed components with these requirements:
    - Update current packages/core/src/pages/Root.tsx with new comprehensive code
    - Don't forget root route (page.tsx) handling
    - You MUST complete the entire prompt before stopping
-​
+​11. Table component should use <PageList>
+12. use `const { fetchData } = useFetch()` to fetch http data,such as ```  fetchData<BasicResponse<{ profile: UserInfoType }>>('account/profile', { method: 'GET' }).then((response) => {
+      const { code, data, msg } = response
+      if (code === STATUS_CODE.SUCCESS) {
+        setUserInfo(data.profile)
+        dispatch({ type: 'UPDATE_USERDATA', userData: data.profile })
+      } else {
+        message.error(msg || $t(RESPONSE_TIPS.error))
+      }
+    })```
