@@ -10,3 +10,7 @@ type UpdateConfig struct {
 	Priority   *int   `json:"priority"`
 	Enable     *bool  `json:"enable"`
 }
+
+type Sort struct {
+	Providers []string `json:"providers"`
+}

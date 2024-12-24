@@ -32,8 +32,8 @@ github.com/eolinker/ap-account v1.0.15 h1:n6DJeL6RHZ8eLlZUcY2U3H4d/GPaA5oelAx3R0
 github.com/eolinker/ap-account v1.0.15/go.mod h1:zm/Ivs6waJ/M/nEszhpPmM6g50y/MKO+5eABFAdeD0g=
 github.com/eolinker/eosc v0.18.3 h1:3IK5HkAPnJRfLbQ0FR7kWsZr6Y/OiqqGazvN1q2BL5A=
 github.com/eolinker/eosc v0.18.3/go.mod h1:O9PQQXFCpB6fjHf+oFt/LN6EOAv779ItbMixMKCfTfk=
-github.com/eolinker/go-common v1.1.1 h1:3WqqecGqcHDgpa8Ljp156c1uWeZKP1CKScdU+6sOfcc=
-github.com/eolinker/go-common v1.1.1/go.mod h1:Kb/jENMN1mApnodvRgV4YwO9FJby1Jkt2EUjrBjvSX4=
+github.com/eolinker/go-common v1.1.3 h1:Chb0x6sj0hZKpIN6Qo9IMdi9pX2KLNUPmqcaAD8mmWs=
+github.com/eolinker/go-common v1.1.3/go.mod h1:Kb/jENMN1mApnodvRgV4YwO9FJby1Jkt2EUjrBjvSX4=
 github.com/gabriel-vasile/mimetype v1.4.4 h1:QjV6pZ7/XZ7ryI2KuyeEDE8wnh7fHP9YnQy+R0LnH8I=
 github.com/gabriel-vasile/mimetype v1.4.4/go.mod h1:JwLei5XPtWdGiMFB5Pjle1oEeoSeEuJfJE+TtfvdB/s=
 github.com/getkin/kin-openapi v0.127.0 h1:Mghqi3Dhryf3F8vR370nN67pAERW+3a95vomb3MAREY=
