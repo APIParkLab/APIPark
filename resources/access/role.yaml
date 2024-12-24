@@ -6,6 +6,12 @@ system:
       - system.api_portal.api_portal.view
       - system.settings.account.manager
       - system.settings.account.view
+      - system.settings.ai_api.manager
+      - system.settings.ai_api.view
+      - system.settings.ai_key_resource.manager
+      - system.settings.ai_key_resource.view
+      - system.settings.ai_log.manager
+      - system.settings.ai_log.view
       - system.settings.ai_provider.manager
       - system.settings.ai_provider.view
       - system.settings.api_gateway.manager
@@ -39,6 +45,12 @@ system:
     permits:
       - system.analysis.run_view.view
       - system.api_portal.api_portal.view
+      - system.settings.ai_api.manager
+      - system.settings.ai_api.view
+      - system.settings.ai_key_resource.manager
+      - system.settings.ai_key_resource.view
+      - system.settings.ai_log.manager
+      - system.settings.ai_log.view
       - system.settings.ai_provider.manager
       - system.settings.ai_provider.view
       - system.settings.api_gateway.manager

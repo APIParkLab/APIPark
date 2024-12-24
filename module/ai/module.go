@@ -20,6 +20,11 @@ type IProviderModule interface {
 	UpdateProviderStatus(ctx context.Context, id string, enable bool) error
 	UpdateProviderConfig(ctx context.Context, id string, input *ai_dto.UpdateConfig) error
 	UpdateProviderDefaultLLM(ctx context.Context, id string, input *ai_dto.UpdateLLM) error
+	Sort(ctx context.Context, input *ai_dto.Sort) error
+}
+
+type IAIAPIModule interface {
+	APIs(ctx context.Context, keyword string, providerId string, start int64, end int64, page int, pageSize int, sortCondition string, asc bool) ([]*ai_dto.APIItem, int64, error)
 }
 
 func init() {
@@ -27,5 +32,9 @@ func init() {
 		module := new(imlProviderModule)
 		gateway.RegisterInitHandleFunc(module.initGateway)
 		return reflect.ValueOf(module)
+	})
+
+	autowire.Auto[IAIAPIModule](func() reflect.Value {
+		return reflect.ValueOf(new(imlAIApiModule))
 	})
 }

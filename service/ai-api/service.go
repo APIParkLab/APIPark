@@ -14,12 +14,18 @@ type IAPIService interface {
 	universally.IServiceEdit[Edit]
 	universally.IServiceDelete
 	CountMapByProvider(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error)
+}
 
-	//ListByServices(ctx context.Context, serviceIds ...string) ([]*API, error)
+type IAPIUseService interface {
+	SumByApis(ctx context.Context, providerId string, start, end int64, apiIds ...string) ([]*APIUse, error)
+	SumByApisPage(ctx context.Context, providerId string, start, end int64, page, pageSize int, order string, apiIds ...string) ([]*APIUse, int64, error)
 }
 
 func init() {
 	autowire.Auto[IAPIService](func() reflect.Value {
 		return reflect.ValueOf(new(imlAPIService))
+	})
+	autowire.Auto[IAPIUseService](func() reflect.Value {
+		return reflect.ValueOf(new(imlAPIUseService))
 	})
 }
