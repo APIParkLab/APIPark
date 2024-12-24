@@ -213,7 +213,7 @@ const AIFlowChart = () => {
   )
 
   return (
-    <div className="overflow-y-auto w-full h-full" style={{ height: '100vh' }}>
+    <div className="w-full h-full" style={{ height: 'calc(100vh - 64px)' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -222,18 +222,18 @@ const AIFlowChart = () => {
         onConnect={onConnect}
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
+        draggable={false}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         maxZoom={1}
-        minZoom={1}
+        minZoom={0}
         zoomOnScroll={false}
         zoomOnPinch={false}
         zoomOnDoubleClick={false}
         panOnScroll={true}
         panOnScrollMode={PanOnScrollMode.Vertical}
         defaultEdgeOptions={{
-          type: 'custom',
-          style: { strokeWidth: 2 }
+          type: 'custom'
         }}
         connectionMode={ConnectionMode.Loose}
       />
