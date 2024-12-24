@@ -39,15 +39,18 @@ interface ApiResponse {
 const calculateNodePositions = (models: ModelData[], startY = LAYOUT.NODE_START_Y, gap = LAYOUT.NODE_GAP) => {
   return models.reduce(
     (acc, model, index) => {
-      acc[model.id] = {
-        x: LAYOUT.MODEL_NODE_X,
-        y: startY + index * gap
+      const y = startY + index * gap
+      return {
+        ...acc,
+        [model.id]: {
+          x: LAYOUT.MODEL_NODE_X,
+          y
+        },
+        [`${model.id}-keys`]: {
+          x: LAYOUT.KEY_NODE_X,
+          y
+        }
       }
-      acc[`${model.id}-keys`] = {
-        x: LAYOUT.KEY_NODE_X,
-        y: startY + index * gap
-      }
-      return acc
     },
     {} as Record<string, { x: number; y: number }>
   )
@@ -83,17 +86,24 @@ const AIFlowChart = () => {
   useEffect(() => {
     if (!modelData.length) return
 
+    const positions = calculateNodePositions(modelData)
+    // subtract 5 to make sure the service node is above the top model node
+    const serviceY = positions[modelData[0].id].y - 5
+
     const newNodes = [
       {
         id: 'apiService',
         type: 'serviceCard',
-        position: { x: LAYOUT.SERVICE_NODE_X, y: LAYOUT.NODE_START_Y },
-        data: {}
+        position: { x: LAYOUT.SERVICE_NODE_X, y: serviceY },
+        data: {
+          title: 'API Service',
+          count: modelData.length
+        }
       },
       ...modelData.map((model) => ({
         id: model.id,
         type: 'modelCard',
-        position: calculateNodePositions(modelData)[model.id],
+        position: positions[model.id],
         data: {
           title: model.name,
           status: model.status,
@@ -104,7 +114,7 @@ const AIFlowChart = () => {
       ...modelData.map((model) => ({
         id: `${model.id}-keys`,
         type: 'keyCard',
-        position: calculateNodePositions(modelData)[`${model.id}-keys`],
+        position: positions[`${model.id}-keys`],
         data: {
           title: 'API Keys',
           keys: model.keys.map((key, index) => ({
@@ -121,14 +131,15 @@ const AIFlowChart = () => {
         id: `service-${model.id}`,
         source: 'apiService',
         target: model.id,
-        label: `apis(${model.api_count})`,
-        markerEnd: { type: 'arrow' },
-        data: { id: model.id }
+        label: `${model.api_count} apis`,
+        data: { id: model.id },
+        animated: true
       })),
       ...modelData.map((model) => ({
         id: `${model.id}-keys-edge`,
         source: model.id,
         target: `${model.id}-keys`,
+        label: `${model.key_count} keys`,
         animated: true
       }))
     ]

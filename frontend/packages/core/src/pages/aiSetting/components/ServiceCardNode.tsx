@@ -5,7 +5,7 @@ import React from 'react'
 export const ServiceCardNode: React.FC<NodeProps> = () => {
   return (
     <div
-      className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[150px] relative nodrag"
+      className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[150px]  nodrag"
       style={{ border: '1px solid var(--border-color)' }}
     >
       <Handle type="source" position={Position.Right} />

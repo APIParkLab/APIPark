@@ -20,7 +20,7 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
   const { title, status, defaultModel, logo } = data
   return (
     <div
-      className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[280px] relative group"
+      className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[280px]  group"
       style={{ border: '1px solid var(--border-color)' }}
     >
       <Handle type="target" position={Position.Left} />
