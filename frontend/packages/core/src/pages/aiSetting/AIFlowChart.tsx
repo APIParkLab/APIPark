@@ -2,9 +2,6 @@
 
 import { useFetch } from '@common/hooks/http'
 import {
-  addEdge,
-  Connection,
-  ConnectionMode,
   CoordinateExtent,
   Edge,
   EdgeTypes,
@@ -88,7 +85,7 @@ const AIFlowChart = () => {
     if (!modelData.length) return
 
     const positions = calculateNodePositions(modelData)
-    // subtract 5 to make sure the service node is above the top model node
+    // subtract 5 to make sure the service node is aligned with the top model node
     const serviceY = positions[modelData[0].id].y - 5
 
     const newNodes = [
@@ -150,17 +147,15 @@ const AIFlowChart = () => {
   }, [modelData])
 
   const calculateExtent = useCallback(() => {
-    const minX = LAYOUT.SERVICE_NODE_X - 50 // Add some padding
-    const maxX = LAYOUT.KEY_NODE_X + 300 // Add space for key node width
-    const minY = 0
-    const maxY = (modelData.length + 1) * LAYOUT.NODE_GAP // Add extra space at bottom
+    const left = LAYOUT.SERVICE_NODE_X - 100
+    const right = LAYOUT.KEY_NODE_X + 100
+    const top = 0 // Allow slight negative scroll to reduce top padding
+    const bottom = LAYOUT.NODE_START_Y + modelData.length * LAYOUT.NODE_GAP
     return [
-      [minX, minY],
-      [maxX, maxY]
+      [left, top],
+      [right, bottom < 100 ? 5000 : bottom]
     ] as CoordinateExtent
   }, [modelData.length])
-
-  const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges])
 
   const onNodeDrag: any = useCallback(
     (_: MouseEvent, node: Node<any>) => {
@@ -231,14 +226,11 @@ const AIFlowChart = () => {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         draggable={false}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        maxZoom={1}
-        minZoom={0}
         zoomOnScroll={false}
         zoomOnPinch={false}
         zoomOnDoubleClick={false}
@@ -247,7 +239,6 @@ const AIFlowChart = () => {
         defaultEdgeOptions={{
           type: 'custom'
         }}
-        connectionMode={ConnectionMode.Loose}
         translateExtent={calculateExtent()}
       />
     </div>
