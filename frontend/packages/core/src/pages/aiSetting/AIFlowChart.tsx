@@ -1,7 +1,17 @@
 'use client'
 
 import { useFetch } from '@common/hooks/http'
-import { addEdge, NodeTypes, ReactFlow, useEdgesState, useNodesState } from '@xyflow/react'
+import {
+  addEdge,
+  Connection,
+  Edge,
+  Node,
+  NodeTypes,
+  PanOnScrollMode,
+  ReactFlow,
+  useEdgesState,
+  useNodesState
+} from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useCallback, useEffect, useState } from 'react'
 import { KeyStatusNode } from './components/KeyStatusNode'
@@ -21,6 +31,18 @@ interface ApiResponse {
   }
   code: number
   success: string
+}
+
+interface NodeData {
+  title?: string
+  status?: string
+  defaultModel?: string
+  logo?: string
+  keys?: Array<{
+    id: string
+    status: string
+    priority: number
+  }>
 }
 
 const calculateNodePositions = (models: ModelData[], startY = LAYOUT.NODE_START_Y, gap = LAYOUT.NODE_GAP) => {
@@ -48,8 +70,8 @@ const nodeTypes: NodeTypes = {
 
 const AIFlowChart = () => {
   const [modelData, setModelData] = useState<ModelData[]>([])
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
   const { fetchData } = useFetch()
 
   useEffect(() => {
@@ -68,7 +90,7 @@ const AIFlowChart = () => {
 
     const newNodes = [
       {
-        id: 'service',
+        id: 'apiService',
         type: 'serviceCard',
         position: { x: LAYOUT.SERVICE_NODE_X, y: LAYOUT.NODE_START_Y },
         data: {}
@@ -123,10 +145,10 @@ const AIFlowChart = () => {
     setEdges(newEdges)
   }, [modelData])
 
-  const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges])
+  const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges])
 
-  const onNodeDrag = useCallback(
-    (_: any, node: any) => {
+  const onNodeDrag: any = useCallback(
+    (_: MouseEvent, node: Node<any>) => {
       if (node.type !== 'modelCard') return
 
       setNodes((nds) => {
@@ -147,8 +169,8 @@ const AIFlowChart = () => {
     [setNodes]
   )
 
-  const onNodeDragStop = useCallback(
-    (_: any, node: any) => {
+  const onNodeDragStop: any = useCallback(
+    (_, node: Node<any>) => {
       if (node.type !== 'modelCard') return
 
       setNodes((nds) => {
@@ -174,7 +196,7 @@ const AIFlowChart = () => {
   )
 
   return (
-    <div className="w-full h-full">
+    <div className="overflow-y-auto w-full h-full" style={{ height: '100vh' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -184,8 +206,13 @@ const AIFlowChart = () => {
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
-        fitView
-        attributionPosition="bottom-left"
+        maxZoom={1}
+        minZoom={1}
+        zoomOnScroll={false}
+        zoomOnPinch={false}
+        zoomOnDoubleClick={false}
+        panOnScroll={true}
+        panOnScrollMode={PanOnScrollMode.Vertical}
       />
     </div>
   )

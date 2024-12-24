@@ -1,6 +1,5 @@
 import { Icon } from '@iconify/react'
 import { Handle, Position } from '@xyflow/react'
-import { Avatar } from 'antd'
 import { t } from 'i18next'
 import React from 'react'
 import { ModelStatus } from './types'
@@ -29,25 +28,13 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
       <div>
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
-            <Avatar
-              shape="square"
-              size={50}
-              className={`rounded-[12px] border-none  ${logo ? 'bg-[linear-gradient(135deg,white,#f0f0f0)]' : 'bg-theme'}`}
-              src={
-                logo ? (
-                  <img
-                    src={logo}
-                    alt="Logo"
-                    style={{ maxWidth: '200px', width: '45px', height: '45px', objectFit: 'unset' }}
-                  />
-                ) : undefined
-              }
-              // TODO use https://www.npmjs.com/package/@icon-park/react
-              icon={logo ? '' : <iconpark-icon name="auto-generate-api"></iconpark-icon>}
-            >
-              {' '}
-            </Avatar>
-            <span className="text-base text-gray-900">{title}</span>
+            <div className="flex flex-1 overflow-hidden items-center  gap-[4px]">
+              <span
+                className=" flex items-center h-[22px]  ai-setting-svg-container"
+                dangerouslySetInnerHTML={{ __html: logo }}
+              ></span>
+            </div>
+            <span className="text-base text-gray-900 max-w-[180px] truncate">{title}</span>
             <Icon
               icon={status === 'enable' ? 'mdi:check-circle' : 'mdi:close-circle'}
               className={`text-xl ${status === 'enable' ? 'text-green-500' : 'text-red-500'}`}
