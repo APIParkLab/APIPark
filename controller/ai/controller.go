@@ -20,10 +20,18 @@ type IProviderController interface {
 	Disable(ctx *gin.Context, id string) error
 	UpdateProviderConfig(ctx *gin.Context, id string, input *ai_dto.UpdateConfig) error
 	UpdateProviderDefaultLLM(ctx *gin.Context, id string, input *ai_dto.UpdateLLM) error
+	Sort(ctx *gin.Context, input *ai_dto.Sort) error
+}
+
+type IStatisticController interface {
+	APIs(ctx *gin.Context, keyword string, providerId string, start string, end string, page string, pageSize string, sortCondition string, asc string) ([]*ai_dto.APIItem, int64, error)
 }
 
 func init() {
 	autowire.Auto[IProviderController](func() reflect.Value {
 		return reflect.ValueOf(&imlProviderController{})
+	})
+	autowire.Auto[IStatisticController](func() reflect.Value {
+		return reflect.ValueOf(&imlStatisticController{})
 	})
 }

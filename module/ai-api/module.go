@@ -2,9 +2,10 @@ package ai_api
 
 import (
 	"context"
+	"reflect"
+
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
 	"github.com/eolinker/go-common/autowire"
-	"reflect"
 )
 
 type IAPIModule interface {
