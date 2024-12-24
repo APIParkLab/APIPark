@@ -1,4 +1,4 @@
-import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react'
+import { BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath } from '@xyflow/react'
 
 export default function CustomEdge({
   id,
@@ -13,36 +13,41 @@ export default function CustomEdge({
   label,
   data
 }: EdgeProps) {
-  const [edgePath, labelX, labelY] = getBezierPath({
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
     sourcePosition,
     targetX,
     targetY,
-    targetPosition
+    targetPosition,
+    borderRadius: 16
   })
+
+  const modelId = data?.id
 
   return (
     <>
-      <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
+      <BaseEdge path={edgePath} markerEnd={markerEnd} style={{ stroke: '#ddd', cursor: 'pointer', strokeWidth: 1 }} />
       {label && (
         <EdgeLabelRenderer>
-          <div
+          <a
+            href={`/aiSetting/model?modelId=${modelId}`}
+            target="_blank"
             style={{
               position: 'absolute',
-              transform: `translate(-50%, -50%) translate(${targetX}px,${targetY}px)`,
-              background: '#f8f9fa',
-              padding: '4px 8px',
+              transform: `translate(${targetX - 80}px,${targetY}px)`,
               borderRadius: '4px',
               fontSize: 12,
               fontWeight: 500,
+              color: 'var(--primary-color)',
+              cursor: 'pointer',
               pointerEvents: 'all',
-              border: '1px solid #ddd'
+              textDecoration: 'none'
             }}
             className="nodrag nopan"
           >
             {label}
-          </div>
+          </a>
         </EdgeLabelRenderer>
       )}
     </>

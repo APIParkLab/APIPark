@@ -122,14 +122,14 @@ const AIFlowChart = () => {
         source: 'apiService',
         target: model.id,
         label: `apis(${model.api_count})`,
-        style: { stroke: '#ddd', cursor: 'pointer' }
+        markerEnd: { type: 'arrow' },
+        data: { id: model.id }
       })),
       ...modelData.map((model) => ({
         id: `${model.id}-keys-edge`,
         source: model.id,
         target: `${model.id}-keys`,
-        animated: true,
-        style: { stroke: '#ddd' }
+        animated: true
       }))
     ]
 
@@ -221,10 +221,10 @@ const AIFlowChart = () => {
         panOnScroll={true}
         panOnScrollMode={PanOnScrollMode.Vertical}
         defaultEdgeOptions={{
-          type: 'custom'
+          type: 'custom',
+          style: { strokeWidth: 2 }
         }}
         connectionMode={ConnectionMode.Loose}
-        fitView
       />
     </div>
   )
