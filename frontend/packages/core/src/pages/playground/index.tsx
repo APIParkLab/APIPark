@@ -5,6 +5,7 @@ import '@xyflow/react/dist/style.css'
 import { useCallback } from 'react'
 import { KeyStatusNode, ModelCardNode, ServiceCardNode } from './components/NodeComponents'
 import { ModelData } from './components/types'
+import { LAYOUT } from './constants'
 import './styles.css'
 
 const modelData: ModelData[] = [
@@ -16,15 +17,15 @@ const modelData: ModelData[] = [
   { id: 'azure', type: 'azure', title: 'Azure OpenAI', status: 'success', defaultModel: 'gpt-4-turbo' }
 ]
 
-const calculateNodePositions = (models: ModelData[], startY = 50, gap = 120) => {
+const calculateNodePositions = (models: ModelData[], startY = LAYOUT.NODE_START_Y, gap = LAYOUT.NODE_GAP) => {
   return models.reduce(
     (acc, model, index) => {
       acc[model.id] = {
-        x: 400,
+        x: LAYOUT.MODEL_NODE_X,
         y: startY + index * gap
       }
       acc[`${model.id}-keys`] = {
-        x: 750,
+        x: LAYOUT.KEY_NODE_X,
         y: startY + index * gap
       }
       return acc
@@ -43,7 +44,7 @@ const initialNodes = [
   {
     id: 'service',
     type: 'serviceCard',
-    position: { x: 50, y: 50 },
+    position: { x: LAYOUT.SERVICE_NODE_X, y: LAYOUT.NODE_START_Y },
     data: {}
   },
   ...modelData.map((model) => ({
@@ -156,7 +157,13 @@ const initialEdges = [
     target: 'openai',
     label: 'apis(12)',
     style: { stroke: '#ddd', cursor: 'pointer' },
-    labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
+    data: {
+      endLabel: 'apis(12)'
+      // endLabelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' },
+      // endLabelBgStyle: { fill: 'white', fillOpacity: 0.8 },
+    },
+    type: 'smoothstep',
+    markerEnd: { type: 'arrow' }
   },
   {
     id: 'service-anthropic',
@@ -164,7 +171,12 @@ const initialEdges = [
     target: 'anthropic',
     label: 'apis(8)',
     style: { stroke: '#ddd', cursor: 'pointer' },
-    labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
+    labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' },
+    labelBgStyle: { fill: 'white', fillOpacity: 0.8 },
+    labelBgPadding: [4, 2],
+    labelShowBg: true,
+    type: 'smoothstep',
+    markerEnd: { type: 'arrow' }
   },
   {
     id: 'service-gemini',
@@ -172,7 +184,12 @@ const initialEdges = [
     target: 'gemini',
     label: 'apis(5)',
     style: { stroke: '#ddd', cursor: 'pointer' },
-    labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
+    labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' },
+    labelBgStyle: { fill: 'white', fillOpacity: 0.8 },
+    labelBgPadding: [4, 2],
+    labelShowBg: true,
+    type: 'smoothstep',
+    markerEnd: { type: 'arrow' }
   },
   {
     id: 'service-mistral',
@@ -180,7 +197,12 @@ const initialEdges = [
     target: 'mistral',
     label: 'apis(4)',
     style: { stroke: '#ddd', cursor: 'pointer' },
-    labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
+    labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' },
+    labelBgStyle: { fill: 'white', fillOpacity: 0.8 },
+    labelBgPadding: [4, 2],
+    labelShowBg: true,
+    type: 'smoothstep',
+    markerEnd: { type: 'arrow' }
   },
   {
     id: 'service-cohere',
@@ -188,7 +210,12 @@ const initialEdges = [
     target: 'cohere',
     label: 'apis(6)',
     style: { stroke: '#ddd', cursor: 'pointer' },
-    labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
+    labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' },
+    labelBgStyle: { fill: 'white', fillOpacity: 0.8 },
+    labelBgPadding: [4, 2],
+    labelShowBg: true,
+    type: 'smoothstep',
+    markerEnd: { type: 'arrow' }
   },
   {
     id: 'service-azure',
@@ -196,11 +223,17 @@ const initialEdges = [
     target: 'azure',
     label: 'apis(10)',
     style: { stroke: '#ddd', cursor: 'pointer' },
-    labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' }
+    labelStyle: { fill: '#3d46f2', fontSize: 12, cursor: 'pointer' },
+    labelBgStyle: { fill: 'white', fillOpacity: 0.8 },
+    labelBgPadding: [4, 2],
+    labelShowBg: true,
+    type: 'smoothstep',
+    markerEnd: { type: 'arrow' }
   },
   ...modelData.map((model) => ({
     id: `${model.id}-keys`,
     source: model.id,
+    type: 'smoothstep',
     target: `${model.id}-keys`,
     animated: true,
     style: { stroke: '#ddd' }
@@ -224,7 +257,7 @@ const Playground = () => {
             return {
               ...n,
               position: {
-                x: 750,
+                x: LAYOUT.KEY_NODE_X,
                 y: node.position.y
               }
             }
@@ -251,22 +284,8 @@ const Playground = () => {
             return {
               ...n,
               position: {
-                x: 400,
-                y: 50 + index * 120
-              }
-            }
-          }
-          if (n.type === 'keyCard') {
-            const modelId = n.id.replace('-keys', '')
-            const modelNode = sortedNodes.find((mn) => mn.id === modelId)
-            if (modelNode) {
-              const index = sortedNodes.findIndex((sn) => sn.id === modelId)
-              return {
-                ...n,
-                position: {
-                  x: 750,
-                  y: 50 + index * 120
-                }
+                x: LAYOUT.MODEL_NODE_X,
+                y: LAYOUT.NODE_START_Y + index * LAYOUT.NODE_GAP
               }
             }
           }
@@ -294,7 +313,8 @@ const Playground = () => {
           animated: true
         }}
         fitView
-        nodesDraggable={(node) => node.type === 'modelCard'}
+        nodesDraggable={true}
+        elementsSelectable={false}
         nodesConnectable={false}
         zoomOnScroll={false}
         zoomOnPinch={false}
