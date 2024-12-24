@@ -1,16 +1,10 @@
 import { Handle, Position } from '@xyflow/react'
 import React from 'react'
-import { ModelCardStatus } from './types'
-
-interface KeyStatus {
-  status: ModelCardStatus
-  keyID: number | string
-  priority?: number
-}
+import { KeyData } from './types'
 
 interface KeyStatusNodeData {
   title: string
-  keys: KeyStatus[]
+  keys: KeyData[]
 }
 
 const KEY_SIZE = '1.25rem' // 20px
@@ -37,22 +31,20 @@ export const KeyStatusNode: React.FC<{ data: KeyStatusNodeData }> = ({ data }) =
             minHeight: KEY_SIZE
           }}
         >
-          {keys
-            .sort((a, b) => (a.priority || 0) - (b.priority || 0))
-            .map((key) => (
-              <div
-                key={key.keyID}
-                style={{
-                  width: keyWidth,
-                  height: KEY_SIZE
-                }}
-                className={`
+          {keys.map((key) => (
+            <div
+              key={key.id}
+              style={{
+                width: keyWidth,
+                height: KEY_SIZE
+              }}
+              className={`
                   rounded-md flex-shrink-0
-                  ${key.status === 'success' ? 'bg-green-500' : 'bg-red-500'}
+                  ${key.status === 'normal' ? 'bg-green-500' : 'bg-red-500'}
                   transition-all duration-200 hover:opacity-80
                 `}
-              />
-            ))}
+            />
+          ))}
         </div>
       </div>
     </div>

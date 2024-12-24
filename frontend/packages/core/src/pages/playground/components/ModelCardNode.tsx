@@ -1,13 +1,14 @@
 import { Icon } from '@iconify/react'
 import { Handle, Position } from '@xyflow/react'
-import React, { useCallback, useState } from 'react'
-import { ModelCardStatus } from './types'
+import { Avatar } from 'antd'
+import React from 'react'
+import { ModelStatus } from './types'
 
 interface ModelCardData {
   title: string
-  status: ModelCardStatus
+  status: ModelStatus
+  logo: string
   defaultModel: string
-  onDragStart?: () => void
 }
 
 type ModelCardNodeData = ModelCardData & {
@@ -16,44 +17,39 @@ type ModelCardNodeData = ModelCardData & {
 }
 
 export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) => {
-  const [isHovered, setIsHovered] = useState(false)
-  const { title, status, defaultModel } = data
-
-  const onDragHandleMouseDown = useCallback((event: React.MouseEvent) => {
-    // Prevent event propagation to allow dragging
-    event.stopPropagation()
-
-    // Create a new drag event
-    const dragEvent = new MouseEvent('mousedown', {
-      clientX: event.clientX,
-      clientY: event.clientY,
-      bubbles: true
-    })
-    // Find the node element and dispatch the event
-    const nodeElement = event.currentTarget.closest('.react-flow__node')
-    if (nodeElement) {
-      // Use the global `document` object if it exists
-      nodeElement.dispatchEvent(dragEvent)
-    }
-  }, [])
+  const { title, status, defaultModel, logo } = data
 
   return (
     <div
       className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[280px] relative group"
       style={{ border: '1px solid var(--border-color)' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <Handle type="target" position={Position.Left} />
       <Handle type="source" position={Position.Right} />
       <div>
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
-            <Icon icon="mdi:robot" className="text-xl text-[--primary-color]" />
+            <Avatar
+              shape="square"
+              size={50}
+              className={`rounded-[12px] border-none rounded-[12px] ${logo ? 'bg-[linear-gradient(135deg,white,#f0f0f0)]' : 'bg-theme'}`}
+              src={
+                logo ? (
+                  <img
+                    src={logo}
+                    alt="Logo"
+                    style={{ maxWidth: '200px', width: '45px', height: '45px', objectFit: 'unset' }}
+                  />
+                ) : undefined
+              }
+              icon={logo ? '' : <iconpark-icon name="auto-generate-api"></iconpark-icon>}
+            >
+              {' '}
+            </Avatar>
             <span className="text-base text-gray-900">{title}</span>
             <Icon
-              icon={status === 'success' ? 'mdi:check-circle' : 'mdi:close-circle'}
-              className={`text-xl ${status === 'success' ? 'text-green-500' : 'text-red-500'}`}
+              icon={status === 'enable' ? 'mdi:check-circle' : 'mdi:close-circle'}
+              className={`text-xl ${status === 'enable' ? 'text-green-500' : 'text-red-500'}`}
             />
           </div>
 
