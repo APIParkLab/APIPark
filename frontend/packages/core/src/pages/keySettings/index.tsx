@@ -31,6 +31,10 @@ const KeySettings: React.FC = () => {
   const { fetchData } = useFetch()
   const [searchWord, setSearchWord] = useState<string>('')
 
+  useEffect(() => {
+    pageListRef.current?.reload()
+  }, [selectedProvider])
+
   useEffect(() => {}, [])
 
   const handleEdit = (record: APIKey) => {
