@@ -227,6 +227,7 @@ const AIFlowChart = () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeDrag={onNodeDrag}
+        proOptions={{ hideAttribution: true }}
         onNodeDragStop={onNodeDragStop}
         draggable={false}
         nodeTypes={nodeTypes}
