@@ -2,9 +2,9 @@ package ai_key_dto
 
 var (
 	KeyNormal  KeyStatus = "normal"
-	KeyExceed  KeyStatus = "exceed"
+	KeyExceed  KeyStatus = "exceeded"
 	KeyExpired KeyStatus = "expired"
-	KeyDisable KeyStatus = "disable"
+	KeyDisable KeyStatus = "disabled"
 	KeyError   KeyStatus = "error"
 )
 
