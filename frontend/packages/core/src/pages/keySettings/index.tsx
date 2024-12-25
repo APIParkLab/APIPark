@@ -1,22 +1,24 @@
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import { ActionType } from '@ant-design/pro-components'
+import { ActionType, ProColumns } from '@ant-design/pro-components'
 import InsidePage from '@common/components/aoplatform/InsidePage'
-import PageList from '@common/components/aoplatform/PageList'
+import PageList, { PageProColumns } from '@common/components/aoplatform/PageList'
+import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
-import { Badge, Button, message, Select, Space, Tooltip } from 'antd'
+import { Divider, message, Select, Space, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import ApiKeyModal from './components/ApiKeyModal'
 import StatusFilter from './components/StatusFilter'
 
 interface APIKey {
   id: string
-  key: string
+  name: string
   status: 'normal' | 'exceeded' | 'expired' | 'disabled' | 'error'
-  expirationDate: string
+  use_token: number
+  update_time: string
+  expire_time: string
+  can_delete: string
   priority: number
-  isDefault: boolean
 }
 
 const KeySettings: React.FC = () => {
@@ -42,14 +44,6 @@ const KeySettings: React.FC = () => {
       }
     })
   }, [])
-
-  const statusColors = {
-    normal: '#52c41a',
-    exceeded: '#ff4d4f',
-    expired: '#faad14',
-    disabled: '#d9d9d9',
-    error: '#ff4d4f'
-  }
 
   const handleEdit = (record: APIKey) => {
     setEditingKey(record)
@@ -109,63 +103,85 @@ const KeySettings: React.FC = () => {
     )
   }
 
-  const columns = [
+  const statusEnum = {
+    normal: { text: <Typography.Text type="success">{$t('正常')}</Typography.Text> },
+    exceeded: { text: <Typography.Text type="warning">{$t('超额')}</Typography.Text> },
+    expired: { text: <Typography.Text type="secondary">{$t('过期')}</Typography.Text> },
+    disabled: { text: <Typography.Text type="warning">{$t('停用')}</Typography.Text> },
+    error: { text: <Typography.Text type="danger">{$t('错误')}</Typography.Text> }
+  }
+
+  const operation: PageProColumns<APIKey>[] = [
     {
-      title: $t('API Key'),
-      dataIndex: 'key',
-      render: (text: string, record: APIKey) => (
-        <Space>
-          {text}
-          {record.isDefault && <Badge count={$t('Default')} style={{ backgroundColor: statusColors.normal }} />}
-        </Space>
-      )
+      title: '',
+      key: 'option',
+      btnNums: 3,
+      fixed: 'right',
+      valueType: 'option',
+      render: (_: React.ReactNode, entity: APIKey) => [
+        <TableBtnWithPermission
+          access="system.settings.ai_key_resource.manager"
+          key="edit"
+          btnType="edit"
+          onClick={() => handleEdit(entity)}
+          btnTitle={$t('编辑')}
+        />,
+        <Divider type="vertical" className="mx-0" key="div3" />,
+        <TableBtnWithPermission
+          access="system.settings.ai_key_resource.manager"
+          key="delete"
+          btnType="delete"
+          onClick={() => handleDelete(entity.id)}
+          btnTitle={$t('删除')}
+        />
+        // <Tooltip title={$t('编辑')}>
+        //   <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(entity)} />
+        // </Tooltip>,
+        // entity.can_delete && (
+        //   <Tooltip title={$t('删除')}>
+        //     <Button type="text" icon={<DeleteOutlined />} danger onClick={() => handleDelete(entity.id)} />
+        //   </Tooltip>
+        // )
+      ]
+    }
+  ]
+
+  const columns: ProColumns<APIKey>[] = [
+    {
+      title: $t('调用优先级'),
+      dataIndex: 'priority',
+      width: '100px'
+    },
+    {
+      title: $t('名称'),
+      dataIndex: 'name',
+      render: (text: string, record: APIKey) => <Space>{text}</Space>
     },
     {
       title: $t('状态'),
       dataIndex: 'status',
-      render: (status: keyof typeof statusColors) => (
-        <Badge
-          status="processing"
-          text={status.charAt(0).toUpperCase() + status.slice(1)}
-          style={{ color: statusColors[status] }}
-        />
-      )
+      ellipsis: true,
+      valueType: 'select',
+      filters: true,
+      onFilter: true,
+      valueEnum: statusEnum,
+      render: (status: APIKey['status']) => statusEnum[status]?.text || status
+    },
+    {
+      title: $t('已用 Token'),
+      dataIndex: 'use_token',
+      render: (value: number) => value.toLocaleString()
+    },
+    {
+      title: $t('编辑时间'),
+      dataIndex: 'update_time'
     },
     {
       title: $t('过期时间'),
-      dataIndex: 'expirationDate'
+      dataIndex: 'expire_time',
+      render: (expireTime: string) => (expireTime === '0' ? $t('永不过期') : expireTime)
     },
-    {
-      title: $t('优先级'),
-      dataIndex: 'priority'
-    },
-    {
-      title: $t('操作'),
-      key: 'actions',
-      render: (_: unknown, record: APIKey) => (
-        <Space>
-          <Tooltip title={$t('Edit')}>
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              disabled={record.isDefault}
-              onClick={() => handleEdit(record)}
-            />
-          </Tooltip>
-          <Tooltip title={$t('Delete')}>
-            <Button
-              type="text"
-              icon={<DeleteOutlined />}
-              disabled={record.isDefault}
-              danger
-              onClick={() => handleDelete(record.id)}
-            />
-          </Tooltip>
-        </Space>
-      ),
-      width: 120,
-      btnNums: 2
-    }
+    ...operation
   ]
 
   const beforeSearchNode = [
@@ -184,9 +200,9 @@ const KeySettings: React.FC = () => {
 
   return (
     <InsidePage
-      className="overflow-y-auto pb-PAGE_INSIDE_B"
+      className="overflow-y-auto pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X"
       pageTitle={$t('APIKey 资源池')}
-      description={$t('支持单个 API 模型供应商下创建多个 APIKey，并可对多个 APIKEY 进行智能负载均衡')}
+      description={$t('支持单个 API 模型供应商下创建多个 APIKey，并可对多个 APIkey 进行智能负载均衡')}
       showBorder={false}
       scrollPage={false}
     >
