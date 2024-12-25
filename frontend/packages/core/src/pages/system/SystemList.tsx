@@ -52,7 +52,7 @@ const SystemList: FC = () => {
         eoTransformKeys: ['api_num', 'service_num', 'create_time']
       }
     )
-      .then(response => {
+      .then((response) => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           setTableListDataSource(data.services)
@@ -78,7 +78,7 @@ const SystemList: FC = () => {
     fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>(
       !checkPermission('system.workspace.team.view_all') ? 'simple/teams/mine' : 'simple/teams',
       { method: 'GET', eoTransformKeys: [] }
-    ).then(response => {
+    ).then((response) => {
       const { code, data, msg } = response
       setTeamList(data.teams)
       if (code === STATUS_CODE.SUCCESS) {
@@ -101,10 +101,9 @@ const SystemList: FC = () => {
 
   const getMemberList = async () => {
     setMemberValueEnum({})
-    const { code, data, msg } = await fetchData<BasicResponse<{ members: SimpleMemberItem[] }>>(
-      'simple/member',
-      { method: 'GET' }
-    )
+    const { code, data, msg } = await fetchData<BasicResponse<{ members: SimpleMemberItem[] }>>('simple/member', {
+      method: 'GET'
+    })
     if (code === STATUS_CODE.SUCCESS) {
       const tmpValueEnum: { [k: string]: { text: string } } = {}
       data.members?.forEach((x: SimpleMemberItem) => {
@@ -131,7 +130,7 @@ const SystemList: FC = () => {
   }
 
   const columns = useMemo(() => {
-    const res = SYSTEM_TABLE_COLUMNS.map(x => {
+    const res = SYSTEM_TABLE_COLUMNS.map((x) => {
       const dataIndex = x.dataIndex as string[]
 
       if (x.filters && dataIndex?.indexOf('master') !== -1) {
@@ -142,8 +141,8 @@ const SystemList: FC = () => {
       }
       if ((x.dataIndex as string) === 'service_kind') {
         x.valueEnum = {}
-        SERVICE_KIND_OPTIONS.forEach(option => {
-          (x.valueEnum as any)[option.value] = { text: $t(option.label) }
+        SERVICE_KIND_OPTIONS.forEach((option) => {
+          ;(x.valueEnum as any)[option.value] = { text: $t(option.label) }
         })
       }
 
@@ -188,13 +187,11 @@ const SystemList: FC = () => {
         onChange={() => {
           setTableHttpReload(false)
         }}
-        onSearchWordChange={e => {
+        onSearchWordChange={(e) => {
           setTableSearchWord(e.target.value)
         }}
         onRowClick={(row: SystemTableListItem) =>
-          navigate(
-            `/service/${row.team.id}/${row.service_kind === 'ai' ? 'aiInside' : 'inside'}/${row.id}`
-          )
+          navigate(`/service/${row.team.id}/${row.service_kind === 'ai' ? 'aiInside' : 'inside'}/${row.id}`)
         }
       />
       <DrawerWithFooter
@@ -202,7 +199,7 @@ const SystemList: FC = () => {
         open={open}
         onClose={onClose}
         onSubmit={() =>
-          drawerFormRef.current?.save()?.then(res => {
+          drawerFormRef.current?.save()?.then((res) => {
             res && manualReloadTable()
             return res
           })
