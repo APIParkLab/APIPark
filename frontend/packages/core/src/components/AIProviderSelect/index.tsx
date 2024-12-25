@@ -4,12 +4,14 @@ import { Select, Space, message } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-interface AIProvider {
+export interface AIProvider {
   id: string
   name: string
   logo: string
   configured: boolean
+  getApikeyUrl: string
   status: string
+  config: string
 }
 
 interface AIProviderResponse {
@@ -24,7 +26,7 @@ interface AIProviderResponse {
 
 interface AIProviderSelectProps {
   value?: string
-  onChange?: (value: string) => void
+  onChange?: (value: string, provider: AIProvider) => void
   style?: React.CSSProperties
 }
 
@@ -35,24 +37,33 @@ const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, st
   const { fetchData } = useFetch()
 
   useEffect(() => {
+    let isMounted = true
     const fetchProviders = async () => {
-      setLoading(true)
+      if (isMounted) setLoading(true)
       try {
         const response = await fetchData<AIProviderResponse>('simple/ai/providers', { method: 'GET' })
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
-          setProviders(data.providers)
+          isMounted && setProviders(data.providers)
+          if (!data.providers?.length) return
+
+          const selectedProvider: AIProvider = value ? providers.find((p) => p.id === value) : data.providers[0]
+          onChange?.(selectedProvider.id, selectedProvider)
         } else {
           message.error(msg || t('Failed to fetch AI providers'))
         }
       } catch (error) {
         message.error(t('Failed to fetch AI providers'))
       } finally {
-        setLoading(false)
+        isMounted && setLoading(false)
       }
     }
 
     fetchProviders()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   return (
@@ -60,7 +71,10 @@ const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, st
       <span>{t('AI 供应商')}:</span>
       <Select
         value={value}
-        onChange={onChange}
+        onChange={(selectedValue) => {
+          const selectedProvider = providers.find((p) => p.id === selectedValue)
+          onChange?.(selectedValue, selectedProvider as AIProvider)
+        }}
         style={style}
         loading={loading}
         showSearch

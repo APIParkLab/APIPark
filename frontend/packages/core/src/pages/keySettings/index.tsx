@@ -5,7 +5,7 @@ import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPe
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
-import AIProviderSelect from '@core/components/AIProviderSelect'
+import AIProviderSelect, { AIProvider } from '@core/components/AIProviderSelect'
 import { Divider, message, Space, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import ApiKeyModal from './components/ApiKeyModal'
@@ -13,8 +13,8 @@ import { APIKey } from './types'
 
 const KeySettings: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
-  const [selectedProvider, setSelectedProvider] = useState<string>('openai')
-  const [providerName, setProviderName] = useState<string>('')
+  const [selectedProvider, setSelectedProvider] = useState<string>()
+  const [provider, setProvider] = useState<AIProvider | undefined>()
   const [modalVisible, setModalVisible] = useState(false)
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add')
   const [editingKey, setEditingKey] = useState<APIKey | null>(null)
@@ -24,27 +24,7 @@ const KeySettings: React.FC = () => {
 
   useEffect(() => {
     pageListRef.current?.reload()
-    fetchProviderName()
   }, [selectedProvider])
-
-  const fetchProviderName = async () => {
-    try {
-      const response = await fetchData<{ code: number; data: { providers: { id: string; name: string }[] } }>(
-        'simple/ai/providers',
-        { method: 'GET' }
-      )
-      if (response.code === STATUS_CODE.SUCCESS) {
-        const provider = response.data.providers.find((p) => p.id === selectedProvider)
-        if (provider) {
-          setProviderName(provider.name)
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch provider name:', error)
-    }
-  }
-
-  useEffect(() => {}, [])
 
   const handleEdit = (record: APIKey) => {
     setEditingKey(record)
@@ -172,6 +152,7 @@ const KeySettings: React.FC = () => {
   }
 
   const requestApiKeys = async (params: any) => {
+    if (!selectedProvider) return
     try {
       const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/resource/keys', {
         method: 'GET',
@@ -310,7 +291,13 @@ const KeySettings: React.FC = () => {
         <>
           {$t('支持单个 API 模型供应商下创建多个 APIKey APIKey 进行智能负载均衡')}
           <div className="mt-4">
-            <AIProviderSelect value={selectedProvider} onChange={setSelectedProvider} />
+            <AIProviderSelect
+              value={selectedProvider}
+              onChange={(value: string, provider: AIProvider) => {
+                setSelectedProvider(value)
+                setProvider(provider)
+              }}
+            />
           </div>
         </>
       }
@@ -338,16 +325,8 @@ const KeySettings: React.FC = () => {
           mode={modalMode}
           onCancel={handleModalCancel}
           onSave={handleSave}
-          providerName={providerName}
-          initialValues={
-            editingKey
-              ? {
-                  id: editingKey.id,
-                  name: editingKey.name,
-                  expire_time: editingKey.expire_time
-                }
-              : undefined
-          }
+          provider={provider}
+          entity={editingKey}
           defaultKeyNumber={apiKeys.length + 1}
         />
       </div>

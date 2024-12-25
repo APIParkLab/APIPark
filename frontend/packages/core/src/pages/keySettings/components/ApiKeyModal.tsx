@@ -1,4 +1,7 @@
+import Icon from '@ant-design/icons'
+import { Codebox } from '@common/components/postcat/api/Codebox'
 import { $t } from '@common/locales'
+import { AIProvider } from '@core/components/AIProviderSelect'
 import { DatePicker, Form, Input, Modal, Switch } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useState } from 'react'
@@ -8,50 +11,32 @@ interface ApiKeyModalProps {
   visible: boolean
   onCancel: () => void
   onSave: (values: any) => void
-  providerName: string
+  provider?: AIProvider
   mode: 'add' | 'edit'
-  initialValues?: Partial<APIKey>
-  defaultKeyNumber?: number
+  entity: APIKey | null
 }
 
-const { TextArea } = Input
-
-const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
-  visible,
-  onCancel,
-  onSave,
-  providerName,
-  mode,
-  initialValues,
-  defaultKeyNumber = 1
-}) => {
+const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ visible, onCancel, onSave, provider, mode, entity }) => {
   const [form] = Form.useForm()
   const [neverExpire, setNeverExpire] = useState(true)
 
   useEffect(() => {
-    if (visible) {
-      if (mode === 'add') {
-        form.setFieldsValue({
-          id: `KEY${defaultKeyNumber}`,
-          neverExpire: true,
-          expire_time: dayjs().add(7, 'days'),
-          name: {
-            openai_api_base: 'API Base',
-            openai_api_key: 'API Key'
-          }
-        })
-      } else if (initialValues) {
-        form.setFieldsValue({
-          id: initialValues.id,
-          name: initialValues.name,
-          expire_time: initialValues.expire_time ? dayjs(initialValues.expire_time) : undefined,
-          enabled: initialValues.enabled,
-          neverExpire: !initialValues.expire_time
-        })
-        setNeverExpire(!initialValues.expire_time)
-      }
+    try {
+      form.setFieldsValue({
+        name: entity?.name,
+        expire_time: entity?.expire_time ? dayjs(entity.expire_time) : undefined,
+        config: entity?.config ? JSON.stringify(JSON.parse(entity?.config), null, 2) : JSON.parse(provider?.config)
+      })
+      setNeverExpire(!entity?.expire_time)
+    } catch (e) {
+      console.error('Error setting form values:', e)
+      form.setFieldsValue({
+        name: entity?.name,
+        expire_time: undefined,
+        config: ''
+      })
     }
-  }, [visible, mode, initialValues, defaultKeyNumber, form])
+  }, [])
 
   const handleOk = async () => {
     try {
@@ -74,57 +59,65 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
     }
   }
 
+  const getProviderKeyUrl = (provider: string): string => {
+    const urls: Record<string, string> = {
+      openai: 'https://platform.openai.com/api-keys',
+      anthropic: 'https://console.anthropic.com/account/keys',
+      google: 'https://console.cloud.google.com/apis/credentials',
+      azure: 'https://portal.azure.com/#blade/Microsoft_Azure_ProjectOxford/CognitiveServicesHub/OpenAI',
+      stability: 'https://platform.stability.ai/account/keys'
+    }
+    return urls[provider.toLowerCase()] || '#'
+  }
+
+  console.log(provider)
   return (
     <Modal
-      title={mode === 'add' ? $t(`添加 ${providerName} APIKey`) : $t('编辑 APIKey')}
+      title={mode === 'add' ? $t(`添加 ${provider?.name} APIKey`) : $t('编辑 APIKey')}
       open={visible}
       onCancel={onCancel}
       onOk={handleOk}
       destroyOnClose
-      width={600}
+      maskClosable={false}
+      footer={(_, { OkBtn, CancelBtn }) => (
+        <div className="flex justify-between items-center">
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={provider?.getApikeyUrl}
+            className="flex items-center gap-[8px]"
+          >
+            <span>{$t('从 (0) 获取 API KEY', [provider?.name])}</span>
+            <Icon icon="ic:baseline-open-in-new" width={16} height={16} />
+          </a>
+          <div>
+            <CancelBtn />
+            <OkBtn />
+          </div>
+        </div>
+      )}
     >
       <Form form={form} layout="vertical">
         <Form.Item name="id" label={$t('APIKey 名称')} rules={[{ required: true, message: $t('请输入 APIKey') }]}>
           <Input disabled={mode === 'edit'} />
         </Form.Item>
 
-        <Form.Item
-          name="name"
-          label={
-            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-              <span>{$t('API Key')}</span>
-              {mode === 'add' && (
-                <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">
-                  {$t('从 OpenAI 获取 API Key')}
-                </a>
-              )}
-            </div>
-          }
-          rules={[{ required: true, message: $t('请输入 API Key') }]}
-        >
-          {mode === 'add' ? (
-            <TextArea
-              rows={4}
-              placeholder={JSON.stringify(
-                {
-                  openai_api_base: 'API Base',
-                  openai_api_key: 'API Key'
-                },
-                null,
-                2
-              )}
-            />
-          ) : (
-            <Input.Password />
-          )}
+        <Form.Item label={$t('API Key')} name="config">
+          <Codebox
+            editorTheme="vs-dark"
+            readOnly={false}
+            width="100%"
+            height="300px"
+            language="json"
+            enableToolbar={false}
+          />
         </Form.Item>
 
-        <Form.Item name="neverExpire" valuePropName="checked">
-          <Switch
-            checkedChildren={$t('永不过期')}
-            unCheckedChildren={$t('设置过期时间')}
-            onChange={handleNeverExpireChange}
-          />
+        <Form.Item label={$t('过期时间')} name="neverExpire" valuePropName="checked">
+          <div className="flex items-center">
+            <Switch onChange={handleNeverExpireChange} />
+            <span className="ml-2">{neverExpire ? $t('永不过期') : $t('设置过期时间')}</span>
+          </div>
         </Form.Item>
 
         {!neverExpire && (
