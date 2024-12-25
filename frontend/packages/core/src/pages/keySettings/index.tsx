@@ -7,7 +7,7 @@ import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { Badge, Button, message, Select, Space, Tooltip } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
-import EditKeyModal from './components/EditKeyModal'
+import ApiKeyModal from './components/ApiKeyModal'
 import StatusFilter from './components/StatusFilter'
 
 interface APIKey {
@@ -23,7 +23,8 @@ const KeySettings: React.FC = () => {
   const actionRef = useRef<ActionType>()
   const [selectedProvider, setSelectedProvider] = useState<string>('openai')
   const [statusFilter, setStatusFilter] = useState<string[]>([])
-  const [editModalVisible, setEditModalVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add')
   const [editingKey, setEditingKey] = useState<APIKey | null>(null)
   const [apiKeys, setApiKeys] = useState<APIKey[]>([])
   const { fetchData } = useFetch()
@@ -52,24 +53,46 @@ const KeySettings: React.FC = () => {
 
   const handleEdit = (record: APIKey) => {
     setEditingKey(record)
-    setEditModalVisible(true)
+    setModalMode('edit')
+    setModalVisible(true)
+  }
+
+  const handleAdd = () => {
+    setModalMode('add')
+    setModalVisible(true)
+  }
+
+  const handleModalCancel = () => {
+    setModalVisible(false)
+    setEditingKey(null)
   }
 
   const handleSave = (values: any) => {
-    if (editingKey) {
+    if (modalMode === 'edit' && editingKey) {
       const newKeys = apiKeys.map((key) =>
         key.id === editingKey.id
           ? {
               ...key,
-              key: values.key,
+              key: values.apiKey,
               expirationDate: values.expirationDate,
               status: values.enabled ? 'normal' : 'disabled'
             }
           : key
       )
       setApiKeys(newKeys)
+    } else {
+      // Handle add case
+      const newKey = {
+        id: String(Date.now()),
+        key: values.apiKey,
+        status: 'normal',
+        expirationDate: values.expirationDate,
+        priority: apiKeys.length + 1,
+        isDefault: apiKeys.length === 0
+      }
+      setApiKeys([...apiKeys, newKey])
     }
-    setEditModalVisible(false)
+    setModalVisible(false)
     setEditingKey(null)
   }
 
@@ -145,7 +168,6 @@ const KeySettings: React.FC = () => {
     }
   ]
 
-  // const filteredKeys = statusFilter.length > 0 ? apiKeys.filter((key) => statusFilter.includes(key.status)) : apiKeys
   const filteredKeys = apiKeys
 
   const beforeSearchNode = [
@@ -178,29 +200,27 @@ const KeySettings: React.FC = () => {
         onDragSortEnd={handleDragSortEnd}
         beforeSearchNode={beforeSearchNode}
         addNewBtnTitle={$t('添加 API Key')}
-        onAddNewBtnClick={() => {
-          setEditingKey(null)
-          setEditModalVisible(true)
-        }}
+        onAddNewBtnClick={handleAdd}
         rowKey="id"
       />
 
-      <EditKeyModal
-        visible={editModalVisible}
-        onCancel={() => {
-          setEditModalVisible(false)
-          setEditingKey(null)
-        }}
+      <ApiKeyModal
+        visible={modalVisible}
+        mode={modalMode}
+        onCancel={handleModalCancel}
         onSave={handleSave}
+        vendorName={selectedProvider}
         initialValues={
           editingKey
             ? {
-                key: editingKey.key,
+                keyName: editingKey.key,
+                apiKey: editingKey.key,
                 expirationDate: editingKey.expirationDate,
-                enabled: editingKey.status !== 'disabled'
+                enabled: editingKey.status === 'normal'
               }
             : undefined
         }
+        defaultKeyNumber={apiKeys.length + 1}
       />
     </InsidePage>
   )
