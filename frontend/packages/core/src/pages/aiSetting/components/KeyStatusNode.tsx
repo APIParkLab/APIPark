@@ -39,7 +39,7 @@ export const KeyStatusNode: React.FC<{ data: KeyStatusNodeData }> = ({ data }) =
                 height: KEY_SIZE
               }}
               className={`
-                  rounded-md flex-shrink-0
+                  flex-shrink-0
                   ${key.status === 'normal' ? 'bg-green-500' : 'bg-red-500'}
                   transition-all duration-200 hover:opacity-80
                 `}
