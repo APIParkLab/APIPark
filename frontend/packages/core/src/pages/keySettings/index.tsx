@@ -29,20 +29,9 @@ const KeySettings: React.FC = () => {
   const [editingKey, setEditingKey] = useState<APIKey | null>(null)
   const [apiKeys, setApiKeys] = useState<APIKey[]>([])
   const { fetchData } = useFetch()
+  const [searchWord, setSearchWord] = useState<string>('')
 
-  useEffect(() => {
-    fetchData<BasicResponse<{ data: APIKey[] }>>('ai/resource/keys', {
-      method: 'GET',
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
-    }).then((response) => {
-      const { code, data, msg } = response
-      if (code === STATUS_CODE.SUCCESS) {
-        setApiKeys(data.keys)
-      } else {
-        message.error(msg || $t(RESPONSE_TIPS.error))
-      }
-    })
-  }, [])
+  useEffect(() => {}, [])
 
   const handleEdit = (record: APIKey) => {
     setEditingKey(record)
@@ -104,6 +93,41 @@ const KeySettings: React.FC = () => {
     )
   }
 
+  const requestApiKeys = async (params: { pageSize: number; current: number }) => {
+    try {
+      const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/resource/keys', {
+        method: 'GET',
+        eoParams: {
+          provider: selectedProvider,
+          page_size: params.pageSize,
+          keyword: searchWord,
+          page: params.current
+        },
+        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      })
+
+      if (response.code === STATUS_CODE.SUCCESS) {
+        return {
+          data: response.data.keys,
+          success: true,
+          total: response.data.total
+        }
+      } else {
+        message.error(response.msg || $t(RESPONSE_TIPS.error))
+        return {
+          data: [],
+          success: false,
+          total: response.data.total
+        }
+      }
+    } catch (error) {
+      return {
+        data: [],
+        success: false,
+        total: 0
+      }
+    }
+  }
   const statusEnum = {
     normal: { text: <Typography.Text type="success">{$t('正常')}</Typography.Text> },
     exceeded: { text: <Typography.Text type="warning">{$t('超额')}</Typography.Text> },
@@ -140,6 +164,11 @@ const KeySettings: React.FC = () => {
   ]
 
   const columns: PageProColumns<APIKey>[] = [
+    {
+      title: '',
+      dataIndex: 'drag',
+      width: '40px'
+    },
     {
       title: $t('调用优先级'),
       dataIndex: 'priority',
@@ -197,45 +226,18 @@ const KeySettings: React.FC = () => {
       showBorder={false}
       scrollPage={false}
     >
-      <div className="h-[calc(100%-1rem)]">
+      <div className="h-[calc(100%-1rem-36px)]">
         <PageList
           actionRef={actionRef}
           rowKey="id"
-          request={async (params) => {
-            try {
-              const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/resource/keys', {
-                method: 'GET',
-                eoParams: {
-                  provider: selectedProvider,
-                  ...params
-                },
-                eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
-              })
-
-              if (response.code === STATUS_CODE.SUCCESS) {
-                return {
-                  data: response.data.keys,
-                  success: true,
-                  total: response.data.keys.length
-                }
-              } else {
-                message.error(response.msg || $t(RESPONSE_TIPS.error))
-                return {
-                  data: [],
-                  success: false,
-                  total: 0
-                }
-              }
-            } catch (error) {
-              return {
-                data: [],
-                success: false,
-                total: 0
-              }
-            }
+          request={requestApiKeys}
+          onSearchWordChange={(e) => {
+            setSearchWord(e.target.value)
           }}
+          showPagination={true}
+          searchPlaceholder={$t('请输入名称搜索')}
           columns={columns}
-          dragSortKey="sort"
+          dragSortKey="drag"
           // onDragSortEnd={handleDragSortEnd}
           addNewBtnTitle={$t('添加 APIKey')}
           onAddNewBtnClick={handleAdd}

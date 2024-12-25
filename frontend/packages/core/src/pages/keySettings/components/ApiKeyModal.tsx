@@ -76,7 +76,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
 
   return (
     <Modal
-      title={mode === 'add' ? $t('Add {{vendorName}} name', { vendorName }) : $t('Edit API Key')}
+      title={mode === 'add' ? $t('添加 {{vendorName}} APIKey', { vendorName }) : $t('编辑 APIKey')}
       open={visible}
       onCancel={onCancel}
       onOk={handleOk}
@@ -84,11 +84,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
       width={600}
     >
       <Form form={form} layout="vertical">
-        <Form.Item
-          name="id"
-          label={$t('* KEY Name')}
-          rules={[{ required: true, message: $t('Please input the KEY name') }]}
-        >
+        <Form.Item name="id" label={$t('APIKey 名称')} rules={[{ required: true, message: $t('请输入 APIKey') }]}>
           <Input disabled={mode === 'edit'} />
         </Form.Item>
 
@@ -96,15 +92,15 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
           name="name"
           label={
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-              <span>{$t('* API KEY')}</span>
+              <span>{$t('API Key')}</span>
               {mode === 'add' && (
                 <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">
-                  {$t('Get API KEY from OpenAI')}
+                  {$t('从 OpenAI 获取 API Key')}
                 </a>
               )}
             </div>
           }
-          rules={[{ required: true, message: $t('Please input the API key') }]}
+          rules={[{ required: true, message: $t('请输入 API Key') }]}
         >
           {mode === 'add' ? (
             <TextArea
@@ -125,8 +121,8 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
 
         <Form.Item name="neverExpire" valuePropName="checked">
           <Switch
-            checkedChildren={$t('Never Expire')}
-            unCheckedChildren={$t('Set Expiration')}
+            checkedChildren={$t('永不过期')}
+            unCheckedChildren={$t('设置过期时间')}
             onChange={handleNeverExpireChange}
           />
         </Form.Item>
@@ -134,16 +130,16 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
         {!neverExpire && (
           <Form.Item
             name="expire_time"
-            label={$t('Expiration Date')}
-            rules={[{ required: true, message: $t('Please select expiration date') }]}
+            label={$t('过期时间')}
+            rules={[{ required: true, message: $t('请选择过期时间') }]}
           >
             <DatePicker style={{ width: '100%' }} showTime />
           </Form.Item>
         )}
 
         {mode === 'edit' && (
-          <Form.Item name="enabled" label={$t('Enabled')} valuePropName="checked">
-            <Switch checkedChildren={$t('Yes')} unCheckedChildren={$t('No')} />
+          <Form.Item name="enabled" label={$t('启用状态')} valuePropName="checked">
+            <Switch checkedChildren={$t('是')} unCheckedChildren={$t('否')} />
           </Form.Item>
         )}
       </Form>

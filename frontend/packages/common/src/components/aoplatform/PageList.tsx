@@ -1,4 +1,12 @@
+import { SearchOutlined } from '@ant-design/icons'
+import type { ActionType, ParamsType, ProColumns, ProTableProps } from '@ant-design/pro-components'
+import { DragSortTable, ProTable } from '@ant-design/pro-components'
+import WithPermission from '@common/components/aoplatform/WithPermission'
+import { PERMISSION_DEFINITION } from '@common/const/permissions'
+import { withMinimumDelay } from '@common/utils/ux'
 import { Button, Dropdown, Input, MenuProps, TablePaginationConfig } from 'antd'
+import { FilterValue, SorterResult, TableCurrentDataSource } from 'antd/es/table/interface'
+import { debounce } from 'lodash-es'
 import {
   ChangeEvent,
   RefAttributes,
@@ -9,16 +17,8 @@ import {
   useRef,
   useState
 } from 'react'
-import type { ActionType, ParamsType, ProColumns, ProTableProps } from '@ant-design/pro-components'
-import { DragSortTable, ProTable } from '@ant-design/pro-components'
-import './PageList.module.css'
-import { SearchOutlined } from '@ant-design/icons'
-import { debounce } from 'lodash-es'
-import WithPermission from '@common/components/aoplatform/WithPermission'
-import { FilterValue, SorterResult, TableCurrentDataSource } from 'antd/es/table/interface'
 import { useGlobalContext } from '../../contexts/GlobalStateContext'
-import { PERMISSION_DEFINITION } from '@common/const/permissions'
-import { withMinimumDelay } from '@common/utils/ux'
+import './PageList.module.css'
 
 export type PageProColumns<T = any, ValueType = 'text'> = ProColumns<T, ValueType> & { btnNums?: number }
 
@@ -104,7 +104,6 @@ const PageList = <T extends Record<string, unknown>>(
   const { accessData, checkPermission, accessInit, state } = useGlobalContext()
   const [minTableWidth, setMinTableWidth] = useState<number>(0)
 
-  // 使用useImperativeHandle来自定义暴露给父组件的实例值
   useImperativeHandle(ref, () => actionRef.current!)
 
   useEffect(() => {
@@ -209,6 +208,32 @@ const PageList = <T extends Record<string, unknown>>(
     )
   }
 
+  const getTableActions = () => {
+    return [
+      ...(beforeSearchNode ? [beforeSearchNode] : []),
+      ...(searchPlaceholder
+        ? [
+            <Input
+              key="search-input"
+              className="my-btnbase ml-btnbase"
+              onChange={onSearchWordChange ? (e) => debounce(onSearchWordChange, 100)(e) : undefined}
+              onPressEnter={() => (manualReloadTable ? manualReloadTable() : actionRef.current?.reload?.())}
+              allowClear
+              placeholder={searchPlaceholder}
+              prefix={
+                <SearchOutlined
+                  className="cursor-pointer"
+                  onClick={() => {
+                    actionRef.current?.reload?.()
+                  }}
+                />
+              }
+            />
+          ]
+        : [])
+    ]
+  }
+
   const requestWithDelay = (
     params: ParamsType & { pageSize?: number | undefined; current?: number | undefined; keyword?: string | undefined },
     sort: unknown,
@@ -229,7 +254,15 @@ const PageList = <T extends Record<string, unknown>>(
           columns={newColumns}
           rowKey={primaryKey}
           search={false}
-          pagination={false}
+          pagination={
+            showPagination
+              ? {
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  size: 'default'
+                }
+              : false
+          }
           request={request}
           dragSortKey={dragSortKey}
           onDragSortEnd={onDragSortEnd}
@@ -238,6 +271,9 @@ const PageList = <T extends Record<string, unknown>>(
             reload: false,
             density: false,
             setting: false
+          }}
+          toolbar={{
+            actions: getTableActions()
           }}
           headerTitle={headerTitle()}
         />
@@ -260,28 +296,7 @@ const PageList = <T extends Record<string, unknown>>(
             ) : null
           ]}
           toolbar={{
-            actions: [
-              ...[beforeSearchNode],
-              ...[
-                searchPlaceholder ? (
-                  <Input
-                    className="my-btnbase ml-btnbase"
-                    onChange={onSearchWordChange ? (e) => debounce(onSearchWordChange, 100)(e) : undefined}
-                    onPressEnter={() => (manualReloadTable ? manualReloadTable() : actionRef.current?.reload?.())}
-                    allowClear
-                    placeholder={searchPlaceholder}
-                    prefix={
-                      <SearchOutlined
-                        className="cursor-pointer"
-                        onClick={() => {
-                          actionRef.current?.reload?.()
-                        }}
-                      />
-                    }
-                  />
-                ) : null
-              ]
-            ]
+            actions: getTableActions()
           }}
           options={{
             reload: false,
@@ -304,7 +319,6 @@ const PageList = <T extends Record<string, unknown>>(
                 }
               : false
           }
-          rowKey={primaryKey}
           onChange={(
             pagination: TablePaginationConfig,
             filters: Record<string, FilterValue | null>,
@@ -319,6 +333,7 @@ const PageList = <T extends Record<string, unknown>>(
               )
             onChange?.(pagination, filters, sorter, extra)
           }}
+          rowKey={primaryKey}
           dataSource={dataSource}
           search={false}
           headerTitle={headerTitle()}
