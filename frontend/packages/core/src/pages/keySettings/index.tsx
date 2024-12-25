@@ -5,11 +5,12 @@ import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPe
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
-import { Divider, message, Select, Space, Typography } from 'antd'
+import AIProviderSelect from '@core/components/AIProviderSelect'
+import { Divider, message, Space, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import ApiKeyModal from './components/ApiKeyModal'
 
-export interface APIKey {
+export interface APIKey extends Record<string, unknown> {
   id: string
   name: string
   status: 'normal' | 'exceeded' | 'expired' | 'disabled' | 'error'
@@ -157,12 +158,15 @@ const KeySettings: React.FC = () => {
       filters: true,
       onFilter: true,
       valueEnum: statusEnum,
-      render: (status: APIKey['status']) => statusEnum[status]?.text || status
+      render: (dom: React.ReactNode, entity: APIKey) => statusEnum[entity.status]?.text || entity.status
     },
     {
       title: $t('已用 Token'),
       dataIndex: 'use_token',
-      render: (value: number) => value.toLocaleString()
+      render: (dom: React.ReactNode, entity: APIKey) => {
+        const value = entity.use_token
+        return value.toLocaleString()
+      }
     },
     {
       title: $t('编辑时间'),
@@ -171,7 +175,9 @@ const KeySettings: React.FC = () => {
     {
       title: $t('过期时间'),
       dataIndex: 'expire_time',
-      render: (expireTime: string) => (expireTime === '0' ? $t('永不过期') : expireTime)
+      render: (dom: React.ReactNode, entity: APIKey) => {
+        return entity.expire_time === '0' ? $t('永不过期') : entity.expire_time
+      }
     },
     ...operation
   ]
@@ -184,19 +190,7 @@ const KeySettings: React.FC = () => {
       showBorder={false}
       scrollPage={false}
     >
-      <Space className="flex items-center">
-        <span>{$t('AI 供应商')}:</span>
-        <Select
-          key="provider"
-          value={selectedProvider}
-          onChange={setSelectedProvider}
-          style={{ width: 200 }}
-          options={[
-            { label: 'OpenAI', value: 'openai' },
-            { label: 'Anthropic', value: 'anthropic' }
-          ]}
-        />
-      </Space>
+      <AIProviderSelect value={selectedProvider} onChange={setSelectedProvider} />
       <PageList
         actionRef={actionRef}
         rowKey="id"
