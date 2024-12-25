@@ -148,7 +148,7 @@ const KeySettings: React.FC = () => {
     {
       title: $t('名称'),
       dataIndex: 'name',
-      render: (text: string, record: APIKey) => <Space>{text}</Space>
+      render: (dom: React.ReactNode, entity: APIKey) => <Space>{entity.name}</Space>
     },
     {
       title: $t('状态'),

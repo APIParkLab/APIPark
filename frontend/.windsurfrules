@@ -42,3 +42,4 @@ fetchData<BasicResponse<{ profile: UserInfoType }>>('account/profile', { method:
       }
 })
 ```
+14. can't not import new package!
