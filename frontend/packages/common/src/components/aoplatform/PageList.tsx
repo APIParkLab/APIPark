@@ -217,14 +217,26 @@ const PageList = <T extends Record<string, unknown>>(
               key="search-input"
               className="my-btnbase ml-btnbase"
               onChange={onSearchWordChange ? (e) => debounce(onSearchWordChange, 100)(e) : undefined}
-              onPressEnter={() => (manualReloadTable ? manualReloadTable() : actionRef.current?.reload?.())}
+              onPressEnter={() => {
+                if (manualReloadTable) {
+                  manualReloadTable()
+                  return
+                }
+                if (actionRef.current) {
+                  actionRef.current.reset?.()
+                  actionRef.current.reload?.()
+                }
+              }}
               allowClear
               placeholder={searchPlaceholder}
               prefix={
                 <SearchOutlined
                   className="cursor-pointer"
                   onClick={() => {
-                    actionRef.current?.reload?.()
+                    if (actionRef.current) {
+                      actionRef.current.reset?.()
+                      actionRef.current.reload?.()
+                    }
                   }}
                 />
               }

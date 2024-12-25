@@ -22,7 +22,7 @@ export interface APIKey extends Record<string, unknown> {
 }
 
 const KeySettings: React.FC = () => {
-  const actionRef = useRef<ActionType>()
+  const pageListRef = useRef<ActionType>(null)
   const [selectedProvider, setSelectedProvider] = useState<string>('openai')
   const [modalVisible, setModalVisible] = useState(false)
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add')
@@ -85,12 +85,32 @@ const KeySettings: React.FC = () => {
   }
 
   const handleDragSortEnd = async (beforeIndex: number, afterIndex: number, newDataSource: APIKey[]) => {
-    setApiKeys(
-      newDataSource.map((item, index) => ({
-        ...item,
-        priority: index + 1
-      }))
-    )
+    try {
+      const response = await fetchData<BasicResponse<any>>('ai/resource/key/sort', {
+        method: 'PUT',
+        eoParams: {
+          origin: newDataSource[beforeIndex].id,
+          target: newDataSource[afterIndex].id,
+          sort: afterIndex > beforeIndex ? 'before' : 'after'
+        },
+        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      })
+
+      if (response.code === STATUS_CODE.SUCCESS) {
+        setApiKeys(
+          newDataSource.map((item, index) => ({
+            ...item,
+            priority: index + 1
+          }))
+        )
+        message.success($t('排序成功'))
+        pageListRef.current?.reload()
+      } else {
+        message.error(response.msg || RESPONSE_TIPS.error)
+      }
+    } catch (error) {
+      message.error(RESPONSE_TIPS.error)
+    }
   }
 
   const requestApiKeys = async (params: { pageSize: number; current: number }) => {
@@ -228,7 +248,7 @@ const KeySettings: React.FC = () => {
     >
       <div className="h-[calc(100%-1rem-36px)]">
         <PageList
-          actionRef={actionRef}
+          ref={pageListRef}
           rowKey="id"
           request={requestApiKeys}
           onSearchWordChange={(e) => {
@@ -238,7 +258,7 @@ const KeySettings: React.FC = () => {
           searchPlaceholder={$t('请输入名称搜索')}
           columns={columns}
           dragSortKey="drag"
-          // onDragSortEnd={handleDragSortEnd}
+          onDragSortEnd={handleDragSortEnd}
           addNewBtnTitle={$t('添加 APIKey')}
           onAddNewBtnClick={handleAdd}
         />
