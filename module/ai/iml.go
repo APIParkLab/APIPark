@@ -60,6 +60,19 @@ type imlProviderModule struct {
 	transaction     store.ITransaction      `autowired:""`
 }
 
+func (i *imlProviderModule) SimpleProvider(ctx context.Context, id string) (*ai_dto.SimpleProvider, error) {
+	p, has := model_runtime.GetProvider(id)
+	if !has {
+		return nil, fmt.Errorf("ai provider not found")
+	}
+	return &ai_dto.SimpleProvider{
+		Id:           p.ID(),
+		Name:         p.Name(),
+		Logo:         p.Logo(),
+		GetAPIKeyUrl: p.HelpUrl(),
+	}, nil
+}
+
 func (i *imlProviderModule) Sort(ctx context.Context, input *ai_dto.Sort) error {
 	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
 		list, err := i.providerService.List(ctx)
