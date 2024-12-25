@@ -1,9 +1,9 @@
-import { Button, Tag } from 'antd'
-import { useNavigate } from 'react-router-dom'
-import WithPermission from '@common/components/aoplatform/WithPermission'
-import { FC, ReactNode } from 'react'
 import { ArrowLeftOutlined } from '@ant-design/icons'
+import WithPermission from '@common/components/aoplatform/WithPermission'
 import { $t } from '@common/locales'
+import { Button, Tag } from 'antd'
+import { FC, ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 class InsidePageProps {
   showBanner?: boolean = true
@@ -49,11 +49,10 @@ const InsidePage: FC<InsidePageProps> = ({
     navigate(backUrl || '/')
   }
   return (
-    // <div className="h-full flex flex-col flex-1 overflow-hidden bg-[#f7f8fa]">
-    <div className={`h-full flex flex-col flex-1 overflow-hidden  ${className}`}>
+    <div className={`flex overflow-hidden flex-col flex-1 h-full ${className}`}>
       {showBanner && (
         <div
-          className={`border-[0px] mr-PAGE_INSIDE_X ${showBorder ? 'border-b-[1px] border-solid border-BORDER' : ''} ${headerClassName}`}
+          className={`border-[0px] mr-PAGE_INSIDE_X ${showBorder ? 'border-solid border-b-[1px] border-BORDER' : ''} ${headerClassName}`}
         >
           {!pageTitle && !description && !backUrl && !customBtn ? (
             <></>
@@ -68,7 +67,7 @@ const InsidePage: FC<InsidePageProps> = ({
                 </div>
               )}
               <div className="flex justify-between mb-[20px] items-center ">
-                <div className="flex items-center  gap-TAG_LEFT ">
+                <div className="flex items-center gap-TAG_LEFT">
                   <div className="text-theme text-[26px] ">{pageTitle}</div>
                   {tagList &&
                     tagList?.length > 0 &&
