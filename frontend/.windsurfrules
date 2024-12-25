@@ -14,8 +14,25 @@ Create detailed components with these requirements:
    - Update current packages/core/src/pages/Root.tsx with new comprehensive code
    - Don't forget root route (page.tsx) handling
    - You MUST complete the entire prompt before stopping
-​11. Table component should use <PageList>
-12. use `const { fetchData } = useFetch()` to fetch http data,such as ```  fetchData<BasicResponse<{ profile: UserInfoType }>>('account/profile', { method: 'GET' }).then((response) => {
+​11. Table component should use  `import PageList from "@common/components/aoplatform/PageList.tsx"`
+12. PageList component MUST use addNewBtnTitle for add button, NOT toolBarRender. Example:
+<PageList
+    id="global_team"
+    className="pl-btnbase"
+    ref={pageListRef}
+    columns = {[...columns]}
+    request = {()=>getTeamList()}
+    showPagination={false}
+    addNewBtnTitle={$t('添加团队')}
+    addNewBtnAccess = "system.organization.team.add"
+    searchPlaceholder={$t("输入名称、ID、负责人查找团队")}
+    onAddNewBtnClick={()=>{openModal('add')}}
+    onSearchWordChange={(e)=>{setSearchWord(e.target.value)}}
+    onRowClick={(row:TeamTableListItem)=>(navigate(`../inside/${row.id}/setting`))}
+/>
+13. use `const { fetchData } = useFetch()` to fetch http data,such as 
+```tsx  
+fetchData<BasicResponse<{ profile: UserInfoType }>>('account/profile', { method: 'GET' }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         setUserInfo(data.profile)
@@ -23,4 +40,5 @@ Create detailed components with these requirements:
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
       }
-    })```
+})
+```
