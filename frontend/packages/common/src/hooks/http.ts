@@ -187,7 +187,7 @@ export function useFetch() {
         }
 
         // 如果响应体为JSON且指定了转换键，则转换响应数据
-        if (isJsonHttp(response.headers)) {
+        if (options?.eoApiPrefix||isJsonHttp(response.headers)) {
           const data = await response.json()
           const newData = (await pluginEventHub.emit('httpResponse', { data, continue: true })) as Response
           return shouldTransformKeys ? (keysToCamel(newData, options.eoTransformKeys as string[]) as T) : data

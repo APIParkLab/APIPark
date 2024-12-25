@@ -18,9 +18,9 @@ import CustomEdge from './components/CustomEdge'
 import { KeyStatusNode } from './components/KeyStatusNode'
 import { ModelCardNode } from './components/ModelCardNode'
 import { ServiceCardNode } from './components/NodeComponents'
-import { ModelData } from './components/types'
 import { LAYOUT } from './constants'
 import './styles.css'
+import { ModelData } from './types'
 
 interface ApiResponse {
   data: {

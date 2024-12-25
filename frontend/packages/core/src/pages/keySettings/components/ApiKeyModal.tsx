@@ -2,7 +2,7 @@ import { $t } from '@common/locales'
 import { DatePicker, Form, Input, Modal, Switch } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useState } from 'react'
-import { APIKey } from '..'
+import { APIKey } from '../types'
 
 interface ApiKeyModalProps {
   visible: boolean

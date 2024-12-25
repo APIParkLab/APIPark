@@ -9,17 +9,7 @@ import AIProviderSelect from '@core/components/AIProviderSelect'
 import { Divider, message, Space, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import ApiKeyModal from './components/ApiKeyModal'
-
-export interface APIKey extends Record<string, unknown> {
-  id: string
-  name: string
-  status: 'normal' | 'exceeded' | 'expired' | 'disabled' | 'error'
-  use_token: number
-  update_time: string
-  expire_time: string
-  can_delete: boolean
-  priority: number
-}
+import { APIKey } from './types'
 
 const KeySettings: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
@@ -84,8 +74,59 @@ const KeySettings: React.FC = () => {
     setEditingKey(null)
   }
 
-  const handleDelete = (id: string) => {
-    setApiKeys(apiKeys.filter((key) => key.id !== id))
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetchData<BasicResponse<any>>('ai/resource/key', {
+        method: 'DELETE',
+        eoParams: {
+          provider: selectedProvider,
+          id: id,
+          branchID: 0
+        },
+        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      })
+
+      if (response.code === STATUS_CODE.SUCCESS) {
+        message.success($t('删除成功'))
+        pageListRef.current?.reload()
+      } else {
+        message.error(response.msg || RESPONSE_TIPS.error)
+      }
+    } catch (error) {
+      message.error(RESPONSE_TIPS.error)
+    }
+  }
+
+  const handleToggleStatus = async (id: string, currentStatus: string) => {
+    try {
+      const newStatus = currentStatus === 'normal' ? 'disable' : 'enable'
+      const response = await fetchData<BasicResponse<any>>(`ai/resource/key/${newStatus}`, {
+        method: 'PUT',
+        eoParams: {
+          provider: selectedProvider,
+          id: id
+        },
+        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      })
+
+      if (response.code === STATUS_CODE.SUCCESS) {
+        message.success(newStatus === 'disable' ? $t('停用成功') : $t('启用成功'))
+        setApiKeys(
+          apiKeys.map((key) =>
+            key.id === id
+              ? ({
+                  ...key,
+                  status: newStatus === 'disable' ? 'disabled' : 'normal'
+                } as APIKey)
+              : (key as APIKey)
+          )
+        )
+      } else {
+        message.error(response.msg || RESPONSE_TIPS.error)
+      }
+    } catch (error) {
+      message.error(RESPONSE_TIPS.error)
+    }
   }
 
   const handleDragSortEnd = async (beforeIndex: number, afterIndex: number, newDataSource: APIKey[]) => {
@@ -164,7 +205,7 @@ const KeySettings: React.FC = () => {
     {
       title: '',
       key: 'option',
-      btnNums: 3,
+      btnNums: 4,
       fixed: 'right',
       valueType: 'option',
       render: (_: React.ReactNode, entity: APIKey) => [
@@ -175,7 +216,20 @@ const KeySettings: React.FC = () => {
           onClick={() => handleEdit(entity)}
           btnTitle={$t('编辑')}
         />,
-        <Divider type="vertical" className="mx-0" key="div3" />,
+        <Divider type="vertical" className="mx-0" key="div1" />,
+        entity.status !== 'expired' && entity.status !== 'error' && (
+          <>
+            <TableBtnWithPermission
+              access="system.settings.ai_key_resource.manager"
+              key="toggle"
+              btnType={entity.status === 'normal' ? 'disable' : 'enable'}
+              onClick={() => handleToggleStatus(entity.id, entity.status)}
+              btnTitle={entity.status === 'normal' ? $t('停用') : $t('启用')}
+            />
+            <Divider type="vertical" className="mx-0" key="div2" />
+          </>
+        ),
+
         <TableBtnWithPermission
           access="system.settings.ai_key_resource.manager"
           key="delete"

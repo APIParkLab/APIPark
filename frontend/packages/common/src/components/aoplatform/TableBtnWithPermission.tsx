@@ -30,7 +30,9 @@ const TableIconName = {
   online: 'ic:baseline-check-circle',
   cancel: 'ic:baseline-cancel-schedule-send',
   refresh: 'ic:baseline-refresh',
-  logs: 'hugeicons:google-doc'
+  logs: 'hugeicons:google-doc',
+  disable: 'ic:baseline-pause-circle',
+  enable: 'ic:baseline-play-circle'
 }
 // 表格操作栏按钮，受权限控制
 const TableBtnWithPermission = ({

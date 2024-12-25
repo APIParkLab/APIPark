@@ -1,6 +1,6 @@
 import { Handle, Position } from '@xyflow/react'
 import React from 'react'
-import { KeyData } from './types'
+import { KeyData } from '../types'
 
 interface KeyStatusNodeData {
   id: string

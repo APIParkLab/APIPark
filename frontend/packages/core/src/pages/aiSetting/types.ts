@@ -1,5 +1,5 @@
-export type ModelStatus = 'enable' | 'abnormal'|'disable'
-export type KeyStatus ='normal' | 'abnormal'|'disable'
+export type ModelStatus = 'enable' | 'abnormal'|'disabled'
+export type KeyStatus ='normal' | 'abnormal'|'disabled'
 
 export interface KeyData {
   id: string
