@@ -185,7 +185,7 @@ const KeySettings: React.FC = () => {
       scrollPage={false}
     >
       <Space className="flex items-center">
-        <span>{$t('选择AI模型供应商')}:</span>
+        <span>{$t('AI 供应商')}:</span>
         <Select
           key="provider"
           value={selectedProvider}
