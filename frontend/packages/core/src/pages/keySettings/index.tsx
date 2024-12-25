@@ -184,72 +184,80 @@ const KeySettings: React.FC = () => {
 
   return (
     <InsidePage
-      className="overflow-y-auto pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X"
+      className="overflow-y-auto gap-4 pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X"
       pageTitle={$t('APIKey 资源池')}
-      description={$t('支持单个 API 模型供应商下创建多个 APIKey APIKey 进行智能负载均衡')}
+      description={
+        <>
+          {$t('支持单个 API 模型供应商下创建多个 APIKey APIKey 进行智能负载均衡')}
+          <div className="mt-4">
+            <AIProviderSelect value={selectedProvider} onChange={setSelectedProvider} />
+          </div>
+        </>
+      }
       showBorder={false}
       scrollPage={false}
     >
-      <AIProviderSelect value={selectedProvider} onChange={setSelectedProvider} />
-      <PageList
-        actionRef={actionRef}
-        rowKey="id"
-        request={async (params) => {
-          try {
-            const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/resource/keys', {
-              method: 'GET',
-              eoParams: {
-                provider: selectedProvider,
-                ...params
-              },
-              eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
-            })
+      <div className="h-[calc(100%-1rem)]">
+        <PageList
+          actionRef={actionRef}
+          rowKey="id"
+          request={async (params) => {
+            try {
+              const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/resource/keys', {
+                method: 'GET',
+                eoParams: {
+                  provider: selectedProvider,
+                  ...params
+                },
+                eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+              })
 
-            if (response.code === STATUS_CODE.SUCCESS) {
-              return {
-                data: response.data.keys,
-                success: true,
-                total: response.data.keys.length
+              if (response.code === STATUS_CODE.SUCCESS) {
+                return {
+                  data: response.data.keys,
+                  success: true,
+                  total: response.data.keys.length
+                }
+              } else {
+                message.error(response.msg || $t(RESPONSE_TIPS.error))
+                return {
+                  data: [],
+                  success: false,
+                  total: 0
+                }
               }
-            } else {
-              message.error(response.msg || $t(RESPONSE_TIPS.error))
+            } catch (error) {
               return {
                 data: [],
                 success: false,
                 total: 0
               }
             }
-          } catch (error) {
-            return {
-              data: [],
-              success: false,
-              total: 0
-            }
+          }}
+          columns={columns}
+          dragSortKey="sort"
+          // onDragSortEnd={handleDragSortEnd}
+          addNewBtnTitle={$t('添加 APIKey')}
+          onAddNewBtnClick={handleAdd}
+        />
+        <ApiKeyModal
+          visible={modalVisible}
+          mode={modalMode}
+          onCancel={handleModalCancel}
+          onSave={handleSave}
+          vendorName={selectedProvider}
+          initialValues={
+            editingKey
+              ? {
+                  id: editingKey.id,
+                  name: editingKey.name,
+                  expire_time: editingKey.expire_time
+                }
+              : undefined
           }
-        }}
-        columns={columns}
-        dragSortKey="sort"
-        // onDragSortEnd={handleDragSortEnd}
-        addNewBtnTitle={$t('添加 APIKey')}
-        onAddNewBtnClick={handleAdd}
-      />
-      <ApiKeyModal
-        visible={modalVisible}
-        mode={modalMode}
-        onCancel={handleModalCancel}
-        onSave={handleSave}
-        vendorName={selectedProvider}
-        initialValues={
-          editingKey
-            ? {
-                id: editingKey.id,
-                name: editingKey.name,
-                expire_time: editingKey.expire_time
-              }
-            : undefined
-        }
-        defaultKeyNumber={apiKeys.length + 1}
-      />
+          defaultKeyNumber={apiKeys.length + 1}
+        />
+      </div>
     </InsidePage>
   )
 }
