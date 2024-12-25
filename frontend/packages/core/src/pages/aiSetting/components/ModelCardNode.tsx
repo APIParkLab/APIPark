@@ -2,7 +2,7 @@ import { Icon } from '@iconify/react'
 import { Handle, Position } from '@xyflow/react'
 import { t } from 'i18next'
 import React from 'react'
-import { ModelStatus } from './types'
+import { ModelStatus } from '../types'
 
 interface ModelCardData {
   title: string
