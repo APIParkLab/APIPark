@@ -14,6 +14,7 @@ import { APIKey } from './types'
 const KeySettings: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
   const [selectedProvider, setSelectedProvider] = useState<string>('openai')
+  const [providerName, setProviderName] = useState<string>('')
   const [modalVisible, setModalVisible] = useState(false)
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add')
   const [editingKey, setEditingKey] = useState<APIKey | null>(null)
@@ -23,7 +24,25 @@ const KeySettings: React.FC = () => {
 
   useEffect(() => {
     pageListRef.current?.reload()
+    fetchProviderName()
   }, [selectedProvider])
+
+  const fetchProviderName = async () => {
+    try {
+      const response = await fetchData<{ code: number; data: { providers: { id: string; name: string }[] } }>(
+        'simple/ai/providers',
+        { method: 'GET' }
+      )
+      if (response.code === STATUS_CODE.SUCCESS) {
+        const provider = response.data.providers.find((p) => p.id === selectedProvider)
+        if (provider) {
+          setProviderName(provider.name)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch provider name:', error)
+    }
+  }
 
   useEffect(() => {}, [])
 
@@ -142,12 +161,6 @@ const KeySettings: React.FC = () => {
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
-        setApiKeys(
-          newDataSource.map((item, index) => ({
-            ...item,
-            priority: index + 1
-          }))
-        )
         message.success($t('排序成功'))
         pageListRef.current?.reload()
       } else {
@@ -158,7 +171,7 @@ const KeySettings: React.FC = () => {
     }
   }
 
-  const requestApiKeys = async (params: { pageSize: number; current: number }) => {
+  const requestApiKeys = async (params: any) => {
     try {
       const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/resource/keys', {
         method: 'GET',
@@ -325,7 +338,7 @@ const KeySettings: React.FC = () => {
           mode={modalMode}
           onCancel={handleModalCancel}
           onSave={handleSave}
-          vendorName={selectedProvider}
+          providerName={providerName}
           initialValues={
             editingKey
               ? {
