@@ -168,8 +168,6 @@ const KeySettings: React.FC = () => {
     }
   ]
 
-  const filteredKeys = apiKeys
-
   const beforeSearchNode = [
     <Select
       key="provider"
@@ -194,14 +192,48 @@ const KeySettings: React.FC = () => {
     >
       <PageList
         actionRef={actionRef}
+        rowKey="id"
+        request={async (params) => {
+          try {
+            const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/resource/keys', {
+              method: 'GET',
+              eoParams: {
+                provider: selectedProvider,
+                status: statusFilter,
+                ...params
+              },
+              eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+            })
+
+            if (response.code === STATUS_CODE.SUCCESS) {
+              return {
+                data: response.data.keys,
+                success: true,
+                total: response.data.keys.length
+              }
+            } else {
+              message.error(response.msg || $t(RESPONSE_TIPS.error))
+              return {
+                data: [],
+                success: false,
+                total: 0
+              }
+            }
+          } catch (error) {
+            return {
+              data: [],
+              success: false,
+              total: 0
+            }
+          }
+        }}
         columns={columns}
-        dataSource={filteredKeys}
+        search={false}
         dragSortKey="sort"
         onDragSortEnd={handleDragSortEnd}
         beforeSearchNode={beforeSearchNode}
-        addNewBtnTitle={$t('添加 API Key')}
+        addNewBtnTitle={$t('添加 APIKey')}
         onAddNewBtnClick={handleAdd}
-        rowKey="id"
       />
 
       <ApiKeyModal
