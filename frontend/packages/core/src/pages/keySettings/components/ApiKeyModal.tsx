@@ -8,7 +8,7 @@ interface ApiKeyModalProps {
   visible: boolean
   onCancel: () => void
   onSave: (values: any) => void
-  vendorName: string
+  providerName: string
   mode: 'add' | 'edit'
   initialValues?: Partial<APIKey>
   defaultKeyNumber?: number
@@ -20,7 +20,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
   visible,
   onCancel,
   onSave,
-  vendorName,
+  providerName,
   mode,
   initialValues,
   defaultKeyNumber = 1
@@ -76,7 +76,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
 
   return (
     <Modal
-      title={mode === 'add' ? $t('添加 {{vendorName}} APIKey', { vendorName }) : $t('编辑 APIKey')}
+      title={mode === 'add' ? $t(`添加 ${providerName} APIKey`) : $t('编辑 APIKey')}
       open={visible}
       onCancel={onCancel}
       onOk={handleOk}
