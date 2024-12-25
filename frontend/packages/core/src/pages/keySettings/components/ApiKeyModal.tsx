@@ -1,7 +1,8 @@
 import { $t } from '@common/locales'
-import { DatePicker, Form, Input, Modal, Switch, theme, Typography } from 'antd'
+import { DatePicker, Form, Input, Modal, Switch } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useState } from 'react'
+import { APIKey } from '..'
 
 interface ApiKeyModalProps {
   visible: boolean
@@ -9,17 +10,11 @@ interface ApiKeyModalProps {
   onSave: (values: any) => void
   vendorName: string
   mode: 'add' | 'edit'
-  initialValues?: {
-    keyName?: string
-    apiKey?: any
-    expirationDate?: string
-    enabled?: boolean
-  }
+  initialValues?: Partial<APIKey>
   defaultKeyNumber?: number
 }
 
 const { TextArea } = Input
-const { Text } = Typography
 
 const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
   visible,
@@ -31,30 +26,29 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
   defaultKeyNumber = 1
 }) => {
   const [form] = Form.useForm()
-  const { token } = theme.useToken()
   const [neverExpire, setNeverExpire] = useState(true)
 
   useEffect(() => {
     if (visible) {
       if (mode === 'add') {
         form.setFieldsValue({
-          keyName: `KEY${defaultKeyNumber}`,
+          id: `KEY${defaultKeyNumber}`,
           neverExpire: true,
-          expirationDate: dayjs().add(7, 'days'),
-          apiKey: {
+          expire_time: dayjs().add(7, 'days'),
+          name: {
             openai_api_base: 'API Base',
             openai_api_key: 'API Key'
           }
         })
       } else if (initialValues) {
         form.setFieldsValue({
-          keyName: initialValues.keyName,
-          apiKey: initialValues.apiKey,
-          expirationDate: initialValues.expirationDate ? dayjs(initialValues.expirationDate) : undefined,
+          id: initialValues.id,
+          name: initialValues.name,
+          expire_time: initialValues.expire_time ? dayjs(initialValues.expire_time) : undefined,
           enabled: initialValues.enabled,
-          neverExpire: !initialValues.expirationDate
+          neverExpire: !initialValues.expire_time
         })
-        setNeverExpire(!initialValues.expirationDate)
+        setNeverExpire(!initialValues.expire_time)
       }
     }
   }, [visible, mode, initialValues, defaultKeyNumber, form])
@@ -64,7 +58,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
       const values = await form.validateFields()
       onSave({
         ...values,
-        expirationDate: neverExpire ? null : values.expirationDate.format('YYYY-MM-DD HH:mm:ss')
+        expire_time: neverExpire ? null : values.expire_time.format('YYYY-MM-DD HH:mm:ss')
       })
     } catch (error) {
       console.error('Validation failed:', error)
@@ -75,14 +69,14 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
     setNeverExpire(checked)
     if (!checked) {
       form.setFieldsValue({
-        expirationDate: dayjs().add(7, 'days')
+        expire_time: dayjs().add(7, 'days')
       })
     }
   }
 
   return (
     <Modal
-      title={mode === 'add' ? $t('Add {{vendorName}} APIKEY', { vendorName }) : $t('Edit API Key')}
+      title={mode === 'add' ? $t('Add {{vendorName}} name', { vendorName }) : $t('Edit API Key')}
       open={visible}
       onCancel={onCancel}
       onOk={handleOk}
@@ -91,7 +85,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
     >
       <Form form={form} layout="vertical">
         <Form.Item
-          name="keyName"
+          name="id"
           label={$t('* KEY Name')}
           rules={[{ required: true, message: $t('Please input the KEY name') }]}
         >
@@ -99,7 +93,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
         </Form.Item>
 
         <Form.Item
-          name="apiKey"
+          name="name"
           label={
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
               <span>{$t('* API KEY')}</span>
@@ -139,7 +133,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
 
         {!neverExpire && (
           <Form.Item
-            name="expirationDate"
+            name="expire_time"
             label={$t('Expiration Date')}
             rules={[{ required: true, message: $t('Please select expiration date') }]}
           >

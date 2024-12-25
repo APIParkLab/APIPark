@@ -1,4 +1,4 @@
-import { ActionType, ProColumns } from '@ant-design/pro-components'
+import { ActionType } from '@ant-design/pro-components'
 import InsidePage from '@common/components/aoplatform/InsidePage'
 import PageList, { PageProColumns } from '@common/components/aoplatform/PageList'
 import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission'
@@ -8,23 +8,21 @@ import { $t } from '@common/locales'
 import { Divider, message, Select, Space, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import ApiKeyModal from './components/ApiKeyModal'
-import StatusFilter from './components/StatusFilter'
 
-interface APIKey {
+export interface APIKey {
   id: string
   name: string
   status: 'normal' | 'exceeded' | 'expired' | 'disabled' | 'error'
   use_token: number
   update_time: string
   expire_time: string
-  can_delete: string
+  can_delete: boolean
   priority: number
 }
 
 const KeySettings: React.FC = () => {
   const actionRef = useRef<ActionType>()
   const [selectedProvider, setSelectedProvider] = useState<string>('openai')
-  const [statusFilter, setStatusFilter] = useState<string[]>([])
   const [modalVisible, setModalVisible] = useState(false)
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add')
   const [editingKey, setEditingKey] = useState<APIKey | null>(null)
@@ -63,12 +61,12 @@ const KeySettings: React.FC = () => {
 
   const handleSave = (values: any) => {
     if (modalMode === 'edit' && editingKey) {
-      const newKeys = apiKeys.map((key) =>
+      const newKeys: APIKey[] = apiKeys.map((key) =>
         key.id === editingKey.id
           ? {
               ...key,
-              key: values.apiKey,
-              expirationDate: values.expirationDate,
+              key: values.name,
+              expire_time: values.expire_time,
               status: values.enabled ? 'normal' : 'disabled'
             }
           : key
@@ -76,13 +74,15 @@ const KeySettings: React.FC = () => {
       setApiKeys(newKeys)
     } else {
       // Handle add case
-      const newKey = {
+      const newKey: APIKey = {
         id: String(Date.now()),
-        key: values.apiKey,
+        name: values.name,
         status: 'normal',
-        expirationDate: values.expirationDate,
+        expire_time: values.expire_time,
         priority: apiKeys.length + 1,
-        isDefault: apiKeys.length === 0
+        can_delete: true,
+        use_token: 0,
+        update_time: ''
       }
       setApiKeys([...apiKeys, newKey])
     }
@@ -134,19 +134,11 @@ const KeySettings: React.FC = () => {
           onClick={() => handleDelete(entity.id)}
           btnTitle={$t('删除')}
         />
-        // <Tooltip title={$t('编辑')}>
-        //   <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(entity)} />
-        // </Tooltip>,
-        // entity.can_delete && (
-        //   <Tooltip title={$t('删除')}>
-        //     <Button type="text" icon={<DeleteOutlined />} danger onClick={() => handleDelete(entity.id)} />
-        //   </Tooltip>
-        // )
       ]
     }
   ]
 
-  const columns: ProColumns<APIKey>[] = [
+  const columns: PageProColumns<APIKey>[] = [
     {
       title: $t('调用优先级'),
       dataIndex: 'priority',
@@ -184,28 +176,27 @@ const KeySettings: React.FC = () => {
     ...operation
   ]
 
-  const beforeSearchNode = [
-    <Select
-      key="provider"
-      value={selectedProvider}
-      onChange={setSelectedProvider}
-      style={{ width: 200 }}
-      options={[
-        { label: 'OpenAI', value: 'openai' },
-        { label: 'Anthropic', value: 'anthropic' }
-      ]}
-    />,
-    <StatusFilter key="status" value={statusFilter} onChange={setStatusFilter} />
-  ]
-
   return (
     <InsidePage
       className="overflow-y-auto pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X"
       pageTitle={$t('APIKey 资源池')}
-      description={$t('支持单个 API 模型供应商下创建多个 APIKey，并可对多个 APIkey 进行智能负载均衡')}
+      description={$t('支持单个 API 模型供应商下创建多个 APIKey APIKey 进行智能负载均衡')}
       showBorder={false}
       scrollPage={false}
     >
+      <Space className="flex items-center">
+        <span>{$t('选择AI模型供应商')}:</span>
+        <Select
+          key="provider"
+          value={selectedProvider}
+          onChange={setSelectedProvider}
+          style={{ width: 200 }}
+          options={[
+            { label: 'OpenAI', value: 'openai' },
+            { label: 'Anthropic', value: 'anthropic' }
+          ]}
+        />
+      </Space>
       <PageList
         actionRef={actionRef}
         rowKey="id"
@@ -215,7 +206,6 @@ const KeySettings: React.FC = () => {
               method: 'GET',
               eoParams: {
                 provider: selectedProvider,
-                status: statusFilter,
                 ...params
               },
               eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
@@ -244,14 +234,11 @@ const KeySettings: React.FC = () => {
           }
         }}
         columns={columns}
-        search={false}
         dragSortKey="sort"
-        onDragSortEnd={handleDragSortEnd}
-        beforeSearchNode={beforeSearchNode}
+        // onDragSortEnd={handleDragSortEnd}
         addNewBtnTitle={$t('添加 APIKey')}
         onAddNewBtnClick={handleAdd}
       />
-
       <ApiKeyModal
         visible={modalVisible}
         mode={modalMode}
@@ -261,10 +248,9 @@ const KeySettings: React.FC = () => {
         initialValues={
           editingKey
             ? {
-                keyName: editingKey.key,
-                apiKey: editingKey.key,
-                expirationDate: editingKey.expirationDate,
-                enabled: editingKey.status === 'normal'
+                id: editingKey.id,
+                name: editingKey.name,
+                expire_time: editingKey.expire_time
               }
             : undefined
         }
