@@ -5,11 +5,11 @@ import (
 )
 
 type SimpleProvider struct {
-	Id           string `json:"id"`
-	Name         string `json:"name"`
-	Config       string `json:"config"`
-	Logo         string `json:"logo"`
-	GetAPIKeyUrl string `json:"get_apikey_url"`
+	Id            string `json:"id"`
+	Name          string `json:"name"`
+	DefaultConfig string `json:"default_config"`
+	Logo          string `json:"logo"`
+	GetAPIKeyUrl  string `json:"get_apikey_url"`
 }
 
 type Provider struct {
@@ -56,6 +56,7 @@ type SimpleProviderItem struct {
 	Configured    bool           `json:"configured"`
 	DefaultConfig string         `json:"default_config"`
 	Status        ProviderStatus `json:"status"`
+	Priority      int            `json:"-"`
 }
 
 type LLMItem struct {
