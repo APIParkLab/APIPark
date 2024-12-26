@@ -1,12 +1,12 @@
-import { memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import type { RefObject } from 'react'
-import { Box, useTheme } from '@mui/material'
-import { Editor, useMonaco } from '@monaco-editor/react'
-import { type editor as MonacoEditor } from 'monaco-editor'
-import { IconButton } from '../IconButton'
-import { message } from 'antd'
-import { $t } from '@common/locales'
 import { RESPONSE_TIPS } from '@common/const/const'
+import { $t } from '@common/locales'
+import { Editor, useMonaco } from '@monaco-editor/react'
+import { Box, useTheme } from '@mui/material'
+import { message } from 'antd'
+import { type editor as MonacoEditor } from 'monaco-editor'
+import type { RefObject } from 'react'
+import { memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { IconButton } from '../IconButton'
 
 export interface CodeboxApiRef {
   insertCode: (value: string) => void
