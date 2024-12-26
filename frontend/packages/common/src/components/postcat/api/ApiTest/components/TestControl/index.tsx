@@ -62,12 +62,11 @@ export function TestControl({ onTest, onAbort, loading }: TestControlProps) {
     }
   }, [loading])
 
-
   return (
     <>
       {!loading ? (
         <Button touchRippleRef={testRippleRef} variant="contained" onClick={onTest}>
-        {$t('发送(Enter)')}
+          {$t('发送(Enter)')}
         </Button>
       ) : (
         <Button variant="outlined" color="warning" onClick={onAbort}>

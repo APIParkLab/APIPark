@@ -1,6 +1,5 @@
 import type { FC } from 'react'
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 // import {
 //   RiMoreFill,
 // } from '@remixicon/react'
@@ -26,7 +25,7 @@ type HistoryBlockComponentProps = {
 const HistoryBlockComponent: FC<HistoryBlockComponentProps> = ({
   nodeKey,
   roleName = { user: '', assistant: '' },
-  onEditRole,
+  onEditRole
 }) => {
   const [ref, isSelected] = useSelectOrDelete(nodeKey, DELETE_HISTORY_BLOCK_COMMAND)
   const [triggerRef, open, setOpen] = useTrigger()
@@ -34,18 +33,20 @@ const HistoryBlockComponent: FC<HistoryBlockComponentProps> = ({
   const [localRoleName, setLocalRoleName] = useState<RoleName>(roleName)
 
   eventEmitter?.useSubscription((v: any) => {
-    if (v?.type === UPDATE_HISTORY_EVENT_EMITTER)
-      setLocalRoleName(v.payload)
+    if (v?.type === UPDATE_HISTORY_EVENT_EMITTER) setLocalRoleName(v.payload)
   })
 
   return (
-    <div className={`
+    <div
+      className={`
       group inline-flex items-center pl-1 pr-0.5 h-6 border border-transparent text-[#DD2590] rounded-[5px] hover:bg-[#FCE7F6]
       ${open ? 'bg-[#FCE7F6]' : 'bg-[#FDF2FA]'}
       ${isSelected && '!border-[#F670C7]'}
-    `} ref={ref}>
+    `}
+      ref={ref}
+    >
       {/* <MessageClockCircle className='mr-1 w-[14px] h-[14px]' /> */}
-      <div className='mr-1 text-xs font-medium'>{$t('会话历史')}</div>
+      <div className="mr-1 text-xs font-medium">{$t('会话历史')}</div>
     </div>
   )
 }

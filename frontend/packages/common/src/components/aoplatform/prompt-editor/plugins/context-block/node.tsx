@@ -3,7 +3,11 @@ import { DecoratorNode } from 'lexical'
 import ContextBlockComponent from './component'
 import type { Dataset } from './index'
 
-export type SerializedNode = SerializedLexicalNode & { datasets: Dataset[]; onAddContext: () => void; canNotAddContext: boolean }
+export type SerializedNode = SerializedLexicalNode & {
+  datasets: Dataset[]
+  onAddContext: () => void
+  canNotAddContext: boolean
+}
 
 export class ContextBlockNode extends DecoratorNode<JSX.Element> {
   __datasets: Dataset[]
@@ -70,7 +74,11 @@ export class ContextBlockNode extends DecoratorNode<JSX.Element> {
   }
 
   static importJSON(serializedNode: SerializedNode): ContextBlockNode {
-    const node = $createContextBlockNode(serializedNode.datasets, serializedNode.onAddContext, serializedNode.canNotAddContext)
+    const node = $createContextBlockNode(
+      serializedNode.datasets,
+      serializedNode.onAddContext,
+      serializedNode.canNotAddContext
+    )
 
     return node
   }
@@ -81,7 +89,7 @@ export class ContextBlockNode extends DecoratorNode<JSX.Element> {
       version: 1,
       datasets: this.getDatasets(),
       onAddContext: this.getOnAddContext(),
-      canNotAddContext: this.getCanNotAddContext(),
+      canNotAddContext: this.getCanNotAddContext()
     }
   }
 
@@ -89,12 +97,14 @@ export class ContextBlockNode extends DecoratorNode<JSX.Element> {
     return '{{#context#}}'
   }
 }
-export function $createContextBlockNode(datasets: Dataset[], onAddContext: () => void, canNotAddContext?: boolean): ContextBlockNode {
+export function $createContextBlockNode(
+  datasets: Dataset[],
+  onAddContext: () => void,
+  canNotAddContext?: boolean
+): ContextBlockNode {
   return new ContextBlockNode(datasets, onAddContext, undefined, canNotAddContext)
 }
 
-export function $isContextBlockNode(
-  node: ContextBlockNode | LexicalNode | null | undefined,
-): boolean {
+export function $isContextBlockNode(node: ContextBlockNode | LexicalNode | null | undefined): boolean {
   return node instanceof ContextBlockNode
 }

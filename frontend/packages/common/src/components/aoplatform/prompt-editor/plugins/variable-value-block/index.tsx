@@ -1,14 +1,8 @@
-import {
-  useCallback,
-  useEffect,
-} from 'react'
+import { useCallback, useEffect } from 'react'
 import type { TextNode } from 'lexical'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useLexicalTextEntity } from '../../hooks'
-import {
-  $createVariableValueBlockNode,
-  VariableValueBlockNode,
-} from './node'
+import { $createVariableValueBlockNode, VariableValueBlockNode } from './node'
 import { getHashtagRegexString } from './utils'
 
 const REGEX = new RegExp(getHashtagRegexString(), 'i')
@@ -28,22 +22,21 @@ const VariableValueBlock = () => {
   const getVariableValueMatch = useCallback((text: string) => {
     const matchArr = REGEX.exec(text)
 
-    if (matchArr === null)
-      return null
+    if (matchArr === null) return null
 
     const hashtagLength = matchArr[0].length
     const startOffset = matchArr.index
     const endOffset = startOffset + hashtagLength
     return {
       end: endOffset,
-      start: startOffset,
+      start: startOffset
     }
   }, [])
 
   useLexicalTextEntity<VariableValueBlockNode>(
     getVariableValueMatch,
     VariableValueBlockNode,
-    createVariableValueBlockNode,
+    createVariableValueBlockNode
   )
 
   return null
