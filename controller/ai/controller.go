@@ -26,7 +26,7 @@ type IProviderController interface {
 }
 
 type IStatisticController interface {
-	APIs(ctx *gin.Context, keyword string, providerId string, start string, end string, page string, pageSize string, sortCondition string, asc string) ([]*ai_dto.APIItem, int64, error)
+	APIs(ctx *gin.Context, keyword string, providerId string, start string, end string, page string, pageSize string, sortCondition string, asc string, models string, services string) ([]*ai_dto.APIItem, *ai_dto.Condition, int64, error)
 }
 
 func init() {
