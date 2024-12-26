@@ -4,8 +4,10 @@ import InsidePage from '@common/components/aoplatform/InsidePage'
 import PageList, { PageProColumns } from '@common/components/aoplatform/PageList'
 import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
+import { checkAccess } from '@common/utils/permission'
 import AIProviderSelect, { AIProvider } from '@core/components/AIProviderSelect'
 import { App, Divider, Space, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
@@ -22,6 +24,8 @@ const KeySettings: React.FC = () => {
   const [searchWord, setSearchWord] = useState<string>('')
   const [total, setTotal] = useState<number>(0)
   const modalRef = useRef<any>()
+  const { accessData } = useGlobalContext()
+
   useEffect(() => {
     pageListRef.current?.reload()
   }, [selectedProvider])
@@ -63,9 +67,10 @@ const KeySettings: React.FC = () => {
       title: mode === 'add' ? $t(`添加 ${provider?.name} APIKey`) : $t('编辑 APIKey'),
       content: <ApiKeyContent ref={modalRef} entity={newEntity} provider={provider} />,
       onOk: () => {
-        return modalRef.current?.save().then((res) => {
-          // if (res === true) setAiConfigFlushed(true)
-          // getAiSettingList()
+        return modalRef.current?.handleOk().then((res) => {
+          if (res === true) {
+            pageListRef.current?.reload()
+          }
         })
       },
       width: 600,
@@ -84,7 +89,7 @@ const KeySettings: React.FC = () => {
             </a>
             <div>
               <CancelBtn />
-              {/* {checkAccess('system.devops.ai_provider.edit', accessData) ? <OkBtn /> : null} */}
+              {checkAccess('system.settings.ai_key_resource.manager', accessData) ? <OkBtn /> : null}
             </div>
           </div>
         )
