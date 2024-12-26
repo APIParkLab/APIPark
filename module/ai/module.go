@@ -16,6 +16,7 @@ type IProviderModule interface {
 	UnConfiguredProviders(ctx context.Context) ([]*ai_dto.ProviderItem, error)
 	SimpleProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, error)
 	Provider(ctx context.Context, id string) (*ai_dto.Provider, error)
+	SimpleProvider(ctx context.Context, id string) (*ai_dto.SimpleProvider, error)
 	LLMs(ctx context.Context, driver string) ([]*ai_dto.LLMItem, *ai_dto.ProviderItem, error)
 	UpdateProviderStatus(ctx context.Context, id string, enable bool) error
 	UpdateProviderConfig(ctx context.Context, id string, input *ai_dto.UpdateConfig) error

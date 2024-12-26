@@ -22,7 +22,7 @@ func (p *plugin) MyTeamApi() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/team/member/role", []string{"context", "query:team", "body"}, nil, p.myTeamController.UpdateMemberRole, access.SystemWorkspaceTeamManager, access.TeamTeamMemberManager),
 
 		// 团队项目操作
-		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/team/services", []string{"context", "query:team", "query:keyword"}, []string{"services"}, p.serviceController.Search, access.SystemWorkspaceServiceViewAll, access.TeamTeamServiceView),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/team/services", []string{"context", "query:team", "query:keyword", "query:page", "query:page_size", "query:sort", "query:asc", "query:status"}, []string{"services"}, p.serviceController.Search, access.SystemWorkspaceServiceViewAll, access.TeamTeamServiceView),
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/team/service", []string{"context", "query:team", "body"}, []string{"service"}, p.serviceController.Create, access.SystemWorkspaceServiceManagerAll, access.TeamTeamServiceManager),
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/team/app", []string{"context", "query:team", "body"}, []string{"app"}, p.appController.CreateApp, access.SystemWorkspaceApplicationManagerAll, access.TeamTeamConsumerManager),
 		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/team/service", []string{"context", "query:service"}, nil, p.serviceController.Delete, access.SystemWorkspaceServiceManagerAll, access.TeamTeamServiceManager),

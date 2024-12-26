@@ -4,6 +4,14 @@ import (
 	"github.com/eolinker/go-common/auto"
 )
 
+type SimpleProvider struct {
+	Id           string `json:"id"`
+	Name         string `json:"name"`
+	Config       string `json:"config"`
+	Logo         string `json:"logo"`
+	GetAPIKeyUrl string `json:"get_apikey_url"`
+}
+
 type Provider struct {
 	Id               string         `json:"id"`
 	Name             string         `json:"name"`
@@ -42,11 +50,12 @@ type ProviderItem struct {
 }
 
 type SimpleProviderItem struct {
-	Id         string         `json:"id"`
-	Name       string         `json:"name"`
-	Logo       string         `json:"logo"`
-	Configured bool           `json:"configured"`
-	Status     ProviderStatus `json:"status"`
+	Id            string         `json:"id"`
+	Name          string         `json:"name"`
+	Logo          string         `json:"logo"`
+	Configured    bool           `json:"configured"`
+	DefaultConfig string         `json:"default_config"`
+	Status        ProviderStatus `json:"status"`
 }
 
 type LLMItem struct {
