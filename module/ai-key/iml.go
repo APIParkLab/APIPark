@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/eolinker/go-common/utils"
+
 	"gorm.io/gorm"
 
 	"github.com/eolinker/go-common/auto"
@@ -192,7 +194,7 @@ func (i *imlKeyModule) Get(ctx context.Context, providerId string, id string) (*
 	}, nil
 }
 
-func (i *imlKeyModule) List(ctx context.Context, providerId string, keyword string, page, pageSize int) ([]*ai_key_dto.Item, int64, error) {
+func (i *imlKeyModule) List(ctx context.Context, providerId string, keyword string, page, pageSize int, statuses []string) ([]*ai_key_dto.Item, int64, error) {
 	_, err := i.aiKeyService.DefaultKey(ctx, providerId)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -217,12 +219,49 @@ func (i *imlKeyModule) List(ctx context.Context, providerId string, keyword stri
 			return nil, 0, fmt.Errorf("create default key failed: %w", err)
 		}
 	}
-	list, total, err := i.aiKeyService.SearchByPage(ctx, keyword, map[string]interface{}{
+	w := map[string]interface{}{
 		"provider": providerId,
-	}, page, pageSize, "sort asc")
-	if err != nil {
-		return nil, 0, err
 	}
+	hasExpired := true
+	if len(statuses) > 0 {
+		hasExpired = false
+		statusConditions := make([]int, 0, len(statuses))
+		for _, s := range statuses {
+			status := ai_key_dto.KeyStatus(s)
+			if status == ai_key_dto.KeyExpired {
+				hasExpired = true
+			}
+			statusConditions = append(statusConditions, status.Int())
+		}
+		w["status"] = statusConditions
+	}
+	var list []*ai_key.Key
+	var total int64
+	if !hasExpired {
+		if keyword != "" {
+			list, err = i.aiKeyService.Search(ctx, keyword, w, "sort asc")
+			if err != nil {
+				return nil, 0, err
+			}
+			if len(list) == 0 {
+				return nil, 0, nil
+			}
+			uuids := utils.SliceToSlice(list, func(key *ai_key.Key) string {
+				return key.ID
+			})
+			w["uuid"] = uuids
+		}
+		list, total, err = i.aiKeyService.SearchUnExpiredByPage(ctx, w, page, pageSize, "sort asc")
+		if err != nil {
+			return nil, 0, err
+		}
+	} else {
+		list, total, err = i.aiKeyService.SearchByPage(ctx, keyword, w, page, pageSize, "sort asc")
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+
 	var result []*ai_key_dto.Item
 	for _, item := range list {
 		status := ai_key_dto.ToKeyStatus(item.Status)

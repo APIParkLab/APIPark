@@ -27,7 +27,7 @@ func (p *plugin) aiAPIs() []pm3.Api {
 func (p *plugin) aiKeyApis() []pm3.Api {
 	return []pm3.Api{
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/ai/resource/key", []string{"context", "query:provider", "query:id"}, []string{"info"}, p.aiKeyController.Get),
-		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/ai/resource/keys", []string{"context", "query:provider", "query:keyword", "query:page", "query:page_size"}, []string{"keys", "total"}, p.aiKeyController.List),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/ai/resource/keys", []string{"context", "query:provider", "query:keyword", "query:page", "query:page_size", "query:statuses"}, []string{"keys", "total"}, p.aiKeyController.List),
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/ai/resource/key", []string{"context", "query:provider", "body"}, nil, p.aiKeyController.Create),
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/ai/resource/key", []string{"context", "query:provider", "query:id", "body"}, nil, p.aiKeyController.Edit),
 		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/ai/resource/key", []string{"context", "query:provider", "query:id"}, nil, p.aiKeyController.Delete),

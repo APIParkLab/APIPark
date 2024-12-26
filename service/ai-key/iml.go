@@ -23,6 +23,29 @@ type imlAIKeyService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlAIKeyService) SearchUnExpiredByPage(ctx context.Context, w map[string]interface{}, page, pageSize int, order string) ([]*Key, int64, error) {
+	sql := "(expire_time = 0 || expire_time > ?)"
+	args := []interface{}{time.Now().Unix()}
+	for k, v := range w {
+		switch v.(type) {
+		case []int:
+			sql += fmt.Sprintf(" and `%s` in (?)", k)
+		default:
+			sql += fmt.Sprintf(" and `%s` = ?", k)
+		}
+		args = append(args, v)
+	}
+	list, total, err := i.store.ListPage(ctx, sql, page, pageSize, args, order)
+	if err != nil {
+		return nil, 0, err
+	}
+	var result []*Key
+	for _, item := range list {
+		result = append(result, FromEntity(item))
+	}
+	return result, total, nil
+}
+
 func (i *imlAIKeyService) KeysAfterPriority(ctx context.Context, providerId string, priority int) ([]*Key, error) {
 	list, err := i.store.ListQuery(ctx, "sort > ? and provider = ?", []interface{}{priority, providerId}, "sort asc")
 	if err != nil {
