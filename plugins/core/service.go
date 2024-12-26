@@ -17,7 +17,7 @@ func (p *plugin) ServiceApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/service/info", []string{"context", "query:service", "body"}, []string{"service"}, p.serviceController.Edit, access.SystemWorkspaceServiceManagerAll, access.TeamTeamServiceManager),
 		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/service/info", []string{"context", "query:service"}, nil, p.serviceController.Delete, access.SystemWorkspaceServiceManagerAll, access.TeamTeamServiceManager),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/my_services", []string{"context", "query:team", "query:keyword"}, []string{"services"}, p.serviceController.SearchMyServices),
-		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/services", []string{"context", "query:team", "query:keyword", "query:page", "query:page_size", "query:sort", "query:asc", "query:workspace"}, []string{"services"}, p.serviceController.Search, access.SystemWorkspaceServiceViewAll, access.TeamTeamServiceView),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/services", []string{"context", "query:team", "query:keyword"}, []string{"services"}, p.serviceController.Search, access.SystemWorkspaceServiceViewAll, access.TeamTeamServiceView),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/services", []string{"context"}, []string{"services"}, p.serviceController.Simple),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/services/mine", []string{"context"}, []string{"services"}, p.serviceController.MySimple),
 		// 应用相关

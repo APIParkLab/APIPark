@@ -318,7 +318,7 @@ func (i *imlServiceController) Get(ctx *gin.Context, id string) (*service_dto.Se
 	return i.module.Get(ctx, id)
 }
 
-func (i *imlServiceController) Search(ctx *gin.Context, teamIDs string, keyword string, page string, pageSize string, sort string, asc string, serviceKind string) ([]*service_dto.ServiceItem, error) {
+func (i *imlServiceController) Search(ctx *gin.Context, teamIDs string, keyword string) ([]*service_dto.ServiceItem, error) {
 	return i.module.Search(ctx, teamIDs, keyword)
 }
 
