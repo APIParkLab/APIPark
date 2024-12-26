@@ -10,6 +10,7 @@ import { $t } from '@common/locales'
 import { checkAccess } from '@common/utils/permission'
 import AIProviderSelect, { AIProvider } from '@core/components/AIProviderSelect'
 import { App, Divider, Space, Typography } from 'antd'
+import dayjs from 'dayjs'
 import React, { useEffect, useRef, useState } from 'react'
 import ApiKeyContent from './components/ApiKeyContent'
 import { APIKey, EditAPIKey } from './types'
@@ -45,7 +46,8 @@ const KeySettings: React.FC = () => {
       message.loading($t(RESPONSE_TIPS.loading))
       const { code, data, msg } = await fetchData<BasicResponse<{ info: EditAPIKey }>>('ai/resource/key', {
         method: 'GET',
-        eoParams: { provider: selectedProvider, id: entity!.id }
+        eoParams: { provider: selectedProvider, id: entity!.id },
+        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
       message.destroy()
       if (code !== STATUS_CODE.SUCCESS) {
@@ -58,7 +60,7 @@ const KeySettings: React.FC = () => {
       entity = {
         name: `key${total}`,
         config: provider.default_config,
-        expire_time: '0'
+        expire_time: 0
       } as EditAPIKey
     }
     const newEntity = entity as EditAPIKey
@@ -67,10 +69,15 @@ const KeySettings: React.FC = () => {
       title: mode === 'add' ? $t(`添加 ${provider?.name} APIKey`) : $t('编辑 APIKey'),
       content: <ApiKeyContent ref={modalRef} entity={newEntity} provider={provider} />,
       onOk: () => {
-        return modalRef.current?.handleOk().then((res) => {
-          if (res === true) {
-            pageListRef.current?.reload()
-          }
+        return new Promise((resolve, reject) => {
+          modalRef.current?.handleOk().then((res: boolean) => {
+            if (res === true) {
+              pageListRef.current?.reload()
+              resolve(res)
+              return
+            }
+            reject()
+          })
         })
       },
       width: 600,
@@ -305,7 +312,9 @@ const KeySettings: React.FC = () => {
       title: $t('过期时间'),
       dataIndex: 'expire_time',
       render: (dom: React.ReactNode, entity: APIKey) => {
-        return entity.expire_time === '0' ? $t('永不过期') : entity.expire_time
+        return entity.expire_time === 0
+          ? $t('永不过期')
+          : dayjs(Number(entity.expire_time)).format('YYYY-MM-DD HH:mm:ss')
       }
     },
     ...operation

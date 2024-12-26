@@ -49,7 +49,6 @@ const AiSettingList = () => {
   const { fetchData } = useFetch()
   const [aiSettingList, setAiSettingList] = useState<AiSettingListItem[]>([])
   const [loading, setLoading] = useState<boolean>(false)
-  // const [updateLoading, setUpdateLoading] = useState<boolean>(false)
   const modalRef = useRef<AiSettingModalContentHandle>()
   const { setAiConfigFlushed, accessData } = useGlobalContext()
 
