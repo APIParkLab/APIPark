@@ -22,26 +22,26 @@ import {
 } from 'react'
 import { ApiParamsTypeOptions } from '../ApiMessageBody/constants'
 import { RequestHeaders } from '../ApiRequestEditor/components/constants'
-import {ApiParamsType, BodyParamsType, ParamAttrType, commonTableSx} from "@common/const/api-detail";
+import { ApiParamsType, BodyParamsType, ParamAttrType, commonTableSx } from '@common/const/api-detail'
 import {
-    determineCheckState,
-    flattenTree,
-    generateId,
-    getActionColWidth,
-    isNil,
-    traverse
-} from "@common/utils/postcat.tsx";
-import {MoreSetting} from "../../../MoreSetting";
+  determineCheckState,
+  flattenTree,
+  generateId,
+  getActionColWidth,
+  isNil,
+  traverse
+} from '@common/utils/postcat.tsx'
+import { MoreSetting } from '../../../MoreSetting'
 import {
-    AutoCompleteOption,
-    DataGridAutoCompleteProps,
-    DataGridTextFieldProps,
-    EditableDataGridSx
-} from "../EditableDataGrid";
-import {collapseTableSx} from "../../../PreviewTable";
-import {IconButton} from "../../../IconButton";
-import {Icon} from "../../../Icon";
-import {useMoreSettingHiddenConfig} from "./hooks/useMoreSettingHiddenConfig.ts";
+  AutoCompleteOption,
+  DataGridAutoCompleteProps,
+  DataGridTextFieldProps,
+  EditableDataGridSx
+} from '../EditableDataGrid'
+import { collapseTableSx } from '../../../PreviewTable'
+import { IconButton } from '../../../IconButton'
+import { Icon } from '../../../Icon'
+import { useMoreSettingHiddenConfig } from './hooks/useMoreSettingHiddenConfig.ts'
 import { $t } from '@common/locales/index.ts'
 
 export interface RenderMessageBody extends BodyParamsType {
@@ -156,7 +156,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
 
   useEffect(() => {
     if (initialRows && loaded && !innerLoaded) {
-      let updateRows = [...initialRows,EmptyRow()]
+      let updateRows = [...initialRows, EmptyRow()]
       if (!updateRows?.length && contentType !== 'XML') {
         updateRows = [EmptyRow()]
       }
@@ -171,7 +171,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
       onChange?.(updateRows)
       setInnerLoaded(true)
     }
-  }, [EmptyRow, contentType, initialRows, loaded,innerLoaded, onChange, updateSelectAll])
+  }, [EmptyRow, contentType, initialRows, loaded, innerLoaded, onChange, updateSelectAll])
 
   useEffect(() => {
     const neoRenderRows = flattenTree(
@@ -251,15 +251,13 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
 
   const getActions = useCallback(
     (params: GridRowParams<RenderMessageBody>) => {
-      const actions = [
-        <IconButton title={$t("更多设置")} name="more" onClick={() => handleOpenMoreSetting(params)} />
-      ]
+      const actions = [<IconButton title={$t('更多设置')} name="more" onClick={() => handleOpenMoreSetting(params)} />]
       const isXML = contentType === 'XML'
       const isRoot = params.row.__globalIndex__ === 0
       if (['JSON', 'XML'].includes(contentType)) {
         actions.unshift(
           <IconButton
-            title={$t("添加子参数")}
+            title={$t('添加子参数')}
             name="add"
             onClick={() => {
               const newRow = EmptyRow()
@@ -289,7 +287,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
         if (!(isXML && isRoot)) {
           actions.unshift(
             <IconButton
-              title={$t("向下添加行")}
+              title={$t('向下添加行')}
               name="down-small"
               onClick={() => {
                 const newRow = EmptyRow()
@@ -302,11 +300,11 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
         }
       }
       if (renderRows.length > 1) {
-        actions.push(<IconButton title={$t("删除")} name="delete" onClick={() => handleRowDelete(params)} />)
+        actions.push(<IconButton title={$t('删除')} name="delete" onClick={() => handleRowDelete(params)} />)
       }
       return actions
     },
-     
+
     [EmptyRow, tableApiRef, contentType, handleOpenMoreSetting, handleRowDelete, renderRows.length, rows]
   )
 
@@ -315,7 +313,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
       field: 'name',
       headerName: $t('标签'),
       editable: true,
-      sortable:false,
+      sortable: false,
       renderEditCell: (params) => {
         const options = RequestHeaders.map((option) => option.key)
         return (
@@ -331,7 +329,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
               const rowIndex = params.row.__globalIndex__ as number
               if (renderRows.length === rowIndex + 1) {
                 const newRow = EmptyRow()
-                  setRows((preRows)=>[...preRows,newRow])
+                setRows((preRows) => [...preRows, newRow])
               }
             }}
           />
@@ -386,7 +384,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
                   const newRow = EmptyRow()
                   const currentLevelChildrenList = params.row.parent?.childList ?? rows
                   currentLevelChildrenList?.splice((params.row.__levelIndex__ || 0) + 1, 0, newRow)
-                  setRows((preRows)=>[...preRows])
+                  setRows((preRows) => [...preRows])
                 }
               }}
             />
@@ -444,7 +442,7 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
               indeterminate={selectAll === 'indeterminate'}
               onChange={handleSelectAllChange}
             />
-            <Typography sx={{fontSize:'14px'}}>{$t('必需')}</Typography>
+            <Typography sx={{ fontSize: '14px' }}>{$t('必需')}</Typography>
           </Box>
         )
       },
@@ -516,7 +514,8 @@ export function MessageDataGrid(props: MessageDataGridProps<RenderMessageBody>) 
                 paddingRight: theme.spacing(1)
               }
             }}
-            placeholder={$t('示例')}          />
+            placeholder={$t('示例')}
+          />
         )
       }
     },
