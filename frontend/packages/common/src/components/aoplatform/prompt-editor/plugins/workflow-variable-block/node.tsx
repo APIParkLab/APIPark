@@ -63,7 +63,7 @@ export class WorkflowVariableBlockNode extends DecoratorNode<JSX.Element> {
       type: 'workflow-variable-block',
       version: 1,
       variables: this.getVariables(),
-      workflowNodesMap: this.getWorkflowNodesMap(),
+      workflowNodesMap: this.getWorkflowNodesMap()
     }
   }
 
@@ -81,12 +81,15 @@ export class WorkflowVariableBlockNode extends DecoratorNode<JSX.Element> {
     return `{{#${this.getVariables().join('.')}#}}`
   }
 }
-export function $createWorkflowVariableBlockNode(variables: string[], workflowNodesMap: WorkflowNodesMap): WorkflowVariableBlockNode {
+export function $createWorkflowVariableBlockNode(
+  variables: string[],
+  workflowNodesMap: WorkflowNodesMap
+): WorkflowVariableBlockNode {
   return new WorkflowVariableBlockNode(variables, workflowNodesMap)
 }
 
 export function $isWorkflowVariableBlockNode(
-  node: WorkflowVariableBlockNode | LexicalNode | null | undefined,
+  node: WorkflowVariableBlockNode | LexicalNode | null | undefined
 ): node is WorkflowVariableBlockNode {
   return node instanceof WorkflowVariableBlockNode
 }

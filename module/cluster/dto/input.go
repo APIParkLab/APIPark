@@ -17,12 +17,12 @@ package cluster_dto
 
 //type SaveMonitorConfig struct {
 //	Driver string                 `json:"driver"`
-//	Config map[string]interface{} `json:"config"`
+//	DefaultConfig map[string]interface{} `json:"config"`
 //}
 
 //type MonitorConfig struct {
 //	Driver string                 `json:"driver"`
-//	Config map[string]interface{} `json:"config"`
+//	DefaultConfig map[string]interface{} `json:"config"`
 //}
 
 //type MonitorPartition struct {

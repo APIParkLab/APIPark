@@ -9,6 +9,8 @@ import (
 	"sort"
 	"time"
 
+	"github.com/APIParkLab/APIPark/service/service"
+
 	ai_key_dto "github.com/APIParkLab/APIPark/module/ai-key/dto"
 
 	ai_key "github.com/APIParkLab/APIPark/service/ai-key"
@@ -66,10 +68,11 @@ func (i *imlProviderModule) SimpleProvider(ctx context.Context, id string) (*ai_
 		return nil, fmt.Errorf("ai provider not found")
 	}
 	return &ai_dto.SimpleProvider{
-		Id:           p.ID(),
-		Name:         p.Name(),
-		Logo:         p.Logo(),
-		GetAPIKeyUrl: p.HelpUrl(),
+		Id:            p.ID(),
+		Name:          p.Name(),
+		Logo:          p.Logo(),
+		DefaultConfig: p.DefaultConfig(),
+		GetAPIKeyUrl:  p.HelpUrl(),
 	}, nil
 }
 
@@ -207,17 +210,69 @@ func (i *imlProviderModule) SimpleProviders(ctx context.Context) ([]*ai_dto.Simp
 	items := make([]*ai_dto.SimpleProviderItem, 0, len(providers))
 	for _, v := range providers {
 		item := &ai_dto.SimpleProviderItem{
-			Id:     v.ID(),
-			Name:   v.Name(),
-			Logo:   v.Logo(),
-			Status: ai_dto.ProviderDisabled,
+			Id:            v.ID(),
+			Name:          v.Name(),
+			Logo:          v.Logo(),
+			DefaultConfig: v.DefaultConfig(),
+			Status:        ai_dto.ProviderDisabled,
 		}
 		if info, has := providerMap[v.ID()]; has {
 			item.Configured = true
 			item.Status = ai_dto.ToProviderStatus(info.Status)
+			item.Priority = info.Priority
 		}
 		items = append(items, item)
 	}
+	sort.Slice(items, func(i, j int) bool {
+		if items[i].Priority != items[j].Priority {
+			if items[i].Priority == 0 {
+				return false
+			}
+			if items[j].Priority == 0 {
+				return true
+			}
+			return items[i].Priority < items[j].Priority
+		}
+		return items[i].Name < items[j].Name
+	})
+	return items, nil
+}
+
+func (i *imlProviderModule) SimpleConfiguredProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, error) {
+	list, err := i.providerService.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]*ai_dto.SimpleProviderItem, 0, len(list))
+	for _, l := range list {
+		p, has := model_runtime.GetProvider(l.Id)
+		if !has {
+			continue
+		}
+		item := &ai_dto.SimpleProviderItem{
+			Id:            l.Id,
+			Name:          l.Name,
+			Logo:          p.Logo(),
+			DefaultConfig: p.DefaultConfig(),
+			Status:        ai_dto.ToProviderStatus(l.Status),
+			Priority:      l.Priority,
+			Configured:    true,
+		}
+
+		items = append(items, item)
+	}
+	sort.Slice(items, func(i, j int) bool {
+		if items[i].Priority != items[j].Priority {
+			if items[i].Priority == 0 {
+				return false
+			}
+			if items[j].Priority == 0 {
+				return true
+			}
+			return items[i].Priority < items[j].Priority
+		}
+		return items[i].Name < items[j].Name
+	})
 	return items, nil
 }
 
@@ -638,26 +693,55 @@ func (i *imlProviderModule) syncGateway(ctx context.Context, clusterId string, r
 var _ IAIAPIModule = (*imlAIApiModule)(nil)
 
 type imlAIApiModule struct {
-	aiAPIService    ai_api.IAPIService    `autowired:""`
-	aiAPIUseService ai_api.IAPIUseService `autowired:""`
+	aiAPIService    ai_api.IAPIService      `autowired:""`
+	aiAPIUseService ai_api.IAPIUseService   `autowired:""`
+	serviceService  service.IServiceService `autowired:""`
 }
 
-func (i *imlAIApiModule) APIs(ctx context.Context, keyword string, providerId string, start int64, end int64, page int, pageSize int, sortCondition string, asc bool) ([]*ai_dto.APIItem, int64, error) {
+func (i *imlAIApiModule) APIs(ctx context.Context, keyword string, providerId string, start int64, end int64, page int, pageSize int, sortCondition string, asc bool, models []string, serviceIds []string) ([]*ai_dto.APIItem, *ai_dto.Condition, int64, error) {
+	p, has := model_runtime.GetProvider(providerId)
+	if !has {
+		return nil, nil, 0, fmt.Errorf("ai provider not found")
+	}
 	sortRule := "desc"
 	if asc {
 		sortRule = "asc"
 	}
+	services, err := i.serviceService.ServiceListByKind(ctx, service.AIService)
+	if err != nil {
+		return nil, nil, 0, err
+	}
+	serviceItems := utils.SliceToSlice(services, func(e *service.Service) *ai_dto.BasicInfo {
+		return &ai_dto.BasicInfo{
+			Id:   e.Id,
+			Name: e.Name,
+		}
+	})
+	modelItems := utils.SliceToSlice(p.Models(), func(e model_runtime.IModel) *ai_dto.BasicInfo {
+		return &ai_dto.BasicInfo{
+			Id:   e.ID(),
+			Name: e.ID(),
+		}
+	})
+	condition := &ai_dto.Condition{Services: serviceItems, Models: modelItems}
 	switch sortCondition {
 	default:
-		apis, err := i.aiAPIService.Search(ctx, keyword, map[string]interface{}{
+		w := map[string]interface{}{
 			"provider": providerId,
-		}, "update_at desc")
+		}
+		if len(models) > 0 {
+			w["model"] = models
+		}
+		if len(serviceIds) > 0 {
+			w["service"] = serviceIds
+		}
+		apis, err := i.aiAPIService.Search(ctx, keyword, w, "update_at desc")
 		if err != nil {
-			return nil, 0, err
+			return nil, nil, 0, err
 		}
 
 		if len(apis) <= 0 {
-			return nil, 0, nil
+			return nil, condition, 0, nil
 		}
 		apiMap := make(map[string]*ai_api.API)
 		apiIds := make([]string, 0, len(apis))
@@ -668,7 +752,7 @@ func (i *imlAIApiModule) APIs(ctx context.Context, keyword string, providerId st
 		offset := (page - 1) * pageSize
 		results, _, err := i.aiAPIUseService.SumByApisPage(ctx, providerId, start, end, offset, pageSize, fmt.Sprintf("total_token %s", sortRule), apiIds...)
 		if err != nil {
-			return nil, 0, err
+			return nil, nil, 0, err
 		}
 
 		apiItems := utils.SliceToSlice(results, func(e *ai_api.APIUse) *ai_dto.APIItem {
@@ -715,7 +799,8 @@ func (i *imlAIApiModule) APIs(ctx context.Context, keyword string, providerId st
 		for i := offset; i < offset+size && i < len(sortApis); i++ {
 			apiItems = append(apiItems, sortApis[i])
 		}
+
 		total := int64(len(apis))
-		return apiItems, total, nil
+		return apiItems, condition, total, nil
 	}
 }
