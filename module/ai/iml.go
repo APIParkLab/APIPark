@@ -66,10 +66,11 @@ func (i *imlProviderModule) SimpleProvider(ctx context.Context, id string) (*ai_
 		return nil, fmt.Errorf("ai provider not found")
 	}
 	return &ai_dto.SimpleProvider{
-		Id:           p.ID(),
-		Name:         p.Name(),
-		Logo:         p.Logo(),
-		GetAPIKeyUrl: p.HelpUrl(),
+		Id:            p.ID(),
+		Name:          p.Name(),
+		Logo:          p.Logo(),
+		DefaultConfig: p.DefaultConfig(),
+		GetAPIKeyUrl:  p.HelpUrl(),
 	}, nil
 }
 
@@ -216,9 +217,60 @@ func (i *imlProviderModule) SimpleProviders(ctx context.Context) ([]*ai_dto.Simp
 		if info, has := providerMap[v.ID()]; has {
 			item.Configured = true
 			item.Status = ai_dto.ToProviderStatus(info.Status)
+			item.Priority = info.Priority
 		}
 		items = append(items, item)
 	}
+	sort.Slice(items, func(i, j int) bool {
+		if items[i].Priority != items[j].Priority {
+			if items[i].Priority == 0 {
+				return false
+			}
+			if items[j].Priority == 0 {
+				return true
+			}
+			return items[i].Priority < items[j].Priority
+		}
+		return items[i].Name < items[j].Name
+	})
+	return items, nil
+}
+
+func (i *imlProviderModule) SimpleConfiguredProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, error) {
+	list, err := i.providerService.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]*ai_dto.SimpleProviderItem, 0, len(list))
+	for _, l := range list {
+		p, has := model_runtime.GetProvider(l.Id)
+		if !has {
+			continue
+		}
+		item := &ai_dto.SimpleProviderItem{
+			Id:            l.Id,
+			Name:          l.Name,
+			Logo:          p.Logo(),
+			DefaultConfig: p.DefaultConfig(),
+			Status:        ai_dto.ToProviderStatus(l.Status),
+			Priority:      l.Priority,
+			Configured:    true,
+		}
+
+		items = append(items, item)
+	}
+	sort.Slice(items, func(i, j int) bool {
+		if items[i].Priority != items[j].Priority {
+			if items[i].Priority == 0 {
+				return false
+			}
+			if items[j].Priority == 0 {
+				return true
+			}
+			return items[i].Priority < items[j].Priority
+		}
+		return items[i].Name < items[j].Name
+	})
 	return items, nil
 }
 
