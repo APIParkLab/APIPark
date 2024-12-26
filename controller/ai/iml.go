@@ -1,6 +1,7 @@
 package ai
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/APIParkLab/APIPark/module/ai"
@@ -71,21 +72,21 @@ type imlStatisticController struct {
 	module ai.IAIAPIModule `autowired:""`
 }
 
-func (i *imlStatisticController) APIs(ctx *gin.Context, keyword string, providerId string, start string, end string, page string, pageSize string, sortCondition string, asc string) ([]*ai_dto.APIItem, int64, error) {
+func (i *imlStatisticController) APIs(ctx *gin.Context, keyword string, providerId string, start string, end string, page string, pageSize string, sortCondition string, asc string, models string, services string) ([]*ai_dto.APIItem, *ai_dto.Condition, int64, error) {
 	s, err := strconv.ParseInt(start, 10, 64)
 	if err != nil {
-		return nil, 0, err
+		return nil, nil, 0, err
 	}
 
 	e, err := strconv.ParseInt(end, 10, 64)
 	if err != nil {
-		return nil, 0, err
+		return nil, nil, 0, err
 	}
 
 	p, err := strconv.Atoi(page)
 	if err != nil {
 		if page != "" {
-			return nil, 0, err
+			return nil, nil, 0, err
 		}
 		p = 1
 	}
@@ -93,9 +94,19 @@ func (i *imlStatisticController) APIs(ctx *gin.Context, keyword string, provider
 	ps, err := strconv.Atoi(pageSize)
 	if err != nil {
 		if pageSize != "" {
-			return nil, 0, err
+			return nil, nil, 0, err
 		}
-		ps = 15
+		ps = 20
 	}
-	return i.module.APIs(ctx, keyword, providerId, s, e, p, ps, sortCondition, asc == "true")
+	ms := make([]string, 0)
+	if models != "" {
+		json.Unmarshal([]byte(models), &ms)
+		ms = append(ms, models)
+	}
+	ss := make([]string, 0)
+	if services != "" {
+		json.Unmarshal([]byte(services), &ss)
+		ss = append(ss, services)
+	}
+	return i.module.APIs(ctx, keyword, providerId, s, e, p, ps, sortCondition, asc == "true", ms, ss)
 }

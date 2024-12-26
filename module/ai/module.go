@@ -26,7 +26,7 @@ type IProviderModule interface {
 }
 
 type IAIAPIModule interface {
-	APIs(ctx context.Context, keyword string, providerId string, start int64, end int64, page int, pageSize int, sortCondition string, asc bool) ([]*ai_dto.APIItem, int64, error)
+	APIs(ctx context.Context, keyword string, providerId string, start int64, end int64, page int, pageSize int, sortCondition string, asc bool, models []string, services []string) ([]*ai_dto.APIItem, *ai_dto.Condition, int64, error)
 }
 
 func init() {

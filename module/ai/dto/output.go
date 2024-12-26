@@ -77,3 +77,13 @@ type APIItem struct {
 	UseToken    int            `json:"use_token"`
 	Disable     bool           `json:"disable"`
 }
+
+type Condition struct {
+	Models   []*BasicInfo `json:"models"`
+	Services []*BasicInfo `json:"services"`
+}
+
+type BasicInfo struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
