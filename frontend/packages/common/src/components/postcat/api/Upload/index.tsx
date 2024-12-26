@@ -27,7 +27,6 @@ export function Upload({ value, onChange }: UploadProps): JSX.Element {
 
   const theme = useTheme()
 
-
   return (
     <Box ref={parent} display="flex" flexDirection="column" height="100%" gap={1}>
       <Paper

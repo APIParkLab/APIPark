@@ -1,4 +1,4 @@
-import {Codebox} from "../../../../Codebox";
+import { Codebox } from '../../../../Codebox'
 
 interface RawProps {
   value: string
