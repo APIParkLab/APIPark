@@ -1,3 +1,4 @@
+import Icon from '@ant-design/icons'
 import { ActionType } from '@ant-design/pro-components'
 import InsidePage from '@common/components/aoplatform/InsidePage'
 import PageList, { PageProColumns } from '@common/components/aoplatform/PageList'
@@ -6,71 +7,92 @@ import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import AIProviderSelect, { AIProvider } from '@core/components/AIProviderSelect'
-import { Divider, message, Space, Typography } from 'antd'
+import { App, Divider, Space, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
-import ApiKeyModal from './components/ApiKeyModal'
-import { APIKey } from './types'
+import ApiKeyContent from './components/ApiKeyContent'
+import { APIKey, EditAPIKey } from './types'
 
 const KeySettings: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
+  const { modal, message } = App.useApp()
   const [selectedProvider, setSelectedProvider] = useState<string>()
   const [provider, setProvider] = useState<AIProvider | undefined>()
-  const [modalVisible, setModalVisible] = useState(false)
-  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add')
-  const [editingKey, setEditingKey] = useState<APIKey | null>(null)
   const [apiKeys, setApiKeys] = useState<APIKey[]>([])
   const { fetchData } = useFetch()
   const [searchWord, setSearchWord] = useState<string>('')
-
+  const [total, setTotal] = useState<number>(0)
+  const modalRef = useRef<any>()
   useEffect(() => {
     pageListRef.current?.reload()
   }, [selectedProvider])
 
   const handleEdit = (record: APIKey) => {
-    setEditingKey(record)
-    setModalMode('edit')
-    setModalVisible(true)
+    openModal(record)
   }
 
   const handleAdd = () => {
-    setModalMode('add')
-    setModalVisible(true)
+    openModal()
   }
 
-  const handleModalCancel = () => {
-    setModalVisible(false)
-    setEditingKey(null)
-  }
-
-  const handleSave = (values: any) => {
-    if (modalMode === 'edit' && editingKey) {
-      const newKeys: APIKey[] = apiKeys.map((key) =>
-        key.id === editingKey.id
-          ? {
-              ...key,
-              key: values.name,
-              expire_time: values.expire_time,
-              status: values.enabled ? 'normal' : 'disabled'
-            }
-          : key
-      )
-      setApiKeys(newKeys)
-    } else {
-      // Handle add case
-      const newKey: APIKey = {
-        id: String(Date.now()),
-        name: values.name,
-        status: 'normal',
-        expire_time: values.expire_time,
-        priority: apiKeys.length + 1,
-        can_delete: true,
-        use_token: 0,
-        update_time: ''
+  const openModal = async (entity?: EditAPIKey) => {
+    if (!provider) return
+    const mode = entity ? 'edit' : 'add'
+    if (mode === 'edit') {
+      message.loading($t(RESPONSE_TIPS.loading))
+      const { code, data, msg } = await fetchData<BasicResponse<{ info: EditAPIKey }>>('ai/resource/key', {
+        method: 'GET',
+        eoParams: { provider: selectedProvider, id: entity!.id }
+      })
+      message.destroy()
+      if (code !== STATUS_CODE.SUCCESS) {
+        message.error(msg || $t(RESPONSE_TIPS.error))
+        return
       }
-      setApiKeys([...apiKeys, newKey])
+      entity = data?.info
+    } else {
+      provider.default_config = '{"apikey":"******"}'
+      entity = {
+        name: `key${total}`,
+        config: provider.default_config,
+        expire_time: '0'
+      } as EditAPIKey
     }
-    setModalVisible(false)
-    setEditingKey(null)
+    const newEntity = entity as EditAPIKey
+
+    modal.confirm({
+      title: mode === 'add' ? $t(`添加 ${provider?.name} APIKey`) : $t('编辑 APIKey'),
+      content: <ApiKeyContent ref={modalRef} entity={newEntity} provider={provider} />,
+      onOk: () => {
+        return modalRef.current?.save().then((res) => {
+          // if (res === true) setAiConfigFlushed(true)
+          // getAiSettingList()
+        })
+      },
+      width: 600,
+      okText: $t('确认'),
+      footer: (_, { OkBtn, CancelBtn }) => {
+        return (
+          <div className="flex justify-between items-center">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={provider.getApikeyUrl}
+              className="flex items-center gap-[8px]"
+            >
+              <span>{$t('从 (0) 获取 API KEY', [provider.name])}</span>
+              <Icon icon="ic:baseline-open-in-new" width={16} height={16} />
+            </a>
+            <div>
+              <CancelBtn />
+              {/* {checkAccess('system.devops.ai_provider.edit', accessData) ? <OkBtn /> : null} */}
+            </div>
+          </div>
+        )
+      },
+      cancelText: $t('取消'),
+      closable: true,
+      icon: <></>
+    })
   }
 
   const handleDelete = async (id: string) => {
@@ -166,6 +188,7 @@ const KeySettings: React.FC = () => {
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
+        setTotal(response.data.total)
         return {
           data: response.data.keys,
           success: true,
@@ -319,15 +342,6 @@ const KeySettings: React.FC = () => {
           onDragSortEnd={handleDragSortEnd}
           addNewBtnTitle={$t('添加 APIKey')}
           onAddNewBtnClick={handleAdd}
-        />
-        <ApiKeyModal
-          visible={modalVisible}
-          mode={modalMode}
-          onCancel={handleModalCancel}
-          onSave={handleSave}
-          provider={provider}
-          entity={editingKey}
-          defaultKeyNumber={apiKeys.length + 1}
         />
       </div>
     </InsidePage>

@@ -11,7 +11,7 @@ export interface AIProvider {
   configured: boolean
   getApikeyUrl: string
   status: string
-  config: string
+  default_config: string
 }
 
 interface AIProviderResponse {
