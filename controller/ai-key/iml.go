@@ -1,6 +1,7 @@
 package ai_key
 
 import (
+	"encoding/json"
 	"strconv"
 
 	ai_key "github.com/APIParkLab/APIPark/module/ai-key"
@@ -38,7 +39,7 @@ func (i *imlAIKeyController) Get(ctx *gin.Context, providerId string, id string)
 	return i.module.Get(ctx, providerId, id)
 }
 
-func (i *imlAIKeyController) List(ctx *gin.Context, providerId string, keyword string, page string, pageSize string) ([]*ai_key_dto.Item, int64, error) {
+func (i *imlAIKeyController) List(ctx *gin.Context, providerId string, keyword string, page string, pageSize string, statuses string) ([]*ai_key_dto.Item, int64, error) {
 	p, err := strconv.Atoi(page)
 	if err != nil {
 		if page != "" {
@@ -51,9 +52,16 @@ func (i *imlAIKeyController) List(ctx *gin.Context, providerId string, keyword s
 		if pageSize != "" {
 			return nil, 0, err
 		}
-		ps = 15
+		ps = 20
 	}
-	return i.module.List(ctx, providerId, keyword, p, ps)
+	ss := make([]string, 0)
+	if statuses != "" {
+		err = json.Unmarshal([]byte(statuses), &ss)
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+	return i.module.List(ctx, providerId, keyword, p, ps, ss)
 }
 
 func (i *imlAIKeyController) Sort(ctx *gin.Context, providerId string, input *ai_key_dto.Sort) error {

@@ -13,7 +13,7 @@ type IKeyModule interface {
 	Edit(ctx context.Context, providerId string, id string, input *ai_key_dto.Edit) error
 	Delete(ctx context.Context, providerId string, id string) error
 	Get(ctx context.Context, providerId string, id string) (*ai_key_dto.Key, error)
-	List(ctx context.Context, providerId string, keyword string, page, pageSize int) ([]*ai_key_dto.Item, int64, error)
+	List(ctx context.Context, providerId string, keyword string, page, pageSize int, statuses []string) ([]*ai_key_dto.Item, int64, error)
 	UpdateKeyStatus(ctx context.Context, providerId string, id string, enable bool) error
 	Sort(ctx context.Context, providerId string, input *ai_key_dto.Sort) error
 }
