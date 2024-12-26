@@ -318,8 +318,8 @@ func (i *imlServiceController) Get(ctx *gin.Context, id string) (*service_dto.Se
 	return i.module.Get(ctx, id)
 }
 
-func (i *imlServiceController) Search(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error) {
-	return i.module.Search(ctx, teamID, keyword)
+func (i *imlServiceController) Search(ctx *gin.Context, teamIDs string, keyword string, page string, pageSize string, sort string, asc string, serviceKind string) ([]*service_dto.ServiceItem, error) {
+	return i.module.Search(ctx, teamIDs, keyword)
 }
 
 func (i *imlServiceController) Create(ctx *gin.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error) {

@@ -207,10 +207,11 @@ func (i *imlProviderModule) SimpleProviders(ctx context.Context) ([]*ai_dto.Simp
 	items := make([]*ai_dto.SimpleProviderItem, 0, len(providers))
 	for _, v := range providers {
 		item := &ai_dto.SimpleProviderItem{
-			Id:     v.ID(),
-			Name:   v.Name(),
-			Logo:   v.Logo(),
-			Status: ai_dto.ProviderDisabled,
+			Id:            v.ID(),
+			Name:          v.Name(),
+			Logo:          v.Logo(),
+			DefaultConfig: v.DefaultConfig(),
+			Status:        ai_dto.ProviderDisabled,
 		}
 		if info, has := providerMap[v.ID()]; has {
 			item.Configured = true
