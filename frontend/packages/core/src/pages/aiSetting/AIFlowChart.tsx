@@ -73,8 +73,8 @@ const AIFlowChart = () => {
   useEffect(() => {
     // Mock API call - replace with actual API call
     fetchData<ApiResponse>('ai/providers/configured', {
-      method: 'GET',
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      method: 'GET'
+      // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
     }).then((response) => {
       const mockApiResponse: ApiResponse = response as ApiResponse
       setModelData(mockApiResponse.data.providers)
@@ -115,7 +115,7 @@ const AIFlowChart = () => {
         position: positions[`${model.id}-keys`],
         data: {
           title: 'API Keys',
-          keys: model.keys.map((key, index) => ({
+          keys: (model.keys || []).map((key, index) => ({
             id: key.id,
             status: key.status,
             priority: index + 1
