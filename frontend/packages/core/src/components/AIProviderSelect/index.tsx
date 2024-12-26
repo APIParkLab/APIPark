@@ -41,7 +41,7 @@ const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, st
     const fetchProviders = async () => {
       if (isMounted) setLoading(true)
       try {
-        const response = await fetchData<AIProviderResponse>('simple/ai/providers', { method: 'GET' })
+        const response = await fetchData<AIProviderResponse>('simple/ai/providers/configured', { method: 'GET' })
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           isMounted && setProviders(data.providers)

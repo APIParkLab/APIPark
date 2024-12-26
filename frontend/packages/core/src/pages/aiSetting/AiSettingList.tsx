@@ -55,8 +55,9 @@ const AiSettingList = () => {
   const getAiSettingList = () => {
     setLoading(true)
     return fetchData<BasicResponse<{ providers: Omit<AiSettingListItem, 'availableLlms' | 'llmListStatus'>[] }>>(
-      `ai/providers`,
+      `ai/providers/unconfigured`,
       { method: 'GET', eoTransformKeys: ['default_llm', 'default_llm_logo'] }
+      // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
     )
       .then((response) => {
         const { code, data, msg } = response

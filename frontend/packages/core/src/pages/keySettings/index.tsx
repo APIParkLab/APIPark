@@ -46,8 +46,8 @@ const KeySettings: React.FC = () => {
       message.loading($t(RESPONSE_TIPS.loading))
       const { code, data, msg } = await fetchData<BasicResponse<{ info: EditAPIKey }>>('ai/resource/key', {
         method: 'GET',
-        eoParams: { provider: selectedProvider, id: entity!.id },
-        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+        eoParams: { provider: selectedProvider, id: entity!.id }
+        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
       message.destroy()
       if (code !== STATUS_CODE.SUCCESS) {
@@ -56,7 +56,6 @@ const KeySettings: React.FC = () => {
       }
       entity = data?.info
     } else {
-      provider.default_config = '{"apikey":"******"}'
       entity = {
         name: `key${total}`,
         config: provider.default_config,
@@ -115,8 +114,8 @@ const KeySettings: React.FC = () => {
           provider: selectedProvider,
           id: id,
           branchID: 0
-        },
-        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+        }
+        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
@@ -138,22 +137,13 @@ const KeySettings: React.FC = () => {
         eoParams: {
           provider: selectedProvider,
           id: id
-        },
-        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+        }
+        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
         message.success(newStatus === 'disable' ? $t('停用成功') : $t('启用成功'))
-        setApiKeys(
-          apiKeys.map((key) =>
-            key.id === id
-              ? ({
-                  ...key,
-                  status: newStatus === 'disable' ? 'disabled' : 'normal'
-                } as APIKey)
-              : (key as APIKey)
-          )
-        )
+        pageListRef.current?.reload()
       } else {
         message.error(response.msg || RESPONSE_TIPS.error)
       }
@@ -163,6 +153,7 @@ const KeySettings: React.FC = () => {
   }
 
   const handleDragSortEnd = async (beforeIndex: number, afterIndex: number, newDataSource: APIKey[]) => {
+    console.log(beforeIndex, afterIndex, newDataSource)
     try {
       const response = await fetchData<BasicResponse<any>>('ai/resource/key/sort', {
         method: 'PUT',
@@ -170,8 +161,8 @@ const KeySettings: React.FC = () => {
           origin: newDataSource[beforeIndex].id,
           target: newDataSource[afterIndex].id,
           sort: afterIndex > beforeIndex ? 'before' : 'after'
-        },
-        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+        }
+        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
@@ -195,8 +186,8 @@ const KeySettings: React.FC = () => {
           page_size: params.pageSize,
           keyword: searchWord,
           page: params.current
-        },
-        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+        }
+        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
@@ -258,14 +249,15 @@ const KeySettings: React.FC = () => {
             <Divider type="vertical" className="mx-0" key="div2" />
           </>
         ),
-
-        <TableBtnWithPermission
-          access="system.settings.ai_key_resource.manager"
-          key="delete"
-          btnType="delete"
-          onClick={() => handleDelete(entity.id)}
-          btnTitle={$t('删除')}
-        />
+        entity.can_delete !== false && (
+          <TableBtnWithPermission
+            access="system.settings.ai_key_resource.manager"
+            key="delete"
+            btnType="delete"
+            onClick={() => handleDelete(entity.id as string)}
+            btnTitle={$t('删除')}
+          />
+        )
       ]
     }
   ]
