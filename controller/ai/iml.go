@@ -33,6 +33,10 @@ func (i *imlProviderController) SimpleProviders(ctx *gin.Context) ([]*ai_dto.Sim
 	return i.module.SimpleProviders(ctx)
 }
 
+func (i *imlProviderController) SimpleConfiguredProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, error) {
+	return i.module.SimpleConfiguredProviders(ctx)
+}
+
 func (i *imlProviderController) Provider(ctx *gin.Context, id string) (*ai_dto.Provider, error) {
 	return i.module.Provider(ctx, id)
 }
