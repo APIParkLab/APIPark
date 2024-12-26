@@ -1,4 +1,3 @@
-
 import { TextField, useTheme } from '@mui/material'
 import {
   DataGridPro,
@@ -9,11 +8,11 @@ import {
   useGridApiRef
 } from '@mui/x-data-grid-pro'
 import { RefObject, useCallback, useEffect, useImperativeHandle, useState } from 'react'
-import {IconButton} from "../../IconButton";
-import {flattenTree, generateId, getActionColWidth} from "@common/utils/postcat.tsx";
-import {EditableDataGridSx} from "../../ApiManager/components/EditableDataGrid";
-import { commonTableSx } from '@common/const/api-detail/index.ts';
-import { $t } from '@common/locales';
+import { IconButton } from '../../IconButton'
+import { flattenTree, generateId, getActionColWidth } from '@common/utils/postcat.tsx'
+import { EditableDataGridSx } from '../../ApiManager/components/EditableDataGrid'
+import { commonTableSx } from '@common/const/api-detail/index.ts'
+import { $t } from '@common/locales'
 
 export interface ValueEnum {
   value: string
@@ -27,7 +26,7 @@ export interface ValueEnumApi {
 interface ValueEnumProps {
   data: ValueEnum[] | null
   apiRef?: RefObject<ValueEnumApi>
-  readOnly?:boolean
+  readOnly?: boolean
 }
 
 interface Row extends ValueEnum {
@@ -45,13 +44,12 @@ class EmptyRow implements Row {
   description = ''
 }
 
-export function ValueEnum({ data, apiRef,readOnly = false }: ValueEnumProps) {
+export function ValueEnum({ data, apiRef, readOnly = false }: ValueEnumProps) {
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
   const tableApiRef = useGridApiRef()
   const [rows, setRows] = useState<Row[]>([new EmptyRow()])
   const [renderRows, setRenderRows] = useState<Row[]>([])
   const theme = useTheme()
-
 
   useEffect(() => {
     if (data?.length) {
@@ -93,7 +91,6 @@ export function ValueEnum({ data, apiRef,readOnly = false }: ValueEnumProps) {
     },
     [rows]
   )
-
 
   const columns: GridColDef<Row>[] = [
     {
@@ -189,11 +186,13 @@ export function ValueEnum({ data, apiRef,readOnly = false }: ValueEnumProps) {
         rows={renderRows}
         columns={columns}
         initialState={{ pinnedColumns: { right: ['actions'] } }}
-        sx={{ ...EditableDataGridSx,
-          ...commonTableSx ,
-        '.MuiDataGrid-row:hover':{
-          backgroundColor: 'transparent',
-        }}}
+        sx={{
+          ...EditableDataGridSx,
+          ...commonTableSx,
+          '.MuiDataGrid-row:hover': {
+            backgroundColor: 'transparent'
+          }
+        }}
         rowHeight={40}
         columnHeaderHeight={40}
         rowModesModel={rowModesModel}

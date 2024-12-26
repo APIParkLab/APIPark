@@ -92,11 +92,6 @@ func (i *imlServiceModule) ExportAll(ctx context.Context) ([]*service_dto.Export
 		serviceTagMap[st.Sid] = append(serviceTagMap[st.Sid], tagMap[st.Tid].Name)
 	}
 
-	//docMap, err := i.serviceDocService.Map(ctx, serviceIds...)
-	//if err != nil {
-	//	return nil, err
-	//}
-
 	items := make([]*service_dto.ExportService, 0, len(services))
 	for _, s := range services {
 		info := &service_dto.ExportService{
@@ -170,24 +165,6 @@ func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, 
 	}
 	return items, nil
 }
-
-//func (i *imlServiceModule) SimpleAPPS(ctx context.Context, keyword string) ([]*service_dto.SimpleServiceItem, error) {
-//	w := make(map[string]interface{})
-//	w["as_app"] = true
-//	services, err := i.serviceService.SearchByDriver(ctx, keyword, w)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return utils.SliceToSlice(services, func(p *service.Service) *service_dto.SimpleServiceItem {
-//		return &service_dto.SimpleServiceItem{
-//			Id:          p.Id,
-//			Name:        p.Name,
-//			Description: p.Description,
-//
-//			Team: auto.UUID(p.Team),
-//		}
-//	}), nil
-//}
 
 func (i *imlServiceModule) Simple(ctx context.Context) ([]*service_dto.SimpleServiceItem, error) {
 	w := make(map[string]interface{})

@@ -15,6 +15,7 @@ type IProviderModule interface {
 	ConfiguredProviders(ctx context.Context) ([]*ai_dto.ConfiguredProviderItem, *auto.Label, error)
 	UnConfiguredProviders(ctx context.Context) ([]*ai_dto.ProviderItem, error)
 	SimpleProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, error)
+	SimpleConfiguredProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, error)
 	Provider(ctx context.Context, id string) (*ai_dto.Provider, error)
 	SimpleProvider(ctx context.Context, id string) (*ai_dto.SimpleProvider, error)
 	LLMs(ctx context.Context, driver string) ([]*ai_dto.LLMItem, *ai_dto.ProviderItem, error)
@@ -25,7 +26,7 @@ type IProviderModule interface {
 }
 
 type IAIAPIModule interface {
-	APIs(ctx context.Context, keyword string, providerId string, start int64, end int64, page int, pageSize int, sortCondition string, asc bool) ([]*ai_dto.APIItem, int64, error)
+	APIs(ctx context.Context, keyword string, providerId string, start int64, end int64, page int, pageSize int, sortCondition string, asc bool, models []string, services []string) ([]*ai_dto.APIItem, *ai_dto.Condition, int64, error)
 }
 
 func init() {

@@ -1,9 +1,9 @@
-import { InputAdornment, TextField, Select, MenuItem, Divider, SelectChangeEvent, Typography, Box } from '@mui/material'
+import { InputAdornment, TextField, Select, MenuItem, Divider, SelectChangeEvent } from '@mui/material'
 import { SyntheticEvent } from 'react'
-import {ParseCurlResult} from "@common/const/api-detail";
-import {HTTPMethod, RequestMethod} from "../../../RequestMethod";
-import {ParseCurl} from "@common/utils/curl.ts";
-import { $t } from '@common/locales';
+import { ParseCurlResult } from '@common/const/api-detail'
+import { HTTPMethod, RequestMethod } from '../../../RequestMethod'
+import { ParseCurl } from '@common/utils/curl.ts'
+import { $t } from '@common/locales'
 
 interface UriInputProps {
   inputValue?: string
@@ -22,8 +22,6 @@ export function UriInput({
   onCURLPaste,
   onTest
 }: UriInputProps) {
-
-
   const handleSelectChange = (event: SelectChangeEvent<HTTPMethod>) => {
     onSelectChange?.(event.target.value as HTTPMethod)
   }
@@ -52,14 +50,14 @@ export function UriInput({
   return (
     <TextField
       fullWidth
-      placeholder={$t("输入 URL 或 cURL")}
+      placeholder={$t('输入 URL 或 cURL')}
       value={inputValue}
       onChange={handleInputChange}
       sx={{
         input: {
           lineHeight: '40px',
           fontSize: '16px',
-           padding:'8.5px 14px 8.5px 0'
+          padding: '8.5px 14px 8.5px 0'
         }
       }}
       onKeyDown={(event) => {
