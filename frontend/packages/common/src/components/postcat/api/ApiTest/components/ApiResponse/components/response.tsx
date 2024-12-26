@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Box, Button, Typography } from '@mui/material'
-import {ResponseContentType} from "@common/hooks/useTest.ts";
-import {Codebox,CodeboxApiRef} from "../../../../Codebox";
+import { ResponseContentType } from '@common/hooks/useTest.ts'
+import { Codebox, CodeboxApiRef } from '../../../../Codebox'
 
 interface ResponseProps {
   responseType: ResponseType
@@ -77,16 +77,17 @@ export function Response({
         </Box>
       ) : null}
       {responsePreviewType === 'default' ? (
-      <>
-        {/*<div className="w-full h-full"></div>*/}
-        <Codebox
-          apiRef={codeboxApiRef}
-          readOnly
-          language={language}
-          height="100%"
-          width="100%"
-          value={`${data || ''}`}
-        /></>
+        <>
+          {/*<div className="w-full h-full"></div>*/}
+          <Codebox
+            apiRef={codeboxApiRef}
+            readOnly
+            language={language}
+            height="100%"
+            width="100%"
+            value={`${data || ''}`}
+          />
+        </>
       ) : null}
     </>
   )

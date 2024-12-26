@@ -20,7 +20,7 @@ const PromptEditorHeightResizeWrap: FC<Props> = ({
   onHeightChange,
   children,
   footer,
-  hideResize,
+  hideResize
 }) => {
   const [clientY, setClientY] = useState(0)
   const [isResizing, setIsResizing] = useState(false)
@@ -38,19 +38,20 @@ const PromptEditorHeightResizeWrap: FC<Props> = ({
     document.body.style.userSelect = prevUserSelectStyle
   }, [prevUserSelectStyle])
 
-  const { run: didHandleResize } = useDebounceFn((e) => {
-    if (!isResizing)
-      return
+  const { run: didHandleResize } = useDebounceFn(
+    (e) => {
+      if (!isResizing) return
 
-    const offset = e.clientY - clientY
-    let newHeight = height + offset
-    setClientY(e.clientY)
-    if (newHeight < minHeight)
-      newHeight = minHeight
-    onHeightChange(newHeight)
-  }, {
-    wait: 0,
-  })
+      const offset = e.clientY - clientY
+      let newHeight = height + offset
+      setClientY(e.clientY)
+      if (newHeight < minHeight) newHeight = minHeight
+      onHeightChange(newHeight)
+    },
+    {
+      wait: 0
+    }
+  )
 
   const handleResize = useCallback(didHandleResize, [isResizing, height, minHeight, clientY])
 
@@ -69,12 +70,11 @@ const PromptEditorHeightResizeWrap: FC<Props> = ({
   }, [handleStopResize])
 
   return (
-    <div
-      className='relative rounded ant-input-outlined'
-    >
-      <div className={`${className} overflow-y-auto`}
+    <div className="relative rounded ant-input-outlined">
+      <div
+        className={`${className} overflow-y-auto`}
         style={{
-          height,
+          height
         }}
       >
         {children}
@@ -83,9 +83,10 @@ const PromptEditorHeightResizeWrap: FC<Props> = ({
       {footer}
       {!hideResize && (
         <div
-          className='absolute bottom-0 left-0 w-full flex justify-center h-2 cursor-row-resize'
-          onMouseDown={handleStartResize}>
-          <div className='w-5 h-[3px] rounded-sm bg-gray-300'></div>
+          className="absolute bottom-0 left-0 w-full flex justify-center h-2 cursor-row-resize"
+          onMouseDown={handleStartResize}
+        >
+          <div className="w-5 h-[3px] rounded-sm bg-gray-300"></div>
         </div>
       )}
     </div>
