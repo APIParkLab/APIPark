@@ -21,7 +21,7 @@ const ApiKeyContent: React.FC<ApiKeyContentProps> = forwardRef(({ provider, enti
 
   useEffect(() => {
     try {
-      const isNeverExpire = entity.expire_time === '0'
+      const isNeverExpire = entity.expire_time === 0
       setNeverExpire(isNeverExpire)
       form.setFieldsValue({
         name: entity.name,
@@ -41,20 +41,14 @@ const ApiKeyContent: React.FC<ApiKeyContentProps> = forwardRef(({ provider, enti
     try {
       const values = await form.validateFields()
       const { expire_time, ...restValues } = values
-      const expireTime = neverExpire ? '0' : expire_time?.format('YYYY-MM-DD HH:mm:ss')
+      const expireTime = neverExpire ? 0 : expire_time.valueOf()
 
-      const [response, error] = await fetchData<BasicResponse<null>>('ai/resource/key', {
-        method: 'POST',
-        eoParams: { provider: provider?.id },
+      const response = await fetchData<BasicResponse<null>>('ai/resource/key', {
+        method: entity.id ? 'PUT' : 'POST',
+        eoParams: { provider: provider?.id, id: entity.id },
         eoBody: { ...restValues, expire_time: expireTime },
         eoTransformKeys: ['config']
       })
-
-      if (error) {
-        console.error('API request failed:', error)
-        message.error($t(RESPONSE_TIPS.error))
-        throw error
-      }
 
       const { code, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
@@ -62,7 +56,7 @@ const ApiKeyContent: React.FC<ApiKeyContentProps> = forwardRef(({ provider, enti
         return true
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
-        throw new Error(msg || $t(RESPONSE_TIPS.error))
+        return false
       }
     } catch (error) {
       console.error('Validation failed:', error)
