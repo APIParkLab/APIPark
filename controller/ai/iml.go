@@ -6,7 +6,6 @@ import (
 
 	"github.com/APIParkLab/APIPark/module/ai"
 	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
-	"github.com/eolinker/go-common/auto"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +21,7 @@ func (i *imlProviderController) Sort(ctx *gin.Context, input *ai_dto.Sort) error
 	return i.module.Sort(ctx, input)
 }
 
-func (i *imlProviderController) ConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ConfiguredProviderItem, *auto.Label, error) {
+func (i *imlProviderController) ConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ConfiguredProviderItem, *ai_dto.BackupProvider, error) {
 	return i.module.ConfiguredProviders(ctx)
 }
 
@@ -34,7 +33,7 @@ func (i *imlProviderController) SimpleProviders(ctx *gin.Context) ([]*ai_dto.Sim
 	return i.module.SimpleProviders(ctx)
 }
 
-func (i *imlProviderController) SimpleConfiguredProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, error) {
+func (i *imlProviderController) SimpleConfiguredProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error) {
 	return i.module.SimpleConfiguredProviders(ctx)
 }
 
