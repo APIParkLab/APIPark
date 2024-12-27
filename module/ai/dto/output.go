@@ -56,7 +56,14 @@ type SimpleProviderItem struct {
 	Configured    bool           `json:"configured"`
 	DefaultConfig string         `json:"default_config"`
 	Status        ProviderStatus `json:"status"`
+	Model         *BasicInfo     `json:"model,omitempty"`
 	Priority      int            `json:"-"`
+}
+
+type BackupProvider struct {
+	Id    string     `json:"id"`
+	Name  string     `json:"name"`
+	Model *BasicInfo `json:"model,omitempty"`
 }
 
 type LLMItem struct {
