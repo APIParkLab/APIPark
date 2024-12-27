@@ -4,18 +4,16 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/eolinker/go-common/auto"
-
 	"github.com/APIParkLab/APIPark/gateway"
 	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
 	"github.com/eolinker/go-common/autowire"
 )
 
 type IProviderModule interface {
-	ConfiguredProviders(ctx context.Context) ([]*ai_dto.ConfiguredProviderItem, *auto.Label, error)
+	ConfiguredProviders(ctx context.Context) ([]*ai_dto.ConfiguredProviderItem, *ai_dto.BackupProvider, error)
 	UnConfiguredProviders(ctx context.Context) ([]*ai_dto.ProviderItem, error)
 	SimpleProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, error)
-	SimpleConfiguredProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, error)
+	SimpleConfiguredProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error)
 	Provider(ctx context.Context, id string) (*ai_dto.Provider, error)
 	SimpleProvider(ctx context.Context, id string) (*ai_dto.SimpleProvider, error)
 	LLMs(ctx context.Context, driver string) ([]*ai_dto.LLMItem, *ai_dto.ProviderItem, error)

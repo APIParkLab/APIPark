@@ -102,7 +102,7 @@ func (i *imlProviderModule) Sort(ctx context.Context, input *ai_dto.Sort) error 
 	})
 }
 
-func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.ConfiguredProviderItem, *auto.Label, error) {
+func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.ConfiguredProviderItem, *ai_dto.BackupProvider, error) {
 	// 获取已配置的AI服务商
 	list, err := i.providerService.List(ctx)
 	if err != nil {
@@ -184,10 +184,10 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.
 		}
 		return providers[i].Name < providers[j].Name
 	})
-	var backup *auto.Label
+	var backup *ai_dto.BackupProvider
 	for _, p := range providers {
 		if p.Status == ai_dto.ProviderEnabled {
-			backup = &auto.Label{
+			backup = &ai_dto.BackupProvider{
 				Id:   p.Id,
 				Name: p.Name,
 			}
@@ -238,16 +238,24 @@ func (i *imlProviderModule) SimpleProviders(ctx context.Context) ([]*ai_dto.Simp
 	return items, nil
 }
 
-func (i *imlProviderModule) SimpleConfiguredProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, error) {
+func (i *imlProviderModule) SimpleConfiguredProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error) {
 	list, err := i.providerService.List(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	items := make([]*ai_dto.SimpleProviderItem, 0, len(list))
+	var backup *ai_dto.BackupProvider
 	for _, l := range list {
 		p, has := model_runtime.GetProvider(l.Id)
 		if !has {
 			continue
+		}
+		model, has := p.GetModel(l.DefaultLLM)
+		if !has {
+			model, has = p.DefaultModel(model_runtime.ModelTypeLLM)
+			if !has {
+				continue
+			}
 		}
 		item := &ai_dto.SimpleProviderItem{
 			Id:            l.Id,
@@ -257,6 +265,10 @@ func (i *imlProviderModule) SimpleConfiguredProviders(ctx context.Context) ([]*a
 			Status:        ai_dto.ToProviderStatus(l.Status),
 			Priority:      l.Priority,
 			Configured:    true,
+			Model: &ai_dto.BasicInfo{
+				Id:   model.ID(),
+				Name: model.ID(),
+			},
 		}
 
 		items = append(items, item)
@@ -273,7 +285,17 @@ func (i *imlProviderModule) SimpleConfiguredProviders(ctx context.Context) ([]*a
 		}
 		return items[i].Name < items[j].Name
 	})
-	return items, nil
+	for _, item := range items {
+		if item.Status == ai_dto.ProviderEnabled {
+			backup = &ai_dto.BackupProvider{
+				Id:    item.Id,
+				Name:  item.Name,
+				Model: item.Model,
+			}
+			break
+		}
+	}
+	return items, backup, nil
 }
 
 func (i *imlProviderModule) UnConfiguredProviders(ctx context.Context) ([]*ai_dto.ProviderItem, error) {
