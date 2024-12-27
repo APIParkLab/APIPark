@@ -5,44 +5,13 @@ import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { checkAccess } from '@common/utils/permission'
 import { Icon } from '@iconify/react/dist/iconify.js'
-import { App } from 'antd'
+import { App, Tabs } from 'antd'
 import { useRef } from 'react'
 import AIFlowChart from './AIFlowChart'
 import AiSettingModalContent, { AiSettingModalContentHandle } from './AiSettingModal'
 import AIUnconfigure from './AIUnconfigure'
+import { AiProviderConfig, AiSettingListItem } from './types'
 
-export type AiSettingListItem = {
-  name: string
-  id: string
-  logo: string
-  defaultLlm: string
-  defaultLlmLogo: string
-  enable: boolean
-  configured: boolean
-}
-
-export type AiProviderLlmsItems = {
-  id: string
-  logo: string
-  scopes: ('chat' | 'completions')[]
-  config: string
-}
-
-export type AiProviderDefaultConfig = {
-  id: string
-  provider: string
-  name: string
-  logo: string
-  defaultLlm: string
-  scopes: string[]
-}
-
-export type AiProviderConfig = {
-  id: string
-  name: string
-  config: string
-  getApikeyUrl: string
-}
 const AiSettingList = () => {
   const { modal, message } = App.useApp()
   const { fetchData } = useFetch()
@@ -111,8 +80,23 @@ const AiSettingList = () => {
         showBorder={false}
         scrollPage={false}
       >
-        <AIFlowChart />
-        <AIUnconfigure openModal={openModal} />
+        <div className="flex flex-col h-full">
+          <Tabs
+            className="flex-shrink-0"
+            items={[
+              {
+                key: 'flow',
+                label: $t('已设置'),
+                children: <AIFlowChart />
+              },
+              {
+                key: 'config',
+                label: $t('未设置'),
+                children: <div className="overflow-auto flex-grow">{<AIUnconfigure openModal={openModal} />}</div>
+              }
+            ]}
+          />
+        </div>
       </InsidePage>
     </>
   )
