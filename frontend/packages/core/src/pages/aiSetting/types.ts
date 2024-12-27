@@ -18,3 +18,36 @@ export interface ModelData {
   keys: KeyData[]
   priority?: number
 }
+
+export type AiSettingListItem = {
+  name: string
+  id: string
+  logo: string
+  defaultLlm: string
+  defaultLlmLogo: string
+  enable: boolean
+  configured: boolean
+}
+
+export type AiProviderLlmsItems = {
+  id: string
+  logo: string
+  scopes: ('chat' | 'completions')[]
+  config: string
+}
+
+export type AiProviderDefaultConfig = {
+  id: string
+  provider: string
+  name: string
+  logo: string
+  defaultLlm: string
+  scopes: string[]
+}
+
+export type AiProviderConfig = {
+  id: string
+  name: string
+  config: string
+  getApikeyUrl: string
+}

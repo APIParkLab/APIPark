@@ -3,12 +3,18 @@ import WithPermission from '@common/components/aoplatform/WithPermission'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
-import { App, Button, Card, Divider, Empty, Spin, Tag } from 'antd'
+import { App, Button, Card, Empty, Spin, Tag } from 'antd'
 import { FC, memo, useEffect, useState } from 'react'
 import { AiSettingListItem } from './AiSettingList'
 
 const CardBox = memo(
-  ({ provider, openModal }: { provider: AiSettingListItem; openModal: (provider: AiSettingListItem) => void }) => {
+  ({
+    provider,
+    openModal
+  }: {
+    provider: AiSettingListItem
+    openModal: (provider: AiSettingListItem) => Promise<void>
+  }) => {
     return (
       <Card
         title={
@@ -56,7 +62,15 @@ const CardBox = memo(
     )
   }
 )
-const ModelCardArea = ({ modelList, className }: { modelList: AiSettingListItem[]; className?: string }) => {
+const ModelCardArea = ({
+  modelList,
+  className,
+  openModal
+}: {
+  modelList: AiSettingListItem[]
+  className?: string
+  openModal?: (provider: AiSettingListItem) => Promise<void>
+}) => {
   return (
     <>
       {modelList.length > 0 ? (
@@ -69,7 +83,7 @@ const ModelCardArea = ({ modelList, className }: { modelList: AiSettingListItem[
           }}
         >
           {modelList.map((provider: AiSettingListItem) => (
-            <CardBox key={provider.id} provider={provider} />
+            <CardBox key={provider.id} provider={provider} openModal={openModal} />
           ))}
         </div>
       ) : (
@@ -78,7 +92,11 @@ const ModelCardArea = ({ modelList, className }: { modelList: AiSettingListItem[
     </>
   )
 }
-const AIUnconfigure: FC = () => {
+interface AIUnconfigureProps {
+  openModal: (entity: AiSettingListItem) => Promise<void>
+}
+
+const AIUnconfigure: FC<AIUnconfigureProps> = ({ openModal }) => {
   const { message } = App.useApp()
   const { fetchData } = useFetch()
   const [aiSettingList, setAiSettingList] = useState<AiSettingListItem[]>([])
@@ -123,8 +141,6 @@ const AIUnconfigure: FC = () => {
         <div>
           {aiSettingList.filter((item) => !item.configured).length > 0 && (
             <>
-              <Divider style={{ margin: '20px 0 !important;' }} />
-              <p className="text-[14px] text-[#666] mb-[4px] mt-[20px] font-bold">{$t('未配置')}</p>
               <ModelCardArea modelList={aiSettingList.filter((item) => !item.configured) || []} />
             </>
           )}
