@@ -1,6 +1,7 @@
 'use client'
 
 import { BasicResponse } from '@common/const/const'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http'
 import {
   CoordinateExtent,
@@ -20,7 +21,6 @@ import { KeyStatusNode } from './components/KeyStatusNode'
 import { ModelCardNode } from './components/ModelCardNode'
 import { ServiceCardNode } from './components/NodeComponents'
 import { LAYOUT } from './constants'
-import { useAiSetting } from './contexts/AiSettingContext'
 import './styles.css'
 import { ModelData } from './types'
 
@@ -67,7 +67,7 @@ const AIFlowChart = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
   const { fetchData } = useFetch()
-  const { openConfigModal } = useAiSetting()
+  const { aiConfigFlushed } = useGlobalContext()
 
   useEffect(() => {
     fetchData<ApiResponse>('ai/providers/configured', {
@@ -76,7 +76,7 @@ const AIFlowChart = () => {
       const mockApiResponse: ApiResponse = response as ApiResponse
       setModelData(mockApiResponse.data.providers)
     })
-  }, [])
+  }, [aiConfigFlushed])
 
   useEffect(() => {
     if (!modelData.length) return
@@ -104,8 +104,7 @@ const AIFlowChart = () => {
           status: model.status,
           defaultLlm: model.default_llm,
           logo: model.logo,
-          id: model.id,
-          openModal: openConfigModal
+          id: model.id
         }
       })),
       ...modelData.map((model) => ({
@@ -220,7 +219,7 @@ const AIFlowChart = () => {
   )
 
   return (
-    <div className="w-full h-full" style={{ height: 'calc(100vh - 64px)' }}>
+    <div className="w-full" style={{ height: 'calc(-300px + 100vh)' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
