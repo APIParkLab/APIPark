@@ -2,7 +2,7 @@ import { Codebox } from '@common/components/postcat/api/Codebox'
 import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
-import { App, Form, Select, Tag } from 'antd'
+import { App, Form, InputNumber, Select, Tag } from 'antd'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { AiProviderConfig, AiProviderLlmsItems } from './AiSettingList'
 
@@ -18,6 +18,7 @@ export type AiSettingModalContentHandle = {
 type AiSettingModalContentField = {
   config: string
   defaultLlm: string
+  priority: number
 }
 
 const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingModalContentProps>((props, ref) => {
@@ -52,12 +53,14 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
     try {
       form.setFieldsValue({
         defaultLlm: entity.defaultLlm,
-        config: entity!.config ? JSON.stringify(JSON.parse(entity!.config), null, 2) : ''
+        config: entity!.config ? JSON.stringify(JSON.parse(entity!.config), null, 2) : '',
+        priority: entity.priority || 1
       })
     } catch (e) {
       form.setFieldsValue({
         defaultLlm: entity.defaultLlm,
-        config: ''
+        config: '',
+        priority: 1
       })
     }
   }, [])
@@ -67,10 +70,15 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
       form
         .validateFields()
         .then((value) => {
+          const finalValue = {
+            ...value,
+            priority: Math.max(1, value.priority)
+          }
+
           fetchData<BasicResponse<null>>('ai/provider/config', {
             method: 'PUT',
             eoParams: { provider: entity?.id },
-            eoBody: value,
+            eoBody: finalValue,
             eoTransformKeys: ['defaultLlm']
           })
             .then((response) => {
@@ -103,7 +111,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
       name="aiServiceInsideRouterModalConfig"
       autoComplete="off"
     >
-      <Form.Item<AiSettingModalContentField> label={$t('模型')} name="defaultLlm" rules={[{ required: true }]}>
+      <Form.Item<AiSettingModalContentField> label={$t('默认模型')} name="defaultLlm" rules={[{ required: true }]}>
         <Select
           className="w-INPUT_NORMAL"
           placeholder={$t(PLACEHOLDER.select)}
@@ -118,6 +126,25 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
             )
           }))}
         ></Select>
+      </Form.Item>
+
+      <Form.Item<AiSettingModalContentField>
+        label={$t('优先级')}
+        name="priority"
+        rules={[
+          { required: true },
+          {
+            validator: async (_, value) => {
+              if (value <= 0) {
+                throw new Error($t('优先级必须大于0'))
+              }
+              return Promise.resolve()
+            }
+          }
+        ]}
+        initialValue={1}
+      >
+        <InputNumber className="w-INPUT_NORMAL" min={1} placeholder={$t('请输入优先级')} />
       </Form.Item>
 
       <Form.Item<AiSettingModalContentField> label={$t('参数')} name="config">

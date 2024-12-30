@@ -4,7 +4,8 @@ import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { App, Button, Card, Empty, Spin, Tag } from 'antd'
-import { FC, memo, useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
+import { useAiSetting } from './contexts/AiSettingContext'
 import { AiSettingListItem } from './types'
 
 const CardBox = memo(
@@ -92,26 +93,23 @@ const ModelCardArea = ({
     </>
   )
 }
-interface AIUnConfigureProps {
-  openModal: (entity: AiSettingListItem) => Promise<void>
-}
 
-const AIUnConfigure: FC<AIUnConfigureProps> = ({ openModal }) => {
-  const { message } = App.useApp()
+const AIUnConfigure = () => {
+  const [modelData, setModelData] = useState<AiSettingListItem[]>([])
   const { fetchData } = useFetch()
-  const [aiSettingList, setAiSettingList] = useState<AiSettingListItem[]>([])
+  const { openConfigModal } = useAiSetting()
   const [loading, setLoading] = useState<boolean>(false)
 
-  const getAiSettingList = () => {
+  useEffect(() => {
     setLoading(true)
-    return fetchData<BasicResponse<{ providers: Omit<AiSettingListItem, 'availableLlms' | 'llmListStatus'>[] }>>(
+    fetchData<BasicResponse<{ providers: Omit<AiSettingListItem, 'availableLlms' | 'llmListStatus'>[] }>>(
       `ai/providers/unconfigured`,
       { method: 'GET', eoTransformKeys: ['default_llm', 'default_llm_logo'] }
     )
       .then((response) => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
-          setAiSettingList(
+          setModelData(
             data.providers?.map((x: AiSettingListItem) => ({
               ...x,
               name: $t(x.name),
@@ -120,14 +118,11 @@ const AIUnConfigure: FC<AIUnConfigureProps> = ({ openModal }) => {
             }))
           )
         } else {
+          const { message } = App.useApp()
           message.error(msg || $t(RESPONSE_TIPS.error))
         }
       })
       .finally(() => setLoading(false))
-  }
-
-  useEffect(() => {
-    getAiSettingList()
   }, [])
 
   return (
@@ -135,13 +130,16 @@ const AIUnConfigure: FC<AIUnConfigureProps> = ({ openModal }) => {
       className="h-full"
       wrapperClassName="h-full pr-PAGE_INSIDE_X"
       indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
-      spinning={loading}
+      spinning={modelData.length === 0}
     >
-      {aiSettingList && aiSettingList.length > 0 ? (
+      {modelData && modelData.length > 0 ? (
         <div>
-          {aiSettingList.filter((item) => !item.configured).length > 0 && (
+          {modelData.filter((item) => !item.configured).length > 0 && (
             <>
-              <ModelCardArea openModal={openModal} modelList={aiSettingList.filter((item) => !item.configured) || []} />
+              <ModelCardArea
+                openModal={openConfigModal}
+                modelList={modelData.filter((item) => !item.configured) || []}
+              />
             </>
           )}
         </div>
@@ -151,5 +149,4 @@ const AIUnConfigure: FC<AIUnConfigureProps> = ({ openModal }) => {
     </Spin>
   )
 }
-
 export default AIUnConfigure

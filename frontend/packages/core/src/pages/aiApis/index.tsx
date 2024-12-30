@@ -1,4 +1,3 @@
-import Icon from '@ant-design/icons'
 import { ActionType } from '@ant-design/pro-components'
 import InsidePage from '@common/components/aoplatform/InsidePage'
 import PageList, { PageProColumns } from '@common/components/aoplatform/PageList'
@@ -7,14 +6,12 @@ import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
-import { checkAccess } from '@common/utils/permission'
 import AIProviderSelect, { AIProvider } from '@core/components/AIProviderSelect'
 import { App, Divider, Space, Typography } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import ApiKeyContent from './components/ApiKeyContent'
-import { APIKey, EditAPIKey } from './types'
+import { APIKey } from './types'
 
 const KeySettings: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
@@ -33,80 +30,9 @@ const KeySettings: React.FC = () => {
     pageListRef.current?.reload()
   }, [selectedProvider])
 
-  const handleEdit = (record: APIKey) => {
-    openModal(record)
-  }
+  const handleEdit = (record: APIKey) => {}
 
-  const handleAdd = () => {
-    openModal()
-  }
-
-  const openModal = async (entity?: EditAPIKey) => {
-    if (!provider) return
-    const mode = entity ? 'edit' : 'add'
-    if (mode === 'edit') {
-      message.loading($t(RESPONSE_TIPS.loading))
-      const { code, data, msg } = await fetchData<BasicResponse<{ info: EditAPIKey }>>('ai/resource/key', {
-        method: 'GET',
-        eoParams: { provider: selectedProvider, id: entity!.id }
-        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
-      })
-      message.destroy()
-      if (code !== STATUS_CODE.SUCCESS) {
-        message.error(msg || $t(RESPONSE_TIPS.error))
-        return
-      }
-      entity = data?.info
-    } else {
-      entity = {
-        name: `key${total}`,
-        config: provider.default_config,
-        expire_time: 0
-      } as EditAPIKey
-    }
-    const newEntity = entity as EditAPIKey
-
-    modal.confirm({
-      title: mode === 'add' ? $t(`添加 ${provider?.name} APIKey`) : $t('编辑 APIKey'),
-      content: <ApiKeyContent ref={modalRef} entity={newEntity} provider={provider} />,
-      onOk: () => {
-        return new Promise((resolve, reject) => {
-          modalRef.current?.handleOk().then((res: boolean) => {
-            if (res === true) {
-              pageListRef.current?.reload()
-              resolve(res)
-              return
-            }
-            reject()
-          })
-        })
-      },
-      width: 600,
-      okText: $t('确认'),
-      footer: (_, { OkBtn, CancelBtn }) => {
-        return (
-          <div className="flex justify-between items-center">
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={provider.getApikeyUrl}
-              className="flex items-center gap-[8px]"
-            >
-              <span>{$t('从 (0) 获取 API KEY', [provider.name])}</span>
-              <Icon icon="ic:baseline-open-in-new" width={16} height={16} />
-            </a>
-            <div>
-              <CancelBtn />
-              {checkAccess('system.settings.ai_key_resource.manager', accessData) ? <OkBtn /> : null}
-            </div>
-          </div>
-        )
-      },
-      cancelText: $t('取消'),
-      closable: true,
-      icon: <></>
-    })
-  }
+  const handleAdd = () => {}
 
   const handleDelete = async (id: string) => {
     try {
