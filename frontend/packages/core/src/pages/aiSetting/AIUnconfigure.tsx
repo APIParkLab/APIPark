@@ -5,7 +5,7 @@ import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { App, Button, Card, Empty, Spin, Tag } from 'antd'
 import { FC, memo, useEffect, useState } from 'react'
-import { AiSettingListItem } from './AiSettingList'
+import { AiSettingListItem } from './types'
 
 const CardBox = memo(
   ({
@@ -92,11 +92,11 @@ const ModelCardArea = ({
     </>
   )
 }
-interface AIUnconfigureProps {
+interface AIUnConfigureProps {
   openModal: (entity: AiSettingListItem) => Promise<void>
 }
 
-const AIUnconfigure: FC<AIUnconfigureProps> = ({ openModal }) => {
+const AIUnConfigure: FC<AIUnConfigureProps> = ({ openModal }) => {
   const { message } = App.useApp()
   const { fetchData } = useFetch()
   const [aiSettingList, setAiSettingList] = useState<AiSettingListItem[]>([])
@@ -141,7 +141,7 @@ const AIUnconfigure: FC<AIUnconfigureProps> = ({ openModal }) => {
         <div>
           {aiSettingList.filter((item) => !item.configured).length > 0 && (
             <>
-              <ModelCardArea modelList={aiSettingList.filter((item) => !item.configured) || []} />
+              <ModelCardArea openModal={openModal} modelList={aiSettingList.filter((item) => !item.configured) || []} />
             </>
           )}
         </div>
@@ -152,4 +152,4 @@ const AIUnconfigure: FC<AIUnconfigureProps> = ({ openModal }) => {
   )
 }
 
-export default AIUnconfigure
+export default AIUnConfigure
