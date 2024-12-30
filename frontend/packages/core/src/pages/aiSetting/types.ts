@@ -27,6 +27,7 @@ export type AiSettingListItem = {
   defaultLlmLogo: string
   enable: boolean
   configured: boolean
+  priority?: number
 }
 
 export type AiProviderLlmsItems = {
@@ -48,6 +49,7 @@ export type AiProviderDefaultConfig = {
 export type AiProviderConfig = {
   id: string
   name: string
-  config: string
+  config?: string
   getApikeyUrl: string
+  priority?: number
 }

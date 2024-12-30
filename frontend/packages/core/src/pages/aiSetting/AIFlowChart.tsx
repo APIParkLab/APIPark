@@ -20,8 +20,9 @@ import { KeyStatusNode } from './components/KeyStatusNode'
 import { ModelCardNode } from './components/ModelCardNode'
 import { ServiceCardNode } from './components/NodeComponents'
 import { LAYOUT } from './constants'
+import { useAiSetting } from './contexts/AiSettingContext'
 import './styles.css'
-import { AiSettingListItem, ModelData } from './types'
+import { ModelData } from './types'
 
 export type ApiResponse = BasicResponse<{
   backup: {
@@ -61,17 +62,16 @@ const edgeTypes: EdgeTypes = {
   custom: CustomEdge
 }
 
-const AIFlowChart = ({ openModal }: { openModal: (entity: AiSettingListItem) => Promise<void> }) => {
+const AIFlowChart = () => {
   const [modelData, setModelData] = useState<ModelData[]>([])
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
   const { fetchData } = useFetch()
+  const { openConfigModal } = useAiSetting()
 
   useEffect(() => {
-    // Mock API call - replace with actual API call
     fetchData<ApiResponse>('ai/providers/configured', {
       method: 'GET'
-      // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
     }).then((response) => {
       const mockApiResponse: ApiResponse = response as ApiResponse
       setModelData(mockApiResponse.data.providers)
@@ -105,7 +105,7 @@ const AIFlowChart = ({ openModal }: { openModal: (entity: AiSettingListItem) => 
           defaultLlm: model.default_llm,
           logo: model.logo,
           id: model.id,
-          openModal
+          openModal: openConfigModal
         }
       })),
       ...modelData.map((model) => ({
