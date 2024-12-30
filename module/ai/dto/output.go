@@ -31,7 +31,7 @@ type ConfiguredProviderItem struct {
 	Status     ProviderStatus `json:"status"`
 	APICount   int64          `json:"api_count"`
 	KeyCount   int            `json:"key_count"`
-	KeyStatus  []*KeyStatus   `json:"key_status"`
+	KeyStatus  []*KeyStatus   `json:"keys"`
 	Priority   int            `json:"priority"`
 }
 
