@@ -1,5 +1,6 @@
 'use client'
 
+import { BasicResponse } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import {
   CoordinateExtent,
@@ -20,19 +21,15 @@ import { ModelCardNode } from './components/ModelCardNode'
 import { ServiceCardNode } from './components/NodeComponents'
 import { LAYOUT } from './constants'
 import './styles.css'
-import { ModelData } from './types'
+import { AiSettingListItem, ModelData } from './types'
 
-interface ApiResponse {
-  data: {
-    backup: {
-      id: string
-      name: string
-    }
-    providers: ModelData[]
+export type ApiResponse = BasicResponse<{
+  backup: {
+    id: string
+    name: string
   }
-  code: number
-  success: string
-}
+  providers: ModelData[]
+}>
 
 const calculateNodePositions = (models: ModelData[], startY = LAYOUT.NODE_START_Y, gap = LAYOUT.NODE_GAP) => {
   return models.reduce(
@@ -46,7 +43,7 @@ const calculateNodePositions = (models: ModelData[], startY = LAYOUT.NODE_START_
         },
         [`${model.id}-keys`]: {
           x: LAYOUT.KEY_NODE_X,
-          y
+          y: y + 16
         }
       }
     },
@@ -64,7 +61,7 @@ const edgeTypes: EdgeTypes = {
   custom: CustomEdge
 }
 
-const AIFlowChart = () => {
+const AIFlowChart = ({ openModal }: { openModal: (entity: AiSettingListItem) => Promise<void> }) => {
   const [modelData, setModelData] = useState<ModelData[]>([])
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
@@ -94,7 +91,7 @@ const AIFlowChart = () => {
         type: 'serviceCard',
         position: { x: LAYOUT.SERVICE_NODE_X, y: serviceY },
         data: {
-          title: 'API Service',
+          title: 'API Services',
           count: modelData.length
         }
       },
@@ -105,8 +102,10 @@ const AIFlowChart = () => {
         data: {
           title: model.name,
           status: model.status,
-          defaultModel: model.default_llm,
-          logo: model.logo
+          defaultLlm: model.default_llm,
+          logo: model.logo,
+          id: model.id,
+          openModal
         }
       })),
       ...modelData.map((model) => ({
@@ -114,7 +113,7 @@ const AIFlowChart = () => {
         type: 'keyCard',
         position: positions[`${model.id}-keys`],
         data: {
-          title: 'API Keys',
+          title: '',
           keys: (model.keys || []).map((key, index) => ({
             id: key.id,
             status: key.status,
@@ -138,6 +137,7 @@ const AIFlowChart = () => {
         source: model.id,
         target: `${model.id}-keys`,
         label: `${model.key_count} keys`,
+        data: { id: model.id },
         animated: true
       }))
     ]
@@ -147,8 +147,8 @@ const AIFlowChart = () => {
   }, [modelData])
 
   const calculateExtent = useCallback(() => {
-    const left = LAYOUT.SERVICE_NODE_X - 100
-    const right = LAYOUT.KEY_NODE_X + 100
+    const left = LAYOUT.SERVICE_NODE_X
+    const right = LAYOUT.KEY_NODE_X
     const top = 0 // Allow slight negative scroll to reduce top padding
     const bottom = LAYOUT.NODE_START_Y + modelData.length * LAYOUT.NODE_GAP
     return [
@@ -207,7 +207,7 @@ const AIFlowChart = () => {
                 ...n,
                 position: {
                   x: LAYOUT.KEY_NODE_X,
-                  y: LAYOUT.NODE_START_Y + index * LAYOUT.NODE_GAP
+                  y: LAYOUT.NODE_START_Y + index * LAYOUT.NODE_GAP + 16
                 }
               }
             }

@@ -2,22 +2,23 @@ import { Icon } from '@iconify/react'
 import { Handle, Position } from '@xyflow/react'
 import { t } from 'i18next'
 import React from 'react'
-import { ModelStatus } from '../types'
+import { AiSettingListItem, ModelStatus } from '../types'
 
 interface ModelCardData {
   title: string
   status: ModelStatus
   logo: string
-  defaultModel: string
+  defaultLlm: string
 }
 
 type ModelCardNodeData = ModelCardData & {
   id: string
   position: { x: number; y: number }
+  openModal?: (entity: AiSettingListItem) => Promise<void>
 }
 
 export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) => {
-  const { title, status, defaultModel, logo } = data
+  const { title, status, defaultLlm, logo } = data
   return (
     <div
       className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[280px]  group"
@@ -46,13 +47,13 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
             <Icon
               icon="mdi:cog"
               className="text-xl text-gray-400 cursor-pointer hover:text-[--primary-color]"
-              onClick={() => console.log('Default:', data.id)}
+              onClick={() => data.openModal?.({ id: data.id, defaultLlm: defaultLlm })}
             />
           </div>
         </div>
         <div className="mt-2 text-sm text-gray-500">
           {t('默认：')}
-          {defaultModel}
+          {defaultLlm}
         </div>
       </div>
     </div>

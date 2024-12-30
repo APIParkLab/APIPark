@@ -46,8 +46,7 @@ const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, st
         if (code === STATUS_CODE.SUCCESS) {
           isMounted && setProviders(data.providers)
           if (!data.providers?.length) return
-
-          const selectedProvider: AIProvider = value ? providers.find((p) => p.id === value) : data.providers[0]
+          const selectedProvider: AIProvider = value ? data.providers.find((p) => p.id === value) : data.providers[0]
           onChange?.(selectedProvider.id, selectedProvider)
         } else {
           message.error(msg || t('Failed to fetch AI providers'))

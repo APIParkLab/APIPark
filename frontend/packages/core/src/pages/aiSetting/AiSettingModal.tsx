@@ -113,7 +113,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
             label: (
               <div className="flex items-center gap-[10px]">
                 <span>{x.id}</span>
-                {x?.scopes?.map((s) => <Tag>{s?.toLocaleUpperCase()}</Tag>)}
+                {x?.scopes?.map((s) => <Tag key={s}>{s?.toLocaleUpperCase()}</Tag>)}
               </div>
             )
           }))}

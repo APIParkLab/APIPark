@@ -9,7 +9,7 @@ import { App, Tabs } from 'antd'
 import { useRef } from 'react'
 import AIFlowChart from './AIFlowChart'
 import AiSettingModalContent, { AiSettingModalContentHandle } from './AiSettingModal'
-import AIUnconfigure from './AIUnconfigure'
+import AIUnConfigure from './AIUnconfigure'
 import { AiProviderConfig, AiSettingListItem } from './types'
 
 const AiSettingList = () => {
@@ -19,6 +19,7 @@ const AiSettingList = () => {
   const { setAiConfigFlushed, accessData } = useGlobalContext()
 
   const openModal = async (entity: AiSettingListItem) => {
+    console.log(entity)
     message.loading($t(RESPONSE_TIPS.loading))
     const { code, data, msg } = await fetchData<BasicResponse<{ provider: AiProviderConfig }>>('ai/provider/config', {
       method: 'GET',
@@ -87,12 +88,12 @@ const AiSettingList = () => {
               {
                 key: 'flow',
                 label: $t('已设置'),
-                children: <AIFlowChart />
+                children: <AIFlowChart openModal={openModal} />
               },
               {
                 key: 'config',
                 label: $t('未设置'),
-                children: <div className="overflow-auto flex-grow">{<AIUnconfigure openModal={openModal} />}</div>
+                children: <div className="overflow-auto flex-grow">{<AIUnConfigure openModal={openModal} />}</div>
               }
             ]}
           />

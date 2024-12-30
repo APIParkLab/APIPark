@@ -12,15 +12,16 @@ import AIProviderSelect, { AIProvider } from '@core/components/AIProviderSelect'
 import { App, Divider, Space, Typography } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import ApiKeyContent from './components/ApiKeyContent'
 import { APIKey, EditAPIKey } from './types'
 
 const KeySettings: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
   const { modal, message } = App.useApp()
-  const [selectedProvider, setSelectedProvider] = useState<string>()
+  const [searchParams] = useSearchParams()
+  const [selectedProvider, setSelectedProvider] = useState<string>(searchParams.get('modelId') || '')
   const [provider, setProvider] = useState<AIProvider | undefined>()
-  const [apiKeys, setApiKeys] = useState<APIKey[]>([])
   const { fetchData } = useFetch()
   const [searchWord, setSearchWord] = useState<string>('')
   const [total, setTotal] = useState<number>(0)
