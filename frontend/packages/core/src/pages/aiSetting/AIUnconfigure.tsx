@@ -95,21 +95,14 @@ const AIUnConfigure = () => {
 
   useEffect(() => {
     setLoading(true)
-    fetchData<BasicResponse<{ providers: Omit<AiSettingListItem, 'availableLlms' | 'llmListStatus'>[] }>>(
-      `ai/providers/unconfigured`,
-      { method: 'GET', eoTransformKeys: ['default_llm', 'default_llm_logo'] }
-    )
+    fetchData<BasicResponse<{ providers: Omit<AiSettingListItem>[] }>>(`ai/providers/unconfigured`, {
+      method: 'GET',
+      eoTransformKeys: ['default_llm', 'default_llm_logo']
+    })
       .then((response) => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
-          setModelData(
-            data.providers?.map((x: AiSettingListItem) => ({
-              ...x,
-              name: $t(x.name),
-              llmListStatus: 'unload',
-              availableLlms: []
-            }))
-          )
+          setModelData(data.providers)
         } else {
           const { message } = App.useApp()
           message.error(msg || $t(RESPONSE_TIPS.error))
