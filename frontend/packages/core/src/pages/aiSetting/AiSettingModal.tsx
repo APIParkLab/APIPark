@@ -80,6 +80,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
             eoParams: { provider: entity?.id },
             eoBody: finalValue,
             eoTransformKeys: ['defaultLlm']
+            // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
           })
             .then((response) => {
               const { code, msg } = response

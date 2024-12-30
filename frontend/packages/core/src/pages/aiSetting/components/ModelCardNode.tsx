@@ -1,7 +1,9 @@
+import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { Icon } from '@iconify/react'
 import { Handle, Position } from '@xyflow/react'
 import { t } from 'i18next'
 import React from 'react'
+import { useAiSetting } from '../contexts/AiSettingContext'
 import { AiSettingListItem, ModelStatus } from '../types'
 
 interface ModelCardData {
@@ -14,11 +16,12 @@ interface ModelCardData {
 type ModelCardNodeData = ModelCardData & {
   id: string
   position: { x: number; y: number }
-  openModal?: (entity: AiSettingListItem) => Promise<void>
 }
 
 export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) => {
   const { title, status, defaultLlm, logo } = data
+  const { openConfigModal } = useAiSetting()
+  const { aiConfigFlushed, setAiConfigFlushed } = useGlobalContext()
   return (
     <div
       className="node-card bg-white rounded-lg shadow-sm p-4 min-w-[280px]  group"
@@ -47,7 +50,10 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
             <Icon
               icon="mdi:cog"
               className="text-xl text-gray-400 cursor-pointer hover:text-[--primary-color]"
-              onClick={() => data.openModal?.({ id: data.id, defaultLlm: defaultLlm })}
+              onClick={() => {
+                openConfigModal({ id: data.id, defaultLlm: defaultLlm } as AiSettingListItem)
+                setAiConfigFlushed(!aiConfigFlushed)
+              }}
             />
           </div>
         </div>
