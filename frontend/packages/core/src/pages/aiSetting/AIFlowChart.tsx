@@ -22,17 +22,17 @@ import { ModelCardNode } from './components/ModelCardNode'
 import { ServiceCardNode } from './components/NodeComponents'
 import { LAYOUT } from './constants'
 import './styles.css'
-import { ModelData } from './types'
+import { ModelListData } from './types'
 
 export type ApiResponse = BasicResponse<{
   backup: {
     id: string
     name: string
   }
-  providers: ModelData[]
+  providers: ModelListData[]
 }>
 
-const calculateNodePositions = (models: ModelData[], startY = LAYOUT.NODE_START_Y, gap = LAYOUT.NODE_GAP) => {
+const calculateNodePositions = (models: ModelListData[], startY = LAYOUT.NODE_START_Y, gap = LAYOUT.NODE_GAP) => {
   return models.reduce(
     (acc, model, index) => {
       const y = startY + index * gap
@@ -63,7 +63,7 @@ const edgeTypes: EdgeTypes = {
 }
 
 const AIFlowChart = () => {
-  const [modelData, setModelData] = useState<ModelData[]>([])
+  const [modelData, setModelData] = useState<ModelListData[]>([])
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
   const { fetchData } = useFetch()
@@ -71,7 +71,8 @@ const AIFlowChart = () => {
 
   useEffect(() => {
     fetchData<ApiResponse>('ai/providers/configured', {
-      method: 'GET'
+      method: 'GET',
+      eoTransformKeys: ['default_llm']
     }).then((response) => {
       const mockApiResponse: ApiResponse = response as ApiResponse
       setModelData(mockApiResponse.data.providers)
@@ -84,7 +85,6 @@ const AIFlowChart = () => {
     const positions = calculateNodePositions(modelData)
     // subtract 5 to make sure the service node is aligned with the top model node
     const serviceY = positions[modelData[0].id].y - 5
-
     const newNodes = [
       {
         id: 'apiService',
@@ -100,9 +100,9 @@ const AIFlowChart = () => {
         type: 'modelCard',
         position: positions[model.id],
         data: {
-          title: model.name,
+          name: model.name,
           status: model.status,
-          defaultLlm: model.default_llm,
+          defaultLlm: model.defaultLlm,
           logo: model.logo,
           id: model.id
         }
