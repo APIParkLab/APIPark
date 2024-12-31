@@ -180,7 +180,7 @@ const AiServiceInsideRouterList: FC = () => {
         })
         x.valueEnum = tmpValueEnum
       }
-      if (x.filters && (x.dataIndex as string[])?.indexOf('disable') !== -1) {
+      if (x.filters && (x.dataIndex as string[])?.indexOf('disabled') !== -1) {
         x.valueEnum = {
           true: { text: <Typography.Text type="danger">{$t('拦截')}</Typography.Text> },
           false: { text: <Typography.Text type="success">{$t('放行')}</Typography.Text> }
