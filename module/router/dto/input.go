@@ -30,7 +30,7 @@ type Create struct {
 	MatchRules  []Match     `json:"match"`
 	Upstream    string      `json:"upstream"`
 	Proxy       *InputProxy `json:"proxy"`
-	Disable     bool        `json:"disable"`
+	Disable     bool        `json:"disabled"`
 }
 
 type InputProxy struct {
@@ -69,7 +69,7 @@ type Edit struct {
 	Methods     *[]string   `json:"methods"`
 	Protocols   *[]string   `json:"protocols"`
 	MatchRules  *[]Match    `json:"match"`
-	Disable     *bool       `json:"disable"`
+	Disable     *bool       `json:"disabled"`
 	Upstream    *string     `json:"upstream"`
 }
 

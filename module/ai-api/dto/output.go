@@ -9,7 +9,7 @@ type API struct {
 	Name        string    `json:"name"`
 	Path        string    `json:"path"`
 	Description string    `json:"description"`
-	Disable     bool      `json:"disable"`
+	Disable     bool      `json:"disabled"`
 	AiPrompt    *AiPrompt `json:"ai_prompt"`
 	AiModel     *AiModel  `json:"ai_model"`
 	Timeout     int       `json:"timeout"`
@@ -21,7 +21,7 @@ type APIItem struct {
 	Name        string         `json:"name"`
 	RequestPath string         `json:"request_path"`
 	Description string         `json:"description"`
-	Disable     bool           `json:"disable"`
+	Disable     bool           `json:"disabled"`
 	Creator     auto.Label     `json:"creator" aolabel:"user"`
 	Updater     auto.Label     `json:"updater" aolabel:"user"`
 	CreateTime  auto.TimeLabel `json:"create_time"`
@@ -40,7 +40,7 @@ type AIAPIItem struct {
 	Provider    ProviderItem   `json:"provider"`
 	UpdateTime  auto.TimeLabel `json:"update_time"`
 	UseToken    int64          `json:"use_token"`
-	Disable     bool           `json:"disable"`
+	Disable     bool           `json:"disabled"`
 }
 
 type ModelItem struct {
