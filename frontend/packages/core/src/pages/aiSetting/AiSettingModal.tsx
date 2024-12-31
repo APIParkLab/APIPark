@@ -1,8 +1,9 @@
+import { QuestionCircleOutlined } from '@ant-design/icons'
 import { Codebox } from '@common/components/postcat/api/Codebox'
 import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
-import { App, Form, InputNumber, Select, Tag } from 'antd'
+import { App, Form, InputNumber, Select, Tag, Tooltip } from 'antd'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { AiProviderConfig, AiProviderLlmsItems } from './AiSettingList'
 
@@ -130,7 +131,16 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
       </Form.Item>
 
       <Form.Item<AiSettingModalContentField>
-        label={$t('优先级')}
+        label={
+          <span className="flex items-center">
+            {$t('负载优先级')}
+            <Tooltip
+              title={$t('负载优先级决定在原供应商异常或停用后，优先使用哪一个供应商。优先级数字越小，优先级越高。')}
+            >
+              <QuestionCircleOutlined className="ml-1 text-gray-500" />
+            </Tooltip>
+          </span>
+        }
         name="priority"
         rules={[
           { required: true },
