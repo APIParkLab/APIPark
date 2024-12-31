@@ -7,7 +7,7 @@ import { checkAccess } from '@common/utils/permission'
 import { App } from 'antd'
 import { createContext, useContext, useRef } from 'react'
 import AiSettingModalContent, { AiSettingModalContentHandle } from '../AiSettingModal'
-import { AiProviderConfig, AiSettingListItem } from '../types'
+import { AiSettingListItem, ModelDetailData } from '../types'
 
 interface AiSettingContextType {
   openConfigModal: (entity: AiSettingListItem) => Promise<void>
@@ -23,7 +23,7 @@ export const AiSettingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const openConfigModal = async (entity: AiSettingListItem) => {
     message.loading($t(RESPONSE_TIPS.loading))
-    const { code, data, msg } = await fetchData<BasicResponse<{ provider: AiProviderConfig }>>('ai/provider/config', {
+    const { code, data, msg } = await fetchData<BasicResponse<{ provider: ModelDetailData }>>('ai/provider/config', {
       method: 'GET',
       eoParams: { provider: entity!.id },
       eoTransformKeys: ['get_apikey_url']

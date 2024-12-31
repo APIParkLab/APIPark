@@ -5,10 +5,10 @@ import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { App, Form, InputNumber, Select, Switch, Tag, Tooltip } from 'antd'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import { AiProviderConfig, AiProviderLlmsItems, ModelDetailData } from './types'
+import { AiProviderLlmsItems, ModelDetailData } from './types'
 
 export type AiSettingModalContentProps = {
-  entity: AiProviderConfig & { defaultLlm: string }
+  entity: ModelDetailData & { defaultLlm: string }
   readOnly: boolean
 }
 
@@ -173,7 +173,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
         />
       </Form.Item>
 
-      {entity.id && (
+      {entity.configured && (
         <Form.Item className="p-4 bg-white rounded-lg" label={$t('LLM 状态管理')}>
           <div className="flex justify-between items-center">
             <div>

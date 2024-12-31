@@ -21,6 +21,9 @@ export interface ModelDetailData extends ModelListData{
   enable:boolean
   config: string,
   priority?: number
+  getApikeyUrl: string
+  status: ModelStatus
+  configured: boolean
 }
 
 
@@ -51,12 +54,4 @@ export type AiProviderDefaultConfig = {
   scopes: string[]
 }
 
-export interface AiProviderConfig {
-  id: string
-  name: string
-  config: string
-  getApikeyUrl: string
-  priority: number
-  enable: boolean
-  status: ModelStatus
-}
+

@@ -15,7 +15,9 @@ import {
   useNodesState
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import { Button, Space } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import CustomEdge from './components/CustomEdge'
 import { KeyStatusNode } from './components/KeyStatusNode'
 import { ModelCardNode } from './components/ModelCardNode'
@@ -68,11 +70,13 @@ const AIFlowChart = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
   const { fetchData } = useFetch()
   const { aiConfigFlushed } = useGlobalContext()
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchData<ApiResponse>('ai/providers/configured', {
       method: 'GET',
       eoTransformKeys: ['default_llm']
+      // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
     }).then((response) => {
       const mockApiResponse: ApiResponse = response as ApiResponse
       setModelData(mockApiResponse.data.providers)
@@ -207,26 +211,35 @@ const AIFlowChart = () => {
 
   return (
     <div className="w-full h-full">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onNodeDragStop={onNodeDragStop}
-        proOptions={{ hideAttribution: true }}
-        draggable={false}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        zoomOnScroll={false}
-        zoomOnPinch={false}
-        zoomOnDoubleClick={false}
-        panOnScroll={true}
-        panOnScrollMode={PanOnScrollMode.Vertical}
-        defaultEdgeOptions={{
-          type: 'custom'
-        }}
-        translateExtent={calculateExtent()}
-      />
+      {modelData.length === 0 ? (
+        <Space className="flex flex-col justify-center items-center h-[200px]">
+          <div>No AI model configured</div>
+          <Button type="primary" onClick={() => navigate('/aisetting?status=unconfigure')}>
+            Go to Settings
+          </Button>
+        </Space>
+      ) : (
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onNodeDragStop={onNodeDragStop}
+          proOptions={{ hideAttribution: true }}
+          draggable={false}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          zoomOnScroll={false}
+          zoomOnPinch={false}
+          zoomOnDoubleClick={false}
+          panOnScroll={true}
+          panOnScrollMode={PanOnScrollMode.Vertical}
+          defaultEdgeOptions={{
+            type: 'custom'
+          }}
+          translateExtent={calculateExtent()}
+        />
+      )}
     </div>
   )
 }
