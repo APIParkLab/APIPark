@@ -6,16 +6,17 @@ import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { App, Button, Card, Empty, Spin, Tag } from 'antd'
 import { memo, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAiSetting } from './contexts/AiSettingContext'
 import { AiSettingListItem } from './types'
 
 const CardBox = memo(({ provider }: { provider: AiSettingListItem }) => {
   const { openConfigModal } = useAiSetting()
-  const { aiConfigFlushed, setAiConfigFlushed } = useGlobalContext()
+  const navigate = useNavigate()
 
   const handleOpenModal = async (provider: AiSettingListItem) => {
     await openConfigModal(provider)
-    setAiConfigFlushed(!aiConfigFlushed)
+    navigate('/aisetting?status=configure')
   }
 
   return (

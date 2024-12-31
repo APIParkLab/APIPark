@@ -44,7 +44,7 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
               ></span>
             </div>
             <span className="text-base text-gray-900 max-w-[180px] truncate">{name}</span>
-            <Icon icon={statusConfig.icon} className={`text-xl ${statusConfig.color}`} />
+            <Icon icon={statusConfig?.icon} className={`text-xl ${statusConfig?.color}`} />
           </div>
 
           {/* Action buttons */}
