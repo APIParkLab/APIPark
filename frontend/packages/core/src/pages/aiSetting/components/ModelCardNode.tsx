@@ -1,4 +1,3 @@
-import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { Icon } from '@iconify/react'
 import { Handle, Position } from '@xyflow/react'
 import { t } from 'i18next'
@@ -14,7 +13,6 @@ type ModelCardNodeData = ModelDetailData & {
 export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) => {
   const { name, status, defaultLlm, logo } = data
   const { openConfigModal } = useAiSetting()
-  const { aiConfigFlushed, setAiConfigFlushed } = useGlobalContext()
 
   const getStatusIcon = (status: ModelStatus) => {
     switch (status) {
@@ -56,7 +54,6 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
               className="text-xl text-gray-400 cursor-pointer hover:text-[--primary-color]"
               onClick={() => {
                 openConfigModal({ id: data.id, defaultLlm: defaultLlm } as AiSettingListItem)
-                setAiConfigFlushed(!aiConfigFlushed)
               }}
             />
           </div>
