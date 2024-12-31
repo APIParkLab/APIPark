@@ -5,7 +5,7 @@ type CreateAPI struct {
 	Name        string    `json:"name"`
 	Path        string    `json:"path"`
 	Description string    `json:"description"`
-	Disable     bool      `json:"disable"`
+	Disable     bool      `json:"disabled"`
 	AiPrompt    *AiPrompt `json:"ai_prompt"`
 	AiModel     *AiModel  `json:"ai_model"`
 	Timeout     int       `json:"timeout"`
@@ -33,7 +33,7 @@ type EditAPI struct {
 	Name        *string   `json:"name"`
 	Path        *string   `json:"path"`
 	Description *string   `json:"description"`
-	Disable     *bool     `json:"disable"`
+	Disable     *bool     `json:"disabled"`
 	AiPrompt    *AiPrompt `json:"ai_prompt"`
 	AiModel     *AiModel  `json:"ai_model"`
 	Timeout     *int      `json:"timeout"`
