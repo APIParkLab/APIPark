@@ -391,6 +391,7 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		DefaultLLMConfig: defaultLLM.DefaultConfig(),
 		Priority:         info.Priority,
 		Status:           ai_dto.ProviderEnabled,
+		Configured:       true,
 	}, nil
 }
 
@@ -589,21 +590,21 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 			log.Errorf("unmarshal ai provider config error,id is %s,err is %v", id, err)
 			return err
 		}
-
-		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
-			{
-				BasicItem: &gateway.BasicItem{
-					ID:          id,
-					Description: info.Name,
-					Resource:    id,
-					Version:     info.UpdateAt.Format("20060102150405"),
-					MatchLabels: map[string]string{
-						"module": "ai-provider",
-					},
-				},
-				Attr: cfg,
-			}, newAIUpstream(id, p.URI()),
-		}, true)
+		return nil
+		//return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+		//	{
+		//		BasicItem: &gateway.BasicItem{
+		//			ID:          id,
+		//			Description: info.Name,
+		//			Resource:    id,
+		//			Version:     info.UpdateAt.Format("20060102150405"),
+		//			MatchLabels: map[string]string{
+		//				"module": "ai-provider",
+		//			},
+		//		},
+		//		Attr: cfg,
+		//	}, newAIUpstream(id, p.URI()),
+		//}, true)
 	})
 }
 
