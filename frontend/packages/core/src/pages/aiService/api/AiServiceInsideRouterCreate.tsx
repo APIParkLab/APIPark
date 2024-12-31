@@ -29,7 +29,7 @@ type AiServiceRouterField = {
   description: string
   timeout: number
   retry: number
-  disable: boolean
+  disabled: boolean
 }
 
 type AiServiceRouterConfig = {
@@ -70,7 +70,7 @@ const AiServiceInsideRouterCreate = () => {
       ?.validateFields()
       .then(() => {
         return form.validateFields().then((formValue) => {
-          const { name, path, description, variables, prompt, timeout, retry, pathMatch, disable } = formValue
+          const { name, path, description, variables, prompt, timeout, retry, pathMatch, disabled } = formValue
           const body = {
             name,
             path: `${prefixForce ? apiPrefix + '/' : ''}${path.trim()}${pathMatch === 'prefix' ? '/*' : ''}`,
@@ -79,7 +79,7 @@ const AiServiceInsideRouterCreate = () => {
             retry,
             aiPrompt: { variables: variables, prompt: prompt },
             aiModel: { id: defaultLlm?.id, provider: defaultLlm?.provider, config: defaultLlm?.config },
-            disable
+            disabled
           }
           return fetchData<BasicResponse<null>>('service/ai-router', {
             method: routeId ? 'PUT' : 'POST',
@@ -405,7 +405,7 @@ const AiServiceInsideRouterCreate = () => {
             </Row>
             <Form.Item<AiServiceRouterField>
               label={$t('拦截接口')}
-              name="disable"
+              name="disabled"
               extra={$t('开启拦截后，网关会拦截所有该路径的请求。')}
             >
               <Switch />

@@ -28,7 +28,7 @@ export const AI_SERVICE_ROUTER_TABLE_COLUMNS: PageProColumns<AiServiceRouterTabl
   },
   {
     title: '是否放行',
-    dataIndex: 'disable',
+    dataIndex: 'disabled',
     ellipsis: true,
     filters: true,
     onFilter: true,
