@@ -18,7 +18,7 @@ const AiSettingContext = createContext<AiSettingContextType | undefined>(undefin
 export const AiSettingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { modal, message } = App.useApp()
   const { fetchData } = useFetch()
-  const { setAiConfigFlushed, accessData } = useGlobalContext()
+  const { aiConfigFlushed, setAiConfigFlushed, accessData } = useGlobalContext()
   const modalRef = useRef<AiSettingModalContentHandle>()
 
   const openConfigModal = async (entity: AiSettingListItem) => {
@@ -46,7 +46,7 @@ export const AiSettingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       onOk: () => {
         return modalRef.current?.save().then((res) => {
           if (res === true) {
-            setAiConfigFlushed(true)
+            setAiConfigFlushed(!aiConfigFlushed)
           }
         })
       },

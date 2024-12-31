@@ -23,7 +23,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
   const { fetchData } = useFetch()
   const [llmList, setLlmList] = useState<AiProviderLlmsItems[]>()
   const [loading, setLoading] = useState<boolean>(false)
-
+  const [enableState, setEnableState] = useState<boolean>(entity.status === 'enabled')
   const getLlmList = () => {
     setLoading(true)
     fetchData<BasicResponse<{ llms: AiProviderLlmsItems[] }>>(`ai/provider/llms`, {
@@ -108,10 +108,10 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
 
   return (
     <Form
+      form={form}
       layout="vertical"
       labelAlign="left"
       scrollToFirstError
-      form={form}
       className="flex flex-col mx-auto h-full"
       name="aiServiceInsideRouterModalConfig"
       autoComplete="off"
@@ -188,13 +188,13 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
                 unCheckedChildren={$t('停用')}
                 onChange={(checked) => {
                   form.setFieldsValue({ enable: checked })
+                  setEnableState(checked)
                 }}
               />
             </Form.Item>
           </div>
-          {(entity.status === 'enabled' && !form.getFieldValue('enable')) ||
-          (entity.status !== 'enabled' && form.getFieldValue('enable')) ? (
-            <div className="mt-2 text-sm text-gray-500">* {getTooltipText(form.getFieldValue('enable'))}</div>
+          {(entity.status === 'enabled' && !enableState) || (entity.status !== 'enabled' && enableState) ? (
+            <div className="mt-2 text-sm text-gray-500">* {getTooltipText(enableState)}</div>
           ) : null}
         </Form.Item>
       )}
