@@ -140,7 +140,6 @@ const AIFlowChart = () => {
         animated: true
       }))
     ]
-
     setNodes(newNodes)
     setEdges(newEdges)
   }, [modelData])
@@ -156,78 +155,65 @@ const AIFlowChart = () => {
     ] as CoordinateExtent
   }, [modelData.length])
 
-  const onNodeDrag: any = useCallback(
-    (_: MouseEvent, node: Node<any>) => {
-      if (node.type !== 'modelCard') return
+  const updateProviderOrder = async (sortedProviderIds: string[]) => {
+    await fetchData('ai/provider/sort', {
+      method: 'PUT',
+      body: JSON.stringify({
+        providers: sortedProviderIds
+      })
+    })
+  }
 
-      setNodes((nds) => {
-        return nds.map((n) => {
-          if (n.type === 'keyCard' && n.id === `${node.id}-keys`) {
+  const onNodeDragStop: any = useCallback((_: any, node: Node<any>) => {
+    if (node.type !== 'modelCard') return
+
+    setNodes((nds) => {
+      const modelNodes = nds.filter((n) => n.type === 'modelCard')
+      const sortedNodes = [...modelNodes].sort((a, b) => a.position.y - b.position.y)
+      const sortedProviderIds = sortedNodes.map((node) => node.id)
+
+      // Update provider order outside of setNodes callback
+      updateProviderOrder(sortedProviderIds)
+      // Update all node positions in a single pass
+      return nds.map((n) => {
+        if (n.type === 'modelCard') {
+          const index = sortedNodes.findIndex((sn) => sn.id === n.id)
+          return {
+            ...n,
+            position: {
+              x: LAYOUT.MODEL_NODE_X,
+              y: LAYOUT.NODE_START_Y + index * LAYOUT.NODE_GAP
+            }
+          }
+        }
+        if (n.type === 'keyCard') {
+          const modelId = n.id.replace('-keys', '')
+          const modelNode = sortedNodes.find((mn) => mn.id === modelId)
+          if (modelNode) {
+            const index = sortedNodes.findIndex((sn) => sn.id === modelId)
             return {
               ...n,
               position: {
                 x: LAYOUT.KEY_NODE_X,
-                y: node.position.y
+                y: LAYOUT.NODE_START_Y + index * LAYOUT.NODE_GAP + 16
               }
             }
           }
-          return n
-        })
+        }
+        return n
       })
-    },
-    [setNodes]
-  )
-
-  const onNodeDragStop: any = useCallback(
-    (_: any, node: Node<any>) => {
-      if (node.type !== 'modelCard') return
-
-      setNodes((nds) => {
-        const modelNodes = nds.filter((n) => n.type === 'modelCard')
-        const sortedNodes = [...modelNodes].sort((a, b) => a.position.y - b.position.y)
-
-        return nds.map((n) => {
-          if (n.type === 'modelCard') {
-            const index = sortedNodes.findIndex((sn) => sn.id === n.id)
-            return {
-              ...n,
-              position: {
-                x: LAYOUT.MODEL_NODE_X,
-                y: LAYOUT.NODE_START_Y + index * LAYOUT.NODE_GAP
-              }
-            }
-          }
-          if (n.type === 'keyCard') {
-            const modelId = n.id.replace('-keys', '')
-            const modelNode = sortedNodes.find((mn) => mn.id === modelId)
-            if (modelNode) {
-              const index = sortedNodes.findIndex((sn) => sn.id === modelId)
-              return {
-                ...n,
-                position: {
-                  x: LAYOUT.KEY_NODE_X,
-                  y: LAYOUT.NODE_START_Y + index * LAYOUT.NODE_GAP + 16
-                }
-              }
-            }
-          }
-          return n
-        })
-      })
-    },
-    [setNodes]
-  )
+    })
+  }, [])
 
   return (
-    <div className="w-full" style={{ height: 'calc(-300px + 100vh)' }}>
+    <div className="w-full h-full">
       <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onNodeDrag={onNodeDrag}
-        proOptions={{ hideAttribution: true }}
         onNodeDragStop={onNodeDragStop}
+        proOptions={{ hideAttribution: true }}
         draggable={false}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
