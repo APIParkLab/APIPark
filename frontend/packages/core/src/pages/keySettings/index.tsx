@@ -187,6 +187,8 @@ const KeySettings: React.FC = () => {
           page_size: params.pageSize,
           keyword: searchWord,
           page: params.current
+          //TODO API 筛选
+          // statuses: params.statuses || []
         }
         // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })

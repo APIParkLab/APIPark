@@ -2,126 +2,57 @@ import { ActionType } from '@ant-design/pro-components'
 import InsidePage from '@common/components/aoplatform/InsidePage'
 import PageList, { PageProColumns } from '@common/components/aoplatform/PageList'
 import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission'
+import TimeRangeSelector, { TimeRangeButton } from '@common/components/aoplatform/TimeRangeSelector'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
-import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import AIProviderSelect, { AIProvider } from '@core/components/AIProviderSelect'
-import { App, Divider, Space, Typography } from 'antd'
+import { App, Button, Typography } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { APIKey } from './types'
 
-const KeySettings: React.FC = () => {
+const ApiSettings: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
   const { modal, message } = App.useApp()
   const [searchParams] = useSearchParams()
   const [selectedProvider, setSelectedProvider] = useState<string>(searchParams.get('modelId') || '')
   const [provider, setProvider] = useState<AIProvider | undefined>()
-  const [apiKeys, setApiKeys] = useState<APIKey[]>([])
   const { fetchData } = useFetch()
   const [searchWord, setSearchWord] = useState<string>('')
   const [total, setTotal] = useState<number>(0)
-  const modalRef = useRef<any>()
-  const { accessData } = useGlobalContext()
+  const [timeButton, setTimeButton] = useState<TimeRangeButton>('day')
+  const [timeRange, setTimeRange] = useState<{ start: number | null; end: number | null }>({
+    start: null,
+    end: null
+  })
+  const [queryBtnLoading, setQueryBtnLoading] = useState(false)
 
   useEffect(() => {
     pageListRef.current?.reload()
   }, [selectedProvider])
 
-  const handleEdit = (record: APIKey) => {}
-
-  const handleAdd = () => {}
-
-  const handleDelete = async (id: string) => {
-    try {
-      const response = await fetchData<BasicResponse<any>>('ai/resource/key', {
-        method: 'DELETE',
-        eoParams: {
-          provider: selectedProvider,
-          id: id,
-          branchID: 0
-        }
-        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
-      })
-
-      if (response.code === STATUS_CODE.SUCCESS) {
-        message.success($t('删除成功'))
-        pageListRef.current?.reload()
-      } else {
-        message.error(response.msg || RESPONSE_TIPS.error)
-      }
-    } catch (error) {
-      message.error(RESPONSE_TIPS.error)
-    }
-  }
-
-  const handleToggleStatus = async (id: string, currentStatus: string) => {
-    try {
-      const newStatus = currentStatus === 'normal' ? 'disable' : 'enable'
-      const response = await fetchData<BasicResponse<any>>(`ai/resource/key/${newStatus}`, {
-        method: 'PUT',
-        eoParams: {
-          provider: selectedProvider,
-          id: id
-        }
-        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
-      })
-
-      if (response.code === STATUS_CODE.SUCCESS) {
-        message.success(newStatus === 'disable' ? $t('停用成功') : $t('启用成功'))
-        pageListRef.current?.reload()
-      } else {
-        message.error(response.msg || RESPONSE_TIPS.error)
-      }
-    } catch (error) {
-      message.error(RESPONSE_TIPS.error)
-    }
-  }
-
-  const handleDragSortEnd = async (beforeIndex: number, afterIndex: number, newDataSource: APIKey[]) => {
-    console.log(beforeIndex, afterIndex, newDataSource)
-    try {
-      const response = await fetchData<BasicResponse<any>>('ai/resource/key/sort', {
-        method: 'PUT',
-        eoParams: {
-          origin: newDataSource[beforeIndex].id,
-          target: newDataSource[afterIndex].id,
-          sort: afterIndex > beforeIndex ? 'before' : 'after'
-        }
-        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
-      })
-
-      if (response.code === STATUS_CODE.SUCCESS) {
-        message.success($t('排序成功'))
-        pageListRef.current?.reload()
-      } else {
-        message.error(response.msg || RESPONSE_TIPS.error)
-      }
-    } catch (error) {
-      message.error(RESPONSE_TIPS.error)
-    }
-  }
-
-  const requestApiKeys = async (params: any) => {
+  const requestApis = async (params: any) => {
     if (!selectedProvider) return
+    setQueryBtnLoading(true)
     try {
-      const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/resource/keys', {
+      const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/apis', {
         method: 'GET',
         eoParams: {
           provider: selectedProvider,
           page_size: params.pageSize,
           keyword: searchWord,
-          page: params.current
+          page: params.current,
+          start: timeRange.start,
+          end: timeRange.end
         }
-        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
-
+      setQueryBtnLoading(false)
       if (response.code === STATUS_CODE.SUCCESS) {
         setTotal(response.data.total)
         return {
-          data: response.data.keys,
+          data: response.data.apis,
           success: true,
           total: response.data.total
         }
@@ -141,13 +72,6 @@ const KeySettings: React.FC = () => {
       }
     }
   }
-  const statusEnum = {
-    normal: { text: <Typography.Text type="success">{$t('正常')}</Typography.Text> },
-    exceeded: { text: <Typography.Text type="warning">{$t('超额')}</Typography.Text> },
-    expired: { text: <Typography.Text type="secondary">{$t('过期')}</Typography.Text> },
-    disabled: { text: <Typography.Text type="warning">{$t('停用')}</Typography.Text> },
-    error: { text: <Typography.Text type="danger">{$t('错误')}</Typography.Text> }
-  }
 
   const operation: PageProColumns<APIKey>[] = [
     {
@@ -161,84 +85,65 @@ const KeySettings: React.FC = () => {
           access="system.settings.ai_key_resource.manager"
           key="edit"
           btnType="edit"
-          onClick={() => handleEdit(entity)}
+          // onClick={() => handleEdit(entity)}
           btnTitle={$t('编辑')}
-        />,
-        <Divider type="vertical" className="mx-0" key="div1" />,
-        entity.status !== 'expired' && entity.status !== 'error' && (
-          <>
-            <TableBtnWithPermission
-              access="system.settings.ai_key_resource.manager"
-              key="toggle"
-              btnType={entity.status === 'normal' ? 'disable' : 'enable'}
-              onClick={() => handleToggleStatus(entity.id, entity.status)}
-              btnTitle={entity.status === 'normal' ? $t('停用') : $t('启用')}
-            />
-            <Divider type="vertical" className="mx-0" key="div2" />
-          </>
-        ),
-        entity.can_delete !== false && (
-          <TableBtnWithPermission
-            access="system.settings.ai_key_resource.manager"
-            key="delete"
-            btnType="delete"
-            onClick={() => handleDelete(entity.id as string)}
-            btnTitle={$t('删除')}
-          />
-        )
+        />
       ]
     }
   ]
 
   const columns: PageProColumns<APIKey>[] = [
     {
-      title: '',
-      dataIndex: 'drag',
-      width: '40px'
-    },
-    {
-      title: $t('调用优先级'),
-      dataIndex: 'priority',
-      width: '100px'
-    },
-    {
-      title: $t('名称'),
+      title: 'AI 服务(name)',
       dataIndex: 'name',
-      render: (dom: React.ReactNode, entity: APIKey) => <Space>{entity.name}</Space>
+      key: 'name',
+      width: 180
     },
     {
-      title: $t('状态'),
-      dataIndex: 'status',
-      ellipsis: true,
-      valueType: 'select',
-      filters: true,
-      onFilter: true,
-      valueEnum: statusEnum,
-      render: (dom: React.ReactNode, entity: APIKey) => statusEnum[entity.status]?.text || entity.status
+      title: 'API URL',
+      dataIndex: 'request_path',
+      key: 'request_path',
+      width: 200,
+      ellipsis: true
     },
     {
-      title: $t('已用 Token'),
+      title: '模型',
+      dataIndex: 'model',
+      key: 'model',
+      width: 150
+    },
+    {
+      title: '已用 Token',
       dataIndex: 'use_token',
-      render: (dom: React.ReactNode, entity: APIKey) => {
-        const value = entity.use_token
-        return value.toLocaleString()
-      }
+      key: 'use_token',
+      width: 120
     },
     {
-      title: $t('编辑时间'),
-      dataIndex: 'update_time'
+      title: '是否放行',
+      dataIndex: 'disabled',
+      key: 'disabled',
+      width: 100,
+      render: (disabled: boolean) => <Typography.Text>{disabled ? '禁用' : '启用'}</Typography.Text>
     },
     {
-      title: $t('过期时间'),
-      dataIndex: 'expire_time',
-      render: (dom: React.ReactNode, entity: APIKey) => {
-        return entity.expire_time === 0
-          ? $t('永不过期')
-          : dayjs(Number(entity.expire_time)).format('YYYY-MM-DD HH:mm:ss')
-      }
+      title: '编辑时间',
+      dataIndex: 'update_time',
+      key: 'update_time',
+      width: 160,
+      render: (time: string) => <Typography.Text>{dayjs(time).format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
     },
     ...operation
   ]
+
+  const resetQuery = () => {
+    setTimeButton('day')
+    setTimeRange({ start: null, end: null })
+    setSearchWord('')
+  }
+
+  const getData = () => {
+    pageListRef.current?.reload()
+  }
 
   return (
     <InsidePage
@@ -261,25 +166,46 @@ const KeySettings: React.FC = () => {
       showBorder={false}
       scrollPage={false}
     >
+      <div className="flex items-center flex-wrap pb-[10px] px-btnbase content-before bg-MAIN_BG pr-PAGE_INSIDE_X">
+        <TimeRangeSelector
+          labelSize="small"
+          hideBtns={['hour']}
+          initialTimeButton={timeButton}
+          onTimeButtonChange={setTimeButton}
+          onTimeRangeChange={($event) => {
+            setTimeRange($event)
+          }}
+        />
+        <div className="flex flex-nowrap items-center pt-btnybase">
+          <Button onClick={resetQuery}>{$t('重置')}</Button>
+          <Button
+            className="ml-btnybase"
+            type="primary"
+            loading={queryBtnLoading}
+            onClick={() => {
+              setQueryBtnLoading(true)
+              getData()
+            }}
+          >
+            {$t('查询')}
+          </Button>
+        </div>
+      </div>
       <div className="h-[calc(100%-1rem-36px)]">
         <PageList
           ref={pageListRef}
           rowKey="id"
-          request={requestApiKeys}
+          request={requestApis}
           onSearchWordChange={(e) => {
             setSearchWord(e.target.value)
           }}
           showPagination={true}
           searchPlaceholder={$t('请输入 APIURL 搜索')}
           columns={columns}
-          dragSortKey="drag"
-          onDragSortEnd={handleDragSortEnd}
-          addNewBtnTitle={$t('添加 APIKey')}
-          onAddNewBtnClick={handleAdd}
         />
       </div>
     </InsidePage>
   )
 }
 
-export default KeySettings
+export default ApiSettings
