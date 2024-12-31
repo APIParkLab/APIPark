@@ -13,9 +13,9 @@ func (p ProviderStatus) Int() int {
 	case ProviderAbnormal:
 		return 2
 	case ProviderEnabled:
-		return 0
-	case ProviderDisabled:
 		return 1
+	case ProviderDisabled:
+		return 0
 	default:
 		return 1
 	}
@@ -30,10 +30,10 @@ func ToProviderStatus(status int) ProviderStatus {
 	case 2:
 		return ProviderAbnormal
 	case 0:
-		return ProviderEnabled
+		return ProviderDisabled
 	case 1:
-		return ProviderDisabled
+		return ProviderEnabled
 	default:
-		return ProviderDisabled
+		return ProviderEnabled
 	}
 }

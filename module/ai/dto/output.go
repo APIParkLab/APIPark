@@ -17,10 +17,11 @@ type Provider struct {
 	Name             string         `json:"name"`
 	Config           string         `json:"config"`
 	GetAPIKeyUrl     string         `json:"get_apikey_url"`
-	DefaultLLM       string         `json:"defaultLLM"`
+	DefaultLLM       string         `json:"default_llm"`
 	DefaultLLMConfig string         `json:"-"`
 	Priority         int            `json:"priority"`
 	Status           ProviderStatus `json:"status"`
+	Configured       bool           `json:"configured"`
 }
 
 type ConfiguredProviderItem struct {
