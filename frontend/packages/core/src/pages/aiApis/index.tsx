@@ -11,7 +11,7 @@ import { getTime } from '@dashboard/utils/dashboard'
 import { Alert, App, Button, Typography } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { APIKey } from './types'
 
 const ApiSettings: React.FC = () => {
@@ -24,6 +24,7 @@ const ApiSettings: React.FC = () => {
   const [searchWord, setSearchWord] = useState<string>('')
   const [total, setTotal] = useState<number>(0)
   const [timeButton, setTimeButton] = useState<TimeRangeButton>('day')
+  const navigate = useNavigate()
   const [timeRange, setTimeRange] = useState<{ start: number | null; end: number | null }>({
     start: null,
     end: null
@@ -163,19 +164,23 @@ const ApiSettings: React.FC = () => {
   }
 
   const renderProviderBanner = () => {
+    if (!provider) return null
+
     console.log(provider)
-    if (provider?.status === 'disabled') {
+    if (provider.status === 'disabled' || provider.status === 'abnormal') {
+      const message =
+        provider.status === 'disabled'
+          ? $t(`当前供应商异常，以下API均临时调用 ${provider.backupName} 下的 ${provider.backupModel} 模型能力。`)
+          : $t(`当前供应商异常，以下API均临时调用 ${provider.backupName} 下的 ${provider.backupModel} 模型能力。`)
+
       return (
         <Alert
-          message={$t(
-            `当前供应商已停用，以下 API 均临时调用 ${provider.backupName} 下的 ${provider.backupModel} 模型能力。`
-          )}
+          message={message}
           type="warning"
           className="my-4"
           showIcon
-          size="small"
           action={
-            <Button size="small" type="link" onClick={() => window.open('/details')}>
+            <Button size="small" type="link" onClick={() => navigate('/aisetting')}>
               {$t('查看详情')}
             </Button>
           }
