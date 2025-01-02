@@ -42,16 +42,14 @@ const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, st
         const response = await fetchData<AIProviderResponse>(endpoint, { method: 'GET' })
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
-          isMounted &&
-            setProviders(
-              data.providers.map((val) => ({
-                ...val,
-                backupName: data.backup?.name,
-                backupModel: data.backup?.model?.name
-              }))
-            )
+          const providers = data.providers.map((val) => ({
+            ...val,
+            backupName: data.backup?.name,
+            backupModel: data.backup?.model?.name
+          }))
+          isMounted && setProviders(providers)
           if (!data.providers?.length) return
-          const selectedProvider: AIProvider = value ? data.providers.find((p) => p.id === value) : data.providers[0]
+          const selectedProvider: AIProvider = value ? providers.find((p) => p.id === value) : providers[0]
           onChange?.(selectedProvider.id, selectedProvider)
         } else {
           message.error(msg || t('Failed to fetch AI providers'))
