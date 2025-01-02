@@ -163,13 +163,17 @@ const ApiSettings: React.FC = () => {
   }
 
   const renderProviderBanner = () => {
-    if (provider?.disabled) {
+    console.log(provider)
+    if (provider?.status === 'disabled') {
       return (
         <Alert
-          message={$t('当前供应商已停用，以下 API 均临时调用 Google Gemini 下的 Gemini Pro 模型能力。')}
+          message={$t(
+            `当前供应商已停用，以下 API 均临时调用 ${provider.backupName} 下的 ${provider.backupModel} 模型能力。`
+          )}
           type="warning"
+          className="my-4"
           showIcon
-          style={{ marginBottom: 16 }}
+          size="small"
           action={
             <Button size="small" type="link" onClick={() => window.open('/details')}>
               {$t('查看详情')}

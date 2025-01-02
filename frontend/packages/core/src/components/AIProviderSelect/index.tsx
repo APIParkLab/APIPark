@@ -1,17 +1,14 @@
 import { STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
+import { ModelDetailData } from '@core/pages/aiSetting/types'
 import { Select, Space, message } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export interface AIProvider {
-  id: string
-  name: string
-  logo: string
-  configured: boolean
-  getApikeyUrl: string
-  status: string
+export interface AIProvider extends ModelDetailData {
   default_config: string
+  backupName: string
+  backupModel: string
 }
 
 interface AIProviderResponse {
@@ -41,10 +38,18 @@ const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, st
     const fetchProviders = async () => {
       if (isMounted) setLoading(true)
       try {
-        const response = await fetchData<AIProviderResponse>('simple/ai/providers/configured', { method: 'GET' })
+        const endpoint = 'simple/ai/providers/configured'
+        const response = await fetchData<AIProviderResponse>(endpoint, { method: 'GET' })
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
-          isMounted && setProviders(data.providers)
+          isMounted &&
+            setProviders(
+              data.providers.map((val) => ({
+                ...val,
+                backupName: data.backup?.name,
+                backupModel: data.backup?.model?.name
+              }))
+            )
           if (!data.providers?.length) return
           const selectedProvider: AIProvider = value ? data.providers.find((p) => p.id === value) : data.providers[0]
           onChange?.(selectedProvider.id, selectedProvider)
