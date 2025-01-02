@@ -309,7 +309,7 @@ const KeySettings: React.FC = () => {
       render: (dom: React.ReactNode, entity: APIKey) => {
         return entity.expire_time === 0
           ? $t('永不过期')
-          : dayjs(Number(entity.expire_time)).format('YYYY-MM-DD HH:mm:ss')
+          : dayjs(Number(entity.expire_time) * 1000).format('YYYY-MM-DD HH:mm:ss')
       }
     },
     ...operation
