@@ -165,22 +165,26 @@ const ApiSettings: React.FC = () => {
 
   const renderProviderBanner = () => {
     if (!provider) return null
-
-    console.log(provider)
     if (provider.status === 'disabled' || provider.status === 'abnormal') {
       const message =
         provider.status === 'disabled'
           ? $t(`当前供应商异常，以下API均临时调用 ${provider.backupName} 下的 ${provider.backupModel} 模型能力。`)
           : $t(`当前供应商异常，以下API均临时调用 ${provider.backupName} 下的 ${provider.backupModel} 模型能力。`)
-
+      const type = provider.status === 'disabled' ? 'warning' : 'error'
       return (
         <Alert
           message={message}
-          type="warning"
+          type={type}
           className="my-4"
           showIcon
           action={
-            <Button size="small" type="link" onClick={() => navigate('/aisetting')}>
+            <Button
+              size="small"
+              type="link"
+              onClick={() => {
+                navigate('/aisetting')
+              }}
+            >
               {$t('查看详情')}
             </Button>
           }
@@ -192,7 +196,7 @@ const ApiSettings: React.FC = () => {
 
   return (
     <InsidePage
-      className="overflow-y-auto gap-4 pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X"
+      className="overflow-y-auto gap-4 pb-PAGE_INSIDE_B"
       pageTitle={$t('AI API 列表')}
       description={
         <>
@@ -211,7 +215,7 @@ const ApiSettings: React.FC = () => {
       showBorder={false}
       scrollPage={false}
     >
-      <div className="h-[calc(100%-1rem-36px)]">
+      <div className="h-[calc(100%-1rem-36px)] pr-PAGE_INSIDE_X">
         <PageList
           ref={pageListRef}
           rowKey="id"
