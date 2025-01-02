@@ -3,6 +3,7 @@
 import { BasicResponse } from '@common/const/const'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http'
+import { $t } from '@common/locales'
 import {
   CoordinateExtent,
   Edge,
@@ -15,7 +16,7 @@ import {
   useNodesState
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { Button, Space } from 'antd'
+import { Button, Space, Spin } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CustomEdge from './components/CustomEdge'
@@ -66,6 +67,7 @@ const edgeTypes: EdgeTypes = {
 
 const AIFlowChart = () => {
   const [modelData, setModelData] = useState<ModelListData[]>([])
+  const [loading, setLoading] = useState(false)
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
   const { fetchData } = useFetch()
@@ -73,14 +75,19 @@ const AIFlowChart = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
+    setLoading(true)
     fetchData<ApiResponse>('ai/providers/configured', {
       method: 'GET',
       eoTransformKeys: ['default_llm']
       // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
-    }).then((response) => {
-      const mockApiResponse: ApiResponse = response as ApiResponse
-      setModelData(mockApiResponse.data.providers)
     })
+      .then((response) => {
+        const mockApiResponse: ApiResponse = response as ApiResponse
+        setModelData(mockApiResponse.data.providers)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [aiConfigFlushed])
 
   useEffect(() => {
@@ -211,11 +218,15 @@ const AIFlowChart = () => {
 
   return (
     <div className="w-full h-full">
-      {modelData.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center items-center h-full">
+          <Spin size="large" />
+        </div>
+      ) : modelData.length === 0 ? (
         <Space className="flex flex-col justify-center items-center h-[200px]">
-          <div>No AI model configured</div>
+          <div>{$t('未配置 AI 模型')}</div>
           <Button type="primary" onClick={() => navigate('/aisetting?status=unconfigure')}>
-            Go to Settings
+            {$t('前往设置')}
           </Button>
         </Space>
       ) : (

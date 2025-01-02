@@ -7,7 +7,8 @@ import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import AIProviderSelect, { AIProvider } from '@core/components/AIProviderSelect'
-import { App, Button, Typography } from 'antd'
+import { getTime } from '@dashboard/utils/dashboard'
+import { Alert, App, Button, Typography } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -37,16 +38,22 @@ const ApiSettings: React.FC = () => {
     if (!selectedProvider) return
     setQueryBtnLoading(true)
     try {
+      const eoParams = {
+        provider: selectedProvider,
+        page_size: params.pageSize,
+        keyword: searchWord,
+        page: params.current,
+        start: timeRange.start,
+        end: timeRange.end
+      }
+      if (!timeRange || !timeRange.start) {
+        const { startTime, endTime } = getTime(timeButton, [])
+        eoParams.start = startTime
+        eoParams.end = endTime
+      }
       const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/apis', {
         method: 'GET',
-        eoParams: {
-          provider: selectedProvider,
-          page_size: params.pageSize,
-          keyword: searchWord,
-          page: params.current,
-          start: timeRange.start,
-          end: timeRange.end
-        }
+        eoParams
       })
       setQueryBtnLoading(false)
       if (response.code === STATUS_CODE.SUCCESS) {
@@ -94,7 +101,7 @@ const ApiSettings: React.FC = () => {
 
   const columns: PageProColumns<APIKey>[] = [
     {
-      title: 'AI 服务(name)',
+      title: 'AI 服务',
       dataIndex: 'name',
       key: 'name',
       width: 180
@@ -108,28 +115,38 @@ const ApiSettings: React.FC = () => {
     },
     {
       title: '模型',
-      dataIndex: 'model',
+      dataIndex: ['model', 'name'],
       key: 'model',
-      width: 150
+      width: 150,
+      filters: true,
+      onFilter: true,
+      valueType: 'select',
+      valueEnum: {}
     },
     {
       title: '已用 Token',
       dataIndex: 'use_token',
       key: 'use_token',
-      width: 120
+      width: 120,
+      sorter: true
     },
     {
       title: '是否放行',
       dataIndex: 'disabled',
-      key: 'disabled',
-      width: 100,
-      render: (disabled: boolean) => <Typography.Text>{disabled ? '禁用' : '启用'}</Typography.Text>
+      ellipsis: true,
+      filters: true,
+      onFilter: true,
+      valueType: 'select',
+      valueEnum: {
+        true: { text: <Typography.Text type="danger">{$t('拦截')}</Typography.Text> },
+        false: { text: <Typography.Text type="success">{$t('放行')}</Typography.Text> }
+      }
     },
     {
       title: '编辑时间',
       dataIndex: 'update_time',
       key: 'update_time',
-      width: 160,
+      width: 200,
       render: (time: string) => <Typography.Text>{dayjs(time).format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
     },
     ...operation
@@ -145,56 +162,77 @@ const ApiSettings: React.FC = () => {
     pageListRef.current?.reload()
   }
 
+  const renderProviderBanner = () => {
+    if (provider?.disabled) {
+      return (
+        <Alert
+          message={$t('当前供应商已停用，以下 API 均临时调用 Google Gemini 下的 Gemini Pro 模型能力。')}
+          type="warning"
+          showIcon
+          style={{ marginBottom: 16 }}
+          action={
+            <Button size="small" type="link" onClick={() => window.open('/details')}>
+              {$t('查看详情')}
+            </Button>
+          }
+        />
+      )
+    }
+    return null
+  }
+
   return (
     <InsidePage
       className="overflow-y-auto gap-4 pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X"
       pageTitle={$t('AI API 列表')}
       description={
         <>
-          {$t('支持查看调用某个 AI 供应商的所有 AI 服务 API 清单')}
-          <div className="mt-4">
+          <div className="flex gap-2 items-center">
             <AIProviderSelect
               value={selectedProvider}
-              onChange={(value: string, provider: AIProvider) => {
+              onChange={(value, option) => {
                 setSelectedProvider(value)
-                setProvider(provider)
+                setProvider(option)
               }}
             />
           </div>
+          {renderProviderBanner()}
         </>
       }
       showBorder={false}
       scrollPage={false}
     >
-      <div className="flex items-center flex-wrap pb-[10px] px-btnbase content-before bg-MAIN_BG pr-PAGE_INSIDE_X">
-        <TimeRangeSelector
-          labelSize="small"
-          hideBtns={['hour']}
-          initialTimeButton={timeButton}
-          onTimeButtonChange={setTimeButton}
-          onTimeRangeChange={($event) => {
-            setTimeRange($event)
-          }}
-        />
-        <div className="flex flex-nowrap items-center pt-btnybase">
-          <Button onClick={resetQuery}>{$t('重置')}</Button>
-          <Button
-            className="ml-btnybase"
-            type="primary"
-            loading={queryBtnLoading}
-            onClick={() => {
-              setQueryBtnLoading(true)
-              getData()
-            }}
-          >
-            {$t('查询')}
-          </Button>
-        </div>
-      </div>
       <div className="h-[calc(100%-1rem-36px)]">
         <PageList
           ref={pageListRef}
           rowKey="id"
+          afterNewBtn={
+            <div className="flex items-center flex-wrap pb-[10px] px-btnbase content-before bg-MAIN_BG pr-PAGE_INSIDE_X">
+              <TimeRangeSelector
+                labelSize="small"
+                hideBtns={['hour']}
+                initialTimeButton={timeButton}
+                onTimeButtonChange={setTimeButton}
+                onTimeRangeChange={($event) => {
+                  setTimeRange($event)
+                }}
+              />
+              <div className="flex flex-nowrap items-center pt-btnybase">
+                <Button onClick={resetQuery}>{$t('重置')}</Button>
+                <Button
+                  className="ml-btnybase"
+                  type="primary"
+                  loading={queryBtnLoading}
+                  onClick={() => {
+                    setQueryBtnLoading(true)
+                    getData()
+                  }}
+                >
+                  {$t('查询')}
+                </Button>
+              </div>
+            </div>
+          }
           request={requestApis}
           onSearchWordChange={(e) => {
             setSearchWord(e.target.value)
