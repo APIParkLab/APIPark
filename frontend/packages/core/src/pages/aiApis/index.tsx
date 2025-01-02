@@ -112,7 +112,13 @@ const ApiSettings: React.FC = () => {
       dataIndex: 'request_path',
       key: 'request_path',
       width: 200,
-      ellipsis: true
+      ellipsis: true,
+      render: (text: string, record: APIKey) => (
+        <p>
+          <Typography.Text type="success">{record.method}</Typography.Text>
+          <span className="ml-1">{text}</span>
+        </p>
+      )
     },
     {
       title: '模型',
