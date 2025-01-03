@@ -1,16 +1,18 @@
-
-
-export interface APIKey extends EditAPIKey {
-  status: 'normal' | 'exceeded' | 'expired' | 'disabled' | 'error'
-  use_token: number
-  update_time: string
-  can_delete: boolean
-  priority: number
-}
-
-export interface EditAPIKey {
-  id?: string
-  name: string
-  config: string
-  expire_time: number
+export interface APIs {
+    id: string;
+    name: string;
+    service: {
+      id: string;
+      name: string;
+    };
+    team:{
+      id: string;
+      name: string;
+    },
+    method: string;
+    request_path: string;
+    model: string;
+    disabled: boolean;
+    update_time: string;
+    use_token: number;
 }

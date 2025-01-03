@@ -25,7 +25,7 @@ const ApiKeyContent: React.FC<ApiKeyContentProps> = forwardRef(({ provider, enti
       setNeverExpire(isNeverExpire)
       form.setFieldsValue({
         name: entity.name,
-        expire_time: isNeverExpire ? undefined : dayjs(entity.expire_time),
+        expire_time: isNeverExpire ? undefined : dayjs(entity.expire_time * 1000),
         config: entity.config
       })
     } catch (e) {
@@ -41,7 +41,7 @@ const ApiKeyContent: React.FC<ApiKeyContentProps> = forwardRef(({ provider, enti
     try {
       const values = await form.validateFields()
       const { expire_time, ...restValues } = values
-      const expireTime = neverExpire ? 0 : expire_time.valueOf()
+      const expireTime = neverExpire ? 0 : Math.trunc(expire_time.valueOf() / 1000)
 
       const response = await fetchData<BasicResponse<null>>('ai/resource/key', {
         method: entity.id ? 'PUT' : 'POST',
