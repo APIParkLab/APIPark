@@ -1,23 +1,23 @@
 import { CloseOutlined, ExpandOutlined, SearchOutlined } from '@ant-design/icons'
-import { Select, Input, Button, App, Drawer } from 'antd'
-import { debounce } from 'lodash-es'
-import { useState, useEffect, useRef } from 'react'
-import { MonitorApiData, SearchBody } from '@dashboard/const/type'
-import { getTime } from '../utils/dashboard'
 import ScrollableSection from '@common/components/aoplatform/ScrollableSection'
 import TimeRangeSelector, {
   RangeValue,
   TimeRange,
   TimeRangeButton
 } from '@common/components/aoplatform/TimeRangeSelector'
-import MonitorTable, { MonitorTableHandler } from './MonitorTable'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
-import { DefaultOptionType } from 'antd/es/select'
-import { useExcelExport } from '@common/hooks/excel'
-import { API_TABLE_GLOBAL_COLUMNS_CONFIG } from '@dashboard/const/const'
-import { useFetch } from '@common/hooks/http'
 import { EntityItem } from '@common/const/type'
+import { useExcelExport } from '@common/hooks/excel'
+import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
+import { API_TABLE_GLOBAL_COLUMNS_CONFIG } from '@dashboard/const/const'
+import { MonitorApiData, SearchBody } from '@dashboard/const/type'
+import { App, Button, Drawer, Input, Select } from 'antd'
+import { DefaultOptionType } from 'antd/es/select'
+import { debounce } from 'lodash-es'
+import { useEffect, useRef, useState } from 'react'
+import { getTime } from '../utils/dashboard'
+import MonitorTable, { MonitorTableHandler } from './MonitorTable'
 export type MonitorApiPageProps = {
   fetchTableData: (body: SearchBody) => Promise<BasicResponse<{ statistics: MonitorApiData[] }>>
   detailDrawerContent: React.ReactNode
@@ -100,6 +100,7 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
   const getMonitorData = () => {
     let query = queryData
     if (!queryData || queryData.start === undefined) {
+      console.log(timeButton, datePickerValue)
       const { startTime, endTime } = getTime(timeButton, datePickerValue || [])
       query = { ...query, start: startTime, end: endTime }
     }
@@ -186,7 +187,7 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
   }
 
   return (
-    <div className="h-full overflow-hidden">
+    <div className="overflow-hidden h-full">
       <ScrollableSection>
         <div className="pl-btnbase pr-btnrbase pb-btnbase content-before">
           <TimeRangeSelector
@@ -196,8 +197,8 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
             initialDatePickerValue={datePickerValue}
             onTimeRangeChange={handleTimeRangeChange}
           />
-          <div className="flex flex-nowrap items-center  pt-btnybase mr-btnybase">
-            <label className=" whitespace-nowrap inline-block">{$t('服务')}：</label>
+          <div className="flex flex-nowrap items-center pt-btnybase mr-btnybase">
+            <label className="inline-block whitespace-nowrap">{$t('服务')}：</label>
             <Select
               className="w-[346px]"
               value={queryData?.services}
@@ -212,7 +213,7 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
               }}
             />
           </div>
-          <div className="flex flex-nowrap items-center  pt-btnybase mr-btnybase">
+          <div className="flex flex-nowrap items-center pt-btnybase mr-btnybase">
             <label className=" whitespace-nowrap inline-block w-[42px] text-right">API ：</label>
             <Select
               className="w-[346px]"
@@ -226,7 +227,7 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
                 setQueryData((prevData) => ({ ...(prevData || {}), apis: value }))
               }}
             />
-            <label className="ml-btnybase whitespace-nowrap">{$t('路径')}：</label>
+            <label className="whitespace-nowrap ml-btnybase">{$t('路径')}：</label>
             <div className="w-[346px] inline-block">
               {/* <SearchInputGroup eoSingle={false} eoInputVal={queryData.path} eoClick={() => setQueryData({ ...queryData, path: '' })} /> */}
               <Input
