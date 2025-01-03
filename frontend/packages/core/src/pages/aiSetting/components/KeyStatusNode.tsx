@@ -22,7 +22,7 @@ export const KeyStatusNode: React.FC<{ data: KeyStatusNodeData }> = ({ data }) =
       style={{ border: '1px solid var(--border-color)' }}
     >
       <Handle type="target" position={Position.Left} />
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col">
         <div className="text-sm text-gray-900">{title}</div>
         <div
           className="flex gap-1 w-full"
