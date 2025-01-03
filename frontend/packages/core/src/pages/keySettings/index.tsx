@@ -12,15 +12,16 @@ import AIProviderSelect, { AIProvider } from '@core/components/AIProviderSelect'
 import { App, Divider, Space, Typography } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import ApiKeyContent from './components/ApiKeyContent'
 import { APIKey, EditAPIKey } from './types'
 
 const KeySettings: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
   const { modal, message } = App.useApp()
-  const [selectedProvider, setSelectedProvider] = useState<string>()
+  const [searchParams] = useSearchParams()
+  const [selectedProvider, setSelectedProvider] = useState<string>(searchParams.get('modelId') || '')
   const [provider, setProvider] = useState<AIProvider | undefined>()
-  const [apiKeys, setApiKeys] = useState<APIKey[]>([])
   const { fetchData } = useFetch()
   const [searchWord, setSearchWord] = useState<string>('')
   const [total, setTotal] = useState<number>(0)
@@ -186,6 +187,8 @@ const KeySettings: React.FC = () => {
           page_size: params.pageSize,
           keyword: searchWord,
           page: params.current
+          //TODO API 筛选
+          // statuses: params.statuses || []
         }
         // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
@@ -306,7 +309,7 @@ const KeySettings: React.FC = () => {
       render: (dom: React.ReactNode, entity: APIKey) => {
         return entity.expire_time === 0
           ? $t('永不过期')
-          : dayjs(Number(entity.expire_time)).format('YYYY-MM-DD HH:mm:ss')
+          : dayjs(Number(entity.expire_time) * 1000).format('YYYY-MM-DD HH:mm:ss')
       }
     },
     ...operation

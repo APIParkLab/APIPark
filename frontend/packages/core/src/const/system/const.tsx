@@ -258,7 +258,7 @@ export const SYSTEM_API_TABLE_COLUMNS: PageProColumns<SystemApiTableListItem>[] 
   },
   {
     title: '是否放行',
-    dataIndex: 'disable',
+    dataIndex: 'disabled',
     ellipsis: true,
     filters: true,
     onFilter: true,
