@@ -215,7 +215,7 @@ const ApiSettings: React.FC = () => {
         <Alert
           message={message}
           type={type}
-          className="my-4"
+          className="mt-[30px]"
           showIcon
           action={
             <Button
@@ -236,7 +236,7 @@ const ApiSettings: React.FC = () => {
 
   return (
     <InsidePage
-      className="overflow-y-auto gap-4 pb-PAGE_INSIDE_B"
+      className="overflow-y-auto pb-PAGE_INSIDE_B"
       pageTitle={$t('AI API 列表')}
       description={
         <>
