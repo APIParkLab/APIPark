@@ -9,8 +9,9 @@ const PromptEditorResizable = (props: {
   onChange?: (value: string) => void
   variablesChange?: (keys: string[]) => void
   promptVariables: VariableItems[]
+  disabled?: boolean
 }) => {
-  const { value, onChange, variablesChange, promptVariables } = props
+  const { value, onChange, variablesChange, promptVariables, disabled } = props
   const minHeight = 68
   const [editorHeight, setEditorHeight] = useState(minHeight)
   const [previousKeys, setPreviousKeys] = useState<string[]>([])
@@ -82,7 +83,7 @@ const PromptEditorResizable = (props: {
                 setPreviousKeys(keys)
               }
             }}
-            editable={true}
+            editable={disabled ? false : true}
           />
         )}
       </>
