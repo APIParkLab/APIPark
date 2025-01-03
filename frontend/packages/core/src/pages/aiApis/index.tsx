@@ -56,6 +56,7 @@ const ApiSettings: React.FC = () => {
         asc: Object.keys(sort)?.length > 0 ? Object.values(sort)?.[0] === 'ascend' : undefined,
         models: filter?.model && filter?.model?.length ? JSON.stringify(filter.model) : undefined,
         services: filter?.name && filter?.name?.length ? JSON.stringify(filter.name) : undefined,
+        disabled: filter?.disable && filter?.disable?.length ? filter.disable[0] : undefined,
         page: params.current,
         start: timeRange.start,
         end: timeRange.end
