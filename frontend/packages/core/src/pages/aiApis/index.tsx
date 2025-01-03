@@ -35,6 +35,9 @@ const ApiSettings: React.FC = () => {
     pageListRef.current?.reload()
   }, [selectedProvider])
 
+  const handlePreview = (record: APIs) => {
+    navigate(`service/${record.team.id}/aiInside/${record.service.id}/route/${record.id}`)
+  }
   const requestApis = async (params: any) => {
     if (!selectedProvider) return
     setQueryBtnLoading(true)
@@ -90,11 +93,11 @@ const ApiSettings: React.FC = () => {
       valueType: 'option',
       render: (_: React.ReactNode, entity: APIs) => [
         <TableBtnWithPermission
-          access="system.settings.ai_key_resource.manager"
-          key="edit"
-          btnType="edit"
-          // onClick={() => handleEdit(entity)}
-          btnTitle={$t('编辑')}
+          access="team.service.router.view"
+          key="preview"
+          btnType="view"
+          onClick={() => handlePreview(entity)}
+          btnTitle={$t('预览')}
         />
       ]
     }
