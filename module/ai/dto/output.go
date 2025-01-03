@@ -78,6 +78,7 @@ type APIItem struct {
 	Id          string         `json:"id"`
 	Name        string         `json:"name"`
 	Service     auto.Label     `json:"service" aolabel:"service"`
+	Team        auto.Label     `json:"team" aolabel:"team"`
 	Method      string         `json:"method"`
 	RequestPath string         `json:"request_path"`
 	Model       auto.Label     `json:"model"`
