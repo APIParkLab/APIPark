@@ -157,7 +157,7 @@ const mockData = [
           {
             name: 'AI API',
             key: 'aiApiList',
-            path: '/aiapis',
+            path: '/aiApis',
             icon: 'ic:baseline-api'
             // access: 'system.settings.ai_api.view'
           }
