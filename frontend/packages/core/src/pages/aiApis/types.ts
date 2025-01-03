@@ -1,7 +1,14 @@
 export interface APIs {
     id: string;
     name: string;
-    service: string;
+    service: {
+      id: string;
+      name: string;
+    };
+    team:{
+      id: string;
+      name: string;
+    },
     method: string;
     request_path: string;
     model: string;
