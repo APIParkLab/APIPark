@@ -12,7 +12,7 @@ import { Alert, App, Button, Typography } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { APIKey } from './types'
+import { APIs } from './types'
 
 const ApiSettings: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
@@ -52,7 +52,7 @@ const ApiSettings: React.FC = () => {
         eoParams.start = startTime
         eoParams.end = endTime
       }
-      const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/apis', {
+      const response = await fetchData<BasicResponse<{ data: APIs[] }>>('ai/apis', {
         method: 'GET',
         eoParams
       })
@@ -81,14 +81,14 @@ const ApiSettings: React.FC = () => {
     }
   }
 
-  const operation: PageProColumns<APIKey>[] = [
+  const operation: PageProColumns<APIs>[] = [
     {
       title: '',
       key: 'option',
       btnNums: 4,
       fixed: 'right',
       valueType: 'option',
-      render: (_: React.ReactNode, entity: APIKey) => [
+      render: (_: React.ReactNode, entity: APIs) => [
         <TableBtnWithPermission
           access="system.settings.ai_key_resource.manager"
           key="edit"
@@ -100,7 +100,7 @@ const ApiSettings: React.FC = () => {
     }
   ]
 
-  const columns: PageProColumns<APIKey>[] = [
+  const columns: PageProColumns<APIs>[] = [
     {
       title: 'AI 服务',
       dataIndex: 'name',
@@ -113,7 +113,7 @@ const ApiSettings: React.FC = () => {
       key: 'request_path',
       width: 200,
       ellipsis: true,
-      render: (text: string, record: APIKey) => (
+      render: (text: string, record: APIs) => (
         <p>
           <Typography.Text type="success">{record.method}</Typography.Text>
           <span className="ml-1">{text}</span>
