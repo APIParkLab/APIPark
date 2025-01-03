@@ -734,12 +734,17 @@ func (i *imlAIApiModule) APIs(ctx context.Context, keyword string, providerId st
 	if err != nil {
 		return nil, nil, 0, err
 	}
-	serviceItems := utils.SliceToSlice(services, func(e *service.Service) *ai_dto.BasicInfo {
-		return &ai_dto.BasicInfo{
-			Id:   e.Id,
-			Name: e.Name,
-		}
-	})
+	serviceItems := make([]*ai_dto.BasicInfo, 0, len(services))
+	serviceTeamMap := make(map[string]string)
+	for _, s := range services {
+		serviceItems = append(serviceItems, &ai_dto.BasicInfo{
+			Id:   s.Id,
+			Name: s.Name,
+		})
+		serviceTeamMap[s.Id] = s.Team
+
+	}
+
 	modelItems := utils.SliceToSlice(p.Models(), func(e model_runtime.IModel) *ai_dto.BasicInfo {
 		return &ai_dto.BasicInfo{
 			Id:   e.ID(),
@@ -786,6 +791,7 @@ func (i *imlAIApiModule) APIs(ctx context.Context, keyword string, providerId st
 				Id:          e.API,
 				Name:        info.Name,
 				Service:     auto.UUID(info.Service),
+				Team:        auto.UUID(serviceTeamMap[info.Service]),
 				Method:      http.MethodPost,
 				RequestPath: info.Path,
 				Model: auto.Label{

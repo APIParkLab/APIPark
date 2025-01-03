@@ -41,6 +41,7 @@ func (i *imlKeyModule) Create(ctx context.Context, providerId string, input *ai_
 	if !has {
 		return fmt.Errorf("provider not found: %w", err)
 	}
+	p.URI()
 	err = p.Check(input.Config)
 	if err != nil {
 		return fmt.Errorf("config check failed: %w", err)
