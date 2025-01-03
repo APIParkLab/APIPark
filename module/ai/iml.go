@@ -809,6 +809,7 @@ func (i *imlAIApiModule) APIs(ctx context.Context, keyword string, providerId st
 				Id:          a.ID,
 				Name:        a.Name,
 				Service:     auto.UUID(a.Service),
+				Team:        auto.UUID(serviceTeamMap[a.Service]),
 				Method:      http.MethodPost,
 				RequestPath: a.Path,
 				Model: auto.Label{
