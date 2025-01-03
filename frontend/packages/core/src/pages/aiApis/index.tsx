@@ -105,7 +105,7 @@ const ApiSettings: React.FC = () => {
 
   const columns: PageProColumns<APIs>[] = [
     {
-      title: 'AI 服务',
+      title: $t('AI 服务'),
       dataIndex: 'name',
       key: 'name',
       width: 180
@@ -124,7 +124,7 @@ const ApiSettings: React.FC = () => {
       )
     },
     {
-      title: '模型',
+      title: $t('模型'),
       dataIndex: ['model', 'name'],
       key: 'model',
       width: 150,
@@ -134,14 +134,14 @@ const ApiSettings: React.FC = () => {
       valueEnum: {}
     },
     {
-      title: '已用 Token',
+      title: $t('已用 Token'),
       dataIndex: 'use_token',
       key: 'use_token',
       width: 120,
       sorter: true
     },
     {
-      title: '是否放行',
+      title: $t('是否放行'),
       dataIndex: 'disabled',
       ellipsis: true,
       filters: true,
@@ -153,7 +153,7 @@ const ApiSettings: React.FC = () => {
       }
     },
     {
-      title: '编辑时间',
+      title: $t('编辑时间'),
       dataIndex: 'update_time',
       key: 'update_time',
       width: 200,
