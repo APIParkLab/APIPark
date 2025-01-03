@@ -12,7 +12,7 @@ import { Alert, App, Button, Typography } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { APIKey } from './types'
+import { APIs } from './types'
 
 const ApiSettings: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
@@ -35,6 +35,9 @@ const ApiSettings: React.FC = () => {
     pageListRef.current?.reload()
   }, [selectedProvider])
 
+  const handlePreview = (record: APIs) => {
+    navigate(`service/${record.team.id}/aiInside/${record.service.id}/route/${record.id}`)
+  }
   const requestApis = async (params: any) => {
     if (!selectedProvider) return
     setQueryBtnLoading(true)
@@ -52,7 +55,7 @@ const ApiSettings: React.FC = () => {
         eoParams.start = startTime
         eoParams.end = endTime
       }
-      const response = await fetchData<BasicResponse<{ data: APIKey[] }>>('ai/apis', {
+      const response = await fetchData<BasicResponse<{ data: APIs[] }>>('ai/apis', {
         method: 'GET',
         eoParams
       })
@@ -81,28 +84,28 @@ const ApiSettings: React.FC = () => {
     }
   }
 
-  const operation: PageProColumns<APIKey>[] = [
+  const operation: PageProColumns<APIs>[] = [
     {
       title: '',
       key: 'option',
       btnNums: 4,
       fixed: 'right',
       valueType: 'option',
-      render: (_: React.ReactNode, entity: APIKey) => [
+      render: (_: React.ReactNode, entity: APIs) => [
         <TableBtnWithPermission
-          access="system.settings.ai_key_resource.manager"
-          key="edit"
-          btnType="edit"
-          // onClick={() => handleEdit(entity)}
-          btnTitle={$t('编辑')}
+          access="team.service.router.view"
+          key="preview"
+          btnType="view"
+          onClick={() => handlePreview(entity)}
+          btnTitle={$t('预览')}
         />
       ]
     }
   ]
 
-  const columns: PageProColumns<APIKey>[] = [
+  const columns: PageProColumns<APIs>[] = [
     {
-      title: 'AI 服务',
+      title: $t('AI 服务'),
       dataIndex: 'name',
       key: 'name',
       width: 180
@@ -112,10 +115,16 @@ const ApiSettings: React.FC = () => {
       dataIndex: 'request_path',
       key: 'request_path',
       width: 200,
-      ellipsis: true
+      ellipsis: true,
+      render: (text: string, record: APIs) => (
+        <p>
+          <Typography.Text type="success">{record.method}</Typography.Text>
+          <span className="ml-1">{text}</span>
+        </p>
+      )
     },
     {
-      title: '模型',
+      title: $t('模型'),
       dataIndex: ['model', 'name'],
       key: 'model',
       width: 150,
@@ -125,14 +134,14 @@ const ApiSettings: React.FC = () => {
       valueEnum: {}
     },
     {
-      title: '已用 Token',
+      title: $t('已用 Token'),
       dataIndex: 'use_token',
       key: 'use_token',
       width: 120,
       sorter: true
     },
     {
-      title: '是否放行',
+      title: $t('是否放行'),
       dataIndex: 'disabled',
       ellipsis: true,
       filters: true,
@@ -144,7 +153,7 @@ const ApiSettings: React.FC = () => {
       }
     },
     {
-      title: '编辑时间',
+      title: $t('编辑时间'),
       dataIndex: 'update_time',
       key: 'update_time',
       width: 200,
@@ -165,22 +174,26 @@ const ApiSettings: React.FC = () => {
 
   const renderProviderBanner = () => {
     if (!provider) return null
-
-    console.log(provider)
     if (provider.status === 'disabled' || provider.status === 'abnormal') {
       const message =
         provider.status === 'disabled'
           ? $t(`当前供应商异常，以下API均临时调用 ${provider.backupName} 下的 ${provider.backupModel} 模型能力。`)
           : $t(`当前供应商异常，以下API均临时调用 ${provider.backupName} 下的 ${provider.backupModel} 模型能力。`)
-
+      const type = provider.status === 'disabled' ? 'warning' : 'error'
       return (
         <Alert
           message={message}
-          type="warning"
+          type={type}
           className="my-4"
           showIcon
           action={
-            <Button size="small" type="link" onClick={() => navigate('/aisetting')}>
+            <Button
+              size="small"
+              type="link"
+              onClick={() => {
+                navigate('/aisetting')
+              }}
+            >
               {$t('查看详情')}
             </Button>
           }
@@ -192,7 +205,7 @@ const ApiSettings: React.FC = () => {
 
   return (
     <InsidePage
-      className="overflow-y-auto gap-4 pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X"
+      className="overflow-y-auto gap-4 pb-PAGE_INSIDE_B"
       pageTitle={$t('AI API 列表')}
       description={
         <>
@@ -211,7 +224,7 @@ const ApiSettings: React.FC = () => {
       showBorder={false}
       scrollPage={false}
     >
-      <div className="h-[calc(100%-1rem-36px)]">
+      <div className="h-[calc(100%-1rem-36px)] pr-PAGE_INSIDE_X">
         <PageList
           ref={pageListRef}
           rowKey="id"

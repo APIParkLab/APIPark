@@ -17,11 +17,11 @@
 
 import G6, { EdgeConfig } from '@antv/g6'
 import {
-  SELF_SPACE_CONTENT_COLOR,
   OUT_SPACE_CONTENT_COLOR,
+  OUT_SPACE_THEME,
   RELATIVE_PICTURE_NODE_FONTSIZE,
-  SELF_SPACE_THEME,
-  OUT_SPACE_THEME
+  SELF_SPACE_CONTENT_COLOR,
+  SELF_SPACE_THEME
 } from '@core/const/system-running/const'
 import { NodeData } from '@core/const/system-running/type'
 import { TopologyProjectItem, TopologyServiceItem } from '@core/pages/systemRunning/SystemRunning'
@@ -143,131 +143,6 @@ export const getNodeSpacing = (num: number, nodes?: unknown) => {
   }
   return result
 }
-
-//   const registerEdge = () => {
-//     G6.registerEdge(
-//       'line-running',
-//       {
-//         options: {
-//           style: EDGE_STYLE
-//         },
-
-//         afterDraw: (cfg, group) => {
-//           const lineDash = [4, 2, 1, 2]
-//           if (!group) return
-//           const shape = group.get('children')[0]
-//           let index = 0
-//           // Define the animation
-//           shape.animate(
-//             () => {
-//               index = index + 0.4
-//               if (index > 1000) {
-//                 index = 0
-//               }
-//               const res = {
-//                 lineDash,
-//                 lineDashOffset: -index
-//               }
-//               return res
-//             },
-//             {
-//               repeat: true,
-//               duration: 5000
-//             }
-//           )
-//         },
-
-//         setState: (name, value, item) => {
-//           if (!item || !name) return
-//           const shape = item.get('keyShape')
-//           const itemStatus = item.getStates()
-
-//           if (
-//             !['edge-success', 'edge-error', 'edge-transparent'].includes(name) &&
-//             itemStatus.some((state) => ['edge-error', 'edge-success', 'edge-transparent'].includes(state))
-//           )
-//             return
-//           const theme = item?._cfg?.model?.style?.stroke || SELF_SPACE_THEME
-//           if (name === 'running') {
-//             if (value) {
-//               shape.attr({
-//                 lineWidth: 4,
-//                 shadowColor: theme,
-//                 shadowBlur: 2
-//               })
-//             } else {
-//               shape.attr(EDGE_STYLE)
-//             }
-//           }
-//         }
-//       },
-//       'quadratic'
-//     )
-//   }
-
-//   private initGraph = (container: ElementRef) => {
-//     const element = container.nativeElement
-//     this.graph = new G6.Graph({
-//       container: container.nativeElement,
-//       plugins: [this.tooltip],
-//       layout: {
-//         type: 'force',
-//         // 稳定系数,初始动画的加载时长（稳定性）=节点数量/稳定系数
-//         alphaDecay: 0.08,
-//         // 因为有分组的存在，整体布局需要往左偏移一点
-//         center: [element.scrollWidth / 2 - 150, element.scrollHeight / 2],
-//         preventOverlap: true,
-//         linkDistance: (d: nodeAny) => {
-//           if (d.source.id === 'node0') {
-//             return 100
-//           }
-//           return 30
-//         },
-//         nodeStrength: (d: nodeAny) => {
-//           if (d.isLeaf) {
-//             return -50
-//           }
-//           return -10
-//         },
-//         edgeStrength: (d: nodeAny) => {
-//           if (d.source.id === 'node1' || d.source.id === 'node2' || d.source.id === 'node3') {
-//             return 0.7
-//           }
-//           return 0.1
-//         }
-//       },
-//       modes: {
-//         default: ['drag-canvas', 'drag-node', 'zoom-canvas']
-//       },
-//       defaultNode: {
-//         size: [24, 24],
-//         style: {
-//           radius: 5,
-//           stroke: '#69c0ff',
-//           lineWidth: 1,
-//           fillOpacity: 1
-//         },
-//         labelCfg: {
-//           style: {
-//             fontSize: RELATIVE_PICTURE_NODE_FONTSIZE,
-//             fill: this.textColor
-//           },
-//           position: 'bottom',
-//           offset: 12
-//         }
-//       },
-//       defaultEdge: {
-//         type: 'line-running',
-//         label: $t('详情',
-//         labelCfg: {
-//           style: {
-//             fill: '5B8FF9',
-//             opacity: 0
-//           }
-//         }
-//       }
-//     })
-//   }
 
 export class UnionFind {
   private parent: Record<string, string>

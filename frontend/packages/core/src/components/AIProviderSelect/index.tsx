@@ -1,5 +1,6 @@
 import { STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
+import { $t } from '@common/locales'
 import { ModelDetailData } from '@core/pages/aiSetting/types'
 import { Select, Space, message } from 'antd'
 import React, { useEffect, useState } from 'react'
@@ -52,10 +53,10 @@ const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, st
           const selectedProvider: AIProvider = value ? providers.find((p) => p.id === value) : providers[0]
           onChange?.(selectedProvider.id, selectedProvider)
         } else {
-          message.error(msg || t('Failed to fetch AI providers'))
+          message.error(msg || t('获取 AI providers 失败'))
         }
       } catch (error) {
-        message.error(t('Failed to fetch AI providers'))
+        message.error(t('获取 AI providers 失败'))
       } finally {
         isMounted && setLoading(false)
       }
@@ -70,7 +71,7 @@ const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, st
 
   return (
     <Space className="flex items-center">
-      <span>{t('AI 供应商')}:</span>
+      <span>{$t('AI 供应商')}:</span>
       <Select
         value={value}
         onChange={(selectedValue) => {
