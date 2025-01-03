@@ -6,11 +6,18 @@
   "Kecbb0e45": "System",
   "Ka358e23d": "General",
   "K449058e9": "API Gateway",
-  "K99935e6f": "AI Model",
   "K1deaa2dd": "User",
   "K631d646f": "Open API",
   "K1196b104": "APIPark",
+  "Kf1b166e7": "Details",
+  "K7ac2be34": "AI Model Management",
+  "K18dccc1a": "Sync Latest Model",
   "K5cfdd950": "This data cannot be recovered after deletion. Are you sure you want to delete?",
+  "K28435c5c": "API Details",
   "Kb9052305": "Search Username, Email",
-  "K40a89bd8": "Enter Name, ID to Search Member"
+  "Kbe3e9335": "Exit Test",
+  "K40a89bd8": "Enter Name, ID to Search Member",
+  "K1da86266": "Invalid",
+  "Kb147fabc": "Create",
+  "K40ca4f2": "Update"
 }

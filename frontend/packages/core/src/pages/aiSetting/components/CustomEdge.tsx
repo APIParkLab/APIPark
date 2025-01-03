@@ -31,7 +31,7 @@ export default function CustomEdge({
       {label && (
         <EdgeLabelRenderer>
           <a
-            href={`/aiSetting/model?modelId=${modelId}`}
+            href={`${label?.toString().includes('apis') ? '/aiapis' : '/keysetting'}?modelId=${modelId}`}
             target="_blank"
             style={{
               position: 'absolute',
