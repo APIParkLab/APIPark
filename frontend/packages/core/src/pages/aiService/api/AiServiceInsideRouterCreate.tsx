@@ -20,6 +20,7 @@ import { App, Button, Form, Input, InputNumber, Row, Select, Space, Spin, Switch
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import AiServiceRouterModelConfig, { AiServiceRouterModelConfigHandle } from './AiServiceInsideRouterModelConfig'
+import WithPermission from '@common/components/aoplatform/WithPermission'
 
 type AiServiceRouterField = {
   name: string
@@ -51,7 +52,7 @@ type AiServiceRouterConfig = {
 const AiServiceInsideRouterCreate = () => {
   const navigator = useNavigate()
   const { message } = App.useApp()
-  const { serviceId, teamId, routeId } = useParams<RouterParams>()
+  const { serviceId, teamId, routeId, type } = useParams<RouterParams>()
   const [form] = Form.useForm()
   const { fetchData } = useFetch()
   const [loading, setLoading] = useState<boolean>(false)
@@ -103,7 +104,8 @@ const AiServiceInsideRouterCreate = () => {
       })
       .catch((errInfo) => Promise.reject(errInfo))
   }
-
+  const isDelete = type === 'apiDetail'
+  const backUrl = isDelete ? `/aiApis/list` : `/service/${teamId}/aiInside/${serviceId}/route`
   const openDrawer = (type: 'edit') => {
     setDrawerType(type)
   }
@@ -208,6 +210,7 @@ const AiServiceInsideRouterCreate = () => {
   }, [])
 
   const addVariable = () => {
+    if (isDelete) return
     form.setFieldsValue({
       variables: [...form.getFieldValue('variables'), { key: '', value: '', require: true }]
     })
@@ -264,12 +267,13 @@ const AiServiceInsideRouterCreate = () => {
       showBorder={false}
       scrollPage={false}
       className="overflow-y-auto"
-      backUrl={`/service/${teamId}/aiInside/${serviceId}/route`}
+      backUrl={backUrl}
       customBtn={
         <div className="flex items-center gap-btnbase">
           <Button
             icon={<Icon icon="ic:baseline-tune" height={18} width={18} />}
             iconPosition="end"
+            disabled={isDelete}
             onClick={() => openDrawer('edit')}
           >
             <div className="flex items-center gap-[10px]">
@@ -281,10 +285,11 @@ const AiServiceInsideRouterCreate = () => {
               {defaultLlm?.scopes?.map((x) => <Tag>{x?.toLocaleUpperCase()}</Tag>)}
             </div>
           </Button>
-
-          <Button type="primary" onClick={onFinish}>
-            {$t('保存')}
-          </Button>
+          {
+            type !== 'apiDetail' && (<Button type="primary" onClick={onFinish}>
+              {$t('保存')}
+            </Button>)
+          }
         </div>
       }
     >
@@ -293,125 +298,130 @@ const AiServiceInsideRouterCreate = () => {
         spinning={loading}
         wrapperClassName=" pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X"
       >
-        <Form
-          layout="vertical"
-          labelAlign="left"
-          scrollToFirstError
-          form={form}
-          className="flex flex-col mx-auto h-full"
-          name="AiServiceInsideRouterCreate"
-          onValuesChange={handleValuesChange}
-          onFinish={onFinish}
-          autoComplete="off"
-        >
-          <div className="">
-            <Row className="flex justify-between items-center w-full gap-btnbase">
-              <Form.Item<AiServiceRouterField>
-                className="flex-1"
-                label={$t('路由名称')}
-                name="name"
-                rules={[{ required: true, whitespace: true }]}
-              >
-                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} />
-              </Form.Item>
+        <WithPermission disabled={isDelete}>
+          <Form
+            layout="vertical"
+            labelAlign="left"
+            scrollToFirstError
+            form={form}
+            className="flex flex-col mx-auto h-full"
+            name="AiServiceInsideRouterCreate"
+            onValuesChange={handleValuesChange}
+            onFinish={onFinish}
+            autoComplete="off"
+          >
+            <div className="">
+              <Row className="flex justify-between items-center w-full gap-btnbase">
+                <Form.Item<AiServiceRouterField>
+                  className="flex-1"
+                  label={$t('路由名称')}
+                  name="name"
+                  rules={[{ required: true, whitespace: true }]}
+                >
+                  <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} />
+                </Form.Item>
 
-              <Form.Item className="flex-1" label={$t('请求路径')}>
-                <Space.Compact block>
-                  <Form.Item
-                    name="pathMatch"
-                    rules={[
-                      { required: true, whitespace: true },
-                      {
-                        validator: validateUrlSlash
-                      }
-                    ]}
-                    noStyle
-                  >
-                    <Select
-                      placeholder={$t(PLACEHOLDER.select)}
-                      options={apiPathMatchRulesOptions}
-                      className="w-[30%] min-w-[100px]"
-                    />
-                  </Form.Item>
-                  <Form.Item<AiServiceRouterField>
-                    name="path"
-                    rules={[
-                      { required: true, whitespace: true },
-                      {
-                        validator: validateUrlSlash
-                      }
-                    ]}
-                    noStyle
-                  >
-                    <Input
-                      prefix={prefixForce ? `${apiPrefix}/` : '/'}
-                      placeholder={$t(PLACEHOLDER.input)}
-                      onChange={(e) => {
-                        if ((e.target.value as string).endsWith('/*')) {
-                          form.setFieldValue('path', e.target.value.slice(0, -2))
-                          form.setFieldValue('pathMatch', 'prefix')
+                <Form.Item className="flex-1" label={$t('请求路径')}>
+                  <Space.Compact block>
+                    <Form.Item
+                      name="pathMatch"
+                      rules={[
+                        { required: true, whitespace: true },
+                        {
+                          validator: validateUrlSlash
                         }
-                      }}
-                    />
-                  </Form.Item>
-                </Space.Compact>
+                      ]}
+                      noStyle
+                    >
+                      <Select
+                        placeholder={$t(PLACEHOLDER.select)}
+                        options={apiPathMatchRulesOptions}
+                        className="w-[30%] min-w-[100px]"
+                      />
+                    </Form.Item>
+                    <Form.Item<AiServiceRouterField>
+                      name="path"
+                      rules={[
+                        { required: true, whitespace: true },
+                        {
+                          validator: validateUrlSlash
+                        }
+                      ]}
+                      noStyle
+                    >
+                      <Input
+                        prefix={prefixForce ? `${apiPrefix}/` : '/'}
+                        placeholder={$t(PLACEHOLDER.input)}
+                        onChange={(e) => {
+                          if ((e.target.value as string).endsWith('/*')) {
+                            form.setFieldValue('path', e.target.value.slice(0, -2))
+                            form.setFieldValue('pathMatch', 'prefix')
+                          }
+                        }}
+                      />
+                    </Form.Item>
+                  </Space.Compact>
+                </Form.Item>
+              </Row>
+
+              <Form.Item<AiServiceRouterField> label={$t('提示词')} name="prompt">
+                <PromptEditorResizable disabled={isDelete} variablesChange={handleVariablesChange} promptVariables={variablesTable} />
               </Form.Item>
-            </Row>
 
-            <Form.Item<AiServiceRouterField> label={$t('提示词')} name="prompt">
-              <PromptEditorResizable variablesChange={handleVariablesChange} promptVariables={variablesTable} />
-            </Form.Item>
-
-            <Form.Item<AiServiceRouterField>
-              label={
-                <div className="flex justify-between items-center w-full">
-                  <span>{$t('变量')}</span>
-                  <a className="flex items-center gap-[4px]" onClick={addVariable}>
-                    <Icon icon="ic:baseline-add" width={16} height={16} />
-                    New
-                  </a>
-                </div>
-              }
-              name="variables"
-              className="[&>.ant-row>.ant-col>label]:w-full"
-            >
-              <EditableTableNotAutoGen<VariableItems & { _id: string }>
-                getFromRef={setVariablesTableRef}
-                configFields={AI_SERVICE_VARIABLES_TABLE_COLUMNS}
-              />
-            </Form.Item>
-
-            <Form.Item<AiServiceRouterField> label={$t('描述')} name="description">
-              <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t('输入这个接口的描述')} />
-            </Form.Item>
-
-            <Row className="flex justify-between items-center w-full gap-btnbase">
               <Form.Item<AiServiceRouterField>
-                className="flex-1"
-                label={$t('请求超时时间')}
-                name={'timeout'}
-                rules={[{ required: true }]}
+                label={
+                  <div className="flex justify-between items-center w-full">
+                    <span>{$t('变量')}</span>
+                    <a
+                      className={`flex items-center gap-[4px] ${isDelete ? 'cursor-not-allowed' : ''}`}
+                      onClick={addVariable}
+                    >
+                      <Icon icon="ic:baseline-add" width={16} height={16} />
+                      New
+                    </a>
+                  </div>
+                }
+                name="variables"
+                className="[&>.ant-row>.ant-col>label]:w-full"
               >
-                <InputNumber className="w-INPUT_NORMAL" suffix="ms" min={1} placeholder={$t(PLACEHOLDER.input)} />
+                <EditableTableNotAutoGen<VariableItems & { _id: string }>
+                  getFromRef={setVariablesTableRef}
+                  configFields={AI_SERVICE_VARIABLES_TABLE_COLUMNS}
+                />
               </Form.Item>
+
+              <Form.Item<AiServiceRouterField> label={$t('描述')} name="description">
+                <Input.TextArea className="w-INPUT_NORMAL" placeholder={$t('输入这个接口的描述')} />
+              </Form.Item>
+
+              <Row className="flex justify-between items-center w-full gap-btnbase">
+                <Form.Item<AiServiceRouterField>
+                  className="flex-1"
+                  label={$t('请求超时时间')}
+                  name={'timeout'}
+                  rules={[{ required: true }]}
+                >
+                  <InputNumber className="w-INPUT_NORMAL" suffix="ms" min={1} placeholder={$t(PLACEHOLDER.input)} />
+                </Form.Item>
+                <Form.Item<AiServiceRouterField>
+                  className="flex-1"
+                  label={$t('重试次数')}
+                  name={'retry'}
+                  rules={[{ required: true }]}
+                >
+                  <InputNumber className="w-INPUT_NORMAL" min={0} placeholder={$t(PLACEHOLDER.input)} />
+                </Form.Item>
+              </Row>
               <Form.Item<AiServiceRouterField>
-                className="flex-1"
-                label={$t('重试次数')}
-                name={'retry'}
-                rules={[{ required: true }]}
+                label={$t('拦截接口')}
+                name="disabled"
+                extra={$t('开启拦截后，网关会拦截所有该路径的请求。')}
               >
-                <InputNumber className="w-INPUT_NORMAL" min={0} placeholder={$t(PLACEHOLDER.input)} />
+                <Switch />
               </Form.Item>
-            </Row>
-            <Form.Item<AiServiceRouterField>
-              label={$t('拦截接口')}
-              name="disabled"
-              extra={$t('开启拦截后，网关会拦截所有该路径的请求。')}
-            >
-              <Switch />
-            </Form.Item>
-          </div>
-        </Form>
+            </div>
+          </Form>
+        </WithPermission>
       </Spin>
       <DrawerWithFooter title={$t('模型配置')} open={open} onClose={onClose} onSubmit={() => handlerSubmit()}>
         <AiServiceRouterModelConfig ref={drawerAddFormRef} llmList={llmList} entity={defaultLlm!} />
