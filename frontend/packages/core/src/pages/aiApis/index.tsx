@@ -22,6 +22,7 @@ const ApiSettings: React.FC = () => {
   const [provider, setProvider] = useState<AIProvider | undefined>()
   const { fetchData } = useFetch()
   const [searchWord, setSearchWord] = useState<string>('')
+  const [columns, setColumns] = useState<PageProColumns<APIs>[]>([])
   const [total, setTotal] = useState<number>(0)
   const [timeButton, setTimeButton] = useState<TimeRangeButton>('day')
   const navigate = useNavigate()
@@ -36,9 +37,14 @@ const ApiSettings: React.FC = () => {
   }, [selectedProvider])
 
   const handlePreview = (record: APIs) => {
-    navigate(`service/${record.team.id}/aiInside/${record.service.id}/route/${record.id}`)
+    navigate(`../service/${record.team.id}/aiInside/${record.service.id}/route/${record.id}/apiDetail`)
   }
-  const requestApis = async (params: any) => {
+  const requestApis = async (params: any & {
+    pageSize: number;
+    current: number;
+  },
+    sort: Record<string, string>,
+    filter: Record<string, string>) => {
     if (!selectedProvider) return
     setQueryBtnLoading(true)
     try {
@@ -46,6 +52,11 @@ const ApiSettings: React.FC = () => {
         provider: selectedProvider,
         page_size: params.pageSize,
         keyword: searchWord,
+        sort: Object.keys(sort)?.length > 0 ? 'use_token' : undefined,
+        asc: Object.keys(sort)?.length > 0 ? Object.values(sort)?.[0] === 'ascend' : undefined,
+        models: filter?.model && filter?.model?.length ? JSON.stringify(filter.model) : undefined,
+        services: filter?.name && filter?.name?.length ? JSON.stringify(filter.name) : undefined,
+        disabled: filter?.disable && filter?.disable?.length ? filter.disable[0] : undefined,
         page: params.current,
         start: timeRange.start,
         end: timeRange.end
@@ -62,8 +73,21 @@ const ApiSettings: React.FC = () => {
       setQueryBtnLoading(false)
       if (response.code === STATUS_CODE.SUCCESS) {
         setTotal(response.data.total)
+        const modalMap: {
+          [key: string]: string
+        } = response.data?.condition?.models.reduce((acc: { [key: string]: string }, item: { id: string; name: string }) => {
+          acc[item.id] = $t(item.name)
+          return acc
+        }, {})
+        const serviceMap: {
+          [key: string]: string
+        } = response.data?.condition?.services.reduce((acc: { [key: string]: string }, item: { id: string; name: string }) => {
+          acc[item.id] = $t(item.name)
+          return acc
+        }, {})
+        setTableColumns(modalMap, serviceMap)
         return {
-          data: response.data.apis,
+          data: response.data.apis || [],
           success: true,
           total: response.data.total
         }
@@ -83,7 +107,74 @@ const ApiSettings: React.FC = () => {
       }
     }
   }
-
+  const setTableColumns = (modalMap: {
+    [key: string]: string
+  }, serviceMap: {
+    [key: string]: string
+  }) => {
+    setColumns([
+      {
+        title: $t('AI 服务'),
+        dataIndex: 'name',
+        key: 'name',
+        width: 180,
+        filters: true,
+        valueEnum: serviceMap || {}
+      },
+      {
+        title: 'API URL',
+        dataIndex: 'request_path',
+        key: 'request_path',
+        ellipsis: true,
+        render: (text: string, record: APIs) => (
+          <p>
+            <Typography.Text type="success">{record.method}</Typography.Text>
+            <span className="ml-1">{text}</span>
+          </p>
+        )
+      },
+      {
+        title: $t('模型'),
+        dataIndex: ['model', 'name'],
+        key: 'model',
+        width: 150,
+        filters: true,
+        onFilter: true,
+        valueType: 'select',
+        valueEnum: modalMap || {}
+      },
+      {
+        title: $t('已用 Token'),
+        dataIndex: 'use_token',
+        key: 'use_token',
+        width: 120,
+        sorter: (a: any, b: any) => {
+          return (a.priority as number) - (b.priority as number)
+        }
+      },
+      {
+        title: $t('是否放行'),
+        dataIndex: 'disable',
+        ellipsis: true,
+        width: 120,
+        filters: true,
+        onFilter: true,
+        valueType: 'select',
+        valueEnum: {
+          true: { text: <Typography.Text type="danger">{$t('拦截')}</Typography.Text> },
+          false: { text: <Typography.Text type="success">{$t('放行')}</Typography.Text> }
+        }
+      },
+      {
+        title: $t('编辑时间'),
+        dataIndex: 'update_time',
+        key: 'update_time',
+        width: 200,
+        render: (time: string) => <Typography.Text>{dayjs(time).format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
+      },
+      ...operation
+    ])
+  }
   const operation: PageProColumns<APIs>[] = [
     {
       title: '',
@@ -95,71 +186,12 @@ const ApiSettings: React.FC = () => {
         <TableBtnWithPermission
           access="team.service.router.view"
           key="preview"
-          btnType="view"
+          btnType="logs"
           onClick={() => handlePreview(entity)}
           btnTitle={$t('预览')}
         />
       ]
     }
-  ]
-
-  const columns: PageProColumns<APIs>[] = [
-    {
-      title: $t('AI 服务'),
-      dataIndex: 'name',
-      key: 'name',
-      width: 180
-    },
-    {
-      title: 'API URL',
-      dataIndex: 'request_path',
-      key: 'request_path',
-      width: 200,
-      ellipsis: true,
-      render: (text: string, record: APIs) => (
-        <p>
-          <Typography.Text type="success">{record.method}</Typography.Text>
-          <span className="ml-1">{text}</span>
-        </p>
-      )
-    },
-    {
-      title: $t('模型'),
-      dataIndex: ['model', 'name'],
-      key: 'model',
-      width: 150,
-      filters: true,
-      onFilter: true,
-      valueType: 'select',
-      valueEnum: {}
-    },
-    {
-      title: $t('已用 Token'),
-      dataIndex: 'use_token',
-      key: 'use_token',
-      width: 120,
-      sorter: true
-    },
-    {
-      title: $t('是否放行'),
-      dataIndex: 'disabled',
-      ellipsis: true,
-      filters: true,
-      onFilter: true,
-      valueType: 'select',
-      valueEnum: {
-        true: { text: <Typography.Text type="danger">{$t('拦截')}</Typography.Text> },
-        false: { text: <Typography.Text type="success">{$t('放行')}</Typography.Text> }
-      }
-    },
-    {
-      title: $t('编辑时间'),
-      dataIndex: 'update_time',
-      key: 'update_time',
-      width: 200,
-      render: (time: string) => <Typography.Text>{dayjs(time).format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
-    },
-    ...operation
   ]
 
   const resetQuery = () => {
@@ -184,7 +216,7 @@ const ApiSettings: React.FC = () => {
         <Alert
           message={message}
           type={type}
-          className="my-4"
+          className="mt-[30px]"
           showIcon
           action={
             <Button
@@ -205,7 +237,7 @@ const ApiSettings: React.FC = () => {
 
   return (
     <InsidePage
-      className="overflow-y-auto gap-4 pb-PAGE_INSIDE_B"
+      className="overflow-y-auto pb-PAGE_INSIDE_B"
       pageTitle={$t('AI API 列表')}
       description={
         <>
@@ -255,7 +287,12 @@ const ApiSettings: React.FC = () => {
               </div>
             </div>
           }
-          request={requestApis}
+          request={async (params: any & {
+            pageSize: number;
+            current: number;
+          },
+            sort: Record<string, string>,
+            filter: Record<string, string>) => requestApis(params, sort, filter)}
           onSearchWordChange={(e) => {
             setSearchWord(e.target.value)
           }}
