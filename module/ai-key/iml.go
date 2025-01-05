@@ -6,6 +6,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/APIParkLab/APIPark/service/cluster"
+	"github.com/eolinker/eosc/log"
+
+	"github.com/APIParkLab/APIPark/gateway"
+
 	"github.com/eolinker/go-common/utils"
 
 	"gorm.io/gorm"
@@ -27,9 +32,32 @@ import (
 var _ IKeyModule = &imlKeyModule{}
 
 type imlKeyModule struct {
-	providerService ai.IProviderService `autowired:""`
-	aiKeyService    ai_key.IKeyService  `autowired:""`
-	transaction     store.ITransaction  `autowired:""`
+	providerService ai.IProviderService     `autowired:""`
+	aiKeyService    ai_key.IKeyService      `autowired:""`
+	clusterService  cluster.IClusterService `autowired:""`
+	transaction     store.ITransaction      `autowired:""`
+}
+
+func newKey(key *ai_key.Key) *gateway.DynamicRelease {
+
+	return &gateway.DynamicRelease{
+		BasicItem: &gateway.BasicItem{
+			ID:          key.ID,
+			Description: key.Name,
+			Resource:    "ai-key",
+			Version:     time.Now().Format("20060102150405"),
+			MatchLabels: map[string]string{
+				"module": "ai-key",
+			},
+		},
+		Attr: map[string]interface{}{
+			"expired":  key.ExpireTime,
+			"config":   key.Config,
+			"provider": key.Provider,
+			"priority": key.Priority,
+			"disabled": key.Status == 1,
+		},
+	}
 }
 
 func (i *imlKeyModule) Create(ctx context.Context, providerId string, input *ai_key_dto.Create) error {
@@ -57,11 +85,9 @@ func (i *imlKeyModule) Create(ctx context.Context, providerId string, input *ai_
 		status := ai_key_dto.KeyNormal.Int()
 		if input.ExpireTime > 0 && time.Unix(int64(input.ExpireTime), 0).Before(time.Now()) {
 			status = ai_key_dto.KeyExpired.Int()
-		} else {
-			// TODO: 发布Key到网关
 		}
 
-		return i.aiKeyService.Create(ctx, &ai_key.Create{
+		err = i.aiKeyService.Create(ctx, &ai_key.Create{
 			ID:         input.Id,
 			Name:       input.Name,
 			Config:     input.Config,
@@ -70,7 +96,41 @@ func (i *imlKeyModule) Create(ctx context.Context, providerId string, input *ai_
 			ExpireTime: input.ExpireTime,
 			Priority:   priority + 1,
 		})
+
+		info, _ := i.aiKeyService.Get(ctx, input.Id)
+		releases := []*gateway.DynamicRelease{newKey(info)}
+		return i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
 	})
+}
+
+func (i *imlKeyModule) syncGateway(ctx context.Context, clusterId string, releases []*gateway.DynamicRelease, online bool) error {
+	client, err := i.clusterService.GatewayClient(ctx, clusterId)
+	if err != nil {
+		log.Errorf("get apinto client error: %v", err)
+		return nil
+	}
+	defer func() {
+		err := client.Close(ctx)
+		if err != nil {
+			log.Warn("close apinto client:", err)
+		}
+	}()
+	for _, releaseInfo := range releases {
+		dynamicClient, err := client.Dynamic(releaseInfo.Resource)
+		if err != nil {
+			return err
+		}
+		if online {
+			err = dynamicClient.Online(ctx, releaseInfo)
+		} else {
+			err = dynamicClient.Offline(ctx, releaseInfo)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (i *imlKeyModule) Edit(ctx context.Context, providerId string, id string, input *ai_key_dto.Edit) error {

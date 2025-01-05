@@ -2,7 +2,6 @@ package ai
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -30,24 +29,24 @@ import (
 	"gorm.io/gorm"
 )
 
-func newAIUpstream(provider string, uri model_runtime.IProviderURI) *gateway.DynamicRelease {
+func newKey(key *ai_key.Key) *gateway.DynamicRelease {
+
 	return &gateway.DynamicRelease{
 		BasicItem: &gateway.BasicItem{
-			ID:          provider,
-			Description: fmt.Sprintf("auto create by ai provider %s", provider),
-			Resource:    "service",
+			ID:          key.ID,
+			Description: key.Name,
+			Resource:    "ai-key",
 			Version:     time.Now().Format("20060102150405"),
 			MatchLabels: map[string]string{
-				"module": "service",
+				"module": "ai-key",
 			},
 		},
 		Attr: map[string]interface{}{
-			"driver":    "http",
-			"balance":   "round-robin",
-			"nodes":     []string{fmt.Sprintf("%s weight=100", uri.Host())},
-			"pass_host": "node",
-			"scheme":    uri.Scheme(),
-			"timeout":   300000,
+			"expired":  key.ExpireTime,
+			"config":   key.Config,
+			"provider": key.Provider,
+			"priority": key.Priority,
+			"disabled": key.Status == 1,
 		},
 	}
 }
@@ -442,72 +441,6 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 	}, nil
 }
 
-func (i *imlProviderModule) UpdateProviderStatus(ctx context.Context, id string, enable bool) error {
-	driver, has := model_runtime.GetProvider(id)
-	if !has {
-		return fmt.Errorf("ai provider not found")
-	}
-	info, err := i.providerService.Get(ctx, id)
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
-		return fmt.Errorf("ai provider not found")
-	}
-
-	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		status := 0
-		if enable {
-			status = 1
-		}
-		err = i.providerService.Save(txCtx, id, &ai.SetProvider{
-			Status: &status,
-		})
-		if err != nil {
-			return err
-		}
-		if enable {
-			cfg := make(map[string]interface{})
-			err = json.Unmarshal([]byte(info.Config), &cfg)
-			if err != nil {
-				log.Errorf("unmarshal ai provider config error,id is %s,err is %v", info.Id, err)
-				return err
-			}
-			cfg["driver"] = info.Id
-
-			return i.syncGateway(txCtx, cluster.DefaultClusterID, []*gateway.DynamicRelease{{
-				BasicItem: &gateway.BasicItem{
-					ID:          info.Id,
-					Description: info.Name,
-					Version:     info.UpdateAt.Format("20060102150405"),
-					MatchLabels: map[string]string{
-						"module": "ai-provider",
-					},
-				},
-				Attr: cfg,
-			}, newAIUpstream(info.Id, driver.URI()),
-			}, enable)
-		} else {
-			return i.syncGateway(txCtx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
-				{
-					BasicItem: &gateway.BasicItem{
-						ID:       info.Id,
-						Resource: info.Id,
-					},
-				},
-				{
-					BasicItem: &gateway.BasicItem{
-						ID:       info.Id,
-						Resource: "service",
-					},
-				},
-			}, enable)
-		}
-
-	})
-
-}
-
 func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string, input *ai_dto.UpdateConfig) error {
 	p, has := model_runtime.GetProvider(id)
 	if !has {
@@ -531,6 +464,10 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 			DefaultLLM: input.DefaultLLM,
 			Config:     input.Config,
 		}
+	}
+	model, has := p.GetModel(input.DefaultLLM)
+	if !has {
+		return fmt.Errorf("ai provider model not found")
 	}
 	err = p.Check(input.Config)
 	if err != nil {
@@ -573,6 +510,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		if err != nil {
 			return err
 		}
+
 		if input.Enable != nil {
 			status = 0
 			if *input.Enable {
@@ -584,40 +522,30 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		if err != nil {
 			return err
 		}
-		cfg := make(map[string]interface{})
-		err = json.Unmarshal([]byte(input.Config), &cfg)
+		// 获取当前供应商所有Key信息
+		defaultKey, err := i.aiKeyService.DefaultKey(ctx, id)
 		if err != nil {
-			log.Errorf("unmarshal ai provider config error,id is %s,err is %v", id, err)
 			return err
 		}
-		return nil
-		//return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
-		//	{
-		//		BasicItem: &gateway.BasicItem{
-		//			ID:          id,
-		//			Description: info.Name,
-		//			Resource:    id,
-		//			Version:     info.UpdateAt.Format("20060102150405"),
-		//			MatchLabels: map[string]string{
-		//				"module": "ai-provider",
-		//			},
-		//		},
-		//		Attr: cfg,
-		//	}, newAIUpstream(id, p.URI()),
-		//}, true)
-	})
-}
-
-func (i *imlProviderModule) UpdateProviderDefaultLLM(ctx context.Context, id string, input *ai_dto.UpdateLLM) error {
-	_, err := i.providerService.Get(ctx, id)
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
-		return fmt.Errorf("ai provider not found")
-	}
-	return i.providerService.Save(ctx, id, &ai.SetProvider{
-		DefaultLLM: &input.LLM,
+		cfg := make(map[string]interface{})
+		cfg["provider"] = info.Id
+		cfg["model"] = info.DefaultLLM
+		cfg["model_config"] = model.DefaultConfig()
+		cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
+		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+			{
+				BasicItem: &gateway.BasicItem{
+					ID:          id,
+					Description: info.Name,
+					Resource:    "ai-provider",
+					Version:     info.UpdateAt.Format("20060102150405"),
+					MatchLabels: map[string]string{
+						"module": "ai-provider",
+					},
+				},
+				Attr: cfg,
+			}, newKey(defaultKey),
+		}, true)
 	})
 }
 
@@ -626,20 +554,30 @@ func (i *imlProviderModule) getAiProviders(ctx context.Context) ([]*gateway.Dyna
 	if err != nil {
 		return nil, err
 	}
+
 	providers := make([]*gateway.DynamicRelease, 0, len(list))
-	for _, p := range list {
-		cfg := make(map[string]interface{})
-		err = json.Unmarshal([]byte(p.Config), &cfg)
-		if err != nil {
-			log.Errorf("unmarshal ai provider config error,id is %s,err is %v", p.Id, err)
-			continue
+	for _, l := range list {
+		// 获取当前供应商所有Key信息
+
+		driver, has := model_runtime.GetProvider(l.Id)
+		if !has {
+			return nil, fmt.Errorf("provider not found: %s", l.Id)
 		}
+		model, has := driver.GetModel(l.DefaultLLM)
+		if !has {
+			return nil, fmt.Errorf("model not found: %s", l.DefaultLLM)
+		}
+		cfg := make(map[string]interface{})
+		cfg["provider"] = l.Id
+		cfg["model"] = l.DefaultLLM
+		cfg["model_config"] = model.DefaultConfig()
+		cfg["priority"] = l.Priority
 		providers = append(providers, &gateway.DynamicRelease{
 			BasicItem: &gateway.BasicItem{
-				ID:          p.Id,
-				Description: p.Name,
-				Resource:    p.Id,
-				Version:     p.UpdateAt.Format("20060102150405"),
+				ID:          l.Id,
+				Description: l.Name,
+				Resource:    "ai-provider",
+				Version:     l.UpdateAt.Format("20060102150405"),
 				MatchLabels: map[string]string{
 					"module": "ai-provider",
 				},
@@ -655,16 +593,9 @@ func (i *imlProviderModule) initGateway(ctx context.Context, clusterId string, c
 	if err != nil {
 		return err
 	}
-	serviceClient, err := clientDriver.Dynamic("service")
-	if err != nil {
-		return err
-	}
+
 	for _, p := range providers {
-		driver, has := model_runtime.GetProvider(p.ID)
-		if !has {
-			continue
-		}
-		client, err := clientDriver.Dynamic(p.ID)
+		client, err := clientDriver.Dynamic(p.Resource)
 		if err != nil {
 			return err
 		}
@@ -672,12 +603,6 @@ func (i *imlProviderModule) initGateway(ctx context.Context, clusterId string, c
 		if err != nil {
 			return err
 		}
-
-		err = serviceClient.Online(ctx, newAIUpstream(p.ID, driver.URI()))
-		if err != nil {
-			return err
-		}
-
 	}
 
 	return nil

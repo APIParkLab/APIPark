@@ -17,9 +17,9 @@ type IProviderModule interface {
 	Provider(ctx context.Context, id string) (*ai_dto.Provider, error)
 	SimpleProvider(ctx context.Context, id string) (*ai_dto.SimpleProvider, error)
 	LLMs(ctx context.Context, driver string) ([]*ai_dto.LLMItem, *ai_dto.ProviderItem, error)
-	UpdateProviderStatus(ctx context.Context, id string, enable bool) error
+	//UpdateProviderStatus(ctx context.Context, id string, enable bool) error
 	UpdateProviderConfig(ctx context.Context, id string, input *ai_dto.UpdateConfig) error
-	UpdateProviderDefaultLLM(ctx context.Context, id string, input *ai_dto.UpdateLLM) error
+	//UpdateProviderDefaultLLM(ctx context.Context, id string, input *ai_dto.UpdateLLM) error
 	Sort(ctx context.Context, input *ai_dto.Sort) error
 }
 
