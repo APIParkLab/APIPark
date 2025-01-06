@@ -363,6 +363,7 @@ const KeySettings: React.FC = () => {
           request={requestApiKeys}
           onSearchWordChange={(e) => {
             setSearchWord(e.target.value)
+            pageListRef.current?.reload()
           }}
           showPagination={true}
           searchPlaceholder={$t('请输入名称搜索')}
