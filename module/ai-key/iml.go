@@ -152,7 +152,7 @@ func (i *imlKeyModule) Edit(ctx context.Context, providerId string, id string, i
 			if err != nil {
 				return fmt.Errorf("config check failed: %w", err)
 			}
-			cfg, err := p.GenConfig(info.Config, *input.Config)
+			cfg, err := p.GenConfig(*input.Config, info.Config)
 			if err != nil {
 				return fmt.Errorf("config gen failed: %w", err)
 			}
@@ -184,16 +184,25 @@ func (i *imlKeyModule) Edit(ctx context.Context, providerId string, id string, i
 			// 停用、超额需要启用，所以维持原状态
 			status = orgStatus.Int()
 		}
-		if status == ai_key_dto.KeyNormal.Int() {
-			// TODO: 发布Key到网关
-		}
 
-		return i.aiKeyService.Save(ctx, id, &ai_key.Edit{
+		err = i.aiKeyService.Save(ctx, id, &ai_key.Edit{
 			Name:       input.Name,
 			Config:     input.Config,
 			ExpireTime: input.ExpireTime,
 			Status:     &status,
 		})
+		if err != nil {
+			return err
+		}
+		if status == ai_key_dto.KeyNormal.Int() {
+			info, err = i.aiKeyService.Get(ctx, id)
+			if err != nil {
+				return err
+			}
+			releases := []*gateway.DynamicRelease{newKey(info)}
+			return i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
+		}
+		return nil
 	})
 
 }
@@ -365,7 +374,6 @@ func (i *imlKeyModule) UpdateKeyStatus(ctx context.Context, providerId string, i
 	}
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		if !enable {
-			// TODO：下线Key
 			status := ai_key_dto.KeyDisable.Int()
 			err = i.aiKeyService.Save(ctx, id, &ai_key.Edit{
 				Status: &status,
