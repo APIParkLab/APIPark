@@ -367,9 +367,20 @@ func (i *imlKeyModule) UpdateKeyStatus(ctx context.Context, providerId string, i
 		if !enable {
 			// TODO：下线Key
 			status := ai_key_dto.KeyDisable.Int()
-			return i.aiKeyService.Save(ctx, id, &ai_key.Edit{
+			err = i.aiKeyService.Save(ctx, id, &ai_key.Edit{
 				Status: &status,
 			})
+			if err != nil {
+				return err
+			}
+			releases := []*gateway.DynamicRelease{{
+				BasicItem: &gateway.BasicItem{
+					ID:       id,
+					Resource: "ai-key",
+				},
+				Attr: nil,
+			}}
+			return i.syncGateway(ctx, providerId, releases, false)
 		}
 		if info.Status == ai_key_dto.KeyDisable.Int() || info.Status == ai_key_dto.KeyExceed.Int() {
 			// 超额 或 停用状态，可启用
@@ -380,7 +391,6 @@ func (i *imlKeyModule) UpdateKeyStatus(ctx context.Context, providerId string, i
 					Status: &status,
 				})
 			}
-			// TODO：发布Key到网关
 			status := ai_key_dto.KeyNormal.Int()
 			err = i.aiKeyService.Save(ctx, id, &ai_key.Edit{
 				Status: &status,
