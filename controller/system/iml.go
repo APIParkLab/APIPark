@@ -437,7 +437,7 @@ func (i *imlInitController) createAIService(ctx context.Context, teamID string, 
 		plugins["ai_formatter"] = api.PluginSetting{
 			Config: plugin_model.ConfigType{
 				"model":    aiModel.Id,
-				"provider": fmt.Sprintf("%s@ai-provider", info.Provider.Id),
+				"provider": info.Provider.Id,
 				"config":   aiModel.Config,
 			},
 		}
@@ -457,8 +457,8 @@ func (i *imlInitController) createAIService(ctx context.Context, teamID string, 
 				Retry:   retry,
 				Plugins: plugins,
 			},
-			Disable:  false,
-			Upstream: info.Provider.Id,
+			Disable: false,
+			//Upstream: info.Provider.Id,
 		})
 		if err != nil {
 			return err

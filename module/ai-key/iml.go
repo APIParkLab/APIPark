@@ -228,8 +228,18 @@ func (i *imlKeyModule) Delete(ctx context.Context, providerId string, id string)
 			}
 		}
 
-		// TODO: 操作网关下线Key
-		return i.aiKeyService.Delete(ctx, id)
+		err = i.aiKeyService.Delete(ctx, id)
+		if err != nil {
+			return err
+		}
+		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{{
+			BasicItem: &gateway.BasicItem{
+				ID:       id,
+				Resource: "ai-key",
+			},
+			Attr: nil,
+		},
+		}, false)
 	})
 }
 
@@ -372,9 +382,18 @@ func (i *imlKeyModule) UpdateKeyStatus(ctx context.Context, providerId string, i
 			}
 			// TODO：发布Key到网关
 			status := ai_key_dto.KeyNormal.Int()
-			return i.aiKeyService.Save(ctx, id, &ai_key.Edit{
+			err = i.aiKeyService.Save(ctx, id, &ai_key.Edit{
 				Status: &status,
 			})
+			if err != nil {
+				return err
+			}
+			info, err = i.aiKeyService.Get(ctx, id)
+			if err != nil {
+				return err
+			}
+			releases := []*gateway.DynamicRelease{newKey(info)}
+			return i.syncGateway(ctx, providerId, releases, true)
 		}
 		return nil
 	})
@@ -397,8 +416,14 @@ func (i *imlKeyModule) Sort(ctx context.Context, providerId string, input *ai_ke
 		if err != nil {
 			return err
 		}
-		// TODO: 全量更新key配置到网关
-
-		return nil
+		list, err := i.aiKeyService.List(ctx)
+		if err != nil {
+			return err
+		}
+		releases := make([]*gateway.DynamicRelease, 0, len(list))
+		for _, info := range list {
+			releases = append(releases, newKey(info))
+		}
+		return i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
 	})
 }
