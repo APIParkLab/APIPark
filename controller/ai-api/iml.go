@@ -2,7 +2,6 @@ package ai_api
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/APIParkLab/APIPark/model/plugin_model"
@@ -52,7 +51,7 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 			plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
 					"model":    input.AiModel.Id,
-					"provider": fmt.Sprintf("%s@ai-provider", input.AiModel.Provider),
+					"provider": input.AiModel.Provider,
 					"config":   input.AiModel.Config,
 				},
 			}
@@ -73,8 +72,8 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 				Retry:   input.Retry,
 				Plugins: plugins,
 			},
-			Upstream: input.AiModel.Provider,
-			Disable:  false,
+			//Upstream: input.AiModel.Provider,
+			Disable: false,
 		})
 
 		return err
@@ -101,16 +100,16 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 			Retry:   apiInfo.Proxy.Retry,
 			Plugins: apiInfo.Proxy.Plugins,
 		}
-		var upstream *string
+		//var upstream *string
 		if input.AiModel != nil {
 			proxy.Plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
 					"model":    input.AiModel.Id,
-					"provider": fmt.Sprintf("%s@ai-provider", input.AiModel.Provider),
+					"provider": input.AiModel.Provider,
 					"config":   input.AiModel.Config,
 				},
 			}
-			upstream = &input.AiModel.Provider
+			//upstream = &input.AiModel.Provider
 		}
 
 		if input.AiPrompt != nil {
@@ -128,7 +127,7 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 			Path:        input.Path,
 			Disable:     input.Disable,
 			Methods:     &apiInfo.Methods,
-			Upstream:    upstream,
+			//Upstream:    upstream,
 		})
 		if err != nil {
 			return err

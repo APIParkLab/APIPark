@@ -161,7 +161,7 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 		labels = r.Labels
 	}
 
-	return &Router{
+	router := &Router{
 		BasicInfo: &BasicInfo{
 			ID:          fmt.Sprintf("%s@router", r.ID),
 			Name:        r.ID,
@@ -174,13 +174,16 @@ func ToRouter(r *gateway.ApiRelease, version string, matches map[string]string) 
 		Method:    r.Methods,
 		Location:  r.Path,
 		Rules:     rules,
-		Service:   fmt.Sprintf("%s@service", r.Service),
 		Plugins:   plugin,
 		Retry:     r.Retry,
 		TimeOut:   r.Timeout,
 		Labels:    labels,
 		Protocols: []string{"http", "https"},
 	}
+	if r.Service != "" {
+		router.Service = fmt.Sprintf("%s@service", r.Service)
+	}
+	return router
 }
 
 // formatProxyPath 格式化转发路径上，用于转发重写插件正则替换 比如 请求路径 /path/{A}/{B} 原转发路径：/path/{B}  格式化后 新转发路径： /path/$2

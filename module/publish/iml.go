@@ -124,6 +124,7 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 		Version: version,
 	}
 	apis := make([]*gateway.ApiRelease, 0, len(apiInfos))
+	hasUpstream := len(upstreamCommitIds) > 0
 	for _, a := range apiInfos {
 		apiInfo := &gateway.ApiRelease{
 			BasicItem: &gateway.BasicItem{
@@ -133,7 +134,10 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 			},
 			Path:    a.Path,
 			Methods: a.Methods,
-			Service: a.Upstream,
+			//Service: a.Upstream,
+		}
+		if hasUpstream {
+			apiInfo.Service = a.Upstream
 		}
 		proxy, ok := proxyCommitMap[a.UUID]
 		if ok {

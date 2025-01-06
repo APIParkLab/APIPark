@@ -50,11 +50,13 @@ func (i *imlProviderController) LLMs(ctx *gin.Context, driver string) ([]*ai_dto
 }
 
 func (i *imlProviderController) Enable(ctx *gin.Context, id string) error {
-	return i.module.UpdateProviderStatus(ctx, id, true)
+	//return i.module.UpdateProviderStatus(ctx, id, true)
+	return nil
 }
 
 func (i *imlProviderController) Disable(ctx *gin.Context, id string) error {
-	return i.module.UpdateProviderStatus(ctx, id, false)
+	//return i.module.UpdateProviderStatus(ctx, id, false)
+	return nil
 }
 
 func (i *imlProviderController) UpdateProviderConfig(ctx *gin.Context, id string, input *ai_dto.UpdateConfig) error {
@@ -62,7 +64,8 @@ func (i *imlProviderController) UpdateProviderConfig(ctx *gin.Context, id string
 }
 
 func (i *imlProviderController) UpdateProviderDefaultLLM(ctx *gin.Context, id string, input *ai_dto.UpdateLLM) error {
-	return i.module.UpdateProviderDefaultLLM(ctx, id, input)
+	//return i.module.UpdateProviderDefaultLLM(ctx, id, input)
+	return nil
 }
 
 var _ IStatisticController = (*imlStatisticController)(nil)

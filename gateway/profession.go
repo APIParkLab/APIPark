@@ -8,6 +8,7 @@ const (
 	ProfessionStrategy    = "strategy"
 	ProfessionService     = "service"
 	ProfessionAIProvider  = "ai-provider"
+	ProfessionAIResource  = "ai-resource"
 )
 
 func RegisterDynamicResourceDriver(key string, worker Worker) {
@@ -60,6 +61,14 @@ var dynamicResourceMap = map[string]Worker{
 	"loki": {
 		Profession: ProfessionOutput,
 		Driver:     "loki",
+	},
+	"ai-provider": {
+		Profession: ProfessionAIProvider,
+		Driver:     "ai-provider",
+	},
+	"ai-key": {
+		Profession: ProfessionAIResource,
+		Driver:     "ai-key",
 	},
 }
 
