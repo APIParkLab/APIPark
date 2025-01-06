@@ -416,7 +416,7 @@ func (i *imlKeyModule) Sort(ctx context.Context, providerId string, input *ai_ke
 		if err != nil {
 			return err
 		}
-		list, err := i.aiKeyService.List(ctx)
+		list, err := i.aiKeyService.KeysByProvider(ctx, providerId)
 		if err != nil {
 			return err
 		}

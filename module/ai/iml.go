@@ -185,11 +185,15 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.
 				status = ai_key_dto.KeyError
 			}
 			keysStatus = append(keysStatus, &ai_dto.KeyStatus{
-				Id:     k.ID,
-				Name:   k.Name,
-				Status: status.String(),
+				Id:       k.ID,
+				Name:     k.Name,
+				Status:   status.String(),
+				Priority: k.Priority,
 			})
 		}
+		sort.Slice(keysStatus, func(i, j int) bool {
+			return keysStatus[i].Priority < keysStatus[j].Priority
+		})
 
 		providers = append(providers, &ai_dto.ConfiguredProviderItem{
 			Id:         l.Id,
