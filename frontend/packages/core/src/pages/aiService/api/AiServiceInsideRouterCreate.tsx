@@ -4,6 +4,7 @@ import { DrawerWithFooter } from '@common/components/aoplatform/DrawerWithFooter
 import EditableTableNotAutoGen from '@common/components/aoplatform/EditableTableNotAutoGen.tsx'
 import InsidePage from '@common/components/aoplatform/InsidePage.tsx'
 import PromptEditorResizable from '@common/components/aoplatform/prompt-editor/PromptEditorResizable.tsx'
+import WithPermission from '@common/components/aoplatform/WithPermission'
 import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http.ts'
@@ -16,11 +17,10 @@ import { API_PATH_MATCH_RULES } from '@core/const/system/const'
 import { useAiServiceContext } from '@core/contexts/AiServiceContext.tsx'
 import { AiProviderDefaultConfig, AiProviderLlmsItems } from '@core/pages/aiSetting/AiSettingList'
 import { Icon } from '@iconify/react/dist/iconify.js'
-import { App, Button, Form, Input, InputNumber, Row, Select, Space, Spin, Switch, Tag } from 'antd'
+import { App, Button, Form, Input, InputNumber, Row, Space, Spin, Switch, Tag } from 'antd'
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import AiServiceRouterModelConfig, { AiServiceRouterModelConfigHandle } from './AiServiceInsideRouterModelConfig'
-import WithPermission from '@common/components/aoplatform/WithPermission'
 
 type AiServiceRouterField = {
   name: string
@@ -285,11 +285,11 @@ const AiServiceInsideRouterCreate = () => {
               {defaultLlm?.scopes?.map((x) => <Tag>{x?.toLocaleUpperCase()}</Tag>)}
             </div>
           </Button>
-          {
-            type !== 'apiDetail' && (<Button type="primary" onClick={onFinish}>
+          {type !== 'apiDetail' && (
+            <Button type="primary" onClick={onFinish}>
               {$t('保存')}
-            </Button>)
-          }
+            </Button>
+          )}
         </div>
       }
     >
@@ -323,22 +323,6 @@ const AiServiceInsideRouterCreate = () => {
 
                 <Form.Item className="flex-1" label={$t('请求路径')}>
                   <Space.Compact block>
-                    <Form.Item
-                      name="pathMatch"
-                      rules={[
-                        { required: true, whitespace: true },
-                        {
-                          validator: validateUrlSlash
-                        }
-                      ]}
-                      noStyle
-                    >
-                      <Select
-                        placeholder={$t(PLACEHOLDER.select)}
-                        options={apiPathMatchRulesOptions}
-                        className="w-[30%] min-w-[100px]"
-                      />
-                    </Form.Item>
                     <Form.Item<AiServiceRouterField>
                       name="path"
                       rules={[
@@ -365,7 +349,11 @@ const AiServiceInsideRouterCreate = () => {
               </Row>
 
               <Form.Item<AiServiceRouterField> label={$t('提示词')} name="prompt">
-                <PromptEditorResizable disabled={isDelete} variablesChange={handleVariablesChange} promptVariables={variablesTable} />
+                <PromptEditorResizable
+                  disabled={isDelete}
+                  variablesChange={handleVariablesChange}
+                  promptVariables={variablesTable}
+                />
               </Form.Item>
 
               <Form.Item<AiServiceRouterField>
