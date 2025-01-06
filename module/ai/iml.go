@@ -84,8 +84,18 @@ func (i *imlProviderModule) Sort(ctx context.Context, input *ai_dto.Sort) error 
 		providerMap := utils.SliceToMap(list, func(e *ai.Provider) string {
 			return e.Id
 		})
+		releases := make([]*gateway.DynamicRelease, 0, len(list))
 		for index, id := range input.Providers {
-			_, has := providerMap[id]
+			p, has := model_runtime.GetProvider(id)
+			if !has {
+				continue
+			}
+
+			l, has := providerMap[id]
+			if !has {
+				continue
+			}
+			model, has := p.GetModel(l.DefaultLLM)
 			if !has {
 				continue
 			}
@@ -93,6 +103,28 @@ func (i *imlProviderModule) Sort(ctx context.Context, input *ai_dto.Sort) error 
 			err = i.providerService.Save(txCtx, id, &ai.SetProvider{
 				Priority: &priority,
 			})
+			if err != nil {
+				return err
+			}
+			cfg := make(map[string]interface{})
+			cfg["provider"] = l.Id
+			cfg["model"] = l.DefaultLLM
+			cfg["model_config"] = model.DefaultConfig()
+			cfg["priority"] = l.Priority
+			cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
+			releases = append(releases, &gateway.DynamicRelease{
+				BasicItem: &gateway.BasicItem{
+					ID:          l.Id,
+					Description: l.Name,
+					Resource:    "ai-provider",
+					Version:     l.UpdateAt.Format("20060102150405"),
+					MatchLabels: map[string]string{
+						"module": "ai-provider",
+					},
+				},
+				Attr: cfg,
+			})
+			err = i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
 			if err != nil {
 				return err
 			}
@@ -531,6 +563,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		cfg["provider"] = info.Id
 		cfg["model"] = info.DefaultLLM
 		cfg["model_config"] = model.DefaultConfig()
+		cfg["priority"] = info.Priority
 		cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
 		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
 			{
