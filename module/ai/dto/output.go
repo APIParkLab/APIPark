@@ -37,9 +37,10 @@ type ConfiguredProviderItem struct {
 }
 
 type KeyStatus struct {
-	Id     string `json:"id"`
-	Name   string `json:"name"`
-	Status string `json:"status"`
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	Status   string `json:"status"`
+	Priority int    `json:"-"`
 }
 
 type ProviderItem struct {
