@@ -1,11 +1,11 @@
-import { Dropdown, Row, Col, Button } from 'antd';
-import i18n from '@common/locales';
-import { memo, useEffect, useMemo } from 'react';
-import { useGlobalContext } from '@common/contexts/GlobalStateContext';
-import { Icon } from '@iconify/react/dist/iconify.js';
+import { useGlobalContext } from '@common/contexts/GlobalStateContext'
+import i18n from '@common/locales'
+import { Icon } from '@iconify/react/dist/iconify.js'
+import { Button, Dropdown } from 'antd'
+import { memo, useEffect, useMemo } from 'react'
 
 const LanguageSetting = ({ mode = 'light' }: { mode?: 'dark' | 'light' }) => {
-  const { dispatch, state } = useGlobalContext();
+  const { dispatch, state } = useGlobalContext()
   const items = [
     {
       key: 'en-US',
@@ -14,7 +14,7 @@ const LanguageSetting = ({ mode = 'light' }: { mode?: 'dark' | 'light' }) => {
           English
         </Button>
       ),
-      title: 'English',
+      title: 'English'
     },
     {
       key: 'ja-JP',
@@ -23,7 +23,7 @@ const LanguageSetting = ({ mode = 'light' }: { mode?: 'dark' | 'light' }) => {
           日本語
         </Button>
       ),
-      title: '日本語',
+      title: '日本語'
     },
     {
       key: 'zh-TW',
@@ -32,7 +32,7 @@ const LanguageSetting = ({ mode = 'light' }: { mode?: 'dark' | 'light' }) => {
           繁體中文
         </Button>
       ),
-      title: '繁體中文',
+      title: '繁體中文'
     },
     {
       key: 'zh-CN',
@@ -41,40 +41,41 @@ const LanguageSetting = ({ mode = 'light' }: { mode?: 'dark' | 'light' }) => {
           简体中文
         </Button>
       ),
-      title: '简体中文',
-    },
-  ];
+      title: '简体中文'
+    }
+  ]
 
-  const langLabel = useMemo(
-    () => items.find(item => item?.key === state.language)?.title,
-    [state.language]
-  );
+  const langLabel = useMemo(() => items.find((item) => item?.key === state.language)?.title, [state.language])
 
   useEffect(() => {
-    const savedLang = sessionStorage.getItem('i18nextLng');
-    const browserLang = navigator.language || navigator.userLanguage;
-    if (savedLang) return;
+    const savedLang = i18n.language || sessionStorage.getItem('i18nextLng')
+    if (savedLang && state.language !== savedLang) {
+      dispatch({ type: 'UPDATE_LANGUAGE', language: savedLang })
+    } else if (!savedLang) {
+      const browserLang = navigator.language
+      const supportedLang = items.find((item) => item.key === browserLang) ? browserLang : 'zh-CN'
+      dispatch({ type: 'UPDATE_LANGUAGE', language: supportedLang })
+      i18n.changeLanguage(supportedLang)
+    }
+  }, [])
 
-    dispatch({ type: 'UPDATE_LANGUAGE', language: browserLang });
-  }, []);
   return (
     <Dropdown
       trigger={['hover']}
       menu={{
         items,
         style: { minWidth: '80px' },
-        onClick: e => {
-          const { key } = e;
-          dispatch({ type: 'UPDATE_LANGUAGE', language: key });
-          i18n.changeLanguage(key);
-        },
+        onClick: (e) => {
+          const { key } = e
+          dispatch({ type: 'UPDATE_LANGUAGE', language: key })
+          i18n.changeLanguage(key)
+          sessionStorage.setItem('i18nextLng', key)
+        }
       }}
     >
       <Button
         className={`border-none ${
-          mode === 'dark'
-            ? 'text-[#333] hover:text-[#333333b3]'
-            : 'text-[#ffffffb3] hover:text-[#fff] '
+          mode === 'dark' ? 'text-[#333] hover:text-[#333333b3]' : 'text-[#ffffffb3] hover:text-[#fff] '
         }`}
         type="default"
         ghost
@@ -86,6 +87,6 @@ const LanguageSetting = ({ mode = 'light' }: { mode?: 'dark' | 'light' }) => {
         </span>
       </Button>
     </Dropdown>
-  );
-};
-export default memo(LanguageSetting);
+  )
+}
+export default memo(LanguageSetting)

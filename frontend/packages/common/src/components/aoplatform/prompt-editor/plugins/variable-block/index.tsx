@@ -1,9 +1,5 @@
 import { useEffect } from 'react'
-import {
-  $insertNodes,
-  COMMAND_PRIORITY_EDITOR,
-  createCommand,
-} from 'lexical'
+import { $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand } from 'lexical'
 import { mergeRegister } from '@lexical/utils'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { CustomTextNode } from '../custom-text/node'
@@ -24,7 +20,7 @@ const VariableBlock = () => {
 
           return true
         },
-        COMMAND_PRIORITY_EDITOR,
+        COMMAND_PRIORITY_EDITOR
       ),
       editor.registerCommand(
         INSERT_VARIABLE_VALUE_BLOCK_COMMAND,
@@ -34,8 +30,8 @@ const VariableBlock = () => {
 
           return true
         },
-        COMMAND_PRIORITY_EDITOR,
-      ),
+        COMMAND_PRIORITY_EDITOR
+      )
     )
   }, [editor])
 
