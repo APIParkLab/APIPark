@@ -39,12 +39,14 @@ const ApiSettings: React.FC = () => {
   const handlePreview = (record: APIs) => {
     navigate(`../service/${record.team.id}/aiInside/${record.service.id}/route/${record.id}/apiDetail`)
   }
-  const requestApis = async (params: any & {
-    pageSize: number;
-    current: number;
-  },
+  const requestApis = async (
+    params: any & {
+      pageSize: number
+      current: number
+    },
     sort: Record<string, string>,
-    filter: Record<string, string>) => {
+    filter: Record<string, string>
+  ) => {
     if (!selectedProvider) return
     setQueryBtnLoading(true)
     try {
@@ -75,16 +77,22 @@ const ApiSettings: React.FC = () => {
         setTotal(response.data.total)
         const modalMap: {
           [key: string]: string
-        } = response.data?.condition?.models.reduce((acc: { [key: string]: string }, item: { id: string; name: string }) => {
-          acc[item.id] = $t(item.name)
-          return acc
-        }, {})
+        } = response.data?.condition?.models.reduce(
+          (acc: { [key: string]: string }, item: { id: string; name: string }) => {
+            acc[item.id] = $t(item.name)
+            return acc
+          },
+          {}
+        )
         const serviceMap: {
           [key: string]: string
-        } = response.data?.condition?.services.reduce((acc: { [key: string]: string }, item: { id: string; name: string }) => {
-          acc[item.id] = $t(item.name)
-          return acc
-        }, {})
+        } = response.data?.condition?.services.reduce(
+          (acc: { [key: string]: string }, item: { id: string; name: string }) => {
+            acc[item.id] = $t(item.name)
+            return acc
+          },
+          {}
+        )
         setTableColumns(modalMap, serviceMap)
         return {
           data: response.data.apis || [],
@@ -107,11 +115,14 @@ const ApiSettings: React.FC = () => {
       }
     }
   }
-  const setTableColumns = (modalMap: {
-    [key: string]: string
-  }, serviceMap: {
-    [key: string]: string
-  }) => {
+  const setTableColumns = (
+    modalMap: {
+      [key: string]: string
+    },
+    serviceMap: {
+      [key: string]: string
+    }
+  ) => {
     setColumns([
       {
         title: $t('AI 服务'),
@@ -287,15 +298,18 @@ const ApiSettings: React.FC = () => {
               </div>
             </div>
           }
-          request={async (params: any & {
-            pageSize: number;
-            current: number;
-          },
+          request={async (
+            params: any & {
+              pageSize: number
+              current: number
+            },
             sort: Record<string, string>,
-            filter: Record<string, string>) => requestApis(params, sort, filter)}
+            filter: Record<string, string>
+          ) => requestApis(params, sort, filter)}
           onSearchWordChange={(e) => {
             setSearchWord(e.target.value)
           }}
+          onRowClick={(row: APIs) => handlePreview(row)}
           showPagination={true}
           searchPlaceholder={$t('请输入 APIURL 搜索')}
           columns={columns}

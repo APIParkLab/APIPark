@@ -151,15 +151,15 @@ const mockData = [
             name: 'APIKey 资源池',
             key: 'aiKeys',
             path: '/keysetting',
-            icon: 'ic:baseline-key'
-            // access: 'system.settings.ai_key_resource.view'
+            icon: 'ic:baseline-key',
+            access: 'system.settings.ai_key_resource.view'
           },
           {
             name: 'AI API',
             key: 'aiApiList',
             path: '/aiApis',
-            icon: 'ic:baseline-api'
-            // access: 'system.settings.ai_api.view'
+            icon: 'ic:baseline-api',
+            access: 'system.settings.ai_api.view'
           }
         ]
       },

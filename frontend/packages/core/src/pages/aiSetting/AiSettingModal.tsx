@@ -97,9 +97,9 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
 
   const getTooltipText = (isChecked: boolean) => {
     if (!isChecked) {
-      return '保存后供应商状态变为【停用】，使用本供应商的 API 将临时使用负载优先级最高的正常供应商。'
+      return $t('保存后供应商状态变为【停用】，使用本供应商的 API 将临时使用负载优先级最高的正常供应商。')
     }
-    return '保存后供应商状态变为【正常】，恢复调用本供应商的 AI 能力。'
+    return $t('保存后供应商状态变为【正常】，恢复调用本供应商的 AI 能力。')
   }
 
   useImperativeHandle(ref, () => ({
@@ -177,7 +177,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
         <Form.Item className="p-4 bg-white rounded-lg" label={$t('LLM 状态管理')}>
           <div className="flex justify-between items-center">
             <div>
-              <span className="text-gray-600">当前调用状态：</span>
+              <span className="text-gray-600">{$t('当前调用状态：')}</span>
               {entity.status === 'enabled' && <Tag color="success">{$t('正常')}</Tag>}
               {entity.status === 'disabled' && <Tag color="warning">{$t('停用')}</Tag>}
               {entity.status === 'abnormal' && <Tag color="error">{$t('异常')}</Tag>}

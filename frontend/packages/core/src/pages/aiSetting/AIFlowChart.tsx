@@ -101,6 +101,7 @@ const AIFlowChart = () => {
         id: 'apiService',
         type: 'serviceCard',
         position: { x: LAYOUT.SERVICE_NODE_X, y: serviceY },
+        draggable: false,
         data: {
           title: 'API Services',
           count: modelData.length
@@ -239,8 +240,10 @@ const AIFlowChart = () => {
           proOptions={{ hideAttribution: true }}
           draggable={false}
           nodeTypes={nodeTypes}
+          elementsSelectable={false}
           edgeTypes={edgeTypes}
           zoomOnScroll={false}
+          panOnDrag={false}
           zoomOnPinch={false}
           zoomOnDoubleClick={false}
           panOnScroll={true}
