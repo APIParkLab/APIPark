@@ -1,8 +1,8 @@
-import { Dropdown, Button } from 'antd'
-import i18n from '@common/locales'
-import { memo, useEffect, useMemo } from 'react'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext'
+import i18n from '@common/locales'
 import { Icon } from '@iconify/react/dist/iconify.js'
+import { Button, Dropdown } from 'antd'
+import { memo, useEffect, useMemo } from 'react'
 
 const LanguageSetting = ({ mode = 'light' }: { mode?: 'dark' | 'light' }) => {
   const { dispatch, state } = useGlobalContext()
@@ -48,12 +48,17 @@ const LanguageSetting = ({ mode = 'light' }: { mode?: 'dark' | 'light' }) => {
   const langLabel = useMemo(() => items.find((item) => item?.key === state.language)?.title, [state.language])
 
   useEffect(() => {
-    const savedLang = sessionStorage.getItem('i18nextLng')
-    const browserLang = navigator.language || navigator.userLanguage
-    if (savedLang) return
-
-    dispatch({ type: 'UPDATE_LANGUAGE', language: browserLang })
+    const savedLang = i18n.language || sessionStorage.getItem('i18nextLng')
+    if (savedLang && state.language !== savedLang) {
+      dispatch({ type: 'UPDATE_LANGUAGE', language: savedLang })
+    } else if (!savedLang) {
+      const browserLang = navigator.language
+      const supportedLang = items.find((item) => item.key === browserLang) ? browserLang : 'zh-CN'
+      dispatch({ type: 'UPDATE_LANGUAGE', language: supportedLang })
+      i18n.changeLanguage(supportedLang)
+    }
   }, [])
+
   return (
     <Dropdown
       trigger={['hover']}
@@ -64,6 +69,7 @@ const LanguageSetting = ({ mode = 'light' }: { mode?: 'dark' | 'light' }) => {
           const { key } = e
           dispatch({ type: 'UPDATE_LANGUAGE', language: key })
           i18n.changeLanguage(key)
+          sessionStorage.setItem('i18nextLng', key)
         }
       }}
     >
