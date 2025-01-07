@@ -27,7 +27,14 @@ export default function CustomEdge({
 
   return (
     <>
-      <BaseEdge path={edgePath} markerEnd={markerEnd} style={{ stroke: '#ddd', cursor: 'pointer', strokeWidth: 1 }} />
+      <BaseEdge
+        path={edgePath}
+        markerEnd={markerEnd}
+        style={{
+          ...style,
+          cursor: 'pointer'
+        }}
+      />
       {label && (
         <EdgeLabelRenderer>
           <a
@@ -39,7 +46,6 @@ export default function CustomEdge({
               borderRadius: '4px',
               fontSize: 12,
               fontWeight: 500,
-              color: 'var(--primary-color)',
               cursor: 'pointer',
               pointerEvents: 'all',
               textDecoration: 'none'

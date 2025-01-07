@@ -39,6 +39,7 @@ const calculateNodePositions = (models: ModelListData[], startY = LAYOUT.NODE_ST
   return models.reduce(
     (acc, model, index) => {
       const y = startY + index * gap
+
       return {
         ...acc,
         [model.id]: {
@@ -134,15 +135,46 @@ const AIFlowChart = () => {
       }))
     ]
 
+    const successModel = modelData.find((model) => model.status !== 'abnormal') as ModelListData
     const newEdges: any = [
-      ...modelData.map((model) => ({
-        id: `service-${model.id}`,
-        source: 'apiService',
-        target: model.id,
-        label: `${model.api_count} apis`,
-        data: { id: model.id },
-        animated: true
-      })),
+      ...modelData.flatMap((model, modelIndex) => {
+        if (model.status === 'enabled') {
+          return [
+            {
+              id: `service-${model.id}`,
+              source: 'apiService',
+              target: model.id,
+              label: `${model.api_count} apis`,
+              data: {
+                id: model.id,
+                offset: modelIndex * 20 // Add vertical offset based on model index
+              },
+              animated: true,
+              style: { stroke: '#52c41a' }
+            }
+          ]
+        } else {
+          return [
+            {
+              id: `service-${model.id}-failed`,
+              source: 'apiService',
+              target: model.id,
+              label: ``,
+              data: { id: model.id },
+              style: { stroke: '#ff4d4f' }
+            },
+            {
+              id: `service-${model.id}-backup`,
+              source: 'apiService',
+              target: successModel.id,
+              label: 'backup',
+              data: { id: model.id, isBackup: true },
+              animated: true,
+              style: { stroke: '#52c41a' }
+            }
+          ]
+        }
+      }),
       ...modelData.map((model) => ({
         id: `${model.id}-keys-edge`,
         source: model.id,
