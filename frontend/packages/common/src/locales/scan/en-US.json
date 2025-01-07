@@ -804,5 +804,9 @@
   "Kefb03657": "APIKey Resource Pool",
   "Kc0352e64": "Supports creating multiple APIKeys under a single API model provider for intelligent load balancing",
   "Kd25acba1": "Please enter name to search",
-  "K6d0388a0": "Add APIKey"
+  "K6d0388a0": "Add APIKey",
+  "Ke32702ac": "After saving, the supplier status will become [Disabled]. APIs using this supplier will temporarily use the normal supplier with the highest load priority.",
+  "Ka08c28d4": "After saving, the supplier status will become [Normal], restoring the AI capabilities of this supplier.",
+  "Kab8fe398": "Current Call Status:",
+  "K4880fd04": "Add (0) APIKey"
 }
