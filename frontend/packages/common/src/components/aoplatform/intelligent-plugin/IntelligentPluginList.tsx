@@ -1,21 +1,21 @@
+import { LoadingOutlined } from '@ant-design/icons'
+import { ActionType, ParamsType } from '@ant-design/pro-components'
+import { DrawerWithFooter } from '@common/components/aoplatform/DrawerWithFooter.tsx'
 import PageList, { PageProColumns } from '@common/components/aoplatform/PageList.tsx'
+import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission.tsx'
+import WithPermission from '@common/components/aoplatform/WithPermission.tsx'
+import { BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const.tsx'
+import { EntityItem } from '@common/const/type.ts'
+import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
+import { useFetch } from '@common/hooks/http.ts'
+import { $t } from '@common/locales/index.ts'
+import { RouterParams } from '@core/components/aoplatform/RenderRoutes.tsx'
 import { App, Divider, Spin } from 'antd'
+import { DefaultOptionType } from 'antd/es/cascader'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useOutletContext, useParams } from 'react-router-dom'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
-import { ActionType, ParamsType } from '@ant-design/pro-components'
-import { RouterParams } from '@core/components/aoplatform/RenderRoutes.tsx'
-import { DefaultOptionType } from 'antd/es/cascader'
 import { IntelligentPluginConfig, IntelligentPluginConfigHandle } from './IntelligentPluginConfig.tsx'
-import { BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const.tsx'
-import { useFetch } from '@common/hooks/http.ts'
-import { EntityItem } from '@common/const/type.ts'
-import WithPermission from '@common/components/aoplatform/WithPermission.tsx'
-import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission.tsx'
-import { DrawerWithFooter } from '@common/components/aoplatform/DrawerWithFooter.tsx'
-import { LoadingOutlined } from '@ant-design/icons'
-import { $t } from '@common/locales/index.ts'
-import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
 
 type DynamicTableField = {
   name: string
@@ -233,7 +233,7 @@ export default function IntelligentPluginList() {
           onClick={() => {
             openDrawer('edit', entity)
           }}
-          btnTitle={$t('查看')}
+          btnTitle={$t('查看 ')}
         />,
         <Divider type="vertical" className="mx-0" key="div2" />,
         <TableBtnWithPermission
