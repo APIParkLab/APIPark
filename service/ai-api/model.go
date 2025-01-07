@@ -19,6 +19,7 @@ type API struct {
 	Provider         string
 	CreateAt         time.Time
 	UpdateAt         time.Time
+	UseToken         int
 	Creator          string
 	Updater          string
 	AdditionalConfig map[string]interface{}
@@ -48,6 +49,7 @@ type Edit struct {
 	Provider         *string
 	Model            *string
 	Disable          *bool
+	UseToken         *int
 	AdditionalConfig *map[string]interface{}
 }
 
@@ -70,12 +72,26 @@ func FromEntity(e *api.AiAPIInfo) *API {
 		Creator:          e.Creator,
 		Updater:          e.Updater,
 		Disable:          e.Disable,
+		UseToken:         e.UseToken,
 		AdditionalConfig: cfg,
 	}
 }
 
 type APIUse struct {
 	API         string
+	InputToken  int
+	OutputToken int
+	TotalToken  int
+}
+
+type IncrAPIUse struct {
+	API         string
+	Service     string
+	Provider    string
+	Model       string
+	Day         int64
+	Hour        int64
+	Minute      int64
 	InputToken  int
 	OutputToken int
 	TotalToken  int
