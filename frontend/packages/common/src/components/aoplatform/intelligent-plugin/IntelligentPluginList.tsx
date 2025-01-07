@@ -218,8 +218,8 @@ export default function IntelligentPluginList() {
       render: (_: React.ReactNode, entity: DynamicTableItem) => [
         <TableBtnWithPermission
           access={`${accessPrefix}.publish`}
-          key="publish"
-          btnType="publish"
+          key={entity.status === $t('已发布') ? 'offline' : 'publish'}
+          btnType={entity.status === $t('已发布') ? 'offline' : 'publish'}
           onClick={() => {
             openModal('publish', entity)
           }}
@@ -322,6 +322,7 @@ export default function IntelligentPluginList() {
             const { code, msg } = response
             if (code === STATUS_CODE.SUCCESS) {
               message.success(msg || $t(RESPONSE_TIPS.success))
+              manualReloadTable()
               return Promise.resolve(true)
             } else {
               message.error(msg || $t(RESPONSE_TIPS.error))
@@ -329,7 +330,6 @@ export default function IntelligentPluginList() {
             }
           })
           .catch((errorInfo) => Promise.reject(errorInfo))
-        message.destroy()
         return
       }
       case 'delete':
