@@ -1,10 +1,10 @@
-import { Button, Tooltip } from 'antd'
-import { useState, useMemo, useEffect, useCallback } from 'react'
-import { useGlobalContext } from '@common/contexts/GlobalStateContext'
-import { useNavigate } from 'react-router-dom'
 import { PERMISSION_DEFINITION } from '@common/const/permissions'
-import { Icon } from '@iconify/react/dist/iconify.js'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { $t } from '@common/locales'
+import { Icon } from '@iconify/react/dist/iconify.js'
+import { Button, Tooltip } from 'antd'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 type TableBtnWithPermissionProps = {
   btnTitle: string
@@ -25,6 +25,7 @@ const TableIconName = {
   copy: 'ic:baseline-file-copy',
   view: 'ic:baseline-remove-red-eye',
   publish: 'ic:baseline-publish',
+  offline: 'ic:baseline-file-download-off',
   approval: 'ic:baseline-approval',
   stop: 'ic:baseline-stop-circle',
   online: 'ic:baseline-check-circle',
@@ -86,7 +87,7 @@ const TableBtnWithPermission = ({
           <Button
             type="text"
             disabled={true}
-            className={`h-[22px] border-none p-0 flex items-center bg-transparent ${className}`}
+            className={`flex items-center p-0 bg-transparent border-none h-[22px] ${className}`}
             key={btnType}
             icon={<Icon icon={TableIconName[btnType as keyof typeof TableIconName]} width="18" height="18" />}
           >
@@ -104,7 +105,7 @@ const TableBtnWithPermission = ({
           <Button
             type="text"
             disabled={disabled}
-            className={`h-[22px] border-none p-0 flex items-center bg-transparent ${className} `}
+            className={`flex items-center p-0 bg-transparent border-none h-[22px] ${className}`}
             key={btnType}
             icon={<Icon icon={TableIconName[btnType as keyof typeof TableIconName]} width="18" height="18" />}
             onClick={handleClick}

@@ -1,6 +1,6 @@
+import { $t } from '@common/locales'
 import { Icon } from '@iconify/react'
 import { Handle, Position } from '@xyflow/react'
-import { t } from 'i18next'
 import React from 'react'
 import { useAiSetting } from '../contexts/AiSettingContext'
 import { AiSettingListItem, ModelDetailData, ModelStatus } from '../types'
@@ -59,7 +59,7 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
           </div>
         </div>
         <div className="mt-2 text-sm text-gray-500">
-          {t('默认：')}
+          {$t('默认：')}
           {defaultLlm}
         </div>
       </div>
