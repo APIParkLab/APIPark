@@ -176,19 +176,6 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 			// 修改订阅表状态
 			subscribers, err := i.subscribeService.ListByApplication(ctx, subscribeInfo.Service, appId)
 			if err != nil {
-				//if !errors.Is(err, gorm.ErrRecordNotFound) {
-				//	return err
-				//}
-				//err = i.subscribeService.Create(ctx, &subscribe.CreateSubscribe{
-				//	Uuid:        uuid.New().String(),
-				//	Service:     subscribeInfo.Service,
-				//	Application: appId,
-				//	ApplyStatus: status,
-				//	From:        subscribe.FromSubscribe,
-				//})
-				//if err != nil {
-				//	return err
-				//}
 				return err
 			} else {
 				subscriberMap := utils.SliceToMap(subscribers, func(t *subscribe.Subscribe) string {

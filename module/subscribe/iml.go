@@ -218,33 +218,46 @@ func (i *imlSubscribeModule) AddSubscriber(ctx context.Context, serviceId string
 	if err != nil {
 		return err
 	}
-	_, err = i.subscribeService.GetByServiceAndApplication(ctx, serviceId, input.Application)
-	if err == nil {
-		// 订阅方已存在
-		return fmt.Errorf("subscriber is already exists")
+	clusters, err := i.clusterService.List(ctx)
+	if err != nil {
+		return err
 	}
-
 	sub := &gateway.SubscribeRelease{
 		Service:     serviceId,
 		Application: input.Application,
 		Expired:     "0",
 	}
-	clusters, err := i.clusterService.List(ctx)
-	if err != nil {
-		return err
-	}
-
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
-		err = i.subscribeService.Create(ctx, &subscribe.CreateSubscribe{
-			Uuid:        uuid.New().String(),
-			Service:     serviceId,
-			Application: input.Application,
-			ApplyStatus: subscribe.ApplyStatusSubscribe,
-			From:        subscribe.FromUser,
-		})
-		if err != nil {
-			return err
+		info, err := i.subscribeService.GetByServiceAndApplication(ctx, serviceId, input.Application)
+		if err == nil {
+			// 订阅方已存在
+			if info.ApplyStatus != subscribe.ApplyStatusSubscribe {
+				// 更新订阅方状态
+				status := subscribe.ApplyStatusSubscribe
+				from := subscribe.FromUser
+				err = i.subscribeService.Save(ctx, info.Id, &subscribe.UpdateSubscribe{
+					ApplyStatus: &status,
+					From:        &from,
+				})
+				if err != nil {
+					return err
+				}
+			} else {
+				return nil
+			}
+		} else {
+			err = i.subscribeService.Create(ctx, &subscribe.CreateSubscribe{
+				Uuid:        uuid.New().String(),
+				Service:     serviceId,
+				Application: input.Application,
+				ApplyStatus: subscribe.ApplyStatusSubscribe,
+				From:        subscribe.FromUser,
+			})
+			if err != nil {
+				return err
+			}
 		}
+
 		for _, c := range clusters {
 			err = i.onlineSubscriber(ctx, c.Uuid, sub)
 			if err != nil {
