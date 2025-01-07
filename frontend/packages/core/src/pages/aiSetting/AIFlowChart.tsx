@@ -167,7 +167,7 @@ const AIFlowChart = () => {
               id: `service-${model.id}-backup`,
               source: 'apiService',
               target: successModel.id,
-              label: 'backup',
+              label: `${model.api_count} apis`,
               data: { id: model.id, isBackup: true },
               animated: true,
               style: { stroke: '#52c41a' }
