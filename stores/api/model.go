@@ -103,9 +103,10 @@ type AiAPIUse struct {
 	API         string `gorm:"size:36;not null;column:api;comment:API;index:api"`
 	Service     string `gorm:"size:36;not null;column:service;comment:服务;index:service"`
 	Provider    string `gorm:"size:36;not null;column:provider;comment:提供者;index:provider"`
-	Day         int    `gorm:"type:int(11);not null;column:day;comment:当前日期"`
-	Hour        int    `gorm:"type:int(11);not null;column:hour;comment:当前小时"`
-	Minute      int    `gorm:"type:int(11);not null;column:minute;comment:当前分钟"`
+	Model       string `gorm:"size:255;not null;column:model;comment:模型"`
+	Day         int64  `gorm:"type:int(11);not null;column:day;comment:当前日期"`
+	Hour        int64  `gorm:"type:int(11);not null;column:hour;comment:当前小时"`
+	Minute      int64  `gorm:"type:int(11);not null;column:minute;comment:当前分钟"`
 	InputToken  int    `gorm:"type:int(11);not null;column:input_token;comment:输入token"`
 	OutputToken int    `gorm:"type:int(11);not null;column:output_token;comment:输出token"`
 	TotalToken  int    `gorm:"type:int(11);not null;column:total_token;comment:总token"`
