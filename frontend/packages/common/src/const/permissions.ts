@@ -219,22 +219,22 @@ export const PERMISSION_DEFINITION = [
         anyOf: [{ backend: ['system.settings.log_configuration.view'] }]
       }
     },
-    'system.devops.log_configuration.add': {
+    'system.settings.log_configuration.add': {
       granted: {
         anyOf: [{ backend: ['system.settings.log_configuration.manager'] }]
       }
     },
-    'system.devops.log_configuration.edit': {
+    'system.settings.log_configuration.edit': {
       granted: {
         anyOf: [{ backend: ['system.settings.log_configuration.manager'] }]
       }
     },
-    'system.devops.log_configuration.publish': {
+    'system.settings.log_configuration.publish': {
       granted: {
         anyOf: [{ backend: ['system.settings.log_configuration.manager'] }]
       }
     },
-    'system.devops.log_configuration.delete': {
+    'system.settings.log_configuration.delete': {
       granted: {
         anyOf: [{ backend: ['system.settings.log_configuration.manager'] }]
       }
