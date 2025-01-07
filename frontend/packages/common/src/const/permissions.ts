@@ -674,9 +674,20 @@ export const PERMISSION_DEFINITION = [
         anyOf: [{ backend: ['project.permission_manager'] }]
       }
     },
+    'system.settings.ai_key_resource.view': {
+      granted: {
+        anyOf: [{ backend: ['system.settings.ai_key_resource.view'] }]
+      }
+    },
     'system.settings.ai_key_resource.manager': {
       granted: {
         anyOf: [{ backend: ['system.settings.ai_key_resource.manager'] }]
+      }
+    },
+
+    'system.settings.ai_api.view': {
+      granted: {
+        anyOf: [{ backend: ['system.settings.ai_api.view'] }]
       }
     }
   }
