@@ -9,7 +9,8 @@ export const AI_SERVICE_ROUTER_TABLE_COLUMNS: PageProColumns<AiServiceRouterTabl
   {
     title: 'URL',
     dataIndex: 'requestPath',
-    ellipsis: true
+    ellipsis: true,
+    width: 200
   },
   {
     title: '名称',

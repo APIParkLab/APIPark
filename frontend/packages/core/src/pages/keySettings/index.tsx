@@ -67,7 +67,7 @@ const KeySettings: React.FC = () => {
     const newEntity = entity as EditAPIKey
 
     modal.confirm({
-      title: mode === 'add' ? $t(`添加 ${provider?.name} APIKey`) : $t('编辑 APIKey'),
+      title: mode === 'add' ? $t('添加 (0) APIKey', [provider?.name]) : $t('编辑 APIKey'),
       content: <ApiKeyContent ref={modalRef} entity={newEntity} provider={provider} />,
       onOk: () => {
         return new Promise((resolve, reject) => {
@@ -363,6 +363,7 @@ const KeySettings: React.FC = () => {
           request={requestApiKeys}
           onSearchWordChange={(e) => {
             setSearchWord(e.target.value)
+            pageListRef.current?.reload()
           }}
           showPagination={true}
           searchPlaceholder={$t('请输入名称搜索')}

@@ -4,6 +4,7 @@ import { DrawerWithFooter } from '@common/components/aoplatform/DrawerWithFooter
 import EditableTableNotAutoGen from '@common/components/aoplatform/EditableTableNotAutoGen.tsx'
 import InsidePage from '@common/components/aoplatform/InsidePage.tsx'
 import PromptEditorResizable from '@common/components/aoplatform/prompt-editor/PromptEditorResizable.tsx'
+import WithPermission from '@common/components/aoplatform/WithPermission'
 import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http.ts'
@@ -16,11 +17,10 @@ import { API_PATH_MATCH_RULES } from '@core/const/system/const'
 import { useAiServiceContext } from '@core/contexts/AiServiceContext.tsx'
 import { AiProviderDefaultConfig, AiProviderLlmsItems } from '@core/pages/aiSetting/AiSettingList'
 import { Icon } from '@iconify/react/dist/iconify.js'
-import { App, Button, Form, Input, InputNumber, Row, Select, Space, Spin, Switch, Tag } from 'antd'
+import { App, Button, Form, Input, InputNumber, Row, Space, Spin, Switch, Tag } from 'antd'
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import AiServiceRouterModelConfig, { AiServiceRouterModelConfigHandle } from './AiServiceInsideRouterModelConfig'
-import WithPermission from '@common/components/aoplatform/WithPermission'
 
 type AiServiceRouterField = {
   name: string
@@ -104,8 +104,8 @@ const AiServiceInsideRouterCreate = () => {
       })
       .catch((errInfo) => Promise.reject(errInfo))
   }
-  const isDelete = type === 'apiDetail'
-  const backUrl = isDelete ? `/aiApis/list` : `/service/${teamId}/aiInside/${serviceId}/route`
+  const isAIApiPreview = type === 'apiDetail'
+  const backUrl = isAIApiPreview ? `/aiApis/list` : `/service/${teamId}/aiInside/${serviceId}/route`
   const openDrawer = (type: 'edit') => {
     setDrawerType(type)
   }
@@ -210,7 +210,7 @@ const AiServiceInsideRouterCreate = () => {
   }, [])
 
   const addVariable = () => {
-    if (isDelete) return
+    if (isAIApiPreview) return
     form.setFieldsValue({
       variables: [...form.getFieldValue('variables'), { key: '', value: '', require: true }]
     })
@@ -273,7 +273,7 @@ const AiServiceInsideRouterCreate = () => {
           <Button
             icon={<Icon icon="ic:baseline-tune" height={18} width={18} />}
             iconPosition="end"
-            disabled={isDelete}
+            disabled={isAIApiPreview}
             onClick={() => openDrawer('edit')}
           >
             <div className="flex items-center gap-[10px]">
@@ -285,11 +285,11 @@ const AiServiceInsideRouterCreate = () => {
               {defaultLlm?.scopes?.map((x) => <Tag>{x?.toLocaleUpperCase()}</Tag>)}
             </div>
           </Button>
-          {
-            type !== 'apiDetail' && (<Button type="primary" onClick={onFinish}>
+          {!isAIApiPreview && (
+            <Button type="primary" onClick={onFinish}>
               {$t('保存')}
-            </Button>)
-          }
+            </Button>
+          )}
         </div>
       }
     >
@@ -298,7 +298,7 @@ const AiServiceInsideRouterCreate = () => {
         spinning={loading}
         wrapperClassName=" pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X"
       >
-        <WithPermission disabled={isDelete}>
+        <WithPermission disabled={isAIApiPreview}>
           <Form
             layout="vertical"
             labelAlign="left"
@@ -323,22 +323,6 @@ const AiServiceInsideRouterCreate = () => {
 
                 <Form.Item className="flex-1" label={$t('请求路径')}>
                   <Space.Compact block>
-                    <Form.Item
-                      name="pathMatch"
-                      rules={[
-                        { required: true, whitespace: true },
-                        {
-                          validator: validateUrlSlash
-                        }
-                      ]}
-                      noStyle
-                    >
-                      <Select
-                        placeholder={$t(PLACEHOLDER.select)}
-                        options={apiPathMatchRulesOptions}
-                        className="w-[30%] min-w-[100px]"
-                      />
-                    </Form.Item>
                     <Form.Item<AiServiceRouterField>
                       name="path"
                       rules={[
@@ -365,7 +349,11 @@ const AiServiceInsideRouterCreate = () => {
               </Row>
 
               <Form.Item<AiServiceRouterField> label={$t('提示词')} name="prompt">
-                <PromptEditorResizable disabled={isDelete} variablesChange={handleVariablesChange} promptVariables={variablesTable} />
+                <PromptEditorResizable
+                  disabled={isAIApiPreview}
+                  variablesChange={handleVariablesChange}
+                  promptVariables={variablesTable}
+                />
               </Form.Item>
 
               <Form.Item<AiServiceRouterField>
@@ -373,7 +361,7 @@ const AiServiceInsideRouterCreate = () => {
                   <div className="flex justify-between items-center w-full">
                     <span>{$t('变量')}</span>
                     <a
-                      className={`flex items-center gap-[4px] ${isDelete ? 'cursor-not-allowed' : ''}`}
+                      className={`flex items-center gap-[4px] ${isAIApiPreview ? 'cursor-not-allowed' : ''}`}
                       onClick={addVariable}
                     >
                       <Icon icon="ic:baseline-add" width={16} height={16} />

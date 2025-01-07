@@ -219,22 +219,22 @@ export const PERMISSION_DEFINITION = [
         anyOf: [{ backend: ['system.settings.log_configuration.view'] }]
       }
     },
-    'system.devops.log_configuration.add': {
+    'system.settings.log_configuration.add': {
       granted: {
         anyOf: [{ backend: ['system.settings.log_configuration.manager'] }]
       }
     },
-    'system.devops.log_configuration.edit': {
+    'system.settings.log_configuration.edit': {
       granted: {
         anyOf: [{ backend: ['system.settings.log_configuration.manager'] }]
       }
     },
-    'system.devops.log_configuration.publish': {
+    'system.settings.log_configuration.publish': {
       granted: {
         anyOf: [{ backend: ['system.settings.log_configuration.manager'] }]
       }
     },
-    'system.devops.log_configuration.delete': {
+    'system.settings.log_configuration.delete': {
       granted: {
         anyOf: [{ backend: ['system.settings.log_configuration.manager'] }]
       }
@@ -674,9 +674,20 @@ export const PERMISSION_DEFINITION = [
         anyOf: [{ backend: ['project.permission_manager'] }]
       }
     },
+    'system.settings.ai_key_resource.view': {
+      granted: {
+        anyOf: [{ backend: ['system.settings.ai_key_resource.view'] }]
+      }
+    },
     'system.settings.ai_key_resource.manager': {
       granted: {
         anyOf: [{ backend: ['system.settings.ai_key_resource.manager'] }]
+      }
+    },
+
+    'system.settings.ai_api.view': {
+      granted: {
+        anyOf: [{ backend: ['system.settings.ai_api.view'] }]
       }
     }
   }
