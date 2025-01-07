@@ -23,6 +23,16 @@ type imlAIKeyService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlAIKeyService) IncrUseToken(ctx context.Context, id string, useToken int) error {
+	info, err := i.store.GetByUUID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	info.UseToken += useToken
+	return i.store.Save(ctx, info)
+}
+
 func (i *imlAIKeyService) SearchUnExpiredByPage(ctx context.Context, w map[string]interface{}, page, pageSize int, order string) ([]*Key, int64, error) {
 	sql := "(expire_time = 0 || expire_time > ?)"
 	args := []interface{}{time.Now().Unix()}
@@ -192,7 +202,7 @@ func (i *imlAIKeyService) OnComplete() {
 }
 
 func labelHandler(e *ai.Key) []string {
-	return []string{e.Name, e.Uuid}
+	return []string{e.Name}
 }
 func uniquestHandler(i *Create) []map[string]interface{} {
 	return []map[string]interface{}{{"uuid": i.ID}}
@@ -229,5 +239,6 @@ func updateHandler(e *ai.Key, i *Edit) {
 	if i.Priority != nil {
 		e.Sort = *i.Priority
 	}
+
 	e.UpdateAt = time.Now()
 }

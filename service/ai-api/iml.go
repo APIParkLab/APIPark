@@ -35,7 +35,7 @@ func (i *imlAPIService) OnComplete() {
 }
 
 func labelHandler(e *api.AiAPIInfo) []string {
-	return []string{e.Name, e.Uuid}
+	return []string{e.Name}
 }
 func uniquestHandler(i *Create) []map[string]interface{} {
 	return []map[string]interface{}{{"uuid": i.ID}}

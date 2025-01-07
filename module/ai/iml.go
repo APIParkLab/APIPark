@@ -425,7 +425,7 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		DefaultLLM:       defaultLLM.ID(),
 		DefaultLLMConfig: defaultLLM.DefaultConfig(),
 		Priority:         info.Priority,
-		Status:           ai_dto.ProviderEnabled,
+		Status:           ai_dto.ToProviderStatus(info.Status),
 		Configured:       true,
 	}, nil
 }
