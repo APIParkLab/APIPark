@@ -4,7 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"strings"
 	"time"
+
+	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
+
+	"github.com/eolinker/go-common/store"
+
+	"github.com/APIParkLab/APIPark/service/ai"
+
+	ai_key "github.com/APIParkLab/APIPark/service/ai-key"
 
 	nsq "github.com/nsqio/go-nsq"
 
@@ -39,8 +48,11 @@ type NSQMessage struct {
 
 // NSQHandler 处理 NSQ 消息并写入 MySQL
 type NSQHandler struct {
-	service ai_api.IAPIUseService `autowired:""`
-	ctx     context.Context
+	apiUseService ai_api.IAPIUseService `autowired:""`
+	aiKeyService  ai_key.IKeyService    `autowired:""`
+	aiService     ai.IProviderService   `autowired:""`
+	transaction   store.ITransaction    `autowired:""`
+	ctx           context.Context
 }
 
 func convertInt(value interface{}) int {
@@ -76,25 +88,57 @@ func (h *NSQHandler) HandleMessage(message *nsq.Message) error {
 	day := time.Date(timestamp.Year(), timestamp.Month(), timestamp.Day(), 0, 0, 0, 0, timestamp.Location())
 	hour := time.Date(timestamp.Year(), timestamp.Month(), timestamp.Day(), timestamp.Hour(), 0, 0, 0, timestamp.Location())
 	minute := time.Date(timestamp.Year(), timestamp.Month(), timestamp.Day(), timestamp.Hour(), timestamp.Minute(), 0, 0, timestamp.Location())
+	return h.transaction.Transaction(context.Background(), func(ctx context.Context) error {
+		finalStatus := &AIProviderStatus{}
+		for _, s := range data.AI.ProviderStats {
+			status := ToKeyStatus(s.Status).Int()
+			keys := strings.Split(s.Key, "@")
+			key := keys[0]
+			err = h.aiKeyService.Save(ctx, key, &ai_key.Edit{
+				Status: &status,
+			})
+			if err != nil {
+				log.Printf("Failed to save AI key: %v", err)
+				return err
+			}
+			if s.Provider != data.AI.Provider {
 
-	// 调用 AI API 接口
-	err = h.service.Incr(context.Background(), &ai_api.IncrAPIUse{
-		API:         data.API,
-		Service:     data.Provider,
-		Provider:    data.AI.Provider,
-		Model:       data.AI.Model,
-		Day:         day.Unix(),
-		Hour:        hour.Unix(),
-		Minute:      minute.Unix(),
-		InputToken:  convertInt(data.AI.InputToken),
-		OutputToken: convertInt(data.AI.OutputToken),
-		TotalToken:  convertInt(data.AI.TotalToken),
+				pStatus := ai_dto.ProviderAbnormal.Int()
+				err = h.aiService.Save(ctx, s.Provider, &ai.SetProvider{
+					Status: &pStatus,
+				})
+			}
+			finalStatus = &s
+		}
+		if finalStatus != nil {
+			keys := strings.Split(finalStatus.Key, "@")
+			err = h.aiKeyService.IncrUseToken(ctx, keys[0], convertInt(data.AI.TotalToken))
+			if err != nil {
+				log.Printf("Failed to increment AI key token: %v", err)
+				return err
+			}
+		}
+
+		// 调用 AI API 接口
+		err = h.apiUseService.Incr(context.Background(), &ai_api.IncrAPIUse{
+			API:         data.API,
+			Service:     data.Provider,
+			Provider:    data.AI.Provider,
+			Model:       data.AI.Model,
+			Day:         day.Unix(),
+			Hour:        hour.Unix(),
+			Minute:      minute.Unix(),
+			InputToken:  convertInt(data.AI.InputToken),
+			OutputToken: convertInt(data.AI.OutputToken),
+			TotalToken:  convertInt(data.AI.TotalToken),
+		})
+		if err != nil {
+			log.Printf("Failed to call AI API: %v", err)
+			return err
+		}
+
+		log.Printf("Message processed and saved to MySQL: %+v", data)
+		return nil
 	})
-	if err != nil {
-		log.Printf("Failed to call AI API: %v", err)
-		return err
-	}
 
-	log.Printf("Message processed and saved to MySQL: %+v", data)
-	return nil
 }
