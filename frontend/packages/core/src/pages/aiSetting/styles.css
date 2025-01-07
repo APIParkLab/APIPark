@@ -1,0 +1,75 @@
+/* Flow Chart Styles */
+.react-flow {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+}
+
+.react-flow__container {
+  width: 100%;
+  height: 100%;
+}
+
+.react-flow__renderer {
+  width: 100%;
+  height: 100%;
+}
+
+.react-flow__node {
+  padding: 0;
+  border-radius: 8px;
+  min-width: 150px;
+  width: auto;
+  max-width: 100%;
+}
+
+/* Custom Node Styles */
+.custom-node {
+  background: white;
+  border: 1px solid #ededed;
+  border-radius: 8px;
+  padding: 10px;
+  width: 280px;
+}
+
+.custom-node:hover {
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+/* API Key Status Grid */
+.api-key-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.api-key-status {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.api-key-status:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+  .custom-node {
+    width: 240px;
+  }
+
+  .api-key-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .custom-node {
+    width: 200px;
+  }
+
+  .api-key-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
