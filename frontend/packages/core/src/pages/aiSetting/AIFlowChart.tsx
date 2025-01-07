@@ -94,6 +94,9 @@ const AIFlowChart = () => {
     if (!modelData.length) return
 
     const positions = calculateNodePositions(modelData)
+    const firstSuccessModel = modelData.find((model) => model.status === 'enabled')
+    console.log(firstSuccessModel)
+
     // subtract 5 to make sure the service node is aligned with the top model node
     const serviceY = positions[modelData[0].id].y - 5
     const newNodes = [
@@ -101,6 +104,7 @@ const AIFlowChart = () => {
         id: 'apiService',
         type: 'serviceCard',
         position: { x: LAYOUT.SERVICE_NODE_X, y: serviceY },
+        draggable: false,
         data: {
           title: 'API Services',
           count: modelData.length
@@ -115,7 +119,8 @@ const AIFlowChart = () => {
           status: model.status,
           defaultLlm: model.defaultLlm,
           logo: model.logo,
-          id: model.id
+          id: model.id,
+          alternativeModel: firstSuccessModel
         }
       })),
       ...modelData.map((model) => ({
@@ -139,8 +144,12 @@ const AIFlowChart = () => {
         source: 'apiService',
         target: model.id,
         label: `${model.api_count} apis`,
-        data: { id: model.id },
-        animated: true
+        data: {
+          id: model.id,
+          status: model.status
+        },
+        animated: true,
+        style: { stroke: model.status === 'enabled' ? '#52c41a' : '#ff4d4f' }
       })),
       ...modelData.map((model) => ({
         id: `${model.id}-keys-edge`,
@@ -239,8 +248,10 @@ const AIFlowChart = () => {
           proOptions={{ hideAttribution: true }}
           draggable={false}
           nodeTypes={nodeTypes}
+          elementsSelectable={false}
           edgeTypes={edgeTypes}
           zoomOnScroll={false}
+          panOnDrag={false}
           zoomOnPinch={false}
           zoomOnDoubleClick={false}
           panOnScroll={true}

@@ -8,10 +8,11 @@ import { AiSettingListItem, ModelDetailData, ModelStatus } from '../types'
 type ModelCardNodeData = ModelDetailData & {
   id: string
   position: { x: number; y: number }
+  alternativeModel?: ModelDetailData
 }
 
 export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) => {
-  const { name, status, defaultLlm, logo } = data
+  const { name, status, defaultLlm, logo, alternativeModel } = data
   const { openConfigModal } = useAiSetting()
 
   const getStatusIcon = (status: ModelStatus) => {
@@ -62,6 +63,11 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
           {$t('默认：')}
           {defaultLlm}
         </div>
+        {status !== 'enabled' && alternativeModel && (
+          <div className="mt-1 text-sm text-gray-500">
+            {$t('关联 API 已转用')} {alternativeModel.name}/{alternativeModel.defaultLlm}
+          </div>
+        )}
       </div>
     </div>
   )
