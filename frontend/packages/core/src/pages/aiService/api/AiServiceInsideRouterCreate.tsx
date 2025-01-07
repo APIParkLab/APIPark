@@ -104,8 +104,8 @@ const AiServiceInsideRouterCreate = () => {
       })
       .catch((errInfo) => Promise.reject(errInfo))
   }
-  const isDelete = type === 'apiDetail'
-  const backUrl = isDelete ? `/aiApis/list` : `/service/${teamId}/aiInside/${serviceId}/route`
+  const isAIApiPreview = type === 'apiDetail'
+  const backUrl = isAIApiPreview ? `/aiApis/list` : `/service/${teamId}/aiInside/${serviceId}/route`
   const openDrawer = (type: 'edit') => {
     setDrawerType(type)
   }
@@ -210,7 +210,7 @@ const AiServiceInsideRouterCreate = () => {
   }, [])
 
   const addVariable = () => {
-    if (isDelete) return
+    if (isAIApiPreview) return
     form.setFieldsValue({
       variables: [...form.getFieldValue('variables'), { key: '', value: '', require: true }]
     })
@@ -273,7 +273,7 @@ const AiServiceInsideRouterCreate = () => {
           <Button
             icon={<Icon icon="ic:baseline-tune" height={18} width={18} />}
             iconPosition="end"
-            disabled={isDelete}
+            disabled={isAIApiPreview}
             onClick={() => openDrawer('edit')}
           >
             <div className="flex items-center gap-[10px]">
@@ -285,7 +285,7 @@ const AiServiceInsideRouterCreate = () => {
               {defaultLlm?.scopes?.map((x) => <Tag>{x?.toLocaleUpperCase()}</Tag>)}
             </div>
           </Button>
-          {type !== 'apiDetail' && (
+          {!isAIApiPreview && (
             <Button type="primary" onClick={onFinish}>
               {$t('保存')}
             </Button>
@@ -298,7 +298,7 @@ const AiServiceInsideRouterCreate = () => {
         spinning={loading}
         wrapperClassName=" pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X"
       >
-        <WithPermission disabled={isDelete}>
+        <WithPermission disabled={isAIApiPreview}>
           <Form
             layout="vertical"
             labelAlign="left"
@@ -350,7 +350,7 @@ const AiServiceInsideRouterCreate = () => {
 
               <Form.Item<AiServiceRouterField> label={$t('提示词')} name="prompt">
                 <PromptEditorResizable
-                  disabled={isDelete}
+                  disabled={isAIApiPreview}
                   variablesChange={handleVariablesChange}
                   promptVariables={variablesTable}
                 />
@@ -361,7 +361,7 @@ const AiServiceInsideRouterCreate = () => {
                   <div className="flex justify-between items-center w-full">
                     <span>{$t('变量')}</span>
                     <a
-                      className={`flex items-center gap-[4px] ${isDelete ? 'cursor-not-allowed' : ''}`}
+                      className={`flex items-center gap-[4px] ${isAIApiPreview ? 'cursor-not-allowed' : ''}`}
                       onClick={addVariable}
                     >
                       <Icon icon="ic:baseline-add" width={16} height={16} />
