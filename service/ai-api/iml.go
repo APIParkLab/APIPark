@@ -3,9 +3,10 @@ package ai_api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
-	"github.com/eolinker/go-common/utils"
+	"gorm.io/gorm"
 
 	"github.com/APIParkLab/APIPark/service/universally"
 	"github.com/APIParkLab/APIPark/stores/api"
@@ -87,7 +88,9 @@ func updateHandler(e *api.AiAPIInfo, i *Edit) {
 	if i.Disable != nil {
 		e.Disable = *i.Disable
 	}
-
+	if i.UseToken != nil {
+		e.UseToken = *i.UseToken
+	}
 	e.UpdateAt = time.Now()
 }
 
@@ -95,6 +98,36 @@ var _ IAPIUseService = (*imlAPIUseService)(nil)
 
 type imlAPIUseService struct {
 	store api.IAiAPIUseStore `autowired:""`
+}
+
+func (i *imlAPIUseService) Incr(ctx context.Context, incr *IncrAPIUse) error {
+	info, err := i.store.First(ctx, map[string]interface{}{
+		"api":      incr.API,
+		"service":  incr.Service,
+		"provider": incr.Provider,
+		"model":    incr.Model,
+		"day":      incr.Day,
+		"hour":     incr.Hour,
+		"minute":   incr.Minute,
+	})
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+		info = &api.AiAPIUse{
+			API:      incr.API,
+			Service:  incr.Service,
+			Provider: incr.Provider,
+			Model:    incr.Model,
+			Day:      incr.Day,
+			Hour:     incr.Hour,
+			Minute:   incr.Minute,
+		}
+	}
+	info.InputToken += incr.InputToken
+	info.OutputToken += incr.OutputToken
+	info.TotalToken += incr.TotalToken
+	return i.store.Save(ctx, info)
 }
 
 func (i *imlAPIUseService) SumByApisPage(ctx context.Context, providerId string, start, end int64, offset, limit int, order string, apiIds ...string) ([]*APIUse, int64, error) {
@@ -116,17 +149,18 @@ func (i *imlAPIUseService) SumByApisPage(ctx context.Context, providerId string,
 }
 
 func (i *imlAPIUseService) SumByApis(ctx context.Context, providerId string, start, end int64, apiIds ...string) ([]*APIUse, error) {
-	list, err := i.store.SumByGroup(ctx, "api", "api,sum(input_token) as input_token,sum(output_token) as output_token,sum(total_token) as total_token", "provider = ? and api in (?) and minute >= ? and minute <= ?", providerId, apiIds, start, end)
-	if err != nil {
-		return nil, err
-	}
-
-	return utils.SliceToSlice(list, func(v *api.AiAPIUse) *APIUse {
-		return &APIUse{
-			API:         v.API,
-			InputToken:  v.InputToken,
-			OutputToken: v.OutputToken,
-			TotalToken:  v.TotalToken,
-		}
-	}), nil
+	//list, err := i.store.SumByGroup(ctx, "api", "api,sum(input_token) as input_token,sum(output_token) as output_token,sum(total_token) as total_token", "provider = ? and api in (?) and minute >= ? and minute <= ?", providerId, apiIds, start, end)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//return utils.SliceToSlice(list, func(v *api.AiAPIUse) *APIUse {
+	//	return &APIUse{
+	//		API:         v.API,
+	//		InputToken:  v.InputToken,
+	//		OutputToken: v.OutputToken,
+	//		TotalToken:  v.TotalToken,
+	//	}
+	//}), nil
+	return nil, nil
 }
