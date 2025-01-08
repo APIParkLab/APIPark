@@ -92,10 +92,10 @@ const mockData = {
     },
     {
       driver: 'apipark.builtIn.component',
-      name: 'aiapis',
+      name: 'aiApis',
       router: [
         {
-          path: 'aiapis',
+          path: 'aiApis',
           type: 'normal'
         }
       ]

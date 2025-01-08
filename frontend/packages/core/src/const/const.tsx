@@ -468,10 +468,34 @@ export const routerMap: Map<string, RouterMapConfig> = new Map([
     }
   ],
   [
-    'aiapis',
+    'aiApis',
     {
       type: 'component',
-      lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiApis/index.tsx'))
+      lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiApis/aiApisLayout.tsx')),
+      key: 'aiApis',
+      provider: AiServiceProvider,
+      children: [
+        {
+          path: 'list',
+          key: 'apiList',
+          lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiApis/index.tsx'))
+        },
+        {
+          path: 'service/:teamId/aiInside/:serviceId',
+          key: 'aiApisServiceInside',
+          lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/AiServiceInsidePage.tsx')),
+          children: [
+            {
+              path: 'route/:routeId/:type',
+              key: 'aiApisServiceInsideRouteDetail',
+              lazy: lazy(
+                () =>
+                  import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/api/AiServiceInsideRouterCreate')
+              )
+            }
+          ]
+        }
+      ]
     }
   ],
   [
