@@ -63,7 +63,7 @@ var dynamicResourceMap = map[string]Worker{
 		Driver:     "loki",
 	},
 	"ai-provider": {
-		Profession: ProfessionAIProvider,
+		Profession: ProfessionAIResource,
 		Driver:     "ai-provider",
 	},
 	"ai-key": {

@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/eolinker/go-common/cftool"
+
 	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
 
 	"github.com/eolinker/go-common/store"
@@ -19,6 +21,15 @@ import (
 
 	ai_api "github.com/APIParkLab/APIPark/service/ai-api"
 )
+
+func init() {
+	cftool.Register[NSQConfig]("nsq")
+}
+
+type NSQConfig struct {
+	Addr        string `json:"addr"`
+	TopicPrefix string `json:"topic_prefix"`
+}
 
 // 定义 NSQ 消息结构
 type AIProviderStatus struct {
@@ -52,6 +63,7 @@ type NSQHandler struct {
 	aiKeyService  ai_key.IKeyService    `autowired:""`
 	aiService     ai.IProviderService   `autowired:""`
 	transaction   store.ITransaction    `autowired:""`
+	nsqConfig     *NSQConfig            `autowired:""`
 	ctx           context.Context
 }
 
@@ -104,6 +116,11 @@ func (h *NSQHandler) HandleMessage(message *nsq.Message) error {
 			if s.Provider != data.AI.Provider {
 
 				pStatus := ai_dto.ProviderAbnormal.Int()
+				err = h.aiService.Save(ctx, s.Provider, &ai.SetProvider{
+					Status: &pStatus,
+				})
+			} else {
+				pStatus := ai_dto.ProviderEnabled.Int()
 				err = h.aiService.Save(ctx, s.Provider, &ai.SetProvider{
 					Status: &pStatus,
 				})

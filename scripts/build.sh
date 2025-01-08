@@ -8,6 +8,8 @@ source ./scripts/common.sh
 OUTPUT_DIR=$(mkdir_output "$1")
 APP="apipark"
 OUTPUT_BIN="${OUTPUT_DIR}/${APP}"
+AI_EVENT_LISTEN_APP="apipark_ai_event_listen"
+AI_EVENT_LISTEN_BIN="${OUTPUT_DIR}/${AI_EVENT_LISTEN_APP}"
 VERSION=$(gen_version "$2")
 BUILD_TYPE=$3
 ARCH=$4
@@ -104,6 +106,10 @@ build_backend() {
   # -ldflags="-w -s" means omit DWARF symbol table and the symbol table and debug information
   echo "GOOS=linux GOARCH=$ARCH CGO_ENABLED=0 go build $Tags -ldflags \"-w -s $flags\" -o \"${OUTPUT_BIN}\""
   GOOS=linux GOARCH=$ARCH CGO_ENABLED=0 go build ${Tags} -ldflags "-w -s $flags" -o ${OUTPUT_BIN}
+
+  echo "Build backend successfully..."
+  echo "GOOS=linux GOARCH=$ARCH CGO_ENABLED=0 go build -ldflags \"-w -s\" -o \"${AI_EVENT_LISTEN_BIN}\" ./app/ai-event-handler"
+  GOOS=linux GOARCH=$ARCH CGO_ENABLED=0 go build -ldflags "-w -s" -o "${AI_EVENT_LISTEN_BIN}" ./app/ai-event-handler
   return
 }
 
@@ -122,6 +128,9 @@ package() {
   echo "cp ${OUTPUT_BIN} ${PACKAGE_DIR}"
 
   cp "${OUTPUT_BIN}" "${PACKAGE_DIR}"
+
+  echo "cp ${AI_EVENT_LISTEN_BIN} ${PACKAGE_DIR}"
+  cp "${AI_EVENT_LISTEN_BIN}" "${PACKAGE_DIR}"
 
   echo "tar -czvf ${PACKAGE_DIR}_linux_${ARCH}.tar.gz -C ${PACKAGE_DIR}/ ./"
   tar -czvf "${PACKAGE_DIR}_linux_${ARCH}.tar.gz" -C "${PACKAGE_DIR}/" "./"
