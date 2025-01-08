@@ -42,10 +42,15 @@ func main() {
 		log.Fatal("check autowired:", err)
 		return
 	}
-
 	// 2. 创建 NSQ 消费者
 	config := nsq.NewConfig()
-	consumer, err := nsq.NewConsumer("ai_event", "tmp", config)
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Fatalf("Failed to get hostname: %v", err)
+		return
+	}
+	nsqConfig := handler.nsqConfig
+	consumer, err := nsq.NewConsumer(fmt.Sprintf("%s_ai_event", nsqConfig.TopicPrefix), hostname, config)
 	if err != nil {
 		log.Fatalf("Failed to create NSQ consumer: %v", err)
 	}
@@ -53,8 +58,8 @@ func main() {
 	consumer.AddHandler(handler)
 
 	// 4. 连接到 NSQ
-	nsqAddress := "172.18.166.219:9150" // NSQ 地址
-	err = consumer.ConnectToNSQD(nsqAddress)
+	//nsqAddress := "172.18.166.219:9150" // NSQ 地址
+	err = consumer.ConnectToNSQD(nsqConfig.Addr)
 	if err != nil {
 		log.Fatalf("Failed to connect to NSQ: %v", err)
 	}
