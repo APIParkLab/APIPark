@@ -12,20 +12,22 @@ import AIProviderSelect, { AIProvider } from '@core/components/AIProviderSelect'
 import { App, Divider, Space, Typography } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import ApiKeyContent from './components/ApiKeyContent'
 import { APIKey, EditAPIKey } from './types'
 
 const KeySettings: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
   const { modal, message } = App.useApp()
-  const [selectedProvider, setSelectedProvider] = useState<string>()
+  const [searchParams] = useSearchParams()
+  const [selectedProvider, setSelectedProvider] = useState<string>(searchParams.get('modelId') || '')
   const [provider, setProvider] = useState<AIProvider | undefined>()
-  const [apiKeys, setApiKeys] = useState<APIKey[]>([])
   const { fetchData } = useFetch()
   const [searchWord, setSearchWord] = useState<string>('')
   const [total, setTotal] = useState<number>(0)
   const modalRef = useRef<any>()
   const { accessData } = useGlobalContext()
+  const [apiKeys, setApiKeys] = useState<APIKey[]>([])
 
   useEffect(() => {
     pageListRef.current?.reload()
@@ -65,7 +67,7 @@ const KeySettings: React.FC = () => {
     const newEntity = entity as EditAPIKey
 
     modal.confirm({
-      title: mode === 'add' ? $t(`添加 ${provider?.name} APIKey`) : $t('编辑 APIKey'),
+      title: mode === 'add' ? $t('添加 (0) APIKey', [provider?.name]) : $t('编辑 APIKey'),
       content: <ApiKeyContent ref={modalRef} entity={newEntity} provider={provider} />,
       onOk: () => {
         return new Promise((resolve, reject) => {
@@ -153,16 +155,30 @@ const KeySettings: React.FC = () => {
   }
 
   const handleDragSortEnd = async (beforeIndex: number, afterIndex: number, newDataSource: APIKey[]) => {
-    console.log(beforeIndex, afterIndex, newDataSource)
     try {
+      let targetId
+      let sortDirection
+
+      // Check if there's an item before afterIndex
+      if (afterIndex > 0) {
+        targetId = newDataSource[afterIndex - 1].id
+        sortDirection = 'after'
+      } else if (afterIndex < newDataSource.length - 1) {
+        // If no item before, use the item after
+        targetId = newDataSource[afterIndex + 1].id
+        sortDirection = 'before'
+      }
+
       const response = await fetchData<BasicResponse<any>>('ai/resource/key/sort', {
         method: 'PUT',
         eoParams: {
-          origin: newDataSource[beforeIndex].id,
-          target: newDataSource[afterIndex].id,
-          sort: afterIndex > beforeIndex ? 'before' : 'after'
+          provider: selectedProvider
+        },
+        eoBody: {
+          origin: apiKeys[beforeIndex].id,
+          target: targetId,
+          sort: sortDirection
         }
-        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
@@ -170,9 +186,13 @@ const KeySettings: React.FC = () => {
         pageListRef.current?.reload()
       } else {
         message.error(response.msg || RESPONSE_TIPS.error)
+        // Revert the UI if API call fails
+        pageListRef.current?.reload()
       }
     } catch (error) {
       message.error(RESPONSE_TIPS.error)
+      // Revert the UI if API call fails
+      pageListRef.current?.reload()
     }
   }
 
@@ -186,12 +206,15 @@ const KeySettings: React.FC = () => {
           page_size: params.pageSize,
           keyword: searchWord,
           page: params.current
+          //TODO API 筛选
+          // statuses: params.statuses || []
         }
         // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
         setTotal(response.data.total)
+        setApiKeys(response.data.keys)
         return {
           data: response.data.keys,
           success: true,
@@ -306,7 +329,7 @@ const KeySettings: React.FC = () => {
       render: (dom: React.ReactNode, entity: APIKey) => {
         return entity.expire_time === 0
           ? $t('永不过期')
-          : dayjs(Number(entity.expire_time)).format('YYYY-MM-DD HH:mm:ss')
+          : dayjs(Number(entity.expire_time) * 1000).format('YYYY-MM-DD HH:mm:ss')
       }
     },
     ...operation
@@ -340,6 +363,7 @@ const KeySettings: React.FC = () => {
           request={requestApiKeys}
           onSearchWordChange={(e) => {
             setSearchWord(e.target.value)
+            pageListRef.current?.reload()
           }}
           showPagination={true}
           searchPlaceholder={$t('请输入名称搜索')}

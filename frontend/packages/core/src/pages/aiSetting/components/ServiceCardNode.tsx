@@ -11,7 +11,7 @@ export const ServiceCardNode: React.FC<NodeProps> = () => {
       <Handle type="source" position={Position.Right} />
       <div className="flex flex-col gap-2 items-center">
         <Icon icon="mdi:robot" className="text-3xl text-[--primary-color]" />
-        <span className="text-base text-gray-900">AI Service</span>
+        <span className="text-base text-gray-900">AI Services</span>
       </div>
     </div>
   )
