@@ -13,7 +13,7 @@ type IKeyController interface {
 	Edit(ctx *gin.Context, providerId string, id string, input *ai_key_dto.Edit) error
 	Delete(ctx *gin.Context, providerId string, id string) error
 	Get(ctx *gin.Context, providerId string, id string) (*ai_key_dto.Key, error)
-	List(ctx *gin.Context, providerId string, keyword string, page string, pageSize string) ([]*ai_key_dto.Item, int64, error)
+	List(ctx *gin.Context, providerId string, keyword string, page string, pageSize string, statuses string) ([]*ai_key_dto.Item, int64, error)
 	Enable(ctx *gin.Context, providerId string, id string) error
 	Disable(ctx *gin.Context, providerId string, id string) error
 	Sort(ctx *gin.Context, providerId string, input *ai_key_dto.Sort) error

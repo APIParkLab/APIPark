@@ -19,6 +19,7 @@ type IAPIService interface {
 type IAPIUseService interface {
 	SumByApis(ctx context.Context, providerId string, start, end int64, apiIds ...string) ([]*APIUse, error)
 	SumByApisPage(ctx context.Context, providerId string, start, end int64, page, pageSize int, order string, apiIds ...string) ([]*APIUse, int64, error)
+	Incr(ctx context.Context, incr *IncrAPIUse) error
 }
 
 func init() {

@@ -23,6 +23,39 @@ type imlAIKeyService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlAIKeyService) IncrUseToken(ctx context.Context, id string, useToken int) error {
+	info, err := i.store.GetByUUID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	info.UseToken += useToken
+	return i.store.Save(ctx, info)
+}
+
+func (i *imlAIKeyService) SearchUnExpiredByPage(ctx context.Context, w map[string]interface{}, page, pageSize int, order string) ([]*Key, int64, error) {
+	sql := "(expire_time = 0 || expire_time > ?)"
+	args := []interface{}{time.Now().Unix()}
+	for k, v := range w {
+		switch v.(type) {
+		case []int:
+			sql += fmt.Sprintf(" and `%s` in (?)", k)
+		default:
+			sql += fmt.Sprintf(" and `%s` = ?", k)
+		}
+		args = append(args, v)
+	}
+	list, total, err := i.store.ListPage(ctx, sql, page, pageSize, args, order)
+	if err != nil {
+		return nil, 0, err
+	}
+	var result []*Key
+	for _, item := range list {
+		result = append(result, FromEntity(item))
+	}
+	return result, total, nil
+}
+
 func (i *imlAIKeyService) KeysAfterPriority(ctx context.Context, providerId string, priority int) ([]*Key, error) {
 	list, err := i.store.ListQuery(ctx, "sort > ? and provider = ?", []interface{}{priority, providerId}, "sort asc")
 	if err != nil {
@@ -169,7 +202,7 @@ func (i *imlAIKeyService) OnComplete() {
 }
 
 func labelHandler(e *ai.Key) []string {
-	return []string{e.Name, e.Uuid}
+	return []string{e.Name}
 }
 func uniquestHandler(i *Create) []map[string]interface{} {
 	return []map[string]interface{}{{"uuid": i.ID}}
@@ -206,5 +239,6 @@ func updateHandler(e *ai.Key, i *Edit) {
 	if i.Priority != nil {
 		e.Sort = *i.Priority
 	}
+
 	e.UpdateAt = time.Now()
 }

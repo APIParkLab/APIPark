@@ -42,7 +42,8 @@ start() {
         cat "$LOG_FILE"
         exit 1
     fi
-
+    # 启动ai事件监听程序
+#    nohup ./apipark_ai_event_listen >> "$LOG_FILE" 2>&1 &
 }
 
 # 停止函数

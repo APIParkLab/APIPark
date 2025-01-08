@@ -2,14 +2,14 @@ package subscribe
 
 import (
 	"time"
-	
+
 	"github.com/APIParkLab/APIPark/stores/subscribe"
 )
 
 type Subscribe struct {
 	Id      string
 	Service string
-	
+
 	// 订阅方相关
 	Application string
 	From        int
@@ -28,6 +28,7 @@ type CreateSubscribe struct {
 }
 
 type UpdateSubscribe struct {
+	From        *int
 	ApplyStatus *int
 }
 
