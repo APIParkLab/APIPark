@@ -7,12 +7,14 @@ go 1.21
 require (
 	github.com/eolinker/ap-account v1.0.15
 	github.com/eolinker/eosc v0.18.3
-	github.com/eolinker/go-common v1.1.3
+	github.com/eolinker/go-common v1.1.4
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/getkin/kin-openapi v0.127.0
 	github.com/gin-gonic/gin v1.10.0
+	github.com/go-sql-driver/mysql v1.7.0
 	github.com/google/uuid v1.6.0
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
+	github.com/nsqio/go-nsq v1.1.0
 	github.com/urfave/cli v1.22.16
 	golang.org/x/crypto v0.24.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -37,8 +39,8 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
-	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
+	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/influxdata/line-protocol v0.0.0-20200327222509-2487e7298839 // indirect

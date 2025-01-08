@@ -46,7 +46,7 @@ func (i *imlServiceService) ServiceListByKind(ctx context.Context, kind Kind, se
 		w["uuid"] = serviceIds
 	}
 	w["as_server"] = true
-	w["kind"] = kind
+	w["kind"] = kind.Int()
 	w["is_delete"] = false
 	list, err := i.store.List(ctx, w)
 	if err != nil {

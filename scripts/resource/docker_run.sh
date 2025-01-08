@@ -21,6 +21,9 @@ echo -e "redis:" >> config.yml
 echo -e "  user_name: ${REDIS_USER_NAME}" >> config.yml
 echo -e "  password: ${REDIS_PWD}" >> config.yml
 echo -e "  addr: " >> config.yml
+echo -e "nsq:" >> config.yml
+echo -e "  addr: ${NSQ_ADDR}" >> config.yml
+echo -e "  topic: ${NSQ_TOPIC}" >> config.yml
 for s in ${arr[@]}
 do
 echo -e "    - $s" >> config.yml
@@ -34,4 +37,6 @@ echo -e "  log_expire: ${ERROR_EXPIRE}" >> config.yml
 echo -e "  log_period: ${ERROR_PERIOD}" >> config.yml
 
 cat config.yml
-./apipark
+nohup ./apipark >> run.log 2>&1 &
+nohup ./apipark_ai_event_listen >> run.log 2>&1 &
+tail -F run.log

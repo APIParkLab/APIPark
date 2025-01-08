@@ -6,6 +6,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/APIParkLab/APIPark/service/cluster"
+	"github.com/eolinker/eosc/log"
+
+	"github.com/APIParkLab/APIPark/gateway"
+
+	"github.com/eolinker/go-common/utils"
+
 	"gorm.io/gorm"
 
 	"github.com/eolinker/go-common/auto"
@@ -25,9 +32,32 @@ import (
 var _ IKeyModule = &imlKeyModule{}
 
 type imlKeyModule struct {
-	providerService ai.IProviderService `autowired:""`
-	aiKeyService    ai_key.IKeyService  `autowired:""`
-	transaction     store.ITransaction  `autowired:""`
+	providerService ai.IProviderService     `autowired:""`
+	aiKeyService    ai_key.IKeyService      `autowired:""`
+	clusterService  cluster.IClusterService `autowired:""`
+	transaction     store.ITransaction      `autowired:""`
+}
+
+func newKey(key *ai_key.Key) *gateway.DynamicRelease {
+
+	return &gateway.DynamicRelease{
+		BasicItem: &gateway.BasicItem{
+			ID:          fmt.Sprintf("%s-%s", key.Provider, key.ID),
+			Description: key.Name,
+			Resource:    "ai-key",
+			Version:     time.Now().Format("20060102150405"),
+			MatchLabels: map[string]string{
+				"module": "ai-key",
+			},
+		},
+		Attr: map[string]interface{}{
+			"expired":  key.ExpireTime,
+			"config":   key.Config,
+			"provider": key.Provider,
+			"priority": key.Priority,
+			"disabled": key.Status == 0,
+		},
+	}
 }
 
 func (i *imlKeyModule) Create(ctx context.Context, providerId string, input *ai_key_dto.Create) error {
@@ -39,6 +69,7 @@ func (i *imlKeyModule) Create(ctx context.Context, providerId string, input *ai_
 	if !has {
 		return fmt.Errorf("provider not found: %w", err)
 	}
+	p.URI()
 	err = p.Check(input.Config)
 	if err != nil {
 		return fmt.Errorf("config check failed: %w", err)
@@ -54,11 +85,9 @@ func (i *imlKeyModule) Create(ctx context.Context, providerId string, input *ai_
 		status := ai_key_dto.KeyNormal.Int()
 		if input.ExpireTime > 0 && time.Unix(int64(input.ExpireTime), 0).Before(time.Now()) {
 			status = ai_key_dto.KeyExpired.Int()
-		} else {
-			// TODO: 发布Key到网关
 		}
 
-		return i.aiKeyService.Create(ctx, &ai_key.Create{
+		err = i.aiKeyService.Create(ctx, &ai_key.Create{
 			ID:         input.Id,
 			Name:       input.Name,
 			Config:     input.Config,
@@ -67,7 +96,41 @@ func (i *imlKeyModule) Create(ctx context.Context, providerId string, input *ai_
 			ExpireTime: input.ExpireTime,
 			Priority:   priority + 1,
 		})
+
+		info, _ := i.aiKeyService.Get(ctx, input.Id)
+		releases := []*gateway.DynamicRelease{newKey(info)}
+		return i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
 	})
+}
+
+func (i *imlKeyModule) syncGateway(ctx context.Context, clusterId string, releases []*gateway.DynamicRelease, online bool) error {
+	client, err := i.clusterService.GatewayClient(ctx, clusterId)
+	if err != nil {
+		log.Errorf("get apinto client error: %v", err)
+		return nil
+	}
+	defer func() {
+		err := client.Close(ctx)
+		if err != nil {
+			log.Warn("close apinto client:", err)
+		}
+	}()
+	for _, releaseInfo := range releases {
+		dynamicClient, err := client.Dynamic(releaseInfo.Resource)
+		if err != nil {
+			return err
+		}
+		if online {
+			err = dynamicClient.Online(ctx, releaseInfo)
+		} else {
+			err = dynamicClient.Offline(ctx, releaseInfo)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (i *imlKeyModule) Edit(ctx context.Context, providerId string, id string, input *ai_key_dto.Edit) error {
@@ -89,7 +152,7 @@ func (i *imlKeyModule) Edit(ctx context.Context, providerId string, id string, i
 			if err != nil {
 				return fmt.Errorf("config check failed: %w", err)
 			}
-			cfg, err := p.GenConfig(info.Config, *input.Config)
+			cfg, err := p.GenConfig(*input.Config, info.Config)
 			if err != nil {
 				return fmt.Errorf("config gen failed: %w", err)
 			}
@@ -121,16 +184,25 @@ func (i *imlKeyModule) Edit(ctx context.Context, providerId string, id string, i
 			// 停用、超额需要启用，所以维持原状态
 			status = orgStatus.Int()
 		}
-		if status == ai_key_dto.KeyNormal.Int() {
-			// TODO: 发布Key到网关
-		}
 
-		return i.aiKeyService.Save(ctx, id, &ai_key.Edit{
+		err = i.aiKeyService.Save(ctx, id, &ai_key.Edit{
 			Name:       input.Name,
 			Config:     input.Config,
 			ExpireTime: input.ExpireTime,
 			Status:     &status,
 		})
+		if err != nil {
+			return err
+		}
+		if status == ai_key_dto.KeyNormal.Int() {
+			info, err = i.aiKeyService.Get(ctx, id)
+			if err != nil {
+				return err
+			}
+			releases := []*gateway.DynamicRelease{newKey(info)}
+			return i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
+		}
+		return nil
 	})
 
 }
@@ -165,8 +237,18 @@ func (i *imlKeyModule) Delete(ctx context.Context, providerId string, id string)
 			}
 		}
 
-		// TODO: 操作网关下线Key
-		return i.aiKeyService.Delete(ctx, id)
+		err = i.aiKeyService.Delete(ctx, id)
+		if err != nil {
+			return err
+		}
+		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{{
+			BasicItem: &gateway.BasicItem{
+				ID:       fmt.Sprintf("%s-%s", providerId, id),
+				Resource: "ai-key",
+			},
+			Attr: nil,
+		},
+		}, false)
 	})
 }
 
@@ -192,7 +274,7 @@ func (i *imlKeyModule) Get(ctx context.Context, providerId string, id string) (*
 	}, nil
 }
 
-func (i *imlKeyModule) List(ctx context.Context, providerId string, keyword string, page, pageSize int) ([]*ai_key_dto.Item, int64, error) {
+func (i *imlKeyModule) List(ctx context.Context, providerId string, keyword string, page, pageSize int, statuses []string) ([]*ai_key_dto.Item, int64, error) {
 	_, err := i.aiKeyService.DefaultKey(ctx, providerId)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -217,12 +299,49 @@ func (i *imlKeyModule) List(ctx context.Context, providerId string, keyword stri
 			return nil, 0, fmt.Errorf("create default key failed: %w", err)
 		}
 	}
-	list, total, err := i.aiKeyService.SearchByPage(ctx, keyword, map[string]interface{}{
+	w := map[string]interface{}{
 		"provider": providerId,
-	}, page, pageSize, "sort asc")
-	if err != nil {
-		return nil, 0, err
 	}
+	hasExpired := true
+	if len(statuses) > 0 {
+		hasExpired = false
+		statusConditions := make([]int, 0, len(statuses))
+		for _, s := range statuses {
+			status := ai_key_dto.KeyStatus(s)
+			if status == ai_key_dto.KeyExpired {
+				hasExpired = true
+			}
+			statusConditions = append(statusConditions, status.Int())
+		}
+		w["status"] = statusConditions
+	}
+	var list []*ai_key.Key
+	var total int64
+	if !hasExpired {
+		if keyword != "" {
+			list, err = i.aiKeyService.Search(ctx, keyword, w, "sort asc")
+			if err != nil {
+				return nil, 0, err
+			}
+			if len(list) == 0 {
+				return nil, 0, nil
+			}
+			uuids := utils.SliceToSlice(list, func(key *ai_key.Key) string {
+				return key.ID
+			})
+			w["uuid"] = uuids
+		}
+		list, total, err = i.aiKeyService.SearchUnExpiredByPage(ctx, w, page, pageSize, "sort asc")
+		if err != nil {
+			return nil, 0, err
+		}
+	} else {
+		list, total, err = i.aiKeyService.SearchByPage(ctx, keyword, w, page, pageSize, "sort asc")
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+
 	var result []*ai_key_dto.Item
 	for _, item := range list {
 		status := ai_key_dto.ToKeyStatus(item.Status)
@@ -255,11 +374,21 @@ func (i *imlKeyModule) UpdateKeyStatus(ctx context.Context, providerId string, i
 	}
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		if !enable {
-			// TODO：下线Key
 			status := ai_key_dto.KeyDisable.Int()
-			return i.aiKeyService.Save(ctx, id, &ai_key.Edit{
+			err = i.aiKeyService.Save(ctx, id, &ai_key.Edit{
 				Status: &status,
 			})
+			if err != nil {
+				return err
+			}
+			releases := []*gateway.DynamicRelease{{
+				BasicItem: &gateway.BasicItem{
+					ID:       id,
+					Resource: "ai-key",
+				},
+				Attr: nil,
+			}}
+			return i.syncGateway(ctx, providerId, releases, false)
 		}
 		if info.Status == ai_key_dto.KeyDisable.Int() || info.Status == ai_key_dto.KeyExceed.Int() {
 			// 超额 或 停用状态，可启用
@@ -270,11 +399,19 @@ func (i *imlKeyModule) UpdateKeyStatus(ctx context.Context, providerId string, i
 					Status: &status,
 				})
 			}
-			// TODO：发布Key到网关
 			status := ai_key_dto.KeyNormal.Int()
-			return i.aiKeyService.Save(ctx, id, &ai_key.Edit{
+			err = i.aiKeyService.Save(ctx, id, &ai_key.Edit{
 				Status: &status,
 			})
+			if err != nil {
+				return err
+			}
+			info, err = i.aiKeyService.Get(ctx, id)
+			if err != nil {
+				return err
+			}
+			releases := []*gateway.DynamicRelease{newKey(info)}
+			return i.syncGateway(ctx, providerId, releases, true)
 		}
 		return nil
 	})
@@ -297,8 +434,14 @@ func (i *imlKeyModule) Sort(ctx context.Context, providerId string, input *ai_ke
 		if err != nil {
 			return err
 		}
-		// TODO: 全量更新key配置到网关
-
-		return nil
+		list, err := i.aiKeyService.KeysByProvider(ctx, providerId)
+		if err != nil {
+			return err
+		}
+		releases := make([]*gateway.DynamicRelease, 0, len(list))
+		for _, info := range list {
+			releases = append(releases, newKey(info))
+		}
+		return i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
 	})
 }

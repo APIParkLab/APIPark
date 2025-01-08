@@ -8,6 +8,9 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 ARG APP
 
+ENV NSQ_ADDR=nsq:4150
+ENV NSQ_TOPIC_PREFIX=apipark
+
 RUN mkdir -p /${APP}
 
 COPY cmd/* /${APP}/
