@@ -39,7 +39,7 @@ i18n
   .init({
     // 初始化
     resources, // 本地多语言数据
-    // fallbackLng: config.lang, // 默认当前环境的语言
+    supportedLngs: ['zh-CN', 'en-US', 'zh-TW', 'ja-JP'],
     detection: {
       caches: ['localStorage', 'sessionStorage', 'cookie']
     }
