@@ -21,13 +21,13 @@ echo -e "redis:" >> config.yml
 echo -e "  user_name: ${REDIS_USER_NAME}" >> config.yml
 echo -e "  password: ${REDIS_PWD}" >> config.yml
 echo -e "  addr: " >> config.yml
-echo -e "nsq:" >> config.yml
-echo -e "  addr: ${NSQ_ADDR}" >> config.yml
-echo -e "  topic: ${NSQ_TOPIC}" >> config.yml
 for s in ${arr[@]}
 do
 echo -e "    - $s" >> config.yml
 done
+echo -e "nsq:" >> config.yml
+echo -e "  addr: ${NSQ_ADDR}" >> config.yml
+echo -e "  topic: ${NSQ_TOPIC}" >> config.yml
 echo -e "port: 8288" >> config.yml
 echo -e "error_log:" >> config.yml
 echo -e "  dir: ${ERROR_DIR}" >> config.yml
