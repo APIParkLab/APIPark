@@ -1,5 +1,5 @@
 import InsidePage from '@common/components/aoplatform/InsidePage'
-import { $t } from '@common/locales'
+import { useI18n } from '@common/locales'
 import { Tabs } from 'antd'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -10,6 +10,7 @@ import { AiSettingProvider } from './contexts/AiSettingContext'
 const CONTENT_STYLE = { height: 'calc(-300px + 100vh)' } as const
 
 const AiSettingContent = () => {
+  const $t = useI18n()
   const [searchParams, setSearchParams] = useSearchParams()
   const [activeKey, setActiveKey] = useState(searchParams.get('status') === 'unconfigure' ? 'config' : 'flow')
 
