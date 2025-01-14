@@ -1,8 +1,8 @@
+import { PERMISSION_DEFINITION } from '@common/const/permissions'
+import { $t } from '@common/locales'
 import { Button, Tooltip, Upload } from 'antd'
 import { ReactElement, cloneElement, useEffect, useMemo, useState } from 'react'
 import { useGlobalContext } from '../../contexts/GlobalStateContext'
-import { PERMISSION_DEFINITION } from '@common/const/permissions'
-import { $t } from '@common/locales'
 
 type WithPermissionProps = {
   access?: string | string[]

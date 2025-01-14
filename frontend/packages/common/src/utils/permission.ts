@@ -18,7 +18,11 @@ export const checkAccess: (access: AccessDataType, accessData: Map<string, strin
   if (accLevel === 'team') {
     accessSet = new Set(Array.from(accessSet).concat(accessData?.get('team') || []))
   }
-  return accessSet!.size > 0 ? hasIntersection(neededBackendAccessArr, accessSet) : false
+  if (!accessSet!.size) {
+    return false
+  }
+  const hasAccess = hasIntersection(neededBackendAccessArr, accessSet)
+  return hasAccess
 }
 
 const hasIntersection = (arr1: string[], set1: Set<string>) => {
