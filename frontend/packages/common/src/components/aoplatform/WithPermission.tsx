@@ -1,8 +1,8 @@
+import { PERMISSION_DEFINITION } from '@common/const/permissions'
+import { $t } from '@common/locales'
 import { Button, Tooltip, Upload } from 'antd'
 import { ReactElement, cloneElement, useEffect, useMemo, useState } from 'react'
 import { useGlobalContext } from '../../contexts/GlobalStateContext'
-import { PERMISSION_DEFINITION } from '@common/const/permissions'
-import { $t } from '@common/locales'
 
 type WithPermissionProps = {
   access?: string | string[]
@@ -18,6 +18,7 @@ const WithPermission = ({ access, tooltip, children, disabled, showDisabled = tr
 
   const lastAccess = useMemo(() => {
     if (!access) return true
+    console.log(access, accessData, checkPermission(access as keyof (typeof PERMISSION_DEFINITION)[0]))
     return checkPermission(access as keyof (typeof PERMISSION_DEFINITION)[0])
   }, [access, accessData, checkPermission, accessInit])
 

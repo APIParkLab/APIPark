@@ -4,7 +4,7 @@ import WithPermission from '@common/components/aoplatform/WithPermission'
 import { BasicResponse, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { PERMISSION_DEFINITION } from '@common/const/permissions'
 import { EntityItem } from '@common/const/type'
-import { useGlobalContext } from '@common/contexts/GlobalStateContext'
+import { GlobalProvider, useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { checkAccess } from '@common/utils/permission'
@@ -28,7 +28,7 @@ export default function ServiceCategory() {
   const { accessData } = useGlobalContext()
   const [loading, setLoading] = useState<boolean>(false)
 
-  const onDrop: TreeProps['onDrop'] = info => {
+  const onDrop: TreeProps['onDrop'] = (info) => {
     const dropKey = info.node.key
     const dragKey = info.dragNode.key
     const dropPos = info.node.pos.split('-')
@@ -59,7 +59,7 @@ export default function ServiceCategory() {
 
     if (!info.dropToGap) {
       // Drop on the content
-      loop(data, dropKey, item => {
+      loop(data, dropKey, (item) => {
         item.children = item.children || []
         // where to insert. New item was inserted to the start of the array in this example, but can be anywhere
         item.children.unshift(dragObj)
@@ -129,9 +129,9 @@ export default function ServiceCategory() {
   const treeData = useMemo(() => {
     setExpandedKeys([])
     const loop = (data: CategorizesType[]): DataNode[] =>
-      data?.map(item => {
+      data?.map((item) => {
         if (item.children) {
-          setExpandedKeys(prev => [...prev, item.id])
+          setExpandedKeys((prev) => [...prev, item.id])
           return {
             title: (
               <TreeWithMore stopClick={false} dropdownMenu={dropdownMenu(item as CategorizesType)}>
@@ -169,40 +169,26 @@ export default function ServiceCategory() {
     return !checkAccess(permission, accessData)
   }
 
-  const openModal = (
-    type: 'addCate' | 'addChildCate' | 'renameCate' | 'delete',
-    entity?: CategorizesType
-  ) => {
+  const openModal = (type: 'addCate' | 'addChildCate' | 'renameCate' | 'delete', entity?: CategorizesType) => {
     let title: string = ''
     let content: string | React.ReactNode = ''
     switch (type) {
-      case 'addCate':
+      case 'addCate': {
         title = $t('添加分类')
         content = (
-          <ServiceHubCategoryConfig WithPermission={WithPermission} ref={addRef} type={type} />
+          <GlobalProvider>
+            <ServiceHubCategoryConfig ref={addRef} type={type} />
+          </GlobalProvider>
         )
         break
+      }
       case 'addChildCate':
         title = $t('添加子分类')
-        content = (
-          <ServiceHubCategoryConfig
-            WithPermission={WithPermission}
-            ref={addChildRef}
-            type={type}
-            entity={entity}
-          />
-        )
+        content = <ServiceHubCategoryConfig ref={addChildRef} type={type} entity={entity} />
         break
       case 'renameCate':
         title = $t('重命名分类')
-        content = (
-          <ServiceHubCategoryConfig
-            WithPermission={WithPermission}
-            ref={renameRef}
-            type={type}
-            entity={entity}
-          />
-        )
+        content = <ServiceHubCategoryConfig ref={renameRef} type={type} entity={entity} />
         break
       case 'delete':
         title = $t('删除')
@@ -215,19 +201,19 @@ export default function ServiceCategory() {
       onOk: () => {
         switch (type) {
           case 'addCate':
-            return addRef.current?.save().then(res => {
+            return addRef.current?.save().then((res) => {
               if (res === true) getCategoryList()
             })
           case 'addChildCate':
-            return addChildRef.current?.save().then(res => {
+            return addChildRef.current?.save().then((res) => {
               if (res === true) getCategoryList()
             })
           case 'renameCate':
-            return renameRef.current?.save().then(res => {
+            return renameRef.current?.save().then((res) => {
               if (res === true) getCategoryList()
             })
           case 'delete':
-            return deleteCate(entity!).then(res => {
+            return deleteCate(entity!).then((res) => {
               if (res === true) getCategoryList()
             })
         }
@@ -249,7 +235,7 @@ export default function ServiceCategory() {
         method: 'DELETE',
         eoParams: { catalogue: entity.id }
       })
-        .then(response => {
+        .then((response) => {
           const { code, msg } = response
           if (code === STATUS_CODE.SUCCESS) {
             message.success(msg || $t(RESPONSE_TIPS.success))
@@ -259,14 +245,14 @@ export default function ServiceCategory() {
             reject(msg || $t(RESPONSE_TIPS.error))
           }
         })
-        .catch(errorInfo => reject(errorInfo))
+        .catch((errorInfo) => reject(errorInfo))
     })
   }
 
   const sortCategories = (newData: CategorizesType[]) => {
     setLoading(true)
     fetchData<BasicResponse<null>>('catalogue/sort', { method: 'PUT', eoBody: newData })
-      .then(response => {
+      .then((response) => {
         const { code, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           getCategoryList()
@@ -288,7 +274,7 @@ export default function ServiceCategory() {
     fetchData<BasicResponse<{ catalogues: CategorizesType[]; tags: EntityItem[] }>>('catalogues', {
       method: 'GET'
     })
-      .then(response => {
+      .then((response) => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           setGData(data.catalogues)
@@ -308,11 +294,7 @@ export default function ServiceCategory() {
 
   return (
     <div className="border border-solid border-BORDER p-[20px] rounded-[10px] ">
-      <Spin
-        indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
-        spinning={loading}
-        className=""
-      >
+      <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} className="">
         <Tree
           showIcon
           draggable

@@ -164,22 +164,6 @@ export default function ServiceHubManagement() {
           </GlobalProvider>
         )
         break
-      // case 'edit':{
-      //     title='配置 Open Api'
-      //     message.loading('正在加载数据')
-      //     const {code,data,msg} = await fetchData<BasicResponse<{app:ManagementConfigFieldType}>>('external-app',{method:'GET',eoParams:{id:entity!.id}})
-      //     message.destroy()
-      //     if(code === STATUS_CODE.SUCCESS){
-      //         content=<ManagementConfig ref={editManagementRef} type={type} entity={data.app}/>
-      //     }else{
-      //         message.error(msg || $t(RESPONSE_TIPS.error))
-      //         return
-      //     }
-      //     break;}
-      // case 'delete':
-      //     title='删除'
-      //     content='该数据删除后将无法找回，请确认是否删除？'
-      //     break;
     }
 
     modal.confirm({
