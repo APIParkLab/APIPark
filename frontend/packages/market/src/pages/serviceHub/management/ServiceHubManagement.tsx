@@ -5,7 +5,7 @@ import WithPermission from '@common/components/aoplatform/WithPermission'
 import { BasicResponse, DATA_SHOW_TYPE_OPTIONS, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { SimpleTeamItem } from '@common/const/type'
 import { useBreadcrumb } from '@common/contexts/BreadcrumbContext'
-import { GlobalProvider, useGlobalContext } from '@common/contexts/GlobalStateContext'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { RouterParams } from '@core/components/aoplatform/RenderRoutes'
@@ -158,11 +158,7 @@ export default function ServiceHubManagement() {
     switch (type) {
       case 'add':
         title = $t('添加消费者')
-        content = (
-          <GlobalProvider>
-            <ManagementConfig ref={addManagementRef} dataShowType={dataShowType} type={type} teamId={teamId!} />
-          </GlobalProvider>
-        )
+        content = <ManagementConfig ref={addManagementRef} dataShowType={dataShowType} type={type} teamId={teamId!} />
         break
     }
 

@@ -4,7 +4,7 @@ import WithPermission from '@common/components/aoplatform/WithPermission'
 import { BasicResponse, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { PERMISSION_DEFINITION } from '@common/const/permissions'
 import { EntityItem } from '@common/const/type'
-import { GlobalProvider, useGlobalContext } from '@common/contexts/GlobalStateContext'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { checkAccess } from '@common/utils/permission'
@@ -175,11 +175,7 @@ export default function ServiceCategory() {
     switch (type) {
       case 'addCate': {
         title = $t('添加分类')
-        content = (
-          <GlobalProvider>
-            <ServiceHubCategoryConfig ref={addRef} type={type} />
-          </GlobalProvider>
-        )
+        content = <ServiceHubCategoryConfig ref={addRef} type={type} />
         break
       }
       case 'addChildCate':

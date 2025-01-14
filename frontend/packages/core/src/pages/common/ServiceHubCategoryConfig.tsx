@@ -79,7 +79,9 @@ export const ServiceHubCategoryConfig = forwardRef<ServiceHubCategoryConfigHandl
     return (
       <WithPermission
         access={
-          type === 'addCate' ? 'system.settings.general.manager' : 'system.api_market.service_classification.edit'
+          type === 'addCate'
+            ? 'system.api_market.service_classification.add'
+            : 'system.api_market.service_classification.edit'
         }
       >
         <Form
