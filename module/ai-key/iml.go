@@ -42,7 +42,7 @@ func newKey(key *ai_key.Key) *gateway.DynamicRelease {
 
 	return &gateway.DynamicRelease{
 		BasicItem: &gateway.BasicItem{
-			ID:          key.ID,
+			ID:          fmt.Sprintf("%s-%s", key.Provider, key.ID),
 			Description: key.Name,
 			Resource:    "ai-key",
 			Version:     time.Now().Format("20060102150405"),
@@ -55,7 +55,7 @@ func newKey(key *ai_key.Key) *gateway.DynamicRelease {
 			"config":   key.Config,
 			"provider": key.Provider,
 			"priority": key.Priority,
-			"disabled": key.Status == 1,
+			"disabled": key.Status == 0,
 		},
 	}
 }
@@ -243,7 +243,7 @@ func (i *imlKeyModule) Delete(ctx context.Context, providerId string, id string)
 		}
 		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{{
 			BasicItem: &gateway.BasicItem{
-				ID:       id,
+				ID:       fmt.Sprintf("%s-%s", providerId, id),
 				Resource: "ai-key",
 			},
 			Attr: nil,
