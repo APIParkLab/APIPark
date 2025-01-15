@@ -33,7 +33,7 @@ func newKey(key *ai_key.Key) *gateway.DynamicRelease {
 
 	return &gateway.DynamicRelease{
 		BasicItem: &gateway.BasicItem{
-			ID:          key.ID,
+			ID:          fmt.Sprintf("%s-%s", key.Provider, key.ID),
 			Description: key.Name,
 			Resource:    "ai-key",
 			Version:     time.Now().Format("20060102150405"),
@@ -46,7 +46,7 @@ func newKey(key *ai_key.Key) *gateway.DynamicRelease {
 			"config":   key.Config,
 			"provider": key.Provider,
 			"priority": key.Priority,
-			"disabled": key.Status == 1,
+			"disabled": key.Status == 0,
 		},
 	}
 }
@@ -85,6 +85,7 @@ func (i *imlProviderModule) Sort(ctx context.Context, input *ai_dto.Sort) error 
 			return e.Id
 		})
 		releases := make([]*gateway.DynamicRelease, 0, len(list))
+		offlineReleases := make([]*gateway.DynamicRelease, 0, len(list))
 		for index, id := range input.Providers {
 			p, has := model_runtime.GetProvider(id)
 			if !has {
@@ -106,30 +107,39 @@ func (i *imlProviderModule) Sort(ctx context.Context, input *ai_dto.Sort) error 
 			if err != nil {
 				return err
 			}
-			cfg := make(map[string]interface{})
-			cfg["provider"] = l.Id
-			cfg["model"] = l.DefaultLLM
-			cfg["model_config"] = model.DefaultConfig()
-			cfg["priority"] = l.Priority
-			cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
-			releases = append(releases, &gateway.DynamicRelease{
-				BasicItem: &gateway.BasicItem{
-					ID:          l.Id,
-					Description: l.Name,
-					Resource:    "ai-provider",
-					Version:     l.UpdateAt.Format("20060102150405"),
-					MatchLabels: map[string]string{
-						"module": "ai-provider",
+			if ai_dto.ToProviderStatus(l.Status) == ai_dto.ProviderDisabled {
+				offlineReleases = append(offlineReleases, &gateway.DynamicRelease{
+					BasicItem: &gateway.BasicItem{
+						ID:       l.Id,
+						Resource: "ai-provider",
+					}})
+			} else {
+				cfg := make(map[string]interface{})
+				cfg["provider"] = l.Id
+				cfg["model"] = l.DefaultLLM
+				cfg["model_config"] = model.DefaultConfig()
+				cfg["priority"] = l.Priority
+				cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
+				releases = append(releases, &gateway.DynamicRelease{
+					BasicItem: &gateway.BasicItem{
+						ID:          l.Id,
+						Description: l.Name,
+						Resource:    "ai-provider",
+						Version:     l.UpdateAt.Format("20060102150405"),
+						MatchLabels: map[string]string{
+							"module": "ai-provider",
+						},
 					},
-				},
-				Attr: cfg,
-			})
-			err = i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
-			if err != nil {
-				return err
+					Attr: cfg,
+				})
 			}
 		}
-		return nil
+		err = i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
+		if err != nil {
+			return err
+		}
+		return i.syncGateway(ctx, cluster.DefaultClusterID, offlineReleases, false)
+
 	})
 }
 
@@ -537,6 +547,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 				Status:     1,
 				ExpireTime: 0,
 				Default:    true,
+				Priority:   1,
 			})
 		} else {
 			err = i.aiKeyService.Save(ctx, id, &ai_key.Edit{
@@ -557,6 +568,16 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		err = i.providerService.Save(ctx, id, pInfo)
 		if err != nil {
 			return err
+		}
+		if *pInfo.Status == 0 {
+			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+				{
+					BasicItem: &gateway.BasicItem{
+						ID:       id,
+						Resource: "ai-provider",
+					},
+				},
+			}, false)
 		}
 		// 获取当前供应商所有Key信息
 		defaultKey, err := i.aiKeyService.DefaultKey(ctx, id)
@@ -665,7 +686,7 @@ func (i *imlProviderModule) syncGateway(ctx context.Context, clusterId string, r
 		if online {
 			err = dynamicClient.Online(ctx, releaseInfo)
 		} else {
-			err = dynamicClient.Offline(ctx, releaseInfo)
+			dynamicClient.Offline(ctx, releaseInfo)
 		}
 		if err != nil {
 			return err
