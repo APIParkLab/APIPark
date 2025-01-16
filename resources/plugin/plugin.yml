@@ -1,4 +1,4 @@
-version: v7
+version: v8
 sort:
   - "access_log"
   - "monitor"
@@ -41,7 +41,7 @@ plugin:
           b: "subscription_service:#{application}"
       response:
         status_code: 403
-        content_typ: "text/plan"
+        content_type: "text/plan"
         charset: "utf-8"
         body: "Forbidden"
 
