@@ -10,132 +10,131 @@ import {
 import { App, Form, Input } from 'antd'
 import { forwardRef, useEffect, useImperativeHandle } from 'react'
 
-export const ServiceHubCategoryConfig = forwardRef<
-  ServiceHubCategoryConfigHandle,
-  ServiceHubCategoryConfigProps
->((props, ref) => {
-  const { message } = App.useApp()
-  const [form] = Form.useForm()
-  const { type, entity } = props
-  const { fetchData } = useFetch()
+export const ServiceHubCategoryConfig = forwardRef<ServiceHubCategoryConfigHandle, ServiceHubCategoryConfigProps>(
+  (props, ref) => {
+    const { message } = App.useApp()
+    const [form] = Form.useForm()
+    const { type, entity } = props
+    const { fetchData } = useFetch()
 
-  const save: () => Promise<boolean | string> = () => {
-    const url: string = 'catalogue'
-    let method: string
-    switch (type) {
-      case 'addCate':
-      case 'addChildCate':
-        method = 'POST'
-        break
-      case 'renameCate':
-        method = 'PUT'
-        break
-    }
-    return new Promise((resolve, reject) => {
-      if (!url || !method) {
-        reject($t(RESPONSE_TIPS.error))
-        return
+    const save: () => Promise<boolean | string> = () => {
+      const url: string = 'catalogue'
+      let method: string
+      switch (type) {
+        case 'addCate':
+        case 'addChildCate':
+          method = 'POST'
+          break
+        case 'renameCate':
+          method = 'PUT'
+          break
       }
-      form
-        .validateFields()
-        .then(value => {
-          fetchData<BasicResponse<null>>(url, {
-            method,
-            eoBody: value,
-            eoParams: { ...(type === 'renameCate' ? { catalogue: value.id } : undefined) }
-          })
-            .then(response => {
-              const { code, msg } = response
-              if (code === STATUS_CODE.SUCCESS) {
-                message.success(msg || $t(RESPONSE_TIPS.success))
-                resolve(true)
-              } else {
-                message.error(msg || $t(RESPONSE_TIPS.error))
-                reject(msg || $t(RESPONSE_TIPS.error))
-              }
+      return new Promise((resolve, reject) => {
+        if (!url || !method) {
+          reject($t(RESPONSE_TIPS.error))
+          return
+        }
+        form
+          .validateFields()
+          .then((value) => {
+            fetchData<BasicResponse<null>>(url, {
+              method,
+              eoBody: value,
+              eoParams: { ...(type === 'renameCate' ? { catalogue: value.id } : undefined) }
             })
-            .catch(errorInfo => reject(errorInfo))
-        })
-        .catch(errorInfo => reject(errorInfo))
-    })
-  }
-
-  useImperativeHandle(ref, () => ({
-    save
-  }))
-
-  useEffect(() => {
-    switch (type) {
-      case 'addCate':
-        form.setFieldsValue({})
-        break
-      case 'addChildCate':
-        form.setFieldsValue({ parent: entity!.id })
-        break
-      case 'renameCate':
-        form.setFieldsValue(entity)
-        break
+              .then((response) => {
+                const { code, msg } = response
+                if (code === STATUS_CODE.SUCCESS) {
+                  message.success(msg || $t(RESPONSE_TIPS.success))
+                  resolve(true)
+                } else {
+                  message.error(msg || $t(RESPONSE_TIPS.error))
+                  reject(msg || $t(RESPONSE_TIPS.error))
+                }
+              })
+              .catch((errorInfo) => reject(errorInfo))
+          })
+          .catch((errorInfo) => reject(errorInfo))
+      })
     }
-  }, [])
 
-  return (
-    <WithPermission
-      access={
-        type === 'addCate'
-          ? 'system.api_market.service_classification.add'
-          : 'system.api_market.service_classification.edit'
+    useImperativeHandle(ref, () => ({
+      save
+    }))
+
+    useEffect(() => {
+      switch (type) {
+        case 'addCate':
+          form.setFieldsValue({})
+          break
+        case 'addChildCate':
+          form.setFieldsValue({ parent: entity!.id })
+          break
+        case 'renameCate':
+          form.setFieldsValue(entity)
+          break
       }
-    >
-      <Form
-        layout="vertical"
-        scrollToFirstError
-        labelAlign="left"
-        form={form}
-        className="mx-auto"
-        name="serviceHubCategoryConfig"
-        autoComplete="off"
-      >
-        {type === 'renameCate' && (
-          <Form.Item<ServiceHubCategoryConfigFieldType>
-            label={$t('ID')}
-            name="id"
-            hidden
-            rules={[{ required: true, whitespace: true }]}
-          >
-            <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} />
-          </Form.Item>
-        )}
-        {(type === 'addCate' || type === 'renameCate') && (
-          <Form.Item<ServiceHubCategoryConfigFieldType>
-            label={$t('分类名称')}
-            name="name"
-            rules={[{ required: true, whitespace: true }]}
-          >
-            <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} />
-          </Form.Item>
-        )}
+    }, [])
 
-        {type === 'addChildCate' && (
-          <>
+    return (
+      <WithPermission
+        access={
+          type === 'addCate'
+            ? 'system.api_market.service_classification.add'
+            : 'system.api_market.service_classification.edit'
+        }
+      >
+        <Form
+          layout="vertical"
+          scrollToFirstError
+          labelAlign="left"
+          form={form}
+          className="mx-auto"
+          name="serviceHubCategoryConfig"
+          autoComplete="off"
+        >
+          {type === 'renameCate' && (
             <Form.Item<ServiceHubCategoryConfigFieldType>
-              label={$t('父分类 ID')}
-              name="parent"
+              label={$t('ID')}
+              name="id"
               hidden
               rules={[{ required: true, whitespace: true }]}
             >
               <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} />
             </Form.Item>
-
+          )}
+          {(type === 'addCate' || type === 'renameCate') && (
             <Form.Item<ServiceHubCategoryConfigFieldType>
-              label={$t('子分类名称')}
+              label={$t('分类名称')}
               name="name"
               rules={[{ required: true, whitespace: true }]}
             >
               <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} />
             </Form.Item>
-          </>
-        )}
-      </Form>
-    </WithPermission>
-  )
-})
+          )}
+
+          {type === 'addChildCate' && (
+            <>
+              <Form.Item<ServiceHubCategoryConfigFieldType>
+                label={$t('父分类 ID')}
+                name="parent"
+                hidden
+                rules={[{ required: true, whitespace: true }]}
+              >
+                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} />
+              </Form.Item>
+
+              <Form.Item<ServiceHubCategoryConfigFieldType>
+                label={$t('子分类名称')}
+                name="name"
+                rules={[{ required: true, whitespace: true }]}
+              >
+                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} />
+              </Form.Item>
+            </>
+          )}
+        </Form>
+      </WithPermission>
+    )
+  }
+)

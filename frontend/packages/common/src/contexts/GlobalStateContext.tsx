@@ -342,7 +342,7 @@ export const GlobalProvider: FC<{ children: ReactNode }> = ({ children }) => {
     updateDate: '2024-07-01',
     powered: 'Powered by https://apipark.com',
     mainPage: '/guide/page',
-    language: 'en-US',
+    language: sessionStorage.getItem('i18nextLng') || 'en-US',
     pluginsLoaded: false
   })
   const [accessData, setAccessData] = useState<Map<string, string[]>>(new Map())
@@ -510,7 +510,7 @@ export const useGlobalContext = () => {
         updateDate: '',
         powered: '',
         mainPage: '',
-        language: 'en-US',
+        language: sessionStorage.getItem('i18nextLng') || 'en-US',
         pluginsLoaded: false
       },
       dispatch: () => {},
