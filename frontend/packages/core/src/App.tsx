@@ -151,15 +151,15 @@ function App() {
         form={{ validateMessages }}
       >
         <PluginEventHubProvider>
-          <AppAntd className="h-full" message={{ maxCount: 1 }}>
-            <PluginSlotHubProvider>
-              <GlobalProvider>
+          <GlobalProvider>
+            <AppAntd className="h-full" message={{ maxCount: 1 }}>
+              <PluginSlotHubProvider>
                 <BreadcrumbProvider>
                   <RenderRoutes />
                 </BreadcrumbProvider>
-              </GlobalProvider>
-            </PluginSlotHubProvider>
-          </AppAntd>
+              </PluginSlotHubProvider>
+            </AppAntd>
+          </GlobalProvider>
         </PluginEventHubProvider>
       </ConfigProvider>
     </StyleProvider>
