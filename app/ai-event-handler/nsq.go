@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -27,8 +28,8 @@ func init() {
 }
 
 type NSQConfig struct {
-	Addr        string `json:"addr"`
-	TopicPrefix string `json:"topic_prefix"`
+	Addr        string `json:"addr" yaml:"addr"`
+	TopicPrefix string `json:"topic_prefix" yaml:"topic_prefix"`
 }
 
 // 定义 NSQ 消息结构
@@ -78,6 +79,11 @@ func convertInt(value interface{}) int {
 	}
 }
 
+func genAIKey(key string, provider string) string {
+	keys := strings.Split(key, "@")
+	return strings.TrimSuffix(keys[0], fmt.Sprintf("-%s", provider))
+}
+
 // HandleMessage 处理从 NSQ 读取的消息
 func (h *NSQHandler) HandleMessage(message *nsq.Message) error {
 	log.Printf("Received message: %s", string(message.Body))
@@ -104,8 +110,7 @@ func (h *NSQHandler) HandleMessage(message *nsq.Message) error {
 		finalStatus := &AIProviderStatus{}
 		for _, s := range data.AI.ProviderStats {
 			status := ToKeyStatus(s.Status).Int()
-			keys := strings.Split(s.Key, "@")
-			key := keys[0]
+			key := genAIKey(s.Key, s.Provider)
 			err = h.aiKeyService.Save(ctx, key, &ai_key.Edit{
 				Status: &status,
 			})
@@ -128,8 +133,9 @@ func (h *NSQHandler) HandleMessage(message *nsq.Message) error {
 			finalStatus = &s
 		}
 		if finalStatus != nil {
-			keys := strings.Split(finalStatus.Key, "@")
-			err = h.aiKeyService.IncrUseToken(ctx, keys[0], convertInt(data.AI.TotalToken))
+			//keys := strings.Split(finalStatus.Key, "@")
+			key := genAIKey(finalStatus.Key, finalStatus.Provider)
+			err = h.aiKeyService.IncrUseToken(ctx, key, convertInt(data.AI.TotalToken))
 			if err != nil {
 				log.Printf("Failed to increment AI key token: %v", err)
 				return err
