@@ -27,7 +27,7 @@ echo -e "    - $s" >> config.yml
 done
 echo -e "nsq:" >> config.yml
 echo -e "  addr: ${NSQ_ADDR}" >> config.yml
-echo -e "  topic: ${NSQ_TOPIC}" >> config.yml
+echo -e "  topic_prefix: ${NSQ_TOPIC_PREFIX}" >> config.yml
 echo -e "port: 8288" >> config.yml
 echo -e "error_log:" >> config.yml
 echo -e "  dir: ${ERROR_DIR}" >> config.yml

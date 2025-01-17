@@ -8,7 +8,7 @@ type Provider struct {
 	Name       string    `gorm:"type:varchar(100);not null;column:name;comment:name"`
 	DefaultLLM string    `gorm:"type:varchar(255);not null;column:default_llm;comment:默认模型ID"`
 	Config     string    `gorm:"type:text;not null;column:config;comment:配置信息"`
-	Status     int       `gorm:"type:tinyint(1);not null;column:status;comment:状态，0：停用；1：启用，2：异常"`
+	Status     int       `gorm:"type:tinyint(1);not null;column:status;comment:状态，0：停用；1：启用，2：异常;default:1"`
 	Priority   int       `gorm:"type:int;not null;column:priority;comment:优先级，值越小优先级越高"`
 	Creator    string    `gorm:"size:36;not null;column:creator;comment:创建人;index:creator" aovalue:"creator"` // 创建人
 	Updater    string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"` // 更新人
