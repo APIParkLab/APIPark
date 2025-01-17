@@ -17,7 +17,7 @@ source ./scripts/common.sh
 APP="apipark"
 
 
-mkdir -p scripts/cmd/ && cp cmd/${APP} scripts/cmd/
+mkdir -p scripts/cmd/ && cp cmd/${APP} scripts/cmd/ && cp cmd/apipark_ai_event_listen scripts/cmd/
 
 VERSION=$(gen_version)
 
