@@ -210,7 +210,7 @@ APIPark uses the Apache 2.0 License. For more details, please refer to the LICEN
 For enterprise-level features and professional technical support, contact our pre-sales experts for personalized demos, customized solutions, and pricing.
 
 - Website: https://apipark.com
-- Email: dev@apipark.com
+- Email: contact@apipark.com
 
 <br>
 
