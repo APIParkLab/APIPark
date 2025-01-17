@@ -93,14 +93,14 @@ func (h *NSQHandler) HandleMessage(message *nsq.Message) error {
 	err := json.Unmarshal(message.Body, &data)
 	if err != nil {
 		log.Printf("Failed to unmarshal message: %v", err)
-		return err
+		return nil
 	}
 
 	// 将时间字符串转换为 time.Time
 	timestamp, err := time.Parse(time.RFC3339, data.TimeISO8601)
 	if err != nil {
 		log.Printf("Failed to parse timestamp: %v", err)
-		return err
+		return nil
 	}
 
 	day := time.Date(timestamp.Year(), timestamp.Month(), timestamp.Day(), 0, 0, 0, 0, timestamp.Location())
@@ -116,7 +116,7 @@ func (h *NSQHandler) HandleMessage(message *nsq.Message) error {
 			})
 			if err != nil {
 				log.Printf("Failed to save AI key: %v", err)
-				return err
+				return nil
 			}
 			if s.Provider != data.AI.Provider {
 
@@ -138,7 +138,7 @@ func (h *NSQHandler) HandleMessage(message *nsq.Message) error {
 			err = h.aiKeyService.IncrUseToken(ctx, key, convertInt(data.AI.TotalToken))
 			if err != nil {
 				log.Printf("Failed to increment AI key token: %v", err)
-				return err
+				return nil
 			}
 		}
 
@@ -157,7 +157,7 @@ func (h *NSQHandler) HandleMessage(message *nsq.Message) error {
 		})
 		if err != nil {
 			log.Printf("Failed to call AI API: %v", err)
-			return err
+			return nil
 		}
 
 		log.Printf("Message processed and saved to MySQL: %+v", data)
