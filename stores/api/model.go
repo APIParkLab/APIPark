@@ -55,7 +55,7 @@ type Doc struct {
 	Id       int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
 	UUID     string    `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
 	Service  string    `gorm:"size:36;not null;column:service;comment:服务;index:service"`
-	Content  string    `gorm:"type:text;null;column:content;comment:文档内容"`
+	Content  string    `gorm:"type:longtext;null;column:content;comment:文档内容"`
 	Updater  string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"`
 	UpdateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:更新时间"`
 	APICount int64     `gorm:"type:int(11);not null;column:api_count;comment:接口数量"`
