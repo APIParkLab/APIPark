@@ -7,7 +7,7 @@ type Commit[H any] struct {
 	UUID     string    `gorm:"size:36;not null;column:uuid;comment:uuid;uniqueIndex:uuid;"`
 	Target   string    `gorm:"column:target;type:varchar(36);NOT NULL;comment:目标id;index:target;"`
 	Key      string    `gorm:"size:50;not null;column:key;comment:类型;index:key;"`
-	Data     *H        `gorm:"type:text;not null;column:data;comment:数据;charset=utf8mb4;serializer:json"`
+	Data     *H        `gorm:"type:longtext;not null;column:data;comment:数据;charset=utf8mb4;serializer:json"`
 	CreateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
 	Operator string    `gorm:"size:36;not null;column:operator;comment:操作人;index:operator;"`
 }
