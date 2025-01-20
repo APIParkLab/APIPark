@@ -533,6 +533,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 			DefaultLLM: &input.DefaultLLM,
 			Config:     &input.Config,
 			Priority:   input.Priority,
+			Status:     &status,
 		}
 		_, err = i.aiKeyService.DefaultKey(ctx, id)
 		if err != nil {
@@ -558,17 +559,18 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 			return err
 		}
 
-		if input.Enable != nil {
-			status = 0
-			if *input.Enable {
-				status = 1
-			}
-			pInfo.Status = &status
-		}
+		//if input.Enable != nil {
+		//	status = 0
+		//	if *input.Enable {
+		//		status = 1
+		//	}
+		//	pInfo.Status = &status
+		//}
 		err = i.providerService.Save(ctx, id, pInfo)
 		if err != nil {
 			return err
 		}
+
 		if *pInfo.Status == 0 {
 			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
 				{
