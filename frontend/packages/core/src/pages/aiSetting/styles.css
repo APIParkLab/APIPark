@@ -18,9 +18,13 @@
 .react-flow__node {
   padding: 0;
   border-radius: 8px;
-  min-width: 150px;
   width: auto;
   max-width: 100%;
+}
+
+.react-flow__node-modelCard,
+.react-flow__node-serviceCard {
+  min-width: 150px;
 }
 
 /* Custom Node Styles */
