@@ -27,6 +27,7 @@ export const KeyStatusNode: React.FC<{ data: KeyStatusNodeData }> = ({ data }) =
         <div
           className="flex gap-1 w-full"
           style={{
+            minWidth: keys.length > 5 ? '118px' : 'auto',
             maxWidth: `calc(${MAX_KEYS} * ${KEY_SIZE} + (${MAX_KEYS} - 1) * ${KEY_GAP})`,
             minHeight: KEY_SIZE
           }}
