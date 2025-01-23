@@ -5,7 +5,7 @@ import WithPermission from '@common/components/aoplatform/WithPermission'
 import { BasicResponse, DATA_SHOW_TYPE_OPTIONS, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { SimpleTeamItem } from '@common/const/type'
 import { useBreadcrumb } from '@common/contexts/BreadcrumbContext'
-import { GlobalProvider, useGlobalContext } from '@common/contexts/GlobalStateContext'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { RouterParams } from '@core/components/aoplatform/RenderRoutes'
@@ -158,28 +158,8 @@ export default function ServiceHubManagement() {
     switch (type) {
       case 'add':
         title = $t('添加消费者')
-        content = (
-          <GlobalProvider>
-            <ManagementConfig ref={addManagementRef} dataShowType={dataShowType} type={type} teamId={teamId!} />
-          </GlobalProvider>
-        )
+        content = <ManagementConfig ref={addManagementRef} dataShowType={dataShowType} type={type} teamId={teamId!} />
         break
-      // case 'edit':{
-      //     title='配置 Open Api'
-      //     message.loading('正在加载数据')
-      //     const {code,data,msg} = await fetchData<BasicResponse<{app:ManagementConfigFieldType}>>('external-app',{method:'GET',eoParams:{id:entity!.id}})
-      //     message.destroy()
-      //     if(code === STATUS_CODE.SUCCESS){
-      //         content=<ManagementConfig ref={editManagementRef} type={type} entity={data.app}/>
-      //     }else{
-      //         message.error(msg || $t(RESPONSE_TIPS.error))
-      //         return
-      //     }
-      //     break;}
-      // case 'delete':
-      //     title='删除'
-      //     content='该数据删除后将无法找回，请确认是否删除？'
-      //     break;
     }
 
     modal.confirm({

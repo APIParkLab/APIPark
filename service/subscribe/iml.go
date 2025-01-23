@@ -200,6 +200,9 @@ func (i *imlSubscribeService) updateHandler(e *subscribe.Subscribe, t *UpdateSub
 	if t.ApplyStatus != nil {
 		e.ApplyStatus = *t.ApplyStatus
 	}
+	if t.From != nil {
+		e.From = *t.From
+	}
 }
 
 var (

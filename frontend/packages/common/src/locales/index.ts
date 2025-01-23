@@ -1,5 +1,5 @@
 import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
+import { initReactI18next, useTranslation } from 'react-i18next'
 // i18next-browser-languagedetector插件 这是一个 i18next 语言检测插件，用于检测浏览器中的用户语言，
 import crc32 from 'crc/crc32'
 import LanguageDetector from 'i18next-browser-languagedetector'
@@ -39,23 +39,22 @@ i18n
   .init({
     // 初始化
     resources, // 本地多语言数据
-    // fallbackLng: config.lang, // 默认当前环境的语言
+    supportedLngs: ['zh-CN', 'en-US', 'zh-TW', 'ja-JP'],
     detection: {
       caches: ['localStorage', 'sessionStorage', 'cookie']
     }
   })
 
 // --------这里是i18next-scanner新增的配置-------------
+// 用于非 React 组件中的翻译
 export const $t = (key: string, params?: any[]): string => {
-  const hashKey = `K${crc32(key).toString(16)}` // 将中文转换成crc32格式去匹配对应的json语言包
+  // 将中文转换成crc32格式去匹配对应的json语言包
+  const hashKey = `K${crc32(key).toString(16)}`
   let words = i18n.t(hashKey)
-  // const { t } = useTranslation();  // 通过hooks
-  // let words = t(hashKey);
   if (words === hashKey) {
     words = key
   }
 
-  // 配置传递参数的场景, 目前仅支持数组，可在此拓展
   if (Array.isArray(params)) {
     const reg = /\((\d)\)/g
     words = words.replace(reg, (a: string, b: number) => {
@@ -63,6 +62,27 @@ export const $t = (key: string, params?: any[]): string => {
     })
   }
   return words
+}
+
+// 用于 React 组件中的翻译
+export const useI18n = () => {
+  const { t } = useTranslation()
+
+  return (key: string, params?: any[]): string => {
+    const hashKey = `K${crc32(key).toString(16)}`
+    let words = t(hashKey)
+    if (words === hashKey) {
+      words = key
+    }
+
+    if (Array.isArray(params)) {
+      const reg = /\((\d)\)/g
+      words = words.replace(reg, (a: string, b: number) => {
+        return params[b]
+      })
+    }
+    return words
+  }
 }
 
 export default i18n

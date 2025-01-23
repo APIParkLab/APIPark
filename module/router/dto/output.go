@@ -15,7 +15,7 @@ type Item struct {
 	Protocols   []string       `json:"protocols"`
 	Path        string         `json:"request_path"`
 	Description string         `json:"description"`
-	Disable     bool           `json:"disable"`
+	Disable     bool           `json:"disabled"`
 	Creator     auto.Label     `json:"creator" aolabel:"user"`
 	Updater     auto.Label     `json:"updater" aolabel:"user"`
 	CreateTime  auto.TimeLabel `json:"create_time"`
@@ -34,7 +34,7 @@ type Detail struct {
 	SimpleDetail
 	Proxy     *Proxy   `json:"proxy"`
 	Protocols []string `json:"protocols"`
-	Disable   bool     `json:"disable"`
+	Disable   bool     `json:"disabled"`
 	//Doc   map[string]interface{} `json:"doc"`
 }
 

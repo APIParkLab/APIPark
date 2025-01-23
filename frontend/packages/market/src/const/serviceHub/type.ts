@@ -1,7 +1,6 @@
-import { DefaultOptionType } from 'antd/es/select'
 import { EntityItem } from '@common/const/type'
 import { SubscribeEnum, SubscribeFromEnum } from '@core/const/system/const'
-import WithPermission from '@common/components/aoplatform/WithPermission'
+import { DefaultOptionType } from 'antd/es/select'
 
 export type ServiceBasicInfoType = {
   app: EntityItem
@@ -37,7 +36,6 @@ export type ServiceHubCategoryConfigFieldType = {
 export type ServiceHubCategoryConfigProps = {
   type: 'addCate' | 'addChildCate' | 'renameCate'
   entity?: { [k: string]: unknown }
-  WithPermission: typeof WithPermission
 }
 
 export type ServiceHubCategoryConfigHandle = {
