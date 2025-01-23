@@ -55,7 +55,7 @@ type Doc struct {
 	Id       int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
 	UUID     string    `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
 	Service  string    `gorm:"size:36;not null;column:service;comment:服务;index:service"`
-	Content  string    `gorm:"type:text;null;column:content;comment:文档内容"`
+	Content  string    `gorm:"type:longtext;null;column:content;comment:文档内容"`
 	Updater  string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"`
 	UpdateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:更新时间"`
 	APICount int64     `gorm:"type:int(11);not null;column:api_count;comment:接口数量"`
@@ -79,11 +79,14 @@ type AiAPIInfo struct {
 	Timeout          int       `gorm:"type:int(11);not null;column:timeout;comment:超时时间"`
 	Retry            int       `gorm:"type:int(11);not null;column:retry;comment:重试次数"`
 	Model            string    `gorm:"size:255;not null;column:model;comment:模型"`
+	Provider         string    `gorm:"size:36;not null;column:provider;comment:提供者;index:provider"`
 	Creator          string    `gorm:"size:36;not null;column:creator;comment:创建人;index:creator" aovalue:"creator"`
 	CreateAt         time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
 	Updater          string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"`
 	UpdateAt         time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:更新时间"`
 	AdditionalConfig string    `gorm:"type:text;null;column:additional_config;comment:额外配置"`
+	UseToken         int       `gorm:"type:int(11);not null;column:use_token;comment:使用token"`
+	Disable          bool      `gorm:"type:tinyint(1);not null;column:disable;comment:是否禁用 0:否 1:是"`
 	IsDelete         bool      `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除 0:否 1:是"`
 }
 
@@ -92,5 +95,27 @@ func (a *AiAPIInfo) TableName() string {
 }
 
 func (a *AiAPIInfo) IdValue() int64 {
+	return a.Id
+}
+
+type AiAPIUse struct {
+	Id          int64  `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
+	API         string `gorm:"size:36;not null;column:api;comment:API;index:api"`
+	Service     string `gorm:"size:36;not null;column:service;comment:服务;index:service"`
+	Provider    string `gorm:"size:36;not null;column:provider;comment:提供者;index:provider"`
+	Model       string `gorm:"size:255;not null;column:model;comment:模型"`
+	Day         int64  `gorm:"type:int(11);not null;column:day;comment:当前日期"`
+	Hour        int64  `gorm:"type:int(11);not null;column:hour;comment:当前小时"`
+	Minute      int64  `gorm:"type:int(11);not null;column:minute;comment:当前分钟"`
+	InputToken  int    `gorm:"type:int(11);not null;column:input_token;comment:输入token"`
+	OutputToken int    `gorm:"type:int(11);not null;column:output_token;comment:输出token"`
+	TotalToken  int    `gorm:"type:int(11);not null;column:total_token;comment:总token"`
+}
+
+func (a *AiAPIUse) TableName() string {
+	return "ai_api_use"
+}
+
+func (a *AiAPIUse) IdValue() int64 {
 	return a.Id
 }

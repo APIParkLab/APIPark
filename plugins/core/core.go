@@ -3,6 +3,8 @@ package core
 import (
 	"net/http"
 
+	ai_key "github.com/APIParkLab/APIPark/controller/ai-key"
+
 	"github.com/APIParkLab/APIPark/controller/log"
 
 	"github.com/APIParkLab/APIPark/controller/strategy"
@@ -74,6 +76,8 @@ type plugin struct {
 	upstreamController          upstream.IUpstreamController                       `autowired:""`
 	routerController            router.IRouterController                           `autowired:""`
 	aiAPIController             ai_api.IAPIController                              `autowired:""`
+	aiStatisticController       ai.IStatisticController                            `autowired:""`
+	aiKeyController             ai_key.IKeyController                              `autowired:""`
 	apiDocController            router.IAPIDocController                           `autowired:""`
 	subscribeController         subscribe.ISubscribeController                     `autowired:""`
 	strategyController          strategy.IStrategyController                       `autowired:""`
@@ -111,6 +115,7 @@ func (p *plugin) OnComplete() {
 	p.apis = append(p.apis, p.commonApis()...)
 	p.apis = append(p.apis, p.systemApis()...)
 	p.apis = append(p.apis, p.aiAPIs()...)
+	p.apis = append(p.apis, p.aiKeyApis()...)
 	p.apis = append(p.apis, p.strategyApis()...)
 	p.apis = append(p.apis, p.logApis()...)
 }

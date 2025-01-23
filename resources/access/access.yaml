@@ -100,6 +100,36 @@ system:
             value: 'manager'
             dependents:
               - system.settings.ai_provider.view
+      - name: ai key resource
+        value: 'ai_key_resource'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+              - system.settings.ai_key_resource.view
+      - name: ai api
+        value: 'ai_api'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+              - system.settings.ai_api.view
+      - name: ai log
+        value: 'ai_log'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+              - system.settings.ai_log.view
       - name: ssl certificate
         cname: 证书
         value: 'ssl_certificate'

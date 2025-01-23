@@ -31,6 +31,14 @@ type imlAiAPIInfoStore struct {
 	store.SearchStoreSoftDelete[AiAPIInfo]
 }
 
+type IAiAPIUseStore interface {
+	store.IStatisticsStore[AiAPIUse]
+}
+
+type imlAiAPIUseStore struct {
+	store.StatisticsStore[AiAPIUse]
+}
+
 func init() {
 
 	autowire.Auto[IApiBaseStore](func() reflect.Value {
@@ -47,5 +55,9 @@ func init() {
 
 	autowire.Auto[IAiAPIInfoStore](func() reflect.Value {
 		return reflect.ValueOf(new(imlAiAPIInfoStore))
+	})
+
+	autowire.Auto[IAiAPIUseStore](func() reflect.Value {
+		return reflect.ValueOf(new(imlAiAPIUseStore))
 	})
 }
