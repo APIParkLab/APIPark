@@ -65,11 +65,6 @@ export const ModelCardNode: React.FC<{ data: ModelCardNodeData }> = ({ data }) =
             {defaultLlm}
           </div>
         </div>
-        {status !== 'enabled' && alternativeModel && (
-          <div className="mt-1 text-sm text-gray-500">
-            {$t('关联 API 已转用')} {alternativeModel.name}/{alternativeModel.defaultLlm}
-          </div>
-        )}
       </div>
           {status !== 'enabled' && alternativeModel && (
             <div className="ml-4 mt-1 text-sm text-gray-500">
