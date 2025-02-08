@@ -109,6 +109,13 @@ export const SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
     ellipsis: true
   },
   {
+    title: '状态',
+    width: 140,
+    dataIndex: 'update_time',
+    // dataIndex: 'state',
+    ellipsis: true
+  },
+  {
     title: 'API 数量',
     dataIndex: 'apiNum',
     ellipsis: true,

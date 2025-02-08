@@ -182,7 +182,7 @@ function BasicLayout({ project = 'core' }: { project: string }) {
       </Button>,
       ...((pluginSlotHub.getSlot('basicLayoutAfterBtns') as unknown[]) || [])
     ]
-  }, [pluginSlotHub.getSlot('basicLayoutAfterBtns')])
+  }, [state.language, pluginSlotHub.getSlot('basicLayoutAfterBtns')])
 
   return (
     <div

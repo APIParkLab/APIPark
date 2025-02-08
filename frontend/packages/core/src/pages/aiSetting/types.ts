@@ -12,6 +12,7 @@ export interface ModelListData {
   name: string
   logo: string
   defaultLlm: string
+  modelMode?: string
   status: ModelStatus
   api_count: number
   key_count: number
