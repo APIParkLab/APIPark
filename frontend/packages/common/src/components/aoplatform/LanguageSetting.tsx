@@ -59,7 +59,6 @@ const LanguageSetting = ({ mode = 'light' }: { mode?: 'dark' | 'light' }) => {
       i18n.changeLanguage(supportedLang)
     }
   }, [])
-
   return (
     <Dropdown
       trigger={['hover']}
