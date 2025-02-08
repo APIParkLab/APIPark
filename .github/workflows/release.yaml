@@ -25,7 +25,7 @@ jobs:
           echo "Build frontend..."
           cd ./frontend && pnpm run build
       - name: upload frontend release
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-package
           path: frontend/dist
@@ -41,7 +41,7 @@ jobs:
       - name: Checkout  #Checkout代码
         uses: actions/checkout@v3
       - name: download frontend release
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend-package
           path: frontend/dist
