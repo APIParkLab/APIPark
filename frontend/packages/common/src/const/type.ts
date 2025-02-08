@@ -63,6 +63,12 @@ export type SimpleTeamItem = {
   description: string
   appNum: number
 }
+export type LocalModelItem = {
+  id: string
+  is_popular: boolean
+  name: string
+  size: string
+}
 
 export type MatchItem = {
   position: typeof MatchPositionEnum

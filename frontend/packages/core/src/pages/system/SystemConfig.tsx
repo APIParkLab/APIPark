@@ -440,7 +440,6 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
               <Input
                 prefix={onEdit ? '' : '/'}
                 className="w-INPUT_NORMAL"
-                disabled={onEdit}
                 placeholder={$t(PLACEHOLDER.input)}
               />
             </Form.Item>
