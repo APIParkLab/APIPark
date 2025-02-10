@@ -15,6 +15,7 @@ import { SERVICE_KIND_OPTIONS, SYSTEM_TABLE_COLUMNS } from '../../const/system/c
 import { SystemConfigHandle, SystemTableListItem } from '../../const/system/type.ts'
 import SystemConfig from './SystemConfig.tsx'
 import { ServiceDeployment } from './serviceDeployment/ServiceDeployment.tsx'
+import { LogsFooter } from './serviceDeployment/ServiceDeployMentFooter.tsx'
 
 const SystemList: FC = () => {
   const navigate = useNavigate()
@@ -130,13 +131,11 @@ const SystemList: FC = () => {
     setOpen(false)
   }
   const openLogsModal = (record: any) => {
-    console.log('record', record)
-
-    modal.confirm({
+    const modalInstance = modal.confirm({
       title: $t('部署过程'),
       content: <ServiceDeployment record={record} />,
-      onOk: () => {
-        console.log('ok')
+      footer: () => {
+        return <LogsFooter record={record} modalInstance={modalInstance} />
       },
       width: 600,
       okText: $t('确认'),
@@ -161,13 +160,13 @@ const SystemList: FC = () => {
           ;(x.valueEnum as any)[option.value] = { text: $t(option.label) }
         })
       }
-      if ((x.dataIndex as string) === 'update_time') {
+      if ((x.dataIndex as string) === 'state') {
         x.render = (text: any, record: any) => (
           <span
-            className={`text-[13px] ${record.can_delete ? '[&>.ant-typography]:text-[#2196f3]' : ''}`}
+            className={`text-[13px] ${record.state === 'deploying' ? '[&>.ant-typography]:text-[#2196f3]' : record.state === 'error' ? '[&>.ant-typography]:text-[#ff4d4f]' : ''}`}
             onClick={(e) => {
-              if (record.can_delete) {
-                e?.stopPropagation();
+              if (['deploying', 'error'].includes(record.state)) {
+                e?.stopPropagation()
                 openLogsModal(record)
               }
             }}

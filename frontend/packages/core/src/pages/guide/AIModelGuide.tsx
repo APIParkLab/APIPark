@@ -92,14 +92,12 @@ export const AIModelGuide = () => {
    */
   const deployLocalModel = (value: { modelID: string; team?: number }) => {
     return new Promise((resolve, reject) => {
-      const finalValue = {
-        model: value.modelID,
-        team: value?.team
-      }
-      console.log(finalValue)
-      fetchData<BasicResponse<null>>('model/local/deploy', {
+      fetchData<BasicResponse<null>>('model/local/deploy/start', {
         method: 'POST',
-        eoBody: finalValue
+        eoBody: {
+          model: value.modelID,
+          team: value?.team
+        }
       })
         .then((response) => {
           const { code, msg } = response
