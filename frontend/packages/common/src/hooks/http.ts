@@ -129,11 +129,13 @@ const DEFAULT_HEADERS = {
   namespace: 'default'
 }
 
-type EoRequest = RequestInit & {
+export type EoRequest = RequestInit & {
   eoParams?: { [k: string]: unknown }
   eoTransformKeys?: string[]
   eoApiPrefix?: string
   eoBody?: { [k: string]: unknown } | Array<unknown> | string
+  isStream?: boolean
+  handleStream?: (line: any) => void
 }
 
 type EoHeaders = Headers | { [k: string]: string }
@@ -186,14 +188,36 @@ export function useFetch() {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
 
-        // 如果响应体为JSON且指定了转换键，则转换响应数据
-        if (options?.eoApiPrefix||isJsonHttp(response.headers)) {
-          const data = await response.json()
-          const newData = (await pluginEventHub.emit('httpResponse', { data, continue: true })) as Response
-          return shouldTransformKeys ? (keysToCamel(newData, options.eoTransformKeys as string[]) as T) : data
-        }
+        if (options?.isStream) {
+          const reader = response.body?.getReader()
+          const decoder = new TextDecoder('utf-8')
+          let buffer = ''
+          if (reader) {
+            while (true) {
+              const { done, value } = await reader.read()
+              if (done) break
+              buffer += decoder.decode(value, { stream: true })
+              const lines = buffer.split('\n')
+              buffer = lines.pop() || ''
+              for (const line of lines) {
+                options?.handleStream?.(line)
+              }
+            }
 
-        return response
+            if (buffer) {
+              options?.handleStream?.(buffer)
+            }
+          }
+        } else {
+          // 如果响应体为JSON且指定了转换键，则转换响应数据
+          if (options?.eoApiPrefix || isJsonHttp(response.headers)) {
+            const data = await response.json()
+            const newData = (await pluginEventHub.emit('httpResponse', { data, continue: true })) as Response
+            return shouldTransformKeys ? (keysToCamel(newData, options.eoTransformKeys as string[]) as T) : data
+          }
+
+          return response
+        }
       })
       .catch((error) => {
         // 全局错误处理

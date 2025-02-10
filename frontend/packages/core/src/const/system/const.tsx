@@ -111,8 +111,7 @@ export const SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
   {
     title: '状态',
     width: 140,
-    dataIndex: 'update_time',
-    // dataIndex: 'state',
+    dataIndex: 'state',
     ellipsis: true
   },
   {
