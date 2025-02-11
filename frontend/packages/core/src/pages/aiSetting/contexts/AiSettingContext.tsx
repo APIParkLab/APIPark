@@ -10,7 +10,7 @@ import AiSettingModalContent, { AiSettingModalContentHandle } from '../AiSetting
 import { AiSettingListItem, ModelDetailData } from '../types'
 
 interface AiSettingContextType {
-  openConfigModal: (entity: AiSettingListItem) => Promise<void>
+  openConfigModal: (entity?: AiSettingListItem) => Promise<void>
 }
 
 const AiSettingContext = createContext<AiSettingContextType | undefined>(undefined)
