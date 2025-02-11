@@ -27,11 +27,10 @@ const OnlineModelList: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetchData<BasicResponse<any>>('ai/resource/key', {
+      const response = await fetchData<BasicResponse<any>>('ai/provider', {
         method: 'DELETE',
         eoParams: {
-          id: id,
-          branchID: 0
+          provider: id
         }
         // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
@@ -61,7 +60,6 @@ const OnlineModelList: React.FC = () => {
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
-        console.log(response)
         setTotal(response.data.total)
         return {
           data: response.data.providers,
@@ -128,8 +126,8 @@ const OnlineModelList: React.FC = () => {
       dataIndex: 'status',
       ellipsis: true,
       valueType: 'select',
-      filters: true,
-      onFilter: true,
+      // filters: true,
+      // onFilter: true,
       valueEnum: statusEnum,
       render: (dom: React.ReactNode, entity: ModelListData) => statusEnum[entity.status]?.text || entity.status
     },
@@ -160,7 +158,6 @@ const OnlineModelList: React.FC = () => {
       showPagination={true}
       searchPlaceholder={$t('请输入名称搜索')}
       columns={columns}
-      dragSortKey="drag"
       addNewBtnTitle={$t('添加模型')}
       onAddNewBtnClick={handleAdd}
     />
