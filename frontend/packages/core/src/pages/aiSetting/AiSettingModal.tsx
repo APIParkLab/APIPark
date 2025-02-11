@@ -272,7 +272,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
       disabled={readOnly}
     >
       {modelMode === 'manual' && (
-        <Form.Item<ModelDetailData> label={$t('模型来源')} name="modelMode" rules={[{ required: true }]}>
+        <Form.Item<ModelDetailData> label={$t('模型供应商')} name="modelMode" rules={[{ required: true }]}>
           <Select
             className="w-INPUT_NORMAL"
             placeholder={$t(PLACEHOLDER.select)}
