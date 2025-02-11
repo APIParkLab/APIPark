@@ -2,10 +2,8 @@ import { ActionType } from '@ant-design/pro-components'
 import PageList, { PageProColumns } from '@common/components/aoplatform/PageList'
 import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
-import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
-import { AIProvider } from '@core/components/AIProviderSelect'
 import { App, Divider, Space, Typography } from 'antd'
 import React, { useRef, useState } from 'react'
 import { useAiSetting } from './contexts/AiSettingContext'
@@ -13,13 +11,10 @@ import { AiSettingListItem, ModelListData } from './types'
 
 const OnlineModelList: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
-  const { modal, message } = App.useApp()
-  const [provider, setProvider] = useState<AIProvider | undefined>()
+  const { message } = App.useApp()
   const { fetchData } = useFetch()
   const [searchWord, setSearchWord] = useState<string>('')
   const [total, setTotal] = useState<number>(0)
-  const modalRef = useRef<any>()
-  const { accessData } = useGlobalContext()
   const { openConfigModal } = useAiSetting()
 
   const handleEdit = (record: ModelListData) => {
@@ -27,7 +22,7 @@ const OnlineModelList: React.FC = () => {
   }
 
   const handleAdd = () => {
-    // openConfigModal()
+    openConfigModal()
   }
 
   const handleDelete = async (id: string) => {
@@ -60,7 +55,8 @@ const OnlineModelList: React.FC = () => {
           page_size: params.pageSize,
           keyword: searchWord,
           page: params.current
-        }
+        },
+        eoTransformKeys: ['default_llm']
         // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
 
