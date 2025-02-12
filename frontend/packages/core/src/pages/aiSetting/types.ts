@@ -1,5 +1,6 @@
 export type ModelStatus = 'enabled' | 'abnormal' | 'disabled'
 export type KeyStatus = 'normal' | 'abnormal' | 'disabled'
+export type ModelDeployStatus = 'normal' | 'disabled' | 'deploying' | 'error' | undefined
 
 export interface KeyData {
   id: string
@@ -14,9 +15,12 @@ export interface ModelListData {
   defaultLlm: string | undefined
   modelMode?: string
   status: ModelStatus
-  api_count: number
-  key_count: number
+  state?: ModelDeployStatus
+  apiCount: number
+  keyCount: number
+  isDisabled?: boolean
   keys: KeyData[]
+  canDelete: boolean
 }
 
 export interface AISettingEntityItem {

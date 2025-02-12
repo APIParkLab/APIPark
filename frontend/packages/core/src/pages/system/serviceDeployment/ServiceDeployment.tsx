@@ -65,7 +65,10 @@ export const ServiceDeployment = (props: { record: SystemTableListItem }) => {
       {
         method: 'POST',
         eoBody: { recordId: record.id },
-        custom: true,
+        eoApiPrefix: '',
+        headers: {
+          'Content-Type': 'event-stream'
+        },
         isStream: true,
         handleStream: (chunk) => {
           const parsedChunk = JSON.parse(chunk)

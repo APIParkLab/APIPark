@@ -11,39 +11,62 @@ import { AiSettingListItem, ModelListData } from './types'
 
 const OnlineModelList: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
-  const { message } = App.useApp()
+  const { message, modal } = App.useApp()
   const { fetchData } = useFetch()
   const [searchWord, setSearchWord] = useState<string>('')
   const [total, setTotal] = useState<number>(0)
   const { openConfigModal } = useAiSetting()
 
   const handleEdit = (record: ModelListData) => {
-    openConfigModal({ id: record.id, defaultLlm: record.defaultLlm } as AiSettingListItem)
+    openConfigModal({ id: record.id, defaultLlm: record.defaultLlm } as AiSettingListItem, () => {
+      pageListRef.current?.reload()
+    })
   }
 
   const handleAdd = () => {
-    openConfigModal()
+    openConfigModal(undefined, () => {
+      pageListRef.current?.reload()
+    })
   }
 
-  const handleDelete = async (id: string) => {
-    try {
-      const response = await fetchData<BasicResponse<any>>('ai/provider', {
-        method: 'DELETE',
-        eoParams: {
-          provider: id
-        }
-        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
-      })
+  const handleDelete = async (id: string, apiCount: number) => {
+    modal.confirm({
+      title: $t('停止部署'),
+      content: `${$t('有')} ${apiCount} ${$t('个API使用当前模型，删除当前的模型配置后，该模型相关的API将会切换为使用负载均衡中优先级最高的可用模型。并且当前模型下的所有API KEY和相关数据将会被清空，是否确认删除当前模型？')}`,
+      onOk: () => {
+        return new Promise((resolve, reject) => {
+          try {
+            fetchData<BasicResponse<any>>('ai/provider', {
+              method: 'DELETE',
+              eoParams: {
+                provider: id
+              }
+              // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+            }).then((response) => {
+              if (response.code === STATUS_CODE.SUCCESS) {
+                message.success($t('删除成功'))
+                pageListRef.current?.reload()
+              } else {
+                message.error(response.msg || RESPONSE_TIPS.error)
+              }
+              resolve(true)
+            }).catch((error) => {
+              message.error(RESPONSE_TIPS.error)
+              resolve(true)
+            })
+          } catch (error) {
+            message.error(RESPONSE_TIPS.error)
+            resolve(true)
+          }
+        })
+      },
+      width: 600,
+      okText: $t('确认'),
+      cancelText: $t('取消'),
+      closable: true,
+      icon: <></>
+    })
 
-      if (response.code === STATUS_CODE.SUCCESS) {
-        message.success($t('删除成功'))
-        pageListRef.current?.reload()
-      } else {
-        message.error(response.msg || RESPONSE_TIPS.error)
-      }
-    } catch (error) {
-      message.error(RESPONSE_TIPS.error)
-    }
   }
 
   const requestList = async (params: any) => {
@@ -55,7 +78,7 @@ const OnlineModelList: React.FC = () => {
           keyword: searchWord,
           page: params.current
         },
-        eoTransformKeys: ['default_llm']
+        eoTransformKeys: ['default_llm', 'api_count', 'key_count', 'can_delete']
         // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
 
@@ -107,8 +130,10 @@ const OnlineModelList: React.FC = () => {
         <TableBtnWithPermission
           access="system.devops.ai_provider.edit"
           key="delete"
+          disabled={!entity?.canDelete}
+          tooltip={$t('当前模型为最后一个模型，不支持删除')}
           btnType="delete"
-          onClick={() => handleDelete(entity.id as string)}
+          onClick={() => handleDelete(entity.id as string, entity.apiCount)}
           btnTitle={$t('删除')}
         />
       ]
@@ -137,11 +162,45 @@ const OnlineModelList: React.FC = () => {
     },
     {
       title: $t('Apis'),
-      dataIndex: 'api_count'
+      dataIndex: 'apiCount',
+      render: (dom: React.ReactNode, record: ModelListData) => (
+        <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
+          <a
+            href={`/aiApis?modelId=${record?.id}`}
+            target="_blank"
+            className="key-link"
+            style={{
+              fontWeight: 500,
+              cursor: 'pointer',
+              pointerEvents: 'all',
+              textDecoration: 'none'
+            }}
+          >
+            {record.apiCount || '0'}
+          </a>
+        </span>
+      )
     },
     {
       title: $t('Keys'),
-      dataIndex: 'key_count'
+      dataIndex: 'keyCount',
+      render: (dom: React.ReactNode, record: ModelListData) => (
+        <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
+          <a
+            href={`/keysetting?modelId=${record?.id}`}
+            target="_blank"
+            className="key-link"
+            style={{
+              fontWeight: 500,
+              cursor: 'pointer',
+              pointerEvents: 'all',
+              textDecoration: 'none'
+            }}
+          >
+            {record.keyCount || '0'}
+          </a>
+        </span>
+      )
     },
     ...operation
   ]
