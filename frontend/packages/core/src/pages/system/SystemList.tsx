@@ -31,7 +31,13 @@ const SystemList: FC = () => {
   const [open, setOpen] = useState(false)
   const drawerFormRef = useRef<SystemConfigHandle>(null)
   const { checkPermission, accessInit, getGlobalAccessData, state } = useGlobalContext()
-
+  const [stateColumnMap] = useState<{ [k: string]: { text: string } }>({
+    normal: { text: $t('正常') },
+    deploying: { text: $t('部署中') },
+    error: { text: $t('异常') },
+    public: { text: $t('公共服务') },
+    private: { text: $t('私有服务') }
+  })
   const getSystemList = () => {
     if (!accessInit) {
       getGlobalAccessData()?.then?.(() => {
@@ -131,9 +137,13 @@ const SystemList: FC = () => {
     setOpen(false)
   }
   const openLogsModal = (record: any) => {
+    const closeModal = () => {
+      modalInstance.destroy()
+      manualReloadTable()
+    }
     const modalInstance = modal.confirm({
       title: $t('部署过程'),
-      content: <ServiceDeployment record={record} />,
+      content: <ServiceDeployment record={record} closeModal={closeModal} />,
       footer: () => {
         return <LogsFooter record={record} modalInstance={modalInstance} />
       },
@@ -163,7 +173,7 @@ const SystemList: FC = () => {
       if ((x.dataIndex as string) === 'state') {
         x.render = (text: any, record: any) => (
           <span
-            className={`text-[13px] ${record.state === 'deploying' ? '[&>.ant-typography]:text-[#2196f3]' : record.state === 'error' ? '[&>.ant-typography]:text-[#ff4d4f]' : ''}`}
+            className={`text-[13px] ${record.state === 'deploying' ? 'text-[#2196f3]' : record.state === 'error' ? 'text-[#ff4d4f]' : ''}`}
             onClick={(e) => {
               if (['deploying', 'error'].includes(record.state)) {
                 e?.stopPropagation()
@@ -171,7 +181,7 @@ const SystemList: FC = () => {
               }
             }}
           >
-            {text}
+            {stateColumnMap[record.state]?.text || '-'}
           </span>
         )
       }

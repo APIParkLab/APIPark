@@ -3,7 +3,8 @@ import { Steps } from 'antd'
 import { CheckCircleOutlined, LoadingOutlined, ClockCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { Codebox } from '@common/components/postcat/api/Codebox'
 import { Collapse } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { $t } from '@common/locales/index.ts'
 import { useFetch } from '@common/hooks/http'
 
 const getIcon = (status: string) => {
@@ -21,43 +22,49 @@ const getIcon = (status: string) => {
   }
 }
 
-export const ServiceDeployment = (props: { record: SystemTableListItem }) => {
-  const { record } = props
+export const ServiceDeployment = (props: { record: SystemTableListItem, closeModal?: () => void }) => {
+  const { record, closeModal } = props
 
   const [stepItem, setStepItem] = useState<
     {
+      id: string
       title: string
       description?: string
       status?: string
     }[]
   >([
     {
-      title: 'Download',
+      id: 'download',
+      title: $t('下载'),
       status: 'pending'
     },
     {
-      title: 'Deploy',
+      id: 'deploy',
+      title: $t('部署'),
       status: 'pending'
     },
     {
-      title: 'Initializing',
+      id: 'initializing',
+      title: $t('初始化'),
       status: 'pending'
     }
   ])
 
   const [scriptStr, setScriptStr] = useState('')
-  const [step, setStep] = useState(0)
+  const step = useRef(0)
   const [collapseText] = useState('Progress log')
   const { fetchData } = useFetch()
 
-  useEffect(() => {
+  const updateStepItems = (targetStep: number, description = '') => {
     setStepItem((prevItems) =>
-      prevItems.map((item, index) => {
-        return { ...item, status: index < step ? 'completed' : item.status }
-      })
-    )
-  }, [step])
-
+      prevItems.map((item, index) => ({
+        ...item,
+        description: item.id === 'download' ? description : item.description,
+        status: index < targetStep ? 'completed' : index === targetStep ? 'inProgress' : 'pending',
+      }))
+    );
+    step.current = targetStep;
+  };
   useEffect(() => {
     fetchData(
       'model/local/deploy',
@@ -72,42 +79,25 @@ export const ServiceDeployment = (props: { record: SystemTableListItem }) => {
           const parsedChunk = JSON.parse(chunk)
           // 下载中
           if (parsedChunk?.data?.state.includes('download')) {
-            setStepItem((prevItems) =>
-              prevItems.map((item) => {
-                return item.title === 'Download'
-                  ? {
-                      ...item,
-                      description: `${parsedChunk?.data?.info?.current} / ${parsedChunk?.data?.info?.total}`,
-                      status: 'inProgress'
-                    }
-                  : item
-              })
-            )
-            setStep(0)
+            updateStepItems(0, `${parsedChunk?.data?.info?.current} / ${parsedChunk?.data?.info?.total}`);
             // 部署中
           } else if (parsedChunk?.data?.state.includes('deploy')) {
-            setStepItem((prevItems) =>
-              prevItems.map((item) => {
-                return { ...item, status: item.title === 'Deploy' ? 'inProgress' : item.status }
-              })
-            )
-            setStep(1)
+            updateStepItems(1);
             // 初始化中
           } else if (parsedChunk?.data?.state.includes('initializing')) {
-            setStepItem((prevItems) =>
-              prevItems.map((item) => {
-                return { ...item, status: item.title === 'Initializing' ? 'inProgress' : item.status }
-              })
-            )
-            setStep(2)
+            updateStepItems(2);
             // 完成
           } else if (parsedChunk?.data?.state.includes('finish')) {
+            updateStepItems(4);
+            setTimeout(() => {
+              closeModal?.()
+            }, 200)
+          } else if (parsedChunk?.data?.state.includes('error')) {
             setStepItem((prevItems) =>
-              prevItems.map((item) => {
-                return { ...item, status: item.title === 'Initializing' ? 'completed' : item.status }
+              prevItems.map((item, index) => {
+                return { ...item, status: index === step.current ? 'error' : item.status }
               })
             )
-            setStep(4)
           }
           setScriptStr(parsedChunk?.data?.message || '')
         }
