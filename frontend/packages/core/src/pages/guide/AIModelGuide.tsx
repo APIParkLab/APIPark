@@ -68,6 +68,7 @@ export const AIModelGuide = () => {
           ref={modalRef}
           modelMode="manual"
           updateEntityData={updateEntityData}
+          originEntity="guide"
           readOnly={!checkAccess('system.devops.ai_provider.edit', accessData)}
         />
       ),

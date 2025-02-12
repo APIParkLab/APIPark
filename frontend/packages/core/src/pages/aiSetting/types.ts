@@ -1,32 +1,36 @@
-export type ModelStatus = 'enabled' | 'abnormal'|'disabled'
-export type KeyStatus ='normal' | 'abnormal'|'disabled'
+export type ModelStatus = 'enabled' | 'abnormal' | 'disabled'
+export type KeyStatus = 'normal' | 'abnormal' | 'disabled'
 
 export interface KeyData {
   id: string
   name: string
-  status: KeyStatus,
+  status: KeyStatus
 }
 
 export interface ModelListData {
-  id: string
+  id: string | undefined
   name: string
   logo: string
-  defaultLlm: string
+  defaultLlm: string | undefined
   modelMode?: string
   status: ModelStatus
   api_count: number
   key_count: number
   keys: KeyData[]
 }
-export interface ModelDetailData extends ModelListData{
-  enable:boolean
-  config: string,
-  priority?: number
+
+export interface AISettingEntityItem {
+  id: string | undefined
+  status?: ModelStatus | undefined
+  defaultLlm: string | undefined
+}
+export interface ModelDetailData extends ModelListData {
+  enable: boolean
+  config: string
   getApikeyUrl: string
   status: ModelStatus
   configured: boolean
 }
-
 
 export type AiSettingListItem = {
   name: string
@@ -54,5 +58,3 @@ export type AiProviderDefaultConfig = {
   defaultLlm: string
   scopes: string[]
 }
-
-

@@ -1,20 +1,20 @@
-import { QuestionCircleOutlined } from '@ant-design/icons'
 import { Codebox } from '@common/components/postcat/api/Codebox'
 import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { App, Form, InputNumber, Select, Switch, Tag, Tooltip } from 'antd'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { AiProviderLlmsItems, ModelDetailData, AiSettingListItem } from './types'
+import { AiProviderLlmsItems, ModelDetailData, AiSettingListItem, AISettingEntityItem } from './types'
 import { MemberItem, SimpleTeamItem } from '@common/const/type'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 
 export type AiSettingModalContentProps = {
-  entity: ModelDetailData & { defaultLlm: string }
+  entity?: AISettingEntityItem
   readOnly: boolean
   modelMode?: 'auto' | 'manual'
+  originEntity?: string
   /** 如果是手动选择 AI 模型，那么需要更新 footer 底部的内容，所以需要这个方法去更新外部的 footer */
-  updateEntityData: (entity: ModelDetailData & { defaultLlm: string }) => void
+  updateEntityData: (entity: AISettingEntityItem) => void
 }
 
 export type AiSettingModalContentHandle = {
@@ -25,7 +25,7 @@ export type AiSettingModalContentHandle = {
 const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingModalContentProps>((props, ref) => {
   const [form] = Form.useForm()
   const { message } = App.useApp()
-  const { entity, readOnly, modelMode = 'auto', updateEntityData } = props
+  const { entity, readOnly, modelMode = 'auto', updateEntityData, originEntity } = props
   const { fetchData } = useFetch()
   const [llmList, setLlmList] = useState<AiProviderLlmsItems[]>()
   const [loading, setLoading] = useState<boolean>(false)
@@ -47,7 +47,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
     setLoading(true)
     fetchData<BasicResponse<{ llms: AiProviderLlmsItems[] }>>(`ai/provider/llms`, {
       method: 'GET',
-      eoParams: { provider: id || localEntity.id }
+      eoParams: { provider: id || localEntity?.id }
     })
       .then((response) => {
         const { code, data, msg } = response
@@ -123,18 +123,17 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
     fetchData<BasicResponse<{ providers: ModelDetailData[] }>>(`ai/provider/config`, {
       method: 'GET',
       eoParams: { provider: id },
-      eoTransformKeys: ['get_apikey_url']
+      eoTransformKeys: ['get_apikey_url', 'default_llm']
     })
       .then((response) => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           const modelEntity = {
-            ...data.provider,
-            defaultLlm: modelProviderListRef.current.find((x) => x.id === id)?.defaultLlm
+            ...data.provider
           }
           setLocalEntity(modelEntity)
           setFormFieldsValue(modelEntity)
-          updateEntityData(modelEntity)
+          updateEntityData?.(modelEntity)
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
         }
@@ -153,26 +152,24 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
       form.setFieldsValue({
         defaultLlm: fieldsValue.defaultLlm,
         config: fieldsValue!.config ? JSON.stringify(JSON.parse(fieldsValue!.config), null, 2) : '',
-        priority: fieldsValue.priority || 1,
         enable: fieldsValue.status === 'enabled'
       })
     } catch (e) {
       form.setFieldsValue({
-        defaultLlm: localEntity.defaultLlm,
+        defaultLlm: localEntity?.defaultLlm,
         config: '',
-        priority: 1,
         enable: true
       })
     }
   }
   useEffect(() => {
     // 如果是直接在 AI 模型配置,则获取默认模型列表和团队列表
-    if (modelMode === 'auto') {
-      getLlmList()
+    if (localEntity?.id) {
+      getModelConfig(localEntity.id)
       setFormFieldsValue(localEntity)
     } else {
       getModelProviderList()
-      getTeamOptionList()
+      originEntity && getTeamOptionList()
     }
   }, [])
 
@@ -217,13 +214,13 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
    */
   const save: () => Promise<boolean | string> = () => {
     return new Promise((resolve, reject) => {
-      form
-        .validateFields()
-        .then((value) => {
-          const finalValue = {
-            ...value,
-            priority: Math.max(1, value.priority)
-          }
+      try {
+        form
+          .validateFields()
+          .then((value) => {
+            const finalValue = {
+              ...value
+            }
 
           fetchData<BasicResponse<null>>('ai/provider/config', {
             method: 'PUT',
@@ -241,10 +238,12 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
                 message.error(msg || $t(RESPONSE_TIPS.error))
                 reject(msg || $t(RESPONSE_TIPS.error))
               }
-            })
-            .catch((errorInfo) => reject(errorInfo))
-        })
-        .catch((errorInfo) => reject(errorInfo))
+            }).catch((errorInfo) => reject(errorInfo))
+          })
+          .catch((errorInfo) => reject(errorInfo))
+      } catch (error) {
+        reject(error)
+      }
     })
   }
 
@@ -307,43 +306,13 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
           }))}
         ></Select>
       </Form.Item>
-      {modelMode === 'auto' && (
-        <Form.Item<ModelDetailData>
-          label={
-            <span className="flex items-center">
-              {$t('负载优先级')}
-              <Tooltip
-                title={$t('负载优先级决定在原供应商异常或停用后，优先使用哪一个供应商。优先级数字越小，优先级越高。')}
-              >
-                <QuestionCircleOutlined className="ml-1 text-gray-500" />
-              </Tooltip>
-            </span>
-          }
-          name="priority"
-          rules={[
-            { required: true },
-            {
-              validator: async (_, value) => {
-                if (value <= 0) {
-                  throw new Error($t('优先级必须大于 0'))
-                }
-                return Promise.resolve()
-              }
-            }
-          ]}
-          initialValue={1}
-        >
-          <InputNumber className="w-INPUT_NORMAL" min={1} placeholder={$t('请输入优先级')} />
-        </Form.Item>
-      )}
-      {modelMode === 'manual' && (
+      {originEntity === 'guide' && (
         <Form.Item label={$t('所属团队')} name="team" className="mt-[16px]" rules={[{ required: true }]}>
           <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} options={teamList} onChange={(value) => {
           form.setFieldValue('team', value)
         }}></Select>
         </Form.Item>
       )}
-
       <Form.Item<ModelDetailData> label={$t('API Key（默认 Key）')} name="config">
         <Codebox
           editorTheme="vs-dark"
@@ -354,15 +323,14 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
           enableToolbar={false}
         />
       </Form.Item>
-
-      {localEntity?.configured && (
+      {originEntity !== 'guide' && (
         <Form.Item className="p-4 bg-white rounded-lg" label={$t('LLM 状态管理')}>
           <div className="flex justify-between items-center">
             <div>
               <span className="text-gray-600">{$t('当前调用状态：')}</span>
-              {localEntity.status === 'enabled' && <Tag color="success">{$t('正常')}</Tag>}
-              {localEntity.status === 'disabled' && <Tag color="warning">{$t('停用')}</Tag>}
-              {localEntity.status === 'abnormal' && <Tag color="error">{$t('异常')}</Tag>}
+              {localEntity?.status === 'enabled' && <Tag color="success">{$t('正常')}</Tag>}
+              {localEntity?.status === 'disabled' && <Tag color="warning">{$t('停用')}</Tag>}
+              {localEntity?.status === 'abnormal' && <Tag color="error">{$t('异常')}</Tag>}
             </div>
             <Form.Item name="enable" valuePropName="checked" noStyle>
               <Switch
@@ -375,7 +343,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
               />
             </Form.Item>
           </div>
-          {(localEntity.status === 'enabled' && !enableState) || (localEntity.status !== 'enabled' && enableState) ? (
+          {(localEntity?.status === 'enabled' && !enableState) || (localEntity?.status !== 'enabled' && enableState) ? (
             <div className="mt-2 text-sm text-gray-500">* {getTooltipText(enableState)}</div>
           ) : null}
         </Form.Item>
