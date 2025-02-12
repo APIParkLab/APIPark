@@ -208,7 +208,7 @@ const LoadBalancingPage = () => {
         ellipsis: true,
         width: 100,
         key: 'provider',
-        render: (text: string, record: LoadBalancingItems) => (
+        render: (dom: React.ReactNode, record: LoadBalancingItems) => (
           <span>
             {record.provider?.name} / {record.model?.name}
           </span>
@@ -220,7 +220,7 @@ const LoadBalancingPage = () => {
         width: 100,
         ellipsis: true,
         key: 'type',
-        render: (text: string, record: LoadBalancingItems) => (
+        render: (dom: React.ReactNode, record: LoadBalancingItems) => (
           <span>{record.type === 'online' ? $t('线上模型') : $t('本地模型')}</span>
         )
       },
@@ -230,15 +230,15 @@ const LoadBalancingPage = () => {
         width: 120,
         ellipsis: true,
         key: 'state',
-        render: (text: string, record: LoadBalancingItems) => <span>{statusEnum[record.state]?.text || '-'}</span>
+        render: (dom: React.ReactNode, record: LoadBalancingItems) => <span>{statusEnum[record.state]?.text || '-'}</span>
       },
       {
-        title: $t('API 数量'),
+        title: $t('Apis'),
         dataIndex: 'api_count',
         ellipsis: true,
         width: 80,
         key: 'api_count',
-        render: (text: string, record: LoadBalancingItems) => (
+        render: (dom: React.ReactNode, record: LoadBalancingItems) => (
           <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
             <a
               href={`/aiApis?modelId=${record.model?.id}`}
@@ -251,18 +251,18 @@ const LoadBalancingPage = () => {
                 textDecoration: 'none'
               }}
             >
-              {record.api_count || '-'}
+              {record.api_count || '0'}
             </a>
           </span>
         )
       },
       {
-        title: $t('KEY 数量'),
+        title: $t('Keys'),
         dataIndex: 'key_count',
         ellipsis: true,
         width: 80,
         key: 'key_count',
-        render: (text: string, record: LoadBalancingItems) => (
+        render: (dom: React.ReactNode, record: LoadBalancingItems) => (
           <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
             <a
               href={`/keysetting?modelId=${record.model?.id}`}
@@ -275,7 +275,7 @@ const LoadBalancingPage = () => {
                 textDecoration: 'none'
               }}
             >
-              {record.key_count || '-'}
+              {record.key_count || '0'}
             </a>
           </span>
         )

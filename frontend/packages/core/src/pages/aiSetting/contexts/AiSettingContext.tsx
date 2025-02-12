@@ -8,7 +8,7 @@ import AiSettingModalContent, { AiSettingModalContentHandle } from '../AiSetting
 import { AiSettingListItem } from '../types'
 
 interface AiSettingContextType {
-  openConfigModal: (entity?: AiSettingListItem) => Promise<void>
+  openConfigModal: (entity?: AiSettingListItem, callback?: () => void) => Promise<void>
 }
 
 const AiSettingContext = createContext<AiSettingContextType | undefined>(undefined)
@@ -19,7 +19,7 @@ export const AiSettingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const modalRef = useRef<AiSettingModalContentHandle>()
   const entityData = useRef<any>(null)
 
-  const openConfigModal = async (entity?: AiSettingListItem) => {
+  const openConfigModal = async (entity?: AiSettingListItem, callback?: () => void) => {
     // 更新弹窗
     const updateEntityData = (data: any) => {
       entityData.current = data
@@ -41,6 +41,7 @@ export const AiSettingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return modalRef.current?.save().then((res) => {
           if (res === true) {
             setAiConfigFlushed(!aiConfigFlushed)
+            callback?.()
           }
         })
       },

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AiSettingProvider } from './contexts/AiSettingContext'
 import OnlineModelList from './OnlineModelList'
+import LocalModelList from './LocalModelList'
 
 const CONTENT_STYLE = { height: 'calc(-300px + 100vh)' } as const
 
@@ -47,7 +48,9 @@ const AiSettingContent = () => {
             {
               key: 'config',
               label: $t('本地模型'),
-              children: <div className="overflow-auto" style={CONTENT_STYLE}></div>
+              children: <div className="overflow-auto" style={CONTENT_STYLE}>
+                <LocalModelList />
+              </div>
             }
           ]}
         />
