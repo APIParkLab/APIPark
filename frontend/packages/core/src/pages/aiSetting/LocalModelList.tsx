@@ -113,7 +113,7 @@ const LocalModelList: React.FC = () => {
 
   const handleEdit = (record: ModelListData) => {
     modal.confirm({
-      title: $t('部署 AI 模型'),
+      title: $t('模型设置'),
       content: <EditLocalModelModal ref={EditLocalModelModalRef} modelID={record.id} enable={record.state !== 'disabled'}/>,
       onOk: () => {
         return EditLocalModelModalRef.current?.save().then((res) => {
@@ -132,7 +132,7 @@ const LocalModelList: React.FC = () => {
 
   const handleAdd = () => {
     const modalInstance = modal.confirm({
-      title: $t('部署 AI 模型'),
+      title: $t('部署本地模型'),
       content: (
         <LocalAiDeploy
           ref={localAiDeployRef}
@@ -159,15 +159,15 @@ const LocalModelList: React.FC = () => {
 
   const handleDelete = async (id: string, apiCount: number) => {
     modal.confirm({
-      title: $t('停止部署'),
+      title: $t('删除模型'),
       content: `${$t('有')} ${apiCount} ${$t('个API使用当前模型，删除当前的模型配置后，该模型相关的API将会切换为使用负载均衡中优先级最高的可用模型。并且当前模型下的所有API KEY和相关数据将会被清空，是否确认删除当前模型？')}`,
       onOk: () => {
         return new Promise((resolve, reject) => {
           try {
-            fetchData<BasicResponse<any>>('ai/provider', {
+            fetchData<BasicResponse<any>>('model/local', {
               method: 'DELETE',
               eoParams: {
-                provider: id
+                model: id
               }
             })
               .then((response) => {
@@ -206,7 +206,6 @@ const LocalModelList: React.FC = () => {
           keyword: searchWord,
           page: params.current
         },
-        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/',
         eoTransformKeys: ['can_delete', 'api_count']
       })
 

@@ -57,7 +57,12 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
         eoTransformKeys: ['default_config']
       }).then((response) => {
         const models = response.data.models || []
-        setLlmList(models)
+        setLlmList(
+          models.map((x: any) => ({
+            ...x,
+            config: x.defaultConfig
+          }))
+        )
         if (setDefaultValue && models.length) {
           const id = models[0].id
           form.setFieldsValue({
@@ -144,10 +149,6 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
         .catch((errorInfo) => console.error(errorInfo))
     }
 
-    const handleChangeProvider = (provider: string) => {
-      getLlmList(provider)
-    }
-
     return (
       <Form
         layout="vertical"
@@ -179,7 +180,7 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
               placeholder={$t(PLACEHOLDER.select)}
               options={providerList}
               onChange={(e) => {
-                handleChangeProvider(e)
+                getLlmList(e)
               }}
             ></Select>
           </Form.Item>
@@ -201,7 +202,7 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
               }))
             }
             onChange={(e) => {
-              form.setFieldValue('config', llmList.find((x) => x.id === e)?.config || llmList.find((x) => x.id === e)?.defaultConfig)
+              form.setFieldValue('config', llmList.find((x) => x.id === e)?.config)
             }}
           ></Select>
         </Form.Item>

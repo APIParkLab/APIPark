@@ -60,12 +60,10 @@ export const ServiceDeployment = (props: { record: SystemTableListItem }) => {
 
   useEffect(() => {
     fetchData(
-      'http://localhost:3000/stream',
-      // 'model/local/deploy',
+      'model/local/deploy',
       {
         method: 'POST',
         eoBody: { recordId: record.id },
-        eoApiPrefix: '',
         headers: {
           'Content-Type': 'event-stream'
         },

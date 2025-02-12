@@ -8,7 +8,6 @@ import { App } from 'antd'
 import { Card } from 'antd'
 import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-
 import AiSettingModalContent, { AiSettingModalContentHandle } from '../aiSetting/AiSettingModal'
 import { checkAccess } from '@common/utils/permission'
 import LocalAiDeploy, { LocalAiDeployHandle } from './LocalAiDeploy'
@@ -68,7 +67,7 @@ export const AIModelGuide = () => {
           ref={modalRef}
           modelMode="manual"
           updateEntityData={updateEntityData}
-          originEntity="guide"
+          source="guide"
           readOnly={!checkAccess('system.devops.ai_provider.edit', accessData)}
         />
       ),
@@ -111,7 +110,7 @@ export const AIModelGuide = () => {
    */
   const localModelCardClick = async () => {
     const modalInstance = modal.confirm({
-      title: $t('部署 AI 模型'),
+      title: $t('部署本地模型'),
       content: <LocalAiDeploy ref={localAiDeployRef} onClose={() => {
         modalInstance.destroy()
         dumpServerPage()

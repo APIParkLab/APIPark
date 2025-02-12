@@ -31,7 +31,7 @@ const OnlineModelList: React.FC = () => {
 
   const handleDelete = async (id: string, apiCount: number) => {
     modal.confirm({
-      title: $t('停止部署'),
+      title: $t('删除模型'),
       content: `${$t('有')} ${apiCount} ${$t('个API使用当前模型，删除当前的模型配置后，该模型相关的API将会切换为使用负载均衡中优先级最高的可用模型。并且当前模型下的所有API KEY和相关数据将会被清空，是否确认删除当前模型？')}`,
       onOk: () => {
         return new Promise((resolve, reject) => {
@@ -41,7 +41,6 @@ const OnlineModelList: React.FC = () => {
               eoParams: {
                 provider: id
               }
-              // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
             }).then((response) => {
               if (response.code === STATUS_CODE.SUCCESS) {
                 message.success($t('删除成功'))
@@ -79,7 +78,6 @@ const OnlineModelList: React.FC = () => {
           page: params.current
         },
         eoTransformKeys: ['default_llm', 'api_count', 'key_count', 'can_delete']
-        // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
