@@ -9,27 +9,23 @@ import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 const useDeployLocalModel = () => {
   const { fetchData } = useFetch()
   const { checkPermission } = useGlobalContext()
-  const deployLocalModel = (value: { modelID: string; team?: number }) => {
-    return new Promise((resolve, reject) => {
-      fetchData<BasicResponse<null>>('model/local/deploy/start', {
+  const deployLocalModel = async (value: { modelID: string; team?: number }) => {
+    const response = await fetchData<BasicResponse<null>>(
+      'model/local/deploy/start',
+      {
         method: 'POST',
         eoBody: {
           model: value.modelID,
           team: value?.team
         }
-      })
-        .then((response) => {
-          const { code, msg } = response
-          if (code === STATUS_CODE.SUCCESS) {
-            message.success(msg || $t(RESPONSE_TIPS.success))
-            resolve(true)
-          } else {
-            message.error(msg || $t(RESPONSE_TIPS.error))
-            reject(false)
-          }
-        })
-        .catch((errorInfo) => reject(errorInfo))
-    })
+      }
+    )
+    const { code, msg } = response
+    if (code === STATUS_CODE.SUCCESS) {
+      message.success(msg || $t(RESPONSE_TIPS.success))
+    } else {
+      message.error(msg || $t(RESPONSE_TIPS.error))
+    }
   }
     /**
    * 获取 team 选项列表

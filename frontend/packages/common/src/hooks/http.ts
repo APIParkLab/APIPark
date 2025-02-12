@@ -129,7 +129,7 @@ const DEFAULT_HEADERS = {
   namespace: 'default'
 }
 
-export type EoRequest = RequestInit & {
+type EoRequest = RequestInit & {
   eoParams?: { [k: string]: unknown }
   eoTransformKeys?: string[]
   eoApiPrefix?: string

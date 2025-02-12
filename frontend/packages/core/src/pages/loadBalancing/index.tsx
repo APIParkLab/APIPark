@@ -57,42 +57,15 @@ const LoadBalancingPage = () => {
    * @param dataType
    * @returns
    */
-  const requestApis = (
-    params: LoadBalancingItems & {
-      pageSize: number
-      current: number
-    },
-    sort: Record<string, string>,
-    filter: Record<string, string>
-  ) => {
-    let filters
-    if (filter) {
-      filters = []
-      if (filter.isStop) {
-        if (filter.isStop.indexOf('true') !== -1) {
-          filters.push('enable')
-        }
-        if (filter.isStop.indexOf('false') !== -1) {
-          filters.push('disable')
-        }
-        if (filter.publishStatus?.length > 0) {
-          filters = [...filters, ...filter.publishStatus]
-        }
-      }
-    }
-
+  const requestApis = () => {
     return fetchData<BasicResponse<{ list: LoadBalancingItems[]; total: number }>>(
-      `strategy/${serviceId === undefined ? 'global' : 'service'}/data-masking/list`,
+      `ai/balances`,
       {
         method: 'GET',
         eoParams: {
-          order: Object.keys(sort)?.[0],
-          sort: Object.keys(sort)?.length > 0 ? (Object.values(sort)?.[0] === 'descend' ? 'desc' : 'asc') : undefined,
-          filters: JSON.stringify(filters),
-          keyword: searchWord,
-          service: serviceId
+          keyword: searchWord
         },
-        eoTransformKeys: ['is_stop', 'is_delete', 'update_time', 'publish_status', 'processed_total']
+        eoTransformKeys: ['api_count', 'key_count']
       }
     )
       .then((response) => {
@@ -234,10 +207,10 @@ const LoadBalancingPage = () => {
       },
       {
         title: $t('Apis'),
-        dataIndex: 'api_count',
+        dataIndex: 'apiCount',
         ellipsis: true,
         width: 80,
-        key: 'api_count',
+        key: 'apiCount',
         render: (dom: React.ReactNode, record: LoadBalancingItems) => (
           <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
             <a
@@ -251,17 +224,17 @@ const LoadBalancingPage = () => {
                 textDecoration: 'none'
               }}
             >
-              {record.api_count || '0'}
+              {record.apiCount || '0'}
             </a>
           </span>
         )
       },
       {
         title: $t('Keys'),
-        dataIndex: 'key_count',
+        dataIndex: 'keyCount',
         ellipsis: true,
         width: 80,
-        key: 'key_count',
+        key: 'keyCount',
         render: (dom: React.ReactNode, record: LoadBalancingItems) => (
           <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
             <a
@@ -275,7 +248,7 @@ const LoadBalancingPage = () => {
                 textDecoration: 'none'
               }}
             >
-              {record.key_count || '0'}
+              {record.keyCount || '0'}
             </a>
           </span>
         )
@@ -289,7 +262,7 @@ const LoadBalancingPage = () => {
         valueType: 'option',
         render: (_: React.ReactNode, entity: any) => [
           <TableBtnWithPermission
-            access="system.settings.ai_key_resource.manager"
+            access=""
             key="delete"
             btnType="delete"
             onClick={() => handleDelete(entity.id as string)}
@@ -324,14 +297,7 @@ const LoadBalancingPage = () => {
                 </Button>
               </WithPermission>
             ]}
-            request={async (
-              params: any & {
-                pageSize: number
-                current: number
-              },
-              sort: Record<string, string>,
-              filter: Record<string, string>
-            ) => requestApis(params, sort, filter)}
+            request={() => requestApis()}
             onSearchWordChange={(e) => {
               setSearchWord(e.target.value)
             }}

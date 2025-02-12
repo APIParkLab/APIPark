@@ -12,7 +12,7 @@ export type AiSettingModalContentProps = {
   entity?: AISettingEntityItem
   readOnly: boolean
   modelMode?: 'auto' | 'manual'
-  originEntity?: string
+  source?: string
   /** 如果是手动选择 AI 模型，那么需要更新 footer 底部的内容，所以需要这个方法去更新外部的 footer */
   updateEntityData: (entity: AISettingEntityItem) => void
 }
@@ -25,7 +25,7 @@ export type AiSettingModalContentHandle = {
 const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingModalContentProps>((props, ref) => {
   const [form] = Form.useForm()
   const { message } = App.useApp()
-  const { entity, readOnly, modelMode = 'auto', updateEntityData, originEntity } = props
+  const { entity, readOnly, modelMode = 'auto', updateEntityData, source } = props
   const { fetchData } = useFetch()
   const [llmList, setLlmList] = useState<AiProviderLlmsItems[]>()
   const [loading, setLoading] = useState<boolean>(false)
@@ -163,13 +163,12 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
     }
   }
   useEffect(() => {
-    // 如果是直接在 AI 模型配置,则获取默认模型列表和团队列表
     if (localEntity?.id) {
       getModelConfig(localEntity.id)
       setFormFieldsValue(localEntity)
     } else {
       getModelProviderList()
-      originEntity && getTeamOptionList()
+      source && getTeamOptionList()
     }
   }, [])
 
@@ -187,7 +186,6 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
             team: value.team,
             provider: localEntity?.id
           }
-          console.log(finalValue)
           fetchData<BasicResponse<null>>('quick/service/ai', {
             method: 'POST',
             eoBody: finalValue
@@ -306,7 +304,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
           }))}
         ></Select>
       </Form.Item>
-      {originEntity === 'guide' && (
+      {source === 'guide' && (
         <Form.Item label={$t('所属团队')} name="team" className="mt-[16px]" rules={[{ required: true }]}>
           <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} options={teamList} onChange={(value) => {
           form.setFieldValue('team', value)
@@ -323,7 +321,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
           enableToolbar={false}
         />
       </Form.Item>
-      {originEntity !== 'guide' && (
+      {source !== 'guide' && (
         <Form.Item className="p-4 bg-white rounded-lg" label={$t('LLM 状态管理')}>
           <div className="flex justify-between items-center">
             <div>
