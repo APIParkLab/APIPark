@@ -22,22 +22,27 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
   const { fetchData } = useFetch()
   const [llmList, setLlmList] = useState<AiProviderLlmsItems[]>()
   const [loading, setLoading] = useState<boolean>(false)
-  const [enableState, setEnableState] = useState<boolean>(entity?.status === 'enabled' ?? true)
+  const [enableState, setEnableState] = useState<boolean>(true)
+  const [status, setStatus] = useState<string>('enabled')
   const [providers, setProviders] = useState<Array<{ id: string; name: string }>>([])
   const [selectedProvider, setSelectedProvider] = useState<string>(entity?.id || '')
 
   const getUnconfiguredProviders = () => {
-    if (entity) return // Skip if editing existing provider
-
+    if (entity?.id) return
     fetchData<BasicResponse<{ providers: Array<{ id: string; name: string }> }>>('ai/providers/unconfigured', {
-      method: 'GET'
+      method: 'GET',
+      eoTransformKeys: ['default_llm']
     }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         setProviders(data.providers)
         if (data.providers.length > 0) {
-          setSelectedProvider(data.providers[0].id)
-          form.setFieldValue('provider', data.providers[0].id)
+          const provider = data.providers[0]
+          setSelectedProvider(provider.id)
+          form.setFieldsValue({
+            provider: provider.id,
+            defaultLlm: provider.defaultLlm
+          })
         }
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
@@ -84,6 +89,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
         config: provider.config ? JSON.stringify(JSON.parse(provider.config), null, 2) : '',
         enable: provider.status === 'enabled'
       })
+      setStatus(provider.status)
       return
     }
     form.setFieldsValue({
@@ -163,7 +169,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
       autoComplete="off"
       disabled={readOnly}
     >
-      {!entity && (
+      {!entity?.id && (
         <Form.Item label={$t('供应商')} name="provider" rules={[{ required: true, message: $t('请选择供应商') }]}>
           <Select
             placeholder={$t('请选择供应商')}
@@ -204,9 +210,9 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
           <div className="flex justify-between items-center">
             <div>
               <span className="text-gray-600">{$t('当前调用状态：')}</span>
-              {entity.status === 'enabled' && <Tag color="success">{$t('正常')}</Tag>}
-              {entity.status === 'disabled' && <Tag color="warning">{$t('停用')}</Tag>}
-              {entity.status === 'abnormal' && <Tag color="error">{$t('异常')}</Tag>}
+              {status === 'enabled' && <Tag color="success">{$t('正常')}</Tag>}
+              {status === 'disabled' && <Tag color="warning">{$t('停用')}</Tag>}
+              {status === 'abnormal' && <Tag color="error">{$t('异常')}</Tag>}
             </div>
             <Form.Item name="enable" valuePropName="checked" noStyle>
               <Switch
@@ -219,7 +225,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
               />
             </Form.Item>
           </div>
-          {(entity.status === 'enabled' && !enableState) || (entity.status !== 'enabled' && enableState) ? (
+          {(status === 'enabled' && !enableState) || (status !== 'enabled' && enableState) ? (
             <div className="mt-2 text-sm text-gray-500">* {getTooltipText(enableState)}</div>
           ) : null}
         </Form.Item>
