@@ -5,19 +5,14 @@ import WithPermission from '@common/components/aoplatform/WithPermission'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales/index.ts'
-import { App, Button,  Typography } from 'antd'
+import { App, Button, Typography } from 'antd'
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
 import { LoadBalancingHandle, LoadBalancingItems } from './type'
 import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission'
 import AddLoadBalancingModel from './AddModel'
 
-
-
 const LoadBalancingPage = () => {
   const pageListRef = useRef<ActionType>(null)
-  const [searchParams] = useSearchParams()
-  const serviceId = searchParams.get('serviceId')
   const [searchWord, setSearchWord] = useState<string>('')
   const [columns, setColumns] = useState<PageProColumns<LoadBalancingItems>[]>([])
   const { modal, message } = App.useApp()
@@ -40,9 +35,9 @@ const LoadBalancingPage = () => {
       closable: true,
       onOk: () => {
         return addModelRef.current?.save().then((res) => {
-            if (res === true) {
-              pageListRef.current?.reload()
-            }
+          if (res === true) {
+            pageListRef.current?.reload()
+          }
         })
       },
       wrapClassName: 'ant-modal-without-footer',
@@ -58,16 +53,13 @@ const LoadBalancingPage = () => {
    * @returns
    */
   const requestApis = () => {
-    return fetchData<BasicResponse<{ list: LoadBalancingItems[]; total: number }>>(
-      `ai/balances`,
-      {
-        method: 'GET',
-        eoParams: {
-          keyword: searchWord
-        },
-        eoTransformKeys: ['api_count', 'key_count']
-      }
-    )
+    return fetchData<BasicResponse<{ list: LoadBalancingItems[]; total: number }>>(`ai/balances`, {
+      method: 'GET',
+      eoParams: {
+        keyword: searchWord
+      },
+      eoTransformKeys: ['api_count', 'key_count']
+    })
       .then((response) => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
@@ -203,7 +195,9 @@ const LoadBalancingPage = () => {
         width: 120,
         ellipsis: true,
         key: 'state',
-        render: (dom: React.ReactNode, record: LoadBalancingItems) => <span>{statusEnum[record.state]?.text || '-'}</span>
+        render: (dom: React.ReactNode, record: LoadBalancingItems) => (
+          <span>{statusEnum[record.state]?.text || '-'}</span>
+        )
       },
       {
         title: $t('Apis'),
