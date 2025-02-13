@@ -116,6 +116,10 @@ function BasicLayout({ project = 'core' }: { project: string }) {
     getGlobalAccessData()
   }, [])
 
+  useEffect(() => {
+    setPathname(location.pathname)
+  }, [location.pathname])
+
   const logOut = () => {
     fetchData<BasicResponse<null>>('account/logout', { method: 'GET' }).then((response) => {
       const { code, msg } = response
