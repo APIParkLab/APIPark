@@ -1,6 +1,6 @@
 export type ModelStatus = 'enabled' | 'abnormal' | 'disabled'
 export type KeyStatus = 'normal' | 'abnormal' | 'disabled'
-export type ModelDeployStatus = 'normal' | 'disabled' | 'deploying' | 'error' | undefined
+export type ModelDeployStatus = 'normal' | 'disabled' | 'deploying' | 'error' | 'deploying_error' | undefined
 
 export interface KeyData {
   id: string

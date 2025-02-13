@@ -73,7 +73,7 @@ export const LogsFooter = (props: any) => {
   }
   return (
     <>
-      {record.state === 'error' ? (
+      {['deploying_error', 'error'].includes(record.state) ? (
         <div className="flex justify-end items-center">
           <Button onClick={() => { modalInstance.destroy() }}>{$t('取消')}</Button>
           <Button onClick={deleteService} type="primary" danger>

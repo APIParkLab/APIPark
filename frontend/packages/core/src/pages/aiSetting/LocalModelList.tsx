@@ -110,6 +110,13 @@ const LocalModelList: React.FC = () => {
   const [searchWord, setSearchWord] = useState<string>('')
   const localAiDeployRef = useRef<LocalAiDeployHandle>()
   const EditLocalModelModalRef = useRef<EditLocalModelModalHandle>()
+  const [stateColumnMap] = useState<{ [k: string]: { text: string; className?: string } }>({
+    normal: { text: '正常' },
+    deploying: { text: '部署中', className: 'text-[#2196f3] cursor-pointer' },
+    error: { text: '模型异常', className: 'text-[#ff4d4f]' },
+    disabled: { text: '停用', className: 'text-[#999]' },
+    deploying_error: { text: '部署失败', className: 'text-[#ff4d4f] cursor-pointer' }
+  })
 
   const handleEdit = (record: ModelListData) => {
     modal.confirm({
@@ -289,15 +296,15 @@ const LocalModelList: React.FC = () => {
       ellipsis: true,
       render: (dom: React.ReactNode, entity: ModelListData) => (
         <span
-          className={`text-[13px] ${entity?.state === 'deploying' ? '[&>.ant-typography]:text-[#2196f3] cursor-pointer' : entity?.state === 'error' ? '[&>.ant-typography]:text-[#ff4d4f] cursor-pointer' : ''}`}
+          className={`text-[13px] ${stateColumnMap[entity?.state as string]?.className}`}
           onClick={(e) => {
-            if (['deploying', 'error'].includes(entity?.state as string)) {
+            if (['deploying', 'deploying_error'].includes(entity?.state as string)) {
               e?.stopPropagation()
               openLogsModal(entity)
             }
           }}
         >
-          {dom}
+          {stateColumnMap[entity?.state as string]?.text || '-'}
         </span>
       )
     },
