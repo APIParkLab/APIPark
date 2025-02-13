@@ -32,11 +32,11 @@ const SystemList: FC = () => {
   const drawerFormRef = useRef<SystemConfigHandle>(null)
   const { checkPermission, accessInit, getGlobalAccessData, state } = useGlobalContext()
   const [stateColumnMap] = useState<{ [k: string]: { text: string } }>({
-    normal: { text: $t('正常') },
-    deploying: { text: $t('部署中') },
-    error: { text: $t('异常') },
-    public: { text: $t('公共服务') },
-    private: { text: $t('私有服务') }
+    normal: { text: '正常' },
+    deploying: { text: '部署中' },
+    error: { text: '异常' },
+    public: { text: '公共服务' },
+    private: { text: '私有服务' }
   })
   const getSystemList = () => {
     if (!accessInit) {
@@ -181,7 +181,7 @@ const SystemList: FC = () => {
               }
             }}
           >
-            {stateColumnMap[record.state]?.text || '-'}
+            {$t(stateColumnMap[record.state]?.text || '-')}
           </span>
         )
       }
