@@ -75,17 +75,17 @@ export const LogsFooter = (props: any) => {
     <>
       {record.state === 'error' ? (
         <div className="flex justify-end items-center">
-          <Button onClick={() => { modalInstance.destroy() }}>取消</Button>
+          <Button onClick={() => { modalInstance.destroy() }}>{$t('取消')}</Button>
           <Button onClick={deleteService} type="primary" danger>
-            删除服务
+            {$t('删除服务')}
           </Button>
         </div>
       ) : (
         <div className="flex justify-end items-center">
           <Button onClick={stopDeploy} type="primary" danger>
-            停止
+            {$t('停止')}
           </Button>
-          <Button type="primary" onClick={() => { modalInstance.destroy() }}>继续等待</Button>
+          <Button type="primary" onClick={() => { modalInstance.destroy() }}>{$t('继续等待')}</Button>
         </div>
       )}
     </>
