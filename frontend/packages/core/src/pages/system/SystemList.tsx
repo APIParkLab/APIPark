@@ -31,10 +31,10 @@ const SystemList: FC = () => {
   const [open, setOpen] = useState(false)
   const drawerFormRef = useRef<SystemConfigHandle>(null)
   const { checkPermission, accessInit, getGlobalAccessData, state } = useGlobalContext()
-  const [stateColumnMap] = useState<{ [k: string]: { text: string } }>({
+  const [stateColumnMap] = useState<{ [k: string]: { text: string; className?: string } }>({
     normal: { text: '正常' },
-    deploying: { text: '部署中' },
-    error: { text: '异常' },
+    deploying: { text: '部署中', className: 'text-[#2196f3]' },
+    error: { text: '异常', className: 'text-[#ff4d4f]' },
     public: { text: '公共服务' },
     private: { text: '私有服务' }
   })
@@ -171,9 +171,9 @@ const SystemList: FC = () => {
         })
       }
       if ((x.dataIndex as string) === 'state') {
-        x.render = (text: any, record: any) => (
+        x.render = (dom: React.ReactNode, record: any) => (
           <span
-            className={`text-[13px] ${record.state === 'deploying' ? 'text-[#2196f3]' : record.state === 'error' ? 'text-[#ff4d4f]' : ''}`}
+            className={`text-[13px] ${stateColumnMap[record.state]?.className}`}
             onClick={(e) => {
               if (['deploying', 'error'].includes(record.state)) {
                 e?.stopPropagation()
