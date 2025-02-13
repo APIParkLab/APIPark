@@ -212,7 +212,7 @@ APIPark 使用 Apache 2.0 授權條款。更多詳情請參閱 LICENSE 文件。
 如需企業級功能與專業技術支援，請聯絡我們的售前專家，獲取個性化演示、定制方案和報價。
 
 - 網站: https://apipark.com
-- 電子郵件: dev@apipark.com
+- 電子郵件: contact@apipark.com
 
 <br>
 

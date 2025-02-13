@@ -160,6 +160,13 @@ const mockData = [
             path: '/aiApis',
             icon: 'ic:baseline-api',
             access: 'system.settings.ai_api.view'
+          },
+          {
+            name: '负载均衡',
+            key: 'loadBalancing',
+            path: '/loadBalancing',
+            icon: 'ph:network-x',
+            access: 'system.settings.data_source.view'
           }
         ]
       },

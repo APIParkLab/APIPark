@@ -11,6 +11,7 @@ export type SystemTableListItem = {
     serviceNum: number,
     description:string;
     master:EntityItem;
+    state: string
     service_kind:'ai'|'rest',
     createTime:string;
 };

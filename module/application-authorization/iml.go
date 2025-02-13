@@ -100,7 +100,8 @@ func (i *imlAuthorizationModule) getApplications(ctx context.Context, appIds []s
 					Config:         authCfg,
 					HideCredential: a.HideCredential,
 					Label: map[string]string{
-						"authorization": a.UUID,
+						"authorization":      a.UUID,
+						"authorization_name": a.Name,
 					},
 				}
 			}),
@@ -157,7 +158,8 @@ func (i *imlAuthorizationModule) online(ctx context.Context, s *service.Service)
 				Config:         authCfg,
 				HideCredential: a.HideCredential,
 				Label: map[string]string{
-					"authorization": a.UUID,
+					"authorization":      a.UUID,
+					"authorization_name": a.Name,
 				},
 			}
 		}),

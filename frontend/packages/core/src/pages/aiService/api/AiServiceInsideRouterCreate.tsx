@@ -79,7 +79,7 @@ const AiServiceInsideRouterCreate = () => {
             timeout,
             retry,
             aiPrompt: { variables: variables, prompt: prompt },
-            aiModel: { id: defaultLlm?.id, provider: defaultLlm?.provider, config: defaultLlm?.config },
+            aiModel: { id: defaultLlm?.id, provider: defaultLlm?.provider, config: defaultLlm?.config, type: defaultLlm?.type },
             disabled
           }
           return fetchData<BasicResponse<null>>('service/ai-router', {
@@ -237,13 +237,14 @@ const AiServiceInsideRouterCreate = () => {
   }
 
   const handlerSubmit: () => Promise<boolean> | undefined = () => {
-    return drawerAddFormRef.current?.save()?.then((res: { id: string; config: string }) => {
+    return drawerAddFormRef.current?.save()?.then((res: { id: string; config: string, type: string, provider: string }) => {
       setDefaultLlm(
         (prev) =>
           ({
             ...prev,
             provider: res.provider,
             id: res.id,
+            type: res.type,
             config: res.config,
             logo: llmList?.find((x: AiProviderLlmsItems) => x.id === res.id)?.logo
           }) as AiProviderDefaultConfig & { config: string }

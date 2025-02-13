@@ -219,6 +219,16 @@ const mockData = {
           type: 'normal'
         }
       ]
+    },
+    {
+      driver: 'apipark.builtIn.component',
+      name: 'loadBalancing',
+      router: [
+        {
+          path: 'loadBalancing',
+          type: 'normal'
+        }
+      ]
     }
     // {
     //   "driver": "apipark.remote.normal",

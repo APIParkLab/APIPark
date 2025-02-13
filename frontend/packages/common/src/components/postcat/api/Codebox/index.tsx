@@ -26,7 +26,8 @@ interface CodeboxProps {
   language?: codeBoxLanguagesType
   extraContent?: React.ReactNode
   sx?: Record<string, unknown>
-  editorTheme?: 'vs' | 'vs-dark' | 'hc-black'
+  editorTheme?: 'vs' | 'vs-dark' | 'hc-black',
+  autoScrollToEnd?: boolean
 }
 
 export const Codebox = memo((props: CodeboxProps) => {
@@ -41,7 +42,8 @@ export const Codebox = memo((props: CodeboxProps) => {
     readOnly = false,
     language = 'plaintext',
     extraContent,
-    editorTheme = 'vs'
+    editorTheme = 'vs',
+    autoScrollToEnd = false
   } = props
 
   const [code, setCode] = useState<string>(``)
@@ -120,6 +122,11 @@ export const Codebox = memo((props: CodeboxProps) => {
 
   const editorDidMount = (editor: MonacoEditor.IStandaloneCodeEditor): void => {
     editorRef.current = editor
+    autoScrollToEnd && editor.onDidChangeModelContent(() => {
+      const model = editor.getModel()
+      const lineCount = model.getLineCount()
+      editor.revealLine(lineCount)
+    })
   }
 
   const formatCode = async (): Promise<void> => {

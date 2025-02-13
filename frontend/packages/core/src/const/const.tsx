@@ -799,5 +799,20 @@ export const routerMap: Map<string, RouterMapConfig> = new Map([
         }
       ]
     }
+  ],
+  [
+    'loadBalancing',
+    {
+      type: 'module',
+      lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/loadBalancing/loadBalancingLayout.tsx')),
+      key: 'loadBalancing',
+      children: [
+        {
+          path: 'list',
+          lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/loadBalancing/index.tsx')),
+          key: 'loadBalancingList'
+        }
+      ]
+    }
   ]
 ])
