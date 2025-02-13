@@ -157,26 +157,28 @@ export default function Guide() {
           </p>
           <p>
             {$t('如果你喜欢我们的产品，欢迎给我们 Star 或提供产品反馈意见。')}
-            {$t('点击这里')}
-            <span className="align-middle leading-[16px]">
+            <span className="font-bold">
+              {$t('点击这里')}
+              <span className="align-middle leading-[16px]">
+                &nbsp;
+                <Icon icon="pajamas:arrow-right" width="16" height="16" />
+                &nbsp;
+              </span>
+              <a className="align-text-top" href="https://github.com/APIParkLab/APIPark" target="_blank">
+                <img src="https://img.shields.io/github/stars/APIParkLab/APIPark?style=social" alt="" />
+              </a>
+              <span className="align-middle leading-[16px]">
+                &nbsp;
+                <Icon icon="pajamas:arrow-right" width="16" height="16" />
+                &nbsp;
+              </span>
+              {$t('点击')}
               &nbsp;
-              <Icon icon="pajamas:arrow-right" width="16" height="16" />
-              &nbsp;
+              <span className="align-middle leading-[16px]">
+                <Icon icon="emojione:star" width="16" height="16" />
+              </span>
+              Star
             </span>
-            <a className="align-text-top" href="https://github.com/APIParkLab/APIPark" target="_blank">
-              <img src="https://img.shields.io/github/stars/APIParkLab/APIPark?style=social" alt="" />
-            </a>
-            <span className="align-middle leading-[16px]">
-              &nbsp;
-              <Icon icon="pajamas:arrow-right" width="16" height="16" />
-              &nbsp;
-            </span>
-            {$t('点击')}
-            &nbsp;
-            <span className="align-middle leading-[16px]">
-              <Icon icon="emojione:star" width="16" height="16" />
-            </span>
-            Star
           </p>
         </div>
       }
