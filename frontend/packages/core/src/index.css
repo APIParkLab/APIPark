@@ -746,6 +746,12 @@ p{
     padding:16px 20px  !important
   }
 }
+.custom-steps .ant-steps-icon span {
+  width: auto !important;
+}
+.custom-steps .ant-steps-item-content {
+  margin-top: 0 !important;
+}
 
 
 .ant-modal-body .pr-PAGE_INSIDE_X{

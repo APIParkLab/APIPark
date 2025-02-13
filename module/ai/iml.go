@@ -535,15 +535,15 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 			Priority:   input.Priority,
 			Status:     &status,
 		}
-		_, err = i.aiKeyService.DefaultKey(ctx, id)
+		_, err = i.aiKeyService.DefaultKey(txCtx, id)
 		if err != nil {
 			if !errors.Is(err, gorm.ErrRecordNotFound) {
 				return err
 			}
-			err = i.aiKeyService.Create(ctx, &ai_key.Create{
+			err = i.aiKeyService.Create(txCtx, &ai_key.Create{
 				ID:         id,
 				Name:       info.Name,
-				Config:     info.Config,
+				Config:     input.Config,
 				Provider:   id,
 				Status:     1,
 				ExpireTime: 0,
@@ -551,28 +551,21 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 				Priority:   1,
 			})
 		} else {
-			err = i.aiKeyService.Save(ctx, id, &ai_key.Edit{
-				Config: &info.Config,
+			err = i.aiKeyService.Save(txCtx, id, &ai_key.Edit{
+				Config: &input.Config,
+				Status: &status,
 			})
 		}
 		if err != nil {
 			return err
 		}
-
-		//if input.Enable != nil {
-		//	status = 0
-		//	if *input.Enable {
-		//		status = 1
-		//	}
-		//	pInfo.Status = &status
-		//}
-		err = i.providerService.Save(ctx, id, pInfo)
+		err = i.providerService.Save(txCtx, id, pInfo)
 		if err != nil {
 			return err
 		}
 
 		if *pInfo.Status == 0 {
-			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+			return i.syncGateway(txCtx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
 				{
 					BasicItem: &gateway.BasicItem{
 						ID:       id,
@@ -581,8 +574,8 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 				},
 			}, false)
 		}
-		// 获取当前供应商所有Key信息
-		defaultKey, err := i.aiKeyService.DefaultKey(ctx, id)
+		// 获取当前供应商默认Key信息
+		defaultKey, err := i.aiKeyService.DefaultKey(txCtx, id)
 		if err != nil {
 			return err
 		}
@@ -592,7 +585,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		cfg["model_config"] = model.DefaultConfig()
 		cfg["priority"] = info.Priority
 		cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
-		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+		return i.syncGateway(txCtx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
 			{
 				BasicItem: &gateway.BasicItem{
 					ID:          id,
