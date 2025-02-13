@@ -98,9 +98,18 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
           <Select
             showSearch
             className="w-INPUT_NORMAL"
-            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+            filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
             placeholder={$t(PLACEHOLDER.input)}
-            options={modelList}
+            options={modelList.map((provider) => ({
+              label: (
+                <div className='relative'>
+                  <span>{provider.name}</span>
+                  <span className='absolute right-[10px] text-[#999]' >{provider.size}</span>
+                  </div>
+              ),
+              value: provider.id,
+              searchText: provider.name.toLowerCase()
+            }))}
             onChange={(value) => {
               form.setFieldValue('modelID', value)
             }}

@@ -849,5 +849,6 @@
   "Kf7056787": "Public Service",
   "Kbe98ba9e": "Private Service",
   "K24540de": "Stop",
-  "Kd85b3f64": "Continue Waiting"
+  "Kd85b3f64": "Continue Waiting",
+  "K1400a1fc": "As a prefix for all APIs within the service, such as host/{service_name}/{api_path}. This has a significant impact, so modify with caution"
 }
