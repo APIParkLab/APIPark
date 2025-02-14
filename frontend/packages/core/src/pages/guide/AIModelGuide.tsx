@@ -129,11 +129,12 @@ export const AIModelGuide = () => {
       icon: <></>
     })
   }
-  const deployDeepSeek = (e: any) => {
+  const deployDeepSeek = async (e: any) => {
     e.stopPropagation()
-    deployLocalModel({
+    await deployLocalModel({
       modelID: 'deepseek-r1'
     })
+    dumpServerPage()
   }
 
   const cardList = [
