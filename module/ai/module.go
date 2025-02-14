@@ -13,7 +13,7 @@ type IProviderModule interface {
 	ConfiguredProviders(ctx context.Context, keyword string) ([]*ai_dto.ConfiguredProviderItem, error)
 	UnConfiguredProviders(ctx context.Context) ([]*ai_dto.ProviderItem, error)
 	SimpleProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, error)
-	SimpleConfiguredProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error)
+	SimpleConfiguredProviders(ctx context.Context, all bool) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error)
 	Provider(ctx context.Context, id string) (*ai_dto.Provider, error)
 	SimpleProvider(ctx context.Context, id string) (*ai_dto.SimpleProvider, error)
 	LLMs(ctx context.Context, driver string) ([]*ai_dto.LLMItem, *ai_dto.ProviderItem, error)

@@ -219,6 +219,7 @@ func (i *imlProviderModule) SimpleProviders(ctx context.Context) ([]*ai_dto.Simp
 	providerMap := utils.SliceToMap(list, func(e *ai.Provider) string {
 		return e.Id
 	})
+
 	items := make([]*ai_dto.SimpleProviderItem, 0, len(providers))
 	for _, v := range providers {
 		item := &ai_dto.SimpleProviderItem{
@@ -231,31 +232,47 @@ func (i *imlProviderModule) SimpleProviders(ctx context.Context) ([]*ai_dto.Simp
 		if info, has := providerMap[v.ID()]; has {
 			item.Configured = true
 			item.Status = ai_dto.ToProviderStatus(info.Status)
-			item.Priority = info.Priority
 		}
 		items = append(items, item)
 	}
-	sort.Slice(items, func(i, j int) bool {
-		if items[i].Priority != items[j].Priority {
-			if items[i].Priority == 0 {
-				return false
-			}
-			if items[j].Priority == 0 {
-				return true
-			}
-			return items[i].Priority < items[j].Priority
-		}
-		return items[i].Name < items[j].Name
-	})
+
+	//sort.Slice(items, func(i, j int) bool {
+	//	if items[i].Priority != items[j].Priority {
+	//		if items[i].Priority == 0 {
+	//			return false
+	//		}
+	//		if items[j].Priority == 0 {
+	//			return true
+	//		}
+	//		return items[i].Priority < items[j].Priority
+	//	}
+	//	return items[i].Name < items[j].Name
+	//})
 	return items, nil
 }
 
-func (i *imlProviderModule) SimpleConfiguredProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error) {
+func (i *imlProviderModule) SimpleConfiguredProviders(ctx context.Context, all bool) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error) {
 	list, err := i.providerService.List(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	items := make([]*ai_dto.SimpleProviderItem, 0, len(list))
+
+	healthProvider := make(map[string]struct{})
+	if all {
+		healthProvider["ollama"] = struct{}{}
+		items = append(items, &ai_dto.SimpleProviderItem{
+			Id:            "ollama",
+			Name:          "Ollama",
+			Logo:          ollamaSvg,
+			Configured:    true,
+			DefaultConfig: "",
+			Status:        ai_dto.ProviderEnabled,
+			Type:          "local",
+		})
+	}
+
 	var backup *ai_dto.BackupProvider
 	for _, l := range list {
 		p, has := model_runtime.GetProvider(l.Id)
@@ -275,34 +292,32 @@ func (i *imlProviderModule) SimpleConfiguredProviders(ctx context.Context) ([]*a
 			Logo:          p.Logo(),
 			DefaultConfig: p.DefaultConfig(),
 			Status:        ai_dto.ToProviderStatus(l.Status),
-			Priority:      l.Priority,
 			Configured:    true,
 			Model: &ai_dto.BasicInfo{
 				Id:   model.ID(),
 				Name: model.ID(),
 			},
 		}
-
+		if item.Status == ai_dto.ProviderEnabled {
+			healthProvider[l.Id] = struct{}{}
+		}
 		items = append(items, item)
 	}
-	sort.Slice(items, func(i, j int) bool {
-		if items[i].Priority != items[j].Priority {
-			if items[i].Priority == 0 {
-				return false
-			}
-			if items[j].Priority == 0 {
-				return true
-			}
-			return items[i].Priority < items[j].Priority
-		}
-		return items[i].Name < items[j].Name
-	})
-	for _, item := range items {
-		if item.Status == ai_dto.ProviderEnabled {
+
+	aiBalanceItems, err := i.aiBalanceService.Search(ctx, "", nil, "priority asc")
+	if err != nil {
+		return nil, nil, err
+	}
+	for _, item := range aiBalanceItems {
+		if _, has := healthProvider[item.Provider]; has {
 			backup = &ai_dto.BackupProvider{
-				Id:    item.Id,
-				Name:  item.Name,
-				Model: item.Model,
+				Id:   item.Provider,
+				Name: item.Provider,
+				Model: &ai_dto.BasicInfo{
+					Id:   item.Model,
+					Name: item.Model,
+				},
+				Type: "local",
 			}
 			break
 		}

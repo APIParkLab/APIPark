@@ -33,8 +33,11 @@ func (i *imlProviderController) SimpleProviders(ctx *gin.Context) ([]*ai_dto.Sim
 	return i.module.SimpleProviders(ctx)
 }
 
-func (i *imlProviderController) SimpleConfiguredProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error) {
-	return i.module.SimpleConfiguredProviders(ctx)
+func (i *imlProviderController) SimpleConfiguredProviders(ctx *gin.Context, all string) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error) {
+	if all == "true" {
+		return i.module.SimpleConfiguredProviders(ctx, true)
+	}
+	return i.module.SimpleConfiguredProviders(ctx, false)
 }
 
 func (i *imlProviderController) Provider(ctx *gin.Context, id string) (*ai_dto.Provider, error) {
