@@ -12,7 +12,7 @@ type IProviderController interface {
 	ConfiguredProviders(ctx *gin.Context, keyword string) ([]*ai_dto.ConfiguredProviderItem, error)
 	UnConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ProviderItem, error)
 	SimpleProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, error)
-	SimpleConfiguredProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error)
+	SimpleConfiguredProviders(ctx *gin.Context, all string) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error)
 	Provider(ctx *gin.Context, id string) (*ai_dto.Provider, error)
 	SimpleProvider(ctx *gin.Context, id string) (*ai_dto.SimpleProvider, error)
 	LLMs(ctx *gin.Context, driver string) ([]*ai_dto.LLMItem, *ai_dto.ProviderItem, error)
