@@ -53,6 +53,10 @@ type imlLocalModelController struct {
 	transaction     store.ITransaction         `autowired:""`
 }
 
+func (i *imlLocalModelController) SimpleList(ctx *gin.Context) ([]*ai_local_dto.SimpleItem, error) {
+	return i.module.SimpleList(ctx)
+}
+
 func (i *imlLocalModelController) State(ctx *gin.Context, model string) (*ai_local_dto.DeployState, *ai_local_dto.ModelInfo, error) {
 	return i.module.ModelState(ctx, model)
 }

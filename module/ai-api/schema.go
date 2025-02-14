@@ -131,7 +131,7 @@ func genMessageSchema() *openapi3.Schema {
 	result.Description = "Chat Message"
 	roleSchema := openapi3.NewStringSchema()
 	roleSchema.Description = "Role of the message sender"
-	roleSchema.Example = "assistant"
+	roleSchema.Example = "user"
 	contentSchema := openapi3.NewStringSchema()
 	contentSchema.Description = "The message content"
 	contentSchema.Example = "Hello, how can I help you?"

@@ -16,5 +16,6 @@ func (p *plugin) aiLocalApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/model/local", []string{"context", "query:model"}, nil, p.aiLocalController.RemoveModel),
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/model/local/info", []string{"context", "query:model", "body"}, nil, p.aiLocalController.Update),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/model/local/state", []string{"context", "query:model"}, []string{"state", "info"}, p.aiLocalController.State),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/ai/models/local/configured", []string{"context"}, []string{"models"}, p.aiLocalController.SimpleList),
 	}
 }

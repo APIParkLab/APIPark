@@ -37,6 +37,24 @@ type imlLocalModel struct {
 	transaction              store.ITransaction                      `autowired:""`
 }
 
+func (i *imlLocalModel) SimpleList(ctx context.Context) ([]*ai_local_dto.SimpleItem, error) {
+	list, err := i.localModelService.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(list, func(s *ai_local.LocalModel) *ai_local_dto.SimpleItem {
+		return &ai_local_dto.SimpleItem{
+			Id:   s.Id,
+			Name: s.Name,
+		}
+	}, func(l *ai_local.LocalModel) bool {
+		if l.State != ai_local_dto.LocalModelStateNormal.Int() && l.State != ai_local_dto.LocalModelStateDisable.Int() {
+			return false
+		}
+		return true
+	}), nil
+}
+
 func (i *imlLocalModel) ModelState(ctx context.Context, model string) (*ai_local_dto.DeployState, *ai_local_dto.ModelInfo, error) {
 	info, err := i.localModelStateService.Get(ctx, model)
 	if err != nil {
@@ -68,6 +86,7 @@ func (i *imlLocalModel) Search(ctx context.Context, keyword string) ([]*ai_local
 			Name:       s.Name,
 			State:      ai_local_dto.FromLocalModelState(s.State),
 			APICount:   apiCountMap[s.Id],
+			CanDelete:  true,
 			UpdateTime: auto.TimeLabel(s.UpdateAt),
 		}
 	}), nil

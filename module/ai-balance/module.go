@@ -12,7 +12,7 @@ import (
 type IBalanceModule interface {
 	Create(ctx context.Context, input *ai_balance_dto.Create) error
 	Sort(ctx context.Context, input *ai_balance_dto.Sort) error
-	List(ctx context.Context) ([]*ai_balance_dto.Item, error)
+	List(ctx context.Context, keyword string) ([]*ai_balance_dto.Item, error)
 	Delete(ctx context.Context, id string) error
 }
 
