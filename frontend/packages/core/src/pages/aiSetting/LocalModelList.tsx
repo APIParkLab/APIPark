@@ -269,11 +269,15 @@ const LocalModelList: React.FC = () => {
   ]
 
   const openLogsModal = (record: any) => {
+    const closeModal = (reload = true) => {
+      reload && pageListRef.current?.reload()
+      modalInstance.destroy()
+    }
     const modalInstance = modal.confirm({
       title: $t('部署过程'),
-      content: <ServiceDeployment record={record} />,
+      content: <ServiceDeployment record={record} closeModal={closeModal} />,
       footer: () => {
-        return <LogsFooter record={record} modalInstance={modalInstance} />
+        return <LogsFooter record={record} closeModal={closeModal} />
       },
       width: 600,
       okText: $t('确认'),

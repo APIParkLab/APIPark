@@ -4,7 +4,7 @@ import { useFetch } from '@common/hooks/http.ts'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 
 export const LogsFooter = (props: any) => {
-  const { record, modalInstance } = props
+  const { record, closeModal = () => {} } = props
   const { message, modal } = App.useApp()
   const { fetchData } = useFetch()
   const stopDeploy = () => {
@@ -21,14 +21,11 @@ export const LogsFooter = (props: any) => {
               const { code, msg } = response
               if (code === STATUS_CODE.SUCCESS) {
                 resolve(true)
+                closeModal()
               } else {
                 message.error(msg || $t(RESPONSE_TIPS.error))
                 reject(false)
               }
-            })
-            .finally(() => {
-              resolve(true)
-              modalInstance.destroy()
             })
         })
       },
@@ -53,14 +50,11 @@ export const LogsFooter = (props: any) => {
               const { code, msg } = response
               if (code === STATUS_CODE.SUCCESS) {
                 resolve(true)
+                closeModal()
               } else {
                 message.error(msg || $t(RESPONSE_TIPS.error))
                 reject(false)
               }
-            })
-            .finally(() => {
-              resolve(true)
-              modalInstance.destroy()
             })
         })
       },
@@ -75,7 +69,7 @@ export const LogsFooter = (props: any) => {
     <>
       {['deploying_error', 'error'].includes(record.state) ? (
         <div className="flex justify-end items-center">
-          <Button onClick={() => { modalInstance.destroy() }}>{$t('取消')}</Button>
+          <Button onClick={() => { closeModal(true) }}>{$t('取消')}</Button>
           <Button onClick={deleteService} type="primary" danger>
             {$t('删除服务')}
           </Button>
@@ -85,7 +79,7 @@ export const LogsFooter = (props: any) => {
           <Button onClick={stopDeploy} type="primary" danger>
             {$t('停止')}
           </Button>
-          <Button type="primary" onClick={() => { modalInstance.destroy() }}>{$t('继续等待')}</Button>
+          <Button type="primary" onClick={() => { closeModal() }}>{$t('继续等待')}</Button>
         </div>
       )}
     </>
