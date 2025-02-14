@@ -19,6 +19,7 @@ const RestAIDeploy = forwardRef<RestAIDeployHandle, any>((props: any, ref: any) 
   const { getTeamOptionList } = useDeployLocalModel()
 
   const uploadProps: UploadProps = {
+    accept: '.json,.yaml',
     name: 'file',
     multiple: false,
     maxCount: 1,
