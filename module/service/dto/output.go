@@ -5,6 +5,44 @@ import (
 	"github.com/eolinker/go-common/auto"
 )
 
+type ServiceState string
+
+const (
+	ServiceStateNormal      ServiceState = "normal"
+	ServiceStateDeploying   ServiceState = "deploying"
+	ServiceStateDeployError ServiceState = "error"
+)
+
+func (s ServiceState) String() string {
+	return string(s)
+}
+
+func (s ServiceState) Int() int {
+	switch s {
+	case ServiceStateNormal:
+		return 0
+	case ServiceStateDeploying:
+		return 1
+	case ServiceStateDeployError:
+		return 2
+	default:
+		return -1
+	}
+}
+
+func FromServiceState(s int) ServiceState {
+	switch s {
+	case 0:
+		return ServiceStateNormal
+	case 1:
+		return ServiceStateDeploying
+	case 2:
+		return ServiceStateDeployError
+	default:
+		return ""
+	}
+}
+
 type ServiceItem struct {
 	Id          string         `json:"id"`
 	Name        string         `json:"name"`
@@ -15,6 +53,7 @@ type ServiceItem struct {
 	CreateTime  auto.TimeLabel `json:"create_time"`
 	UpdateTime  auto.TimeLabel `json:"update_time"`
 	Provider    *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
+	State       string         `json:"state"`
 	CanDelete   bool           `json:"can_delete"`
 }
 
@@ -96,6 +135,13 @@ func ToService(model *service.Service) *Service {
 		AsApp:        model.AsApp,
 		ServiceKind:  model.Kind.String(),
 	}
+	state := FromServiceState(model.State)
+	if state == ServiceStateNormal {
+		s.State = model.ServiceType.String()
+	} else {
+		s.State = state.String()
+	}
+
 	switch model.Kind {
 	case service.AIService:
 		provider := auto.UUID(model.AdditionalConfig["provider"])
