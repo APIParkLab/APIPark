@@ -1,7 +1,6 @@
 package ai
 
 import (
-	"context"
 	"reflect"
 
 	"github.com/APIParkLab/APIPark/service/universally"
@@ -10,9 +9,11 @@ import (
 
 type IProviderService interface {
 	universally.IServiceGet[Provider]
+	universally.IServiceCreate[CreateProvider]
+	universally.IServiceEdit[SetProvider]
 	universally.IServiceDelete
-	Save(ctx context.Context, id string, cfg *SetProvider) error
-	MaxPriority(ctx context.Context) (int, error)
+	//Save(ctx context.Context, id string, cfg *SetProvider) error
+	//MaxPriority(ctx context.Context) (int, error)
 }
 
 func init() {
