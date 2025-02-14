@@ -8,6 +8,9 @@ import (
 	"sort"
 	"time"
 
+	"github.com/eolinker/go-common/register"
+	"github.com/eolinker/go-common/server"
+
 	ai_local "github.com/APIParkLab/APIPark/service/ai-local"
 
 	ai_balance "github.com/APIParkLab/APIPark/service/ai-balance"
@@ -62,6 +65,20 @@ type imlProviderModule struct {
 	aiKeyService     ai_key.IKeyService         `autowired:""`
 	aiBalanceService ai_balance.IBalanceService `autowired:""`
 	transaction      store.ITransaction         `autowired:""`
+}
+
+func (i *imlProviderModule) OnInit() {
+	register.Handle(func(v server.Server) {
+		ctx := context.Background()
+
+		list, err := i.providerService.List(ctx)
+		if err != nil {
+			return
+		}
+		for _, l := range list {
+			i.providerService.Save(ctx, l.Id, &ai.SetProvider{})
+		}
+	})
 }
 
 func (i *imlProviderModule) Delete(ctx context.Context, id string) error {
@@ -428,9 +445,6 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		}
 		defaultLLM = model
 	}
-	//if info.Priority == 0 {
-	//	info.Priority = maxPriority
-	//}
 
 	return &ai_dto.Provider{
 		Id:               info.Id,
@@ -497,38 +511,48 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 	if !has {
 		return fmt.Errorf("ai provider not found")
 	}
-	info, err := i.providerService.Get(ctx, id)
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
+
+	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		info, err := i.providerService.Get(ctx, id)
+		if err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return err
+			}
+			if input.DefaultLLM == "" {
+				defaultLLM, has := p.DefaultModel(model_runtime.ModelTypeLLM)
+				if !has {
+					return fmt.Errorf("ai provider default llm not found")
+				}
+				input.DefaultLLM = defaultLLM.ID()
+			}
+			info = &ai.Provider{
+				Id:         id,
+				Name:       p.Name(),
+				DefaultLLM: input.DefaultLLM,
+				Config:     input.Config,
+			}
+			err = i.providerService.Create(ctx, &ai.CreateProvider{
+				Id:         info.Id,
+				Name:       info.Name,
+				DefaultLLM: input.DefaultLLM,
+				Config:     input.Config,
+			})
+			if err != nil {
+				return err
+			}
+		}
+		model, has := p.GetModel(input.DefaultLLM)
+		if !has {
+			return fmt.Errorf("ai provider model not found")
+		}
+		err = p.Check(input.Config)
+		if err != nil {
 			return err
 		}
-		if input.DefaultLLM == "" {
-			defaultLLM, has := p.DefaultModel(model_runtime.ModelTypeLLM)
-			if !has {
-				return fmt.Errorf("ai provider default llm not found")
-			}
-			input.DefaultLLM = defaultLLM.ID()
+		input.Config, err = p.GenConfig(input.Config, info.Config)
+		if err != nil {
+			return err
 		}
-		info = &ai.Provider{
-			Id:         id,
-			Name:       p.Name(),
-			DefaultLLM: input.DefaultLLM,
-			Config:     input.Config,
-		}
-	}
-	model, has := p.GetModel(input.DefaultLLM)
-	if !has {
-		return fmt.Errorf("ai provider model not found")
-	}
-	err = p.Check(input.Config)
-	if err != nil {
-		return err
-	}
-	input.Config, err = p.GenConfig(input.Config, info.Config)
-	if err != nil {
-		return err
-	}
-	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
 		status := 0
 		if input.Enable != nil && *input.Enable {
 			status = 1
@@ -537,7 +561,6 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 			Name:       &info.Name,
 			DefaultLLM: &input.DefaultLLM,
 			Config:     &input.Config,
-			Priority:   input.Priority,
 			Status:     &status,
 		}
 		_, err = i.aiKeyService.DefaultKey(txCtx, id)
