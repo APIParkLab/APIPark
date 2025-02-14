@@ -40,7 +40,7 @@ const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, st
       if (isMounted) setLoading(true)
       try {
         const endpoint = 'simple/ai/providers/configured'
-        const response = await fetchData<AIProviderResponse>(endpoint, { method: 'GET' })
+        const response = await fetchData<AIProviderResponse>(endpoint, { method: 'GET', eoParams: { all: true} })
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           const providers = data.providers.map((val) => ({
