@@ -73,6 +73,17 @@ system:
             value: 'manager'
             dependents:
               - system.settings.account.view
+      - name: ai balance
+        value: 'ai_balance'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+              - system.settings.ai_balance.view
+
       - name: role
         value: 'role'
         children:
