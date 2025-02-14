@@ -166,7 +166,7 @@ const mockData = [
             key: 'loadBalancing',
             path: '/loadBalancing',
             icon: 'ph:network-x',
-            access: 'system.settings.data_source.view'
+            access: 'system.settings.ai_balance.view'
           }
         ]
       },
