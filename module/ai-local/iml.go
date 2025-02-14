@@ -210,6 +210,7 @@ func (i *imlLocalModel) CancelDeploy(ctx context.Context, model string) error {
 }
 
 func (i *imlLocalModel) RemoveModel(ctx context.Context, model string) error {
+
 	err := ai_provider_local.RemoveModel(model)
 	if err != nil {
 		return err
