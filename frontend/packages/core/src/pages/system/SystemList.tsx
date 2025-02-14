@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom'
 import { SERVICE_KIND_OPTIONS, SYSTEM_TABLE_COLUMNS } from '../../const/system/const.tsx'
 import { SystemConfigHandle, SystemTableListItem } from '../../const/system/type.ts'
 import SystemConfig from './SystemConfig.tsx'
+import { ServiceDeployment } from './serviceDeployment/ServiceDeployment.tsx'
+import { LogsFooter } from './serviceDeployment/ServiceDeployMentFooter.tsx'
 
 const SystemList: FC = () => {
   const navigate = useNavigate()
@@ -23,13 +25,19 @@ const SystemList: FC = () => {
   const { fetchData } = useFetch()
   const [tableListDataSource, setTableListDataSource] = useState<SystemTableListItem[]>([])
   const [tableHttpReload, setTableHttpReload] = useState(true)
-  const { message } = App.useApp()
+  const { message, modal } = App.useApp()
   const pageListRef = useRef<ActionType>(null)
   const [memberValueEnum, setMemberValueEnum] = useState<{ [k: string]: { text: string } }>({})
   const [open, setOpen] = useState(false)
   const drawerFormRef = useRef<SystemConfigHandle>(null)
   const { checkPermission, accessInit, getGlobalAccessData, state } = useGlobalContext()
-
+  const [stateColumnMap] = useState<{ [k: string]: { text: string; className?: string } }>({
+    normal: { text: '正常' },
+    deploying: { text: '部署中', className: 'text-[#2196f3]' },
+    error: { text: '异常', className: 'text-[#ff4d4f]' },
+    public: { text: '公共服务' },
+    private: { text: '私有服务' }
+  })
   const getSystemList = () => {
     if (!accessInit) {
       getGlobalAccessData()?.then?.(() => {
@@ -128,7 +136,24 @@ const SystemList: FC = () => {
   const onClose = () => {
     setOpen(false)
   }
-
+  const openLogsModal = (record: any) => {
+    const closeModal = () => {
+      modalInstance.destroy()
+      manualReloadTable()
+    }
+    const modalInstance = modal.confirm({
+      title: $t('部署过程'),
+      content: <ServiceDeployment record={record} closeModal={closeModal} />,
+      footer: () => {
+        return <LogsFooter record={record} modalInstance={modalInstance} />
+      },
+      width: 600,
+      okText: $t('确认'),
+      cancelText: $t('取消'),
+      closable: true,
+      icon: <></>
+    })
+  }
   const columns = useMemo(() => {
     const res = SYSTEM_TABLE_COLUMNS.map((x) => {
       const dataIndex = x.dataIndex as string[]
@@ -144,6 +169,21 @@ const SystemList: FC = () => {
         SERVICE_KIND_OPTIONS.forEach((option) => {
           ;(x.valueEnum as any)[option.value] = { text: $t(option.label) }
         })
+      }
+      if ((x.dataIndex as string) === 'state') {
+        x.render = (dom: React.ReactNode, record: any) => (
+          <span
+            className={`text-[13px] ${stateColumnMap[record.state]?.className}`}
+            onClick={(e) => {
+              if (['deploying', 'error'].includes(record.state)) {
+                e?.stopPropagation()
+                openLogsModal(record)
+              }
+            }}
+          >
+            {$t(stateColumnMap[record.state]?.text || '-')}
+          </span>
+        )
       }
 
       return { ...x, title: typeof x.title === 'string' ? $t(x.title as string) : x.title }

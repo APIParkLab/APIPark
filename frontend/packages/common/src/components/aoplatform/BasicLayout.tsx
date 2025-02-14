@@ -116,6 +116,10 @@ function BasicLayout({ project = 'core' }: { project: string }) {
     getGlobalAccessData()
   }, [])
 
+  useEffect(() => {
+    setPathname(location.pathname)
+  }, [location.pathname])
+
   const logOut = () => {
     fetchData<BasicResponse<null>>('account/logout', { method: 'GET' }).then((response) => {
       const { code, msg } = response
@@ -182,7 +186,7 @@ function BasicLayout({ project = 'core' }: { project: string }) {
       </Button>,
       ...((pluginSlotHub.getSlot('basicLayoutAfterBtns') as unknown[]) || [])
     ]
-  }, [pluginSlotHub.getSlot('basicLayoutAfterBtns')])
+  }, [state.language, pluginSlotHub.getSlot('basicLayoutAfterBtns')])
 
   return (
     <div
