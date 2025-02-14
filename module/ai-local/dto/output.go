@@ -59,8 +59,9 @@ func FromLocalModelState(state int) LocalModelState {
 }
 
 type SimpleItem struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	Id            string `json:"id"`
+	Name          string `json:"name"`
+	DefaultConfig string `json:"default_config"`
 }
 
 type LocalModelItem struct {
