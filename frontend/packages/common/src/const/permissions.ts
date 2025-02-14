@@ -239,6 +239,21 @@ export const PERMISSION_DEFINITION = [
         anyOf: [{ backend: ['system.settings.log_configuration.manager'] }]
       }
     },
+    'system.settings.ai_balance.view': {
+      granted: {
+        anyOf: [{ backend: ['system.settings.ai_balance.view'] }]
+      }
+    },
+    'system.settings.ai_balance.delete': {
+      granted: {
+        anyOf: [{ backend: ['system.settings.ai_balance.manager'] }]
+      }
+    },
+    'system.settings.ai_balance.add': {
+      granted: {
+        anyOf: [{ backend: ['system.settings.ai_balance.manager'] }]
+      }
+    },
     'system.devops.policy.view': {
       granted: {
         anyOf: [{ backend: ['system.settings.strategy.view'] }]
