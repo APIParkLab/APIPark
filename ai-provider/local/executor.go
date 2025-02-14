@@ -288,7 +288,13 @@ func CancelPipeline(model string, id string) {
 
 func RemoveModel(model string) error {
 	taskExecutor.CloseModelPipeline(model)
-	return client.Delete(context.Background(), &api.DeleteRequest{Model: model})
+	err := client.Delete(context.Background(), &api.DeleteRequest{Model: model})
+	if err != nil {
+		if err.Error() == fmt.Sprintf("model '%s' not found", model) {
+			return nil
+		}
+	}
+	return err
 }
 
 func ModelsInstalled() ([]Model, error) {
