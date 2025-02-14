@@ -9,7 +9,7 @@ toolchain go1.23.6
 require (
 	github.com/eolinker/ap-account v1.0.15
 	github.com/eolinker/eosc v0.18.3
-	github.com/eolinker/go-common v1.1.4
+	github.com/eolinker/go-common v1.1.5
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/getkin/kin-openapi v0.127.0
 	github.com/gin-contrib/gzip v1.0.1

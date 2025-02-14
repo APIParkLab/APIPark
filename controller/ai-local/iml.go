@@ -127,6 +127,8 @@ func (i *imlLocalModelController) Deploy(ctx *gin.Context) {
 	}()
 	var complete int64
 	var total int64
+	ctx.Header("Content-Type", "text/plain; charset=utf-8")
+	ctx.Header("text-encoding", "chunked")
 	ctx.Stream(func(w io.Writer) bool {
 		msg, ok := <-p.Message()
 		if !ok {
