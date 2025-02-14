@@ -146,7 +146,7 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
                         deployPopularModel(item.id)
                       }}
                     >
-                      {item.name}
+                      {item.name}({item.size})
                     </span>
                   ))
               : null}
