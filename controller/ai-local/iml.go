@@ -220,6 +220,7 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 			Prefix:       prefix,
 			Description:  "Auto generated service for AI model " + model,
 			ServiceType:  "public",
+			State:        "deploying",
 			Catalogue:    catalogueInfo.Id,
 			ApprovalType: "auto",
 			Kind:         "ai",

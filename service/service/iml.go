@@ -20,10 +20,16 @@ var (
 
 type imlServiceService struct {
 	store service.IServiceStore `autowired:""`
+
 	universally.IServiceGet[Service]
 	universally.IServiceDelete
 	universally.IServiceCreate[Create]
 	universally.IServiceEdit[Edit]
+}
+
+func (i *imlServiceService) ForceDelete(ctx context.Context, id string) error {
+	_, err := i.store.DeleteWhere(ctx, map[string]interface{}{"uuid": id})
+	return err
 }
 
 func (i *imlServiceService) ServiceList(ctx context.Context, serviceIds ...string) ([]*Service, error) {
@@ -168,6 +174,7 @@ func createEntityHandler(i *Create) *service.Service {
 		ApprovalType:     i.ApprovalType.Int(),
 		Kind:             i.Kind.Int(),
 		AdditionalConfig: string(cfg),
+		State:            i.State,
 		Catalogue:        i.Catalogue,
 		AsServer:         i.AsServer,
 		AsApp:            i.AsApp,
@@ -199,4 +206,8 @@ func updateHandler(e *service.Service, i *Edit) {
 	if i.ApprovalType != nil {
 		e.ApprovalType = (*i.ApprovalType).Int()
 	}
+	if i.State != nil {
+		e.State = *i.State
+	}
+	e.UpdateAt = time.Now()
 }
