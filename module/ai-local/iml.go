@@ -169,7 +169,15 @@ func (i *imlLocalModel) pullHook() func(msg ai_provider_local.PullMessage) error
 			if msg.Msg != "" {
 				info.Msg = msg.Msg
 			}
-			return i.localModelStateService.Save(ctx, msg.Model, &ai_local.EditLocalModelInstallState{State: &state, Complete: &info.Complete, Total: &info.Total, Msg: &info.Msg})
+			err = i.localModelStateService.Save(ctx, msg.Model, &ai_local.EditLocalModelInstallState{State: &state, Complete: &info.Complete, Total: &info.Total, Msg: &info.Msg})
+			if err != nil {
+				return err
+			}
+			serviceState := 0
+			if msg.Status == "error" {
+				state = 2
+			}
+			return i.serviceService.Save(ctx, msg.Model, &service.Edit{State: &serviceState})
 		})
 	}
 }

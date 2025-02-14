@@ -8,6 +8,8 @@ import (
 	"sort"
 	"time"
 
+	ai_local "github.com/APIParkLab/APIPark/service/ai-local"
+
 	ai_balance "github.com/APIParkLab/APIPark/service/ai-balance"
 
 	"github.com/APIParkLab/APIPark/service/service"
@@ -63,9 +65,36 @@ type imlProviderModule struct {
 }
 
 func (i *imlProviderModule) Delete(ctx context.Context, id string) error {
-	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		// TODO: implement Delete
-		return nil
+	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		keys, err := i.aiKeyService.KeysByProvider(ctx, id)
+		if err != nil {
+			return err
+		}
+		err = i.aiKeyService.DeleteByProvider(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		err = i.providerService.Delete(ctx, id)
+		if err != nil {
+			return err
+		}
+		releases := make([]*gateway.DynamicRelease, 0, len(keys))
+		for _, key := range keys {
+			releases = append(releases, newKey(key))
+		}
+		err = i.syncGateway(ctx, cluster.DefaultClusterID, releases, false)
+		if err != nil {
+			return err
+		}
+		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+			{
+				BasicItem: &gateway.BasicItem{
+					ID:       id,
+					Resource: "ai-provider",
+				},
+			},
+		}, false)
 	})
 }
 
@@ -670,16 +699,38 @@ func (i *imlProviderModule) syncGateway(ctx context.Context, clusterId string, r
 var _ IAIAPIModule = (*imlAIApiModule)(nil)
 
 type imlAIApiModule struct {
-	aiAPIService    ai_api.IAPIService      `autowired:""`
-	aiAPIUseService ai_api.IAPIUseService   `autowired:""`
-	serviceService  service.IServiceService `autowired:""`
+	aiAPIService        ai_api.IAPIService          `autowired:""`
+	aiAPIUseService     ai_api.IAPIUseService       `autowired:""`
+	serviceService      service.IServiceService     `autowired:""`
+	aiLocalModelService ai_local.ILocalModelService `autowired:""`
 }
 
 func (i *imlAIApiModule) APIs(ctx context.Context, keyword string, providerId string, start int64, end int64, page int, pageSize int, sortCondition string, asc bool, models []string, serviceIds []string) ([]*ai_dto.APIItem, *ai_dto.Condition, int64, error) {
-	p, has := model_runtime.GetProvider(providerId)
-	if !has {
-		return nil, nil, 0, fmt.Errorf("ai provider not found")
+	modelItems := make([]*ai_dto.BasicInfo, 0)
+	if providerId == "ollama" {
+		items, err := i.aiLocalModelService.Search(ctx, "", nil, "update_at desc")
+		if err != nil {
+			return nil, nil, 0, err
+		}
+		modelItems = utils.SliceToSlice(items, func(e *ai_local.LocalModel) *ai_dto.BasicInfo {
+			return &ai_dto.BasicInfo{
+				Id:   e.Id,
+				Name: e.Name,
+			}
+		})
+	} else {
+		p, has := model_runtime.GetProvider(providerId)
+		if !has {
+			return nil, nil, 0, fmt.Errorf("ai provider not found")
+		}
+		modelItems = utils.SliceToSlice(p.Models(), func(e model_runtime.IModel) *ai_dto.BasicInfo {
+			return &ai_dto.BasicInfo{
+				Id:   e.ID(),
+				Name: e.ID(),
+			}
+		})
 	}
+
 	sortRule := "desc"
 	if asc {
 		sortRule = "asc"
@@ -699,12 +750,6 @@ func (i *imlAIApiModule) APIs(ctx context.Context, keyword string, providerId st
 
 	}
 
-	modelItems := utils.SliceToSlice(p.Models(), func(e model_runtime.IModel) *ai_dto.BasicInfo {
-		return &ai_dto.BasicInfo{
-			Id:   e.ID(),
-			Name: e.ID(),
-		}
-	})
 	condition := &ai_dto.Condition{Services: serviceItems, Models: modelItems}
 	switch sortCondition {
 	default:

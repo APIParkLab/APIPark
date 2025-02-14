@@ -23,6 +23,14 @@ type imlAIKeyService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlAIKeyService) DeleteByProvider(ctx context.Context, providerId string) error {
+	_, err := i.store.DeleteWhere(ctx, map[string]interface{}{"provider": providerId})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (i *imlAIKeyService) CountMapByProvider(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error) {
 	return i.store.CountByGroup(ctx, keyword, conditions, "provider")
 }
