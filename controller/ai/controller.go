@@ -9,7 +9,7 @@ import (
 )
 
 type IProviderController interface {
-	ConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ConfiguredProviderItem, *ai_dto.BackupProvider, error)
+	ConfiguredProviders(ctx *gin.Context, keyword string) ([]*ai_dto.ConfiguredProviderItem, error)
 	UnConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ProviderItem, error)
 	SimpleProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, error)
 	SimpleConfiguredProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error)
@@ -20,7 +20,7 @@ type IProviderController interface {
 	Disable(ctx *gin.Context, id string) error
 	UpdateProviderConfig(ctx *gin.Context, id string, input *ai_dto.UpdateConfig) error
 	UpdateProviderDefaultLLM(ctx *gin.Context, id string, input *ai_dto.UpdateLLM) error
-	Sort(ctx *gin.Context, input *ai_dto.Sort) error
+	//Sort(ctx *gin.Context, input *ai_dto.Sort) error
 }
 
 type IStatisticController interface {

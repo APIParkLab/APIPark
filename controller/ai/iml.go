@@ -17,12 +17,12 @@ type imlProviderController struct {
 	module ai.IProviderModule `autowired:""`
 }
 
-func (i *imlProviderController) Sort(ctx *gin.Context, input *ai_dto.Sort) error {
-	return i.module.Sort(ctx, input)
-}
+//func (i *imlProviderController) Sort(ctx *gin.Context, input *ai_dto.Sort) error {
+//	return i.module.Sort(ctx, input)
+//}
 
-func (i *imlProviderController) ConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ConfiguredProviderItem, *ai_dto.BackupProvider, error) {
-	return i.module.ConfiguredProviders(ctx)
+func (i *imlProviderController) ConfiguredProviders(ctx *gin.Context, keyword string) ([]*ai_dto.ConfiguredProviderItem, error) {
+	return i.module.ConfiguredProviders(ctx, keyword)
 }
 
 func (i *imlProviderController) UnConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ProviderItem, error) {
