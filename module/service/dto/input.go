@@ -1,5 +1,12 @@
 package service_dto
 
+type QuickCreateAIService struct {
+	Provider string `json:"provider"`
+	Model    string `json:"model"`
+	Config   string `json:"config"`
+	Team     string `json:"team"`
+}
+
 type CreateService struct {
 	Id           string   `json:"id"`
 	Name         string   `json:"name"`
@@ -12,7 +19,7 @@ type CreateService struct {
 	ApprovalType string   `json:"approval_type"`
 	Kind         string   `json:"service_kind"`
 	State        string   `json:"state"`
-	Provider     *string  `json:"provider" aocheck:"ai_provider"`
+	Provider     *string  `json:"provider"`
 	AsApp        *bool    `json:"as_app"`
 	AsServer     *bool    `json:"as_server"`
 }
