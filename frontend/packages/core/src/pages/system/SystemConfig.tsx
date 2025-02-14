@@ -428,7 +428,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
               label={$t('API 调用前缀')}
               name="prefix"
               extra={$t(
-                '作为服务内所有API的前缀，比如host/{service_name}/{api_path}，一旦保存无法修改'
+                '作为服务内所有API的前缀，比如host/{service_name}/{api_path}，影响较大，谨慎修改'
               )}
               rules={[
                 { required: true, whitespace: true },
@@ -440,7 +440,6 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
               <Input
                 prefix={onEdit ? '' : '/'}
                 className="w-INPUT_NORMAL"
-                disabled={onEdit}
                 placeholder={$t(PLACEHOLDER.input)}
               />
             </Form.Item>
