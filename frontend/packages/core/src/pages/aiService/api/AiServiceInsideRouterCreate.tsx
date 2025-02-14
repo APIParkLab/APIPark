@@ -147,10 +147,11 @@ const AiServiceInsideRouterCreate = () => {
                 ...prev,
                 provider: aiModel?.provider,
                 id: aiModel?.id,
-                config: aiModel.config
+                config: aiModel.config,
+                type: aiModel?.type
               }) as AiProviderDefaultConfig & { config: string }
           )
-          getDefaultModelConfig(aiModel?.provider)
+          aiModel?.type !== 'local' && getDefaultModelConfig(aiModel?.provider)
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
         }
