@@ -20,6 +20,7 @@ type IProviderController interface {
 	Disable(ctx *gin.Context, id string) error
 	UpdateProviderConfig(ctx *gin.Context, id string, input *ai_dto.UpdateConfig) error
 	UpdateProviderDefaultLLM(ctx *gin.Context, id string, input *ai_dto.UpdateLLM) error
+	Delete(ctx *gin.Context, id string) error
 	//Sort(ctx *gin.Context, input *ai_dto.Sort) error
 }
 
