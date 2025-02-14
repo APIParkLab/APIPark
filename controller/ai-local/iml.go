@@ -3,11 +3,14 @@ package ai_local
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"math"
 	"net/http"
 	"strings"
+
+	"gorm.io/gorm"
 
 	"github.com/APIParkLab/APIPark/module/router"
 
@@ -194,6 +197,14 @@ func (i *imlLocalModelController) DeployStart(ctx *gin.Context, input *ai_local_
 
 func (i *imlLocalModelController) initAILocalService(ctx context.Context, model string, teamID string) error {
 	err := i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		_, err := i.serviceModule.Get(ctx, model)
+		if err == nil {
+			return nil
+		} else {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return err
+			}
+		}
 		catalogueInfo, err := i.catalogueModule.DefaultCatalogue(ctx)
 		if err != nil {
 			return err
