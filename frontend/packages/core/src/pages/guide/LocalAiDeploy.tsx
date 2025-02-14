@@ -40,9 +40,10 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
         const tagList = data.models?.map((x: LocalModelItem) => {
           return { ...x, label: x.name, value: x.id }
         })
-        tagList.unshift({ id: 'default', name: 'default' })
-        form.setFieldValue('model', 'default')
         setTagList(tagList)
+        if (tagList.length) {
+          form.setFieldValue('model', tagList[0].id)
+        }
       }
     } else {
       message.error(msg || $t(RESPONSE_TIPS.error))
@@ -135,7 +136,7 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
           <div className="pl-[5px] flex flex-wrap">
             {modelList.length
               ? modelList
-                  .filter((item) => item.is_popular)
+                  .filter((item) => item.isPopular)
                   .map((item) => (
                     <span
                       key={item.id}
