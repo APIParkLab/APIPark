@@ -65,7 +65,7 @@ export type SimpleTeamItem = {
 }
 export type LocalModelItem = {
   id: string
-  is_popular: boolean
+  isPopular: boolean
   name: string
   size: string
 }

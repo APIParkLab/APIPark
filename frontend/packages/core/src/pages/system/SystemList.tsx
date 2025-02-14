@@ -137,15 +137,15 @@ const SystemList: FC = () => {
     setOpen(false)
   }
   const openLogsModal = (record: any) => {
-    const closeModal = () => {
+    const closeModal = (reload = true) => {
       modalInstance.destroy()
-      manualReloadTable()
+      reload && manualReloadTable()
     }
     const modalInstance = modal.confirm({
       title: $t('部署过程'),
       content: <ServiceDeployment record={record} closeModal={closeModal} />,
       footer: () => {
-        return <LogsFooter record={record} modalInstance={modalInstance} />
+        return <LogsFooter record={record} closeModal={closeModal} />
       },
       width: 600,
       okText: $t('确认'),
