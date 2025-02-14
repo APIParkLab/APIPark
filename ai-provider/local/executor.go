@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/ollama/ollama/progress"
 
@@ -19,9 +18,13 @@ var (
 // Pipeline 结构体，表示每个用户的管道
 type Pipeline struct {
 	id      string
-	channel chan string
+	channel chan PullMessage
 	ctx     context.Context
 	cancel  context.CancelFunc
+}
+
+func (p *Pipeline) Message() <-chan PullMessage {
+	return p.channel
 }
 
 // AsyncExecutor 结构体，管理不同模型的管道和任务队列
@@ -34,9 +37,10 @@ type AsyncExecutor struct {
 }
 
 type modelPipeline struct {
-	pipelines eosc.Untyped[string, *Pipeline]
 	ctx       context.Context
 	cancel    context.CancelFunc
+	pipelines eosc.Untyped[string, *Pipeline]
+	pullFn    PullCallback
 	maxSize   int
 }
 
@@ -57,6 +61,21 @@ func (m *modelPipeline) Set(id string, p *Pipeline) error {
 	}
 	m.pipelines.Set(id, p)
 	return nil
+}
+
+func (m *modelPipeline) AddPipeline(id string) (*Pipeline, error) {
+	ctx, cancel := context.WithCancel(m.ctx)
+	pipeline := &Pipeline{
+		ctx:     ctx,
+		cancel:  cancel,
+		id:      id,
+		channel: make(chan PullMessage, 10), // 带缓冲，防止阻塞
+	}
+	err := m.Set(id, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	return pipeline, nil
 }
 
 func (m *modelPipeline) Close() {
@@ -90,9 +109,16 @@ func newModelPipeline(ctx context.Context, maxSize int) *modelPipeline {
 
 // messageTask 结构体，包含模型名和消息内容
 type messageTask struct {
-	model   string
-	message string
-	status  string
+	message PullMessage
+}
+
+type PullMessage struct {
+	Model     string
+	Status    string
+	Digest    string
+	Total     int64
+	Completed int64
+	Msg       string
 }
 
 // NewAsyncExecutor 创建一个新的异步任务执行器
@@ -109,27 +135,18 @@ func NewAsyncExecutor(queueSize int) *AsyncExecutor {
 	return executor
 }
 
-// AddPipeline 为指定模型的用户创建一个管道
-func (e *AsyncExecutor) AddPipeline(model, id string) (*Pipeline, bool) {
+func (e *AsyncExecutor) GetModelPipeline(model string) (*modelPipeline, bool) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
-	hasModel := true
 	mp, ok := e.pipelines[model]
-	if !ok {
-		hasModel = false
-		mp = newModelPipeline(e.ctx, 100)
-		e.pipelines[model] = mp
-	}
-	ctx, cancel := context.WithCancel(mp.ctx)
-	pipeline := &Pipeline{
-		ctx:     ctx,
-		cancel:  cancel,
-		id:      id,
-		channel: make(chan string, 10), // 带缓冲，防止阻塞
-	}
-	mp.Set(id, pipeline)
-	return pipeline, hasModel
+	return mp, ok
+}
+
+func (e *AsyncExecutor) SetModelPipeline(model string, mp *modelPipeline) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.pipelines[model] = mp
 }
 
 // ClosePipeline 关闭管道并移除
@@ -159,18 +176,22 @@ func (e *AsyncExecutor) CloseModelPipeline(model string) {
 func (e *AsyncExecutor) StartMessageDistributor() {
 	go func() {
 		for task := range e.msgQueue {
-			if task.status == "error" || task.status == "success" {
-				e.DistributeToModelPipelines(task.model, task.message)
-				e.CloseModelPipeline(task.model)
+			msg := task.message
+			e.DistributeToModelPipelines(msg.Model, msg)
+			if msg.Status == "error" || msg.Status == "success" {
+				mp, has := e.GetModelPipeline(msg.Model)
+				if has && mp.pullFn != nil {
+					mp.pullFn(msg)
+				}
+				e.CloseModelPipeline(msg.Model)
 				continue
 			}
-			e.DistributeToModelPipelines(task.model, task.message)
 		}
 	}()
 }
 
 // DistributeToModelPipelines 仅将消息分发给指定模型的管道
-func (e *AsyncExecutor) DistributeToModelPipelines(model, message string) {
+func (e *AsyncExecutor) DistributeToModelPipelines(model string, msg PullMessage) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	pipelines, ok := e.pipelines[model]
@@ -179,15 +200,26 @@ func (e *AsyncExecutor) DistributeToModelPipelines(model, message string) {
 	}
 	for _, pipeline := range pipelines.List() {
 		select {
-		case pipeline.channel <- message:
+		case pipeline.channel <- msg:
 		default:
 			// 如果管道已满，跳过
 		}
 	}
 }
 
-func PullModel(model string, id string) (*Pipeline, error) {
-	p, has := taskExecutor.AddPipeline(model, id)
+type PullCallback func(msg PullMessage) error
+
+func PullModel(model string, id string, fn PullCallback) (*Pipeline, error) {
+	mp, has := taskExecutor.GetModelPipeline(model)
+	if !has {
+		mp = newModelPipeline(taskExecutor.ctx, 100)
+		mp.pullFn = fn
+		taskExecutor.SetModelPipeline(model, mp)
+	}
+	p, err := mp.AddPipeline(id)
+	if err != nil {
+		return nil, err
+	}
 	if !has {
 		var status string
 		bars := make(map[string]*progress.Bar)
@@ -201,38 +233,62 @@ func PullModel(model string, id string) (*Pipeline, error) {
 				bar.Set(resp.Completed)
 
 				taskExecutor.msgQueue <- messageTask{
-					model:   model,
-					message: bar.String(),
-					status:  resp.Status,
+					message: PullMessage{
+						Model:     model,
+						Digest:    resp.Digest,
+						Total:     resp.Total,
+						Completed: resp.Completed,
+						Msg:       bar.String(),
+						Status:    resp.Status,
+					},
 				}
 			} else if status != resp.Status {
 				taskExecutor.msgQueue <- messageTask{
-					model:   model,
-					message: resp.Status,
-					status:  resp.Status,
+					message: PullMessage{
+						Model:     model,
+						Digest:    resp.Digest,
+						Total:     resp.Total,
+						Completed: resp.Completed,
+						Msg:       status,
+						Status:    resp.Status,
+					},
 				}
 			}
 
 			return nil
 		}
 		go func() {
-			err := client.Pull(context.Background(), &api.PullRequest{Model: model}, fn)
+			err = client.Pull(mp.ctx, &api.PullRequest{Model: model}, fn)
 			if err != nil {
 				taskExecutor.msgQueue <- messageTask{
-					model:   model,
-					message: err.Error(),
-					status:  "error",
+					message: PullMessage{
+						Model:     model,
+						Status:    "error",
+						Digest:    "",
+						Total:     0,
+						Completed: 0,
+						Msg:       err.Error(),
+					},
 				}
 			}
-
 		}()
 
 	}
+
 	return p, nil
 }
 
 func StopPull(model string) {
 	taskExecutor.CloseModelPipeline(model)
+}
+
+func CancelPipeline(model string, id string) {
+	taskExecutor.ClosePipeline(model, id)
+}
+
+func RemoveModel(model string) error {
+	taskExecutor.CloseModelPipeline(model)
+	return client.Delete(context.Background(), &api.DeleteRequest{Model: model})
 }
 
 func ModelsInstalled() ([]Model, error) {
@@ -259,23 +315,4 @@ func ModelsInstalled() ([]Model, error) {
 		})
 	}
 	return models, nil
-}
-
-type Model struct {
-	Name       string       `json:"name"`
-	Model      string       `json:"model"`
-	ModifiedAt time.Time    `json:"modified_at"`
-	Size       int64        `json:"size"`
-	Digest     string       `json:"digest"`
-	Details    ModelDetails `json:"details,omitempty"`
-}
-
-// ModelDetails provides details about a model.
-type ModelDetails struct {
-	ParentModel       string   `json:"parent_model"`
-	Format            string   `json:"format"`
-	Family            string   `json:"family"`
-	Families          []string `json:"families"`
-	ParameterSize     string   `json:"parameter_size"`
-	QuantizationLevel string   `json:"quantization_level"`
 }

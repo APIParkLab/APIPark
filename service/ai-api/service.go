@@ -14,6 +14,7 @@ type IAPIService interface {
 	universally.IServiceEdit[Edit]
 	universally.IServiceDelete
 	CountMapByProvider(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error)
+	CountMapByModel(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error)
 }
 
 type IAPIUseService interface {

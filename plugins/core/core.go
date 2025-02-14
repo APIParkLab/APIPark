@@ -3,6 +3,8 @@ package core
 import (
 	"net/http"
 
+	ai_local "github.com/APIParkLab/APIPark/controller/ai-local"
+
 	ai_key "github.com/APIParkLab/APIPark/controller/ai-key"
 
 	"github.com/APIParkLab/APIPark/controller/log"
@@ -78,6 +80,7 @@ type plugin struct {
 	aiAPIController             ai_api.IAPIController                              `autowired:""`
 	aiStatisticController       ai.IStatisticController                            `autowired:""`
 	aiKeyController             ai_key.IKeyController                              `autowired:""`
+	aiLocalController           ai_local.ILocalModelController                     `autowired:""`
 	apiDocController            router.IAPIDocController                           `autowired:""`
 	subscribeController         subscribe.ISubscribeController                     `autowired:""`
 	strategyController          strategy.IStrategyController                       `autowired:""`
@@ -118,6 +121,7 @@ func (p *plugin) OnComplete() {
 	p.apis = append(p.apis, p.aiKeyApis()...)
 	p.apis = append(p.apis, p.strategyApis()...)
 	p.apis = append(p.apis, p.logApis()...)
+	p.apis = append(p.apis, p.aiLocalApis()...)
 }
 
 func (p *plugin) Name() string {
