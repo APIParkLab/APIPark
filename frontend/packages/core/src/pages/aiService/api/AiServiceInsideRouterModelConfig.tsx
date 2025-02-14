@@ -94,6 +94,7 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
     }
 
     useEffect(() => {
+      setModelType(entity.type as 'online' | 'local')
       if (entity.type === 'online') {
         getProviderList()
         getLlmList(entity.provider)
