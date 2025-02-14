@@ -13,12 +13,7 @@ func genOpenAPI3Template(title string, description string) *openapi3.T {
 		Description: description,
 		Version:     "beta",
 	}
-	//result.Tags = openapi3.Tags{
-	//	{
-	//		Name:        title,
-	//		Description: description,
-	//	},
-	//}
+
 	result.Components = components
 	result.Paths = new(openapi3.Paths)
 	return result

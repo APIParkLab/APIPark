@@ -62,6 +62,7 @@ type Service struct {
 	AsServer     bool           `json:"as_server"`
 	AsApp        bool           `json:"as_app"`
 	ServiceKind  string         `json:"service_kind"`
+	State        string         `json:"state"`
 }
 
 type App struct {

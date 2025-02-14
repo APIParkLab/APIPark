@@ -23,6 +23,10 @@ type imlAPIService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlAPIService) CountMapByModel(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error) {
+	return i.store.CountByGroup(ctx, keyword, conditions, "model")
+}
+
 func (i *imlAPIService) CountMapByProvider(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error) {
 	return i.store.CountByGroup(ctx, keyword, conditions, "provider")
 }
@@ -30,7 +34,7 @@ func (i *imlAPIService) CountMapByProvider(ctx context.Context, keyword string, 
 func (i *imlAPIService) OnComplete() {
 	i.IServiceGet = universally.NewGetSoftDelete[API, api.AiAPIInfo](i.store, FromEntity)
 	i.IServiceCreate = universally.NewCreatorSoftDelete[Create, api.AiAPIInfo](i.store, "ai_api_info", createEntityHandler, uniquestHandler, labelHandler)
-	i.IServiceEdit = universally.NewEdit[Edit, api.AiAPIInfo](i.store, updateHandler)
+	i.IServiceEdit = universally.NewEdit[Edit, api.AiAPIInfo](i.store, updateHandler, labelHandler)
 	i.IServiceDelete = universally.NewSoftDelete[api.AiAPIInfo](i.store)
 }
 
@@ -54,6 +58,7 @@ func createEntityHandler(i *Create) *api.AiAPIInfo {
 		Model:            i.Model,
 		Provider:         i.Provider,
 		Disable:          i.Disable,
+		Type:             i.Type,
 		CreateAt:         now,
 		UpdateAt:         now,
 		AdditionalConfig: string(cfg),
@@ -90,6 +95,9 @@ func updateHandler(e *api.AiAPIInfo, i *Edit) {
 	}
 	if i.UseToken != nil {
 		e.UseToken = *i.UseToken
+	}
+	if i.Type != nil {
+		e.Type = *i.Type
 	}
 	e.UpdateAt = time.Now()
 }

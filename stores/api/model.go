@@ -86,6 +86,7 @@ type AiAPIInfo struct {
 	UpdateAt         time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:更新时间"`
 	AdditionalConfig string    `gorm:"type:text;null;column:additional_config;comment:额外配置"`
 	UseToken         int       `gorm:"type:int(11);not null;column:use_token;comment:使用token"`
+	Type             int       `gorm:"type:tinyint(1);not null;column:type;comment:类型 0:online api 1:local api"`
 	Disable          bool      `gorm:"type:tinyint(1);not null;column:disable;comment:是否禁用 0:否 1:是"`
 	IsDelete         bool      `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除 0:否 1:是"`
 }
