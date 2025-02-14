@@ -256,7 +256,7 @@ const LoadBalancingPage = () => {
         valueType: 'option',
         render: (_: React.ReactNode, entity: any) => [
           <TableBtnWithPermission
-            access=""
+            access="system.settings.ai_balance.delete"
             key="delete"
             btnType="delete"
             onClick={() => handleDelete(entity.id as string)}
@@ -285,7 +285,7 @@ const LoadBalancingPage = () => {
             ref={pageListRef}
             rowKey="id"
             afterNewBtn={[
-              <WithPermission key="removeFromDepPermission" access={``}>
+              <WithPermission key="removeFromDepPermission" access="system.settings.ai_balance.add">
                 <Button className="mr-btnbase" type="primary" key="removeFromDep" onClick={() => addModel()}>
                   {$t('添加模型')}
                 </Button>
