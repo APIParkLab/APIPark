@@ -179,6 +179,7 @@ func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string
 				Id:       model,
 				Name:     model,
 				Provider: names[0],
+				State:    ai_local_dto.LocalModelStateDeploying.Int(),
 			})
 
 		} else {
