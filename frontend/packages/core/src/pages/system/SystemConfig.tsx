@@ -74,9 +74,10 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
 
   const getProviderOptionList = () => {
     setProviderOptionList([])
-    fetchData<BasicResponse<{ providers: SimpleAiProviderItem[] }>>('simple/ai/providers', {
+    fetchData<BasicResponse<{ providers: SimpleAiProviderItem[] }>>('simple/ai/providers/configured', {
       method: 'GET',
-      eoTransformKeys: []
+      eoTransformKeys: [],
+      eoParams: { all: true}
     }).then(response => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
