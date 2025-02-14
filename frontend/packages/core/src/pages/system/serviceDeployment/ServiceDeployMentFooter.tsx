@@ -47,7 +47,7 @@ export const LogsFooter = (props: any) => {
         return new Promise((resolve, reject) => {
           fetchData<BasicResponse<any>>('model/local', {
             method: 'DELETE',
-            eoBody: { model: record.id }
+            eoParams: { model: record.id }
           })
             .then((response: BasicResponse<any>) => {
               const { code, msg } = response
