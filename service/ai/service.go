@@ -10,6 +10,7 @@ import (
 
 type IProviderService interface {
 	universally.IServiceGet[Provider]
+	universally.IServiceDelete
 	Save(ctx context.Context, id string, cfg *SetProvider) error
 	MaxPriority(ctx context.Context) (int, error)
 }

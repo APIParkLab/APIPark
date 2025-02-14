@@ -17,6 +17,7 @@ var _ IProviderService = (*imlProviderService)(nil)
 
 type imlProviderService struct {
 	universally.IServiceGet[Provider]
+	universally.IServiceDelete
 	store ai.IProviderStore `autowired:""`
 }
 
@@ -102,5 +103,6 @@ func (i *imlProviderService) GetLabels(ctx context.Context, ids ...string) map[s
 
 func (i *imlProviderService) OnComplete() {
 	i.IServiceGet = universally.NewGet[Provider, ai.Provider](i.store, FromEntity)
+	i.IServiceDelete = universally.NewDelete[ai.Provider](i.store)
 	auto.RegisterService("ai_provider", i)
 }

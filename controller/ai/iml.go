@@ -17,6 +17,10 @@ type imlProviderController struct {
 	module ai.IProviderModule `autowired:""`
 }
 
+func (i *imlProviderController) Delete(ctx *gin.Context, id string) error {
+	return i.module.Delete(ctx, id)
+}
+
 //func (i *imlProviderController) Sort(ctx *gin.Context, input *ai_dto.Sort) error {
 //	return i.module.Sort(ctx, input)
 //}
