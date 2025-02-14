@@ -53,16 +53,16 @@ func (i *imlBalanceService) SortBefore(ctx context.Context, originID string, tar
 	fn := func(priority int) int {
 		return priority + 1
 	}
-	sql := "sort < ? and sort >= ?"
+	sql := "priority < ? and priority >= ?"
 	if originKeySort < targetKeySort {
 		// 如果原始Key在目标Key之前，中间的key往前移动，原始Key移动到`targetKeySort - 1`位置
-		sql = "sort > ? and sort < ?"
+		sql = "priority > ? and priority < ?"
 		originKey.Priority = targetKeySort - 1
 		fn = func(priority int) int {
 			return priority - 1
 		}
 	}
-	list, err := i.store.ListQuery(ctx, sql, []interface{}{originKeySort, targetKeySort}, "sort asc")
+	list, err := i.store.ListQuery(ctx, sql, []interface{}{originKeySort, targetKeySort}, "priority asc")
 	if err != nil {
 		return nil, err
 	}
@@ -102,16 +102,16 @@ func (i *imlBalanceService) SortAfter(ctx context.Context, originID string, targ
 	fn := func(priority int) int {
 		return priority + 1
 	}
-	sql := "sort < ? and sort > ?"
+	sql := "priority < ? and priority > ?"
 	if originKeySort < targetKeySort {
 		// 如果原始Key在目标Key之前，中间的Key往前移动，原始Key移动到`targetKeySort`位置
-		sql = "sort > ? and sort <= ?"
+		sql = "priority > ? and priority <= ?"
 		originKey.Priority = targetKeySort
 		fn = func(priority int) int {
 			return priority - 1
 		}
 	}
-	list, err := i.store.ListQuery(ctx, sql, []interface{}{originKeySort, targetKeySort}, "sort asc")
+	list, err := i.store.ListQuery(ctx, sql, []interface{}{originKeySort, targetKeySort}, "priority asc")
 	if err != nil {
 		return nil, err
 	}

@@ -36,3 +36,12 @@ func (p *plugin) aiKeyApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/ai/resource/key/sort", []string{"context", "query:provider", "body"}, nil, p.aiKeyController.Sort),
 	}
 }
+
+func (p *plugin) aiBalanceAPIs() []pm3.Api {
+	return []pm3.Api{
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/ai/balances", []string{"context", "query:keyword"}, []string{"list"}, p.aiBalanceController.List),
+		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/ai/balance/sort", []string{"context", "body"}, nil, p.aiBalanceController.Sort),
+		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/ai/balance", []string{"context", "body"}, nil, p.aiBalanceController.Create),
+		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/ai/balance", []string{"context", "query:id"}, nil, p.aiBalanceController.Delete),
+	}
+}

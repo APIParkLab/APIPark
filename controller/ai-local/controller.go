@@ -17,6 +17,7 @@ type ILocalModelController interface {
 	RemoveModel(ctx *gin.Context, model string) error
 	Update(ctx *gin.Context, model string, input *ai_local_dto.Update) error
 	State(ctx *gin.Context, model string) (*ai_local_dto.DeployState, *ai_local_dto.ModelInfo, error)
+	SimpleList(ctx *gin.Context) ([]*ai_local_dto.SimpleItem, error)
 }
 
 func init() {

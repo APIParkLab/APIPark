@@ -58,12 +58,19 @@ func FromLocalModelState(state int) LocalModelState {
 	}
 }
 
+type SimpleItem struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
 type LocalModelItem struct {
-	Id         string          `json:"id"`
-	Name       string          `json:"name"`
-	State      LocalModelState `json:"state"`
-	APICount   int64           `json:"api_count"`
-	UpdateTime auto.TimeLabel  `json:"update_time"`
+	Id       string          `json:"id"`
+	Name     string          `json:"name"`
+	State    LocalModelState `json:"state"`
+	APICount int64           `json:"api_count"`
+
+	UpdateTime auto.TimeLabel `json:"update_time"`
+	CanDelete  bool           `json:"can_delete"`
 }
 
 type LocalModelPackageItem struct {

@@ -2,8 +2,13 @@ package ai_balance
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
+
+	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
+
+	"gorm.io/gorm"
 
 	ai_key "github.com/APIParkLab/APIPark/service/ai-key"
 
@@ -36,18 +41,28 @@ type imlBalanceModule struct {
 func (i *imlBalanceModule) Create(ctx context.Context, input *ai_balance_dto.Create) error {
 	priority, err := i.balanceService.MaxPriority(ctx)
 	if err != nil {
-		return err
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+		priority = 0
 	}
 	if input.Id == "" {
 		input.Id = uuid.NewString()
 	}
 	providerName := ""
 	modelName := ""
-	// TODO: 名称进行优化
 	switch input.Type {
 	case ai_balance_dto.ModelTypeOnline:
+		p, has := model_runtime.GetProvider(input.Provider)
+		if !has {
+			return fmt.Errorf("provider not found")
+		}
+		providerName = p.Name()
+		modelName = input.Model
 	case ai_balance_dto.ModelTypeLocal:
-
+		input.Provider = "ollama"
+		providerName = "Ollama"
+		modelName = input.Model
 	}
 	return i.balanceService.Create(ctx, &ai_balance.Create{
 		Id:           input.Id,
@@ -85,8 +100,8 @@ func (i *imlBalanceModule) Sort(ctx context.Context, input *ai_balance_dto.Sort)
 	return nil
 }
 
-func (i *imlBalanceModule) List(ctx context.Context) ([]*ai_balance_dto.Item, error) {
-	list, err := i.balanceService.List(ctx)
+func (i *imlBalanceModule) List(ctx context.Context, keyword string) ([]*ai_balance_dto.Item, error) {
+	list, err := i.balanceService.Search(ctx, keyword, nil, "priority asc")
 	if err != nil {
 		return nil, err
 	}

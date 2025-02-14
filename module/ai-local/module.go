@@ -20,6 +20,7 @@ type ILocalModelModule interface {
 	Enable(ctx context.Context, model string) error
 	Disable(ctx context.Context, model string) error
 	ModelState(ctx context.Context, model string) (*ai_local_dto.DeployState, *ai_local_dto.ModelInfo, error)
+	SimpleList(ctx context.Context) ([]*ai_local_dto.SimpleItem, error)
 }
 
 func init() {

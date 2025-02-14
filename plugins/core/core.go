@@ -3,6 +3,8 @@ package core
 import (
 	"net/http"
 
+	ai_balance "github.com/APIParkLab/APIPark/controller/ai-balance"
+
 	ai_local "github.com/APIParkLab/APIPark/controller/ai-local"
 
 	ai_key "github.com/APIParkLab/APIPark/controller/ai-key"
@@ -80,6 +82,7 @@ type plugin struct {
 	aiAPIController             ai_api.IAPIController                              `autowired:""`
 	aiStatisticController       ai.IStatisticController                            `autowired:""`
 	aiKeyController             ai_key.IKeyController                              `autowired:""`
+	aiBalanceController         ai_balance.IBalanceController                      `autowired:""`
 	aiLocalController           ai_local.ILocalModelController                     `autowired:""`
 	apiDocController            router.IAPIDocController                           `autowired:""`
 	subscribeController         subscribe.ISubscribeController                     `autowired:""`
@@ -122,6 +125,7 @@ func (p *plugin) OnComplete() {
 	p.apis = append(p.apis, p.strategyApis()...)
 	p.apis = append(p.apis, p.logApis()...)
 	p.apis = append(p.apis, p.aiLocalApis()...)
+	p.apis = append(p.apis, p.aiBalanceAPIs()...)
 }
 
 func (p *plugin) Name() string {
