@@ -48,7 +48,7 @@ const RestAIDeploy = forwardRef<RestAIDeployHandle, any>((props: any, ref: any) 
     return new Promise((resolve, reject) => {
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('type', file.type)
+      formData.append('type', 'swagger')
       formData.append('team', form.getFieldValue('team'))
       fetchData<BasicResponse<{ teams: SimpleTeamItem[] }>>('quick/service/rest', {
         method: 'POST',
