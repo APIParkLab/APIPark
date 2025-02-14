@@ -8,9 +8,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/APIParkLab/APIPark/service/service"
+	ai_balance "github.com/APIParkLab/APIPark/service/ai-balance"
 
-	ai_key_dto "github.com/APIParkLab/APIPark/module/ai-key/dto"
+	"github.com/APIParkLab/APIPark/service/service"
 
 	ai_key "github.com/APIParkLab/APIPark/service/ai-key"
 
@@ -54,11 +54,19 @@ func newKey(key *ai_key.Key) *gateway.DynamicRelease {
 var _ IProviderModule = (*imlProviderModule)(nil)
 
 type imlProviderModule struct {
-	providerService ai.IProviderService     `autowired:""`
-	clusterService  cluster.IClusterService `autowired:""`
-	aiAPIService    ai_api.IAPIService      `autowired:""`
-	aiKeyService    ai_key.IKeyService      `autowired:""`
-	transaction     store.ITransaction      `autowired:""`
+	providerService  ai.IProviderService        `autowired:""`
+	clusterService   cluster.IClusterService    `autowired:""`
+	aiAPIService     ai_api.IAPIService         `autowired:""`
+	aiKeyService     ai_key.IKeyService         `autowired:""`
+	aiBalanceService ai_balance.IBalanceService `autowired:""`
+	transaction      store.ITransaction         `autowired:""`
+}
+
+func (i *imlProviderModule) Delete(ctx context.Context, id string) error {
+	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		// TODO: implement Delete
+		return nil
+	})
 }
 
 func (i *imlProviderModule) SimpleProvider(ctx context.Context, id string) (*ai_dto.SimpleProvider, error) {
@@ -75,83 +83,87 @@ func (i *imlProviderModule) SimpleProvider(ctx context.Context, id string) (*ai_
 	}, nil
 }
 
-func (i *imlProviderModule) Sort(ctx context.Context, input *ai_dto.Sort) error {
-	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		list, err := i.providerService.List(ctx)
-		if err != nil {
-			return err
-		}
-		providerMap := utils.SliceToMap(list, func(e *ai.Provider) string {
-			return e.Id
-		})
-		releases := make([]*gateway.DynamicRelease, 0, len(list))
-		offlineReleases := make([]*gateway.DynamicRelease, 0, len(list))
-		for index, id := range input.Providers {
-			p, has := model_runtime.GetProvider(id)
-			if !has {
-				continue
-			}
+//func (i *imlProviderModule) Sort(ctx context.Context, input *ai_dto.Sort) error {
+//	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+//		list, err := i.providerService.List(ctx)
+//		if err != nil {
+//			return err
+//		}
+//		providerMap := utils.SliceToMap(list, func(e *ai.Provider) string {
+//			return e.Id
+//		})
+//		releases := make([]*gateway.DynamicRelease, 0, len(list))
+//		offlineReleases := make([]*gateway.DynamicRelease, 0, len(list))
+//		for index, id := range input.Providers {
+//			p, has := model_runtime.GetProvider(id)
+//			if !has {
+//				continue
+//			}
+//
+//			l, has := providerMap[id]
+//			if !has {
+//				continue
+//			}
+//			model, has := p.GetModel(l.DefaultLLM)
+//			if !has {
+//				continue
+//			}
+//			priority := index + 1
+//			err = i.providerService.Save(txCtx, id, &ai.SetProvider{
+//				Priority: &priority,
+//			})
+//			if err != nil {
+//				return err
+//			}
+//			if ai_dto.ToProviderStatus(l.Status) == ai_dto.ProviderDisabled {
+//				offlineReleases = append(offlineReleases, &gateway.DynamicRelease{
+//					BasicItem: &gateway.BasicItem{
+//						ID:       l.Id,
+//						Resource: "ai-provider",
+//					}})
+//			} else {
+//				cfg := make(map[string]interface{})
+//				cfg["provider"] = l.Id
+//				cfg["model"] = l.DefaultLLM
+//				cfg["model_config"] = model.DefaultConfig()
+//				cfg["priority"] = l.Priority
+//				cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
+//				releases = append(releases, &gateway.DynamicRelease{
+//					BasicItem: &gateway.BasicItem{
+//						ID:          l.Id,
+//						Description: l.Name,
+//						Resource:    "ai-provider",
+//						Version:     l.UpdateAt.Format("20060102150405"),
+//						MatchLabels: map[string]string{
+//							"module": "ai-provider",
+//						},
+//					},
+//					Attr: cfg,
+//				})
+//			}
+//		}
+//		err = i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
+//		if err != nil {
+//			return err
+//		}
+//		return i.syncGateway(ctx, cluster.DefaultClusterID, offlineReleases, false)
+//
+//	})
+//}
 
-			l, has := providerMap[id]
-			if !has {
-				continue
-			}
-			model, has := p.GetModel(l.DefaultLLM)
-			if !has {
-				continue
-			}
-			priority := index + 1
-			err = i.providerService.Save(txCtx, id, &ai.SetProvider{
-				Priority: &priority,
-			})
-			if err != nil {
-				return err
-			}
-			if ai_dto.ToProviderStatus(l.Status) == ai_dto.ProviderDisabled {
-				offlineReleases = append(offlineReleases, &gateway.DynamicRelease{
-					BasicItem: &gateway.BasicItem{
-						ID:       l.Id,
-						Resource: "ai-provider",
-					}})
-			} else {
-				cfg := make(map[string]interface{})
-				cfg["provider"] = l.Id
-				cfg["model"] = l.DefaultLLM
-				cfg["model_config"] = model.DefaultConfig()
-				cfg["priority"] = l.Priority
-				cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
-				releases = append(releases, &gateway.DynamicRelease{
-					BasicItem: &gateway.BasicItem{
-						ID:          l.Id,
-						Description: l.Name,
-						Resource:    "ai-provider",
-						Version:     l.UpdateAt.Format("20060102150405"),
-						MatchLabels: map[string]string{
-							"module": "ai-provider",
-						},
-					},
-					Attr: cfg,
-				})
-			}
-		}
-		err = i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
-		if err != nil {
-			return err
-		}
-		return i.syncGateway(ctx, cluster.DefaultClusterID, offlineReleases, false)
-
-	})
-}
-
-func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.ConfiguredProviderItem, *ai_dto.BackupProvider, error) {
+func (i *imlProviderModule) ConfiguredProviders(ctx context.Context, keyword string) ([]*ai_dto.ConfiguredProviderItem, error) {
 	// 获取已配置的AI服务商
-	list, err := i.providerService.List(ctx)
+	list, err := i.providerService.Search(ctx, keyword, nil, "update_at")
 	if err != nil {
-		return nil, nil, fmt.Errorf("get provider list error:%v", err)
+		return nil, fmt.Errorf("get provider list error:%v", err)
 	}
 	aiAPIMap, err := i.aiAPIService.CountMapByProvider(ctx, "", nil)
 	if err != nil {
-		return nil, nil, fmt.Errorf("get ai api count error:%v", err)
+		return nil, fmt.Errorf("get ai api count error:%v", err)
+	}
+	keyMap, err := i.aiKeyService.CountMapByProvider(ctx, "", nil)
+	if err != nil {
+		return nil, fmt.Errorf("get ai key count error:%v", err)
 	}
 	providers := make([]*ai_dto.ConfiguredProviderItem, 0, len(list))
 	for _, l := range list {
@@ -159,7 +171,7 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.
 		_, err = i.aiKeyService.DefaultKey(ctx, l.Id)
 		if err != nil {
 			if !errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil, nil, err
+				return nil, err
 			}
 			err = i.aiKeyService.Create(ctx, &ai_key.Create{
 				ID:         l.Id,
@@ -173,7 +185,7 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.
 				Default:    true,
 			})
 			if err != nil {
-				return nil, nil, fmt.Errorf("create default key error:%v", err)
+				return nil, fmt.Errorf("create default key error:%v", err)
 			}
 		}
 
@@ -181,29 +193,6 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.
 		if !has {
 			continue
 		}
-		keys, err := i.aiKeyService.KeysByProvider(ctx, l.Id)
-		if err != nil {
-			return nil, nil, fmt.Errorf("get provider keys error:%v", err)
-		}
-
-		keysStatus := make([]*ai_dto.KeyStatus, 0, len(keys))
-		for _, k := range keys {
-			status := ai_key_dto.ToKeyStatus(k.Status)
-			switch status {
-			case ai_key_dto.KeyNormal, ai_key_dto.KeyDisable, ai_key_dto.KeyError:
-			default:
-				status = ai_key_dto.KeyError
-			}
-			keysStatus = append(keysStatus, &ai_dto.KeyStatus{
-				Id:       k.ID,
-				Name:     k.Name,
-				Status:   status.String(),
-				Priority: k.Priority,
-			})
-		}
-		sort.Slice(keysStatus, func(i, j int) bool {
-			return keysStatus[i].Priority < keysStatus[j].Priority
-		})
 
 		providers = append(providers, &ai_dto.ConfiguredProviderItem{
 			Id:         l.Id,
@@ -212,34 +201,12 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context) ([]*ai_dto.
 			DefaultLLM: l.DefaultLLM,
 			Status:     ai_dto.ToProviderStatus(l.Status),
 			APICount:   aiAPIMap[l.Id],
-			KeyCount:   len(keysStatus),
-			KeyStatus:  keysStatus,
-			Priority:   l.Priority,
+			KeyCount:   keyMap[l.Id],
+			CanDelete:  len(list) > 1,
 		})
 	}
-	sort.Slice(providers, func(i, j int) bool {
-		if providers[i].Priority != providers[j].Priority {
-			if providers[i].Priority == 0 {
-				return false
-			}
-			if providers[j].Priority == 0 {
-				return true
-			}
-			return providers[i].Priority < providers[j].Priority
-		}
-		return providers[i].Name < providers[j].Name
-	})
-	var backup *ai_dto.BackupProvider
-	for _, p := range providers {
-		if p.Status == ai_dto.ProviderEnabled {
-			backup = &ai_dto.BackupProvider{
-				Id:   p.Id,
-				Name: p.Name,
-			}
-			break
-		}
-	}
-	return providers, backup, nil
+
+	return providers, nil
 }
 
 func (i *imlProviderModule) SimpleProviders(ctx context.Context) ([]*ai_dto.SimpleProviderItem, error) {
@@ -388,13 +355,7 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 	if !has {
 		return nil, fmt.Errorf("ai provider not found")
 	}
-	maxPriority, err := i.providerService.MaxPriority(ctx)
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, err
-		}
-	}
-	maxPriority = maxPriority + 1
+
 	info, err := i.providerService.Get(ctx, id)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -412,7 +373,7 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 			DefaultLLM:       defaultLLM.ID(),
 			DefaultLLMConfig: defaultLLM.Logo(),
 			Status:           ai_dto.ProviderDisabled,
-			Priority:         maxPriority,
+			//Priority:         maxPriority,
 		}, nil
 	}
 	defaultLLM, has := p.GetModel(info.DefaultLLM)
@@ -423,9 +384,9 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		}
 		defaultLLM = model
 	}
-	if info.Priority == 0 {
-		info.Priority = maxPriority
-	}
+	//if info.Priority == 0 {
+	//	info.Priority = maxPriority
+	//}
 
 	return &ai_dto.Provider{
 		Id:               info.Id,
@@ -434,9 +395,9 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		GetAPIKeyUrl:     p.HelpUrl(),
 		DefaultLLM:       defaultLLM.ID(),
 		DefaultLLMConfig: defaultLLM.DefaultConfig(),
-		Priority:         info.Priority,
-		Status:           ai_dto.ToProviderStatus(info.Status),
-		Configured:       true,
+		//Priority:         info.Priority,
+		Status:     ai_dto.ToProviderStatus(info.Status),
+		Configured: true,
 	}, nil
 }
 
