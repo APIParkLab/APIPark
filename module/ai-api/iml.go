@@ -107,6 +107,7 @@ func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_a
 		if err != nil {
 			return err
 		}
+
 		return i.aiAPIService.Create(ctx, &ai_api.Create{
 			ID:          input.Id,
 			Name:        input.Name,
@@ -118,6 +119,7 @@ func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_a
 			Retry:       input.Retry,
 			Model:       input.AiModel.Id,
 			Provider:    input.AiModel.Provider,
+			Type:        ai_api_dto.ModelType(input.AiModel.Type).Int(),
 			AdditionalConfig: map[string]interface{}{
 				"ai_prompt": input.AiPrompt,
 				"ai_model":  input.AiModel,
@@ -163,6 +165,7 @@ func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string,
 		if input.AiModel != nil {
 			apiInfo.AdditionalConfig["ai_model"] = input.AiModel
 		}
+		typ := ai_api_dto.ModelType(input.AiModel.Type).Int()
 		return i.aiAPIService.Save(ctx, apiId, &ai_api.Edit{
 			Name:             input.Name,
 			Path:             input.Path,
@@ -171,6 +174,7 @@ func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string,
 			Retry:            input.Retry,
 			Model:            modelId,
 			Provider:         providerId,
+			Type:             &typ,
 			AdditionalConfig: &apiInfo.AdditionalConfig,
 			Disable:          input.Disable,
 		})

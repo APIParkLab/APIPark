@@ -119,6 +119,7 @@ type Service struct {
 	Kind             Kind
 	Catalogue        string
 	AdditionalConfig map[string]string
+	State            int
 	AsServer         bool
 	AsApp            bool
 	ApprovalType     ApprovalType
@@ -144,6 +145,7 @@ func FromEntity(e *service.Service) *Service {
 		ApprovalType:     ToApprovalType(e.ApprovalType),
 		AsServer:         e.AsServer,
 		AsApp:            e.AsApp,
+		State:            e.State,
 		CreateTime:       e.CreateAt,
 		UpdateTime:       e.UpdateAt,
 		AdditionalConfig: additionalConfig,
@@ -162,6 +164,7 @@ type Create struct {
 	Catalogue        string
 	AdditionalConfig map[string]string
 	ApprovalType     ApprovalType
+	State            int
 	AsServer         bool
 	AsApp            bool
 }
@@ -174,6 +177,7 @@ type Edit struct {
 	Catalogue        *string
 	Logo             *string
 	AdditionalConfig *map[string]string
+	State            *int
 	ApprovalType     *ApprovalType
 }
 

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/APIParkLab/APIPark/service/service"
+
 	"github.com/eolinker/go-common/auto"
 
 	ai_api "github.com/APIParkLab/APIPark/service/ai-api"
@@ -34,8 +36,13 @@ type imlLocalModel struct {
 	localModelPackageService ai_local.ILocalModelPackageService      `autowired:""`
 	localModelStateService   ai_local.ILocalModelInstallStateService `autowired:""`
 	aiAPIService             ai_api.IAPIService                      `autowired:""`
+	serviceService           service.IServiceService                 `autowired:""`
 	transaction              store.ITransaction                      `autowired:""`
 }
+
+var (
+	ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
+)
 
 func (i *imlLocalModel) SimpleList(ctx context.Context) ([]*ai_local_dto.SimpleItem, error) {
 	list, err := i.localModelService.List(ctx)
@@ -44,8 +51,9 @@ func (i *imlLocalModel) SimpleList(ctx context.Context) ([]*ai_local_dto.SimpleI
 	}
 	return utils.SliceToSlice(list, func(s *ai_local.LocalModel) *ai_local_dto.SimpleItem {
 		return &ai_local_dto.SimpleItem{
-			Id:   s.Id,
-			Name: s.Name,
+			Id:            s.Id,
+			Name:          s.Name,
+			DefaultConfig: ollamaConfig,
 		}
 	}, func(l *ai_local.LocalModel) bool {
 		if l.State != ai_local_dto.LocalModelStateNormal.Int() && l.State != ai_local_dto.LocalModelStateDisable.Int() {
@@ -203,10 +211,19 @@ func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string
 }
 
 func (i *imlLocalModel) CancelDeploy(ctx context.Context, model string) error {
-	ai_provider_local.StopPull(model)
-
-	// 删除模型
-	return i.localModelService.Delete(ctx, model)
+	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		err := i.serviceService.ForceDelete(ctx, model)
+		if err != nil {
+			return err
+		}
+		// 删除模型
+		err = i.localModelService.Delete(ctx, model)
+		if err != nil {
+			return err
+		}
+		ai_provider_local.StopPull(model)
+		return nil
+	})
 }
 
 func (i *imlLocalModel) RemoveModel(ctx context.Context, model string) error {
