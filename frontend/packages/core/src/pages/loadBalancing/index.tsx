@@ -132,7 +132,7 @@ const LoadBalancingPage = () => {
   const handleDelete = (id: string) => {
     fetchData<BasicResponse<null>>('ai/balance', {
       method: 'DELETE',
-      eoBody: {
+      eoParams: {
         id
       }
     })

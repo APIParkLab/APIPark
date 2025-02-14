@@ -99,11 +99,10 @@ export const ServiceDeployment = (props: { record: SystemTableListItem, closeMod
    */
   const getLocalModelState = () => {
     fetchData<BasicResponse<any>>('model/local/state', {
-      method: 'DELETE',
+      method: 'GET',
       eoParams: {
         model: record.id
-      },
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      }
     })
       .then((response) => {
         if (response.code === STATUS_CODE.SUCCESS) {
@@ -125,10 +124,7 @@ export const ServiceDeployment = (props: { record: SystemTableListItem, closeMod
         'model/local/deploy',
         {
           method: 'POST',
-          eoBody: { recordId: record.id },
-          headers: {
-            'Content-Type': 'event-stream'
-          },
+          eoBody: { model: record.id, team: record.team?.id },
           isStream: true,
           handleStream: (chunk) => {
             const parsedChunk = JSON.parse(chunk)
