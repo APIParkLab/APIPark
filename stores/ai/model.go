@@ -72,9 +72,9 @@ func (i *Key) IdValue() int64 {
 type Balance struct {
 	Id           int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
 	Uuid         string    `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
-	Provider     string    `gorm:"type:varchar(36);not null;column:provider;comment:供应商ID"`
+	Provider     string    `gorm:"type:varchar(100);not null;column:provider;comment:供应商ID"`
 	ProviderName string    `gorm:"type:varchar(100);not null;column:provider_name;comment:供应商名称"`
-	Model        string    `gorm:"type:varchar(36);not null;column:model;comment:模型ID"`
+	Model        string    `gorm:"type:varchar(100);not null;column:model;comment:模型ID"`
 	ModelName    string    `gorm:"type:varchar(100);not null;column:model_name;comment:模型名称"`
 	Type         int       `gorm:"type:tinyint(1);not null;column:type;comment:类型,0：online，1：local"`
 	State        int       `gorm:"type:tinyint(1);not null;column:state;comment:状态,0：异常，1：正常;default:1"`
@@ -97,7 +97,7 @@ type LocalModel struct {
 	Id       int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
 	Uuid     string    `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
 	Name     string    `gorm:"type:varchar(100);not null;column:name;comment:名称"`
-	Provider string    `gorm:"type:varchar(36);not null;column:provider;comment:供应商ID"`
+	Provider string    `gorm:"type:varchar(100);not null;column:provider;comment:供应商ID"`
 	State    int       `gorm:"type:tinyint(1);not null;column:state;comment:状态,0：关闭，1：正常;default:1"`
 	Creator  string    `gorm:"size:36;not null;column:creator;comment:创建人;index:creator" aovalue:"creator"` // 创建人
 	Updater  string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"` // 更新人
