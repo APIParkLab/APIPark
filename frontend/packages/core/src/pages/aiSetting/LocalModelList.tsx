@@ -275,7 +275,7 @@ const LocalModelList: React.FC = () => {
     }
     const modalInstance = modal.confirm({
       title: $t('部署过程'),
-      content: <ServiceDeployment record={record} />,
+      content: <ServiceDeployment record={record} closeModal={closeModal} />,
       footer: () => {
         return <LogsFooter record={record} closeModal={closeModal} />
       },
