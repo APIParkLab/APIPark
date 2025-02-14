@@ -15,6 +15,7 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
   const [form] = Form.useForm()
   const { fetchData } = useFetch()
   const [modelList, setModelList] = useState<any[]>([])
+  const [tagList, setTagList] = useState<any[]>([])
   const [teamList, setTeamList] = useState<SimpleTeamItem[]>([])
   const { deployLocalModel, getTeamOptionList } = useDeployLocalModel()
 
@@ -22,17 +23,27 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
    * 获取本地模型列表
    * @returns 本地模型列表
    */
-  const getLocalModelList = async () => {
-    const response = await fetchData<BasicResponse<{ models: LocalModelItem[] }>>(
-      'model/local/can_deploy',
-      { method: 'GET', eoTransformKeys: ['is_popular'] }
-    )
+  const getLocalModelList = async (keyword?: string) => {
+    const response = await fetchData<BasicResponse<{ models: LocalModelItem[] }>>('model/local/can_deploy', {
+      method: 'GET',
+      eoTransformKeys: ['is_popular'],
+      ...(keyword ? { eoParams: { keyword } } : {})
+    })
     const { code, data, msg } = response
     if (code === STATUS_CODE.SUCCESS) {
-      const modelList = data.models?.map((x: LocalModelItem) => {
-        return { ...x, label: x.name, value: x.id }
-      })
-      setModelList(modelList)
+      if (!keyword) {
+        const modelList = data.models?.map((x: LocalModelItem) => {
+          return { ...x, label: x.name, value: x.id }
+        })
+        setModelList(modelList)
+      } else {
+        const tagList = data.models?.map((x: LocalModelItem) => {
+          return { ...x, label: x.name, value: x.id }
+        })
+        tagList.unshift({ id: 'default', name: 'default' })
+        form.setFieldValue('model', 'default')
+        setTagList(tagList)
+      }
     } else {
       message.error(msg || $t(RESPONSE_TIPS.error))
       return []
@@ -42,12 +53,11 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
   /**
    * 部署热门模型
    * @param id 模型ID
-   * @returns 
+   * @returns
    */
   const deployPopularModel = async (id: string) => {
     await deployLocalModel({
-      modelID: id,
-      team: form.getFieldValue('team')
+      modelID: id
     })
     onClose?.()
   }
@@ -66,14 +76,17 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
 
   /**
    * 部署本地AI
-   * @returns 
+   * @returns
    */
   const deployLocalAIServer = () => {
     return new Promise((resolve, reject) => {
       form
         .validateFields()
         .then(async (value) => {
-          await deployLocalModel(value)
+          await deployLocalModel({
+            modelID: value.model,
+            team: value.team
+          })
           resolve(true)
         })
         .catch((errorInfo) => reject(errorInfo))
@@ -94,7 +107,7 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
         name="partitionInsideCert"
         autoComplete="off"
       >
-        <Form.Item label={$t('模型名称')} name="modelID" rules={[{ required: true }]}>
+        <Form.Item label={$t('模型供应商')} name="provider" rules={[{ required: true }]}>
           <Select
             showSearch
             className="w-INPUT_NORMAL"
@@ -102,16 +115,17 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
             placeholder={$t(PLACEHOLDER.input)}
             options={modelList.map((provider) => ({
               label: (
-                <div className='relative'>
+                <div className="relative">
                   <span>{provider.name}</span>
-                  <span className='absolute right-[10px] text-[#999]' >{provider.size}</span>
-                  </div>
+                  <span className="absolute right-[10px] text-[#999]">{provider.size}</span>
+                </div>
               ),
               value: provider.id,
               searchText: provider.name.toLowerCase()
             }))}
             onChange={(value) => {
-              form.setFieldValue('modelID', value)
+              form.setFieldValue('provider', value)
+              getLocalModelList(value)
             }}
           ></Select>
           <div className="mt-[10px] mb-[5px]">
@@ -119,22 +133,44 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
             {$t('热点模型')}
           </div>
           <div className="pl-[5px] flex flex-wrap">
-            {modelList.length ?
-              modelList
-                .filter((item) => item.is_popular)
-                .map((item) => (
-                  <span
-                    key={item.id}
-                    className="text-[#2196f3] text-[15px] hover:text-[#1976d2] mr-[20px] cursor-pointer
+            {modelList.length
+              ? modelList
+                  .filter((item) => item.is_popular)
+                  .map((item) => (
+                    <span
+                      key={item.id}
+                      className="text-[#2196f3] text-[15px] hover:text-[#1976d2] mr-[20px] cursor-pointer
   "
-                    onClick={() => {
-                      deployPopularModel(item.id)
-                    }}
-                  >
-                    {item.name}
-                  </span>
-                )) : null}
+                      onClick={() => {
+                        deployPopularModel(item.id)
+                      }}
+                    >
+                      {item.name}
+                    </span>
+                  ))
+              : null}
           </div>
+        </Form.Item>
+        <Form.Item label={$t('默认模型')} name="model" className="mt-[16px]" rules={[{ required: true }]}>
+        <Select
+            showSearch
+            className="w-INPUT_NORMAL"
+            filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
+            placeholder={$t(PLACEHOLDER.input)}
+            options={tagList.map((provider) => ({
+              label: (
+                <div className="relative">
+                  <span>{provider.name}</span>
+                  { provider.size && <span className="absolute right-[10px] text-[#999]">{provider.size}</span> }
+                </div>
+              ),
+              value: provider.id,
+              searchText: provider.name.toLowerCase()
+            }))}
+            onChange={(value) => {
+              form.setFieldValue('model', value)
+            }}
+          ></Select>
         </Form.Item>
         <Form.Item label={$t('所属团队')} name="team" className="mt-[16px]" rules={[{ required: true }]}>
           <Select
