@@ -182,11 +182,10 @@ func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string
 			if !errors.Is(err, gorm.ErrRecordNotFound) {
 				return err
 			}
-			names := strings.Split(model, ":")
 			err = i.localModelService.Create(ctx, &ai_local.CreateLocalModel{
 				Id:       model,
 				Name:     model,
-				Provider: names[0],
+				Provider: "ollama",
 				State:    ai_local_dto.LocalModelStateDeploying.Int(),
 			})
 
