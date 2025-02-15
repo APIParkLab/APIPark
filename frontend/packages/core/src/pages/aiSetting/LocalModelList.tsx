@@ -318,7 +318,7 @@ const LocalModelList: React.FC = () => {
       render: (dom: React.ReactNode, record: ModelListData) => (
         <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
           <a
-            href={`/aiApis?modelId=${record?.id}`}
+            href={`/aiApis?modelId=${record?.provider}`}
             target="_blank"
             className="key-link"
             style={{
