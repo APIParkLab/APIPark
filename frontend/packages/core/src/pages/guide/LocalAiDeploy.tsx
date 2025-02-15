@@ -57,9 +57,12 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
    * @returns
    */
   const deployPopularModel = async (id: string) => {
-    await deployLocalModel({
+    const response = await deployLocalModel({
       modelID: id
     })
+    if (response.code !== STATUS_CODE.SUCCESS) {
+      return
+    }
     onClose?.()
   }
 
@@ -84,10 +87,13 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
       form
         .validateFields()
         .then(async (value) => {
-          await deployLocalModel({
+          const response = await deployLocalModel({
             modelID: value.model,
             team: value.team
           })
+          if (response.code !== STATUS_CODE.SUCCESS) {
+            return
+          }
           resolve(true)
         })
         .catch((errorInfo) => reject(errorInfo))
