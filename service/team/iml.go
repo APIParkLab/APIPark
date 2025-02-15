@@ -24,6 +24,15 @@ type imlTeamService struct {
 	universally.IServiceEdit[EditTeam]
 }
 
+func (s *imlTeamService) DefaultTeam(ctx context.Context) (*Team, error) {
+	item, err := s.teamStore.First(ctx, nil, "id asc")
+	if err != nil {
+		return nil, err
+
+	}
+	return FromEntity(item), nil
+}
+
 func (s *imlTeamService) OnComplete() {
 	s.IServiceGet = universally.NewGetSoftDelete[Team, team.Team](s.teamStore, FromEntity)
 

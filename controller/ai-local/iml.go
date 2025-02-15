@@ -213,7 +213,7 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 		}
 
 		providerId := "ollama"
-		prefix := "/" + model
+		prefix := strings.Replace("/"+model, ":", "_", -1)
 		info, err := i.serviceModule.Create(ctx, teamID, &service_dto.CreateService{
 			Id:           model,
 			Name:         model,
@@ -229,28 +229,12 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 		if err != nil {
 			return err
 		}
-		path := fmt.Sprintf("/%s/demo_translation_api", strings.Trim(prefix, "/"))
+		path := fmt.Sprintf("/%s/chat", strings.Trim(prefix, "/"))
 		timeout := 300000
 		retry := 0
 		aiPrompt := &ai_api_dto.AiPrompt{
-			Variables: []*ai_api_dto.AiPromptVariable{
-				{
-					Key:         "source_lang",
-					Description: "",
-					Require:     true,
-				},
-				{
-					Key:         "target_lang",
-					Description: "",
-					Require:     true,
-				},
-				{
-					Key:         "text",
-					Description: "",
-					Require:     true,
-				},
-			},
-			Prompt: "You need to translate {{source_lang}} into {{target_lang}}, and the following is the content that needs to be translated.\n---\n{{text}}",
+			Variables: []*ai_api_dto.AiPromptVariable{},
+			Prompt:    "",
 		}
 		aiModel := &ai_api_dto.AiModel{
 			Id:       model,
@@ -258,8 +242,8 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 			Provider: providerId,
 			Type:     "local",
 		}
-		name := "Demo Translation API"
-		description := "A demo that shows you how to use a prompt to create a Translation API."
+		name := "Demo AI API"
+		description := "A demo that shows you how to use a e a Chat API."
 		apiId := uuid.New().String()
 		err = i.aiAPIModule.Create(
 			ctx,
@@ -316,7 +300,7 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 		}
 
 		return i.docModule.SaveServiceDoc(ctx, info.Id, &service_dto.SaveServiceDoc{
-			Doc: "The Translation API allows developers to translate text from one language to another. It supports multiple languages and enables easy integration of high-quality translation features into applications. With simple API requests, you can quickly translate content into different target languages.",
+			Doc: "",
 		})
 	})
 
