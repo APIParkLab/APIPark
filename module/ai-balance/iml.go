@@ -39,6 +39,13 @@ type imlBalanceModule struct {
 }
 
 func (i *imlBalanceModule) Create(ctx context.Context, input *ai_balance_dto.Create) error {
+	has, err := i.balanceService.Exist(ctx, input.Provider, input.Model)
+	if err != nil {
+		return err
+	}
+	if has {
+		return fmt.Errorf("model already exists")
+	}
 	priority, err := i.balanceService.MaxPriority(ctx)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -64,19 +71,52 @@ func (i *imlBalanceModule) Create(ctx context.Context, input *ai_balance_dto.Cre
 		providerName = "Ollama"
 		modelName = input.Model
 	}
-	return i.balanceService.Create(ctx, &ai_balance.Create{
-		Id:           input.Id,
-		Priority:     priority + 1,
-		Provider:     input.Provider,
-		ProviderName: providerName,
-		Model:        input.Model,
-		ModelName:    modelName,
-		Type:         ai_balance_dto.ModelType(input.Type).Int(),
+	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		err = i.balanceService.Create(ctx, &ai_balance.Create{
+			Id:           input.Id,
+			Priority:     priority + 1,
+			Provider:     input.Provider,
+			ProviderName: providerName,
+			Model:        input.Model,
+			ModelName:    modelName,
+			Type:         ai_balance_dto.ModelType(input.Type).Int(),
+		})
+		if err != nil {
+			return err
+		}
+		item, err := i.balanceService.Get(ctx, input.Id)
+		if err != nil {
+			return err
+		}
+		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{newRelease(item)}, true)
 	})
+
 }
 
+var (
+	ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
+	ollamaBase   = "http://apipark-ollama:11434"
+)
+
 func newRelease(item *ai_balance.Balance) *gateway.DynamicRelease {
-	return &gateway.DynamicRelease{}
+
+	cfg := make(map[string]interface{})
+	cfg["provider"] = item.Id
+	cfg["model"] = item.Model
+	cfg["model_config"] = ollamaConfig
+	cfg["base"] = ollamaBase
+	return &gateway.DynamicRelease{
+		BasicItem: &gateway.BasicItem{
+			ID:          item.Id,
+			Description: item.ModelName,
+			Resource:    "ai-provider",
+			Version:     item.UpdateAt.Format("20060102150405"),
+			MatchLabels: map[string]string{
+				"module": "ai-provider",
+			},
+		},
+		Attr: cfg,
+	}
 }
 
 func (i *imlBalanceModule) Sort(ctx context.Context, input *ai_balance_dto.Sort) error {
@@ -91,11 +131,13 @@ func (i *imlBalanceModule) Sort(ctx context.Context, input *ai_balance_dto.Sort)
 	if err != nil {
 		return err
 	}
+	releases := make([]*gateway.DynamicRelease, 0, len(list))
 	for _, item := range list {
-		err = i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{newRelease(item)}, true)
-		if err != nil {
-			return err
-		}
+		releases = append(releases, newRelease(item))
+	}
+	err = i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -140,11 +182,23 @@ func (i *imlBalanceModule) List(ctx context.Context, keyword string) ([]*ai_bala
 }
 
 func (i *imlBalanceModule) Delete(ctx context.Context, id string) error {
-	return i.balanceService.Delete(ctx, id)
+	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		err := i.balanceService.Delete(ctx, id)
+		if err != nil {
+			return err
+		}
+		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+			{
+				BasicItem: &gateway.BasicItem{
+					ID: id,
+				},
+			},
+		}, false)
+	})
+
 }
 
 func (i *imlBalanceModule) syncGateway(ctx context.Context, clusterId string, releases []*gateway.DynamicRelease, online bool) error {
-	return nil
 	client, err := i.clusterService.GatewayClient(ctx, clusterId)
 	if err != nil {
 		log.Errorf("get apinto client error: %v", err)

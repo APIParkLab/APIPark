@@ -129,74 +129,6 @@ func (i *imlProviderModule) SimpleProvider(ctx context.Context, id string) (*ai_
 	}, nil
 }
 
-//func (i *imlProviderModule) Sort(ctx context.Context, input *ai_dto.Sort) error {
-//	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-//		list, err := i.providerService.List(ctx)
-//		if err != nil {
-//			return err
-//		}
-//		providerMap := utils.SliceToMap(list, func(e *ai.Provider) string {
-//			return e.Id
-//		})
-//		releases := make([]*gateway.DynamicRelease, 0, len(list))
-//		offlineReleases := make([]*gateway.DynamicRelease, 0, len(list))
-//		for index, id := range input.Providers {
-//			p, has := model_runtime.GetProvider(id)
-//			if !has {
-//				continue
-//			}
-//
-//			l, has := providerMap[id]
-//			if !has {
-//				continue
-//			}
-//			model, has := p.GetModel(l.DefaultLLM)
-//			if !has {
-//				continue
-//			}
-//			priority := index + 1
-//			err = i.providerService.Save(txCtx, id, &ai.SetProvider{
-//				Priority: &priority,
-//			})
-//			if err != nil {
-//				return err
-//			}
-//			if ai_dto.ToProviderStatus(l.Status) == ai_dto.ProviderDisabled {
-//				offlineReleases = append(offlineReleases, &gateway.DynamicRelease{
-//					BasicItem: &gateway.BasicItem{
-//						ID:       l.Id,
-//						Resource: "ai-provider",
-//					}})
-//			} else {
-//				cfg := make(map[string]interface{})
-//				cfg["provider"] = l.Id
-//				cfg["model"] = l.DefaultLLM
-//				cfg["model_config"] = model.DefaultConfig()
-//				cfg["priority"] = l.Priority
-//				cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
-//				releases = append(releases, &gateway.DynamicRelease{
-//					BasicItem: &gateway.BasicItem{
-//						ID:          l.Id,
-//						Description: l.Name,
-//						Resource:    "ai-provider",
-//						Version:     l.UpdateAt.Format("20060102150405"),
-//						MatchLabels: map[string]string{
-//							"module": "ai-provider",
-//						},
-//					},
-//					Attr: cfg,
-//				})
-//			}
-//		}
-//		err = i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
-//		if err != nil {
-//			return err
-//		}
-//		return i.syncGateway(ctx, cluster.DefaultClusterID, offlineReleases, false)
-//
-//	})
-//}
-
 func (i *imlProviderModule) ConfiguredProviders(ctx context.Context, keyword string) ([]*ai_dto.ConfiguredProviderItem, error) {
 	// 获取已配置的AI服务商
 	list, err := i.providerService.Search(ctx, keyword, nil, "update_at")
@@ -611,7 +543,6 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		cfg["provider"] = info.Id
 		cfg["model"] = info.DefaultLLM
 		cfg["model_config"] = model.DefaultConfig()
-		cfg["priority"] = info.Priority
 		cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
 		return i.syncGateway(txCtx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
 			{
@@ -652,7 +583,6 @@ func (i *imlProviderModule) getAiProviders(ctx context.Context) ([]*gateway.Dyna
 		cfg["provider"] = l.Id
 		cfg["model"] = l.DefaultLLM
 		cfg["model_config"] = model.DefaultConfig()
-		cfg["priority"] = l.Priority
 		providers = append(providers, &gateway.DynamicRelease{
 			BasicItem: &gateway.BasicItem{
 				ID:          l.Id,
