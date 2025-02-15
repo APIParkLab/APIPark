@@ -255,6 +255,7 @@ const ApiSettings: React.FC = () => {
           <div className="flex gap-2 items-center">
             <AIProviderSelect
               value={selectedProvider}
+              source="ai_api"
               onChange={(value, option) => {
                 setSelectedProvider(value)
                 setProvider(option)
