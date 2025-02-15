@@ -23,6 +23,7 @@ const useDeployLocalModel = () => {
     const { code, msg } = response
     if (code === STATUS_CODE.SUCCESS) {
       message.success(msg || $t(RESPONSE_TIPS.success))
+      return response
     } else {
       message.error(msg || $t(RESPONSE_TIPS.error))
     }
