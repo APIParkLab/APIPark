@@ -133,7 +133,7 @@ func genMessageSchema() *openapi3.Schema {
 	roleSchema.Example = "user"
 	contentSchema := openapi3.NewStringSchema()
 	contentSchema.Description = "The message content"
-	contentSchema.Example = "Hello, how can I help you?"
+	contentSchema.Example = "Hello, who are you?"
 	result.WithProperties(map[string]*openapi3.Schema{
 		"role":    roleSchema,
 		"content": contentSchema,
