@@ -65,13 +65,13 @@ type SimpleItem struct {
 }
 
 type LocalModelItem struct {
-	Id       string          `json:"id"`
-	Name     string          `json:"name"`
-	State    LocalModelState `json:"state"`
-	APICount int64           `json:"api_count"`
-
-	UpdateTime auto.TimeLabel `json:"update_time"`
-	CanDelete  bool           `json:"can_delete"`
+	Id         string          `json:"id"`
+	Name       string          `json:"name"`
+	State      LocalModelState `json:"state"`
+	APICount   int64           `json:"api_count"`
+	Provider   string          `json:"provider"`
+	UpdateTime auto.TimeLabel  `json:"update_time"`
+	CanDelete  bool            `json:"can_delete"`
 }
 
 type LocalModelPackageItem struct {
