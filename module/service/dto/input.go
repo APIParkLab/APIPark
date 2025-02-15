@@ -31,7 +31,7 @@ type EditService struct {
 	Catalogue    *string   `json:"catalogue"`
 	Logo         *string   `json:"logo"`
 	Tags         *[]string `json:"tags"`
-	Provider     *string   `json:"provider" aocheck:"ai_provider"`
+	Provider     *string   `json:"provider"`
 	ApprovalType *string   `json:"approval_type"`
 	State        *string   `json:"state"`
 }

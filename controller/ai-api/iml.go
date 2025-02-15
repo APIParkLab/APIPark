@@ -48,10 +48,14 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 			}
 		}
 		if input.AiModel != nil {
+			provider := "ollama"
+			if input.AiModel.Type != "local" {
+				provider = input.AiModel.Provider
+			}
 			plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
 					"model":    input.AiModel.Id,
-					"provider": input.AiModel.Provider,
+					"provider": provider,
 					"config":   input.AiModel.Config,
 				},
 			}
@@ -102,10 +106,14 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 		}
 		//var upstream *string
 		if input.AiModel != nil {
+			provider := "ollama"
+			if input.AiModel.Type != "local" {
+				provider = input.AiModel.Provider
+			}
 			proxy.Plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
 					"model":    input.AiModel.Id,
-					"provider": input.AiModel.Provider,
+					"provider": provider,
 					"config":   input.AiModel.Config,
 				},
 			}

@@ -17,6 +17,7 @@ type IBalanceService interface {
 	MaxPriority(ctx context.Context) (int, error)
 	SortBefore(ctx context.Context, originID string, targetID string) ([]*Balance, error)
 	SortAfter(ctx context.Context, originID string, targetID string) ([]*Balance, error)
+	Exist(ctx context.Context, provider string, model string) (bool, error)
 }
 
 func init() {
