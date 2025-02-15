@@ -2,9 +2,12 @@ package ai_balance
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"time"
+
+	"gorm.io/gorm"
 
 	"github.com/eolinker/go-common/store"
 
@@ -21,6 +24,17 @@ type imlBalanceService struct {
 	universally.IServiceCreate[Create]
 	universally.IServiceEdit[Edit]
 	universally.IServiceDelete
+}
+
+func (i *imlBalanceService) Exist(ctx context.Context, provider string, model string) (bool, error) {
+	_, err := i.store.First(ctx, map[string]interface{}{"provider": provider, "model": model})
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, err
+		}
+		return false, nil
+	}
+	return true, nil
 }
 
 func (i *imlBalanceService) OnComplete() {

@@ -4,7 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
+
+	"github.com/eolinker/eosc/env"
+
+	"github.com/APIParkLab/APIPark/gateway"
+	"github.com/eolinker/eosc/log"
+
+	"github.com/APIParkLab/APIPark/service/cluster"
 
 	"github.com/APIParkLab/APIPark/service/service"
 
@@ -35,6 +43,7 @@ type imlLocalModel struct {
 	localModelService        ai_local.ILocalModelService             `autowired:""`
 	localModelPackageService ai_local.ILocalModelPackageService      `autowired:""`
 	localModelStateService   ai_local.ILocalModelInstallStateService `autowired:""`
+	clusterService           cluster.IClusterService                 `autowired:""`
 	aiAPIService             ai_api.IAPIService                      `autowired:""`
 	serviceService           service.IServiceService                 `autowired:""`
 	transaction              store.ITransaction                      `autowired:""`
@@ -42,7 +51,20 @@ type imlLocalModel struct {
 
 var (
 	ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
+	ollamaBase   = "http://apipark-ollama:11434"
 )
+
+func init() {
+	base, has := env.GetEnv("OLLAMA_BASE")
+	if !has {
+		return
+	}
+	_, err := url.Parse(base)
+	if err == nil {
+		ollamaBase = base
+	}
+
+}
 
 func (i *imlLocalModel) SimpleList(ctx context.Context) ([]*ai_local_dto.SimpleItem, error) {
 	list, err := i.localModelService.List(ctx)
@@ -135,6 +157,7 @@ func (i *imlLocalModel) ListCanInstall(ctx context.Context, keyword string) ([]*
 func (i *imlLocalModel) pullHook() func(msg ai_provider_local.PullMessage) error {
 	return func(msg ai_provider_local.PullMessage) error {
 		return i.transaction.Transaction(context.Background(), func(ctx context.Context) error {
+
 			state := ai_local_dto.DeployStateFinish.Int()
 			modelState := ai_local_dto.LocalModelStateNormal.Int()
 			if msg.Status == "error" {
@@ -151,7 +174,7 @@ func (i *imlLocalModel) pullHook() func(msg ai_provider_local.PullMessage) error
 					return err
 				}
 
-				return i.localModelStateService.Create(ctx, &ai_local.CreateLocalModelInstallState{
+				err = i.localModelStateService.Create(ctx, &ai_local.CreateLocalModelInstallState{
 					Id:       msg.Model,
 					Complete: msg.Completed,
 					Total:    msg.Total,
@@ -159,28 +182,81 @@ func (i *imlLocalModel) pullHook() func(msg ai_provider_local.PullMessage) error
 					Msg:      msg.Msg,
 				})
 
-			}
-			if info.Complete < msg.Completed {
-				info.Complete = msg.Completed
+			} else {
+				if info.Complete < msg.Completed {
+					info.Complete = msg.Completed
 
+				}
+				if info.Total < msg.Total {
+					info.Total = msg.Total
+				}
+				if msg.Msg != "" {
+					info.Msg = msg.Msg
+				}
+				err = i.localModelStateService.Save(ctx, msg.Model, &ai_local.EditLocalModelInstallState{State: &state, Complete: &info.Complete, Total: &info.Total, Msg: &info.Msg})
+				if err != nil {
+					return err
+				}
+				serviceState := 0
+				if msg.Status == "error" {
+					state = 2
+				}
+				err = i.serviceService.Save(ctx, msg.Model, &service.Edit{State: &serviceState})
 			}
-			if info.Total < msg.Total {
-				info.Total = msg.Total
-			}
-			if msg.Msg != "" {
-				info.Msg = msg.Msg
-			}
-			err = i.localModelStateService.Save(ctx, msg.Model, &ai_local.EditLocalModelInstallState{State: &state, Complete: &info.Complete, Total: &info.Total, Msg: &info.Msg})
 			if err != nil {
 				return err
 			}
-			serviceState := 0
-			if msg.Status == "error" {
-				state = 2
-			}
-			return i.serviceService.Save(ctx, msg.Model, &service.Edit{State: &serviceState})
+			cfg := make(map[string]interface{})
+			cfg["provider"] = "ollama"
+			cfg["model"] = msg.Model
+			cfg["model_config"] = ollamaConfig
+			cfg["priority"] = 0
+			cfg["base"] = ollamaBase
+			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+				{
+					BasicItem: &gateway.BasicItem{
+						ID:          msg.Model,
+						Description: msg.Model,
+						Resource:    "ai-provider",
+						Version:     info.UpdateAt.Format("20060102150405"),
+						MatchLabels: map[string]string{
+							"module": "ai-provider",
+						},
+					},
+					Attr: cfg,
+				}}, true)
 		})
 	}
+}
+
+func (i *imlLocalModel) syncGateway(ctx context.Context, clusterId string, releases []*gateway.DynamicRelease, online bool) error {
+	client, err := i.clusterService.GatewayClient(ctx, clusterId)
+	if err != nil {
+		log.Errorf("get apinto client error: %v", err)
+		return nil
+	}
+	defer func() {
+		err := client.Close(ctx)
+		if err != nil {
+			log.Warn("close apinto client:", err)
+		}
+	}()
+	for _, releaseInfo := range releases {
+		dynamicClient, err := client.Dynamic(releaseInfo.Resource)
+		if err != nil {
+			return err
+		}
+		if online {
+			err = dynamicClient.Online(ctx, releaseInfo)
+		} else {
+			err = dynamicClient.Offline(ctx, releaseInfo)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string) (*ai_provider_local.Pipeline, error) {
@@ -340,4 +416,52 @@ func (i *imlLocalModel) OnInit() {
 			}
 		}
 	})
+}
+
+func (i *imlLocalModel) getLocalModels(ctx context.Context) ([]*gateway.DynamicRelease, error) {
+	list, err := i.localModelService.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	releases := make([]*gateway.DynamicRelease, 0, len(list))
+	for _, l := range list {
+		cfg := make(map[string]interface{})
+		cfg["provider"] = "ollama"
+		cfg["model"] = l.Id
+		cfg["model_config"] = ollamaConfig
+		cfg["base"] = ollamaBase
+		releases = append(releases, &gateway.DynamicRelease{
+			BasicItem: &gateway.BasicItem{
+				ID:          l.Id,
+				Description: l.Name,
+				Resource:    "ai-provider",
+				Version:     l.UpdateAt.Format("20060102150405"),
+				MatchLabels: map[string]string{
+					"module": "ai-provider",
+				},
+			},
+			Attr: cfg,
+		})
+	}
+	return releases, nil
+}
+
+func (i *imlLocalModel) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
+	releases, err := i.getLocalModels(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, p := range releases {
+		client, err := clientDriver.Dynamic(p.Resource)
+		if err != nil {
+			return err
+		}
+		err = client.Online(ctx, p)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

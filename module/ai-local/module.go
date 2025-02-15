@@ -4,6 +4,8 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/APIParkLab/APIPark/gateway"
+
 	"github.com/eolinker/go-common/autowire"
 
 	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
@@ -24,7 +26,9 @@ type ILocalModelModule interface {
 }
 
 func init() {
+	localModel := new(imlLocalModel)
 	autowire.Auto[ILocalModelModule](func() reflect.Value {
-		return reflect.ValueOf(&imlLocalModel{})
+		gateway.RegisterInitHandleFunc(localModel.initGateway)
+		return reflect.ValueOf(localModel)
 	})
 }
