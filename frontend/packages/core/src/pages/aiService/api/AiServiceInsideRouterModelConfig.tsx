@@ -97,7 +97,7 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
       setModelType(entity.type as 'online' | 'local')
       if (entity.type === 'online') {
         getProviderList()
-        getLlmList(entity.provider)
+        getLlmList(entity.provider, false)
       } else {
         getLocalLlmList()
       }
@@ -129,7 +129,7 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
       })
     }
 
-    const getLlmList = (provider: string) => {
+    const getLlmList = (provider: string, setDefaultValue = true) => {
       fetchData<BasicResponse<{ llms: AiProviderLlmsItems[]; provider: AiProviderDefaultConfig }>>('ai/provider/llms', {
         method: 'GET',
         eoParams: { provider },
@@ -139,10 +139,12 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
           const { code, data, msg } = response
           if (code === STATUS_CODE.SUCCESS) {
             setLlmList(data.llms)
-            form.setFieldsValue({
-              id: data.provider.defaultLlm,
-              config: data.llms.find((x) => x.id === data.provider.defaultLlm)?.config
-            })
+            if (setDefaultValue && data.llms.length) {
+              form.setFieldsValue({
+                id: data.provider.defaultLlm,
+                config: data.llms.find((x) => x.id === data.provider.defaultLlm)?.config
+              })
+            }
           } else {
             message.error(msg || $t(RESPONSE_TIPS.error))
           }
