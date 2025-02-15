@@ -122,36 +122,20 @@ func (i *imlServiceController) QuickCreateAIService(ctx *gin.Context, input *ser
 			return err
 		}
 
-		path := fmt.Sprintf("%s/demo_translation_api", prefix)
+		path := fmt.Sprintf("%s/chat", prefix)
 		timeout := 300000
 		retry := 0
 		aiPrompt := &ai_api_dto.AiPrompt{
-			Variables: []*ai_api_dto.AiPromptVariable{
-				{
-					Key:         "source_lang",
-					Description: "",
-					Require:     true,
-				},
-				{
-					Key:         "target_lang",
-					Description: "",
-					Require:     true,
-				},
-				{
-					Key:         "text",
-					Description: "",
-					Require:     true,
-				},
-			},
-			Prompt: "You need to translate {{source_lang}} into {{target_lang}}, and the following is the content that needs to be translated.\n---\n{{text}}",
+			Variables: []*ai_api_dto.AiPromptVariable{},
+			Prompt:    "",
 		}
 		aiModel := &ai_api_dto.AiModel{
 			Id:       m.ID(),
 			Config:   m.DefaultConfig(),
 			Provider: input.Provider,
 		}
-		name := "Demo Translation API"
-		description := "A demo that shows you how to use a prompt to create a Translation API."
+		name := "Demo AI API"
+		description := "A demo that shows you how to use a e a Chat"
 		apiId := uuid.New().String()
 		err = i.aiAPIModule.Create(
 			ctx,
@@ -208,7 +192,7 @@ func (i *imlServiceController) QuickCreateAIService(ctx *gin.Context, input *ser
 		}
 
 		return i.docModule.SaveServiceDoc(ctx, info.Id, &service_dto.SaveServiceDoc{
-			Doc: "The Translation API allows developers to translate text from one language to another. It supports multiple languages and enables easy integration of high-quality translation features into applications. With simple API requests, you can quickly translate content into different target languages.",
+			Doc: "",
 		})
 	})
 }
@@ -457,28 +441,13 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 		if err != nil {
 			return err
 		}
-		path := fmt.Sprintf("/%s/demo_translation_api", strings.Trim(input.Prefix, "/"))
+		prefix := strings.Replace(input.Prefix, ":", "_", -1)
+		path := fmt.Sprintf("/%s/chat", strings.Trim(prefix, "/"))
 		timeout := 300000
 		retry := 0
 		aiPrompt := &ai_api_dto.AiPrompt{
-			Variables: []*ai_api_dto.AiPromptVariable{
-				{
-					Key:         "source_lang",
-					Description: "",
-					Require:     true,
-				},
-				{
-					Key:         "target_lang",
-					Description: "",
-					Require:     true,
-				},
-				{
-					Key:         "text",
-					Description: "",
-					Require:     true,
-				},
-			},
-			Prompt: "You need to translate {{source_lang}} into {{target_lang}}, and the following is the content that needs to be translated.\n---\n{{text}}",
+			Variables: []*ai_api_dto.AiPromptVariable{},
+			Prompt:    "",
 		}
 		aiModel := &ai_api_dto.AiModel{
 			Id:       modelId,
@@ -486,8 +455,8 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 			Provider: *input.Provider,
 			Type:     modelType,
 		}
-		name := "Demo Translation API"
-		description := "A demo that shows you how to use a prompt to create a Translation API."
+		name := "Demo AI API "
+		description := "A demo that shows you how to use Chat API."
 		apiId := uuid.New().String()
 		err = i.aiAPIModule.Create(
 			ctx,
@@ -545,7 +514,7 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 		}
 
 		return i.docModule.SaveServiceDoc(ctx, info.Id, &service_dto.SaveServiceDoc{
-			Doc: "The Translation API allows developers to translate text from one language to another. It supports multiple languages and enables easy integration of high-quality translation features into applications. With simple API requests, you can quickly translate content into different target languages.",
+			Doc: "",
 		})
 	})
 

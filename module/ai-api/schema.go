@@ -21,7 +21,6 @@ func genOpenAPI3Template(title string, description string) *openapi3.T {
 
 func genOperation(summary string, description string, variables []*ai_api_dto.AiPromptVariable) *openapi3.Operation {
 	operation := openapi3.NewOperation()
-	//operation.Parameters = genRequestParameters(variables)
 	operation.Summary = summary
 	operation.Description = description
 	operation.RequestBody = genRequestBody(variables)

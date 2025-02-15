@@ -297,6 +297,13 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 	if input.Id == "" {
 		input.Id = uuid.New().String()
 	}
+	if teamID == "" {
+		item, err := i.teamService.DefaultTeam(ctx)
+		if err != nil {
+			return nil, err
+		}
+		teamID = item.Id
+	}
 	mo := &service.Create{
 		Id:               input.Id,
 		Name:             input.Name,
