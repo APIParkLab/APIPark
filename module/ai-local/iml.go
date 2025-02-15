@@ -96,6 +96,7 @@ func (i *imlLocalModel) Search(ctx context.Context, keyword string) ([]*ai_local
 			APICount:   apiCountMap[s.Id],
 			CanDelete:  true,
 			UpdateTime: auto.TimeLabel(s.UpdateAt),
+			Provider:   "ollama",
 		}
 	}), nil
 }
