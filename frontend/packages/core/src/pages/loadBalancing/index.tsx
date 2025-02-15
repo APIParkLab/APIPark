@@ -205,7 +205,7 @@ const LoadBalancingPage = () => {
       render: (dom: React.ReactNode, record: LoadBalancingItems) => (
         <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
           <a
-            href={`/aiApis?modelId=${record.model?.id}`}
+            href={`/aiApis?modelId=${record.provider?.id}`}
             target="_blank"
             className="key-link"
             style={{
@@ -229,7 +229,7 @@ const LoadBalancingPage = () => {
       render: (dom: React.ReactNode, record: LoadBalancingItems) => (
         <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
           <a
-            href={`/keysetting?modelId=${record.model?.id}`}
+            href={`/keysetting?modelId=${record.provider?.id}`}
             target="_blank"
             className="key-link"
             style={{
