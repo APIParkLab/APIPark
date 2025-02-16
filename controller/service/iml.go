@@ -92,18 +92,6 @@ func (i *imlServiceController) QuickCreateAIService(ctx *gin.Context, input *ser
 		if err != nil {
 			return err
 		}
-		//pv, err := i.providerModule.Provider(ctx, input.Provider)
-		//if err != nil {
-		//	return err
-		//}
-		//p, has := model_runtime.GetProvider(input.Provider)
-		//if !has {
-		//	return fmt.Errorf("provider not found")
-		//}
-		//m, has := p.GetModel(pv.DefaultLLM)
-		//if !has {
-		//	return fmt.Errorf("model %s not found", pv.DefaultLLM)
-		//}
 
 		id := uuid.NewString()
 		prefix := fmt.Sprintf("/%s", id[:8])
@@ -124,91 +112,6 @@ func (i *imlServiceController) QuickCreateAIService(ctx *gin.Context, input *ser
 			Kind:         "ai",
 		})
 		return err
-		//info, err = i.module.Create(ctx, input.Team, &service_dto.CreateService{
-		//	Id:           uuid.NewString(),
-		//	Name:         input.Provider + " AI Service",
-		//	Prefix:       prefix,
-		//	Description:  "Quick create by AI provider",
-		//	ServiceType:  "public",
-		//	State:        "normal",
-		//	Catalogue:    catalogueInfo.Id,
-		//	ApprovalType: "auto",
-		//	Provider:     &input.Provider,
-		//	Kind:         "ai",
-		//})
-		//if err != nil {
-		//	return err
-		//}
-		//
-		//path := fmt.Sprintf("%s/chat", prefix)
-		//timeout := 300000
-		//retry := 0
-		//aiPrompt := &ai_api_dto.AiPrompt{
-		//	Variables: []*ai_api_dto.AiPromptVariable{},
-		//	Prompt:    "",
-		//}
-		//aiModel := &ai_api_dto.AiModel{
-		//	Id:       m.ID(),
-		//	Config:   m.DefaultConfig(),
-		//	Provider: input.Provider,
-		//}
-		//name := "Demo AI API"
-		//description := "A demo that shows you how to use a e a Chat"
-		//apiId := uuid.New().String()
-		//err = i.aiAPIModule.Create(
-		//	ctx,
-		//	info.Id,
-		//	&ai_api_dto.CreateAPI{
-		//		Id:          apiId,
-		//		Name:        name,
-		//		Path:        path,
-		//		Description: description,
-		//		Disable:     false,
-		//		AiPrompt:    aiPrompt,
-		//		AiModel:     aiModel,
-		//		Timeout:     timeout,
-		//		Retry:       retry,
-		//	},
-		//)
-		//if err != nil {
-		//	return err
-		//}
-		//plugins := make(map[string]api.PluginSetting)
-		//plugins["ai_prompt"] = api.PluginSetting{
-		//	Config: plugin_model.ConfigType{
-		//		"prompt":    aiPrompt.Prompt,
-		//		"variables": aiPrompt.Variables,
-		//	},
-		//}
-		//plugins["ai_formatter"] = api.PluginSetting{
-		//	Config: plugin_model.ConfigType{
-		//		"model":    aiModel.Id,
-		//		"provider": info.Provider.Id,
-		//		"config":   aiModel.Config,
-		//	},
-		//}
-		//_, err = i.routerModule.Create(ctx, info.Id, &router_dto.Create{
-		//	Id:   apiId,
-		//	Name: name,
-		//	Path: path,
-		//	Methods: []string{
-		//		http.MethodPost,
-		//	},
-		//	Description: description,
-		//	Protocols:   []string{"http", "https"},
-		//	MatchRules:  nil,
-		//	Proxy: &router_dto.InputProxy{
-		//		Path:    path,
-		//		Timeout: timeout,
-		//		Retry:   retry,
-		//		Plugins: plugins,
-		//	},
-		//	Disable: false,
-		//})
-		//if err != nil {
-		//	return err
-		//}
-
 	})
 }
 
