@@ -1,7 +1,10 @@
 package ai_local
 
 import (
+	"context"
 	"time"
+
+	"github.com/eolinker/go-common/utils"
 
 	"github.com/APIParkLab/APIPark/service/universally"
 	"github.com/APIParkLab/APIPark/stores/ai"
@@ -186,4 +189,40 @@ func (i *imlLocalModelInstallStateService) updateHandler(e *ai.LocalModelInstall
 		e.LastMsg = *c.Msg
 	}
 	e.UpdateAt = time.Now()
+}
+
+var _ ILocalModelCacheService = &imlLocalModelCacheService{}
+
+type imlLocalModelCacheService struct {
+	store ai.ILocalModelCacheStore `autowired:""`
+}
+
+func (i *imlLocalModelCacheService) List(ctx context.Context, model string, typ CacheType) ([]*LocalModelCache, error) {
+	list, err := i.store.List(ctx, map[string]interface{}{"model": model, "type": typ.Int()})
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(list, func(s *ai.LocalModelCache) *LocalModelCache {
+		return &LocalModelCache{
+			Model:  s.Model,
+			Target: s.Target,
+			Type:   CacheType(s.Type),
+		}
+	}), nil
+}
+
+func (i *imlLocalModelCacheService) Delete(ctx context.Context, model string) error {
+	_, err := i.store.DeleteWhere(ctx, map[string]interface{}{"model": model})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (i *imlLocalModelCacheService) Save(ctx context.Context, model string, typ CacheType, target string) error {
+	return i.store.Insert(ctx, &ai.LocalModelCache{
+		Model:  model,
+		Target: target,
+		Type:   typ.Int(),
+	})
 }

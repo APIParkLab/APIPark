@@ -41,6 +41,13 @@ type imlAPIService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlAPIService) DeleteByService(ctx context.Context, serviceId string) error {
+	_, err := i.store.DeleteWhere(ctx, map[string]interface{}{
+		"service": serviceId,
+	})
+	return err
+}
+
 func (i *imlAPIService) ListForServices(ctx context.Context, serviceIds ...string) ([]*API, error) {
 	w := map[string]interface{}{}
 	if len(serviceIds) > 0 {
