@@ -26,7 +26,7 @@ func (s ServiceState) Int() int {
 	case ServiceStateDeployError:
 		return 2
 	default:
-		return -1
+		return 0
 	}
 }
 

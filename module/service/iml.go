@@ -282,6 +282,7 @@ func toServiceItem(model *service.Service) *service_dto.ServiceItem {
 
 	switch model.Kind {
 	case service.RestService:
+		item.State = model.ServiceType.String()
 		return item
 	case service.AIService:
 		provider := auto.UUID(model.AdditionalConfig["provider"])

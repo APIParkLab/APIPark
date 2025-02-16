@@ -75,3 +75,37 @@ type EditLocalModelInstallState struct {
 	State    *int
 	Msg      *string
 }
+
+type LocalModelCache struct {
+	Model  string
+	Target string
+	Type   CacheType
+}
+
+type CacheType string
+
+func (c CacheType) String() string {
+	return string(c)
+}
+
+func (c CacheType) Int() int {
+	switch c {
+	case CacheTypeService:
+		return 0
+	default:
+		return 0
+	}
+}
+
+func FromCacheType(s int) CacheType {
+	switch s {
+	case 0:
+		return CacheTypeService
+	default:
+		return CacheTypeService
+	}
+}
+
+const (
+	CacheTypeService CacheType = "service"
+)

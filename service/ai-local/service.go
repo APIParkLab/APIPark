@@ -1,6 +1,7 @@
 package ai_local
 
 import (
+	"context"
 	"reflect"
 
 	"github.com/APIParkLab/APIPark/service/universally"
@@ -28,6 +29,12 @@ type ILocalModelInstallStateService interface {
 	universally.IServiceDelete
 }
 
+type ILocalModelCacheService interface {
+	List(ctx context.Context, model string, typ CacheType) ([]*LocalModelCache, error)
+	Delete(ctx context.Context, model string) error
+	Save(ctx context.Context, model string, typ CacheType, target string) error
+}
+
 func init() {
 	autowire.Auto[ILocalModelService](func() reflect.Value {
 		return reflect.ValueOf(new(imlLocalModelService))
@@ -38,5 +45,9 @@ func init() {
 
 	autowire.Auto[ILocalModelInstallStateService](func() reflect.Value {
 		return reflect.ValueOf(new(imlLocalModelInstallStateService))
+	})
+
+	autowire.Auto[ILocalModelCacheService](func() reflect.Value {
+		return reflect.ValueOf(new(imlLocalModelCacheService))
 	})
 }

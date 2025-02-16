@@ -23,6 +23,14 @@ type imlAPIService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlAPIService) DeleteByService(ctx context.Context, serviceId string) error {
+	_, err := i.store.DeleteWhere(ctx, map[string]interface{}{"service": serviceId})
+	if err != nil {
+		return nil
+	}
+	return err
+}
+
 func (i *imlAPIService) CountMapByModel(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error) {
 	return i.store.CountByGroup(ctx, keyword, conditions, "model")
 }
