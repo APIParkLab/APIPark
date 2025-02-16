@@ -43,6 +43,7 @@ type IAPIService interface {
 
 	Save(ctx context.Context, id string, model *Edit) error
 	Create(ctx context.Context, input *Create) (err error)
+	DeleteByService(ctx context.Context, serviceId string) error
 }
 
 var (

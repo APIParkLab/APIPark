@@ -63,6 +63,14 @@ type imlLocalModelInstallStateStore struct {
 	store.SearchStore[LocalModelInstallState]
 }
 
+type ILocalModelCacheStore interface {
+	store.IBaseStore[LocalModelCache]
+}
+
+type imlLocalModelCacheStore struct {
+	store.Store[LocalModelCache]
+}
+
 func init() {
 	autowire.Auto[IProviderStore](func() reflect.Value {
 		return reflect.ValueOf(new(imlProviderStore))
@@ -90,5 +98,9 @@ func init() {
 
 	autowire.Auto[ILocalModelInstallStateStore](func() reflect.Value {
 		return reflect.ValueOf(new(imlLocalModelInstallStateStore))
+	})
+
+	autowire.Auto[ILocalModelCacheStore](func() reflect.Value {
+		return reflect.ValueOf(new(imlLocalModelCacheStore))
 	})
 }

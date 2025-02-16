@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/APIParkLab/APIPark/service/api"
+
 	"github.com/eolinker/eosc/env"
 
 	"github.com/APIParkLab/APIPark/gateway"
@@ -43,8 +45,10 @@ type imlLocalModel struct {
 	localModelService        ai_local.ILocalModelService             `autowired:""`
 	localModelPackageService ai_local.ILocalModelPackageService      `autowired:""`
 	localModelStateService   ai_local.ILocalModelInstallStateService `autowired:""`
+	localModelCacheService   ai_local.ILocalModelCacheService        `autowired:""`
 	clusterService           cluster.IClusterService                 `autowired:""`
 	aiAPIService             ai_api.IAPIService                      `autowired:""`
+	routerService            api.IAPIService                         `autowired:""`
 	serviceService           service.IServiceService                 `autowired:""`
 	transaction              store.ITransaction                      `autowired:""`
 }
@@ -181,7 +185,7 @@ func (i *imlLocalModel) pullHook() func(msg ai_provider_local.PullMessage) error
 					State:    state,
 					Msg:      msg.Msg,
 				})
-
+				info, err = i.localModelStateService.Get(ctx, msg.Model)
 			} else {
 				if info.Complete < msg.Completed {
 					info.Complete = msg.Completed
@@ -201,30 +205,54 @@ func (i *imlLocalModel) pullHook() func(msg ai_provider_local.PullMessage) error
 				if msg.Status == "error" {
 					state = 2
 				}
-				err = i.serviceService.Save(ctx, msg.Model, &service.Edit{State: &serviceState})
+				list, err := i.localModelCacheService.List(ctx, msg.Model, ai_local.CacheTypeService)
+				if err != nil {
+					return err
+				}
+				for _, l := range list {
+					_, err := i.serviceService.Get(ctx, l.Target)
+					if err != nil {
+						if errors.Is(err, gorm.ErrRecordNotFound) {
+							continue
+						}
+						return err
+					}
+					if info.State == 0 {
+						continue
+					}
+					err = i.serviceService.Save(ctx, l.Target, &service.Edit{State: &serviceState})
+					if err != nil {
+						return err
+					}
+				}
+
 			}
 			if err != nil {
 				return err
 			}
-			cfg := make(map[string]interface{})
-			cfg["provider"] = "ollama"
-			cfg["model"] = msg.Model
-			cfg["model_config"] = ollamaConfig
-			cfg["priority"] = 0
-			cfg["base"] = ollamaBase
-			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
-				{
-					BasicItem: &gateway.BasicItem{
-						ID:          msg.Model,
-						Description: msg.Model,
-						Resource:    "ai-provider",
-						Version:     info.UpdateAt.Format("20060102150405"),
-						MatchLabels: map[string]string{
-							"module": "ai-provider",
+			if state == ai_local_dto.DeployStateFinish.Int() {
+				cfg := make(map[string]interface{})
+				cfg["provider"] = "ollama"
+				cfg["model"] = msg.Model
+				cfg["model_config"] = ollamaConfig
+				cfg["priority"] = 0
+				cfg["base"] = ollamaBase
+
+				return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+					{
+						BasicItem: &gateway.BasicItem{
+							ID:          msg.Model,
+							Description: msg.Model,
+							Resource:    "ai-provider",
+							Version:     info.UpdateAt.Format("20060102150405"),
+							MatchLabels: map[string]string{
+								"module": "ai-provider",
+							},
 						},
-					},
-					Attr: cfg,
-				}}, true)
+						Attr: cfg,
+					}}, true)
+			}
+			return nil
 		})
 	}
 }
@@ -294,9 +322,41 @@ func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string
 	return p, nil
 }
 
+func (i *imlLocalModel) SaveCache(ctx context.Context, model string, target string) error {
+	return i.localModelCacheService.Save(ctx, model, ai_local.CacheTypeService, target)
+}
+
 func (i *imlLocalModel) CancelDeploy(ctx context.Context, model string) error {
 	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		err := i.serviceService.ForceDelete(ctx, model)
+		list, err := i.localModelCacheService.List(ctx, model, ai_local.CacheTypeService)
+		if err != nil {
+			return err
+		}
+		for _, l := range list {
+			info, err := i.serviceService.Get(ctx, l.Target)
+			if err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					continue
+				}
+				return err
+			}
+			if info.State == 0 {
+				continue
+			}
+			err = i.serviceService.Delete(ctx, info.Id)
+			if err != nil {
+				return err
+			}
+			err = i.aiAPIService.DeleteByService(ctx, info.Id)
+			if err != nil {
+				return err
+			}
+			err = i.routerService.DeleteByService(ctx, info.Id)
+			if err != nil {
+				return err
+			}
+		}
+		err = i.localModelCacheService.Delete(ctx, model)
 		if err != nil {
 			return err
 		}
