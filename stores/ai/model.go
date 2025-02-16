@@ -149,3 +149,18 @@ func (i *LocalModelPackage) TableName() string {
 func (i *LocalModelPackage) IdValue() int64 {
 	return i.Id
 }
+
+type LocalModelCache struct {
+	Id     int64  `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
+	Model  string `gorm:"type:varchar(100);not null;column:model;comment:模型ID"`
+	Target string `gorm:"type:varchar(100);not null;column:target;comment:目标"`
+	Type   int    `gorm:"type:tinyint(1);not null;column:type;comment:类型,0: 服务"`
+}
+
+func (i *LocalModelCache) TableName() string {
+	return "ai_local_model_cache"
+}
+
+func (i *LocalModelCache) IdValue() int64 {
+	return i.Id
+}

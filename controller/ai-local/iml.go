@@ -3,14 +3,11 @@ package ai_local
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"math"
 	"net/http"
 	"strings"
-
-	"gorm.io/gorm"
 
 	"github.com/APIParkLab/APIPark/module/router"
 
@@ -100,13 +97,13 @@ func (i *imlLocalModelController) Deploy(ctx *gin.Context) {
 		return
 
 	}
-	err = i.initAILocalService(ctx, input.Model, input.Team)
-	if err != nil {
-		ctx.JSON(200, gin.H{
-			"code": -1, "msg": err.Error(), "success": "fail",
-		})
-		return
-	}
+	//err = i.initAILocalService(ctx, input.Model, input.Team)
+	//if err != nil {
+	//	ctx.JSON(200, gin.H{
+	//		"code": -1, "msg": err.Error(), "success": "fail",
+	//	})
+	//	return
+	//}
 	id := uuid.NewString()
 	p, err := i.module.Deploy(ctx, input.Model, id)
 	if err != nil {
@@ -199,23 +196,15 @@ func (i *imlLocalModelController) DeployStart(ctx *gin.Context, input *ai_local_
 
 func (i *imlLocalModelController) initAILocalService(ctx context.Context, model string, teamID string) error {
 	err := i.transaction.Transaction(ctx, func(ctx context.Context) error {
-		_, err := i.serviceModule.Get(ctx, model)
-		if err == nil {
-			return nil
-		} else {
-			if !errors.Is(err, gorm.ErrRecordNotFound) {
-				return err
-			}
-		}
 		catalogueInfo, err := i.catalogueModule.DefaultCatalogue(ctx)
 		if err != nil {
 			return err
 		}
-
+		serviceId := uuid.NewString()
+		prefix := fmt.Sprintf("/%s", serviceId[:8])
 		providerId := "ollama"
-		prefix := strings.Replace("/"+model, ":", "_", -1)
 		info, err := i.serviceModule.Create(ctx, teamID, &service_dto.CreateService{
-			Id:           model,
+			Id:           serviceId,
 			Name:         model,
 			Prefix:       prefix,
 			Description:  "Auto generated service for AI model " + model,
@@ -226,6 +215,10 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 			Kind:         "ai",
 			Provider:     &providerId,
 		})
+		if err != nil {
+			return err
+		}
+		err = i.module.SaveCache(ctx, model, serviceId)
 		if err != nil {
 			return err
 		}
@@ -244,7 +237,7 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 		}
 		name := "Demo AI API"
 		description := "A demo that shows you how to use a e a Chat API."
-		apiId := uuid.New().String()
+		apiId := uuid.NewString()
 		err = i.aiAPIModule.Create(
 			ctx,
 			info.Id,
