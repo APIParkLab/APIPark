@@ -97,6 +97,7 @@ type Service struct {
 	Tags         []auto.Label   `json:"tags" aolabel:"tag"`
 	Logo         string         `json:"logo"`
 	Provider     *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
+	ProviderType string         `json:"provider_type"`
 	ApprovalType string         `json:"approval_type"`
 	AsServer     bool           `json:"as_server"`
 	AsApp        bool           `json:"as_app"`
@@ -119,6 +120,7 @@ func ToService(model *service.Service) *Service {
 	if model.Prefix != "" {
 		prefix = model.Prefix
 	}
+
 	s := &Service{
 		Id:           model.Id,
 		Name:         model.Name,
@@ -146,6 +148,10 @@ func ToService(model *service.Service) *Service {
 	case service.AIService:
 		provider := auto.UUID(model.AdditionalConfig["provider"])
 		s.Provider = &provider
+		s.ProviderType = "local"
+		if provider.Id != "ollama" {
+			s.ProviderType = "online"
+		}
 	}
 	return s
 }
