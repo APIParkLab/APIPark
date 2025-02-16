@@ -13,6 +13,7 @@ export interface ModelListData {
   name: string
   logo: string
   defaultLlm: string | undefined
+  provider?: string
   modelMode?: string
   status: ModelStatus
   state?: ModelDeployStatus

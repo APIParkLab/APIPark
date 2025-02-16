@@ -156,6 +156,7 @@ const OnlineModelList: React.FC = () => {
     },
     {
       title: $t('默认模型'),
+      ellipsis: true,
       dataIndex: 'defaultLlm'
     },
     {
