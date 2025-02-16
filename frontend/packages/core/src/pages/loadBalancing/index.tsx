@@ -14,7 +14,6 @@ import AddLoadBalancingModel from './AddModel'
 const LoadBalancingPage = () => {
   const pageListRef = useRef<ActionType>(null)
   const [searchWord, setSearchWord] = useState<string>('')
-  const [columns, setColumns] = useState<PageProColumns<LoadBalancingItems>[]>([])
   const { modal, message } = App.useApp()
   const [apiKeys, setApiKeys] = useState<LoadBalancingItems[]>([])
   const addModelRef = useRef<LoadBalancingHandle>()
@@ -150,125 +149,120 @@ const LoadBalancingPage = () => {
       })
   }
 
-  /**
+    /**
    * 设置表格列
    */
-  const setTableColumns = () => {
-    setColumns([
-      {
-        title: '',
-        dataIndex: 'drag',
-        width: '40px'
-      },
-      {
-        title: $t('优先级'),
-        dataIndex: 'priority',
-        width: 80,
-        ellipsis: true,
-        key: 'priority'
-      },
-      {
-        title: $t('模型'),
-        dataIndex: ['provider', 'name'],
-        ellipsis: true,
-        width: 100,
-        key: 'provider',
-        render: (dom: React.ReactNode, record: LoadBalancingItems) => (
-          <span>
-            {record.provider?.name} / {record.model?.name}
-          </span>
-        )
-      },
-      {
-        title: $t('类型'),
-        dataIndex: 'type',
-        width: 100,
-        ellipsis: true,
-        key: 'type',
-        render: (dom: React.ReactNode, record: LoadBalancingItems) => (
-          <span>{record.type === 'online' ? $t('线上模型') : $t('本地模型')}</span>
-        )
-      },
-      {
-        title: $t('状态'),
-        dataIndex: 'state',
-        width: 120,
-        ellipsis: true,
-        key: 'state',
-        render: (dom: React.ReactNode, record: LoadBalancingItems) => (
-          <span>{statusEnum[record.state]?.text || '-'}</span>
-        )
-      },
-      {
-        title: $t('Apis'),
-        dataIndex: 'apiCount',
-        ellipsis: true,
-        width: 80,
-        key: 'apiCount',
-        render: (dom: React.ReactNode, record: LoadBalancingItems) => (
-          <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
-            <a
-              href={`/aiApis?modelId=${record.model?.id}`}
-              target="_blank"
-              className="key-link"
-              style={{
-                fontWeight: 500,
-                cursor: 'pointer',
-                pointerEvents: 'all',
-                textDecoration: 'none'
-              }}
-            >
-              {record.apiCount || '0'}
-            </a>
-          </span>
-        )
-      },
-      {
-        title: $t('Keys'),
-        dataIndex: 'keyCount',
-        ellipsis: true,
-        width: 80,
-        key: 'keyCount',
-        render: (dom: React.ReactNode, record: LoadBalancingItems) => (
-          <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
-            <a
-              href={`/keysetting?modelId=${record.model?.id}`}
-              target="_blank"
-              className="key-link"
-              style={{
-                fontWeight: 500,
-                cursor: 'pointer',
-                pointerEvents: 'all',
-                textDecoration: 'none'
-              }}
-            >
-              {record.keyCount || '0'}
-            </a>
-          </span>
-        )
-      },
-      {
-        title: '',
-        key: 'option',
-        btnNums: 1,
-        width: 80,
-        fixed: 'right',
-        valueType: 'option',
-        render: (_: React.ReactNode, entity: any) => [
-          <TableBtnWithPermission
-            access="system.settings.ai_balance.delete"
-            key="delete"
-            btnType="delete"
-            onClick={() => handleDelete(entity.id as string)}
-            btnTitle={$t('删除')}
-          />
-        ]
-      }
-    ])
-  }
-  useEffect(() => {
-    setTableColumns()
-  }, [])
+  const columns: PageProColumns<LoadBalancingItems>[] = [
+    {
+      title: '',
+      dataIndex: 'drag',
+      width: '40px'
+    },
+    {
+      title: $t('优先级'),
+      dataIndex: 'priority',
+      width: 80,
+      ellipsis: true,
+      key: 'priority'
+    },
+    {
+      title: $t('模型'),
+      dataIndex: ['provider', 'name'],
+      ellipsis: true,
+      key: 'provider',
+      render: (dom: React.ReactNode, record: LoadBalancingItems) => (
+        <span>
+          {record.provider?.name} / {record.model?.name}
+        </span>
+      )
+    },
+    {
+      title: $t('类型'),
+      dataIndex: 'type',
+      width: 120,
+      ellipsis: true,
+      key: 'type',
+      render: (dom: React.ReactNode, record: LoadBalancingItems) => (
+        <span>{record.type === 'online' ? $t('线上模型') : $t('本地模型')}</span>
+      )
+    },
+    {
+      title: $t('状态'),
+      dataIndex: 'state',
+      width: 80,
+      ellipsis: true,
+      key: 'state',
+      render: (dom: React.ReactNode, record: LoadBalancingItems) => (
+        <span>{statusEnum[record.state]?.text || '-'}</span>
+      )
+    },
+    {
+      title: $t('Apis'),
+      dataIndex: 'apiCount',
+      ellipsis: true,
+      width: 80,
+      key: 'apiCount',
+      render: (dom: React.ReactNode, record: LoadBalancingItems) => (
+        <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
+          <a
+            href={`/aiApis?modelId=${record.provider?.id}`}
+            target="_blank"
+            className="key-link"
+            style={{
+              fontWeight: 500,
+              cursor: 'pointer',
+              pointerEvents: 'all',
+              textDecoration: 'none'
+            }}
+          >
+            {record.apiCount || '0'}
+          </a>
+        </span>
+      )
+    },
+    {
+      title: $t('Keys'),
+      dataIndex: 'keyCount',
+      ellipsis: true,
+      width: 80,
+      key: 'keyCount',
+      render: (dom: React.ReactNode, record: LoadBalancingItems) => (
+        <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
+          <a
+            href={`/keysetting?modelId=${record.provider?.id}`}
+            target="_blank"
+            className="key-link"
+            style={{
+              fontWeight: 500,
+              cursor: 'pointer',
+              pointerEvents: 'all',
+              textDecoration: 'none'
+            }}
+          >
+            {record.keyCount || '0'}
+          </a>
+        </span>
+      )
+    },
+    {
+      title: '',
+      key: 'option',
+      btnNums: 1,
+      width: 50,
+      fixed: 'right',
+      valueType: 'option',
+      render: (_: React.ReactNode, entity: any) => [
+        <TableBtnWithPermission
+          access="system.settings.ai_balance.delete"
+          key="delete"
+          btnType="delete"
+          onClick={() => handleDelete(entity.id as string)}
+          btnTitle={$t('删除')}
+        />
+      ]
+    }
+  ]
+
 
   return (
     <>

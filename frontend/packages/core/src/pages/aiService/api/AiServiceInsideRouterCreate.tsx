@@ -151,7 +151,7 @@ const AiServiceInsideRouterCreate = () => {
                 type: aiModel?.type
               }) as AiProviderDefaultConfig & { config: string }
           )
-          aiModel?.type !== 'local' && getDefaultModelConfig(aiModel?.provider)
+          aiModel?.type !== 'local' && getDefaultModelConfig(aiModel?.provider, false)
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
         }
@@ -160,7 +160,7 @@ const AiServiceInsideRouterCreate = () => {
       .finally(() => setLoading(false))
   }
 
-  const getDefaultModelConfig = (provider?: string) => {
+  const getDefaultModelConfig = (provider?: string, resetDefaultLlm = true) => {
     fetchData<BasicResponse<{ llms: AiProviderLlmsItems[]; provider: AiProviderDefaultConfig }>>('ai/provider/llms', {
       method: 'GET',
       eoParams: { provider: provider ?? aiServiceInfo?.provider?.id },
@@ -170,19 +170,21 @@ const AiServiceInsideRouterCreate = () => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           setLlmList(data.llms)
-          setDefaultLlm((prev) => {
-            const llmSetting = data.llms?.find(
-              (x: AiProviderLlmsItems) => x.id === (prev?.id ?? data.provider.defaultLlm)
-            )
-            return {
-              ...prev,
-              defaultLlm: data.provider.defaultLlm,
-              provider: data.provider.id,
-              name: data.provider.name,
-              config: llmSetting?.config || '',
-              ...(llmSetting ?? {})
-            } as AiProviderDefaultConfig & { config: string }
-          })
+          if (resetDefaultLlm) {
+            setDefaultLlm((prev) => {
+              const llmSetting = data.llms?.find(
+                (x: AiProviderLlmsItems) => x.id === (prev?.id ?? data.provider.defaultLlm)
+              )
+              return {
+                ...prev,
+                defaultLlm: data.provider.defaultLlm,
+                provider: data.provider.id,
+                name: data.provider.name,
+                config: llmSetting?.config || '',
+                ...(llmSetting ?? {})
+              } as AiProviderDefaultConfig & { config: string }
+            })
+          }
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
         }

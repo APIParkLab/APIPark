@@ -114,7 +114,7 @@ const LocalModelList: React.FC = () => {
     normal: { text: '正常' },
     deploying: { text: '部署中', className: 'text-[#2196f3] cursor-pointer' },
     error: { text: '模型异常', className: 'text-[#ff4d4f]' },
-    disabled: { text: '停用', className: 'text-[#999]' },
+    disabled: { text: '停用' },
     deploying_error: { text: '部署失败', className: 'text-[#ff4d4f] cursor-pointer' }
   })
 
@@ -318,7 +318,7 @@ const LocalModelList: React.FC = () => {
       render: (dom: React.ReactNode, record: ModelListData) => (
         <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
           <a
-            href={`/aiApis?modelId=${record?.id}`}
+            href={`/aiApis?modelId=${record?.provider}`}
             target="_blank"
             className="key-link"
             style={{
