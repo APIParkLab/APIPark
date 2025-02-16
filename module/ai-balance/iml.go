@@ -150,7 +150,7 @@ func (i *imlBalanceModule) List(ctx context.Context, keyword string) ([]*ai_bala
 	sort.Slice(list, func(i, j int) bool {
 		return list[i].Priority < list[j].Priority
 	})
-	aiAPIMap, err := i.aiAPIService.CountMapByProvider(ctx, "", nil)
+	aiAPIMap, err := i.aiAPIService.CountMapByModel(ctx, "", nil)
 	if err != nil {
 		return nil, fmt.Errorf("get ai api count error:%v", err)
 	}
