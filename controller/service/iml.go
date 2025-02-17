@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
+
 	subscribe_dto "github.com/APIParkLab/APIPark/module/subscribe/dto"
 
 	"github.com/APIParkLab/APIPark/module/subscribe"
@@ -55,9 +57,9 @@ import (
 	"github.com/google/uuid"
 )
 
-var (
-	ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
-)
+//var (
+//	ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
+//)
 
 var (
 	_ IServiceController = (*imlServiceController)(nil)
@@ -343,7 +345,7 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 			return nil, fmt.Errorf("no local model")
 		}
 		modelId = list[0].Id
-		modelCfg = ollamaConfig
+		modelCfg = ai_provider_local.OllamaConfig
 	} else {
 		pv, err := i.providerModule.Provider(ctx, *input.Provider)
 		if err != nil {
