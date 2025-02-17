@@ -15,12 +15,12 @@ import { AI_SERVICE_VARIABLES_TABLE_COLUMNS } from '@core/const/ai-service/const
 import { VariableItems } from '@core/const/ai-service/type.ts'
 import { API_PATH_MATCH_RULES } from '@core/const/system/const'
 import { useAiServiceContext } from '@core/contexts/AiServiceContext.tsx'
-import { AiProviderDefaultConfig, AiProviderLlmsItems } from '@core/pages/aiSetting/AiSettingList'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { App, Button, Form, Input, InputNumber, Row, Space, Spin, Switch, Tag } from 'antd'
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import AiServiceRouterModelConfig, { AiServiceRouterModelConfigHandle } from './AiServiceInsideRouterModelConfig'
+import { AiProviderDefaultConfig, AiProviderLlmsItems } from '@core/pages/aiSetting/types'
 
 type AiServiceRouterField = {
   name: string
@@ -151,7 +151,13 @@ const AiServiceInsideRouterCreate = () => {
                 type: aiModel?.type
               }) as AiProviderDefaultConfig & { config: string }
           )
-          aiModel?.type !== 'local' && getDefaultModelConfig(aiModel?.provider, false)
+          getDefaultModelConfig({
+            provider: aiModel?.provider,
+            id: aiModel?.id,
+            replaceDefaultLlm: false,
+            setIcon: true,
+            type: aiModel?.type
+          })
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
         }
@@ -160,36 +166,109 @@ const AiServiceInsideRouterCreate = () => {
       .finally(() => setLoading(false))
   }
 
-  const getDefaultModelConfig = (provider?: string, resetDefaultLlm = true) => {
-    fetchData<BasicResponse<{ llms: AiProviderLlmsItems[]; provider: AiProviderDefaultConfig }>>('ai/provider/llms', {
-      method: 'GET',
-      eoParams: { provider: provider ?? aiServiceInfo?.provider?.id },
-      eoTransformKeys: ['default_llm']
-    })
-      .then((response) => {
-        const { code, data, msg } = response
-        if (code === STATUS_CODE.SUCCESS) {
-          setLlmList(data.llms)
-          if (resetDefaultLlm) {
-            setDefaultLlm((prev) => {
-              const llmSetting = data.llms?.find(
-                (x: AiProviderLlmsItems) => x.id === (prev?.id ?? data.provider.defaultLlm)
-              )
-              return {
-                ...prev,
-                defaultLlm: data.provider.defaultLlm,
-                provider: data.provider.id,
-                name: data.provider.name,
-                config: llmSetting?.config || '',
-                ...(llmSetting ?? {})
-              } as AiProviderDefaultConfig & { config: string }
-            })
-          }
-        } else {
-          message.error(msg || $t(RESPONSE_TIPS.error))
-        }
+  const getDefaultModelConfig = ({
+    provider,
+    id,
+    replaceDefaultLlm = true,
+    setIcon = true,
+    type
+  }: {
+    provider?: string
+    id?: string
+    replaceDefaultLlm?: boolean
+    setIcon?: boolean
+    type?: string
+  } = {}) => {
+    // 如果编辑状态下 是本地 或者，新增状态下是本地
+    if (type === 'local' || (!type && aiServiceInfo?.providerType === 'local')) {
+      fetchData<BasicResponse<{ llms: AiProviderLlmsItems[]; provider: AiProviderDefaultConfig }>>('simple/ai/models/local/configured', {
+        method: 'GET',
+        eoTransformKeys: ['default_config']
       })
-      .catch((errorInfo) => console.error(errorInfo))
+        .then((response) => {
+          const { code, data, msg } = response
+          if (code === STATUS_CODE.SUCCESS) {
+            setLlmList(data.models)
+            const localId = id || aiServiceInfo?.id
+            
+            if (replaceDefaultLlm) {
+              setDefaultLlm((prev) => {
+                const llmSetting = data.models?.find(
+                  (x: AiProviderLlmsItems) => x.id === (prev?.id ?? localId)
+                )
+                return {
+                  ...prev,
+                  defaultLlm: localId,
+                  provider: localId,
+                  name: aiServiceInfo?.name,
+                  config: llmSetting?.defaultConfig || '',
+                  type: 'local',
+                  ...(llmSetting ?? {})
+                } as AiProviderDefaultConfig & { config: string }
+              })
+            }
+            if (setIcon) {
+              setDefaultLlm((prev) => {
+                const llmSetting = data.models?.find(
+                  (x: AiProviderLlmsItems) => x.id === (prev?.id ?? localId)
+                )
+                return {
+                  ...prev,
+                  logo: llmSetting?.logo,
+                  scopes: llmSetting?.scopes
+                } as AiProviderDefaultConfig & { config: string }
+              })
+            }
+          } else {
+            message.error(msg || $t(RESPONSE_TIPS.error))
+          }
+        })
+        .catch((errorInfo) => console.error(errorInfo))
+    } else {
+      fetchData<BasicResponse<{ llms: AiProviderLlmsItems[]; provider: AiProviderDefaultConfig }>>('ai/provider/llms', {
+        method: 'GET',
+        eoParams: { provider: provider ?? aiServiceInfo?.provider?.id },
+        eoTransformKeys: ['default_llm']
+      })
+        .then((response) => {
+          const { code, data, msg } = response
+          if (code === STATUS_CODE.SUCCESS) {
+            setLlmList(data.llms)
+            if (replaceDefaultLlm) {
+              setDefaultLlm((prev) => {
+                const llmSetting = data.llms?.find(
+                  (x: AiProviderLlmsItems) => x.id === (prev?.id ?? data.provider.defaultLlm)
+                )
+                return {
+                  ...prev,
+                  defaultLlm: data.provider.defaultLlm,
+                  provider: data.provider.id,
+                  name: data.provider.name,
+                  config: llmSetting?.config || '',
+                  type: 'online',
+                  ...(llmSetting ?? {})
+                } as AiProviderDefaultConfig & { config: string }
+              })
+            }
+            if (setIcon) {
+              setDefaultLlm((prev) => {
+                const llmSetting = data.llms?.find(
+                  (x: AiProviderLlmsItems) => x.id === (prev?.id ?? data.provider.defaultLlm)
+                )
+                return {
+                  ...prev,
+                  logo: llmSetting?.logo,
+                  scopes: llmSetting?.scopes
+                } as AiProviderDefaultConfig & { config: string }
+              })
+            }
+          } else {
+            message.error(msg || $t(RESPONSE_TIPS.error))
+          }
+        })
+        .catch((errorInfo) => console.error(errorInfo))
+    }
+    
   }
 
   useEffect(() => {
