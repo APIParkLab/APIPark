@@ -201,6 +201,18 @@ type imlLocalModelCacheService struct {
 	store ai.ILocalModelCacheStore `autowired:""`
 }
 
+func (i *imlLocalModelCacheService) GetByTarget(ctx context.Context, typ CacheType, target string) (*LocalModelCache, error) {
+	item, err := i.store.First(ctx, map[string]interface{}{"target": target, "type": typ.Int()})
+	if err != nil {
+		return nil, err
+	}
+	return &LocalModelCache{
+		Model:  item.Model,
+		Target: item.Target,
+		Type:   CacheType(item.Type),
+	}, nil
+}
+
 func (i *imlLocalModelCacheService) List(ctx context.Context, model string, typ CacheType) ([]*LocalModelCache, error) {
 	list, err := i.store.List(ctx, map[string]interface{}{"model": model, "type": typ.Int()})
 	if err != nil {
