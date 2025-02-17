@@ -66,6 +66,10 @@ func (i *imlLocalModelService) fromEntity(e *ai.LocalModel) *LocalModel {
 	}
 }
 
+var (
+	_ ILocalModelPackageService = &imlLocalModelPackageService{}
+)
+
 type imlLocalModelPackageService struct {
 	store ai.ILocalModelPackageStore `autowired:""`
 	universally.IServiceGet[LocalModelPackage]

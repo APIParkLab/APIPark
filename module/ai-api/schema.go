@@ -72,9 +72,13 @@ func genResponse() *openapi3.ResponseRef {
 
 func genRequestBodySchema(variables []*ai_api_dto.AiPromptVariable) *openapi3.Schema {
 	result := openapi3.NewObjectSchema()
-	result.WithProperty("variables", genVariableSchema(variables))
+	if len(variables) > 0 {
+		result.WithProperty("variables", genVariableSchema(variables))
+		result.WithRequired([]string{"variables", "messages"})
+	}
+
 	result.WithPropertyRef("messages", messagesSchemaRef)
-	result.WithRequired([]string{"variables", "messages"})
+
 	return result
 }
 

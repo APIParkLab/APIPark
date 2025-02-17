@@ -130,34 +130,41 @@ func (i *imlLocalModel) Search(ctx context.Context, keyword string) ([]*ai_local
 }
 
 func (i *imlLocalModel) ListCanInstall(ctx context.Context, keyword string) ([]*ai_local_dto.LocalModelPackageItem, error) {
-	list, err := i.localModelPackageService.Search(ctx, keyword, nil)
-	if err != nil {
-		return nil, err
-	}
-	if keyword != "" {
+
+	if keyword == "" {
+		list, err := i.localModelPackageService.Search(ctx, keyword, nil)
+		if err != nil {
+			return nil, err
+		}
+		return utils.SliceToSlice(list, func(s *ai_local.LocalModelPackage) *ai_local_dto.LocalModelPackageItem {
+			return &ai_local_dto.LocalModelPackageItem{
+				Id:        s.Id,
+				Name:      s.Name,
+				Size:      s.Size,
+				IsPopular: s.IsPopular,
+			}
+		}), nil
+	} else {
+		info, err := i.localModelPackageService.Get(ctx, keyword)
+		if err != nil {
+			return nil, err
+		}
 		result := make([]*ai_local_dto.LocalModelPackageItem, 0)
 
-		for _, v := range list {
-			models := ai_provider_local.ModelsCanInstallById(v.Id)
-			for _, model := range models {
-				result = append(result, &ai_local_dto.LocalModelPackageItem{
-					Id:        model.Id,
-					Name:      model.Name,
-					Size:      model.Size,
-					IsPopular: model.IsPopular,
-				})
-			}
+		//for _, v := range list {
+		models := ai_provider_local.ModelsCanInstallById(info.Id)
+		for _, model := range models {
+			result = append(result, &ai_local_dto.LocalModelPackageItem{
+				Id:        model.Id,
+				Name:      model.Name,
+				Size:      model.Size,
+				IsPopular: model.IsPopular,
+			})
 		}
+		//}
 		return result, nil
 	}
-	return utils.SliceToSlice(list, func(s *ai_local.LocalModelPackage) *ai_local_dto.LocalModelPackageItem {
-		return &ai_local_dto.LocalModelPackageItem{
-			Id:        s.Id,
-			Name:      s.Name,
-			Size:      s.Size,
-			IsPopular: s.IsPopular,
-		}
-	}), nil
+
 }
 
 func (i *imlLocalModel) pullHook() func(msg ai_provider_local.PullMessage) error {
@@ -292,7 +299,7 @@ func (i *imlLocalModel) syncGateway(ctx context.Context, clusterId string, relea
 func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string) (*ai_provider_local.Pipeline, error) {
 	var p *ai_provider_local.Pipeline
 	err := i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		_, err := i.localModelService.Get(ctx, model)
+		info, err := i.localModelService.Get(ctx, model)
 		if err != nil {
 			if !errors.Is(err, gorm.ErrRecordNotFound) {
 				return err
@@ -305,8 +312,10 @@ func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string
 			})
 
 		} else {
-			state := ai_local_dto.LocalModelStateDeploying.Int()
-			err = i.localModelService.Save(ctx, model, &ai_local.EditLocalModel{State: &state})
+			if info.State == ai_local_dto.LocalModelStateDeployingError.Int() {
+				state := ai_local_dto.LocalModelStateDeploying.Int()
+				err = i.localModelService.Save(ctx, model, &ai_local.EditLocalModel{State: &state})
+			}
 		}
 		if err != nil {
 			return err
@@ -428,6 +437,7 @@ func (i *imlLocalModel) OnInit() {
 		})
 		models, version := ai_provider_local.ModelsCanInstall()
 		for _, model := range models {
+			delete(oldModels, model.Id)
 			if v, ok := oldModels[model.Id]; ok {
 				if v.Version == version {
 					continue
@@ -456,7 +466,6 @@ func (i *imlLocalModel) OnInit() {
 					return
 				}
 			}
-			delete(oldModels, model.Id)
 		}
 		for id := range oldModels {
 			err = i.localModelPackageService.Delete(ctx, id)
