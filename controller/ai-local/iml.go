@@ -6,13 +6,8 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"net/http"
-	"strings"
 
 	"github.com/APIParkLab/APIPark/module/router"
-
-	"github.com/APIParkLab/APIPark/model/plugin_model"
-	"github.com/APIParkLab/APIPark/service/api"
 
 	ai_api "github.com/APIParkLab/APIPark/module/ai-api"
 
@@ -23,9 +18,6 @@ import (
 	"github.com/eolinker/go-common/store"
 
 	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
-
-	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
-	router_dto "github.com/APIParkLab/APIPark/module/router/dto"
 
 	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
 
@@ -199,7 +191,7 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 		serviceId := uuid.NewString()
 		prefix := fmt.Sprintf("/%s", serviceId[:8])
 		providerId := "ollama"
-		info, err := i.serviceModule.Create(ctx, teamID, &service_dto.CreateService{
+		_, err = i.serviceModule.Create(ctx, teamID, &service_dto.CreateService{
 			Id:           serviceId,
 			Name:         model,
 			Prefix:       prefix,
@@ -214,83 +206,81 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 		if err != nil {
 			return err
 		}
-		err = i.module.SaveCache(ctx, model, serviceId)
-		if err != nil {
-			return err
-		}
-		path := fmt.Sprintf("/%s/chat", strings.Trim(prefix, "/"))
-		timeout := 300000
-		retry := 0
-		aiPrompt := &ai_api_dto.AiPrompt{
-			Variables: []*ai_api_dto.AiPromptVariable{},
-			Prompt:    "",
-		}
-		aiModel := &ai_api_dto.AiModel{
-			Id:       model,
-			Config:   ai_provider_local.OllamaConfig,
-			Provider: providerId,
-			Type:     "local",
-		}
-		name := "Demo AI API"
-		description := "A demo that shows you how to use a e a Chat API."
-		apiId := uuid.NewString()
-		err = i.aiAPIModule.Create(
-			ctx,
-			info.Id,
-			&ai_api_dto.CreateAPI{
-				Id:          apiId,
-				Name:        name,
-				Path:        path,
-				Description: description,
-				Disable:     false,
-				AiPrompt:    aiPrompt,
-				AiModel:     aiModel,
-				Timeout:     timeout,
-				Retry:       retry,
-			},
-		)
-		if err != nil {
-			return err
-		}
-		plugins := make(map[string]api.PluginSetting)
-		plugins["ai_prompt"] = api.PluginSetting{
-			Config: plugin_model.ConfigType{
-				"prompt":    aiPrompt.Prompt,
-				"variables": aiPrompt.Variables,
-			},
-		}
-		plugins["ai_formatter"] = api.PluginSetting{
-			Config: plugin_model.ConfigType{
-				"model":    aiModel.Id,
-				"provider": info.Provider.Id,
-				"config":   aiModel.Config,
-			},
-		}
-		_, err = i.routerModule.Create(ctx, info.Id, &router_dto.Create{
-			Id:   apiId,
-			Name: name,
-			Path: path,
-			Methods: []string{
-				http.MethodPost,
-			},
-			Description: description,
-			Protocols:   []string{"http", "https"},
-			MatchRules:  nil,
-			Proxy: &router_dto.InputProxy{
-				Path:    path,
-				Timeout: timeout,
-				Retry:   retry,
-				Plugins: plugins,
-			},
-			Disable: false,
-		})
-		if err != nil {
-			return err
-		}
+		return i.module.SaveCache(ctx, model, serviceId)
 
-		return i.docModule.SaveServiceDoc(ctx, info.Id, &service_dto.SaveServiceDoc{
-			Doc: "",
-		})
+		//path := fmt.Sprintf("/%s/chat", strings.Trim(prefix, "/"))
+		//timeout := 300000
+		//retry := 0
+		//aiPrompt := &ai_api_dto.AiPrompt{
+		//	Variables: []*ai_api_dto.AiPromptVariable{},
+		//	Prompt:    "",
+		//}
+		//aiModel := &ai_api_dto.AiModel{
+		//	Id:       model,
+		//	Config:   ai_provider_local.OllamaConfig,
+		//	Provider: providerId,
+		//	Type:     "local",
+		//}
+		//name := "Demo AI API"
+		//description := "A demo that shows you how to use a e a Chat API."
+		//apiId := uuid.NewString()
+		//err = i.aiAPIModule.Create(
+		//	ctx,
+		//	info.Id,
+		//	&ai_api_dto.CreateAPI{
+		//		Id:          apiId,
+		//		Name:        name,
+		//		Path:        path,
+		//		Description: description,
+		//		Disable:     false,
+		//		AiPrompt:    aiPrompt,
+		//		AiModel:     aiModel,
+		//		Timeout:     timeout,
+		//		Retry:       retry,
+		//	},
+		//)
+		//if err != nil {
+		//	return err
+		//}
+		//plugins := make(map[string]api.PluginSetting)
+		//plugins["ai_prompt"] = api.PluginSetting{
+		//	Config: plugin_model.ConfigType{
+		//		"prompt":    aiPrompt.Prompt,
+		//		"variables": aiPrompt.Variables,
+		//	},
+		//}
+		//plugins["ai_formatter"] = api.PluginSetting{
+		//	Config: plugin_model.ConfigType{
+		//		"model":    aiModel.Id,
+		//		"provider": info.Provider.Id,
+		//		"config":   aiModel.Config,
+		//	},
+		//}
+		//_, err = i.routerModule.Create(ctx, info.Id, &router_dto.Create{
+		//	Id:   apiId,
+		//	Name: name,
+		//	Path: path,
+		//	Methods: []string{
+		//		http.MethodPost,
+		//	},
+		//	Description: description,
+		//	Protocols:   []string{"http", "https"},
+		//	MatchRules:  nil,
+		//	Proxy: &router_dto.InputProxy{
+		//		Path:    path,
+		//		Timeout: timeout,
+		//		Retry:   retry,
+		//		Plugins: plugins,
+		//	},
+		//	Disable: false,
+		//})
+		//if err != nil {
+		//	return err
+		//}
+		//
+		//return i.docModule.SaveServiceDoc(ctx, info.Id, &service_dto.SaveServiceDoc{
+		//	Doc: "",
+		//})
 	})
 
 	return err

@@ -12,10 +12,10 @@ type API struct {
 	Upstream string    `gorm:"size:36;not null;column:upstream;comment:上游;index:upstream"`                  // 上游ID
 	Creator  string    `gorm:"size:36;not null;column:creator;comment:创建人;index:creator" aovalue:"creator"` // 创建人
 	CreateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
-	IsDelete int       `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除 0:未删除 1:已删除"`
 	Method   []string  `gorm:"size:255;not null;column:method;comment:请求方法;serializer:json"`
 	Protocol []string  `gorm:"type:text;not null;column:protocol;comment:协议;serializer:json"`
 	Path     string    `gorm:"size:255;not null;column:path;comment:请求路径"`
+	IsDelete bool      `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除 0:未删除 1:已删除"`
 }
 type Info struct {
 	Id          int64     `gorm:"column:id;type:BIGINT(20);NOT NULL;comment:id;primary_key;comment:主键ID;"`
