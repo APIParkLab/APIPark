@@ -116,12 +116,13 @@ func (i *imlLocalModel) Search(ctx context.Context, keyword string) ([]*ai_local
 	}
 
 	return utils.SliceToSlice(list, func(s *ai_local.LocalModel) *ai_local_dto.LocalModelItem {
+		count := apiCountMap[s.Id]
 		return &ai_local_dto.LocalModelItem{
 			Id:         s.Id,
 			Name:       s.Name,
 			State:      ai_local_dto.FromLocalModelState(s.State),
-			APICount:   apiCountMap[s.Id],
-			CanDelete:  true,
+			APICount:   count,
+			CanDelete:  count < 1,
 			UpdateTime: auto.TimeLabel(s.UpdateAt),
 			Provider:   "ollama",
 		}
@@ -372,12 +373,22 @@ func (i *imlLocalModel) CancelDeploy(ctx context.Context, model string) error {
 }
 
 func (i *imlLocalModel) RemoveModel(ctx context.Context, model string) error {
-
-	err := ai_provider_local.RemoveModel(model)
+	// 判断是否有api
+	count, err := i.aiAPIService.CountByModel(ctx, model)
 	if err != nil {
 		return err
 	}
-	return i.localModelService.Delete(ctx, model)
+	if count > 0 {
+		return fmt.Errorf("model %s has api, can not remove", model)
+	}
+	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		err = i.localModelService.Delete(ctx, model)
+		if err != nil {
+			return err
+		}
+		return ai_provider_local.RemoveModel(model)
+	})
+
 }
 
 func (i *imlLocalModel) Enable(ctx context.Context, model string) error {
