@@ -83,15 +83,8 @@ func (i *imlLocalModelController) Deploy(ctx *gin.Context) {
 			"code": -1, "msg": "model is required", "success": "fail",
 		})
 		return
-
 	}
-	//err = i.initAILocalService(ctx, input.Model, input.Team)
-	//if err != nil {
-	//	ctx.JSON(200, gin.H{
-	//		"code": -1, "msg": err.Error(), "success": "fail",
-	//	})
-	//	return
-	//}
+
 	id := uuid.NewString()
 	p, err := i.module.Deploy(ctx, input.Model, id)
 	if err != nil {
@@ -105,10 +98,11 @@ func (i *imlLocalModelController) Deploy(ctx *gin.Context) {
 	go func() {
 		select {
 		case <-ctx.Writer.CloseNotify():
-			log.Info("client closed connection,close pipeline")
-			ai_provider_local.CancelPipeline(input.Model, id)
+
 		case <-done:
+
 		}
+		ai_provider_local.CancelPipeline(input.Model, id)
 	}()
 	var complete int64
 	var total int64
