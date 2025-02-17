@@ -8,6 +8,8 @@ import (
 	"sort"
 	"time"
 
+	"github.com/google/uuid"
+
 	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
 
 	"github.com/eolinker/go-common/register"
@@ -77,14 +79,59 @@ func (i *imlProviderModule) OnInit() {
 		if err != nil {
 			return
 		}
-		for _, l := range list {
-			i.providerService.Save(ctx, l.Id, &ai.SetProvider{})
-		}
+		i.transaction.Transaction(ctx, func(ctx context.Context) error {
+			for _, l := range list {
+				if l.Priority < 1 {
+					continue
+				}
+				has, err := i.aiBalanceService.Exist(ctx, l.Id, l.DefaultLLM)
+				if err != nil {
+					return err
+				}
+				if has {
+					continue
+				}
+
+				p, has := model_runtime.GetProvider(l.Id)
+				if !has {
+					continue
+				}
+				err = i.aiBalanceService.Create(ctx, &ai_balance.Create{
+					Id:           uuid.NewString(),
+					Priority:     l.Priority,
+					Provider:     l.Id,
+					ProviderName: p.Name(),
+					Model:        l.DefaultLLM,
+					ModelName:    l.DefaultLLM,
+					Type:         0,
+				})
+				if err != nil {
+					return err
+				}
+				priority := 0
+				err = i.providerService.Save(ctx, l.Id, &ai.SetProvider{
+					Priority: &priority,
+				})
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		})
+
 	})
 }
 
 func (i *imlProviderModule) Delete(ctx context.Context, id string) error {
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		// 判断是否有api
+		count, err := i.aiAPIService.CountByProvider(ctx, id)
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return fmt.Errorf("provider has api")
+		}
 		keys, err := i.aiKeyService.KeysByProvider(ctx, id)
 		if err != nil {
 			return err
@@ -173,6 +220,7 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context, keyword str
 		if !has {
 			continue
 		}
+		apiCount := aiAPIMap[l.Id]
 
 		providers = append(providers, &ai_dto.ConfiguredProviderItem{
 			Id:         l.Id,
@@ -180,9 +228,9 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context, keyword str
 			Logo:       p.Logo(),
 			DefaultLLM: l.DefaultLLM,
 			Status:     ai_dto.ToProviderStatus(l.Status),
-			APICount:   aiAPIMap[l.Id],
+			APICount:   apiCount,
 			KeyCount:   keyMap[l.Id],
-			CanDelete:  len(list) > 1,
+			CanDelete:  apiCount < 1,
 		})
 	}
 
@@ -216,18 +264,6 @@ func (i *imlProviderModule) SimpleProviders(ctx context.Context) ([]*ai_dto.Simp
 		items = append(items, item)
 	}
 
-	//sort.Slice(items, func(i, j int) bool {
-	//	if items[i].Priority != items[j].Priority {
-	//		if items[i].Priority == 0 {
-	//			return false
-	//		}
-	//		if items[j].Priority == 0 {
-	//			return true
-	//		}
-	//		return items[i].Priority < items[j].Priority
-	//	}
-	//	return items[i].Name < items[j].Name
-	//})
 	return items, nil
 }
 

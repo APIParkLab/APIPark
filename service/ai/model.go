@@ -32,6 +32,7 @@ type SetProvider struct {
 	Name       *string
 	DefaultLLM *string
 	Config     *string
+	Priority   *int
 	Status     *int
 }
 

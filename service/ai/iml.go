@@ -126,5 +126,8 @@ func updateHandler(e *ai.Provider, i *SetProvider) {
 	if i.Status != nil {
 		e.Status = *i.Status
 	}
+	if i.Priority != nil {
+		e.Priority = *i.Priority
+	}
 	e.UpdateAt = time.Now()
 }
