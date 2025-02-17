@@ -20,6 +20,7 @@ type ILocalModelPackageService interface {
 	universally.IServiceCreate[CreateLocalModelPackage]
 	universally.IServiceEdit[EditLocalModelPackage]
 	universally.IServiceDelete
+	//SearchByModel(ctx context.Context, model string) ([]*LocalModelPackage, error)
 }
 
 type ILocalModelInstallStateService interface {
