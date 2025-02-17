@@ -1,5 +1,5 @@
 variables:
-  PATH: /opt/go-1.23/go/bin/:/opt/node/node/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+  PATH: /opt/go-1.23/go/bin/:/opt/node-1.22/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
   GOROOT: /opt/go-1.23/go
   GOPROXY: https://goproxy.cn
   VERSION: $CI_COMMIT_SHORT_SHA
