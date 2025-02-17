@@ -19,6 +19,7 @@ export type AiServiceConfigFieldType = {
     serviceType?:'public'|'inner';
     catalogue?:string | string[];
     approvalType?:string;
+    providerType?:string
 };
 
 export type AiServiceSubServiceTableListItem = {

@@ -31,7 +31,8 @@ const AiServiceInsidePage: FC = () => {
   const getAiServiceInfo = () => {
     fetchData<BasicResponse<{ service: AiServiceConfigFieldType }>>('service/info', {
       method: 'GET',
-      eoParams: { team: teamId, service: serviceId }
+      eoParams: { team: teamId, service: serviceId },
+      eoTransformKeys: ['provider_type']
     }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
