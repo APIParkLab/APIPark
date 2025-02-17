@@ -79,7 +79,7 @@ const AiServiceInsideRouterCreate = () => {
             timeout,
             retry,
             aiPrompt: { variables: variables, prompt: prompt },
-            aiModel: { id: defaultLlm?.id, provider: defaultLlm?.provider, config: defaultLlm?.config },
+            aiModel: { id: defaultLlm?.id, provider: defaultLlm?.provider, config: defaultLlm?.config, type: defaultLlm?.type },
             disabled
           }
           return fetchData<BasicResponse<null>>('service/ai-router', {
@@ -147,10 +147,11 @@ const AiServiceInsideRouterCreate = () => {
                 ...prev,
                 provider: aiModel?.provider,
                 id: aiModel?.id,
-                config: aiModel.config
+                config: aiModel.config,
+                type: aiModel?.type
               }) as AiProviderDefaultConfig & { config: string }
           )
-          getDefaultModelConfig(aiModel?.provider)
+          aiModel?.type !== 'local' && getDefaultModelConfig(aiModel?.provider, false)
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
         }
@@ -159,7 +160,7 @@ const AiServiceInsideRouterCreate = () => {
       .finally(() => setLoading(false))
   }
 
-  const getDefaultModelConfig = (provider?: string) => {
+  const getDefaultModelConfig = (provider?: string, resetDefaultLlm = true) => {
     fetchData<BasicResponse<{ llms: AiProviderLlmsItems[]; provider: AiProviderDefaultConfig }>>('ai/provider/llms', {
       method: 'GET',
       eoParams: { provider: provider ?? aiServiceInfo?.provider?.id },
@@ -169,19 +170,21 @@ const AiServiceInsideRouterCreate = () => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           setLlmList(data.llms)
-          setDefaultLlm((prev) => {
-            const llmSetting = data.llms?.find(
-              (x: AiProviderLlmsItems) => x.id === (prev?.id ?? data.provider.defaultLlm)
-            )
-            return {
-              ...prev,
-              defaultLlm: data.provider.defaultLlm,
-              provider: data.provider.id,
-              name: data.provider.name,
-              config: llmSetting?.config || '',
-              ...(llmSetting ?? {})
-            } as AiProviderDefaultConfig & { config: string }
-          })
+          if (resetDefaultLlm) {
+            setDefaultLlm((prev) => {
+              const llmSetting = data.llms?.find(
+                (x: AiProviderLlmsItems) => x.id === (prev?.id ?? data.provider.defaultLlm)
+              )
+              return {
+                ...prev,
+                defaultLlm: data.provider.defaultLlm,
+                provider: data.provider.id,
+                name: data.provider.name,
+                config: llmSetting?.config || '',
+                ...(llmSetting ?? {})
+              } as AiProviderDefaultConfig & { config: string }
+            })
+          }
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
         }
@@ -237,13 +240,14 @@ const AiServiceInsideRouterCreate = () => {
   }
 
   const handlerSubmit: () => Promise<boolean> | undefined = () => {
-    return drawerAddFormRef.current?.save()?.then((res: { id: string; config: string }) => {
+    return drawerAddFormRef.current?.save()?.then((res: { id: string; config: string, type: string, provider: string }) => {
       setDefaultLlm(
         (prev) =>
           ({
             ...prev,
             provider: res.provider,
             id: res.id,
+            type: res.type,
             config: res.config,
             logo: llmList?.find((x: AiProviderLlmsItems) => x.id === res.id)?.logo
           }) as AiProviderDefaultConfig & { config: string }

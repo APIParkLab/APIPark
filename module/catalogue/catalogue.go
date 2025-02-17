@@ -2,8 +2,9 @@ package catalogue
 
 import (
 	"context"
-	"github.com/APIParkLab/APIPark/module/system"
 	"reflect"
+
+	"github.com/APIParkLab/APIPark/module/system"
 
 	"github.com/eolinker/go-common/autowire"
 
@@ -28,6 +29,7 @@ type ICatalogueModule interface {
 	// Subscribe 订阅服务
 	Subscribe(ctx context.Context, subscribeInfo *catalogue_dto.SubscribeService) error
 	Sort(ctx context.Context, sorts []*catalogue_dto.SortItem) error
+	DefaultCatalogue(ctx context.Context) (*catalogue_dto.Catalogue, error)
 	//ExportAll(ctx context.Context) ([]*catalogue_dto.ExportCatalogue, error)
 }
 

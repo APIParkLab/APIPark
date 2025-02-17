@@ -66,6 +66,24 @@ type imlCatalogueModule struct {
 	root                  *Root
 }
 
+func (i *imlCatalogueModule) DefaultCatalogue(ctx context.Context) (*catalogue_dto.Catalogue, error) {
+	catalogues, err := i.catalogueService.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range catalogues {
+		if v.Parent == "" {
+			return &catalogue_dto.Catalogue{
+				Id:     v.Id,
+				Name:   v.Name,
+				Parent: v.Parent,
+				Sort:   v.Sort,
+			}, nil
+		}
+	}
+	return nil, errors.New("no default catalogue")
+}
+
 func (i *imlCatalogueModule) onlineSubscriber(ctx context.Context, clusterId string, sub *gateway.SubscribeRelease) error {
 	client, err := i.clusterService.GatewayClient(ctx, clusterId)
 	if err != nil {

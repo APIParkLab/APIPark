@@ -54,7 +54,7 @@ func (i *imlAPIModule) getAPIDoc(ctx context.Context, serviceId string) (*openap
 	return openapi3Loader.LoadFromData([]byte(doc.Content))
 }
 
-func (i *imlAPIModule) updateAPIDoc(ctx context.Context, serviceId string, serviceName string, path string, summary string, description string, aiPrompt *ai_api_dto.AiPrompt) error {
+func (i *imlAPIModule) updateAPIDoc(ctx context.Context, serviceId, serviceName, orgPath, path, summary, description string, aiPrompt *ai_api_dto.AiPrompt) error {
 	doc, err := i.getAPIDoc(ctx, serviceId)
 	if err != nil {
 		return err
@@ -64,6 +64,10 @@ func (i *imlAPIModule) updateAPIDoc(ctx context.Context, serviceId string, servi
 	if aiPrompt != nil {
 		variables = aiPrompt.Variables
 	}
+	if doc.Paths != nil {
+		doc.Paths.Delete(orgPath)
+	}
+
 	doc.AddOperation(path, http.MethodPost, genOperation(summary, description, variables))
 	result, err := doc.MarshalJSON()
 	if err != nil {
@@ -103,10 +107,11 @@ func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_a
 		input.Id = uuid.New().String()
 	}
 	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		err = i.updateAPIDoc(ctx, serviceId, info.Name, input.Path, input.Name, input.Description, input.AiPrompt)
+		err = i.updateAPIDoc(ctx, serviceId, info.Name, "", input.Path, input.Name, input.Description, input.AiPrompt)
 		if err != nil {
 			return err
 		}
+
 		return i.aiAPIService.Create(ctx, &ai_api.Create{
 			ID:          input.Id,
 			Name:        input.Name,
@@ -118,6 +123,7 @@ func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_a
 			Retry:       input.Retry,
 			Model:       input.AiModel.Id,
 			Provider:    input.AiModel.Provider,
+			Type:        ai_api_dto.ModelType(input.AiModel.Type).Int(),
 			AdditionalConfig: map[string]interface{}{
 				"ai_prompt": input.AiPrompt,
 				"ai_model":  input.AiModel,
@@ -141,13 +147,14 @@ func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string,
 		if err != nil {
 			return err
 		}
+		orgPath := apiInfo.Path
 		if input.Path != nil {
 			apiInfo.Path = *input.Path
 		}
 		if input.Description != nil {
 			apiInfo.Description = *input.Description
 		}
-		err = i.updateAPIDoc(ctx, serviceId, info.Name, apiInfo.Path, apiInfo.Name, apiInfo.Description, input.AiPrompt)
+		err = i.updateAPIDoc(ctx, serviceId, info.Name, orgPath, apiInfo.Path, apiInfo.Name, apiInfo.Description, input.AiPrompt)
 		if err != nil {
 			return err
 		}
@@ -163,6 +170,7 @@ func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string,
 		if input.AiModel != nil {
 			apiInfo.AdditionalConfig["ai_model"] = input.AiModel
 		}
+		typ := ai_api_dto.ModelType(input.AiModel.Type).Int()
 		return i.aiAPIService.Save(ctx, apiId, &ai_api.Edit{
 			Name:             input.Name,
 			Path:             input.Path,
@@ -171,6 +179,7 @@ func (i *imlAPIModule) Edit(ctx context.Context, serviceId string, apiId string,
 			Retry:            input.Retry,
 			Model:            modelId,
 			Provider:         providerId,
+			Type:             &typ,
 			AdditionalConfig: &apiInfo.AdditionalConfig,
 			Disable:          input.Disable,
 		})

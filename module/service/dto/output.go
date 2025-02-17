@@ -5,6 +5,44 @@ import (
 	"github.com/eolinker/go-common/auto"
 )
 
+type ServiceState string
+
+const (
+	ServiceStateNormal      ServiceState = "normal"
+	ServiceStateDeploying   ServiceState = "deploying"
+	ServiceStateDeployError ServiceState = "error"
+)
+
+func (s ServiceState) String() string {
+	return string(s)
+}
+
+func (s ServiceState) Int() int {
+	switch s {
+	case ServiceStateNormal:
+		return 0
+	case ServiceStateDeploying:
+		return 1
+	case ServiceStateDeployError:
+		return 2
+	default:
+		return 0
+	}
+}
+
+func FromServiceState(s int) ServiceState {
+	switch s {
+	case 0:
+		return ServiceStateNormal
+	case 1:
+		return ServiceStateDeploying
+	case 2:
+		return ServiceStateDeployError
+	default:
+		return ""
+	}
+}
+
 type ServiceItem struct {
 	Id          string         `json:"id"`
 	Name        string         `json:"name"`
@@ -15,6 +53,7 @@ type ServiceItem struct {
 	CreateTime  auto.TimeLabel `json:"create_time"`
 	UpdateTime  auto.TimeLabel `json:"update_time"`
 	Provider    *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
+	State       string         `json:"state"`
 	CanDelete   bool           `json:"can_delete"`
 }
 
@@ -58,10 +97,12 @@ type Service struct {
 	Tags         []auto.Label   `json:"tags" aolabel:"tag"`
 	Logo         string         `json:"logo"`
 	Provider     *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
+	ProviderType string         `json:"provider_type"`
 	ApprovalType string         `json:"approval_type"`
 	AsServer     bool           `json:"as_server"`
 	AsApp        bool           `json:"as_app"`
 	ServiceKind  string         `json:"service_kind"`
+	State        string         `json:"state"`
 }
 
 type App struct {
@@ -79,6 +120,7 @@ func ToService(model *service.Service) *Service {
 	if model.Prefix != "" {
 		prefix = model.Prefix
 	}
+
 	s := &Service{
 		Id:           model.Id,
 		Name:         model.Name,
@@ -95,10 +137,21 @@ func ToService(model *service.Service) *Service {
 		AsApp:        model.AsApp,
 		ServiceKind:  model.Kind.String(),
 	}
+	state := FromServiceState(model.State)
+	if state == ServiceStateNormal {
+		s.State = model.ServiceType.String()
+	} else {
+		s.State = state.String()
+	}
+
 	switch model.Kind {
 	case service.AIService:
 		provider := auto.UUID(model.AdditionalConfig["provider"])
 		s.Provider = &provider
+		s.ProviderType = "local"
+		if provider.Id != "ollama" {
+			s.ProviderType = "online"
+		}
 	}
 	return s
 }

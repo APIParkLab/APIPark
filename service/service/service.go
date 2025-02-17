@@ -20,6 +20,7 @@ type IServiceService interface {
 	ServiceList(ctx context.Context, serviceIds ...string) ([]*Service, error)
 	ServiceListByKind(ctx context.Context, kind Kind, serviceIds ...string) ([]*Service, error)
 	AppList(ctx context.Context, appIds ...string) ([]*Service, error)
+	ForceDelete(ctx context.Context, id string) error
 }
 
 func init() {

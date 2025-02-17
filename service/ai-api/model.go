@@ -22,6 +22,7 @@ type API struct {
 	UseToken         int
 	Creator          string
 	Updater          string
+	Type             int
 	AdditionalConfig map[string]interface{}
 	Disable          bool
 }
@@ -37,6 +38,7 @@ type Create struct {
 	Model            string
 	Provider         string
 	AdditionalConfig map[string]interface{}
+	Type             int
 	Disable          bool
 }
 
@@ -50,6 +52,7 @@ type Edit struct {
 	Model            *string
 	Disable          *bool
 	UseToken         *int
+	Type             *int
 	AdditionalConfig *map[string]interface{}
 }
 
@@ -73,6 +76,7 @@ func FromEntity(e *api.AiAPIInfo) *API {
 		Updater:          e.Updater,
 		Disable:          e.Disable,
 		UseToken:         e.UseToken,
+		Type:             e.Type,
 		AdditionalConfig: cfg,
 	}
 }
