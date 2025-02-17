@@ -8,8 +8,8 @@ import { $t } from '@common/locales/index.ts'
 import { useFetch } from '@common/hooks/http'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 
-export const ServiceDeployment = (props: { record: SystemTableListItem, closeModal?: () => void }) => {
-  const { record, closeModal } = props
+export const ServiceDeployment = (props: { record: SystemTableListItem, closeModal?: () => void, updateFooter?: () => void, cancelCb?: (cancel: () => void) => void }) => {
+  const { record, closeModal, updateFooter, cancelCb } = props
   const { message } = App.useApp()
   const getIcon = (status: string) => {
     switch (status) {
@@ -126,6 +126,9 @@ export const ServiceDeployment = (props: { record: SystemTableListItem, closeMod
           method: 'POST',
           eoBody: { model: record.id, team: record.team?.id },
           isStream: true,
+          callback: (cancel: () => void) => {
+            cancelCb?.(cancel)
+          },
           handleStream: (chunk) => {
             const parsedChunk = JSON.parse(chunk)
             // 下载中
@@ -144,6 +147,7 @@ export const ServiceDeployment = (props: { record: SystemTableListItem, closeMod
                 closeModal?.()
               }, 200)
             } else if (parsedChunk?.data?.state.includes('error')) {
+              updateFooter?.()
               setStepItem((prevItems) =>
                 prevItems.map((item, index) => {
                   return { ...item, status: index === step.current ? 'error' : item.status }

@@ -141,11 +141,22 @@ const SystemList: FC = () => {
       modalInstance.destroy()
       reload && manualReloadTable()
     }
+    const updateFooter = () => {
+      record.state = 'error'
+      modalInstance.update({})
+    }
+    let cancelCb: () => void = () => {}
+    const cancel = (cancel: () => void) => {
+      cancelCb = cancel
+    }
     const modalInstance = modal.confirm({
       title: $t('部署过程'),
-      content: <ServiceDeployment record={record} closeModal={closeModal} />,
+      content: <ServiceDeployment record={record} closeModal={closeModal} updateFooter={updateFooter} cancelCb={cancel} />,
       footer: () => {
         return <LogsFooter record={record} closeModal={closeModal} />
+      },
+      afterClose: () => {
+        cancelCb()
       },
       width: 600,
       okText: $t('确认'),
