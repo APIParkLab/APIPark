@@ -9,6 +9,7 @@ type CancelDeploy struct {
 }
 
 type DeployInput struct {
-	Model string `json:"model"`
-	Team  string `json:"team"`
+	Model   string `json:"model"`
+	Service string `json:"service"`
+	Team    string `json:"team"`
 }
