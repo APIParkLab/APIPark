@@ -15,7 +15,7 @@ type Service struct {
 	Catalogue        string    `gorm:"type:text;not null;column:catalogue;comment:目录"`
 	CreateAt         time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
 	UpdateAt         time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;column:update_at;comment:修改时间"`
-	IsDelete         int       `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除"`
+	IsDelete         bool      `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除"`
 	Kind             int       `gorm:"type:tinyint(4);not null;column:kind;comment:服务种类，0:Rest服务，1:AI服务"`
 	State            int       `gorm:"type:tinyint(4);not null;column:state;comment:状态"`
 	AdditionalConfig string    `gorm:"type:text;not null;column:additional_config;comment:额外配置"`
