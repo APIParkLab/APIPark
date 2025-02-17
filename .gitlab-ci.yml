@@ -10,6 +10,7 @@ variables:
   VIEW_ADDR: http://172.18.166.219:8288
   SAVE_DIR: /opt/${APP}
   NODE_OPTIONS: --max_old_space_size=8192
+  APIPARK_OLLAMA_BASE: http://127.0.0.1:11434
 
 stages:
   - notice
