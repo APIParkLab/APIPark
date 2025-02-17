@@ -9,6 +9,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/APIParkLab/APIPark/module/subscribe"
+	subscribe_dto "github.com/APIParkLab/APIPark/module/subscribe/dto"
+
 	"github.com/APIParkLab/APIPark/model/plugin_model"
 	"github.com/APIParkLab/APIPark/service/api"
 
@@ -44,7 +47,9 @@ type imlLocalModelController struct {
 	serviceModule   service.IServiceModule     `autowired:""`
 	catalogueModule catalogue.ICatalogueModule `autowired:""`
 	aiAPIModule     ai_api.IAPIModule          `autowired:""`
+	appModule       service.IAppModule         `autowired:""`
 	routerModule    router.IRouterModule       `autowired:""`
+	subscribeModule subscribe.ISubscribeModule `autowired:""`
 	docModule       service.IServiceDocModule  `autowired:""`
 	transaction     store.ITransaction         `autowired:""`
 }
@@ -226,7 +231,7 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 			Type:     "local",
 		}
 		name := "Demo AI API"
-		description := "A demo that shows you how to use a e a Chat API."
+		description := "This is a demo that shows you how to use a Chat API."
 		apiId := uuid.NewString()
 		err = i.aiAPIModule.Create(
 			ctx,
@@ -281,7 +286,15 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 		if err != nil {
 			return err
 		}
-
+		apps, err := i.appModule.Search(ctx, teamID, "")
+		if err != nil {
+			return err
+		}
+		for _, app := range apps {
+			i.subscribeModule.AddSubscriber(ctx, serviceId, &subscribe_dto.AddSubscriber{
+				Application: app.Id,
+			})
+		}
 		return i.docModule.SaveServiceDoc(ctx, serviceId, &service_dto.SaveServiceDoc{
 			Doc: "",
 		})
