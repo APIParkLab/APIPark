@@ -136,6 +136,7 @@ type EoRequest = RequestInit & {
   eoBody?: { [k: string]: unknown } | Array<unknown> | string
   isStream?: boolean
   handleStream?: (line: any) => void
+  callback?: (cancel: () => void) => void
 }
 
 type EoHeaders = Headers | { [k: string]: string }
@@ -145,6 +146,14 @@ export function useFetch() {
   const pluginEventHub = usePluginEventHub()
 
   function fetchData<T>(url: string, options: EoRequest) {
+    const controller = new AbortController()
+    const signal = controller.signal
+
+    // 如果提供了callback，则传递取消请求的函数
+    if (options.callback) {
+      options.callback(() => controller.abort())
+    }
+
     // 合并传入的headers与默认headers
     const headers = { ...(options.body ? {} : DEFAULT_HEADERS), ...options.headers }
 
@@ -163,7 +172,8 @@ export function useFetch() {
       headers: {
         ...headers
         // Authorization: 'Bearer your-token', // 示例：添加统一的Token认证
-      }
+      },
+      signal // 将signal传递给fetch请求
     }
 
     return fetch(`${options?.eoApiPrefix === undefined ? '/api/v1/' : options.eoApiPrefix}${url}`, finalOptions)
