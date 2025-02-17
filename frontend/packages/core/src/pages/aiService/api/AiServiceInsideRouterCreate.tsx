@@ -320,6 +320,13 @@ const AiServiceInsideRouterCreate = () => {
 
   const handlerSubmit: () => Promise<boolean> | undefined = () => {
     return drawerAddFormRef.current?.save()?.then((res: { id: string; config: string, type: string, provider: string }) => {
+      getDefaultModelConfig({
+        provider: res.provider,
+        id: res.id,
+        type: res.type,
+        replaceDefaultLlm: false,
+        setIcon: true
+      })
       setDefaultLlm(
         (prev) =>
           ({
