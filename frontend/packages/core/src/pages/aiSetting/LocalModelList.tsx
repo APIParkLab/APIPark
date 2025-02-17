@@ -273,9 +273,13 @@ const LocalModelList: React.FC = () => {
       reload && pageListRef.current?.reload()
       modalInstance.destroy()
     }
+    const updateFooter = () => {
+      record.state = 'error'
+      modalInstance.update({})
+    }
     const modalInstance = modal.confirm({
       title: $t('部署过程'),
-      content: <ServiceDeployment record={record} closeModal={closeModal} />,
+      content: <ServiceDeployment record={record} closeModal={closeModal} updateFooter={updateFooter} />,
       footer: () => {
         return <LogsFooter record={record} closeModal={closeModal} />
       },
