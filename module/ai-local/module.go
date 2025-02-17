@@ -16,7 +16,7 @@ import (
 type ILocalModelModule interface {
 	Search(ctx context.Context, keyword string) ([]*ai_local_dto.LocalModelItem, error)
 	ListCanInstall(ctx context.Context, keyword string) ([]*ai_local_dto.LocalModelPackageItem, error)
-	Deploy(ctx context.Context, model string, session string) (*ai_provider_local.Pipeline, error)
+	Deploy(ctx context.Context, model string, session string, fn ...func() error) (*ai_provider_local.Pipeline, error)
 	CancelDeploy(ctx context.Context, model string) error
 	RemoveModel(ctx context.Context, model string) error
 	Enable(ctx context.Context, model string) error

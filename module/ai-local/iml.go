@@ -167,7 +167,7 @@ func (i *imlLocalModel) ListCanInstall(ctx context.Context, keyword string) ([]*
 
 }
 
-func (i *imlLocalModel) pullHook() func(msg ai_provider_local.PullMessage) error {
+func (i *imlLocalModel) pullHook(fn ...func() error) func(msg ai_provider_local.PullMessage) error {
 	return func(msg ai_provider_local.PullMessage) error {
 		return i.transaction.Transaction(context.Background(), func(ctx context.Context) error {
 
@@ -240,6 +240,12 @@ func (i *imlLocalModel) pullHook() func(msg ai_provider_local.PullMessage) error
 				return err
 			}
 			if state == ai_local_dto.DeployStateFinish.Int() {
+				for _, f := range fn {
+					err = f()
+					if err != nil {
+						return err
+					}
+				}
 				cfg := make(map[string]interface{})
 				cfg["provider"] = "ollama"
 				cfg["model"] = msg.Model
@@ -296,7 +302,7 @@ func (i *imlLocalModel) syncGateway(ctx context.Context, clusterId string, relea
 	return nil
 }
 
-func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string) (*ai_provider_local.Pipeline, error) {
+func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string, fn ...func() error) (*ai_provider_local.Pipeline, error) {
 	var p *ai_provider_local.Pipeline
 	err := i.transaction.Transaction(ctx, func(txCtx context.Context) error {
 		item, err := i.localModelCacheService.GetByTarget(ctx, ai_local.CacheTypeService, model)
@@ -329,7 +335,7 @@ func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string
 		if err != nil {
 			return err
 		}
-		p, err = ai_provider_local.PullModel(model, session, i.pullHook())
+		p, err = ai_provider_local.PullModel(model, session, i.pullHook(fn...))
 		if err != nil {
 			return err
 		}
