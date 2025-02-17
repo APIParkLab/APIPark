@@ -23,6 +23,18 @@ type imlAIKeyService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlAIKeyService) DeleteByProvider(ctx context.Context, providerId string) error {
+	_, err := i.store.DeleteWhere(ctx, map[string]interface{}{"provider": providerId})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (i *imlAIKeyService) CountMapByProvider(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error) {
+	return i.store.CountByGroup(ctx, keyword, conditions, "provider")
+}
+
 func (i *imlAIKeyService) IncrUseToken(ctx context.Context, id string, useToken int) error {
 	info, err := i.store.GetByUUID(ctx, id)
 	if err != nil {
@@ -111,16 +123,16 @@ func (i *imlAIKeyService) SortBefore(ctx context.Context, provider string, origi
 	fn := func(priority int) int {
 		return priority + 1
 	}
-	sql := "sort < ? and sort >= ?"
+	sql := "provider = ? and sort < ? and sort >= ?"
 	if originKeySort < targetKeySort {
 		// 如果原始Key在目标Key之前，中间的key往前移动，原始Key移动到`targetKeySort - 1`位置
-		sql = "sort > ? and sort < ?"
+		sql = "provider = ? and sort > ? and sort < ?"
 		originKey.Sort = targetKeySort - 1
 		fn = func(priority int) int {
 			return priority - 1
 		}
 	}
-	list, err := i.store.ListQuery(ctx, sql, []interface{}{originKeySort, targetKeySort}, "sort asc")
+	list, err := i.store.ListQuery(ctx, sql, []interface{}{provider, originKeySort, targetKeySort}, "sort asc")
 	if err != nil {
 		return nil, err
 	}
@@ -160,16 +172,16 @@ func (i *imlAIKeyService) SortAfter(ctx context.Context, provider string, origin
 	fn := func(priority int) int {
 		return priority + 1
 	}
-	sql := "sort < ? and sort > ?"
+	sql := "provider = ? and sort < ? and sort > ?"
 	if originKeySort < targetKeySort {
 		// 如果原始Key在目标Key之前，中间的Key往前移动，原始Key移动到`targetKeySort`位置
-		sql = "sort > ? and sort <= ?"
+		sql = "provider = ? and sort > ? and sort <= ?"
 		originKey.Sort = targetKeySort
 		fn = func(priority int) int {
 			return priority - 1
 		}
 	}
-	list, err := i.store.ListQuery(ctx, sql, []interface{}{originKeySort, targetKeySort}, "sort asc")
+	list, err := i.store.ListQuery(ctx, sql, []interface{}{provider, originKeySort, targetKeySort}, "sort asc")
 	if err != nil {
 		return nil, err
 	}
@@ -196,8 +208,8 @@ func (i *imlAIKeyService) SortAfter(ctx context.Context, provider string, origin
 
 func (i *imlAIKeyService) OnComplete() {
 	i.IServiceGet = universally.NewGet[Key, ai.Key](i.store, FromEntity)
-	i.IServiceCreate = universally.NewCreator[Create, ai.Key](i.store, "ai_api_info", createEntityHandler, uniquestHandler, labelHandler)
-	i.IServiceEdit = universally.NewEdit[Edit, ai.Key](i.store, updateHandler)
+	i.IServiceCreate = universally.NewCreator[Create, ai.Key](i.store, "ai_key", createEntityHandler, uniquestHandler, labelHandler)
+	i.IServiceEdit = universally.NewEdit[Edit, ai.Key](i.store, updateHandler, labelHandler)
 	i.IServiceDelete = universally.NewDelete[ai.Key](i.store)
 }
 

@@ -13,15 +13,15 @@ type SimpleProvider struct {
 }
 
 type Provider struct {
-	Id               string         `json:"id"`
-	Name             string         `json:"name"`
-	Config           string         `json:"config"`
-	GetAPIKeyUrl     string         `json:"get_apikey_url"`
-	DefaultLLM       string         `json:"default_llm"`
-	DefaultLLMConfig string         `json:"-"`
-	Priority         int            `json:"priority"`
-	Status           ProviderStatus `json:"status"`
-	Configured       bool           `json:"configured"`
+	Id               string `json:"id"`
+	Name             string `json:"name"`
+	Config           string `json:"config"`
+	GetAPIKeyUrl     string `json:"get_apikey_url"`
+	DefaultLLM       string `json:"default_llm"`
+	DefaultLLMConfig string `json:"-"`
+	//Priority         int            `json:"priority"`
+	Status     ProviderStatus `json:"status"`
+	Configured bool           `json:"configured"`
 }
 
 type ConfiguredProviderItem struct {
@@ -31,9 +31,8 @@ type ConfiguredProviderItem struct {
 	DefaultLLM string         `json:"default_llm"`
 	Status     ProviderStatus `json:"status"`
 	APICount   int64          `json:"api_count"`
-	KeyCount   int            `json:"key_count"`
-	KeyStatus  []*KeyStatus   `json:"keys"`
-	Priority   int            `json:"priority"`
+	KeyCount   int64          `json:"key_count"`
+	CanDelete  bool           `json:"can_delete"`
 }
 
 type KeyStatus struct {
@@ -59,13 +58,14 @@ type SimpleProviderItem struct {
 	DefaultConfig string         `json:"default_config"`
 	Status        ProviderStatus `json:"status"`
 	Model         *BasicInfo     `json:"model,omitempty"`
-	Priority      int            `json:"-"`
+	Type          string         `json:"type"`
 }
 
 type BackupProvider struct {
 	Id    string     `json:"id"`
 	Name  string     `json:"name"`
 	Model *BasicInfo `json:"model,omitempty"`
+	Type  string     `json:"type"`
 }
 
 type LLMItem struct {

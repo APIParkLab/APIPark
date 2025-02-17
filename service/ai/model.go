@@ -20,12 +20,20 @@ type Provider struct {
 	UpdateAt   time.Time
 }
 
+type CreateProvider struct {
+	Id         string
+	Name       string
+	DefaultLLM string
+	Config     string
+	Status     int
+}
+
 type SetProvider struct {
 	Name       *string
 	DefaultLLM *string
 	Config     *string
-	Status     *int
 	Priority   *int
+	Status     *int
 }
 
 func FromEntity(e *ai.Provider) *Provider {

@@ -13,12 +13,7 @@ func genOpenAPI3Template(title string, description string) *openapi3.T {
 		Description: description,
 		Version:     "beta",
 	}
-	//result.Tags = openapi3.Tags{
-	//	{
-	//		Name:        title,
-	//		Description: description,
-	//	},
-	//}
+
 	result.Components = components
 	result.Paths = new(openapi3.Paths)
 	return result
@@ -26,7 +21,6 @@ func genOpenAPI3Template(title string, description string) *openapi3.T {
 
 func genOperation(summary string, description string, variables []*ai_api_dto.AiPromptVariable) *openapi3.Operation {
 	operation := openapi3.NewOperation()
-	//operation.Parameters = genRequestParameters(variables)
 	operation.Summary = summary
 	operation.Description = description
 	operation.RequestBody = genRequestBody(variables)
@@ -136,10 +130,10 @@ func genMessageSchema() *openapi3.Schema {
 	result.Description = "Chat Message"
 	roleSchema := openapi3.NewStringSchema()
 	roleSchema.Description = "Role of the message sender"
-	roleSchema.Example = "assistant"
+	roleSchema.Example = "user"
 	contentSchema := openapi3.NewStringSchema()
 	contentSchema.Description = "The message content"
-	contentSchema.Example = "Hello, how can I help you?"
+	contentSchema.Example = "Hello, who are you?"
 	result.WithProperties(map[string]*openapi3.Schema{
 		"role":    roleSchema,
 		"content": contentSchema,

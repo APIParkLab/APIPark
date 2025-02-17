@@ -273,8 +273,16 @@ func toServiceItem(model *service.Service) *service_dto.ServiceItem {
 		Team:        auto.UUID(model.Team),
 		ServiceKind: model.Kind.String(),
 	}
+	state := service_dto.FromServiceState(model.State)
+	if state == service_dto.ServiceStateNormal {
+		item.State = model.ServiceType.String()
+	} else {
+		item.State = state.String()
+	}
+
 	switch model.Kind {
 	case service.RestService:
+		item.State = model.ServiceType.String()
 		return item
 	case service.AIService:
 		provider := auto.UUID(model.AdditionalConfig["provider"])
@@ -290,6 +298,13 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 	if input.Id == "" {
 		input.Id = uuid.New().String()
 	}
+	if teamID == "" {
+		item, err := i.teamService.DefaultTeam(ctx)
+		if err != nil {
+			return nil, err
+		}
+		teamID = item.Id
+	}
 	mo := &service.Create{
 		Id:               input.Id,
 		Name:             input.Name,
@@ -299,6 +314,7 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 		Catalogue:        input.Catalogue,
 		Prefix:           input.Prefix,
 		Logo:             input.Logo,
+		State:            service_dto.ServiceState(input.State).Int(),
 		ApprovalType:     service.ApprovalType(input.ApprovalType),
 		AdditionalConfig: make(map[string]string),
 		Kind:             service.Kind(input.Kind),
@@ -375,8 +391,7 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 		if input.ApprovalType != nil {
 			approvalType = service.ApprovalType(*input.ApprovalType)
 		}
-
-		err = i.serviceService.Save(ctx, id, &service.Edit{
+		editCfg := &service.Edit{
 			Name:             input.Name,
 			Description:      input.Description,
 			Logo:             input.Logo,
@@ -384,7 +399,13 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 			Catalogue:        input.Catalogue,
 			AdditionalConfig: &info.AdditionalConfig,
 			ApprovalType:     &approvalType,
-		})
+		}
+		if input.State != nil {
+			state := service_dto.ServiceState(*input.State).Int()
+			editCfg.State = &state
+		}
+
+		err = i.serviceService.Save(ctx, id, editCfg)
 		if err != nil {
 			return err
 		}
