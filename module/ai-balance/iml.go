@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"sort"
 
+	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
+
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 
 	"gorm.io/gorm"
@@ -93,18 +95,18 @@ func (i *imlBalanceModule) Create(ctx context.Context, input *ai_balance_dto.Cre
 
 }
 
-var (
-	ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
-	ollamaBase   = "http://apipark-ollama:11434"
-)
+//var (
+//	ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
+//	ollamaBase   = "http://apipark-ollama:11434"
+//)
 
 func newRelease(item *ai_balance.Balance) *gateway.DynamicRelease {
 
 	cfg := make(map[string]interface{})
 	cfg["provider"] = item.Id
 	cfg["model"] = item.Model
-	cfg["model_config"] = ollamaConfig
-	cfg["base"] = ollamaBase
+	cfg["model_config"] = ai_provider_local.OllamaConfig
+	cfg["base"] = ai_provider_local.OllamaBase
 	return &gateway.DynamicRelease{
 		BasicItem: &gateway.BasicItem{
 			ID:          item.Id,

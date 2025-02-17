@@ -62,6 +62,7 @@ type SimpleItem struct {
 	Id            string `json:"id"`
 	Name          string `json:"name"`
 	DefaultConfig string `json:"default_config"`
+	Logo          string `json:"logo"`
 }
 
 type LocalModelItem struct {
