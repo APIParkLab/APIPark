@@ -54,8 +54,8 @@ type imlLocalModel struct {
 }
 
 var (
-	ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
-	ollamaBase   = "http://apipark-ollama:11434"
+	// ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
+	ollamaBase = "http://apipark-ollama:11434"
 )
 
 func init() {
@@ -79,7 +79,8 @@ func (i *imlLocalModel) SimpleList(ctx context.Context) ([]*ai_local_dto.SimpleI
 		return &ai_local_dto.SimpleItem{
 			Id:            s.Id,
 			Name:          s.Name,
-			DefaultConfig: ollamaConfig,
+			DefaultConfig: ai_provider_local.OllamaConfig,
+			Logo:          ai_provider_local.OllamaSvg,
 		}
 	}, func(l *ai_local.LocalModel) bool {
 		if l.State != ai_local_dto.LocalModelStateNormal.Int() && l.State != ai_local_dto.LocalModelStateDisable.Int() {
@@ -234,7 +235,7 @@ func (i *imlLocalModel) pullHook() func(msg ai_provider_local.PullMessage) error
 				cfg := make(map[string]interface{})
 				cfg["provider"] = "ollama"
 				cfg["model"] = msg.Model
-				cfg["model_config"] = ollamaConfig
+				cfg["model_config"] = ai_provider_local.OllamaConfig
 				cfg["priority"] = 0
 				cfg["base"] = ollamaBase
 
@@ -488,7 +489,7 @@ func (i *imlLocalModel) getLocalModels(ctx context.Context) ([]*gateway.DynamicR
 		cfg := make(map[string]interface{})
 		cfg["provider"] = "ollama"
 		cfg["model"] = l.Id
-		cfg["model_config"] = ollamaConfig
+		cfg["model_config"] = ai_provider_local.OllamaSvg
 		cfg["base"] = ollamaBase
 		releases = append(releases, &gateway.DynamicRelease{
 			BasicItem: &gateway.BasicItem{

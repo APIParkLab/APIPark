@@ -8,6 +8,8 @@ import (
 	"sort"
 	"time"
 
+	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
+
 	"github.com/eolinker/go-common/register"
 	"github.com/eolinker/go-common/server"
 
@@ -243,7 +245,7 @@ func (i *imlProviderModule) SimpleConfiguredProviders(ctx context.Context, all b
 		items = append(items, &ai_dto.SimpleProviderItem{
 			Id:            "ollama",
 			Name:          "Ollama",
-			Logo:          ollamaSvg,
+			Logo:          ai_provider_local.OllamaSvg,
 			Configured:    true,
 			DefaultConfig: "",
 			Status:        ai_dto.ProviderEnabled,
