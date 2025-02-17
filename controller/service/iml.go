@@ -386,7 +386,7 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 			Type:     modelType,
 		}
 		name := "Demo AI API "
-		description := "A demo that shows you how to use Chat API."
+		description := "This is a demo that shows you how to use a Chat API."
 		apiId := uuid.New().String()
 		err = i.aiAPIModule.Create(
 			ctx,
