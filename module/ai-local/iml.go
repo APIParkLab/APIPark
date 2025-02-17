@@ -299,6 +299,15 @@ func (i *imlLocalModel) syncGateway(ctx context.Context, clusterId string, relea
 func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string) (*ai_provider_local.Pipeline, error) {
 	var p *ai_provider_local.Pipeline
 	err := i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		item, err := i.localModelCacheService.GetByTarget(ctx, ai_local.CacheTypeService, model)
+		if err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return err
+			}
+
+		} else {
+			model = item.Model
+		}
 		info, err := i.localModelService.Get(ctx, model)
 		if err != nil {
 			if !errors.Is(err, gorm.ErrRecordNotFound) {
