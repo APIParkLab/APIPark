@@ -145,7 +145,7 @@ export const ServiceDeployment = (props: { record: SystemTableListItem, closeMod
               updateStepItems(4);
               setTimeout(() => {
                 closeModal?.()
-              }, 200)
+              }, 500)
             } else if (parsedChunk?.data?.state.includes('error')) {
               updateFooter?.()
               setStepItem((prevItems) =>
