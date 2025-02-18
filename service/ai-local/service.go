@@ -20,6 +20,7 @@ type ILocalModelPackageService interface {
 	universally.IServiceCreate[CreateLocalModelPackage]
 	universally.IServiceEdit[EditLocalModelPackage]
 	universally.IServiceDelete
+	//SearchByModel(ctx context.Context, model string) ([]*LocalModelPackage, error)
 }
 
 type ILocalModelInstallStateService interface {
@@ -33,6 +34,7 @@ type ILocalModelCacheService interface {
 	List(ctx context.Context, model string, typ CacheType) ([]*LocalModelCache, error)
 	Delete(ctx context.Context, model string) error
 	Save(ctx context.Context, model string, typ CacheType, target string) error
+	GetByTarget(ctx context.Context, typ CacheType, target string) (*LocalModelCache, error)
 }
 
 func init() {
