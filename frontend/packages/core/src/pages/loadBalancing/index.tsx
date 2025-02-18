@@ -28,7 +28,7 @@ const LoadBalancingPage = () => {
   const { fetchData } = useFetch()
   const addModel = () => {
     modal.confirm({
-      title: $t('添加负载均衡'),
+      title: $t('添加模型'),
       content: <AddLoadBalancingModel ref={addModelRef} />,
       width: 600,
       closable: true,
@@ -267,7 +267,7 @@ const LoadBalancingPage = () => {
   return (
     <>
       <InsidePage
-        pageTitle={$t('负载均衡')}
+        pageTitle={$t('模型灾备')}
         description={$t(
           '系统自动识别异常AI模型后，自动替换成以下优先级最高的可用模型。这将确保您的AI应用保持高可用性和最佳性能，从而防止任何单个LLM异常成为您的性能瓶颈。'
         )}
