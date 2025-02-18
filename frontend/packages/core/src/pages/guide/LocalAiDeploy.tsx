@@ -135,6 +135,27 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
               getLocalModelList(value)
             }}
           ></Select>
+        </Form.Item>
+        <Form.Item label={$t('模型')} name="model" className="mt-[16px]" rules={[{ required: true }]}>
+          <Select
+            showSearch
+            className="w-INPUT_NORMAL"
+            filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
+            placeholder={$t(PLACEHOLDER.input)}
+            options={tagList.map((provider) => ({
+              label: (
+                <div className="relative">
+                  <span>{provider.name}</span>
+                  {provider.size && <span className="absolute right-[10px] text-[#999]">{provider.size}</span>}
+                </div>
+              ),
+              value: provider.id,
+              searchText: provider.name.toLowerCase()
+            }))}
+            onChange={(value) => {
+              form.setFieldValue('model', value)
+            }}
+          ></Select>
           <div className="mt-[10px] mb-[5px]">
             <Icon className="align-text-top" icon="noto-v1:fire" width="17" height="17" />
             {$t('热点模型')}
@@ -157,27 +178,6 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
                   ))
               : null}
           </div>
-        </Form.Item>
-        <Form.Item label={$t('默认模型')} name="model" className="mt-[16px]" rules={[{ required: true }]}>
-        <Select
-            showSearch
-            className="w-INPUT_NORMAL"
-            filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
-            placeholder={$t(PLACEHOLDER.input)}
-            options={tagList.map((provider) => ({
-              label: (
-                <div className="relative">
-                  <span>{provider.name}</span>
-                  { provider.size && <span className="absolute right-[10px] text-[#999]">{provider.size}</span> }
-                </div>
-              ),
-              value: provider.id,
-              searchText: provider.name.toLowerCase()
-            }))}
-            onChange={(value) => {
-              form.setFieldValue('model', value)
-            }}
-          ></Select>
         </Form.Item>
         <Form.Item label={$t('所属团队')} name="team" className="mt-[16px]" rules={[{ required: true }]}>
           <Select
