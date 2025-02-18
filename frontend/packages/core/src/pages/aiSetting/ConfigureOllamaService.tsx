@@ -31,7 +31,8 @@ const ConfigureOllamaService = forwardRef<ConfigureOllamaServiceHandle, any>((pr
           .then((value) => {
             fetchData<BasicResponse<null>>('model/local/source/ollama', {
               method: 'PUT',
-              eoParams: { address: value.address }
+              eoParams: { address: value.address },
+              transformParams: false
             })
               .then((response) => {
                 const { code, msg } = response
@@ -69,7 +70,7 @@ const ConfigureOllamaService = forwardRef<ConfigureOllamaServiceHandle, any>((pr
           name="address"
           rules={[{ required: true, whitespace: true }]}
           className="p-4 bg-white rounded-lg"
-          label={$t('Ollama 端点')}
+          label={$t('Ollama 地址')}
         >
           <Input
             placeholder={$t('输入例如：https://www.apipark.com')}

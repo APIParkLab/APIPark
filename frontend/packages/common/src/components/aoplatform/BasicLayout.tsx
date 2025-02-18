@@ -280,9 +280,9 @@ function BasicLayout({ project = 'core' }: { project: string }) {
             collapsedButtonRender={false}
           >
             <div
-              className={`w-full h-calc-100vh-minus-navbar pl-PAGE_INSIDE_X pt-PAGE_INSIDE_T ${
+              className={`w-full h-calc-100vh-minus-navbar ${
                 currentUrl.startsWith('/role/list') ? 'overflow-auto' : 'overflow-hidden'
-              }`}
+              } ${currentUrl.startsWith('/guide/page') ? '' : 'pl-PAGE_INSIDE_X pt-PAGE_INSIDE_T'}`}
             >
               <Outlet />
             </div>
