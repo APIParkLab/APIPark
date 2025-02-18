@@ -6,16 +6,18 @@ import { $t } from '@common/locales'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { App } from 'antd'
 import { Card } from 'antd'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AiSettingModalContent, { AiSettingModalContentHandle } from '../aiSetting/AiSettingModal'
 import { checkAccess } from '@common/utils/permission'
 import LocalAiDeploy, { LocalAiDeployHandle } from './LocalAiDeploy'
 import useDeployLocalModel from './deployModelUtil'
 import RestAIDeploy, { RestAIDeployHandle } from './RestAIDeploy'
+import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
+import { useFetch } from '@common/hooks/http'
 
 export const AIModelGuide = () => {
-  const { modal } = App.useApp()
+  const { message, modal } = App.useApp()
   const entityData = useRef<any>(null)
   const navigateTo = useNavigate()
   const { accessData } = useGlobalContext()
@@ -23,6 +25,8 @@ export const AIModelGuide = () => {
   const localAiDeployRef = useRef<LocalAiDeployHandle>()
   const restAiDeployRef = useRef<RestAIDeployHandle>()
   const { deployLocalModel } = useDeployLocalModel()
+  const { fetchData } = useFetch()
+  const [ollamaAddress, setOllamaAddress] = useState<string>('')
 
   const dumpServerPage = () => {
     navigateTo('/service/list')
@@ -105,10 +109,31 @@ export const AIModelGuide = () => {
     })
   }
 
+
+  const getOllamaData = async () => {
+    const response = await fetchData<BasicResponse<{ data: any[] }>>('model/local/source/ollama', {
+      method: 'GET'
+    })
+
+    if (response.code === STATUS_CODE.SUCCESS) {
+      setOllamaAddress(response.data?.config?.address || '')
+    } else {
+      message.error(response.msg || $t(RESPONSE_TIPS.error))
+    }
+  }
+
+  useEffect(() => {
+    getOllamaData()
+  }, [])
+
   /**
    * 本地部署 AI 并生成 API
    */
   const localModelCardClick = async () => {
+    if (!ollamaAddress) {
+      navigateTo('/aisetting?status=unconfigure')
+      return 
+    }
     const modalInstance = modal.confirm({
       title: $t('部署本地模型'),
       content: <LocalAiDeploy ref={localAiDeployRef} onClose={() => {
@@ -131,6 +156,10 @@ export const AIModelGuide = () => {
   }
   const deployDeepSeek = async (e: any) => {
     e.stopPropagation()
+    if (!ollamaAddress) {
+      navigateTo('/aisetting?status=unconfigure')
+      return 
+    }
     await deployLocalModel({
       modelID: 'deepseek-r1'
     })
@@ -141,13 +170,13 @@ export const AIModelGuide = () => {
     {
       imgSrc: restAPIPic,
       title: $t('添加 Rest 服务'),
-      description: $t('支持批量添加现有 API 文档以实现统一的外部访问。'),
+      description: $t('导入OpenAPI文档，将现有系统的API发布到APIPark。'),
       click: restCardClick
     },
     {
       imgSrc: onlineAIPic,
       title: $t('添加在线 AI API'),
-      description: $t('快速调用 AI 模型的云服务 API，方便管理提示词和统一计费。'),
+      description: $t('添加公有云AI模型的 API Key，通过APIPark 统一调用公有云的AI模型。'),
       click: aiCardClick
     },
     {

@@ -151,12 +151,13 @@ export default function Guide() {
       description={
         <div className="flex flex-col gap-[8px]">
           <p>
+            <span className="font-bold">🦄 APIPark </span>
             {$t(
-              '你能通过 APIPark 快速在企业内部构建 API 开放门户/市场，享受极致的转发性能、API 可观测、服务治理、多租户管理、订阅审核流程等诸多好处。'
+              '是开源的一站式 AI 网关与 API 门户，可快速接入 OpenAI/DeepSeek 等各类 AI 模型，通过统一请求格式避免模型切换对业务造成影响，提供企业级 API 安全防护（鉴权/限流/敏感词过滤）与实时用量监控，支持团队内 API 共享协作，管理接口订阅授权并保证您的API安全。'
             )}
           </p>
           <p>
-            {$t('如果你喜欢我们的产品，欢迎给我们 Star 或提供产品反馈意见。')}
+            {$t('✨ 欢迎在 Github 为我们 Star 或提供产品反馈意见。')}
             <span className="font-bold">
               {$t('点击这里')}
               <span className="align-middle leading-[16px]">
@@ -180,6 +181,7 @@ export default function Guide() {
               Star
             </span>
           </p>
+          <p>{$t('⚡您可快速通过以下方式开放API供大家使用：')}</p>
         </div>
       }
       showBorder={false}
