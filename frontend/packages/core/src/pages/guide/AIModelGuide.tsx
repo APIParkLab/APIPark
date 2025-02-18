@@ -193,7 +193,7 @@ export const AIModelGuide = () => {
     }
   ]
   return (
-    <div className="mb-[30px] pt-[15px] flex justify-between space-x-4">
+    <div className="mb-[30px] pt-[30px] flex justify-between space-x-4">
       {cardList.map((item, itemIndex) => (
         <Card
           key={itemIndex}
