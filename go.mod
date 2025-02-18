@@ -4,8 +4,6 @@ go 1.23.4
 
 toolchain go1.23.6
 
-//toolchain go1.21.1
-
 require (
 	github.com/eolinker/ap-account v1.0.15
 	github.com/eolinker/eosc v0.18.3
@@ -83,6 +81,7 @@ require (
 //	github.com/eolinker/eosc => ../../eolinker/eosc
 //)
 
-//replace github.com/eolinker/ap-account => ../aoaccount
+//replace github.com/eolinker/ap-account => ../../eolinker/ap-account
+
 //
 //replace github.com/eolinker/go-common => ../../eolinker/go-common
