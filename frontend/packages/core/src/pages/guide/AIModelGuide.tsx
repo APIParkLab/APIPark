@@ -164,11 +164,11 @@ export const AIModelGuide = () => {
     }
   ]
   return (
-    <div className="mb-[30px] p-[15px] flex justify-center">
+    <div className="mb-[30px] pt-[15px] flex justify-between space-x-4">
       {cardList.map((item, itemIndex) => (
         <Card
           key={itemIndex}
-          className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] bg-[linear-gradient(153.41deg,rgba(244,245,255,1)_0.23%,rgba(255,255,255,1)_83.32%)] mr-[30px] rounded-[10px] overflow-visible cursor-pointer w-[250px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]"
+          className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] bg-[linear-gradient(153.41deg,rgba(244,245,255,1)_0.23%,rgba(255,255,255,1)_83.32%)] rounded-[10px] overflow-visible cursor-pointer flex-1 transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]"
           classNames={{
             header: 'border-b-[0px] p-[20px] pb-[10px] text-[14px] font-normal',
             body: 'p-[20px] pt-[50px] pb-[50px] text-[12px] text-[#666] text-center'
