@@ -9,6 +9,10 @@ import (
 	"net/http"
 	"strings"
 
+	system_dto "github.com/APIParkLab/APIPark/module/system/dto"
+
+	"github.com/APIParkLab/APIPark/module/system"
+
 	"github.com/APIParkLab/APIPark/module/subscribe"
 	subscribe_dto "github.com/APIParkLab/APIPark/module/subscribe/dto"
 
@@ -51,7 +55,21 @@ type imlLocalModelController struct {
 	routerModule    router.IRouterModule       `autowired:""`
 	subscribeModule subscribe.ISubscribeModule `autowired:""`
 	docModule       service.IServiceDocModule  `autowired:""`
+	settingModule   system.ISettingModule      `autowired:""`
 	transaction     store.ITransaction         `autowired:""`
+}
+
+func (i *imlLocalModelController) OllamaConfig(ctx *gin.Context) (*ai_local_dto.OllamaConfig, error) {
+	cfg := i.settingModule.Get(ctx)
+	return &ai_local_dto.OllamaConfig{
+		Address: cfg.OllamaAddress,
+	}, nil
+}
+
+func (i *imlLocalModelController) OllamaConfigUpdate(ctx *gin.Context, input *ai_local_dto.OllamaConfig) error {
+	return i.settingModule.Set(ctx, &system_dto.InputSetting{
+		OllamaAddress: &input.Address,
+	})
 }
 
 func (i *imlLocalModelController) SimpleList(ctx *gin.Context) ([]*ai_local_dto.SimpleItem, error) {
