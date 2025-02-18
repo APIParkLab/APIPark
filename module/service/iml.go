@@ -125,7 +125,7 @@ func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, 
 			return nil, err
 		}
 		condition["team"] = teamId
-		return i.serviceService.Search(ctx, keyword, condition, "update_at desc")
+		return i.serviceService.Search(ctx, keyword, condition, "create_at desc")
 	} else {
 		membersForUser, err := i.teamMemberService.FilterMembersForUser(ctx, userID)
 		if err != nil {
@@ -133,7 +133,7 @@ func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, 
 		}
 		teamIds := membersForUser[userID]
 		condition["team"] = teamIds
-		return i.serviceService.Search(ctx, keyword, condition, "update_at desc")
+		return i.serviceService.Search(ctx, keyword, condition, "create_at desc")
 	}
 
 }
@@ -235,9 +235,9 @@ func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword st
 		if err != nil {
 			return nil, err
 		}
-		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"team": teamID, "as_server": true}, "update_at desc")
+		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"team": teamID, "as_server": true}, "create_at desc")
 	} else {
-		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"as_server": true}, "update_at desc")
+		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"as_server": true}, "create_at desc")
 	}
 	if err != nil {
 		return nil, err
