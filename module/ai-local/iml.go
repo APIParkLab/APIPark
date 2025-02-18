@@ -354,6 +354,15 @@ func (i *imlLocalModel) SaveCache(ctx context.Context, model string, target stri
 
 func (i *imlLocalModel) CancelDeploy(ctx context.Context, model string) error {
 	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		item, err := i.localModelCacheService.GetByTarget(ctx, ai_local.CacheTypeService, model)
+		if err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return err
+			}
+
+		} else {
+			model = item.Model
+		}
 		list, err := i.localModelCacheService.List(ctx, model, ai_local.CacheTypeService)
 		if err != nil {
 			return err
