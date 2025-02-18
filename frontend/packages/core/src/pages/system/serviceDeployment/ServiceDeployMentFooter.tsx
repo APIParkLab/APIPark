@@ -20,8 +20,10 @@ export const LogsFooter = (props: any) => {
             .then((response) => {
               const { code, msg } = response
               if (code === STATUS_CODE.SUCCESS) {
-                resolve(true)
-                closeModal()
+                setTimeout(() => {
+                  resolve(true)
+                  closeModal()
+                }, 500)
               } else {
                 message.error(msg || $t(RESPONSE_TIPS.error))
                 reject(false)
@@ -49,8 +51,10 @@ export const LogsFooter = (props: any) => {
             .then((response: BasicResponse<any>) => {
               const { code, msg } = response
               if (code === STATUS_CODE.SUCCESS) {
-                resolve(true)
-                closeModal()
+                setTimeout(() => {
+                  resolve(true)
+                  closeModal()
+                }, 500)
               } else {
                 message.error(msg || $t(RESPONSE_TIPS.error))
                 reject(false)
