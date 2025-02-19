@@ -498,7 +498,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
             <Form.Item<SystemConfigFieldType>
               label={$t('图标')}
               name="logoFile"
-              extra={$t('仅支持 .png .jpg .jpeg .svg 格式的图片文件, 大于 1KB 的文件将被压缩')}
+              extra={$t('仅支持 .png .jpg .jpeg .svg 格式的图片文件')}
               valuePropName="fileList"
               getValueFromEvent={normFile}
             >

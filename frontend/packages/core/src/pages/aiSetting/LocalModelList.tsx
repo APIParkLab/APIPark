@@ -4,13 +4,15 @@ import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPe
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
-import { App, Divider, Form, Space, Switch, Tag } from 'antd'
+import { App, Divider, Form, Space, Switch, Tag, Button } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { ModelListData } from './types'
 import LocalAiDeploy, { LocalAiDeployHandle } from '../guide/LocalAiDeploy'
 import { ServiceDeployment } from '../system/serviceDeployment/ServiceDeployment'
 import { LogsFooter } from '../system/serviceDeployment/ServiceDeployMentFooter'
 import WithPermission from '@common/components/aoplatform/WithPermission'
+import { Icon } from '@iconify/react/dist/iconify.js'
+import ConfigureOllamaService, { ConfigureOllamaServiceHandle } from './ConfigureOllamaService'
 type EditLocalModelModalHandle = {
   save: () => Promise<boolean | string>
 }
@@ -18,20 +20,21 @@ type EditLocalModelModalProps = {
   enable: boolean
   modelID?: string
 }
-const EditLocalModelModal = forwardRef<EditLocalModelModalHandle, EditLocalModelModalProps>((props: EditLocalModelModalProps, ref) => {
-  const { enable, modelID } = props
-  const { fetchData } = useFetch()
-  const { message } = App.useApp()
-  const [form] = Form.useForm()
-  const [currentStatus, setCurrentStatus] = useState<boolean>(enable)
+const EditLocalModelModal = forwardRef<EditLocalModelModalHandle, EditLocalModelModalProps>(
+  (props: EditLocalModelModalProps, ref) => {
+    const { enable, modelID } = props
+    const { fetchData } = useFetch()
+    const { message } = App.useApp()
+    const [form] = Form.useForm()
+    const [currentStatus, setCurrentStatus] = useState<boolean>(enable)
 
-  useEffect(() => {
-    form.setFieldsValue({ enable })
-  }, [])
+    useEffect(() => {
+      form.setFieldsValue({ enable })
+    }, [])
     /**
-   * 保存
-   * @returns 
-   */
+     * 保存
+     * @returns
+     */
     const save: () => Promise<boolean | string> = () => {
       return new Promise((resolve, reject) => {
         try {
@@ -41,22 +44,23 @@ const EditLocalModelModal = forwardRef<EditLocalModelModalHandle, EditLocalModel
               const finalValue = {
                 disable: !value.enable
               }
-  
-            fetchData<BasicResponse<null>>('model/local/info', {
-              method: 'PUT',
-              eoParams: { model: modelID },
-              eoBody: finalValue,
-            })
-              .then((response) => {
-                const { code, msg } = response
-                if (code === STATUS_CODE.SUCCESS) {
-                  message.success(msg || $t(RESPONSE_TIPS.success))
-                  resolve(true)
-                } else {
-                  message.error(msg || $t(RESPONSE_TIPS.error))
-                  reject(msg || $t(RESPONSE_TIPS.error))
-                }
-              }).catch((errorInfo) => reject(errorInfo))
+
+              fetchData<BasicResponse<null>>('model/local/info', {
+                method: 'PUT',
+                eoParams: { model: modelID },
+                eoBody: finalValue
+              })
+                .then((response) => {
+                  const { code, msg } = response
+                  if (code === STATUS_CODE.SUCCESS) {
+                    message.success(msg || $t(RESPONSE_TIPS.success))
+                    resolve(true)
+                  } else {
+                    message.error(msg || $t(RESPONSE_TIPS.error))
+                    reject(msg || $t(RESPONSE_TIPS.error))
+                  }
+                })
+                .catch((errorInfo) => reject(errorInfo))
             })
             .catch((errorInfo) => reject(errorInfo))
         } catch (error) {
@@ -68,40 +72,41 @@ const EditLocalModelModal = forwardRef<EditLocalModelModalHandle, EditLocalModel
       save
     }))
 
-  return (
-    <WithPermission access="">
-    <Form
-      layout="vertical"
-      labelAlign="left"
-      scrollToFirstError
-      form={form}
-      className="mx-auto "
-      name="partitionInsideCert"
-      autoComplete="off"
-    >
-    <Form.Item className="p-4 bg-white rounded-lg" label={$t('LLM 状态管理')}>
-      <div className="flex justify-between items-center">
-        <div>
-          <span className="text-gray-600">{$t('当前调用状态：')}</span>
-          {currentStatus && <Tag color="success">{$t('正常')}</Tag>}
-          {!currentStatus && <Tag color="warning">{$t('停用')}</Tag>}
-        </div>
-        <Form.Item name="enable" valuePropName="checked" noStyle>
-          <Switch
-            checkedChildren={$t('启用')}
-            unCheckedChildren={$t('停用')}
-            onChange={(checked) => {
-              form.setFieldsValue({ enable: checked })
-              setCurrentStatus(checked)
-            }}
-          />
-        </Form.Item>
-      </div>
-    </Form.Item>
-    </Form>
-  </WithPermission>
-  )
-})
+    return (
+      <WithPermission access="">
+        <Form
+          layout="vertical"
+          labelAlign="left"
+          scrollToFirstError
+          form={form}
+          className="mx-auto "
+          name="partitionInsideCert"
+          autoComplete="off"
+        >
+          <Form.Item className="p-4 bg-white rounded-lg" label={$t('LLM 状态管理')}>
+            <div className="flex justify-between items-center">
+              <div>
+                <span className="text-gray-600">{$t('当前调用状态：')}</span>
+                {currentStatus && <Tag color="success">{$t('正常')}</Tag>}
+                {!currentStatus && <Tag color="warning">{$t('停用')}</Tag>}
+              </div>
+              <Form.Item name="enable" valuePropName="checked" noStyle>
+                <Switch
+                  checkedChildren={$t('启用')}
+                  unCheckedChildren={$t('停用')}
+                  onChange={(checked) => {
+                    form.setFieldsValue({ enable: checked })
+                    setCurrentStatus(checked)
+                  }}
+                />
+              </Form.Item>
+            </div>
+          </Form.Item>
+        </Form>
+      </WithPermission>
+    )
+  }
+)
 
 const LocalModelList: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
@@ -109,6 +114,7 @@ const LocalModelList: React.FC = () => {
   const { fetchData } = useFetch()
   const [searchWord, setSearchWord] = useState<string>('')
   const localAiDeployRef = useRef<LocalAiDeployHandle>()
+  const ConfigureOllamaServiceRef = useRef<ConfigureOllamaServiceHandle>()
   const EditLocalModelModalRef = useRef<EditLocalModelModalHandle>()
   const [stateColumnMap] = useState<{ [k: string]: { text: string; className?: string } }>({
     normal: { text: '正常' },
@@ -118,10 +124,84 @@ const LocalModelList: React.FC = () => {
     deploying_error: { text: '部署失败', className: 'text-[#ff4d4f] cursor-pointer' }
   })
 
+  const [ollamaAddress, setOllamaAddress] = useState<string>('')
+
+  useEffect(() => {
+    getOllamaData()
+  }, [])
+
+  const configureService = (address?: string) => {
+    modal.confirm({
+      title: $t('配置 Ollama 服务'),
+      content: (
+        <ConfigureOllamaService ref={ConfigureOllamaServiceRef} address={address}></ConfigureOllamaService>
+      ),
+      onOk: () => {
+        return ConfigureOllamaServiceRef.current?.save().then((res) => {
+          if (res === true) {
+            getOllamaData()
+            pageListRef.current?.reload()
+          }
+        })
+      },
+      footer: (_, { OkBtn, CancelBtn }) => {
+        return (
+          <div className="flex justify-between items-center">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://ollama.com/download/linux"
+              className="flex items-center gap-[8px]"
+            >
+              <span>{$t('如何部署 Ollama？')}</span>
+            </a>
+            <div>
+              <CancelBtn />
+              <OkBtn />
+            </div>
+          </div>
+        )
+      },
+      width: 600,
+      okText: $t('确认'),
+      cancelText: $t('取消'),
+      closable: true,
+      icon: <></>
+    })
+  }
+
+  const customEmptyRender = () => {
+    return (
+      <>
+        <div>
+          <Icon className="align-sub mr-[5px]" icon="ph:hard-drives-light" width="50" height="50" />
+          <div>{$t('模型部署服务未配置')}</div>
+          <Button type="primary" className="mt-[10px]" onClick={() => configureService()}>
+            {$t('配置服务')}
+          </Button>
+        </div>
+      </>
+    )
+  }
+
+  const getOllamaData = async () => {
+    const response = await fetchData<BasicResponse<{ data: any[] }>>('model/local/source/ollama', {
+      method: 'GET'
+    })
+
+    if (response.code === STATUS_CODE.SUCCESS) {
+      setOllamaAddress(response.data?.config?.address || '')
+    } else {
+      message.error(response.msg || $t(RESPONSE_TIPS.error))
+    }
+  }
+
   const handleEdit = (record: ModelListData) => {
     modal.confirm({
       title: $t('模型设置'),
-      content: <EditLocalModelModal ref={EditLocalModelModalRef} modelID={record.id} enable={record.state !== 'disabled'}/>,
+      content: (
+        <EditLocalModelModal ref={EditLocalModelModalRef} modelID={record.id} enable={record.state !== 'disabled'} />
+      ),
       onOk: () => {
         return EditLocalModelModalRef.current?.save().then((res) => {
           if (res === true) {
@@ -243,7 +323,7 @@ const LocalModelList: React.FC = () => {
     {
       title: '',
       key: 'option',
-      btnNums: 4,
+      btnNums: 2,
       fixed: 'right',
       valueType: 'option',
       render: (_: React.ReactNode, entity: ModelListData) => [
@@ -283,7 +363,9 @@ const LocalModelList: React.FC = () => {
     }
     const modalInstance = modal.confirm({
       title: $t('部署过程'),
-      content: <ServiceDeployment record={record} closeModal={closeModal} updateFooter={updateFooter} cancelCb={cancel} />,
+      content: (
+        <ServiceDeployment record={record} closeModal={closeModal} updateFooter={updateFooter} cancelCb={cancel} />
+      ),
       footer: () => {
         return <LogsFooter record={record} closeModal={closeModal} />
       },
@@ -319,13 +401,14 @@ const LocalModelList: React.FC = () => {
             }
           }}
         >
-          {stateColumnMap[entity?.state as string]?.text || '-'}
+          {$t(stateColumnMap[entity?.state as string]?.text || '-')}
         </span>
       )
     },
     {
       title: $t('Apis'),
       dataIndex: 'apiCount',
+      width: 100,
       render: (dom: React.ReactNode, record: ModelListData) => (
         <span className="[&>.key-link]:text-[#2196f3] cursor-pointer">
           <a
@@ -351,11 +434,16 @@ const LocalModelList: React.FC = () => {
     <PageList
       ref={pageListRef}
       rowKey="id"
+      tableClass="local-model-list"
+      customEmptyRender={customEmptyRender}
       request={requestList}
       onSearchWordChange={(e) => {
         setSearchWord(e.target.value)
         pageListRef.current?.reload()
       }}
+      beforeNewBtn={
+        [<Button className="mr-btnbase" key="removeFromDep" onClick={() => configureService(ollamaAddress)}>{$t('配置服务')}</Button>]
+      }
       showPagination={true}
       searchPlaceholder={$t('请输入名称搜索')}
       columns={columns}

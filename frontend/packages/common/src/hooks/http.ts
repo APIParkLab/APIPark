@@ -98,7 +98,7 @@ const trimStringValuesInObject = (obj: unknown): unknown => {
   return obj
 }
 
-const processQueryParams = (url: string, options: EoRequest, shouldTransformKeys: boolean) => {
+const processQueryParams = (url: string, options: EoRequest, shouldTransformKeys: boolean, transformParams = true) => {
   if (options.eoParams) {
     const cleanParams = Object.fromEntries(
       Object.entries(options.eoParams)
@@ -106,7 +106,10 @@ const processQueryParams = (url: string, options: EoRequest, shouldTransformKeys
         .map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value])
     )
     const queryParams = convertQueryParamsToSnake(cleanParams, shouldTransformKeys, options.eoTransformKeys as string[])
-    const queryString = queryParams.toString()
+    let queryString = queryParams.toString()
+    if (!transformParams) {
+      queryString = decodeURIComponent(queryString)
+    }
     url += (url.includes('?') ? '&' : '?') + queryString // 添加查询字符串到URL
   }
   return url
@@ -137,6 +140,7 @@ type EoRequest = RequestInit & {
   isStream?: boolean
   handleStream?: (line: any) => void
   callback?: (cancel: () => void) => void
+  transformParams?: boolean
 }
 
 type EoHeaders = Headers | { [k: string]: string }
@@ -162,7 +166,7 @@ export function useFetch() {
       !shouldNotTransform(url) && options?.eoTransformKeys && options?.eoTransformKeys?.length > 0
 
     // 处理URL查询参数
-    url = processQueryParams(url, options, !!shouldTransformKeys)
+    url = processQueryParams(url, options, !!shouldTransformKeys, options?.transformParams)
 
     // 处理请求体, 当请求头为json时，fetch的body应当是json字符串
     options.body = processRequestBody(options, headers as EoHeaders, !!shouldTransformKeys)
