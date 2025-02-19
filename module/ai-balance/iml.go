@@ -106,10 +106,11 @@ func (i *imlBalanceModule) Create(ctx context.Context, input *ai_balance_dto.Cre
 func newRelease(item *ai_balance.Balance, base string) *gateway.DynamicRelease {
 
 	cfg := make(map[string]interface{})
-	cfg["provider"] = item.Id
+	cfg["provider"] = item.Provider
 	cfg["model"] = item.Model
 	cfg["model_config"] = ai_provider_local.OllamaConfig
 	cfg["base"] = base
+	cfg["priority"] = item.Priority
 	return &gateway.DynamicRelease{
 		BasicItem: &gateway.BasicItem{
 			ID:          item.Id,
