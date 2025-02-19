@@ -94,7 +94,10 @@ func (i *imlServiceController) QuickCreateAIService(ctx *gin.Context, input *ser
 		if err != nil {
 			return err
 		}
-
+		p, err := i.providerModule.Provider(ctx, input.Provider)
+		if err != nil {
+			return err
+		}
 		id := uuid.NewString()
 		prefix := fmt.Sprintf("/%s", id[:8])
 		catalogueInfo, err := i.catalogueModule.DefaultCatalogue(ctx)
@@ -111,6 +114,7 @@ func (i *imlServiceController) QuickCreateAIService(ctx *gin.Context, input *ser
 			Catalogue:    catalogueInfo.Id,
 			ApprovalType: "auto",
 			Provider:     &input.Provider,
+			Model:        &p.DefaultLLM,
 			Kind:         "ai",
 		})
 		return err

@@ -20,6 +20,7 @@ type CreateService struct {
 	Kind         string   `json:"service_kind"`
 	State        string   `json:"state"`
 	Provider     *string  `json:"provider"`
+	Model        *string  `json:"model"`
 	AsApp        *bool    `json:"as_app"`
 	AsServer     *bool    `json:"as_server"`
 }
@@ -32,6 +33,7 @@ type EditService struct {
 	Logo         *string   `json:"logo"`
 	Tags         *[]string `json:"tags"`
 	Provider     *string   `json:"provider"`
+	Model        *string   `json:"model"`
 	ApprovalType *string   `json:"approval_type"`
 	State        *string   `json:"state"`
 }
