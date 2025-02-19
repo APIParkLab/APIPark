@@ -3,6 +3,11 @@ package system
 import (
 	"context"
 
+	"github.com/eolinker/go-common/server"
+
+	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
+	"github.com/eolinker/go-common/register"
+
 	"github.com/eolinker/go-common/store"
 
 	"github.com/eolinker/go-common/utils"
@@ -43,6 +48,21 @@ func (i *imlSettingModule) Set(ctx context.Context, input *system_dto.InputSetti
 				return err
 			}
 		}
+		if input.OllamaAddress != nil {
+			ai_provider_local.ResetOllamaAddress(*input.OllamaAddress)
+		}
 		return nil
+	})
+}
+
+func (i *imlSettingModule) OnInit() {
+	register.Handle(func(v server.Server) {
+		ctx := context.Background()
+
+		address, has := i.settingService.Get(ctx, "system.ai_model.ollama_address")
+		if has {
+			ai_provider_local.ResetOllamaAddress(address)
+		}
+
 	})
 }
