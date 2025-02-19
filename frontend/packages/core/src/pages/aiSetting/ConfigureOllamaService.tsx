@@ -31,8 +31,7 @@ const ConfigureOllamaService = forwardRef<ConfigureOllamaServiceHandle, any>((pr
           .then((value) => {
             fetchData<BasicResponse<null>>('model/local/source/ollama', {
               method: 'PUT',
-              eoParams: { address: value.address },
-              transformParams: false
+              eoBody: { address: value.address }
             })
               .then((response) => {
                 const { code, msg } = response
