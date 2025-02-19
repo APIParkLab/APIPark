@@ -351,6 +351,12 @@ func (i *imlInitController) createAIService(ctx context.Context, teamID string, 
 	if input.Id == "" {
 		input.Id = uuid.New().String()
 	}
+	providerInfo, err := i.providerModule.Provider(ctx, *input.Provider)
+	if err != nil {
+		return err
+	}
+	input.Model = &providerInfo.DefaultLLM
+
 	if input.Prefix == "" {
 		if len(input.Id) < 9 {
 			input.Prefix = input.Id

@@ -8,6 +8,10 @@ import (
 	"strings"
 	"time"
 
+	ai_local "github.com/APIParkLab/APIPark/service/ai-local"
+
+	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
+
 	"github.com/eolinker/eosc/log"
 
 	"github.com/APIParkLab/APIPark/resources/access"
@@ -58,6 +62,7 @@ type imlServiceModule struct {
 	teamService       team.ITeamService              `autowired:""`
 	teamMemberService team_member.ITeamMemberService `autowired:""`
 	tagService        tag.ITagService                `autowired:""`
+	localModelService ai_local.ILocalModelService    `autowired:""`
 
 	serviceTagService service_tag.ITagService `autowired:""`
 	apiService        api.IAPIService         `autowired:""`
@@ -223,6 +228,25 @@ func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Ser
 	s.Tags = auto.List(utils.SliceToSlice(tags, func(p *service_tag.Tag) string {
 		return p.Tid
 	}))
+	if s.Model == "" {
+		switch s.ProviderType {
+		case "online":
+			p, has := model_runtime.GetProvider(s.Provider.Id)
+			if has {
+				m, has := p.DefaultModel(model_runtime.ModelTypeLLM)
+				if has {
+					s.Model = m.ID()
+				}
+			}
+		case "local":
+			info, err := i.localModelService.DefaultModel(ctx)
+			if err != nil {
+				return nil, err
+			}
+			s.Model = info.Id
+
+		}
+	}
 	log.Infof("get service cost %d ms", time.Since(now).Milliseconds())
 	return s, nil
 }
@@ -328,6 +352,11 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 			return nil, fmt.Errorf("ai service: provider can not be empty")
 		}
 		mo.AdditionalConfig["provider"] = *input.Provider
+		if input.Model == nil {
+			return nil, fmt.Errorf("ai service: model can not be empty")
+		}
+		mo.AdditionalConfig["model"] = *input.Model
+
 	}
 	if input.AsApp == nil {
 		// 默认值为false
@@ -377,6 +406,9 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 	case service.AIService:
 		if input.Provider != nil {
 			info.AdditionalConfig["provider"] = *input.Provider
+		}
+		if input.Model != nil {
+			info.AdditionalConfig["model"] = *input.Model
 		}
 
 	}
