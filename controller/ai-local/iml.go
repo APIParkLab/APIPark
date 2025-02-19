@@ -227,6 +227,7 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 			ApprovalType: "auto",
 			Kind:         "ai",
 			Provider:     &providerId,
+			Model:        &model,
 		})
 		if err != nil {
 			return err

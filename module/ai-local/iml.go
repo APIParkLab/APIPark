@@ -529,7 +529,7 @@ func (i *imlLocalModel) getLocalModels(ctx context.Context) ([]*gateway.DynamicR
 		cfg := make(map[string]interface{})
 		cfg["provider"] = "ollama"
 		cfg["model"] = l.Id
-		cfg["model_config"] = ai_provider_local.OllamaSvg
+		cfg["model_config"] = ai_provider_local.OllamaConfig
 		cfg["base"] = v
 		releases = append(releases, &gateway.DynamicRelease{
 			BasicItem: &gateway.BasicItem{
