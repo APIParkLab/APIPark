@@ -189,7 +189,7 @@ const AiServiceInsideRouterCreate = () => {
           const { code, data, msg } = response
           if (code === STATUS_CODE.SUCCESS) {
             setLlmList(data.models)
-            const localId = id || aiServiceInfo?.id
+            const localId = id || aiServiceInfo?.name
             
             if (replaceDefaultLlm) {
               setDefaultLlm((prev) => {
