@@ -338,10 +338,10 @@ const KeySettings: React.FC = () => {
   return (
     <InsidePage
       className="overflow-y-auto gap-4 pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X"
-      pageTitle={$t('APIKey 资源池')}
+      pageTitle={$t('API Key 负载')}
       description={
         <>
-          {$t('支持单个 API 模型供应商下创建多个 APIKey APIKey 进行智能负载均衡')}
+          {$t('支持单个 API 模型供应商下创建多个 API Key 进行智能负载均衡')}
           <div className="mt-4">
             <AIProviderSelect
               value={selectedProvider}

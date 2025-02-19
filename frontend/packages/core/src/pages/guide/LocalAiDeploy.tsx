@@ -114,7 +114,7 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
         name="partitionInsideCert"
         autoComplete="off"
       >
-        <Form.Item label={$t('模型供应商')} name="provider" rules={[{ required: true }]}>
+        <Form.Item label={$t('模型')} name="provider" rules={[{ required: true }]}>
           <Select
             showSearch
             className="w-INPUT_NORMAL"
@@ -158,8 +158,8 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
               : null}
           </div>
         </Form.Item>
-        <Form.Item label={$t('默认模型')} name="model" className="mt-[16px]" rules={[{ required: true }]}>
-        <Select
+        <Form.Item label={$t('Tags')} name="model" className="mt-[16px]" rules={[{ required: true }]}>
+          <Select
             showSearch
             className="w-INPUT_NORMAL"
             filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
@@ -168,7 +168,7 @@ const LocalAiDeploy = forwardRef<LocalAiDeployHandle, any>((props: any, ref: any
               label: (
                 <div className="relative">
                   <span>{provider.name}</span>
-                  { provider.size && <span className="absolute right-[10px] text-[#999]">{provider.size}</span> }
+                  {provider.size && <span className="absolute right-[10px] text-[#999]">{provider.size}</span>}
                 </div>
               ),
               value: provider.id,

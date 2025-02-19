@@ -9,6 +9,7 @@ export type AiServiceConfigFieldType = {
     name?: string;
     id?: string;
     provider?:string
+    model?:string
     prefix?:string;
     logo?:string;
     logoFile?:UploadFile;
