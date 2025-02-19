@@ -1,7 +1,6 @@
 package ai_provider_local
 
 var (
-	OllamaBase   = "http://apipark-ollama:11434"
 	OllamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
 	OllamaSvg    = `<?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
