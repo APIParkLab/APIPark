@@ -32,8 +32,6 @@ import (
 
 	api_doc "github.com/APIParkLab/APIPark/module/api-doc"
 
-	upstream_dto "github.com/APIParkLab/APIPark/module/upstream/dto"
-
 	"github.com/eolinker/eosc/log"
 
 	application_authorization "github.com/APIParkLab/APIPark/module/application-authorization"
@@ -298,25 +296,18 @@ func (i *imlServiceController) editAIService(ctx *gin.Context, id string, input 
 	if input.Provider == nil {
 		return nil, fmt.Errorf("provider is required")
 	}
-	p, has := model_runtime.GetProvider(*input.Provider)
-	if !has {
-		return nil, fmt.Errorf("provider not found")
-	}
-	info, err := i.module.Get(ctx, id)
-	if err != nil {
-
-	}
-	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		info, err = i.module.Edit(ctx, id, input)
-		if err != nil {
-			return err
+	if *input.Provider != "ollama" {
+		_, has := model_runtime.GetProvider(*input.Provider)
+		if !has {
+			return nil, fmt.Errorf("provider not found")
 		}
-		_, err = i.upstreamModule.Save(ctx, id, newAIUpstream(id, *input.Provider, p.URI()))
-		return err
-	})
+	}
+
+	info, err := i.module.Edit(ctx, id, input)
 	if err != nil {
 		return nil, err
 	}
+	//_, err = i.upstreamModule.Save(ctx, id, newAIUpstream(id, *input.Provider, p.URI()))
 
 	return info, nil
 }
@@ -594,22 +585,22 @@ func (i *imlAppController) DeleteApp(ctx *gin.Context, appId string) error {
 	return i.module.DeleteApp(ctx, appId)
 }
 
-func newAIUpstream(id string, provider string, uri model_runtime.IProviderURI) *upstream_dto.Upstream {
-	return &upstream_dto.Upstream{
-		Type:            "http",
-		Balance:         "round-robin",
-		Timeout:         300000,
-		Retry:           0,
-		Remark:          fmt.Sprintf("auto create by ai service %s,provider is %s", id, provider),
-		LimitPeerSecond: 0,
-		ProxyHeaders:    nil,
-		Scheme:          uri.Scheme(),
-		PassHost:        "node",
-		Nodes: []*upstream_dto.NodeConfig{
-			{
-				Address: uri.Host(),
-				Weight:  100,
-			},
-		},
-	}
-}
+//func newAIUpstream(id string, provider string, uri model_runtime.IProviderURI) *upstream_dto.Upstream {
+//	return &upstream_dto.Upstream{
+//		Type:            "http",
+//		Balance:         "round-robin",
+//		Timeout:         300000,
+//		Retry:           0,
+//		Remark:          fmt.Sprintf("auto create by ai service %s,provider is %s", id, provider),
+//		LimitPeerSecond: 0,
+//		ProxyHeaders:    nil,
+//		Scheme:          uri.Scheme(),
+//		PassHost:        "node",
+//		Nodes: []*upstream_dto.NodeConfig{
+//			{
+//				Address: uri.Host(),
+//				Weight:  100,
+//			},
+//		},
+//	}
+//}
