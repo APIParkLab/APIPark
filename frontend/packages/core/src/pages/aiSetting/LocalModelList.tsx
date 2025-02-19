@@ -117,11 +117,11 @@ const LocalModelList: React.FC = () => {
   const ConfigureOllamaServiceRef = useRef<ConfigureOllamaServiceHandle>()
   const EditLocalModelModalRef = useRef<EditLocalModelModalHandle>()
   const [stateColumnMap] = useState<{ [k: string]: { text: string; className?: string } }>({
-    normal: { text: $t('正常') },
-    deploying: { text: $t('部署中'), className: 'text-[#2196f3] cursor-pointer' },
-    error: { text: $t('模型异常'), className: 'text-[#ff4d4f]' },
-    disabled: { text: $t('停用') },
-    deploying_error: { text: $t('部署失败'), className: 'text-[#ff4d4f] cursor-pointer' }
+    normal: { text: '正常' },
+    deploying: { text: '部署中', className: 'text-[#2196f3] cursor-pointer' },
+    error: { text: '模型异常', className: 'text-[#ff4d4f]' },
+    disabled: { text: '停用' },
+    deploying_error: { text: '部署失败', className: 'text-[#ff4d4f] cursor-pointer' }
   })
 
   const [ollamaAddress, setOllamaAddress] = useState<string>('')
@@ -401,7 +401,7 @@ const LocalModelList: React.FC = () => {
             }
           }}
         >
-          {stateColumnMap[entity?.state as string]?.text || '-'}
+          {$t(stateColumnMap[entity?.state as string]?.text || '-')}
         </span>
       )
     },
