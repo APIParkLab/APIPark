@@ -181,7 +181,6 @@ export default function Guide() {
               Star
             </span>
           </p>
-          <p>{$t('⚡您可快速通过以下方式开放API供大家使用：')}</p>
         </div>
       }
       showBorder={false}

@@ -193,7 +193,9 @@ export const AIModelGuide = () => {
     }
   ]
   return (
-    <div className="mb-[30px] pt-[30px] flex justify-between space-x-4">
+    <>
+      <p>{$t('⚡您可快速通过以下方式开放API供大家使用：')}</p>
+        <div className="mb-[30px] pt-[25px] flex justify-between space-x-4">
       {cardList.map((item, itemIndex) => (
         <Card
           key={itemIndex}
@@ -211,5 +213,6 @@ export const AIModelGuide = () => {
         </Card>
       ))}
     </div>
+    </>
   )
 }
