@@ -20,6 +20,14 @@ type imlLocalModelService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlLocalModelService) DefaultModel(ctx context.Context) (*LocalModel, error) {
+	info, err := i.store.First(ctx, map[string]interface{}{"state": 1})
+	if err != nil {
+		return nil, err
+	}
+	return i.fromEntity(info), nil
+}
+
 func (i *imlLocalModelService) OnComplete() {
 	i.IServiceGet = universally.NewGet[LocalModel, ai.LocalModel](i.store, i.fromEntity)
 	i.IServiceCreate = universally.NewCreator[CreateLocalModel, ai.LocalModel](i.store, "ai_local_model", i.createEntityHandler, i.uniquestHandler, i.labelHandler)
