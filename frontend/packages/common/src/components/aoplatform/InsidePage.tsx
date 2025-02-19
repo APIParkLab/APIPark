@@ -22,6 +22,7 @@ class InsidePageProps {
   headerClassName?: string = ''
   /** 整个页面滚动 */
   scrollPage?: boolean = true
+  customPadding?: boolean
   customBtn?: ReactNode
 }
 
@@ -41,6 +42,7 @@ const InsidePage: FC<InsidePageProps> = ({
   contentClassName = '',
   headerClassName = '',
   scrollPage = true,
+  customPadding = false,
   customBtn
 }) => {
   const navigate = useNavigate()
@@ -57,7 +59,7 @@ const InsidePage: FC<InsidePageProps> = ({
           {!pageTitle && !description && !backUrl && !customBtn ? (
             <></>
           ) : (
-            <div className="mb-[30px]">
+            <div className={customPadding ? '' : 'mb-[30px]'}>
               {backUrl && (
                 <div className="text-[18px] leading-[25px] mb-[12px]">
                   <Button type="text" onClick={goBack}>

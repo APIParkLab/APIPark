@@ -996,6 +996,13 @@ p{
   min-width:unset !important;
 }
 
+.local-model-list .ant-pro-table .ant-table-body {
+  overflow: hidden !important;
+}
+.local-model-list .ant-pro-table td {
+  border-bottom: none !important;
+}
+
 .table-border {
   .ant-table:not(.ant-table-bordered){
     border:1px solid var(--border-color) !important;
