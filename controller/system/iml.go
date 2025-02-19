@@ -248,7 +248,7 @@ func (i *imlInitController) OnInit() {
 			if len(items) == 0 {
 				err = i.catalogueModule.Create(ctx, &catalogue_dto.CreateCatalogue{
 					Id:   catalogueId,
-					Name: "Default Catalogue",
+					Name: "Default Category",
 				})
 				if err != nil {
 					return fmt.Errorf("create default catalogue error: %v", err)
