@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	ai_balance "github.com/APIParkLab/APIPark/service/ai-balance"
+
 	"github.com/APIParkLab/APIPark/service/setting"
 
 	"github.com/APIParkLab/APIPark/service/api"
@@ -45,12 +47,21 @@ type imlLocalModel struct {
 	localModelPackageService ai_local.ILocalModelPackageService      `autowired:""`
 	localModelStateService   ai_local.ILocalModelInstallStateService `autowired:""`
 	localModelCacheService   ai_local.ILocalModelCacheService        `autowired:""`
+	balanceService           ai_balance.IBalanceService              `autowired:""`
 	clusterService           cluster.IClusterService                 `autowired:""`
 	aiAPIService             ai_api.IAPIService                      `autowired:""`
 	routerService            api.IAPIService                         `autowired:""`
 	serviceService           service.IServiceService                 `autowired:""`
 	settingService           setting.ISettingService                 `autowired:""`
 	transaction              store.ITransaction                      `autowired:""`
+}
+
+func (i *imlLocalModel) SyncLocalModels(ctx context.Context, address string) error {
+	releases, err := i.getLocalModels(ctx, address)
+	if err != nil {
+		return err
+	}
+	return i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
 }
 
 func (i *imlLocalModel) SimpleList(ctx context.Context) ([]*ai_local_dto.SimpleItem, error) {
@@ -177,6 +188,13 @@ func (i *imlLocalModel) pullHook(fn ...func() error) func(msg ai_provider_local.
 					State:    state,
 					Msg:      msg.Msg,
 				})
+				if err != nil {
+					return err
+				}
+				info, err = i.localModelStateService.Get(ctx, msg.Model)
+				if err != nil {
+					return err
+				}
 
 			} else {
 				if info.Complete < msg.Completed {
@@ -422,8 +440,36 @@ func (i *imlLocalModel) Enable(ctx context.Context, model string) error {
 		return err
 	}
 	if info.State == ai_local_dto.LocalModelStateDisable.Int() || info.State == ai_local_dto.LocalModelStateError.Int() {
-		status := ai_local_dto.LocalModelStateNormal.Int()
-		return i.localModelService.Save(ctx, model, &ai_local.EditLocalModel{State: &status})
+
+		return i.transaction.Transaction(ctx, func(ctx context.Context) error {
+			status := ai_local_dto.LocalModelStateNormal.Int()
+			err = i.localModelService.Save(ctx, model, &ai_local.EditLocalModel{State: &status})
+			if err != nil {
+				return err
+			}
+			v, _ := i.settingService.Get(ctx, "system.ai_model.ollama_address")
+			cfg := make(map[string]interface{})
+			cfg["provider"] = "ollama"
+			cfg["model"] = info.Id
+			cfg["model_config"] = ai_provider_local.OllamaConfig
+			cfg["priority"] = 0
+			cfg["base"] = v
+
+			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+				{
+					BasicItem: &gateway.BasicItem{
+						ID:          info.Id,
+						Description: info.Id,
+						Resource:    "ai-provider",
+						Version:     info.UpdateAt.Format("20060102150405"),
+						MatchLabels: map[string]string{
+							"module": "ai-provider",
+						},
+					},
+					Attr: cfg,
+				}}, true)
+		})
+
 	}
 	return fmt.Errorf("model %s is not disabled state,can not enable", model)
 }
@@ -435,7 +481,21 @@ func (i *imlLocalModel) Disable(ctx context.Context, model string) error {
 	}
 	if info.State == ai_local_dto.LocalModelStateNormal.Int() {
 		disable := ai_local_dto.LocalModelStateDisable.Int()
-		return i.localModelService.Save(ctx, model, &ai_local.EditLocalModel{State: &disable})
+		return i.transaction.Transaction(ctx, func(ctx context.Context) error {
+			err = i.localModelService.Save(ctx, model, &ai_local.EditLocalModel{State: &disable})
+			if err != nil {
+				return err
+			}
+
+			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+				{
+					BasicItem: &gateway.BasicItem{
+						ID:       info.Id,
+						Resource: "ai-provider",
+					},
+				}}, false)
+		})
+
 	}
 	return fmt.Errorf("model %s is not enabled state,can not disable", model)
 }
@@ -515,17 +575,24 @@ func (i *imlLocalModel) OnInit() {
 	})
 }
 
-func (i *imlLocalModel) getLocalModels(ctx context.Context) ([]*gateway.DynamicRelease, error) {
+func (i *imlLocalModel) getLocalModels(ctx context.Context, v string) ([]*gateway.DynamicRelease, error) {
 	list, err := i.localModelService.List(ctx)
 	if err != nil {
 		return nil, err
 	}
-	v, has := i.settingService.Get(ctx, "system.ai_model.ollama_address")
-	if !has {
-		return nil, errors.New("ollama_address not set")
+	if v == "" {
+		var has bool
+		v, has = i.settingService.Get(ctx, "system.ai_model.ollama_address")
+		if !has {
+			return nil, errors.New("ollama_address not set")
+		}
 	}
+
 	releases := make([]*gateway.DynamicRelease, 0, len(list))
 	for _, l := range list {
+		if l.State != ai_local_dto.LocalModelStateNormal.Int() {
+			continue
+		}
 		cfg := make(map[string]interface{})
 		cfg["provider"] = "ollama"
 		cfg["model"] = l.Id
@@ -548,7 +615,7 @@ func (i *imlLocalModel) getLocalModels(ctx context.Context) ([]*gateway.DynamicR
 }
 
 func (i *imlLocalModel) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
-	releases, err := i.getLocalModels(ctx)
+	releases, err := i.getLocalModels(ctx, "")
 	if err != nil {
 		return err
 	}
