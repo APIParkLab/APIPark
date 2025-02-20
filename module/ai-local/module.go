@@ -24,6 +24,8 @@ type ILocalModelModule interface {
 	ModelState(ctx context.Context, model string) (*ai_local_dto.DeployState, *ai_local_dto.ModelInfo, error)
 	SimpleList(ctx context.Context) ([]*ai_local_dto.SimpleItem, error)
 	SaveCache(ctx context.Context, model string, target string) error
+
+	SyncLocalModels(ctx context.Context, address string) error
 }
 
 func init() {
