@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	subscribe_dto "github.com/APIParkLab/APIPark/module/subscribe/dto"
+
 	"github.com/eolinker/eosc/log"
 
 	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
@@ -222,6 +224,7 @@ type imlInitController struct {
 	applicationAuthorizationModule application_authorization.IAuthorizationModule `autowired:""`
 	catalogueModule                catalogue.ICatalogueModule                     `autowired:""`
 	providerModule                 ai.IProviderModule                             `autowired:""`
+	subscribeModule                subscribe.ISubscribeModule                     `autowired:""`
 	transaction                    store.ITransaction                             `autowired:""`
 	aiAPIModule                    ai_api.IAPIModule                              `autowired:""`
 	docModule                      service.IServiceDocModule                      `autowired:""`
@@ -248,7 +251,7 @@ func (i *imlInitController) OnInit() {
 			if len(items) == 0 {
 				err = i.catalogueModule.Create(ctx, &catalogue_dto.CreateCatalogue{
 					Id:   catalogueId,
-					Name: "Default Catalogue",
+					Name: "Default Category",
 				})
 				if err != nil {
 					return fmt.Errorf("create default catalogue error: %v", err)
@@ -263,6 +266,13 @@ func (i *imlInitController) OnInit() {
 			})
 			if err != nil {
 				return fmt.Errorf("create default team error: %v", err)
+			}
+			app, err := i.appModule.CreateApp(ctx, info.Id, &service_dto.CreateApp{
+				Name:        "Demo Application",
+				Description: "Auto created By APIPark",
+			})
+			if err != nil {
+				return fmt.Errorf("create default app error: %v", err)
 			}
 			// 创建Rest服务
 			restPath := "/rest-demo"
@@ -298,6 +308,13 @@ func (i *imlInitController) OnInit() {
 			if err != nil {
 				return fmt.Errorf("create default router error: %v", err)
 			}
+			err = i.subscribeModule.AddSubscriber(ctx, serviceInfo.Id, &subscribe_dto.AddSubscriber{
+				Application: app.Id,
+			})
+			if err != nil {
+				return err
+			}
+
 			// 创建AI服务
 			err = i.createAIService(ctx, info.Id, &service_dto.CreateService{
 				Name:         "AI Demo Service",
@@ -307,17 +324,11 @@ func (i *imlInitController) OnInit() {
 				Catalogue:    catalogueId,
 				ApprovalType: "auto",
 				Kind:         "ai",
-			})
+			}, app.Id)
 			if err != nil {
 				return err
 			}
-			app, err := i.appModule.CreateApp(ctx, info.Id, &service_dto.CreateApp{
-				Name:        "Demo Application",
-				Description: "Auto created By APIPark",
-			})
-			if err != nil {
-				return fmt.Errorf("create default app error: %v", err)
-			}
+
 			_, err = i.applicationAuthorizationModule.AddAuthorization(ctx, app.Id, &application_authorization_dto.CreateAuthorization{
 				Name:       "Default API Key",
 				Driver:     "apikey",
@@ -338,7 +349,7 @@ func (i *imlInitController) OnInit() {
 		}
 	})
 }
-func (i *imlInitController) createAIService(ctx context.Context, teamID string, input *service_dto.CreateService) error {
+func (i *imlInitController) createAIService(ctx context.Context, teamID string, input *service_dto.CreateService, appId string) error {
 
 	providerId := "fakegpt"
 	err := i.providerModule.UpdateProviderConfig(ctx, providerId, &ai_dto.UpdateConfig{
@@ -351,6 +362,12 @@ func (i *imlInitController) createAIService(ctx context.Context, teamID string, 
 	if input.Id == "" {
 		input.Id = uuid.New().String()
 	}
+	providerInfo, err := i.providerModule.Provider(ctx, *input.Provider)
+	if err != nil {
+		return err
+	}
+	input.Model = &providerInfo.DefaultLLM
+
 	if input.Prefix == "" {
 		if len(input.Id) < 9 {
 			input.Prefix = input.Id
@@ -459,6 +476,12 @@ func (i *imlInitController) createAIService(ctx context.Context, teamID string, 
 			},
 			Disable: false,
 			//Upstream: info.Provider.Id,
+		})
+		if err != nil {
+			return err
+		}
+		err = i.subscribeModule.AddSubscriber(ctx, info.Id, &subscribe_dto.AddSubscriber{
+			Application: appId,
 		})
 		if err != nil {
 			return err

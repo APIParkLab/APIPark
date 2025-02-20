@@ -32,8 +32,6 @@ import (
 
 	api_doc "github.com/APIParkLab/APIPark/module/api-doc"
 
-	upstream_dto "github.com/APIParkLab/APIPark/module/upstream/dto"
-
 	"github.com/eolinker/eosc/log"
 
 	application_authorization "github.com/APIParkLab/APIPark/module/application-authorization"
@@ -94,7 +92,10 @@ func (i *imlServiceController) QuickCreateAIService(ctx *gin.Context, input *ser
 		if err != nil {
 			return err
 		}
-
+		p, err := i.providerModule.Provider(ctx, input.Provider)
+		if err != nil {
+			return err
+		}
 		id := uuid.NewString()
 		prefix := fmt.Sprintf("/%s", id[:8])
 		catalogueInfo, err := i.catalogueModule.DefaultCatalogue(ctx)
@@ -111,6 +112,7 @@ func (i *imlServiceController) QuickCreateAIService(ctx *gin.Context, input *ser
 			Catalogue:    catalogueInfo.Id,
 			ApprovalType: "auto",
 			Provider:     &input.Provider,
+			Model:        &p.DefaultLLM,
 			Kind:         "ai",
 		})
 		return err
@@ -294,25 +296,18 @@ func (i *imlServiceController) editAIService(ctx *gin.Context, id string, input 
 	if input.Provider == nil {
 		return nil, fmt.Errorf("provider is required")
 	}
-	p, has := model_runtime.GetProvider(*input.Provider)
-	if !has {
-		return nil, fmt.Errorf("provider not found")
-	}
-	info, err := i.module.Get(ctx, id)
-	if err != nil {
-
-	}
-	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		info, err = i.module.Edit(ctx, id, input)
-		if err != nil {
-			return err
+	if *input.Provider != "ollama" {
+		_, has := model_runtime.GetProvider(*input.Provider)
+		if !has {
+			return nil, fmt.Errorf("provider not found")
 		}
-		_, err = i.upstreamModule.Save(ctx, id, newAIUpstream(id, *input.Provider, p.URI()))
-		return err
-	})
+	}
+
+	info, err := i.module.Edit(ctx, id, input)
 	if err != nil {
 		return nil, err
 	}
+	//_, err = i.upstreamModule.Save(ctx, id, newAIUpstream(id, *input.Provider, p.URI()))
 
 	return info, nil
 }
@@ -482,13 +477,13 @@ func (i *imlServiceController) Create(ctx *gin.Context, teamID string, input *se
 	}
 	var err error
 	var info *service_dto.Service
-	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		info, err = i.module.Create(txCtx, teamID, input)
+	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		info, err = i.module.Create(ctx, teamID, input)
 		if err != nil {
 			return err
 		}
 		path := fmt.Sprintf("/%s/", strings.Trim(input.Prefix, "/"))
-		_, err = i.routerModule.Create(txCtx, info.Id, &router_dto.Create{
+		_, err = i.routerModule.Create(ctx, info.Id, &router_dto.Create{
 			Id:          uuid.New().String(),
 			Name:        "",
 			Path:        path + "*",
@@ -504,6 +499,15 @@ func (i *imlServiceController) Create(ctx *gin.Context, teamID string, input *se
 			},
 			Disable: false,
 		})
+		apps, err := i.appModule.Search(ctx, teamID, "")
+		if err != nil {
+			return err
+		}
+		for _, app := range apps {
+			i.subscribeModule.AddSubscriber(ctx, info.Id, &subscribe_dto.AddSubscriber{
+				Application: app.Id,
+			})
+		}
 		return err
 	})
 	return info, err
@@ -590,22 +594,22 @@ func (i *imlAppController) DeleteApp(ctx *gin.Context, appId string) error {
 	return i.module.DeleteApp(ctx, appId)
 }
 
-func newAIUpstream(id string, provider string, uri model_runtime.IProviderURI) *upstream_dto.Upstream {
-	return &upstream_dto.Upstream{
-		Type:            "http",
-		Balance:         "round-robin",
-		Timeout:         300000,
-		Retry:           0,
-		Remark:          fmt.Sprintf("auto create by ai service %s,provider is %s", id, provider),
-		LimitPeerSecond: 0,
-		ProxyHeaders:    nil,
-		Scheme:          uri.Scheme(),
-		PassHost:        "node",
-		Nodes: []*upstream_dto.NodeConfig{
-			{
-				Address: uri.Host(),
-				Weight:  100,
-			},
-		},
-	}
-}
+//func newAIUpstream(id string, provider string, uri model_runtime.IProviderURI) *upstream_dto.Upstream {
+//	return &upstream_dto.Upstream{
+//		Type:            "http",
+//		Balance:         "round-robin",
+//		Timeout:         300000,
+//		Retry:           0,
+//		Remark:          fmt.Sprintf("auto create by ai service %s,provider is %s", id, provider),
+//		LimitPeerSecond: 0,
+//		ProxyHeaders:    nil,
+//		Scheme:          uri.Scheme(),
+//		PassHost:        "node",
+//		Nodes: []*upstream_dto.NodeConfig{
+//			{
+//				Address: uri.Host(),
+//				Weight:  100,
+//			},
+//		},
+//	}
+//}

@@ -210,6 +210,9 @@ func (e *AsyncExecutor) DistributeToModelPipelines(model string, msg PullMessage
 type PullCallback func(msg PullMessage) error
 
 func PullModel(model string, id string, fn PullCallback) (*Pipeline, error) {
+	if client == nil {
+		return nil, fmt.Errorf("client not initialized")
+	}
 	mp, has := taskExecutor.GetModelPipeline(model)
 	if !has {
 		mp = newModelPipeline(taskExecutor.ctx, 100)
@@ -279,6 +282,9 @@ func PullModel(model string, id string, fn PullCallback) (*Pipeline, error) {
 }
 
 func StopPull(model string) {
+	if client == nil {
+		return
+	}
 	taskExecutor.CloseModelPipeline(model)
 }
 
@@ -287,6 +293,9 @@ func CancelPipeline(model string, id string) {
 }
 
 func RemoveModel(model string) error {
+	if client == nil {
+		return fmt.Errorf("client not initialized")
+	}
 	taskExecutor.CloseModelPipeline(model)
 	err := client.Delete(context.Background(), &api.DeleteRequest{Model: model})
 	if err != nil {
@@ -298,6 +307,9 @@ func RemoveModel(model string) error {
 }
 
 func ModelsInstalled() ([]Model, error) {
+	if client == nil {
+		return nil, fmt.Errorf("client not initialized")
+	}
 	result, err := client.List(context.Background())
 	if err != nil {
 		return nil, err

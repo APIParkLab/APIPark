@@ -58,6 +58,10 @@ func FromLocalModelState(state int) LocalModelState {
 	}
 }
 
+type OllamaConfig struct {
+	Address string `json:"address"`
+}
+
 type SimpleItem struct {
 	Id            string `json:"id"`
 	Name          string `json:"name"`

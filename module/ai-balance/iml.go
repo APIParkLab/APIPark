@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/APIParkLab/APIPark/service/setting"
+
 	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
 
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
@@ -37,7 +39,16 @@ type imlBalanceModule struct {
 	aiAPIService   ai_api.IAPIService         `autowired:""`
 	aiKeyService   ai_key.IKeyService         `autowired:""`
 	balanceService ai_balance.IBalanceService `autowired:""`
+	settingService setting.ISettingService    `autowired:""`
 	transaction    store.ITransaction         `autowired:""`
+}
+
+func (i *imlBalanceModule) SyncLocalBalances(ctx context.Context, address string) error {
+	releases, err := i.getLocalBalances(ctx, address)
+	if err != nil {
+		return err
+	}
+	return i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
 }
 
 func (i *imlBalanceModule) Create(ctx context.Context, input *ai_balance_dto.Create) error {
@@ -60,6 +71,7 @@ func (i *imlBalanceModule) Create(ctx context.Context, input *ai_balance_dto.Cre
 	}
 	providerName := ""
 	modelName := ""
+	base := ""
 	switch input.Type {
 	case ai_balance_dto.ModelTypeOnline:
 		p, has := model_runtime.GetProvider(input.Provider)
@@ -68,11 +80,18 @@ func (i *imlBalanceModule) Create(ctx context.Context, input *ai_balance_dto.Cre
 		}
 		providerName = p.Name()
 		modelName = input.Model
+		base = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
 	case ai_balance_dto.ModelTypeLocal:
 		input.Provider = "ollama"
 		providerName = "Ollama"
 		modelName = input.Model
+		v, has := i.settingService.Get(ctx, "system.ai_model.ollama_address")
+		if !has {
+			return fmt.Errorf("ollama address not found")
+		}
+		base = v
 	}
+
 	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		err = i.balanceService.Create(ctx, &ai_balance.Create{
 			Id:           input.Id,
@@ -90,23 +109,19 @@ func (i *imlBalanceModule) Create(ctx context.Context, input *ai_balance_dto.Cre
 		if err != nil {
 			return err
 		}
-		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{newRelease(item)}, true)
+		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{newRelease(item, base)}, true)
 	})
 
 }
 
-//var (
-//	ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
-//	ollamaBase   = "http://apipark-ollama:11434"
-//)
-
-func newRelease(item *ai_balance.Balance) *gateway.DynamicRelease {
+func newRelease(item *ai_balance.Balance, base string) *gateway.DynamicRelease {
 
 	cfg := make(map[string]interface{})
-	cfg["provider"] = item.Id
+	cfg["provider"] = item.Provider
 	cfg["model"] = item.Model
 	cfg["model_config"] = ai_provider_local.OllamaConfig
-	cfg["base"] = ai_provider_local.OllamaBase
+	cfg["base"] = base
+	cfg["priority"] = item.Priority
 	return &gateway.DynamicRelease{
 		BasicItem: &gateway.BasicItem{
 			ID:          item.Id,
@@ -133,9 +148,22 @@ func (i *imlBalanceModule) Sort(ctx context.Context, input *ai_balance_dto.Sort)
 	if err != nil {
 		return err
 	}
+	v, has := i.settingService.Get(ctx, "system.ai_model.ollama_address")
+	if !has {
+		return fmt.Errorf("ollama address not found")
+	}
 	releases := make([]*gateway.DynamicRelease, 0, len(list))
 	for _, item := range list {
-		releases = append(releases, newRelease(item))
+		base := v
+		if item.Provider != "ollama" {
+			p, has := model_runtime.GetProvider(item.Provider)
+			if !has {
+				continue
+			}
+			base = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
+		}
+
+		releases = append(releases, newRelease(item, base))
 	}
 	err = i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
 	if err != nil {
@@ -227,5 +255,75 @@ func (i *imlBalanceModule) syncGateway(ctx context.Context, clusterId string, re
 		}
 	}
 
+	return nil
+}
+
+func (i *imlBalanceModule) getLocalBalances(ctx context.Context, v string) ([]*gateway.DynamicRelease, error) {
+	balances, err := i.balanceService.Search(ctx, "", map[string]interface{}{"provider": "ollama"}, "priority asc")
+	if err != nil {
+		return nil, err
+	}
+	if v == "" {
+		var has bool
+		v, has = i.settingService.Get(ctx, "system.ai_model.ollama_address")
+		if !has {
+			return nil, fmt.Errorf("ollama address not found")
+		}
+	}
+
+	releases := make([]*gateway.DynamicRelease, 0, len(balances))
+	for _, item := range balances {
+		base := v
+		if item.Provider != "ollama" {
+			p, has := model_runtime.GetProvider(item.Provider)
+			if !has {
+				continue
+			}
+			base = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
+		}
+		releases = append(releases, newRelease(item, base))
+	}
+	return releases, nil
+}
+
+func (i *imlBalanceModule) getBalances(ctx context.Context) ([]*gateway.DynamicRelease, error) {
+	balances, err := i.balanceService.Search(ctx, "", nil, "priority asc")
+	if err != nil {
+		return nil, err
+	}
+	v, has := i.settingService.Get(ctx, "system.ai_model.ollama_address")
+	if !has {
+		return nil, fmt.Errorf("ollama address not found")
+	}
+	releases := make([]*gateway.DynamicRelease, 0, len(balances))
+	for _, item := range balances {
+		base := v
+		if item.Provider != "ollama" {
+			p, has := model_runtime.GetProvider(item.Provider)
+			if !has {
+				continue
+			}
+			base = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
+		}
+		releases = append(releases, newRelease(item, base))
+	}
+	return releases, nil
+}
+
+func (i *imlBalanceModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
+	releases, err := i.getBalances(ctx)
+	if err != nil {
+		return err
+	}
+	for _, p := range releases {
+		client, err := clientDriver.Dynamic(p.Resource)
+		if err != nil {
+			return err
+		}
+		err = client.Online(ctx, p)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
