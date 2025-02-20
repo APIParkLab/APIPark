@@ -36,6 +36,7 @@ interface PageListProps<T> extends ProTableProps<T, unknown>, RefAttributes<Acti
   primaryKey?: string
   addNewBtnTitle?: string
   addNewBtnAccess?: string
+  addNewBtnDisabled?: boolean
   tableClickAccess?: string
   onAddNewBtnClick?: () => void
   beforeSearchNode?: React.ReactNode[]
@@ -75,6 +76,7 @@ const PageList = <T extends Record<string, unknown>>(
     primaryKey = 'id',
     addNewBtnTitle,
     addNewBtnAccess,
+    addNewBtnDisabled = false,
     tableClickAccess,
     tableClass,
     onAddNewBtnClick,
@@ -202,6 +204,7 @@ const PageList = <T extends Record<string, unknown>>(
             <Button
               type="primary"
               className={`mr-btnrbase my-btnbase ${addNewBtnWrapperClass}`}
+              disabled={addNewBtnDisabled}
               onClick={onAddNewBtnClick}
             >
               {addNewBtnTitle}
