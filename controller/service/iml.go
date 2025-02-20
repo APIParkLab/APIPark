@@ -477,13 +477,13 @@ func (i *imlServiceController) Create(ctx *gin.Context, teamID string, input *se
 	}
 	var err error
 	var info *service_dto.Service
-	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		info, err = i.module.Create(txCtx, teamID, input)
+	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		info, err = i.module.Create(ctx, teamID, input)
 		if err != nil {
 			return err
 		}
 		path := fmt.Sprintf("/%s/", strings.Trim(input.Prefix, "/"))
-		_, err = i.routerModule.Create(txCtx, info.Id, &router_dto.Create{
+		_, err = i.routerModule.Create(ctx, info.Id, &router_dto.Create{
 			Id:          uuid.New().String(),
 			Name:        "",
 			Path:        path + "*",
@@ -499,6 +499,15 @@ func (i *imlServiceController) Create(ctx *gin.Context, teamID string, input *se
 			},
 			Disable: false,
 		})
+		apps, err := i.appModule.Search(ctx, teamID, "")
+		if err != nil {
+			return err
+		}
+		for _, app := range apps {
+			i.subscribeModule.AddSubscriber(ctx, info.Id, &subscribe_dto.AddSubscriber{
+				Application: app.Id,
+			})
+		}
 		return err
 	})
 	return info, err

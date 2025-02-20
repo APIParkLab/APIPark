@@ -7,11 +7,15 @@ import (
 	"io"
 	"math"
 	"net/http"
+	"net/url"
 	"strings"
+	"time"
 
-	system_dto "github.com/APIParkLab/APIPark/module/system/dto"
+	ai_balance "github.com/APIParkLab/APIPark/module/ai-balance"
 
 	"github.com/APIParkLab/APIPark/module/system"
+	system_dto "github.com/APIParkLab/APIPark/module/system/dto"
+	ollama_api "github.com/ollama/ollama/api"
 
 	"github.com/APIParkLab/APIPark/module/subscribe"
 	subscribe_dto "github.com/APIParkLab/APIPark/module/subscribe/dto"
@@ -51,6 +55,7 @@ type imlLocalModelController struct {
 	serviceModule   service.IServiceModule     `autowired:""`
 	catalogueModule catalogue.ICatalogueModule `autowired:""`
 	aiAPIModule     ai_api.IAPIModule          `autowired:""`
+	aiBalanceModule ai_balance.IBalanceModule  `autowired:""`
 	appModule       service.IAppModule         `autowired:""`
 	routerModule    router.IRouterModule       `autowired:""`
 	subscribeModule subscribe.ISubscribeModule `autowired:""`
@@ -66,9 +71,35 @@ func (i *imlLocalModelController) OllamaConfig(ctx *gin.Context) (*ai_local_dto.
 	}, nil
 }
 
+var (
+	client = &http.Client{
+		Timeout: 2 * time.Second,
+	}
+)
+
 func (i *imlLocalModelController) OllamaConfigUpdate(ctx *gin.Context, input *ai_local_dto.OllamaConfig) error {
-	return i.settingModule.Set(ctx, &system_dto.InputSetting{
-		OllamaAddress: &input.Address,
+	u, err := url.Parse(input.Address)
+	if err != nil {
+		return nil
+	}
+	ollamaClient := ollama_api.NewClient(u, client)
+	_, err = ollamaClient.Version(ctx)
+	if err != nil {
+		return err
+	}
+	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		err = i.module.SyncLocalModels(ctx, input.Address)
+		if err != nil {
+			return err
+		}
+		err = i.aiBalanceModule.SyncLocalBalances(ctx, input.Address)
+		if err != nil {
+			return err
+		}
+
+		return i.settingModule.Set(ctx, &system_dto.InputSetting{
+			OllamaAddress: &input.Address,
+		})
 	})
 }
 
