@@ -216,6 +216,7 @@ const OnlineModelList: React.FC = () => {
       showPagination={true}
       searchPlaceholder={$t('请输入名称搜索')}
       columns={columns}
+      addNewBtnAccess="system.devops.ai_provider.edit"
       addNewBtnTitle={$t('添加模型')}
       onAddNewBtnClick={handleAdd}
     />
