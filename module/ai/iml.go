@@ -482,7 +482,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		return fmt.Errorf("ai provider not found")
 	}
 
-	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		info, err := i.providerService.Get(ctx, id)
 		if err != nil {
 			if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -533,12 +533,12 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 			Config:     &input.Config,
 			Status:     &status,
 		}
-		_, err = i.aiKeyService.DefaultKey(txCtx, id)
+		_, err = i.aiKeyService.DefaultKey(ctx, id)
 		if err != nil {
 			if !errors.Is(err, gorm.ErrRecordNotFound) {
 				return err
 			}
-			err = i.aiKeyService.Create(txCtx, &ai_key.Create{
+			err = i.aiKeyService.Create(ctx, &ai_key.Create{
 				ID:         id,
 				Name:       info.Name,
 				Config:     input.Config,
@@ -549,7 +549,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 				Priority:   1,
 			})
 		} else {
-			err = i.aiKeyService.Save(txCtx, id, &ai_key.Edit{
+			err = i.aiKeyService.Save(ctx, id, &ai_key.Edit{
 				Config: &input.Config,
 				Status: &status,
 			})
@@ -557,13 +557,13 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		if err != nil {
 			return err
 		}
-		err = i.providerService.Save(txCtx, id, pInfo)
+		err = i.providerService.Save(ctx, id, pInfo)
 		if err != nil {
 			return err
 		}
 
 		if *pInfo.Status == 0 {
-			return i.syncGateway(txCtx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
 				{
 					BasicItem: &gateway.BasicItem{
 						ID:       id,
@@ -573,7 +573,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 			}, false)
 		}
 		// 获取当前供应商默认Key信息
-		defaultKey, err := i.aiKeyService.DefaultKey(txCtx, id)
+		defaultKey, err := i.aiKeyService.DefaultKey(ctx, id)
 		if err != nil {
 			return err
 		}
@@ -582,7 +582,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		cfg["model"] = info.DefaultLLM
 		cfg["model_config"] = model.DefaultConfig()
 		cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
-		return i.syncGateway(txCtx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
 			{
 				BasicItem: &gateway.BasicItem{
 					ID:          id,

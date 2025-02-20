@@ -18,6 +18,8 @@ type ILocalModelController interface {
 	Update(ctx *gin.Context, model string, input *ai_local_dto.Update) error
 	State(ctx *gin.Context, model string) (*ai_local_dto.DeployState, *ai_local_dto.ModelInfo, error)
 	SimpleList(ctx *gin.Context) ([]*ai_local_dto.SimpleItem, error)
+	OllamaConfig(ctx *gin.Context) (*ai_local_dto.OllamaConfig, error)
+	OllamaConfigUpdate(ctx *gin.Context, input *ai_local_dto.OllamaConfig) error
 }
 
 func init() {

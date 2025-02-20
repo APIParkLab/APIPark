@@ -13,6 +13,7 @@ type ILocalModelService interface {
 	universally.IServiceCreate[CreateLocalModel]
 	universally.IServiceEdit[EditLocalModel]
 	universally.IServiceDelete
+	DefaultModel(ctx context.Context) (*LocalModel, error)
 }
 
 type ILocalModelPackageService interface {

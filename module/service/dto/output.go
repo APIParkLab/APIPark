@@ -97,7 +97,8 @@ type Service struct {
 	Tags         []auto.Label   `json:"tags" aolabel:"tag"`
 	Logo         string         `json:"logo"`
 	Provider     *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
-	ProviderType string         `json:"provider_type"`
+	ProviderType string         `json:"provider_type,omitempty"`
+	Model        string         `json:"model,omitempty"`
 	ApprovalType string         `json:"approval_type"`
 	AsServer     bool           `json:"as_server"`
 	AsApp        bool           `json:"as_app"`
@@ -151,6 +152,10 @@ func ToService(model *service.Service) *Service {
 		s.ProviderType = "local"
 		if provider.Id != "ollama" {
 			s.ProviderType = "online"
+		}
+		modelId := model.AdditionalConfig["model"]
+		if modelId != "" {
+			s.Model = modelId
 		}
 	}
 	return s
