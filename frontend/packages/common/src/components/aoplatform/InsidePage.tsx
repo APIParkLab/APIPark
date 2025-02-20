@@ -22,6 +22,7 @@ class InsidePageProps {
   headerClassName?: string = ''
   /** 整个页面滚动 */
   scrollPage?: boolean = true
+  scrollInsidePage?: boolean = false
   customPadding?: boolean
   customBtn?: ReactNode
 }
@@ -42,6 +43,7 @@ const InsidePage: FC<InsidePageProps> = ({
   contentClassName = '',
   headerClassName = '',
   scrollPage = true,
+  scrollInsidePage = false,
   customPadding = false,
   customBtn
 }) => {
@@ -51,7 +53,9 @@ const InsidePage: FC<InsidePageProps> = ({
     navigate(backUrl || '/')
   }
   return (
-    <div className={`flex overflow-hidden flex-col flex-1 h-full ${className}`}>
+    <div
+      className={`flex flex-col flex-1 h-full ${scrollInsidePage ? 'overflow-auto' : 'overflow-hidden'} ${className}`}
+    >
       {showBanner && (
         <div
           className={`border-[0px] mr-PAGE_INSIDE_X ${showBorder ? 'border-solid border-b-[1px] border-BORDER' : ''} ${headerClassName}`}
@@ -100,7 +104,9 @@ const InsidePage: FC<InsidePageProps> = ({
           )}
         </div>
       )}
-      <div className={`h-full  ${scrollPage ? 'overflow-hidden' : 'overflow-auto'} ${contentClassName || ''}`}>
+      <div
+        className={`h-full  ${scrollInsidePage ? 'overflow-visible' : scrollPage ? 'overflow-hidden' : 'overflow-auto'} ${contentClassName || ''}`}
+      >
         {children}
       </div>
     </div>

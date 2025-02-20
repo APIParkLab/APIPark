@@ -185,12 +185,13 @@ export default function Guide() {
       }
       showBorder={false}
       scrollPage={false}
+      scrollInsidePage={true}
       customPadding={true}
       headerClassName="pt-[30px] pl-[40px]"
       contentClassName=" w-full pr-PAGE_INSIDE_X pb-PAGE_INSIDE_B pl-[40px]"
     >
       <AIModelGuide></AIModelGuide>
-      <div className="flex flex-col gap-[15px]">
+      <div className="flex flex-col gap-[15px] pb-PAGE_INSIDE_B">
         {showGuide && (
           <Collapse
             size="large"
