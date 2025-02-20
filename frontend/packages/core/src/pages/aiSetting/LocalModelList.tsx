@@ -435,7 +435,7 @@ const LocalModelList: React.FC = () => {
       ref={pageListRef}
       rowKey="id"
       tableClass="local-model-list"
-      customEmptyRender={customEmptyRender}
+      customEmptyRender={!ollamaAddress ? customEmptyRender : undefined}
       request={requestList}
       onSearchWordChange={(e) => {
         setSearchWord(e.target.value)
