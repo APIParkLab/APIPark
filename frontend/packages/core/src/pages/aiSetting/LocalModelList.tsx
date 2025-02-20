@@ -140,7 +140,6 @@ const LocalModelList: React.FC = () => {
         return ConfigureOllamaServiceRef.current?.save().then((res) => {
           if (res === true) {
             getOllamaData()
-            pageListRef.current?.reload()
           }
         })
       },
@@ -191,6 +190,7 @@ const LocalModelList: React.FC = () => {
 
     if (response.code === STATUS_CODE.SUCCESS) {
       setOllamaAddress(response.data?.config?.address || '')
+      pageListRef.current?.reload()
     } else {
       message.error(response.msg || $t(RESPONSE_TIPS.error))
     }
@@ -286,6 +286,13 @@ const LocalModelList: React.FC = () => {
 
   const requestList = async (params: any) => {
     try {
+      if (!ollamaAddress) {
+        return {
+          data: [],
+          success: true,
+          total: 0
+        }
+      }
       const response = await fetchData<BasicResponse<{ data: ModelListData[] }>>('model/local/list', {
         method: 'GET',
         eoParams: {
@@ -449,6 +456,7 @@ const LocalModelList: React.FC = () => {
       columns={columns}
       addNewBtnTitle={$t('部署模型')}
       onAddNewBtnClick={handleAdd}
+      addNewBtnDisabled={!ollamaAddress}
     />
   )
 }
