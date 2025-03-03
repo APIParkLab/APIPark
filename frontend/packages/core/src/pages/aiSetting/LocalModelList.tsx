@@ -133,14 +133,11 @@ const LocalModelList: React.FC = () => {
   const configureService = (address?: string) => {
     modal.confirm({
       title: $t('配置 Ollama 服务'),
-      content: (
-        <ConfigureOllamaService ref={ConfigureOllamaServiceRef} address={address}></ConfigureOllamaService>
-      ),
+      content: <ConfigureOllamaService ref={ConfigureOllamaServiceRef} address={address}></ConfigureOllamaService>,
       onOk: () => {
         return ConfigureOllamaServiceRef.current?.save().then((res) => {
           if (res === true) {
             getOllamaData()
-            pageListRef.current?.reload()
           }
         })
       },
@@ -176,9 +173,11 @@ const LocalModelList: React.FC = () => {
         <div>
           <Icon className="align-sub mr-[5px]" icon="ph:hard-drives-light" width="50" height="50" />
           <div>{$t('模型部署服务未配置')}</div>
-          <Button type="primary" className="mt-[10px]" onClick={() => configureService()}>
-            {$t('配置服务')}
-          </Button>
+          <WithPermission access="system.devops.ai_provider.edit">
+            <Button type="primary" className="mt-[10px]" onClick={() => configureService()}>
+              {$t('配置服务')}
+            </Button>
+          </WithPermission>
         </div>
       </>
     )
@@ -191,6 +190,7 @@ const LocalModelList: React.FC = () => {
 
     if (response.code === STATUS_CODE.SUCCESS) {
       setOllamaAddress(response.data?.config?.address || '')
+      pageListRef.current?.reload()
     } else {
       message.error(response.msg || $t(RESPONSE_TIPS.error))
     }
@@ -286,6 +286,13 @@ const LocalModelList: React.FC = () => {
 
   const requestList = async (params: any) => {
     try {
+      if (!ollamaAddress) {
+        return {
+          data: [],
+          success: true,
+          total: 0
+        }
+      }
       const response = await fetchData<BasicResponse<{ data: ModelListData[] }>>('model/local/list', {
         method: 'GET',
         eoParams: {
@@ -435,20 +442,26 @@ const LocalModelList: React.FC = () => {
       ref={pageListRef}
       rowKey="id"
       tableClass="local-model-list"
-      customEmptyRender={customEmptyRender}
+      customEmptyRender={!ollamaAddress ? customEmptyRender : undefined}
       request={requestList}
       onSearchWordChange={(e) => {
         setSearchWord(e.target.value)
         pageListRef.current?.reload()
       }}
-      beforeNewBtn={
-        [<Button className="mr-btnbase" key="removeFromDep" onClick={() => configureService(ollamaAddress)}>{$t('配置服务')}</Button>]
-      }
+      beforeNewBtn={[
+        <WithPermission access="system.devops.ai_provider.edit">
+          <Button className="mr-btnbase" key="removeFromDep" onClick={() => configureService(ollamaAddress)}>
+            {$t('配置服务')}
+          </Button>
+        </WithPermission>
+      ]}
       showPagination={true}
       searchPlaceholder={$t('请输入名称搜索')}
       columns={columns}
       addNewBtnTitle={$t('部署模型')}
       onAddNewBtnClick={handleAdd}
+      addNewBtnAccess="system.devops.ai_provider.edit"
+      addNewBtnDisabled={!ollamaAddress}
     />
   )
 }
