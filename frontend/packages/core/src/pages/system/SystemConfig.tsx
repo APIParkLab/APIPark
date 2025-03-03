@@ -87,10 +87,12 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
         if (serviceId && configuredProvider.length > 0) {
           const providerID = form.getFieldValue('provider')
           const provider = configuredProvider?.find((item: any) => item.id === providerID)
-          if (provider?.type === 'local') {
-            getLocalModelList(false)
-          } else {
-            getOnlineModelList(provider?.id, false)
+          if (provider) {
+            if (provider?.type === 'local') {
+              getLocalModelList(false)
+            } else {
+              getOnlineModelList(provider?.id, false)
+            }
           }
         }
       } else {

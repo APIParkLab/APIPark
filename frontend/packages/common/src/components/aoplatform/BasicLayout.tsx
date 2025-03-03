@@ -241,8 +241,18 @@ function BasicLayout({ project = 'core' }: { project: string }) {
             headerTitleRender={() => (
               <div className="w-[192px]  flex items-center">
                 <img className="h-[20px] cursor-pointer " src={Logo} onClick={() => navigator(mainPage)} />
-                <a className="align-text-top" href="https://github.com/APIParkLab/APIPark" target="_blank" className="ml-[5px] h-[25px] relative">
-                  <img src="https://img.shields.io/github/stars/APIParkLab/APIPark?style=social" className='absolute top-[6px]' width={75} alt="" />
+                <a
+                  className="align-text-top ml-[5px] h-[25px] relative"
+                  href="https://github.com/APIParkLab/APIPark"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <img
+                    src="https://img.shields.io/github/stars/APIParkLab/APIPark?style=social"
+                    className="absolute top-[6px]"
+                    width={75}
+                    alt=""
+                  />
                 </a>
               </div>
             )}
