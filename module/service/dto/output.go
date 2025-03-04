@@ -62,6 +62,7 @@ type Service struct {
 	AsServer     bool           `json:"as_server"`
 	AsApp        bool           `json:"as_app"`
 	ServiceKind  string         `json:"service_kind"`
+	ModelMapping string         `json:"model_mapping"`
 }
 
 type App struct {
@@ -133,16 +134,17 @@ type ServiceDoc struct {
 }
 
 type ExportService struct {
-	Id          string   `json:"id"`
-	Name        string   `json:"name"`
-	Prefix      string   `json:"prefix,omitempty"`
-	Description string   `json:"description"`
-	Team        string   `json:"team"`
-	ServiceType string   `json:"service_type"`
-	Catalogue   string   `json:"catalogue"`
-	Tags        []string `json:"tags"`
-	Logo        string   `json:"logo"`
-	Doc         string   `json:"doc"`
+	Id           string   `json:"id"`
+	Name         string   `json:"name"`
+	Prefix       string   `json:"prefix,omitempty"`
+	Description  string   `json:"description"`
+	Team         string   `json:"team"`
+	ServiceType  string   `json:"service_type"`
+	Catalogue    string   `json:"catalogue"`
+	Tags         []string `json:"tags"`
+	Logo         string   `json:"logo"`
+	Doc          string   `json:"doc"`
+	ModelMapping string   `json:"model_mapping"`
 }
 
 type ExportApp struct {

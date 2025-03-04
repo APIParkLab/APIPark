@@ -8,9 +8,20 @@ import "reflect"
 
 type IServiceStore interface {
 	store.ISearchStore[Service]
+	GetModelMapping(service string) (*ModelMapping, error)
+	SaveModelMapping(mapping *ModelMapping) error
 }
 type imlServiceStore struct {
 	store.SearchStore[Service]
+	mappingStore IModelMappingStore `autowired:""`
+}
+
+func (i *imlServiceStore) GetModelMapping(service string) (*ModelMapping, error) {
+	return i.mappingStore.First(nil, map[string]interface{}{"service": service})
+}
+
+func (i *imlServiceStore) SaveModelMapping(mapping *ModelMapping) error {
+	return i.mappingStore.Save(nil, mapping)
 }
 
 type IServiceTagStore interface {
