@@ -14,6 +14,7 @@ type CreateService struct {
 	Provider     *string  `json:"provider" aocheck:"ai_provider"`
 	AsApp        *bool    `json:"as_app"`
 	AsServer     *bool    `json:"as_server"`
+	ModelMapping string   `json:"model_mapping"`
 }
 
 type EditService struct {
@@ -25,6 +26,7 @@ type EditService struct {
 	Tags         *[]string `json:"tags"`
 	Provider     *string   `json:"provider" aocheck:"ai_provider"`
 	ApprovalType *string   `json:"approval_type"`
+	ModelMapping string    `json:"model_mapping"`
 }
 
 type CreateApp struct {
