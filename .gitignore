@@ -6,3 +6,4 @@
 .gitlab-ci.yml
 /.vscode/
 .vscode/
+.air.toml
