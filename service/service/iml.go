@@ -14,9 +14,7 @@ import (
 	"github.com/APIParkLab/APIPark/stores/service"
 )
 
-var (
-	_ IServiceService = (*imlServiceService)(nil)
-)
+var _ IServiceService = (*imlServiceService)(nil)
 
 type imlServiceService struct {
 	store service.IServiceStore `autowired:""`
@@ -154,9 +152,11 @@ func (i *imlServiceService) OnComplete() {
 func labelHandler(e *service.Service) []string {
 	return []string{e.Name, e.UUID, e.Description}
 }
+
 func uniquestHandler(i *Create) []map[string]interface{} {
 	return []map[string]interface{}{{"uuid": i.Id}}
 }
+
 func createEntityHandler(i *Create) *service.Service {
 	cfg, _ := json.Marshal(i.AdditionalConfig)
 	now := time.Now()

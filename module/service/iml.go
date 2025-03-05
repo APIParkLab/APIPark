@@ -19,6 +19,7 @@ import (
 	"github.com/eolinker/ap-account/service/role"
 
 	application_authorization "github.com/APIParkLab/APIPark/service/application-authorization"
+	service_model_mapping "github.com/APIParkLab/APIPark/service/service-model-mapping"
 
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 
@@ -68,6 +69,8 @@ type imlServiceModule struct {
 	apiService        api.IAPIService         `autowired:""`
 	apiDocService     api_doc.IAPIDocService  `autowired:""`
 	transaction       store.ITransaction      `autowired:""`
+
+	serviceModelMappingService service_model_mapping.IServiceModelMappingService `autowired:""`
 }
 
 func (i *imlServiceModule) ExportAll(ctx context.Context) ([]*service_dto.ExportService, error) {
@@ -116,11 +119,9 @@ func (i *imlServiceModule) ExportAll(ctx context.Context) ([]*service_dto.Export
 		items = append(items, info)
 	}
 	return items, nil
-
 }
 
 func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, keyword string) ([]*service.Service, error) {
-
 	userID := utils.UserId(ctx)
 	condition := make(map[string]interface{})
 	condition["as_server"] = true
@@ -140,7 +141,6 @@ func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, 
 		condition["team"] = teamIds
 		return i.serviceService.Search(ctx, keyword, condition, "create_at desc")
 	}
-
 }
 
 func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, keyword string) ([]*service_dto.ServiceItem, error) {
@@ -182,7 +182,6 @@ func (i *imlServiceModule) Simple(ctx context.Context) ([]*service_dto.SimpleSer
 
 	items := make([]*service_dto.SimpleServiceItem, 0, len(services))
 	for _, p := range services {
-
 		items = append(items, &service_dto.SimpleServiceItem{
 			Id:          p.Id,
 			Name:        p.Name,
@@ -195,14 +194,12 @@ func (i *imlServiceModule) Simple(ctx context.Context) ([]*service_dto.SimpleSer
 
 func (i *imlServiceModule) MySimple(ctx context.Context) ([]*service_dto.SimpleServiceItem, error) {
 	services, err := i.searchMyServices(ctx, "", "")
-
 	if err != nil {
 		return nil, err
 	}
 
 	items := make([]*service_dto.SimpleServiceItem, 0, len(services))
 	for _, p := range services {
-
 		items = append(items, &service_dto.SimpleServiceItem{
 			Id:          p.Id,
 			Name:        p.Name,
@@ -247,6 +244,13 @@ func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Ser
 
 		}
 	}
+
+	serviceModelMapping, err := i.serviceModelMappingService.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	s.ModelMapping = serviceModelMapping.Content
+
 	log.Infof("get service cost %d ms", time.Since(now).Milliseconds())
 	return s, nil
 }
@@ -318,7 +322,6 @@ func toServiceItem(model *service.Service) *service_dto.ServiceItem {
 }
 
 func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error) {
-
 	if input.Id == "" {
 		input.Id = uuid.New().String()
 	}
@@ -356,7 +359,6 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 			return nil, fmt.Errorf("ai service: model can not be empty")
 		}
 		mo.AdditionalConfig["model"] = *input.Model
-
 	}
 	if input.AsApp == nil {
 		// 默认值为false
@@ -388,6 +390,14 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 				}
 			}
 		}
+
+		err := i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
+			Sid:     input.Id,
+			Content: input.ModelMapping,
+		})
+		if err != nil {
+			return err
+		}
 		return i.serviceService.Create(ctx, mo)
 	})
 	if err != nil {
@@ -410,7 +420,6 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 		if input.Model != nil {
 			info.AdditionalConfig["model"] = *input.Model
 		}
-
 	}
 	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		serviceType := (*service.ServiceType)(input.ServiceType)
@@ -457,9 +466,15 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 				}
 			}
 		}
+		err = i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
+			Sid:     id,
+			Content: input.ModelMapping,
+		})
+		if err != nil {
+			return err
+		}
 		return nil
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -523,7 +538,6 @@ type imlServiceDocModule struct {
 
 func (i *imlServiceDocModule) ServiceDoc(ctx context.Context, pid string) (*serviceDto.ServiceDoc, error) {
 	_, err := i.serviceService.Check(ctx, pid, map[string]bool{"as_server": true})
-
 	if err != nil {
 		return nil, err
 	}
@@ -555,7 +569,6 @@ func (i *imlServiceDocModule) ServiceDoc(ctx context.Context, pid string) (*serv
 
 func (i *imlServiceDocModule) SaveServiceDoc(ctx context.Context, pid string, input *serviceDto.SaveServiceDoc) error {
 	_, err := i.serviceService.Check(ctx, pid, map[string]bool{"as_server": true})
-
 	if err != nil {
 		return err
 	}
@@ -737,7 +750,6 @@ func (i *imlAppModule) Search(ctx context.Context, teamId string, keyword string
 }
 
 func (i *imlAppModule) CreateApp(ctx context.Context, teamID string, input *service_dto.CreateApp) (*service_dto.App, error) {
-
 	if input.Id == "" {
 		input.Id = uuid.New().String()
 	}
@@ -759,9 +771,7 @@ func (i *imlAppModule) CreateApp(ctx context.Context, teamID string, input *serv
 	}
 
 	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
-
 		return i.serviceService.Create(ctx, mo)
-
 	})
 	if err != nil {
 		return nil, err
@@ -770,7 +780,7 @@ func (i *imlAppModule) CreateApp(ctx context.Context, teamID string, input *serv
 }
 
 func (i *imlAppModule) UpdateApp(ctx context.Context, appId string, input *service_dto.UpdateApp) (*service_dto.App, error) {
-	//userId := utils.UserId(ctx)
+	// userId := utils.UserId(ctx)
 	info, err := i.serviceService.Get(ctx, appId)
 	if err != nil {
 		return nil, err
@@ -907,7 +917,6 @@ func (i *imlAppModule) MySimpleApps(ctx context.Context, keyword string) ([]*ser
 	}
 	items := make([]*service_dto.SimpleAppItem, 0, len(services))
 	for _, p := range services {
-
 		items = append(items, &service_dto.SimpleAppItem{
 			Id:          p.Id,
 			Name:        p.Name,
