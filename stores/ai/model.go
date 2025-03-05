@@ -68,3 +68,99 @@ func (i *Key) TableName() string {
 func (i *Key) IdValue() int64 {
 	return i.Id
 }
+
+type Balance struct {
+	Id           int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
+	Uuid         string    `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
+	Provider     string    `gorm:"type:varchar(100);not null;column:provider;comment:供应商ID;uniqueIndex:provider_model" aovalue:"provider`
+	ProviderName string    `gorm:"type:varchar(100);not null;column:provider_name;comment:供应商名称"`
+	Model        string    `gorm:"type:varchar(100);not null;column:model;comment:模型ID;uniqueIndex:provider_model"`
+	ModelName    string    `gorm:"type:varchar(100);not null;column:model_name;comment:模型名称"`
+	Type         int       `gorm:"type:tinyint(1);not null;column:type;comment:类型,0：online，1：local"`
+	State        int       `gorm:"type:tinyint(1);not null;column:state;comment:状态,0：异常，1：正常;default:1"`
+	Priority     int       `gorm:"type:int;not null;column:priority;comment:优先级，数字越小优先级越大"`
+	Creator      string    `gorm:"size:36;not null;column:creator;comment:创建人;index:creator" aovalue:"creator"` // 创建人
+	Updater      string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"` // 更新人
+	CreateAt     time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
+	UpdateAt     time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:更新时间"`
+}
+
+func (i *Balance) TableName() string {
+	return "ai_balance"
+}
+
+func (i *Balance) IdValue() int64 {
+	return i.Id
+}
+
+type LocalModel struct {
+	Id       int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
+	Uuid     string    `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
+	Name     string    `gorm:"type:varchar(100);not null;column:name;comment:名称"`
+	Provider string    `gorm:"type:varchar(100);not null;column:provider;comment:供应商ID"`
+	State    int       `gorm:"type:tinyint(1);not null;column:state;comment:状态,0：关闭，1：正常;default:1"`
+	Creator  string    `gorm:"size:36;not null;column:creator;comment:创建人;index:creator" aovalue:"creator"` // 创建人
+	Updater  string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"` // 更新人
+	CreateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
+	UpdateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:更新时间"`
+}
+
+func (i *LocalModel) TableName() string {
+	return "ai_local_model"
+}
+
+func (i *LocalModel) IdValue() int64 {
+	return i.Id
+}
+
+type LocalModelInstallState struct {
+	Id       int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
+	Uuid     string    `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
+	Complete int64     `gorm:"type:BIGINT(20);not null;column:complete;comment:已下载大小"`
+	Total    int64     `gorm:"type:BIGINT(20);not null;column:total;comment:总大小"`
+	State    int       `gorm:"type:tinyint(1);not null;column:state;comment:状态"`
+	LastMsg  string    `gorm:"type:text;not null;column:last_msg;comment:最后一次消息"`
+	UpdateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:更新时间"`
+}
+
+func (i *LocalModelInstallState) TableName() string {
+	return "ai_local_model_install_state"
+}
+
+func (i *LocalModelInstallState) IdValue() int64 {
+	return i.Id
+}
+
+type LocalModelPackage struct {
+	Id          int64  `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
+	Uuid        string `gorm:"type:varchar(100);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
+	Name        string `gorm:"type:varchar(100);not null;column:name;comment:名称"`
+	Size        string `gorm:"type:varchar(100);not null;column:size;comment:模型大小"`
+	Hash        string `gorm:"type:varchar(100);not null;column:hash;comment:模型hash"`
+	Description string `gorm:"type:varchar(255);not null;column:description;comment:描述"`
+	Version     string `gorm:"type:varchar(100);not null;column:version;comment:版本"`
+	IsPopular   bool   `gorm:"type:tinyint(1);not null;column:is_popular;comment:是否热门"`
+}
+
+func (i *LocalModelPackage) TableName() string {
+	return "ai_local_model_package"
+}
+
+func (i *LocalModelPackage) IdValue() int64 {
+	return i.Id
+}
+
+type LocalModelCache struct {
+	Id     int64  `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
+	Model  string `gorm:"type:varchar(100);not null;column:model;comment:模型ID"`
+	Target string `gorm:"type:varchar(100);not null;column:target;comment:目标"`
+	Type   int    `gorm:"type:tinyint(1);not null;column:type;comment:类型,0: 服务"`
+}
+
+func (i *LocalModelCache) TableName() string {
+	return "ai_local_model_cache"
+}
+
+func (i *LocalModelCache) IdValue() int64 {
+	return i.Id
+}

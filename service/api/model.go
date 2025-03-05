@@ -48,7 +48,7 @@ func FromEntity(e *api.API) *API {
 	return &API{
 		UUID:      e.UUID,
 		CreateAt:  e.CreateAt,
-		IsDelete:  e.IsDelete != 0,
+		IsDelete:  e.IsDelete,
 		Service:   e.Service,
 		Team:      e.Team,
 		Creator:   e.Creator,

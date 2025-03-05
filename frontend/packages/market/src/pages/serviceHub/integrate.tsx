@@ -68,12 +68,12 @@ const Integrate = ({ service }: { service: ServiceDetailType }) => {
       <div className="my-[10px]">{$t('可通过以下 URL 或 下载 Json 文件，导入 API 文档数据到 Agent 平台中。')}</div>
       <div className="flex w-full items-center gap-[30px]">
         <Space.Compact className="w-[700px]">
-          <Input className="truncate" disabled title={url} value={url} />
+          <Input className="truncate" readOnly title={url} value={url} />
           <Button type="primary" onClick={copyURL}>
             {$t('复制 URL')}
           </Button>
         </Space.Compact>
-        <span className="text-[14px] font-bold">OR</span>
+        <span className="text-[14px] font-bold">{$t('或')}</span>
         <Button href={`/api/v1/export/openapi/${serviceId}`} target="_blank">
           {$t('下载 Json 文件')}
         </Button>

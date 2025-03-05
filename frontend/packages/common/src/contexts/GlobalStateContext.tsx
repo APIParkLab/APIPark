@@ -148,7 +148,7 @@ const mockData = [
             access: 'system.settings.ai_provider.view'
           },
           {
-            name: 'APIKey 资源池',
+            name: 'API Key 负载',
             key: 'aiKeys',
             path: '/keysetting',
             icon: 'ic:baseline-key',
@@ -160,6 +160,13 @@ const mockData = [
             path: '/aiApis',
             icon: 'ic:baseline-api',
             access: 'system.settings.ai_api.view'
+          },
+          {
+            name: '模型灾备',
+            key: 'loadBalancing',
+            path: '/loadBalancing',
+            icon: 'ph:network-x',
+            access: 'system.settings.ai_balance.view'
           }
         ]
       },

@@ -16,6 +16,9 @@ type IServiceController interface {
 	// SearchMyServices 搜索服务
 	SearchMyServices(ctx *gin.Context, teamID string, keyword string) ([]*service_dto.ServiceItem, error)
 	Search(ctx *gin.Context, teamIDs string, keyword string) ([]*service_dto.ServiceItem, error)
+	QuickCreateRestfulService(ctx *gin.Context) error
+
+	QuickCreateAIService(ctx *gin.Context, input *service_dto.QuickCreateAIService) error
 	// Create 创建
 	Create(ctx *gin.Context, teamID string, input *service_dto.CreateService) (*service_dto.Service, error)
 	// Edit 编辑

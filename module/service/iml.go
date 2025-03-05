@@ -8,6 +8,10 @@ import (
 	"strings"
 	"time"
 
+	ai_local "github.com/APIParkLab/APIPark/service/ai-local"
+
+	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
+
 	"github.com/eolinker/eosc/log"
 
 	"github.com/APIParkLab/APIPark/resources/access"
@@ -59,6 +63,7 @@ type imlServiceModule struct {
 	teamService       team.ITeamService              `autowired:""`
 	teamMemberService team_member.ITeamMemberService `autowired:""`
 	tagService        tag.ITagService                `autowired:""`
+	localModelService ai_local.ILocalModelService    `autowired:""`
 
 	serviceTagService service_tag.ITagService `autowired:""`
 	apiService        api.IAPIService         `autowired:""`
@@ -126,7 +131,7 @@ func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, 
 			return nil, err
 		}
 		condition["team"] = teamId
-		return i.serviceService.Search(ctx, keyword, condition, "update_at desc")
+		return i.serviceService.Search(ctx, keyword, condition, "create_at desc")
 	} else {
 		membersForUser, err := i.teamMemberService.FilterMembersForUser(ctx, userID)
 		if err != nil {
@@ -134,7 +139,7 @@ func (i *imlServiceModule) searchMyServices(ctx context.Context, teamId string, 
 		}
 		teamIds := membersForUser[userID]
 		condition["team"] = teamIds
-		return i.serviceService.Search(ctx, keyword, condition, "update_at desc")
+		return i.serviceService.Search(ctx, keyword, condition, "create_at desc")
 	}
 }
 
@@ -220,6 +225,25 @@ func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Ser
 	s.Tags = auto.List(utils.SliceToSlice(tags, func(p *service_tag.Tag) string {
 		return p.Tid
 	}))
+	if s.Model == "" {
+		switch s.ProviderType {
+		case "online":
+			p, has := model_runtime.GetProvider(s.Provider.Id)
+			if has {
+				m, has := p.DefaultModel(model_runtime.ModelTypeLLM)
+				if has {
+					s.Model = m.ID()
+				}
+			}
+		case "local":
+			info, err := i.localModelService.DefaultModel(ctx)
+			if err != nil {
+				return nil, err
+			}
+			s.Model = info.Id
+
+		}
+	}
 	
 	serviceModelMapping, err := i.serviceModelMappingService.GetByService(ctx, id)
 	if err != nil {
@@ -239,9 +263,9 @@ func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword st
 		if err != nil {
 			return nil, err
 		}
-		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"team": teamID, "as_server": true}, "update_at desc")
+		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"team": teamID, "as_server": true}, "create_at desc")
 	} else {
-		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"as_server": true}, "update_at desc")
+		list, err = i.serviceService.Search(ctx, keyword, map[string]interface{}{"as_server": true}, "create_at desc")
 	}
 	if err != nil {
 		return nil, err
@@ -277,8 +301,16 @@ func toServiceItem(model *service.Service) *service_dto.ServiceItem {
 		Team:        auto.UUID(model.Team),
 		ServiceKind: model.Kind.String(),
 	}
+	state := service_dto.FromServiceState(model.State)
+	if state == service_dto.ServiceStateNormal {
+		item.State = model.ServiceType.String()
+	} else {
+		item.State = state.String()
+	}
+
 	switch model.Kind {
 	case service.RestService:
+		item.State = model.ServiceType.String()
 		return item
 	case service.AIService:
 		provider := auto.UUID(model.AdditionalConfig["provider"])
@@ -293,6 +325,13 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 	if input.Id == "" {
 		input.Id = uuid.New().String()
 	}
+	if teamID == "" {
+		item, err := i.teamService.DefaultTeam(ctx)
+		if err != nil {
+			return nil, err
+		}
+		teamID = item.Id
+	}
 	mo := &service.Create{
 		Id:               input.Id,
 		Name:             input.Name,
@@ -302,6 +341,7 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 		Catalogue:        input.Catalogue,
 		Prefix:           input.Prefix,
 		Logo:             input.Logo,
+		State:            service_dto.ServiceState(input.State).Int(),
 		ApprovalType:     service.ApprovalType(input.ApprovalType),
 		AdditionalConfig: make(map[string]string),
 		Kind:             service.Kind(input.Kind),
@@ -315,6 +355,11 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 			return nil, fmt.Errorf("ai service: provider can not be empty")
 		}
 		mo.AdditionalConfig["provider"] = *input.Provider
+		if input.Model == nil {
+			return nil, fmt.Errorf("ai service: model can not be empty")
+		}
+		mo.AdditionalConfig["model"] = *input.Model
+
 	}
 	if input.AsApp == nil {
 		// 默认值为false
@@ -374,6 +419,9 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 		if input.Provider != nil {
 			info.AdditionalConfig["provider"] = *input.Provider
 		}
+		if input.Model != nil {
+			info.AdditionalConfig["model"] = *input.Model
+		}
 	}
 	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		serviceType := (*service.ServiceType)(input.ServiceType)
@@ -386,8 +434,7 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 		if input.ApprovalType != nil {
 			approvalType = service.ApprovalType(*input.ApprovalType)
 		}
-
-		err = i.serviceService.Save(ctx, id, &service.Edit{
+		editCfg := &service.Edit{
 			Name:             input.Name,
 			Description:      input.Description,
 			Logo:             input.Logo,
@@ -395,7 +442,13 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 			Catalogue:        input.Catalogue,
 			AdditionalConfig: &info.AdditionalConfig,
 			ApprovalType:     &approvalType,
-		})
+		}
+		if input.State != nil {
+			state := service_dto.ServiceState(*input.State).Int()
+			editCfg.State = &state
+		}
+
+		err = i.serviceService.Save(ctx, id, editCfg)
 		if err != nil {
 			return err
 		}

@@ -14,8 +14,10 @@ type IKeyService interface {
 	universally.IServiceCreate[Create]
 	universally.IServiceEdit[Edit]
 	universally.IServiceDelete
+	DeleteByProvider(ctx context.Context, providerId string) error
 	DefaultKey(ctx context.Context, providerId string) (*Key, error)
 	KeysByProvider(ctx context.Context, providerId string) ([]*Key, error)
+	CountMapByProvider(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error)
 	MaxPriority(ctx context.Context, providerId string) (int, error)
 	SortBefore(ctx context.Context, provider string, originID string, targetID string) ([]*Key, error)
 	SortAfter(ctx context.Context, provider string, originID string, targetID string) ([]*Key, error)

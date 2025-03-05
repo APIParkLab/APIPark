@@ -17,12 +17,16 @@ type imlProviderController struct {
 	module ai.IProviderModule `autowired:""`
 }
 
-func (i *imlProviderController) Sort(ctx *gin.Context, input *ai_dto.Sort) error {
-	return i.module.Sort(ctx, input)
+func (i *imlProviderController) Delete(ctx *gin.Context, id string) error {
+	return i.module.Delete(ctx, id)
 }
 
-func (i *imlProviderController) ConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ConfiguredProviderItem, *ai_dto.BackupProvider, error) {
-	return i.module.ConfiguredProviders(ctx)
+//func (i *imlProviderController) Sort(ctx *gin.Context, input *ai_dto.Sort) error {
+//	return i.module.Sort(ctx, input)
+//}
+
+func (i *imlProviderController) ConfiguredProviders(ctx *gin.Context, keyword string) ([]*ai_dto.ConfiguredProviderItem, error) {
+	return i.module.ConfiguredProviders(ctx, keyword)
 }
 
 func (i *imlProviderController) UnConfiguredProviders(ctx *gin.Context) ([]*ai_dto.ProviderItem, error) {
@@ -33,8 +37,11 @@ func (i *imlProviderController) SimpleProviders(ctx *gin.Context) ([]*ai_dto.Sim
 	return i.module.SimpleProviders(ctx)
 }
 
-func (i *imlProviderController) SimpleConfiguredProviders(ctx *gin.Context) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error) {
-	return i.module.SimpleConfiguredProviders(ctx)
+func (i *imlProviderController) SimpleConfiguredProviders(ctx *gin.Context, all string) ([]*ai_dto.SimpleProviderItem, *ai_dto.BackupProvider, error) {
+	if all == "true" {
+		return i.module.SimpleConfiguredProviders(ctx, true)
+	}
+	return i.module.SimpleConfiguredProviders(ctx, false)
 }
 
 func (i *imlProviderController) Provider(ctx *gin.Context, id string) (*ai_dto.Provider, error) {

@@ -25,10 +25,11 @@ interface AIProviderResponse {
 interface AIProviderSelectProps {
   value?: string
   onChange?: (value: string, provider: AIProvider) => void
-  style?: React.CSSProperties
+  style?: React.CSSProperties,
+  source?: 'ai_api' | 'ai_keys'
 }
 
-const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, style = { width: 200 } }) => {
+const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, source = 'ai', style = { width: 200 } }) => {
   const { t } = useTranslation()
   const [providers, setProviders] = useState<AIProvider[]>([])
   const [loading, setLoading] = useState(false)
@@ -40,7 +41,7 @@ const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, st
       if (isMounted) setLoading(true)
       try {
         const endpoint = 'simple/ai/providers/configured'
-        const response = await fetchData<AIProviderResponse>(endpoint, { method: 'GET' })
+        const response = await fetchData<AIProviderResponse>(endpoint, { method: 'GET', ...(source === 'ai_api' ? { eoParams: { all: true } } : {}) })
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           const providers = data.providers.map((val) => ({

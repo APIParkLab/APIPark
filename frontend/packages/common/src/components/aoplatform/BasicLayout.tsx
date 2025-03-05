@@ -116,6 +116,10 @@ function BasicLayout({ project = 'core' }: { project: string }) {
     getGlobalAccessData()
   }, [])
 
+  useEffect(() => {
+    setPathname(location.pathname)
+  }, [location.pathname])
+
   const logOut = () => {
     fetchData<BasicResponse<null>>('account/logout', { method: 'GET' }).then((response) => {
       const { code, msg } = response
@@ -182,7 +186,7 @@ function BasicLayout({ project = 'core' }: { project: string }) {
       </Button>,
       ...((pluginSlotHub.getSlot('basicLayoutAfterBtns') as unknown[]) || [])
     ]
-  }, [pluginSlotHub.getSlot('basicLayoutAfterBtns')])
+  }, [state.language, pluginSlotHub.getSlot('basicLayoutAfterBtns')])
 
   return (
     <div
@@ -237,6 +241,19 @@ function BasicLayout({ project = 'core' }: { project: string }) {
             headerTitleRender={() => (
               <div className="w-[192px]  flex items-center">
                 <img className="h-[20px] cursor-pointer " src={Logo} onClick={() => navigator(mainPage)} />
+                <a
+                  className="align-text-top ml-[5px] h-[25px] relative"
+                  href="https://github.com/APIParkLab/APIPark"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <img
+                    src="https://img.shields.io/github/stars/APIParkLab/APIPark?style=social"
+                    className="absolute top-[6px]"
+                    width={75}
+                    alt=""
+                  />
+                </a>
               </div>
             )}
             logo={Logo}
@@ -276,9 +293,9 @@ function BasicLayout({ project = 'core' }: { project: string }) {
             collapsedButtonRender={false}
           >
             <div
-              className={`w-full h-calc-100vh-minus-navbar pl-PAGE_INSIDE_X pt-PAGE_INSIDE_T ${
+              className={`w-full h-calc-100vh-minus-navbar ${
                 currentUrl.startsWith('/role/list') ? 'overflow-auto' : 'overflow-hidden'
-              }`}
+              } ${currentUrl.startsWith('/guide/page') ? '' : 'pl-PAGE_INSIDE_X pt-PAGE_INSIDE_T'}`}
             >
               <Outlet />
             </div>
