@@ -4,15 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/eolinker/go-common/auto"
 	"github.com/eolinker/go-common/store"
 	"github.com/eolinker/go-common/utils"
 	"gorm.io/gorm"
 )
 
-var (
-	_ IServiceDelete = (*imlServiceDelete[any])(nil)
-)
+var _ IServiceDelete = (*imlServiceDelete[any])(nil)
 
 type IServiceDelete interface {
 	Delete(ctx context.Context, uuid string) error
@@ -26,10 +25,12 @@ func NewDelete[E any](store store.ISearchStore[E]) IServiceDelete {
 	assert(new(E))
 	return &imlServiceDelete[E]{store: store}
 }
+
 func NewSoftDelete[E any](s store.ISearchStore[E]) IServiceDelete {
 	assert(new(E))
 	return &imlServiceSoftDelete[E]{store: s}
 }
+
 func (p *imlServiceDelete[E]) Delete(ctx context.Context, uuid string) error {
 	return p.store.Transaction(ctx, func(ctx context.Context) error {
 		o, err := p.store.First(ctx, map[string]interface{}{"uuid": uuid})
@@ -46,7 +47,6 @@ func (p *imlServiceDelete[E]) Delete(ctx context.Context, uuid string) error {
 		}
 		return p.store.SetLabels(ctx, idValue(o))
 	})
-
 }
 
 type imlServiceSoftDelete[E any] struct {
@@ -66,7 +66,5 @@ func (p *imlServiceSoftDelete[E]) Delete(ctx context.Context, uuid string) error
 
 		auto.Auto("operator", operator, o)
 		return p.store.SoftDelete(ctx, map[string]interface{}{"uuid": uuid})
-
 	})
-
 }
