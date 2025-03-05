@@ -27,6 +27,7 @@ type AiModel struct {
 	Id       string `json:"id"`
 	Config   string `json:"config"`
 	Provider string `json:"provider"`
+	Type     string `json:"type"`
 }
 
 type EditAPI struct {

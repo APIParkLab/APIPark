@@ -134,6 +134,9 @@ type EoRequest = RequestInit & {
   eoTransformKeys?: string[]
   eoApiPrefix?: string
   eoBody?: { [k: string]: unknown } | Array<unknown> | string
+  isStream?: boolean
+  handleStream?: (line: any) => void
+  callback?: (cancel: () => void) => void
 }
 
 type EoHeaders = Headers | { [k: string]: string }
@@ -143,6 +146,14 @@ export function useFetch() {
   const pluginEventHub = usePluginEventHub()
 
   function fetchData<T>(url: string, options: EoRequest) {
+    const controller = new AbortController()
+    const signal = controller.signal
+
+    // 如果提供了callback，则传递取消请求的函数
+    if (options.callback) {
+      options.callback(() => controller.abort())
+    }
+
     // 合并传入的headers与默认headers
     const headers = { ...(options.body ? {} : DEFAULT_HEADERS), ...options.headers }
 
@@ -161,7 +172,8 @@ export function useFetch() {
       headers: {
         ...headers
         // Authorization: 'Bearer your-token', // 示例：添加统一的Token认证
-      }
+      },
+      signal // 将signal传递给fetch请求
     }
 
     return fetch(`${options?.eoApiPrefix === undefined ? '/api/v1/' : options.eoApiPrefix}${url}`, finalOptions)
@@ -186,14 +198,36 @@ export function useFetch() {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
 
-        // 如果响应体为JSON且指定了转换键，则转换响应数据
-        if (options?.eoApiPrefix||isJsonHttp(response.headers)) {
-          const data = await response.json()
-          const newData = (await pluginEventHub.emit('httpResponse', { data, continue: true })) as Response
-          return shouldTransformKeys ? (keysToCamel(newData, options.eoTransformKeys as string[]) as T) : data
-        }
+        if (options?.isStream) {
+          const reader = response.body?.getReader()
+          const decoder = new TextDecoder('utf-8')
+          let buffer = ''
+          if (reader) {
+            while (true) {
+              const { done, value } = await reader.read()
+              if (done) break
+              buffer += decoder.decode(value, { stream: true })
+              const lines = buffer.split('\n')
+              buffer = lines.pop() || ''
+              for (const line of lines) {
+                options?.handleStream?.(line)
+              }
+            }
 
-        return response
+            if (buffer) {
+              options?.handleStream?.(buffer)
+            }
+          }
+        } else {
+          // 如果响应体为JSON且指定了转换键，则转换响应数据
+          if (options?.eoApiPrefix || isJsonHttp(response.headers)) {
+            const data = await response.json()
+            const newData = (await pluginEventHub.emit('httpResponse', { data, continue: true })) as Response
+            return shouldTransformKeys ? (keysToCamel(newData, options.eoTransformKeys as string[]) as T) : data
+          }
+
+          return response
+        }
       })
       .catch((error) => {
         // 全局错误处理

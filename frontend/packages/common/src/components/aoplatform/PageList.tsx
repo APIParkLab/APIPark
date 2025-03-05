@@ -36,11 +36,13 @@ interface PageListProps<T> extends ProTableProps<T, unknown>, RefAttributes<Acti
   primaryKey?: string
   addNewBtnTitle?: string
   addNewBtnAccess?: string
+  addNewBtnDisabled?: boolean
   tableClickAccess?: string
   onAddNewBtnClick?: () => void
   beforeSearchNode?: React.ReactNode[]
   onSearchWordChange?: (e: ChangeEvent<HTMLInputElement>) => void
   afterNewBtn?: React.ReactNode[]
+  beforeNewBtn?: React.ReactNode[]
   dragSortKey?: string
   onDragSortEnd?: (beforeIndex: number, afterIndex: number, newDataSource: T[]) => void | Promise<void>
   tableTitle?: string
@@ -56,7 +58,8 @@ interface PageListProps<T> extends ProTableProps<T, unknown>, RefAttributes<Acti
   delayLoading?: boolean
   noScroll?: boolean
   /* 前端分页的表格，需要传入该字段以支持后端搜索 */
-  manualReloadTable?: () => void
+  manualReloadTable?: () => void,
+  customEmptyRender?: () => React.ReactNode
 }
 
 const PageList = <T extends Record<string, unknown>>(
@@ -73,6 +76,7 @@ const PageList = <T extends Record<string, unknown>>(
     primaryKey = 'id',
     addNewBtnTitle,
     addNewBtnAccess,
+    addNewBtnDisabled = false,
     tableClickAccess,
     tableClass,
     onAddNewBtnClick,
@@ -80,6 +84,7 @@ const PageList = <T extends Record<string, unknown>>(
     onSearchWordChange,
     manualReloadTable,
     afterNewBtn,
+    beforeNewBtn,
     dragSortKey,
     onDragSortEnd,
     tableTitle,
@@ -94,7 +99,8 @@ const PageList = <T extends Record<string, unknown>>(
     tableTitleClass,
     delayLoading = true,
     besidesTableHeight,
-    noScroll
+    noScroll,
+    customEmptyRender
   } = props
   const parentRef = useRef<HTMLDivElement>(null)
   const [tableHeight, setTableHeight] = useState(minVirtualHeight || window.innerHeight)
@@ -190,6 +196,7 @@ const PageList = <T extends Record<string, unknown>>(
   const headerTitle = () => {
     return (
       <>
+        {beforeNewBtn ? (beforeNewBtn as React.ReactNode[]) : undefined}
         {tableTitle ? (
           <span className={`text-[30px] leading-[42px] my-mbase pl-[20px] ${tableTitleClass}`}>{tableTitle}</span>
         ) : addNewBtnTitle ? (
@@ -197,6 +204,7 @@ const PageList = <T extends Record<string, unknown>>(
             <Button
               type="primary"
               className={`mr-btnrbase my-btnbase ${addNewBtnWrapperClass}`}
+              disabled={addNewBtnDisabled}
               onClick={onAddNewBtnClick}
             >
               {addNewBtnTitle}
@@ -345,6 +353,11 @@ const PageList = <T extends Record<string, unknown>>(
               )
             onChange?.(pagination, filters, sorter, extra)
           }}
+          locale={{
+            emptyText: customEmptyRender ? customEmptyRender?.() : undefined
+          }}
+          style={customEmptyRender ? { height: '100%' } : undefined}
+          bodyStyle={customEmptyRender ? { height: '100%' } : undefined}
           rowKey={primaryKey}
           dataSource={dataSource}
           search={false}

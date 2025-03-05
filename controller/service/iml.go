@@ -3,9 +3,26 @@ package service
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
+
+	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
+
+	subscribe_dto "github.com/APIParkLab/APIPark/module/subscribe/dto"
+
+	"github.com/APIParkLab/APIPark/module/subscribe"
+
+	ai_local "github.com/APIParkLab/APIPark/module/ai-local"
+
+	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
+
+	api_doc_dto "github.com/APIParkLab/APIPark/module/api-doc/dto"
+
+	"github.com/APIParkLab/APIPark/module/catalogue"
+
+	"github.com/APIParkLab/APIPark/module/team"
 
 	"github.com/eolinker/go-common/pm3"
 
@@ -14,8 +31,6 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 
 	api_doc "github.com/APIParkLab/APIPark/module/api-doc"
-
-	upstream_dto "github.com/APIParkLab/APIPark/module/upstream/dto"
 
 	"github.com/eolinker/eosc/log"
 
@@ -40,6 +55,10 @@ import (
 	"github.com/google/uuid"
 )
 
+//var (
+//	ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
+//)
+
 var (
 	_ IServiceController = (*imlServiceController)(nil)
 
@@ -47,15 +66,138 @@ var (
 )
 
 type imlServiceController struct {
-	module         service.IServiceModule    `autowired:""`
-	docModule      service.IServiceDocModule `autowired:""`
-	aiAPIModule    ai_api.IAPIModule         `autowired:""`
-	routerModule   router.IRouterModule      `autowired:""`
-	apiDocModule   api_doc.IAPIDocModule     `autowired:""`
-	providerModule ai.IProviderModule        `autowired:""`
-	upstreamModule upstream.IUpstreamModule  `autowired:""`
-	settingModule  system.ISettingModule     `autowired:""`
-	transaction    store.ITransaction        `autowired:""`
+	module          service.IServiceModule     `autowired:""`
+	docModule       service.IServiceDocModule  `autowired:""`
+	subscribeModule subscribe.ISubscribeModule `autowired:""`
+	aiAPIModule     ai_api.IAPIModule          `autowired:""`
+	routerModule    router.IRouterModule       `autowired:""`
+	apiDocModule    api_doc.IAPIDocModule      `autowired:""`
+	providerModule  ai.IProviderModule         `autowired:""`
+	aiLocalModel    ai_local.ILocalModelModule `autowired:""`
+	appModule       service.IAppModule         `autowired:""`
+	upstreamModule  upstream.IUpstreamModule   `autowired:""`
+	settingModule   system.ISettingModule      `autowired:""`
+	teamModule      team.ITeamModule           `autowired:""`
+	catalogueModule catalogue.ICatalogueModule `autowired:""`
+	transaction     store.ITransaction         `autowired:""`
+}
+
+func (i *imlServiceController) QuickCreateAIService(ctx *gin.Context, input *service_dto.QuickCreateAIService) error {
+	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		enable := true
+		err := i.providerModule.UpdateProviderConfig(ctx, input.Provider, &ai_dto.UpdateConfig{
+			Config: input.Config,
+			Enable: &enable,
+		})
+		if err != nil {
+			return err
+		}
+		p, err := i.providerModule.Provider(ctx, input.Provider)
+		if err != nil {
+			return err
+		}
+		id := uuid.NewString()
+		prefix := fmt.Sprintf("/%s", id[:8])
+		catalogueInfo, err := i.catalogueModule.DefaultCatalogue(ctx)
+		if err != nil {
+			return err
+		}
+		_, err = i.createAIService(ctx, input.Team, &service_dto.CreateService{
+			Id:           uuid.NewString(),
+			Name:         input.Provider + " AI Service",
+			Prefix:       prefix,
+			Description:  "Quick create by AI provider",
+			ServiceType:  "public",
+			State:        "normal",
+			Catalogue:    catalogueInfo.Id,
+			ApprovalType: "auto",
+			Provider:     &input.Provider,
+			Model:        &p.DefaultLLM,
+			Kind:         "ai",
+		})
+		return err
+	})
+}
+
+func (i *imlServiceController) QuickCreateRestfulService(ctx *gin.Context) error {
+	fileHeader, err := ctx.FormFile("file")
+	if err != nil {
+		return err
+	}
+	file, err := fileHeader.Open()
+	if err != nil {
+		return err
+	}
+	content, err := io.ReadAll(file)
+	if err != nil {
+		return err
+	}
+	typ := ctx.PostForm("type")
+	switch typ {
+	case "swagger", "":
+	default:
+		return fmt.Errorf("type %s not support", typ)
+	}
+
+	return i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+		teamId := ctx.PostForm("team")
+		id := uuid.NewString()
+		prefix := fmt.Sprintf("/%s", id[:8])
+		catalogueInfo, err := i.catalogueModule.DefaultCatalogue(ctx)
+		if err != nil {
+			return err
+		}
+		s, err := i.module.Create(ctx, teamId, &service_dto.CreateService{
+			Id:           uuid.NewString(),
+			Name:         "Restful Service By Swagger",
+			Prefix:       prefix,
+			Description:  "Auto create by upload swagger",
+			ServiceType:  "public",
+			State:        "normal",
+			Catalogue:    catalogueInfo.Id,
+			ApprovalType: "auto",
+			Kind:         "rest",
+		})
+		if err != nil {
+			return err
+		}
+		_, err = i.apiDocModule.UpdateDoc(ctx, s.Id, &api_doc_dto.UpdateDoc{
+			Id:      s.Id,
+			Content: string(content),
+		})
+		if err != nil {
+			return err
+		}
+		path := prefix + "/"
+		_, err = i.routerModule.Create(ctx, s.Id, &router_dto.Create{
+			Id:          uuid.NewString(),
+			Name:        "",
+			Path:        path + "*",
+			Methods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodPatch, http.MethodOptions},
+			Description: "auto create by create service",
+			Protocols:   []string{"http", "https"},
+			Proxy: &router_dto.InputProxy{
+				Path:    path,
+				Timeout: 30000,
+				Retry:   0,
+			},
+			Disable: false,
+		})
+		if err != nil {
+			return err
+		}
+		apps, err := i.appModule.Search(ctx, teamId, "")
+		if err != nil {
+			return err
+		}
+		for _, app := range apps {
+			i.subscribeModule.AddSubscriber(ctx, id, &subscribe_dto.AddSubscriber{
+				Application: app.Id,
+			})
+		}
+
+		return nil
+	})
 }
 
 var (
@@ -154,25 +296,18 @@ func (i *imlServiceController) editAIService(ctx *gin.Context, id string, input 
 	if input.Provider == nil {
 		return nil, fmt.Errorf("provider is required")
 	}
-	p, has := model_runtime.GetProvider(*input.Provider)
-	if !has {
-		return nil, fmt.Errorf("provider not found")
-	}
-	info, err := i.module.Get(ctx, id)
-	if err != nil {
-
-	}
-	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		info, err = i.module.Edit(ctx, id, input)
-		if err != nil {
-			return err
+	if *input.Provider != "ollama" {
+		_, has := model_runtime.GetProvider(*input.Provider)
+		if !has {
+			return nil, fmt.Errorf("provider not found")
 		}
-		_, err = i.upstreamModule.Save(ctx, id, newAIUpstream(id, *input.Provider, p.URI()))
-		return err
-	})
+	}
+
+	info, err := i.module.Edit(ctx, id, input)
 	if err != nil {
 		return nil, err
 	}
+	//_, err = i.upstreamModule.Save(ctx, id, newAIUpstream(id, *input.Provider, p.URI()))
 
 	return info, nil
 }
@@ -192,56 +327,61 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 			input.Prefix = input.Id[:8]
 		}
 	}
-	pv, err := i.providerModule.Provider(ctx, *input.Provider)
-	if err != nil {
-		return nil, err
-	}
-	p, has := model_runtime.GetProvider(*input.Provider)
-	if !has {
-		return nil, fmt.Errorf("provider not found")
-	}
-	m, has := p.GetModel(pv.DefaultLLM)
-	if !has {
-		return nil, fmt.Errorf("model %s not found", pv.DefaultLLM)
+	modelId := ""
+	modelCfg := ""
+	modelType := "online"
+	if *input.Provider == "ollama" {
+		modelType = "local"
+		list, err := i.aiLocalModel.SimpleList(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if len(list) == 0 {
+			return nil, fmt.Errorf("no local model")
+		}
+		modelId = list[0].Id
+		modelCfg = ai_provider_local.OllamaConfig
+	} else {
+		pv, err := i.providerModule.Provider(ctx, *input.Provider)
+		if err != nil {
+			return nil, err
+		}
+		p, has := model_runtime.GetProvider(*input.Provider)
+		if !has {
+			return nil, fmt.Errorf("provider not found")
+		}
+		m, has := p.GetModel(pv.DefaultLLM)
+		if !has {
+			return nil, fmt.Errorf("model %s not found", pv.DefaultLLM)
+		}
+		modelId = m.ID()
+		modelCfg = m.DefaultConfig()
+
 	}
 
 	var info *service_dto.Service
-	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
+	err := i.transaction.Transaction(ctx, func(txCtx context.Context) error {
 		var err error
 		info, err = i.module.Create(ctx, teamID, input)
 		if err != nil {
 			return err
 		}
-		path := fmt.Sprintf("/%s/demo_translation_api", strings.Trim(input.Prefix, "/"))
+		prefix := strings.Replace(input.Prefix, ":", "_", -1)
+		path := fmt.Sprintf("/%s/chat", strings.Trim(prefix, "/"))
 		timeout := 300000
 		retry := 0
 		aiPrompt := &ai_api_dto.AiPrompt{
-			Variables: []*ai_api_dto.AiPromptVariable{
-				{
-					Key:         "source_lang",
-					Description: "",
-					Require:     true,
-				},
-				{
-					Key:         "target_lang",
-					Description: "",
-					Require:     true,
-				},
-				{
-					Key:         "text",
-					Description: "",
-					Require:     true,
-				},
-			},
-			Prompt: "You need to translate {{source_lang}} into {{target_lang}}, and the following is the content that needs to be translated.\n---\n{{text}}",
+			Variables: []*ai_api_dto.AiPromptVariable{},
+			Prompt:    "",
 		}
 		aiModel := &ai_api_dto.AiModel{
-			Id:       m.ID(),
-			Config:   m.DefaultConfig(),
+			Id:       modelId,
+			Config:   modelCfg,
 			Provider: *input.Provider,
+			Type:     modelType,
 		}
-		name := "Demo Translation API"
-		description := "A demo that shows you how to use a prompt to create a Translation API."
+		name := "Demo AI API "
+		description := "This is a demo that shows you how to use a Chat API."
 		apiId := uuid.New().String()
 		err = i.aiAPIModule.Create(
 			ctx,
@@ -297,9 +437,18 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 		if err != nil {
 			return err
 		}
+		apps, err := i.appModule.Search(ctx, info.Team.Id, "")
+		if err != nil {
+			return err
+		}
+		for _, app := range apps {
+			i.subscribeModule.AddSubscriber(ctx, info.Id, &subscribe_dto.AddSubscriber{
+				Application: app.Id,
+			})
+		}
 
 		return i.docModule.SaveServiceDoc(ctx, info.Id, &service_dto.SaveServiceDoc{
-			Doc: "The Translation API allows developers to translate text from one language to another. It supports multiple languages and enables easy integration of high-quality translation features into applications. With simple API requests, you can quickly translate content into different target languages.",
+			Doc: "",
 		})
 	})
 
@@ -328,13 +477,13 @@ func (i *imlServiceController) Create(ctx *gin.Context, teamID string, input *se
 	}
 	var err error
 	var info *service_dto.Service
-	err = i.transaction.Transaction(ctx, func(txCtx context.Context) error {
-		info, err = i.module.Create(txCtx, teamID, input)
+	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		info, err = i.module.Create(ctx, teamID, input)
 		if err != nil {
 			return err
 		}
 		path := fmt.Sprintf("/%s/", strings.Trim(input.Prefix, "/"))
-		_, err = i.routerModule.Create(txCtx, info.Id, &router_dto.Create{
+		_, err = i.routerModule.Create(ctx, info.Id, &router_dto.Create{
 			Id:          uuid.New().String(),
 			Name:        "",
 			Path:        path + "*",
@@ -350,6 +499,15 @@ func (i *imlServiceController) Create(ctx *gin.Context, teamID string, input *se
 			},
 			Disable: false,
 		})
+		apps, err := i.appModule.Search(ctx, teamID, "")
+		if err != nil {
+			return err
+		}
+		for _, app := range apps {
+			i.subscribeModule.AddSubscriber(ctx, info.Id, &subscribe_dto.AddSubscriber{
+				Application: app.Id,
+			})
+		}
 		return err
 	})
 	return info, err
@@ -436,22 +594,22 @@ func (i *imlAppController) DeleteApp(ctx *gin.Context, appId string) error {
 	return i.module.DeleteApp(ctx, appId)
 }
 
-func newAIUpstream(id string, provider string, uri model_runtime.IProviderURI) *upstream_dto.Upstream {
-	return &upstream_dto.Upstream{
-		Type:            "http",
-		Balance:         "round-robin",
-		Timeout:         300000,
-		Retry:           0,
-		Remark:          fmt.Sprintf("auto create by ai service %s,provider is %s", id, provider),
-		LimitPeerSecond: 0,
-		ProxyHeaders:    nil,
-		Scheme:          uri.Scheme(),
-		PassHost:        "node",
-		Nodes: []*upstream_dto.NodeConfig{
-			{
-				Address: uri.Host(),
-				Weight:  100,
-			},
-		},
-	}
-}
+//func newAIUpstream(id string, provider string, uri model_runtime.IProviderURI) *upstream_dto.Upstream {
+//	return &upstream_dto.Upstream{
+//		Type:            "http",
+//		Balance:         "round-robin",
+//		Timeout:         300000,
+//		Retry:           0,
+//		Remark:          fmt.Sprintf("auto create by ai service %s,provider is %s", id, provider),
+//		LimitPeerSecond: 0,
+//		ProxyHeaders:    nil,
+//		Scheme:          uri.Scheme(),
+//		PassHost:        "node",
+//		Nodes: []*upstream_dto.NodeConfig{
+//			{
+//				Address: uri.Host(),
+//				Weight:  100,
+//			},
+//		},
+//	}
+//}

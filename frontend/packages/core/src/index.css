@@ -746,6 +746,15 @@ p{
     padding:16px 20px  !important
   }
 }
+.custom-steps .ant-steps-icon span {
+  width: auto !important;
+}
+.custom-steps .ant-steps-item-content {
+  margin-top: 0 !important;
+}
+.custom-steps .ant-steps-item-content .ant-steps-item-description {
+  width: 138px !important;
+}
 
 
 .ant-modal-body .pr-PAGE_INSIDE_X{
@@ -985,6 +994,13 @@ p{
 
 .apipark-layout-layout .ant-drawer-content-wrapper{
   min-width:unset !important;
+}
+
+.local-model-list .ant-pro-table .ant-table-body {
+  overflow: hidden !important;
+}
+.local-model-list .ant-pro-table td {
+  border-bottom: none !important;
 }
 
 .table-border {

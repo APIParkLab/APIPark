@@ -4,6 +4,39 @@ import (
 	"github.com/eolinker/go-common/auto"
 )
 
+type ModelType string
+
+const (
+	ModelTypeOnline ModelType = "online"
+	ModelTypeLocal  ModelType = "local"
+)
+
+func (m ModelType) String() string {
+	return string(m)
+}
+
+func (m ModelType) Int() int {
+	switch m {
+	case ModelTypeOnline:
+		return 0
+	case ModelTypeLocal:
+		return 1
+	default:
+		return -1
+	}
+}
+
+func FromModelType(m int) ModelType {
+	switch m {
+	case 0:
+		return ModelTypeOnline
+	case 1:
+		return ModelTypeLocal
+	default:
+		return ""
+	}
+}
+
 type API struct {
 	Id          string    `json:"id"`
 	Name        string    `json:"name"`
@@ -19,6 +52,7 @@ type API struct {
 type APIItem struct {
 	Id          string         `json:"id"`
 	Name        string         `json:"name"`
+	ModelType   ModelType      `json:"model_type"`
 	RequestPath string         `json:"request_path"`
 	Description string         `json:"description"`
 	Disable     bool           `json:"disabled"`
