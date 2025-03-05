@@ -19,7 +19,7 @@ import (
 	"github.com/eolinker/ap-account/service/role"
 
 	application_authorization "github.com/APIParkLab/APIPark/service/application-authorization"
-	"github.com/APIParkLab/APIPark/service/service_model_mapping"
+	service_model_mapping "github.com/APIParkLab/APIPark/service/service-model-mapping"
 
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 
@@ -244,8 +244,8 @@ func (i *imlServiceModule) Get(ctx context.Context, id string) (*service_dto.Ser
 
 		}
 	}
-	
-	serviceModelMapping, err := i.serviceModelMappingService.GetByService(ctx, id)
+
+	serviceModelMapping, err := i.serviceModelMappingService.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -359,7 +359,6 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 			return nil, fmt.Errorf("ai service: model can not be empty")
 		}
 		mo.AdditionalConfig["model"] = *input.Model
-
 	}
 	if input.AsApp == nil {
 		// 默认值为false
@@ -391,14 +390,13 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 				}
 			}
 		}
-		if input.ModelMapping != "" {
-			err := i.serviceModelMappingService.Create(ctx, &service_model_mapping.Create{
-				Service: input.Id,
-				Content: input.ModelMapping,
-			})
-			if err != nil {
-				return err
-			}
+
+		err := i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
+			Sid:     input.Id,
+			Content: input.ModelMapping,
+		})
+		if err != nil {
+			return err
 		}
 		return i.serviceService.Create(ctx, mo)
 	})
@@ -468,20 +466,12 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 				}
 			}
 		}
-		if input.ModelMapping != "" {
-			// 先删除旧的映射
-			err := i.serviceModelMappingService.Delete(ctx, id)
-			if err != nil {
-				return err
-			}
-			// 创建新的映射
-			err = i.serviceModelMappingService.Create(ctx, &service_model_mapping.Create{
-				Service: id,
-				Content: input.ModelMapping,
-			})
-			if err != nil {
-				return err
-			}
+		err = i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
+			Sid:     id,
+			Content: input.ModelMapping,
+		})
+		if err != nil {
+			return err
 		}
 		return nil
 	})
