@@ -1,6 +1,8 @@
 package service
 
-import "time"
+import (
+	"time"
+)
 
 type Service struct {
 	Id   int64  `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
@@ -27,6 +29,7 @@ type Service struct {
 func (p *Service) IdValue() int64 {
 	return p.Id
 }
+
 func (p *Service) TableName() string {
 	return "service"
 }
@@ -86,4 +89,22 @@ func (d *Doc) IdValue() int64 {
 
 func (d *Doc) TableName() string {
 	return "server_doc"
+}
+
+type ModelMapping struct {
+	Id       int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:PRIMARY ID;primary_key"`
+	Sid      string    `gorm:"size:36;not null;column:sid;comment:service uuid;uniqueIndex:unique_sid;"`
+	Content  string    `gorm:"type:text;not null;column:content;comment:mapping json"`
+	Creator  string    `gorm:"type:varchar(36);not null;column:creator;comment:creator" aovalue:"creator"`
+	Updater  string    `gorm:"type:varchar(36);not null;column:updater;comment:updater" aovalue:"updater"`
+	CreateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:create_at"`
+	UpdateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;column:update_at;comment:update_at"`
+}
+
+func (m *ModelMapping) TableName() string {
+	return "service_model_mapping"
+}
+
+func (m *ModelMapping) IdValue() int64 {
+	return m.Id
 }
