@@ -15,6 +15,7 @@ type Provider struct {
 	Creator    string
 	Updater    string
 	Status     int
+	Type       int
 	Priority   int
 	CreateAt   time.Time
 	UpdateAt   time.Time
@@ -34,6 +35,7 @@ type SetProvider struct {
 	Config     *string
 	Priority   *int
 	Status     *int
+	Type       *int
 }
 
 func FromEntity(e *ai.Provider) *Provider {
@@ -52,5 +54,6 @@ func FromEntity(e *ai.Provider) *Provider {
 		UpdateAt:   e.UpdateAt,
 		Status:     e.Status,
 		Priority:   e.Priority,
+		Type:       e.Type,
 	}
 }

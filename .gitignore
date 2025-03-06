@@ -5,3 +5,6 @@
 /apipark
 .gitlab-ci.yml
 /.vscode/
+.air.toml
+/tmp/
+/work
