@@ -36,6 +36,10 @@ export const AIModelGuide = () => {
    * rest 服务卡片点击事件
    */
   const restCardClick = async () => {
+    const permission = checkAccess('system.workspace.service.edit', accessData)
+    if (!permission) {
+      return message.warning($t('暂无权限'))
+    }
     modal.confirm({
       title: $t('添加 Rest 服务'),
       content: <RestAIDeploy ref={restAiDeployRef}></RestAIDeploy>,
@@ -58,6 +62,10 @@ export const AIModelGuide = () => {
    * AI 模型配置弹窗
    */
   const aiCardClick = () => {
+    const permission = checkAccess('system.devops.ai_provider.edit', accessData)
+    if (!permission) {
+      return message.warning($t('暂无权限'))
+    }
     // 更新弹窗
     const updateEntityData = (data: any) => {
       entityData.current = data
@@ -130,6 +138,10 @@ export const AIModelGuide = () => {
    * 本地部署 AI 并生成 API
    */
   const localModelCardClick = async () => {
+    const permission = checkAccess('system.devops.ai_provider.edit', accessData)
+    if (!permission) {
+      return message.warning($t('暂无权限'))
+    }
     if (!ollamaAddress) {
       navigateTo('/aisetting?status=unconfigure')
       return 
@@ -156,6 +168,10 @@ export const AIModelGuide = () => {
   }
   const deployDeepSeek = async (e: any) => {
     e.stopPropagation()
+    const permission = checkAccess('system.devops.ai_provider.edit', accessData)
+    if (!permission) {
+      return message.warning($t('暂无权限'))
+    }
     if (!ollamaAddress) {
       navigateTo('/aisetting?status=unconfigure')
       return 

@@ -894,5 +894,6 @@
   "Kb8ad0af5": "There are interfaces using the current model. Please unbind them before deleting.",
   "K60b54d0": "Edit (0) Model",
   "Kbf48dc2d": "Are you sure you want to delete it?",
-  "K3d2324d0": "Deletion failed."
+  "K3d2324d0": "Deletion failed.",
+  "Kce2fcdbf": "No Permission"
 }
