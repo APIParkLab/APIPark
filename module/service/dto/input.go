@@ -23,6 +23,7 @@ type CreateService struct {
 	Model        *string  `json:"model"`
 	AsApp        *bool    `json:"as_app"`
 	AsServer     *bool    `json:"as_server"`
+	ModelMapping string   `json:"model_mapping"`
 }
 
 type EditService struct {
@@ -36,6 +37,7 @@ type EditService struct {
 	Model        *string   `json:"model"`
 	ApprovalType *string   `json:"approval_type"`
 	State        *string   `json:"state"`
+	ModelMapping string    `json:"model_mapping"`
 }
 
 type CreateApp struct {
