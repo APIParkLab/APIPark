@@ -30,9 +30,9 @@ const ModelsDetailTable = (props: { providerID?: string }) => {
           access="system.devops.ai_provider.edit"
           key="edit"
           btnType="edit"
-          disabled={entity?.isTemplate || !entity?.can_edit}
+          disabled={entity?.is_system}
           tooltip={
-            entity?.isTemplate ? $t('该模型为官方模型，不可编辑') : $t('存在使用当前模型的接口，需要先解绑后才能编辑')
+            entity?.is_system ? $t('该模型为官方模型，不可编辑') : ''
           }
           onClick={() => handleEdit(entity)}
           btnTitle={$t('设置')}
@@ -41,9 +41,9 @@ const ModelsDetailTable = (props: { providerID?: string }) => {
         <TableBtnWithPermission
           access="system.devops.ai_provider.edit"
           key="delete"
-          disabled={entity?.isTemplate || !entity?.can_delete}
+          disabled={entity?.is_system || entity?.api_count}
           tooltip={
-            entity?.isTemplate ? $t('该模型为官方模型，不可删除') : $t('存在使用当前模型的接口，需要先解绑后才能删除')
+            entity?.is_system ? $t('该模型为官方模型，不可删除') : $t('存在使用当前模型的接口，需要先解绑后才能删除')
           }
           btnType="delete"
           onClick={() => handleDelete(entity)}
