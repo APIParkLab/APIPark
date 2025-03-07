@@ -637,7 +637,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		if err != nil {
 			return err
 		}
-
+		/**
 		if *pInfo.Status == 0 {
 			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
 				{
@@ -672,6 +672,9 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 				Attr: cfg,
 			}, newKey(defaultKey),
 		}, true)
+		*/
+
+		return nil
 	})
 }
 
