@@ -503,10 +503,7 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 		return nil, nil, fmt.Errorf("ai provider not found")
 	}
 
-	llms, has := p.ModelsByType(model_runtime.ModelTypeLLM)
-	if !has {
-		return nil, nil, fmt.Errorf("ai provider not found")
-	}
+	llms, _ := p.ModelsByType(model_runtime.ModelTypeLLM)
 	modelApiCountMap, _ := i.aiAPIService.CountMapByModel(ctx, "", map[string]interface{}{"provider": driver})
 	items := make([]*ai_dto.LLMItem, 0, len(llms))
 	for _, v := range llms {
@@ -530,14 +527,15 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil, err
 		}
-		defaultLLM, has := p.DefaultModel(model_runtime.ModelTypeLLM)
-		if !has {
-			return nil, nil, fmt.Errorf("ai provider default llm not found")
+		defaultLLMID := ""
+		defaultLLM, _ := p.DefaultModel(model_runtime.ModelTypeLLM)
+		if defaultLLM != nil {
+			defaultLLMID = defaultLLM.ID()
 		}
 		return items, &ai_dto.ProviderItem{
 			Id:         p.ID(),
 			Name:       p.Name(),
-			DefaultLLM: defaultLLM.ID(),
+			DefaultLLM: defaultLLMID,
 			Logo:       p.Logo(),
 		}, nil
 	}
