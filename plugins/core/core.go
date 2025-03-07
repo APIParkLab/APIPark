@@ -1,6 +1,7 @@
 package core
 
 import (
+	ai_model "github.com/APIParkLab/APIPark/controller/ai-model"
 	"net/http"
 
 	ai_balance "github.com/APIParkLab/APIPark/controller/ai-balance"
@@ -97,6 +98,7 @@ type plugin struct {
 	exportConfigController      system.IExportConfigController                     `autowired:""`
 	importConfigController      system.IImportConfigController                     `autowired:""`
 	aiProviderController        ai.IProviderController                             `autowired:""`
+	aiProviderModelController   ai_model.IProviderModelController                  `autowired:""`
 	settingController           system.ISettingController                          `autowired:""`
 	initController              system.IInitController                             `autowired:""`
 	logController               log.ILogController                                 `autowired:""`

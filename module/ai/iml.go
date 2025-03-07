@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	ai_model "github.com/APIParkLab/APIPark/service/ai-model"
+	"github.com/google/uuid"
 	"net/http"
 	"sort"
 	"time"
-
-	"github.com/google/uuid"
 
 	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
 
@@ -63,12 +63,13 @@ func newKey(key *ai_key.Key) *gateway.DynamicRelease {
 var _ IProviderModule = (*imlProviderModule)(nil)
 
 type imlProviderModule struct {
-	providerService  ai.IProviderService        `autowired:""`
-	clusterService   cluster.IClusterService    `autowired:""`
-	aiAPIService     ai_api.IAPIService         `autowired:""`
-	aiKeyService     ai_key.IKeyService         `autowired:""`
-	aiBalanceService ai_balance.IBalanceService `autowired:""`
-	transaction      store.ITransaction         `autowired:""`
+	providerService      ai.IProviderService            `autowired:""`
+	providerModelService ai_model.IProviderModelService `autowired:""`
+	clusterService       cluster.IClusterService        `autowired:""`
+	aiAPIService         ai_api.IAPIService             `autowired:""`
+	aiKeyService         ai_key.IKeyService             `autowired:""`
+	aiBalanceService     ai_balance.IBalanceService     `autowired:""`
+	transaction          store.ITransaction             `autowired:""`
 }
 
 func (i *imlProviderModule) OnInit() {
@@ -78,6 +79,33 @@ func (i *imlProviderModule) OnInit() {
 		list, err := i.providerService.List(ctx)
 		if err != nil {
 			return
+		}
+		// register provider
+		for _, p := range list {
+			// get customize models
+			models, _ := i.providerModelService.Search(ctx, "", map[string]interface{}{"provider": p.Id}, "update_at desc")
+			iModels := make([]model_runtime.IModel, 0, len(models))
+			if models != nil {
+				for _, model := range models {
+					// parse access_config & model_parameters
+					iModel, _ := model_runtime.NewCustomizeModel(model.Id, model.Name, model_runtime.GetCustomizeLogo(), model.AccessConfiguration, model.ModelParameters)
+					iModels = append(iModels, iModel)
+				}
+			}
+			// default provider
+			if p.Type == 0 {
+				runtimeProvider, _ := model_runtime.GetProvider(p.Id)
+				for _, tmpIModel := range iModels {
+					tmpIModel.SetLogo(runtimeProvider.Logo())
+					if p.DefaultLLM == tmpIModel.ID() {
+						runtimeProvider.SetDefaultModel(model_runtime.ModelTypeLLM, tmpIModel)
+					}
+					runtimeProvider.SetModel(tmpIModel.ID(), tmpIModel)
+				}
+			} else {
+				provider, _ := model_runtime.NewCustomizeProvider(p.Id, p.Name, iModels, p.DefaultLLM, p.Config)
+				model_runtime.Register(p.Id, provider)
+			}
 		}
 		i.transaction.Transaction(ctx, func(ctx context.Context) error {
 			for _, l := range list {
@@ -145,6 +173,8 @@ func (i *imlProviderModule) Delete(ctx context.Context, id string) error {
 		if err != nil {
 			return err
 		}
+		// delete register provider
+		model_runtime.Remove(id)
 		releases := make([]*gateway.DynamicRelease, 0, len(keys))
 		for _, key := range keys {
 			releases = append(releases, newKey(key))
@@ -162,6 +192,30 @@ func (i *imlProviderModule) Delete(ctx context.Context, id string) error {
 			},
 		}, false)
 	})
+}
+
+func (i *imlProviderModule) AddProvider(ctx context.Context, input *ai_dto.NewProvider) (*ai_dto.SimpleProvider, error) {
+	if has := i.providerService.CheckNameDuplicate(ctx, input.Name); has {
+		return nil, fmt.Errorf("provider `%s` duplicate", input.Name)
+	}
+	id := uuid.New().String()
+	config, defaultLLM := "{\"api_endpoint_url\": \"http://127.0.0.1\", \"api_key\": \"\"}", ""
+	typeValue := 1
+	if err := i.providerService.Save(ctx, id, &ai.SetProvider{
+		Name:       &input.Name,
+		DefaultLLM: &defaultLLM,
+		Config:     &config,
+		Type:       &typeValue,
+	}); err != nil {
+		return nil, err
+	}
+	// register provider
+	iProvider, _ := model_runtime.NewCustomizeProvider(id, input.Name, []model_runtime.IModel{}, "", "")
+	model_runtime.Register(id, iProvider)
+	return &ai_dto.SimpleProvider{
+		Id:   id,
+		Name: input.Name,
+	}, nil
 }
 
 func (i *imlProviderModule) SimpleProvider(ctx context.Context, id string) (*ai_dto.SimpleProvider, error) {
@@ -231,6 +285,7 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context, keyword str
 			APICount:   apiCount,
 			KeyCount:   keyMap[l.Id],
 			CanDelete:  apiCount < 1,
+			ModelCount: int64(len(p.Models())),
 		})
 	}
 
@@ -394,8 +449,9 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		}
 		defaultLLM, has := p.DefaultModel(model_runtime.ModelTypeLLM)
 		if !has {
-			return nil, fmt.Errorf("ai provider llm not found")
+			defaultLLM, _ = model_runtime.NewCustomizeModel("", "", "", "", "")
 		}
+		providerModelConfig := p.GetModelConfig()
 		return &ai_dto.Provider{
 			Id:               p.ID(),
 			Name:             p.Name(),
@@ -405,13 +461,17 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 			DefaultLLMConfig: defaultLLM.Logo(),
 			Status:           ai_dto.ProviderDisabled,
 			//Priority:         maxPriority,
+			ModelConfig: ai_dto.ModelConfig{
+				AccessConfigurationStatus: providerModelConfig.AccessConfigurationStatus,
+				AccessConfigurationDemo:   providerModelConfig.AccessConfigurationDemo,
+			},
 		}, nil
 	}
 	defaultLLM, has := p.GetModel(info.DefaultLLM)
 	if !has {
 		model, has := p.DefaultModel(model_runtime.ModelTypeLLM)
 		if !has {
-			return nil, fmt.Errorf("ai provider llm not found")
+			defaultLLM, _ = model_runtime.NewCustomizeModel("", "", "", "", "")
 		}
 		defaultLLM = model
 	}
@@ -426,6 +486,10 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		//Priority:         info.Priority,
 		Status:     ai_dto.ToProviderStatus(info.Status),
 		Configured: true,
+		ModelConfig: ai_dto.ModelConfig{
+			AccessConfigurationStatus: false,
+			AccessConfigurationDemo:   "",
+		},
 	}, nil
 }
 
@@ -439,16 +503,21 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 	if !has {
 		return nil, nil, fmt.Errorf("ai provider not found")
 	}
-
+	modelApiCountMap, _ := i.aiAPIService.CountMapByModel(ctx, "", map[string]interface{}{"provider": driver})
 	items := make([]*ai_dto.LLMItem, 0, len(llms))
 	for _, v := range llms {
 		items = append(items, &ai_dto.LLMItem{
-			Id:     v.ID(),
-			Logo:   v.Logo(),
-			Config: v.DefaultConfig(),
+			Id:                  v.ID(),
+			Logo:                v.Logo(),
+			Config:              v.DefaultConfig(),
+			AccessConfiguration: v.AccessConfiguration(),
+			ModelParameters:     v.ModelParameters(),
 			Scopes: []string{
 				"chat",
 			},
+			Type:     "chat",
+			IsSystem: v.Source() != "customize",
+			ApiCount: modelApiCountMap[v.ID()],
 		})
 	}
 	info, err := i.providerService.Get(ctx, driver)
@@ -522,6 +591,11 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		input.Config, err = p.GenConfig(input.Config, info.Config)
 		if err != nil {
 			return err
+		}
+		if input.DefaultLLM != "" {
+			if defaultLLM, has := p.GetModel(input.DefaultLLM); has {
+				p.SetDefaultModel(model_runtime.ModelTypeLLM, defaultLLM)
+			}
 		}
 		status := 0
 		if input.Enable != nil && *input.Enable {
