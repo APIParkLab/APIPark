@@ -3,7 +3,6 @@ package model_runtime
 import (
 	"encoding/json"
 	"github.com/APIParkLab/APIPark/ai-provider/model-runtime/entity"
-	"github.com/APIParkLab/APIPark/common"
 	"gopkg.in/yaml.v3"
 	"strconv"
 )
@@ -70,14 +69,14 @@ func NewCustomizeModel(id string, name string, logo string, accessConfiguration 
 		logo = GetCustomizeLogo()
 	}
 	// handle access_config & model_config
-	config := common.MergeJSON(accessConfiguration, modelParameters)
 	return &Model{
 		id:                  id,
 		name:                name,
 		logo:                logo,
 		source:              "customize",
 		accessConfiguration: accessConfiguration,
-		IConfig:             NewConfig(config, nil),
+		modelParameters:     modelParameters,
+		IConfig:             NewConfig(modelParameters, nil),
 	}, nil
 }
 

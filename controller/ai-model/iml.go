@@ -17,6 +17,10 @@ type imlProviderModelController struct {
 	module ai_model.IProviderModelModule `autowired:""`
 }
 
+func (i *imlProviderModelController) GetModelParametersTemplate(ctx *gin.Context) ([]*model_dto.ModelParametersTemplate, error) {
+	return i.module.GetModelParametersTemplate(ctx)
+}
+
 func (i *imlProviderModelController) UpdateProviderModel(ctx *gin.Context, provider string, input *model_dto.EditModel) error {
 	if strings.TrimSpace(input.Name) == "" {
 		return fmt.Errorf("name is empty")
