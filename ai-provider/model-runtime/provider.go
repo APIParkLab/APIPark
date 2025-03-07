@@ -45,6 +45,7 @@ type IProviderInfo interface {
 	DefaultModel(modelType string) (IModel, bool)
 	HelpUrl() string
 	Logo() string
+	SetURI(IProviderURI)
 	URI() IProviderURI
 }
 
@@ -54,7 +55,7 @@ func GetCustomizeLogo() string {
 	return string(logo)
 }
 
-func NewCustomizeProvider(id string, name string, models []IModel, defaultModel string, config string) (IProvider, error) {
+func GetCustomizeProviderURI(config string, emptyURI bool) (IProviderURI, error) {
 	var providerCfg CustomizeProviderConfig
 	if strings.TrimSpace(config) != "" {
 		err := json.Unmarshal([]byte(config), &providerCfg)
@@ -62,7 +63,22 @@ func NewCustomizeProvider(id string, name string, models []IModel, defaultModel 
 			return nil, err
 		}
 	}
-	uri, err := newProviderUri(providerCfg.ApiEndpointUrl)
+	if providerCfg.BaseUrl == "" && emptyURI {
+		return &providerUri{
+			scheme: "",
+			host:   "",
+			path:   "",
+		}, nil
+	}
+	uri, err := newProviderUri(providerCfg.BaseUrl)
+	if err != nil {
+		return nil, err
+	}
+	return uri, nil
+}
+
+func NewCustomizeProvider(id string, name string, models []IModel, defaultModel string, config string) (IProvider, error) {
+	uri, err := GetCustomizeProviderURI(config, true)
 	if err != nil {
 		return nil, err
 	}
@@ -239,6 +255,10 @@ func (p *Provider) Recommend() bool {
 
 func (p *Provider) URI() IProviderURI {
 	return p.uri
+}
+
+func (p *Provider) SetURI(uri IProviderURI) {
+	p.uri = uri
 }
 
 func (p *Provider) ID() string {

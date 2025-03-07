@@ -199,7 +199,7 @@ func (i *imlProviderModule) AddProvider(ctx context.Context, input *ai_dto.NewPr
 		return nil, fmt.Errorf("provider `%s` duplicate", input.Name)
 	}
 	id := uuid.New().String()
-	config, defaultLLM := "{\"api_endpoint_url\": \"http://127.0.0.1\", \"api_key\": \"\"}", ""
+	config, defaultLLM := "{\"base_url\": \"\", \"api_key\": \"\"}", ""
 	if err := i.providerService.Create(ctx, &ai.CreateProvider{
 		Id:         id,
 		Name:       input.Name,
@@ -638,6 +638,12 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		err = i.providerService.Save(ctx, id, pInfo)
 		if err != nil {
 			return err
+		}
+		// customize provider
+		if info.Type == 1 {
+			if uri, uriErr := model_runtime.GetCustomizeProviderURI(input.Config, false); uriErr != nil {
+				p.SetURI(uri)
+			}
 		}
 		/**
 		if *pInfo.Status == 0 {
