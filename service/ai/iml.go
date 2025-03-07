@@ -70,6 +70,14 @@ type imlProviderService struct {
 //	return i.store.Save(ctx, info)
 //}
 
+func (i *imlProviderService) CheckNameDuplicate(ctx context.Context, name string) bool {
+	v, _ := i.store.First(ctx, map[string]interface{}{"name": name})
+	if v != nil {
+		return true
+	}
+	return false
+}
+
 func (i *imlProviderService) GetLabels(ctx context.Context, ids ...string) map[string]string {
 	if len(ids) == 0 {
 		return nil

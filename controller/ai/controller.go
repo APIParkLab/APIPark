@@ -22,6 +22,7 @@ type IProviderController interface {
 	UpdateProviderDefaultLLM(ctx *gin.Context, id string, input *ai_dto.UpdateLLM) error
 	Delete(ctx *gin.Context, id string) error
 	//Sort(ctx *gin.Context, input *ai_dto.Sort) error
+	AddProvider(ctx *gin.Context, input *ai_dto.NewProvider) (*ai_dto.SimpleProvider, error)
 }
 
 type IStatisticController interface {

@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/APIParkLab/APIPark/gateway"
-
 	"github.com/eolinker/eosc"
 )
 
@@ -36,7 +34,10 @@ func (c *Config) Check(cfg string) error {
 	if err != nil {
 		return err
 	}
-	return c.validator.Valid(data)
+	if c.validator != nil {
+		return c.validator.Valid(data)
+	}
+	return nil
 }
 
 func (c *Config) GenConfig(target string, origin string) (string, error) {
@@ -83,6 +84,9 @@ func Load() error {
 			continue
 		}
 		name := fmt.Sprintf("model-providers/%s", file.Name())
+		if file.Name() == "customize" {
+			continue
+		}
 		err = LoadProvider(name)
 		if err != nil {
 			return err
@@ -119,10 +123,10 @@ func LoadProvider(name string) error {
 	if err != nil {
 		return err
 	}
-	gateway.RegisterDynamicResourceDriver(provider.ID(), gateway.Worker{
-		Profession: gateway.ProfessionAIProvider,
-		Driver:     provider.ID(),
-	})
+	//gateway.RegisterDynamicResourceDriver(provider.ID(), gateway.Worker{
+	//	Profession: gateway.ProfessionAIProvider,
+	//	Driver:     provider.ID(),
+	//})
 	Register(provider.ID(), provider)
 	return nil
 }
