@@ -83,6 +83,7 @@ type BackupProvider struct {
 
 type LLMItem struct {
 	Id                  string   `json:"id"`
+	Name                string   `json:"name"`
 	Logo                string   `json:"logo"`
 	Config              string   `json:"config"`
 	AccessConfiguration string   `json:"access_configuration"`
