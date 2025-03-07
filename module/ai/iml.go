@@ -582,7 +582,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 				return err
 			}
 		}
-		model, has := p.GetModel(input.DefaultLLM)
+		_, has := p.GetModel(input.DefaultLLM)
 		if !has {
 			return fmt.Errorf("ai provider model not found")
 		}
