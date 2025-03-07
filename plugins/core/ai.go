@@ -23,6 +23,7 @@ func (p *plugin) aiAPIs() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodPost, "/api/v1/ai/provider/model", []string{"context", "query:provider", "body"}, []string{"model"}, p.aiProviderModelController.AddProviderModel, access.SystemSettingsAiProviderManager),
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/ai/provider/model", []string{"context", "query:provider", "body"}, nil, p.aiProviderModelController.UpdateProviderModel, access.SystemSettingsAiProviderManager),
 		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/ai/provider/model", []string{"context", "query:provider", "query:id"}, nil, p.aiProviderModelController.DeleteProviderModel, access.SystemSettingsAiProviderManager),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/ai/provider/model/templates", []string{"context"}, []string{"templates"}, p.aiProviderModelController.GetModelParametersTemplate, access.SystemSettingsAiProviderView),
 
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/ai/apis", []string{"context", "query:keyword", "query:provider", "query:start", "query:end", "query:page", "query:page_size", "query:sort", "query:asc", "query:models", "query:services"}, []string{"apis", "condition", "total"}, p.aiStatisticController.APIs),
 	}
