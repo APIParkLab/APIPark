@@ -200,12 +200,12 @@ func (i *imlProviderModule) AddProvider(ctx context.Context, input *ai_dto.NewPr
 	}
 	id := uuid.New().String()
 	config, defaultLLM := "{\"api_endpoint_url\": \"http://127.0.0.1\", \"api_key\": \"\"}", ""
-	typeValue := 1
-	if err := i.providerService.Save(ctx, id, &ai.SetProvider{
-		Name:       &input.Name,
-		DefaultLLM: &defaultLLM,
-		Config:     &config,
-		Type:       &typeValue,
+	if err := i.providerService.Create(ctx, &ai.CreateProvider{
+		Id:         id,
+		Name:       input.Name,
+		DefaultLLM: defaultLLM,
+		Config:     config,
+		Type:       1,
 	}); err != nil {
 		return nil, err
 	}
@@ -213,8 +213,10 @@ func (i *imlProviderModule) AddProvider(ctx context.Context, input *ai_dto.NewPr
 	iProvider, _ := model_runtime.NewCustomizeProvider(id, input.Name, []model_runtime.IModel{}, "", "")
 	model_runtime.Register(id, iProvider)
 	return &ai_dto.SimpleProvider{
-		Id:   id,
-		Name: input.Name,
+		Id:            id,
+		Name:          input.Name,
+		DefaultConfig: config,
+		Logo:          model_runtime.GetCustomizeLogo(),
 	}, nil
 }
 
