@@ -8,6 +8,7 @@ import (
 	ai_model "github.com/APIParkLab/APIPark/service/ai-model"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"slices"
 
 	"github.com/eolinker/go-common/store"
 )
@@ -22,7 +23,26 @@ type imlProviderModelModule struct {
 	transaction          store.ITransaction             `autowired:""`
 }
 
-func (i imlProviderModelModule) UpdateProviderModel(ctx *gin.Context, provider string, input *model_dto.EditModel) error {
+func (i *imlProviderModelModule) GetModelParametersTemplate(ctx *gin.Context) ([]*model_dto.ModelParametersTemplate, error) {
+	templates := make([]*model_dto.ModelParametersTemplate, 0)
+	providerNames := []string{"openai", "google", "anthropic", "deepseek", "tongyi"}
+	providers := model_runtime.Providers()
+	for _, provider := range providers {
+		if slices.Contains(providerNames, provider.ID()) {
+			defaultModel, _ := provider.DefaultModel(model_runtime.ModelTypeLLM)
+			templates = append(templates, &model_dto.ModelParametersTemplate{
+				Id:              provider.ID(),
+				ProviderName:    provider.Name(),
+				ModelName:       defaultModel.Name(),
+				ModelParameters: defaultModel.DefaultConfig(),
+			})
+		}
+	}
+
+	return templates, nil
+}
+
+func (i *imlProviderModelModule) UpdateProviderModel(ctx *gin.Context, provider string, input *model_dto.EditModel) error {
 	p, has := model_runtime.GetProvider(provider)
 	if !has {
 		return fmt.Errorf("ai provider not found")
@@ -57,7 +77,7 @@ func (i imlProviderModelModule) UpdateProviderModel(ctx *gin.Context, provider s
 	return nil
 }
 
-func (i imlProviderModelModule) DeleteProviderModel(ctx *gin.Context, provider string, id string) error {
+func (i *imlProviderModelModule) DeleteProviderModel(ctx *gin.Context, provider string, id string) error {
 	// check provider exist
 	providerInfo, err := i.providerService.Get(ctx, provider)
 	if err != nil {
@@ -73,7 +93,7 @@ func (i imlProviderModelModule) DeleteProviderModel(ctx *gin.Context, provider s
 	return i.providerModelService.Delete(ctx, id)
 }
 
-func (i imlProviderModelModule) AddProviderModel(ctx *gin.Context, provider string, input *model_dto.Model) (*model_dto.SimpleModel, error) {
+func (i *imlProviderModelModule) AddProviderModel(ctx *gin.Context, provider string, input *model_dto.Model) (*model_dto.SimpleModel, error) {
 	p, has := model_runtime.GetProvider(provider)
 	if !has {
 		return nil, fmt.Errorf("ai provider not found")
