@@ -3,8 +3,10 @@ package model_runtime
 import (
 	"encoding/json"
 	"fmt"
+	"hash/fnv"
 	"net/url"
 	"strings"
+	"sync"
 
 	yaml "gopkg.in/yaml.v3"
 
@@ -19,8 +21,8 @@ const (
 type IProvider interface {
 	IProviderInfo
 	GetModelConfig() ModelConfig
-	SetModelsByType(modelType string, models []IModel)
 	SetModel(id string, model IModel)
+	RemoveModel(id string)
 	SetDefaultModel(modelType string, model IModel)
 	GetModel(name string) (IModel, bool)
 	Models() []IModel
@@ -66,17 +68,15 @@ func NewCustomizeProvider(id string, name string, models []IModel, defaultModel 
 	}
 
 	provider := &Provider{
-		id:            id,
-		name:          name,
-		logo:          GetCustomizeLogo(),
-		helpUrl:       "",
-		models:        eosc.BuildUntyped[string, IModel](),
-		defaultModels: eosc.BuildUntyped[string, IModel](),
-		modelsByType:  eosc.BuildUntyped[string, []IModel](),
-		maskKeys:      make([]string, 0),
-		recommend:     false,
-		sort:          0,
-		uri:           uri,
+		id:        id,
+		name:      name,
+		logo:      GetCustomizeLogo(),
+		helpUrl:   "",
+		registry:  newModelRegistry(),
+		maskKeys:  make([]string, 0),
+		recommend: false,
+		sort:      0,
+		uri:       uri,
 		modelConfig: ModelConfig{
 			AccessConfigurationStatus: false,
 			AccessConfigurationDemo:   "",
@@ -93,7 +93,6 @@ func NewCustomizeProvider(id string, name string, models []IModel, defaultModel 
 			provider.SetDefaultModel(name, model)
 		}
 	}
-	provider.SetModelsByType(ModelTypeLLM, models)
 
 	return provider, nil
 }
@@ -123,17 +122,15 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 		return nil, fmt.Errorf("model logo not found:%s", providerCfg.Provider)
 	}
 	provider := &Provider{
-		id:            providerCfg.Provider,
-		name:          providerCfg.Label[entity.LanguageEnglish],
-		logo:          modelLogo,
-		helpUrl:       providerCfg.Help.URL[entity.LanguageEnglish],
-		models:        eosc.BuildUntyped[string, IModel](),
-		defaultModels: eosc.BuildUntyped[string, IModel](),
-		modelsByType:  eosc.BuildUntyped[string, []IModel](),
-		maskKeys:      make([]string, 0),
-		recommend:     providerCfg.Recommend,
-		sort:          providerCfg.Sort,
-		uri:           uri,
+		id:        providerCfg.Provider,
+		name:      providerCfg.Label[entity.LanguageEnglish],
+		logo:      modelLogo,
+		helpUrl:   providerCfg.Help.URL[entity.LanguageEnglish],
+		registry:  newModelRegistry(),
+		maskKeys:  make([]string, 0),
+		recommend: providerCfg.Recommend,
+		sort:      providerCfg.Sort,
+		uri:       uri,
 		modelConfig: ModelConfig{
 			AccessConfigurationStatus: providerCfg.ModelConfig.AccessConfigurationStatus,
 			AccessConfigurationDemo:   providerCfg.ModelConfig.AccessConfigurationDemo,
@@ -159,7 +156,6 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 	defaultCfgByte, _ := json.MarshalIndent(defaultCfg, "", "  ")
 	provider.IConfig = NewConfig(string(defaultCfgByte), params)
 	for name, f := range modelContents {
-		models := make([]IModel, 0, f.Count())
 		defaultModel := providerCfg.Default[name]
 		for i, v := range f.List() {
 			model, err := NewModel(v, modelLogo)
@@ -173,28 +169,55 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 			if model.ID() == defaultModel {
 				provider.SetDefaultModel(name, model)
 			}
-			models = append(models, model)
 		}
-		provider.SetModelsByType(name, models)
 	}
 
 	return provider, nil
 }
 
 type Provider struct {
-	id            string
-	name          string
-	logo          string
-	helpUrl       string
+	id          string
+	name        string
+	logo        string
+	helpUrl     string
+	registry    *ModelRegistry
+	maskKeys    []string
+	uri         IProviderURI
+	sort        int
+	recommend   bool
+	modelConfig ModelConfig
+	mu          sync.Mutex
+	IConfig
+}
+
+type ModelRegistry struct {
 	models        eosc.Untyped[string, IModel]
 	defaultModels eosc.Untyped[string, IModel]
-	modelsByType  eosc.Untyped[string, []IModel]
-	maskKeys      []string
-	uri           IProviderURI
-	sort          int
-	recommend     bool
-	modelConfig   ModelConfig
-	IConfig
+
+	typeIndex  map[string]*modelNode // type->header node
+	reverseMap map[string]*modelNode // ID->node
+	typeShard  [8]sync.RWMutex       // lock
+}
+
+type modelNode struct {
+	model      IModel
+	prev, next *modelNode
+	typeKey    string
+}
+
+func newModelRegistry() *ModelRegistry {
+	return &ModelRegistry{
+		models:        eosc.BuildUntyped[string, IModel](),
+		defaultModels: eosc.BuildUntyped[string, IModel](),
+		typeIndex:     make(map[string]*modelNode),
+		reverseMap:    make(map[string]*modelNode),
+	}
+}
+
+func (r *ModelRegistry) getShard(key string) *sync.RWMutex {
+	h := fnv.New32a()
+	h.Write([]byte(key))
+	return &r.typeShard[h.Sum32()%8]
 }
 
 type ModelConfig struct {
@@ -234,20 +257,89 @@ func (p *Provider) Logo() string {
 	return p.logo
 }
 
+func (r *ModelRegistry) addModel(m IModel, isDefault bool) {
+	r.models.Set(m.ID(), m)
+
+	// get lock
+	shard := r.getShard(m.ID())
+	shard.Lock()
+	defer shard.Unlock()
+
+	// create model node
+	node := &modelNode{
+		model:   m,
+		typeKey: m.ModelType(),
+	}
+
+	// update index
+	if head := r.typeIndex[m.ModelType()]; head != nil {
+		node.next = head
+		head.prev = node
+	}
+	r.typeIndex[m.ModelType()] = node
+	r.reverseMap[m.ID()] = node
+
+	// default model
+	if isDefault {
+		r.defaultModels.Set(m.ModelType(), m)
+	}
+}
+
+func (r *ModelRegistry) removeModel(id string) {
+	r.models.Del(id)
+
+	// check node exist
+	node, exist := r.reverseMap[id]
+	if !exist {
+		return
+	}
+
+	// get lock
+	shard := r.getShard(node.typeKey)
+	shard.Lock()
+	defer shard.Unlock()
+
+	// delete node chain
+	if node.prev != nil {
+		node.prev.next = node.next
+	} else {
+		r.typeIndex[node.typeKey] = node.next
+	}
+	if node.next != nil {
+		node.next.prev = node.prev
+	}
+
+	// clean index
+	delete(r.reverseMap, id)
+	if r.typeIndex[node.typeKey] == nil {
+		delete(r.typeIndex, node.typeKey)
+	}
+}
+
 func (p *Provider) DefaultModel(modelType string) (IModel, bool) {
-	return p.defaultModels.Get(modelType)
+	return p.registry.defaultModels.Get(modelType)
 }
 
 func (p *Provider) GetModel(name string) (IModel, bool) {
-	return p.models.Get(name)
+	return p.registry.models.Get(name)
 }
 
 func (p *Provider) Models() []IModel {
-	return p.models.List()
+	return p.registry.models.List()
 }
 
 func (p *Provider) ModelsByType(modelType string) ([]IModel, bool) {
-	return p.modelsByType.Get(modelType)
+	shard := p.registry.getShard(modelType)
+	shard.RLock()
+	defer shard.RUnlock()
+
+	var result []IModel
+	if node := p.registry.typeIndex[modelType]; node != nil {
+		for n := node; n != nil; n = n.next {
+			result = append(result, n.model)
+		}
+	}
+	return result, true
 }
 
 func (p *Provider) MaskConfig(cfg string) string {
@@ -266,19 +358,15 @@ func (p *Provider) MaskConfig(cfg string) string {
 }
 
 func (p *Provider) SetDefaultModel(modelType string, model IModel) {
-	p.defaultModels.Set(modelType, model)
+	p.registry.addModel(model, true)
 }
 
 func (p *Provider) SetModel(id string, model IModel) {
-	p.models.Set(id, model)
+	p.registry.addModel(model, false)
 }
 
 func (p *Provider) RemoveModel(id string) {
-	p.models.Del(id)
-}
-
-func (p *Provider) SetModelsByType(modelType string, models []IModel) {
-	p.modelsByType.Set(modelType, models)
+	p.registry.removeModel(id)
 }
 
 type providerUri struct {

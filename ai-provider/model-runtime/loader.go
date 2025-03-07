@@ -58,6 +58,10 @@ func (c *Config) GenConfig(target string, origin string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if c.validator == nil {
+		c.validator = ParamValidator(nil)
+	}
+
 	return c.validator.GenConfig(targetData, originData)
 }
 

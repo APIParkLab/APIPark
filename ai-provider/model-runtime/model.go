@@ -12,6 +12,7 @@ type IModel interface {
 	Name() string
 	Logo() string
 	Source() string
+	ModelType() string
 	SetLogo(logo string)
 	AccessConfiguration() string
 	ModelParameters() string
@@ -26,6 +27,8 @@ type Model struct {
 	modelParameters     string
 	// default: ""/"system", "customize"
 	source string
+	// @see ModelTypeLLM etc
+	modelType string
 	//defaultConfig string
 	IConfig
 	//validator IParamValidator
@@ -52,6 +55,10 @@ func (m *Model) Source() string {
 	return m.source
 }
 
+func (m *Model) ModelType() string {
+	return m.modelType
+}
+
 func (m *Model) Logo() string {
 	return m.logo
 }
@@ -73,6 +80,7 @@ func NewCustomizeModel(id string, name string, logo string, accessConfiguration 
 		id:                  id,
 		name:                name,
 		logo:                logo,
+		modelType:           ModelTypeLLM,
 		source:              "customize",
 		accessConfiguration: accessConfiguration,
 		modelParameters:     modelParameters,
@@ -154,6 +162,7 @@ func NewModel(data string, logo string) (IModel, error) {
 		id:                  cfg.Model,
 		name:                cfg.Model,
 		logo:                logo,
+		modelType:           cfg.ModelType,
 		accessConfiguration: "",
 		IConfig:             NewConfig(string(dCfg), params),
 	}, nil

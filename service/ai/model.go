@@ -27,6 +27,7 @@ type CreateProvider struct {
 	DefaultLLM string
 	Config     string
 	Status     int
+	Type       int
 }
 
 type SetProvider struct {
