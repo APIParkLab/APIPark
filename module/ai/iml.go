@@ -411,12 +411,16 @@ func (i *imlProviderModule) UnConfiguredProviders(ctx context.Context) ([]*ai_dt
 			// 已配置，跳过
 			continue
 		}
+		defaultLLMID := ""
 		defaultLLM, _ := v.DefaultModel(model_runtime.ModelTypeLLM)
+		if defaultLLM != nil {
+			defaultLLMID = defaultLLM.ID()
+		}
 		item := &ai_dto.ProviderItem{
 			Id:         v.ID(),
 			Name:       v.Name(),
 			Logo:       v.Logo(),
-			DefaultLLM: defaultLLM.ID(),
+			DefaultLLM: defaultLLMID,
 			Sort:       v.Sort(),
 		}
 		items = append(items, item)
@@ -508,6 +512,7 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 	for _, v := range llms {
 		items = append(items, &ai_dto.LLMItem{
 			Id:                  v.ID(),
+			Name:                v.Name(),
 			Logo:                v.Logo(),
 			Config:              v.DefaultConfig(),
 			AccessConfiguration: v.AccessConfiguration(),
