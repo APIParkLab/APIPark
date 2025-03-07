@@ -14,7 +14,7 @@ import { AiServiceConfigFieldType } from '@core/const/ai-service/type.ts'
 import { SERVICE_APPROVAL_OPTIONS } from '@core/const/system/const.tsx'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { CategorizesType } from '@market/const/serviceHub/type.ts'
-import { App, Button, Form, Input, Radio, Row, Select, TreeSelect, Upload } from 'antd'
+import { App, Button, Form, Input, Radio, Row, Select, Tooltip, TreeSelect, Upload } from 'antd'
 import { DefaultOptionType } from 'antd/es/cascader'
 import { RcFile, UploadChangeParam, UploadFile, UploadProps } from 'antd/es/upload/interface'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
@@ -22,6 +22,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import { SystemConfigFieldType, SystemConfigHandle } from '../../const/system/type.ts'
 import { useSystemContext } from '../../contexts/SystemContext.tsx'
+import { Codebox } from '@common/components/postcat/api/Codebox/index.tsx'
 
 export type SimpleAiProviderItem = EntityItem & {
   configured: boolean
@@ -225,7 +226,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
     fetchData<BasicResponse<{ service: SystemConfigFieldType }>>('service/info', {
       method: 'GET',
       eoParams: { team: teamId, service: serviceId },
-      eoTransformKeys: ['team_id', 'service_type', 'approval_type', 'service_kind']
+      eoTransformKeys: ['team_id', 'service_type', 'approval_type', 'service_kind', 'model_mapping']
     }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
@@ -265,7 +266,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
             ...(serviceId === undefined ? { team: value.team } : { service: serviceId, team: teamId })
           },
           eoBody: { ...value, prefix: value.prefix?.trim() },
-          eoTransformKeys: ['serviceType', 'approvalType', 'serviceKind']
+          eoTransformKeys: ['serviceType', 'approvalType', 'serviceKind', 'modelMapping']
         }
       )
         .then((response) => {
@@ -568,6 +569,25 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
                 options={tagOptionList}
               ></Select>
             </Form.Item>
+            {showAI && (
+              <Form.Item<SystemConfigFieldType>
+                label={
+                  <span>
+                    {$t('模型值重定向')}
+                    <Tooltip
+                      title={$t(
+                        '本项非必填，用于简化请求中的 Model 参数值，key 为希望使用的简化值，value 为原来的对应值。例如: {"deepseek-r1":"ollama/deepseek-r1-1.5b-qwen-distill-fp16"}'
+                      )}
+                    >
+                      <Icon className="align-sub ml-[3px]" icon="fe:question" width="18" height="18" />
+                    </Tooltip>
+                  </span>
+                }
+                name="modelMapping"
+              >
+                <Codebox editorTheme="vs-dark" width="100%" height="150px" language="json" enableToolbar={false} />
+              </Form.Item>
+            )}
 
             {onEdit && (
               <>

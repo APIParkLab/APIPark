@@ -209,7 +209,7 @@ const AddLoadBalancingModel = forwardRef<LoadBalancingHandle>((props, ref: any) 
                 value: x.id,
                 label: (
                   <div className="flex items-center gap-[10px]">
-                    <span>{x.id}</span>
+                    <span>{x.name || x.id}</span>
                     { modelType === 'online' &&x?.scopes?.map((s: any) => <Tag key={s}>{s?.toLocaleUpperCase()}</Tag>)}
                   </div>
                 )

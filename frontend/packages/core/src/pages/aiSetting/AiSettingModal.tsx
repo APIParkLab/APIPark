@@ -7,6 +7,8 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 're
 import { AiProviderLlmsItems, ModelDetailData, AiSettingListItem, AISettingEntityItem } from './types'
 import { MemberItem, SimpleTeamItem } from '@common/const/type'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext'
+import AddModels, { addModelsContentHandle } from './contexts/AddModels'
+import AddProvider, { addProviderContentHandle } from './contexts/AddProvider'
 
 export type AiSettingModalContentProps = {
   entity?: AISettingEntityItem
@@ -24,7 +26,7 @@ export type AiSettingModalContentHandle = {
 
 const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingModalContentProps>((props, ref) => {
   const [form] = Form.useForm()
-  const { message } = App.useApp()
+  const { message, modal } = App.useApp()
   const { entity, readOnly, modelMode = 'auto', updateEntityData, source } = props
   const { fetchData } = useFetch()
   const [llmList, setLlmList] = useState<AiProviderLlmsItems[]>()
@@ -38,6 +40,12 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
   const [modelModeLoading, setModelModeLoading] = useState<boolean>(false)
   const [enableState, setEnableState] = useState<boolean>(localEntity?.status === 'enabled')
   const { checkPermission } = useGlobalContext()
+  // 添加模型弹窗
+  const addModelModalRef = useRef<addModelsContentHandle>()
+  // 添加供应商弹窗
+  const addProviderModalRef = useRef<addProviderContentHandle>()
+  // 记录最后的 llm id，因为如果手动加了 model，那么需要刷新
+  const [lastLlmID, setLastLlmID] = useState<string | undefined>('')
 
   /**
    * 获取 llm 列表
@@ -45,9 +53,11 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
    */
   const getLlmList = (id?: string) => {
     setLoading(true)
+    const providerID = id || localEntity?.id
+    setLastLlmID(providerID)
     fetchData<BasicResponse<{ llms: AiProviderLlmsItems[] }>>(`ai/provider/llms`, {
       method: 'GET',
-      eoParams: { provider: id || localEntity?.id }
+      eoParams: { provider: providerID }
     })
       .then((response) => {
         const { code, data, msg } = response
@@ -89,7 +99,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
   /**
    * 获取未配置模型提供者列表
    */
-  const getModelProviderList = () => {
+  const getModelProviderList = (setModelValue = true, defaultId?: string | number) => {
     setModelModeLoading(true)
     fetchData<BasicResponse<{ providers: AiSettingListItem[] }>>(`ai/providers/unconfigured`, {
       method: 'GET',
@@ -100,8 +110,8 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
         if (code === STATUS_CODE.SUCCESS) {
           const providers = data.providers || []
           modelProviderListRef.current = providers
-          if (providers.length) {
-            const id = providers[0].id
+          if ((setModelValue && providers.length) || defaultId) {
+            const id = defaultId || providers[0].id
             form.setFieldValue('modelMode', id)
             getModelConfig(id)
           }
@@ -208,7 +218,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
 
   /**
    * 保存
-   * @returns 
+   * @returns
    */
   const save: () => Promise<boolean | string> = () => {
     return new Promise((resolve, reject) => {
@@ -220,23 +230,24 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
               ...value
             }
 
-          fetchData<BasicResponse<null>>('ai/provider/config', {
-            method: 'PUT',
-            eoParams: { provider: localEntity?.id },
-            eoBody: finalValue,
-            eoTransformKeys: ['defaultLlm']
-            // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
-          })
-            .then((response) => {
-              const { code, msg } = response
-              if (code === STATUS_CODE.SUCCESS) {
-                message.success(msg || $t(RESPONSE_TIPS.success))
-                resolve(true)
-              } else {
-                message.error(msg || $t(RESPONSE_TIPS.error))
-                reject(msg || $t(RESPONSE_TIPS.error))
-              }
-            }).catch((errorInfo) => reject(errorInfo))
+            fetchData<BasicResponse<null>>('ai/provider/config', {
+              method: 'PUT',
+              eoParams: { provider: localEntity?.id },
+              eoBody: finalValue,
+              eoTransformKeys: ['defaultLlm']
+              // eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+            })
+              .then((response) => {
+                const { code, msg } = response
+                if (code === STATUS_CODE.SUCCESS) {
+                  message.success(msg || $t(RESPONSE_TIPS.success))
+                  resolve(true)
+                } else {
+                  message.error(msg || $t(RESPONSE_TIPS.error))
+                  reject(msg || $t(RESPONSE_TIPS.error))
+                }
+              })
+              .catch((errorInfo) => reject(errorInfo))
           })
           .catch((errorInfo) => reject(errorInfo))
       } catch (error) {
@@ -250,6 +261,53 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
       return $t('保存后供应商状态变为【停用】，使用本供应商的 API 将临时使用负载优先级最高的正常供应商。')
     }
     return $t('保存后供应商状态变为【正常】，恢复调用本供应商的 AI 能力。')
+  }
+
+  /**
+   * 添加模型
+   */
+  const addModel = () => {
+    const providerName = form.getFieldValue('modelMode') || localEntity?.name
+    const showAccessConfig = localEntity?.model_config?.access_configuration_status || false
+    const accessConfig = localEntity?.model_config?.access_configuration_demo || ''
+    modal.confirm({
+      title: $t('添加 (0) 模型', [providerName]),
+      content: <AddModels ref={addModelModalRef} showAccessConfig={showAccessConfig} accessConfig={accessConfig} providerID={localEntity?.id}></AddModels>,
+      onOk: () => {
+        return addModelModalRef.current?.save().then((res) => {
+          if (res === true) {
+            getLlmList(lastLlmID)
+          }
+        })
+      },
+      width: 600,
+      okText: $t('确认'),
+      cancelText: $t('取消'),
+      closable: true,
+      icon: <></>
+    })
+  }
+
+  /**
+   * 添加自定义供应商
+   */
+  const addProvider = () => {
+    modal.confirm({
+      title: $t('添加自定义供应商'),
+      content: <AddProvider ref={addProviderModalRef}></AddProvider>,
+      onOk: () => {
+        return addProviderModalRef.current?.save().then((res) => {
+          if (res) {
+            getModelProviderList(false, res)
+          }
+        })
+      },
+      width: 600,
+      okText: $t('确认'),
+      cancelText: $t('取消'),
+      closable: true,
+      icon: <></>
+    })
   }
 
   useImperativeHandle(ref, () => ({
@@ -269,26 +327,35 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
       disabled={readOnly}
     >
       {modelMode === 'manual' && (
-        <Form.Item<ModelDetailData> label={$t('模型供应商')} name="modelMode" rules={[{ required: true }]}>
-          <Select
-            className="w-INPUT_NORMAL"
-            placeholder={$t(PLACEHOLDER.select)}
-            loading={modelModeLoading}
-            options={modelProviderListRef.current?.map((x) => ({
-              value: x.id,
-              label: (
-                <div className="flex items-center gap-[10px]">
-                  <span>{x.name}</span>
-                </div>
-              )
-            }))}
-            onChange={(e) => {
-              getModelConfig(e)
-            }}
-          ></Select>
+        <Form.Item<ModelDetailData> label={$t('模型供应商')}>
+          <span className="absolute top-[-28px] right-0 text-theme cursor-pointer" onClick={addProvider}>
+            + {$t('添加自定义供应商')}
+          </span>
+          <Form.Item<ModelDetailData> name="modelMode" rules={[{ required: true }]}>
+            <Select
+              className="w-INPUT_NORMAL"
+              placeholder={$t(PLACEHOLDER.select)}
+              loading={modelModeLoading}
+              options={modelProviderListRef.current?.map((x) => ({
+                value: x.id,
+                label: (
+                  <div className="flex items-center gap-[10px]">
+                    <span>{x.name}</span>
+                  </div>
+                )
+              }))}
+              onChange={(e) => {
+                getModelConfig(e)
+              }}
+            ></Select>
+          </Form.Item>
         </Form.Item>
       )}
-      <Form.Item<ModelDetailData> label={$t('默认模型')} name="defaultLlm" rules={[{ required: true }]}>
+      <Form.Item<ModelDetailData> label={$t('默认模型')}>
+        <span className="absolute top-[-28px] right-0 text-theme cursor-pointer" onClick={addModel}>
+          + {$t('添加模型')}
+        </span>
+      <Form.Item<ModelDetailData> name="defaultLlm" rules={[{ required: true }]}>
         <Select
           className="w-INPUT_NORMAL"
           placeholder={$t(PLACEHOLDER.select)}
@@ -297,18 +364,24 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
             value: x.id,
             label: (
               <div className="flex items-center gap-[10px]">
-                <span>{x.id}</span>
+                <span>{x.name || x.id}</span>
                 {x?.scopes?.map((s) => <Tag key={s}>{s?.toLocaleUpperCase()}</Tag>)}
               </div>
             )
           }))}
         ></Select>
       </Form.Item>
+      </Form.Item>
       {source === 'guide' && (
         <Form.Item label={$t('所属团队')} name="team" className="mt-[16px]" rules={[{ required: true }]}>
-          <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} options={teamList} onChange={(value) => {
-          form.setFieldValue('team', value)
-        }}></Select>
+          <Select
+            className="w-INPUT_NORMAL"
+            placeholder={$t(PLACEHOLDER.input)}
+            options={teamList}
+            onChange={(value) => {
+              form.setFieldValue('team', value)
+            }}
+          ></Select>
         </Form.Item>
       )}
       <Form.Item<ModelDetailData> label={$t('API Key（默认 Key）')} name="config">
