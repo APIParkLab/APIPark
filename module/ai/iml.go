@@ -411,12 +411,16 @@ func (i *imlProviderModule) UnConfiguredProviders(ctx context.Context) ([]*ai_dt
 			// 已配置，跳过
 			continue
 		}
+		defaultLLMID := ""
 		defaultLLM, _ := v.DefaultModel(model_runtime.ModelTypeLLM)
+		if defaultLLM != nil {
+			defaultLLMID = defaultLLM.ID()
+		}
 		item := &ai_dto.ProviderItem{
 			Id:         v.ID(),
 			Name:       v.Name(),
 			Logo:       v.Logo(),
-			DefaultLLM: defaultLLM.ID(),
+			DefaultLLM: defaultLLMID,
 			Sort:       v.Sort(),
 		}
 		items = append(items, item)
@@ -470,10 +474,9 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 	defaultLLM, has := p.GetModel(info.DefaultLLM)
 	if !has {
 		model, has := p.DefaultModel(model_runtime.ModelTypeLLM)
-		if !has {
+		if !has || model == nil {
 			defaultLLM, _ = model_runtime.NewCustomizeModel("", "", "", "", "")
 		}
-		defaultLLM = model
 	}
 
 	return &ai_dto.Provider{
@@ -499,15 +502,13 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 		return nil, nil, fmt.Errorf("ai provider not found")
 	}
 
-	llms, has := p.ModelsByType(model_runtime.ModelTypeLLM)
-	if !has {
-		return nil, nil, fmt.Errorf("ai provider not found")
-	}
+	llms, _ := p.ModelsByType(model_runtime.ModelTypeLLM)
 	modelApiCountMap, _ := i.aiAPIService.CountMapByModel(ctx, "", map[string]interface{}{"provider": driver})
 	items := make([]*ai_dto.LLMItem, 0, len(llms))
 	for _, v := range llms {
 		items = append(items, &ai_dto.LLMItem{
 			Id:                  v.ID(),
+			Name:                v.Name(),
 			Logo:                v.Logo(),
 			Config:              v.DefaultConfig(),
 			AccessConfiguration: v.AccessConfiguration(),
@@ -525,14 +526,15 @@ func (i *imlProviderModule) LLMs(ctx context.Context, driver string) ([]*ai_dto.
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil, err
 		}
-		defaultLLM, has := p.DefaultModel(model_runtime.ModelTypeLLM)
-		if !has {
-			return nil, nil, fmt.Errorf("ai provider default llm not found")
+		defaultLLMID := ""
+		defaultLLM, _ := p.DefaultModel(model_runtime.ModelTypeLLM)
+		if defaultLLM != nil {
+			defaultLLMID = defaultLLM.ID()
 		}
 		return items, &ai_dto.ProviderItem{
 			Id:         p.ID(),
 			Name:       p.Name(),
-			DefaultLLM: defaultLLM.ID(),
+			DefaultLLM: defaultLLMID,
 			Logo:       p.Logo(),
 		}, nil
 	}
