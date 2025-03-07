@@ -70,8 +70,8 @@ func (i *imlProviderModelService) Save(ctx context.Context, id string, model *Mo
 
 func (i *imlProviderModelService) CheckNameDuplicate(ctx context.Context, provider string, name string, excludeId string) bool {
 	v, _ := i.store.First(ctx, map[string]interface{}{"provider": provider, "name": name})
-	if v != nil {
-		return true
+	if v == nil {
+		return false
 	} else if excludeId != "" && v.UUID != excludeId {
 		return true
 	}
