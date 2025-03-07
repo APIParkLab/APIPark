@@ -12,6 +12,7 @@ type IProviderModelModule interface {
 	AddProviderModel(ctx *gin.Context, provider string, input *model_dto.Model) (*model_dto.SimpleModel, error)
 	UpdateProviderModel(ctx *gin.Context, provider string, input *model_dto.EditModel) error
 	DeleteProviderModel(ctx *gin.Context, provider string, id string) error
+	GetModelParametersTemplate(ctx *gin.Context) ([]*model_dto.ModelParametersTemplate, error)
 }
 
 func init() {
