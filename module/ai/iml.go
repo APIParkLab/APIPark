@@ -474,10 +474,9 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 	defaultLLM, has := p.GetModel(info.DefaultLLM)
 	if !has {
 		model, has := p.DefaultModel(model_runtime.ModelTypeLLM)
-		if !has {
+		if !has || model == nil {
 			defaultLLM, _ = model_runtime.NewCustomizeModel("", "", "", "", "")
 		}
-		defaultLLM = model
 	}
 
 	return &ai_dto.Provider{
