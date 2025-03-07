@@ -43,6 +43,10 @@ func Register(name string, driver IProvider) {
 	defaultManager.Set(name, driver)
 }
 
+func Remove(name string) {
+	defaultManager.Del(name)
+}
+
 func GetProvider(name string) (IProvider, bool) {
 	return defaultManager.Get(name)
 }

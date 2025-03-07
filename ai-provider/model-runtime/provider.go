@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 
 	yaml "gopkg.in/yaml.v3"
 
@@ -17,6 +18,10 @@ const (
 
 type IProvider interface {
 	IProviderInfo
+	GetModelConfig() ModelConfig
+	SetModelsByType(modelType string, models []IModel)
+	SetModel(id string, model IModel)
+	SetDefaultModel(modelType string, model IModel)
 	GetModel(name string) (IModel, bool)
 	Models() []IModel
 	ModelsByType(modelType string) ([]IModel, bool)
@@ -39,6 +44,58 @@ type IProviderInfo interface {
 	HelpUrl() string
 	Logo() string
 	URI() IProviderURI
+}
+
+func GetCustomizeLogo() string {
+	logo, _ := providerDir.ReadFile("customize/assets/icon_s_en.svg")
+
+	return string(logo)
+}
+
+func NewCustomizeProvider(id string, name string, models []IModel, defaultModel string, config string) (IProvider, error) {
+	var providerCfg CustomizeProviderConfig
+	if strings.TrimSpace(config) != "" {
+		err := json.Unmarshal([]byte(config), &providerCfg)
+		if err != nil {
+			return nil, err
+		}
+	}
+	uri, err := newProviderUri(providerCfg.ApiEndpointUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	provider := &Provider{
+		id:            id,
+		name:          name,
+		logo:          GetCustomizeLogo(),
+		helpUrl:       "",
+		models:        eosc.BuildUntyped[string, IModel](),
+		defaultModels: eosc.BuildUntyped[string, IModel](),
+		modelsByType:  eosc.BuildUntyped[string, []IModel](),
+		maskKeys:      make([]string, 0),
+		recommend:     false,
+		sort:          0,
+		uri:           uri,
+		modelConfig: ModelConfig{
+			AccessConfigurationStatus: false,
+			AccessConfigurationDemo:   "",
+		},
+	}
+	provider.IConfig = NewConfig("", nil)
+
+	for _, model := range models {
+		provider.SetModel(model.ID(), model)
+		if defaultModel == "" {
+			defaultModel = model.ID()
+		}
+		if model.ID() == defaultModel {
+			provider.SetDefaultModel(name, model)
+		}
+	}
+	provider.SetModelsByType(ModelTypeLLM, models)
+
+	return provider, nil
 }
 
 func NewProvider(providerData string, modelContents map[string]eosc.Untyped[string, string]) (IProvider, error) {
@@ -77,6 +134,10 @@ func NewProvider(providerData string, modelContents map[string]eosc.Untyped[stri
 		recommend:     providerCfg.Recommend,
 		sort:          providerCfg.Sort,
 		uri:           uri,
+		modelConfig: ModelConfig{
+			AccessConfigurationStatus: providerCfg.ModelConfig.AccessConfigurationStatus,
+			AccessConfigurationDemo:   providerCfg.ModelConfig.AccessConfigurationDemo,
+		},
 	}
 	defaultCfg := make(map[string]string)
 	params := make(ParamValidator, 0, len(providerCfg.ProviderCredentialSchema.CredentialFormSchemas))
@@ -132,7 +193,17 @@ type Provider struct {
 	uri           IProviderURI
 	sort          int
 	recommend     bool
+	modelConfig   ModelConfig
 	IConfig
+}
+
+type ModelConfig struct {
+	AccessConfigurationStatus bool
+	AccessConfigurationDemo   string
+}
+
+func (p *Provider) GetModelConfig() ModelConfig {
+	return p.modelConfig
 }
 
 func (p *Provider) Sort() int {
@@ -200,6 +271,10 @@ func (p *Provider) SetDefaultModel(modelType string, model IModel) {
 
 func (p *Provider) SetModel(id string, model IModel) {
 	p.models.Set(id, model)
+}
+
+func (p *Provider) RemoveModel(id string) {
+	p.models.Del(id)
 }
 
 func (p *Provider) SetModelsByType(modelType string, models []IModel) {

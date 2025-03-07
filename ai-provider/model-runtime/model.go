@@ -3,30 +3,82 @@ package model_runtime
 import (
 	"encoding/json"
 	"github.com/APIParkLab/APIPark/ai-provider/model-runtime/entity"
+	"github.com/APIParkLab/APIPark/common"
 	"gopkg.in/yaml.v3"
 	"strconv"
 )
 
 type IModel interface {
 	ID() string
+	Name() string
 	Logo() string
+	Source() string
+	SetLogo(logo string)
+	AccessConfiguration() string
+	ModelParameters() string
 	IConfig
 }
 
 type Model struct {
-	id   string
-	logo string
+	id                  string
+	logo                string
+	name                string
+	accessConfiguration string
+	modelParameters     string
+	// default: ""/"system", "customize"
+	source string
 	//defaultConfig string
 	IConfig
 	//validator IParamValidator
+}
+
+func (m *Model) SetLogo(logo string) {
+	m.logo = logo
+}
+
+func (m *Model) Name() string {
+	return m.name
+}
+
+type CustomizeProviderConfig struct {
+	ApiEndpointUrl string `json:"api_endpoint_url"`
+	ApiKey         string `json:"api_key"`
 }
 
 func (m *Model) ID() string {
 	return m.id
 }
 
+func (m *Model) Source() string {
+	return m.source
+}
+
 func (m *Model) Logo() string {
 	return m.logo
+}
+
+func (m *Model) AccessConfiguration() string {
+	return m.accessConfiguration
+}
+
+func (m *Model) ModelParameters() string {
+	return m.modelParameters
+}
+
+func NewCustomizeModel(id string, name string, logo string, accessConfiguration string, modelParameters string) (IModel, error) {
+	if logo == "" {
+		logo = GetCustomizeLogo()
+	}
+	// handle access_config & model_config
+	config := common.MergeJSON(accessConfiguration, modelParameters)
+	return &Model{
+		id:                  id,
+		name:                name,
+		logo:                logo,
+		source:              "customize",
+		accessConfiguration: accessConfiguration,
+		IConfig:             NewConfig(config, nil),
+	}, nil
 }
 
 func NewModel(data string, logo string) (IModel, error) {
@@ -100,8 +152,10 @@ func NewModel(data string, logo string) (IModel, error) {
 		return nil, err
 	}
 	return &Model{
-		id:      cfg.Model,
-		logo:    logo,
-		IConfig: NewConfig(string(dCfg), params),
+		id:                  cfg.Model,
+		name:                cfg.Model,
+		logo:                logo,
+		accessConfiguration: "",
+		IConfig:             NewConfig(string(dCfg), params),
 	}, nil
 }
