@@ -14,3 +14,7 @@ type UpdateConfig struct {
 type Sort struct {
 	Providers []string `json:"providers"`
 }
+
+type NewProvider struct {
+	Name string `json:"name"`
+}

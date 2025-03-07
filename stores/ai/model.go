@@ -10,6 +10,7 @@ type Provider struct {
 	Config     string    `gorm:"type:text;not null;column:config;comment:配置信息"`
 	Status     int       `gorm:"type:tinyint(1);not null;column:status;comment:状态，0：停用；1：启用，2：异常;default:1"`
 	Priority   int       `gorm:"type:int;not null;column:priority;comment:优先级，值越小优先级越高"`
+	Type       int       `gorm:"type:tinyint(1);not null;column:type;comment:type 0:default 1:customize"`
 	Creator    string    `gorm:"size:36;not null;column:creator;comment:创建人;index:creator" aovalue:"creator"` // 创建人
 	Updater    string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"` // 更新人
 	CreateAt   time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
@@ -164,3 +165,26 @@ func (i *LocalModelCache) TableName() string {
 func (i *LocalModelCache) IdValue() int64 {
 	return i.Id
 }
+
+type ProviderModel struct {
+	Id                  int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:PRIMARY ID;"`
+	UUID                string    `gorm:"type:varchar(36);not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`
+	Name                string    `gorm:"type:varchar(100);not null;column:name;comment:name;index:name"`
+	Type                string    `gorm:"type:varchar(100);not null;column:type;comment:type:chat"`
+	AccessConfiguration string    `gorm:"type:text;not null;column:access_configuration;comment:access_configuration json"`
+	ModelParameters     string    `gorm:"type:text;not null;column:model_parameters;comment:model_parameters json"`
+	Provider            string    `gorm:"type:varchar(36);not null;column:provider;comment:ai_provider:uuid;index:provider"`
+	Creator             string    `gorm:"size:36;not null;column:creator;comment:creator;index:creator" aovalue:"creator"`
+	Updater             string    `gorm:"size:36;not null;column:updater;comment:updater;index:updater" aovalue:"updater"`
+	CreateAt            time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:create_at"`
+	UpdateAt            time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:update_at"`
+}
+
+func (i *ProviderModel) TableName() string {
+	return "ai_provider_model"
+}
+
+func (i *ProviderModel) IdValue() int64 {
+	return i.Id
+}
+

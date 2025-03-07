@@ -4,6 +4,11 @@ import (
 	"github.com/eolinker/go-common/auto"
 )
 
+type SimpleModel struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
 type SimpleProvider struct {
 	Id            string `json:"id"`
 	Name          string `json:"name"`
@@ -20,8 +25,14 @@ type Provider struct {
 	DefaultLLM       string `json:"default_llm"`
 	DefaultLLMConfig string `json:"-"`
 	//Priority         int            `json:"priority"`
-	Status     ProviderStatus `json:"status"`
-	Configured bool           `json:"configured"`
+	Status      ProviderStatus `json:"status"`
+	Configured  bool           `json:"configured"`
+	ModelConfig ModelConfig    `json:"model_config"`
+}
+
+type ModelConfig struct {
+	AccessConfigurationStatus bool   `json:"access_configuration_status"`
+	AccessConfigurationDemo   string `json:"access_configuration_demo"`
 }
 
 type ConfiguredProviderItem struct {
@@ -32,6 +43,7 @@ type ConfiguredProviderItem struct {
 	Status     ProviderStatus `json:"status"`
 	APICount   int64          `json:"api_count"`
 	KeyCount   int64          `json:"key_count"`
+	ModelCount int64          `json:"model_count"`
 	CanDelete  bool           `json:"can_delete"`
 }
 
@@ -48,6 +60,7 @@ type ProviderItem struct {
 	Logo       string `json:"logo"`
 	DefaultLLM string `json:"default_llm"`
 	Sort       int    `json:"-"`
+	Type       int    `json:"type"` // 0:default 1:customize
 }
 
 type SimpleProviderItem struct {
@@ -69,10 +82,15 @@ type BackupProvider struct {
 }
 
 type LLMItem struct {
-	Id     string   `json:"id"`
-	Logo   string   `json:"logo"`
-	Config string   `json:"config"`
-	Scopes []string `json:"scopes"`
+	Id                  string   `json:"id"`
+	Logo                string   `json:"logo"`
+	Config              string   `json:"config"`
+	AccessConfiguration string   `json:"access_configuration"`
+	ModelParameters     string   `json:"model_parameters"`
+	Scopes              []string `json:"scopes"`
+	Type                string   `json:"type"`
+	IsSystem            bool     `json:"is_system"`
+	ApiCount            int64    `json:"api_count"`
 }
 
 type APIItem struct {

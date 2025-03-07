@@ -25,6 +25,11 @@ type Provider struct {
 	Address                  string                   `json:"address" yaml:"address"`
 	Recommend                bool                     `json:"recommend" yaml:"recommend"`
 	Sort                     int                      `json:"sort" yaml:"sort"`
+	ModelConfig              ModelConfig              `json:"model_config" yaml:"model_config"`
+}
+type ModelConfig struct {
+	AccessConfigurationStatus bool   `json:"access_configuration_status" yaml:"access_configuration_status"`
+	AccessConfigurationDemo   string `json:"access_configuration_demo" yaml:"access_configuration_demo"`
 }
 
 type ProviderCredentialSchema struct {

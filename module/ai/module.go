@@ -19,6 +19,7 @@ type IProviderModule interface {
 	LLMs(ctx context.Context, driver string) ([]*ai_dto.LLMItem, *ai_dto.ProviderItem, error)
 	UpdateProviderConfig(ctx context.Context, id string, input *ai_dto.UpdateConfig) error
 	Delete(ctx context.Context, id string) error
+	AddProvider(ctx context.Context, input *ai_dto.NewProvider) (*ai_dto.SimpleProvider, error)
 }
 
 type IAIAPIModule interface {

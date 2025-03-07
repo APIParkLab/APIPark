@@ -2,7 +2,9 @@ package ai
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/APIParkLab/APIPark/module/ai"
 	ai_dto "github.com/APIParkLab/APIPark/module/ai/dto"
@@ -19,6 +21,13 @@ type imlProviderController struct {
 
 func (i *imlProviderController) Delete(ctx *gin.Context, id string) error {
 	return i.module.Delete(ctx, id)
+}
+
+func (i *imlProviderController) AddProvider(ctx *gin.Context, input *ai_dto.NewProvider) (*ai_dto.SimpleProvider, error) {
+	if strings.TrimSpace(input.Name) == "" {
+		return nil, fmt.Errorf("name is empty")
+	}
+	return i.module.AddProvider(ctx, input)
 }
 
 //func (i *imlProviderController) Sort(ctx *gin.Context, input *ai_dto.Sort) error {
@@ -67,6 +76,9 @@ func (i *imlProviderController) Disable(ctx *gin.Context, id string) error {
 }
 
 func (i *imlProviderController) UpdateProviderConfig(ctx *gin.Context, id string, input *ai_dto.UpdateConfig) error {
+	if strings.TrimSpace(id) == "" {
+		return fmt.Errorf("id is empty")
+	}
 	return i.module.UpdateProviderConfig(ctx, id, input)
 }
 
