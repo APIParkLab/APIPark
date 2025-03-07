@@ -78,19 +78,25 @@ func (i *imlProviderModelModule) UpdateProviderModel(ctx *gin.Context, provider 
 }
 
 func (i *imlProviderModelModule) DeleteProviderModel(ctx *gin.Context, provider string, id string) error {
+	p, has := model_runtime.GetProvider(provider)
 	// check provider exist
 	providerInfo, err := i.providerService.Get(ctx, provider)
 	if err != nil {
 		return err
 	}
-	if providerInfo == nil {
+	if providerInfo == nil || !has {
 		return fmt.Errorf("provider not found")
 	}
 	modelInfo, _ := i.providerModelService.Get(ctx, id)
 	if modelInfo == nil || modelInfo.Provider != provider {
 		return fmt.Errorf("model not found")
 	}
-	return i.providerModelService.Delete(ctx, id)
+	if err := i.providerModelService.Delete(ctx, id); err != nil {
+		return err
+	}
+	p.RemoveModel(id)
+
+	return nil
 }
 
 func (i *imlProviderModelModule) AddProviderModel(ctx *gin.Context, provider string, input *model_dto.Model) (*model_dto.SimpleModel, error) {
