@@ -50,7 +50,7 @@ const AddModels = forwardRef<addModelsContentHandle, addModelContentProps>((prop
    * @param id
    */
   const getModelTemplateList = () => {
-    fetchData<BasicResponse<{ templates: TemplatesItems[] }>>(`ai/provider/model/template`, {
+    fetchData<BasicResponse<{ templates: TemplatesItems[] }>>(`ai/provider/model/templates`, {
       method: 'GET',
       eoTransformKeys: ['provider_name', 'model_name', 'model_parameters']
     })
