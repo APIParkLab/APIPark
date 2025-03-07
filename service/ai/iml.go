@@ -114,6 +114,7 @@ func createEntityHandler(i *CreateProvider) *ai.Provider {
 		DefaultLLM: i.DefaultLLM,
 		Config:     i.Config,
 		Status:     i.Status,
+		Type:       i.Type,
 		CreateAt:   now,
 		UpdateAt:   now,
 	}
