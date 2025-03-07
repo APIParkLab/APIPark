@@ -43,8 +43,8 @@ func (m *Model) Name() string {
 }
 
 type CustomizeProviderConfig struct {
-	ApiEndpointUrl string `json:"api_endpoint_url"`
-	ApiKey         string `json:"api_key"`
+	BaseUrl string `json:"base_url"`
+	ApiKey  string `json:"api_key"`
 }
 
 func (m *Model) ID() string {
