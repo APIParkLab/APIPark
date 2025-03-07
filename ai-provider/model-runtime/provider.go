@@ -278,6 +278,7 @@ func (p *Provider) Logo() string {
 }
 
 func (r *ModelRegistry) addModel(m IModel, isDefault bool) {
+	_, exist := r.models.Get(m.ID())
 	r.models.Set(m.ID(), m)
 
 	// get lock
@@ -285,19 +286,22 @@ func (r *ModelRegistry) addModel(m IModel, isDefault bool) {
 	shard.Lock()
 	defer shard.Unlock()
 
-	// create model node
-	node := &modelNode{
-		model:   m,
-		typeKey: m.ModelType(),
+	if exist {
+		if node, exist := r.reverseMap[m.ID()]; exist {
+			node.model = m
+		}
+	} else {
+		node := &modelNode{
+			model:   m,
+			typeKey: m.ModelType(),
+		}
+		if head := r.typeIndex[m.ModelType()]; head != nil {
+			node.next = head
+			head.prev = node
+		}
+		r.typeIndex[m.ModelType()] = node
+		r.reverseMap[m.ID()] = node
 	}
-
-	// update index
-	if head := r.typeIndex[m.ModelType()]; head != nil {
-		node.next = head
-		head.prev = node
-	}
-	r.typeIndex[m.ModelType()] = node
-	r.reverseMap[m.ID()] = node
 
 	// default model
 	if isDefault {
