@@ -113,7 +113,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
           if ((setModelValue && providers.length) || defaultId) {
             const id = defaultId || providers[0].id
             form.setFieldValue('modelMode', id)
-            getModelConfig(id)
+            getModelConfig(id, defaultId)
           }
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
@@ -128,7 +128,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
    * 获取模型配置
    * @param id
    */
-  const getModelConfig = (id: string) => {
+  const getModelConfig = (id: string, defaultId?: string | number) => {
     getLlmList(id)
     fetchData<BasicResponse<{ providers: ModelDetailData[] }>>(`ai/provider/config`, {
       method: 'GET',
@@ -139,7 +139,8 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           const modelEntity = {
-            ...data.provider
+            ...data.provider,
+            isNewProvider: !!defaultId
           }
           setLocalEntity(modelEntity)
           setFormFieldsValue(modelEntity)
@@ -267,12 +268,19 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
    * 添加模型
    */
   const addModel = () => {
-    const providerName = form.getFieldValue('modelMode') || localEntity?.name
+    const providerName = localEntity?.name || form.getFieldValue('modelMode')
     const showAccessConfig = localEntity?.model_config?.access_configuration_status || false
     const accessConfig = localEntity?.model_config?.access_configuration_demo || ''
     modal.confirm({
       title: $t('添加 (0) 模型', [providerName]),
-      content: <AddModels ref={addModelModalRef} showAccessConfig={showAccessConfig} accessConfig={accessConfig} providerID={localEntity?.id}></AddModels>,
+      content: (
+        <AddModels
+          ref={addModelModalRef}
+          showAccessConfig={showAccessConfig}
+          accessConfig={accessConfig}
+          providerID={localEntity?.id}
+        ></AddModels>
+      ),
       onOk: () => {
         return addModelModalRef.current?.save().then((res) => {
           if (res === true) {
@@ -298,7 +306,7 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
       onOk: () => {
         return addProviderModalRef.current?.save().then((res) => {
           if (res) {
-            getModelProviderList(false, res)
+            getModelProviderList(false, res.id)
           }
         })
       },
@@ -326,14 +334,16 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
       autoComplete="off"
       disabled={readOnly}
     >
-      {modelMode === 'manual' && (
+      {modelMode === 'manual' && !localEntity?.isNewProvider && (
         <Form.Item<ModelDetailData> label={$t('模型供应商')}>
           <span className="absolute top-[-28px] right-0 text-theme cursor-pointer" onClick={addProvider}>
             + {$t('添加自定义供应商')}
           </span>
           <Form.Item<ModelDetailData> name="modelMode" rules={[{ required: true }]}>
             <Select
+              showSearch
               className="w-INPUT_NORMAL"
+              filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
               placeholder={$t(PLACEHOLDER.select)}
               loading={modelModeLoading}
               options={modelProviderListRef.current?.map((x) => ({
@@ -342,7 +352,8 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
                   <div className="flex items-center gap-[10px]">
                     <span>{x.name}</span>
                   </div>
-                )
+                ),
+                searchText: x.name.toLowerCase()
               }))}
               onChange={(e) => {
                 getModelConfig(e)
@@ -355,22 +366,25 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
         <span className="absolute top-[-28px] right-0 text-theme cursor-pointer" onClick={addModel}>
           + {$t('添加模型')}
         </span>
-      <Form.Item<ModelDetailData> name="defaultLlm" rules={[{ required: true }]}>
-        <Select
-          className="w-INPUT_NORMAL"
-          placeholder={$t(PLACEHOLDER.select)}
-          loading={loading}
-          options={llmList?.map((x) => ({
-            value: x.id,
-            label: (
-              <div className="flex items-center gap-[10px]">
-                <span>{x.name || x.id}</span>
-                {x?.scopes?.map((s) => <Tag key={s}>{s?.toLocaleUpperCase()}</Tag>)}
-              </div>
-            )
-          }))}
-        ></Select>
-      </Form.Item>
+        <Form.Item<ModelDetailData> name="defaultLlm" rules={[{ required: true }]}>
+          <Select
+            showSearch
+            className="w-INPUT_NORMAL"
+            filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
+            placeholder={$t(PLACEHOLDER.select)}
+            loading={loading}
+            options={llmList?.map((x) => ({
+              value: x.id,
+              label: (
+                <div className="flex items-center gap-[10px]">
+                  <span>{x.name || x.id}</span>
+                  {x?.scopes?.map((s) => <Tag key={s}>{s?.toLocaleUpperCase()}</Tag>)}
+                </div>
+              ),
+              searchText: x.name.toLowerCase()
+            }))}
+          ></Select>
+        </Form.Item>
       </Form.Item>
       {source === 'guide' && (
         <Form.Item label={$t('所属团队')} name="team" className="mt-[16px]" rules={[{ required: true }]}>
