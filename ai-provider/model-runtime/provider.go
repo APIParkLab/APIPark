@@ -202,7 +202,6 @@ type Provider struct {
 	sort        int
 	recommend   bool
 	modelConfig ModelConfig
-	mu          sync.Mutex
 	IConfig
 }
 

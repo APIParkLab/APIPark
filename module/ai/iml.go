@@ -467,6 +467,7 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 			DefaultLLMConfig: defaultLLM.Logo(),
 			Status:           ai_dto.ProviderDisabled,
 			//Priority:         maxPriority,
+			Type: 0,
 			ModelConfig: ai_dto.ModelConfig{
 				AccessConfigurationStatus: providerModelConfig.AccessConfigurationStatus,
 				AccessConfigurationDemo:   providerModelConfig.AccessConfigurationDemo,
@@ -491,6 +492,7 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		//Priority:         info.Priority,
 		Status:     ai_dto.ToProviderStatus(info.Status),
 		Configured: true,
+		Type:       info.Type,
 		ModelConfig: ai_dto.ModelConfig{
 			AccessConfigurationStatus: false,
 			AccessConfigurationDemo:   "",
