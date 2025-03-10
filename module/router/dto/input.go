@@ -63,6 +63,7 @@ func (a *Create) Validate() error {
 }
 
 type Edit struct {
+	Name        *string     `json:"name"`
 	Description *string     `json:"description"`
 	Proxy       *InputProxy `json:"proxy"`
 	Path        *string     `json:"path"`
