@@ -37,7 +37,7 @@ type EditService struct {
 	Model        *string   `json:"model"`
 	ApprovalType *string   `json:"approval_type"`
 	State        *string   `json:"state"`
-	ModelMapping string    `json:"model_mapping"`
+	ModelMapping *string   `json:"model_mapping"`
 }
 
 type CreateApp struct {
