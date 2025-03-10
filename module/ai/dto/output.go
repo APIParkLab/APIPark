@@ -25,6 +25,7 @@ type Provider struct {
 	DefaultLLM       string `json:"default_llm"`
 	DefaultLLMConfig string `json:"-"`
 	//Priority         int            `json:"priority"`
+	Type        int            `json:"type"`
 	Status      ProviderStatus `json:"status"`
 	Configured  bool           `json:"configured"`
 	ModelConfig ModelConfig    `json:"model_config"`
