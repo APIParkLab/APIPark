@@ -198,7 +198,7 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
                 value: x.id,
                 label: (
                   <div className="flex items-center gap-[10px]" key={x.id}>
-                    <span>{x.id}</span>
+                    <span>{x.name || x.id}</span>
                     {modelType === 'online' && x?.scopes?.map((s: any) => <Tag>{s?.toLocaleUpperCase()}</Tag>)}
                   </div>
                 )
