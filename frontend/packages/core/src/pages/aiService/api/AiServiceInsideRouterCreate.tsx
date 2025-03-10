@@ -65,6 +65,7 @@ const AiServiceInsideRouterCreate = () => {
   const [llmList, setLlmList] = useState<AiProviderLlmsItems[]>([])
   const [variablesTableRef, setVariablesTableRef] = useState<MutableRefObject<EditableFormInstance<T> | undefined>>()
   const { state } = useGlobalContext()
+  const [resultPath, setResultPath] = useState<string>('')
 
   const onFinish = () => {
     return variablesTableRef?.current
@@ -114,6 +115,26 @@ const AiServiceInsideRouterCreate = () => {
     drawerType !== undefined ? setOpen(true) : setOpen(false)
   }, [drawerType])
 
+  const getPath = (path: string) => {
+    let newPath = path
+    let pathMatch = 'full'
+    if (prefixForce && path?.startsWith(apiPrefix + '/')) {
+      newPath = path.slice((apiPrefix?.length || 0) + 1)
+    }
+    if (newPath.endsWith('/*')) {
+      newPath = newPath.slice(0, -2)
+      pathMatch = 'prefix'
+    }
+    return { newPath, pathMatch }
+  }
+
+  useEffect(() => {
+    if (resultPath) {
+      const { newPath, pathMatch } = getPath(resultPath)
+      form.setFieldsValue({ path: newPath, pathMatch })
+    }
+  }, [apiPrefix, resultPath])
+
   const getRouterConfig = () => {
     setLoading(true)
     fetchData<BasicResponse<{ api: AiServiceRouterConfig }>>('service/ai-router', {
@@ -125,21 +146,14 @@ const AiServiceInsideRouterCreate = () => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           const { path, aiPrompt, aiModel } = data.api
-          let newPath = path
-          let pathMatch = 'full'
-          if (prefixForce && path?.startsWith(apiPrefix + '/')) {
-            newPath = path.slice((apiPrefix?.length || 0) + 1)
-          }
-          if (newPath.endsWith('/*')) {
-            newPath = newPath.slice(0, -2)
-            pathMatch = 'prefix'
-          }
+          const { newPath, pathMatch } = getPath(path)
           form.setFieldsValue({
             ...data.api,
             ...aiPrompt,
             path: newPath,
             pathMatch
           })
+          setResultPath(path)
           setVariablesTable(aiPrompt.variables as VariableItems[])
           setDefaultLlm(
             (prev) =>
