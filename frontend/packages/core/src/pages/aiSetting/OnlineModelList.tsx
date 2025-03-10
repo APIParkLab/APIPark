@@ -4,10 +4,15 @@ import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPe
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
-import { App, Divider, Space, Typography } from 'antd'
+import { App, Divider, Modal, Space, Typography } from 'antd'
 import React, { useRef, useState } from 'react'
-import { useAiSetting } from './contexts/AiSettingContext'
-import { AiSettingListItem, ModelListData } from './types'
+import { AISettingEntityItem, ModelListData } from './types'
+import { DrawerWithFooter } from '@common/components/aoplatform/DrawerWithFooter'
+import AiSettingModalContent, { AiSettingModalContentHandle } from './AiSettingModal'
+import { checkAccess } from '@common/utils/permission'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext'
+import ModelsDetailTable from './contexts/ModelsDetailTable'
+import { Icon } from '@iconify/react/dist/iconify.js'
 
 const OnlineModelList: React.FC = () => {
   const pageListRef = useRef<ActionType>(null)
@@ -15,18 +20,22 @@ const OnlineModelList: React.FC = () => {
   const { fetchData } = useFetch()
   const [searchWord, setSearchWord] = useState<string>('')
   const [total, setTotal] = useState<number>(0)
-  const { openConfigModal } = useAiSetting()
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
+  const drawerFormRef = useRef<AiSettingModalContentHandle>(null)
+  const [entity, setEntity] = useState<AISettingEntityItem>()
+  const [footerLeft, setFooterLeft] = useState<React.ReactNode>()
+  const { aiConfigFlushed, setAiConfigFlushed, accessData } = useGlobalContext()
+  const [modalVisible, setModalVisible] = useState(false)
+  const [selectedProviderID, setSelectedProviderID] = useState('')
+  const [selectedProviderName, setSelectedProviderName] = useState('')
+  const [currentEditDrawerData, setCurrentEditDrawerData] = useState<any>()
 
   const handleEdit = (record: ModelListData) => {
-    openConfigModal({ id: record.id, defaultLlm: record.defaultLlm } as AiSettingListItem, () => {
-      pageListRef.current?.reload()
+    setEntity({
+      id: record.id,
+      defaultLlm: record.defaultLlm
     })
-  }
-
-  const handleAdd = () => {
-    openConfigModal(undefined, () => {
-      pageListRef.current?.reload()
-    })
+    setDrawerOpen(true)
   }
 
   const handleDelete = async (id: string, apiCount: number) => {
@@ -41,18 +50,20 @@ const OnlineModelList: React.FC = () => {
               eoParams: {
                 provider: id
               }
-            }).then((response) => {
-              if (response.code === STATUS_CODE.SUCCESS) {
-                message.success($t('删除成功'))
-                pageListRef.current?.reload()
-              } else {
-                message.error(response.msg || RESPONSE_TIPS.error)
-              }
-              resolve(true)
-            }).catch((error) => {
-              message.error(RESPONSE_TIPS.error)
-              resolve(true)
             })
+              .then((response) => {
+                if (response.code === STATUS_CODE.SUCCESS) {
+                  message.success($t('删除成功'))
+                  pageListRef.current?.reload()
+                } else {
+                  message.error(response.msg || RESPONSE_TIPS.error)
+                }
+                resolve(true)
+              })
+              .catch((error) => {
+                message.error(RESPONSE_TIPS.error)
+                resolve(true)
+              })
           } catch (error) {
             message.error(RESPONSE_TIPS.error)
             resolve(true)
@@ -65,7 +76,6 @@ const OnlineModelList: React.FC = () => {
       closable: true,
       icon: <></>
     })
-
   }
 
   const requestList = async (params: any) => {
@@ -77,7 +87,7 @@ const OnlineModelList: React.FC = () => {
           keyword: searchWord,
           page: params.current
         },
-        eoTransformKeys: ['default_llm', 'api_count', 'key_count', 'can_delete']
+        eoTransformKeys: ['default_llm', 'api_count', 'key_count', 'model_count', 'can_delete']
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
@@ -103,6 +113,34 @@ const OnlineModelList: React.FC = () => {
       }
     }
   }
+
+  // 更新抽屉底部
+  const updateEntityData = (data: any) => {
+    // 0 常规，1 自定义
+    setCurrentEditDrawerData(data)
+    setFooterLeft(
+      <a target="_blank" rel="noopener noreferrer" href={data?.getApikeyUrl} className="flex items-center gap-[8px]">
+        <span>{$t('从 (0) 获取 API KEY', [data?.name])}</span>
+        <Icon icon="ic:baseline-open-in-new" width={16} height={16} />
+      </a>
+    )
+  }
+
+  /**
+   * 打开模型详情
+   * @param e
+   * @param record
+   */
+  const openModelsModal = (e: any, record: ModelListData) => {
+    e.stopPropagation()
+    setSelectedProviderID(record.id as string)
+    setSelectedProviderName(record.name)
+    setModalVisible(true)
+  }
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
   const statusEnum = {
     enabled: { text: <Typography.Text type="success">{$t('正常')}</Typography.Text> },
     disabled: { text: <Typography.Text type="warning">{$t('停用')}</Typography.Text> },
@@ -140,7 +178,7 @@ const OnlineModelList: React.FC = () => {
 
   const columns: PageProColumns<ModelListData>[] = [
     {
-      title: $t('名称'),
+      title: $t('供应商名称'),
       dataIndex: 'name',
       render: (dom: React.ReactNode, entity: ModelListData) => <Space>{entity.name}</Space>
     },
@@ -158,6 +196,15 @@ const OnlineModelList: React.FC = () => {
       title: $t('默认模型'),
       ellipsis: true,
       dataIndex: 'defaultLlm'
+    },
+    {
+      title: $t('Models'),
+      dataIndex: 'modelCount',
+      render: (dom: React.ReactNode, record: ModelListData) => (
+        <span className="text-[#2196f3] cursor-pointer" onClick={(e) => openModelsModal(e, record)}>
+          {record.modelCount || '0'}
+        </span>
+      )
     },
     {
       title: $t('Apis'),
@@ -205,21 +252,64 @@ const OnlineModelList: React.FC = () => {
   ]
 
   return (
-    <PageList
-      ref={pageListRef}
-      rowKey="id"
-      request={requestList}
-      onSearchWordChange={(e) => {
-        setSearchWord(e.target.value)
-        pageListRef.current?.reload()
-      }}
-      showPagination={true}
-      searchPlaceholder={$t('请输入名称搜索')}
-      columns={columns}
-      addNewBtnAccess="system.devops.ai_provider.edit"
-      addNewBtnTitle={$t('添加模型')}
-      onAddNewBtnClick={handleAdd}
-    />
+    <>
+      <PageList
+        ref={pageListRef}
+        rowKey="id"
+        request={requestList}
+        onSearchWordChange={(e) => {
+          setSearchWord(e.target.value)
+          pageListRef.current?.reload()
+        }}
+        showPagination={true}
+        searchPlaceholder={$t('请输入名称搜索')}
+        columns={columns}
+        addNewBtnAccess="system.devops.ai_provider.edit"
+        addNewBtnTitle={$t('添加供应商')}
+        onAddNewBtnClick={() => setDrawerOpen(true)}
+      />
+      <DrawerWithFooter
+        title={currentEditDrawerData?.isNewProvider ? $t('编辑供应商( (0) )', [currentEditDrawerData.name]) : entity ? $t('编辑供应商') : $t('添加供应商')}
+        open={drawerOpen}
+        width="30%"
+        onClose={() => {
+          setEntity(undefined)
+          setDrawerOpen(false)
+        }}
+        onSubmit={() =>
+          drawerFormRef.current?.save()?.then((res) => {
+            res && pageListRef.current?.reload()
+            setAiConfigFlushed(!aiConfigFlushed)
+            setEntity(undefined)
+            return res
+          })
+        }
+        footerLeft={!currentEditDrawerData?.type ? footerLeft : undefined}
+        submitAccess=""
+      >
+        <AiSettingModalContent
+          ref={drawerFormRef}
+          entity={{ id: entity?.id, defaultLlm: entity?.defaultLlm }}
+          modelMode={entity ? 'auto' : 'manual'}
+          updateEntityData={updateEntityData}
+          readOnly={!checkAccess('system.devops.ai_provider.edit', accessData)}
+        />
+      </DrawerWithFooter>
+      <Modal
+        title={$t('(0) 模型', [selectedProviderName])}
+        visible={modalVisible}
+        destroyOnClose={true}
+        onCancel={handleCloseModal}
+        footer={null}
+        wrapClassName="modal-without-footer"
+        width={600}
+        maskClosable={true}
+      >
+        <div className="pb-btnybase flex flex-nowrap flex-col h-full w-full items-center justify-between">
+          <ModelsDetailTable providerID={selectedProviderID}></ModelsDetailTable>
+        </div>
+      </Modal>
+    </>
   )
 }
 
