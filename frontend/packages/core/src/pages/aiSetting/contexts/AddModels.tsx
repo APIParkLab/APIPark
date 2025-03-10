@@ -98,7 +98,7 @@ const AddModels = forwardRef<addModelsContentHandle, addModelContentProps>((prop
               id: modelID
             }
             fetchData<BasicResponse<null>>('ai/provider/model', {
-              method: type === 'edit' ? 'DELETE' : 'POST',
+              method: type === 'edit' ? 'PUT' : 'POST',
               eoParams: { provider: providerID },
               eoBody: finalValue,
               eoTransformKeys: ['defaultLlm']
