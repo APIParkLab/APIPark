@@ -324,6 +324,7 @@ func (i *imlRouterModule) Edit(ctx context.Context, serviceId string, apiId stri
 			match = &m
 		}
 		err = i.apiService.Save(ctx, apiId, &api.Edit{
+			Name:        dto.Name,
 			Description: dto.Description,
 			Methods:     dto.Methods,
 			Protocols:   dto.Protocols,
