@@ -63,6 +63,7 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 
 		_, err = i.routerModule.Create(ctx, serviceId, &router_dto.Create{
 			Id:   input.Id,
+			Name: input.Name,
 			Path: input.Path,
 			Methods: []string{
 				http.MethodPost,
@@ -130,6 +131,7 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 		}
 
 		_, err = i.routerModule.Edit(ctx, serviceId, apiId, &router_dto.Edit{
+			Name:        input.Name,
 			Description: input.Description,
 			Proxy:       proxy,
 			Path:        input.Path,
