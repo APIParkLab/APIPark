@@ -3,12 +3,13 @@ import { $t } from '@common/locales'
 import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { forwardRef, useImperativeHandle } from 'react'
+import { AISettingEntityItem } from '../types'
 type modelFieldType = {
   name: string
 }
 
 export type addProviderContentHandle = {
-  save: () => Promise<number | string>
+  save: () => Promise<AISettingEntityItem>
 }
 
 type addProviderContentProps = {
@@ -24,7 +25,7 @@ const AddProvider = forwardRef<addProviderContentHandle, addProviderContentProps
    * 保存
    * @returns
    */
-  const save: () => Promise<number | string> = () => {
+  const save: () => Promise<AISettingEntityItem> = () => {
     return new Promise((resolve, reject) => {
       try {
         form
@@ -41,7 +42,7 @@ const AddProvider = forwardRef<addProviderContentHandle, addProviderContentProps
                 const { code, data, msg } = response
                 if (code === STATUS_CODE.SUCCESS) {
                   message.success($t(RESPONSE_TIPS.success) || msg)
-                  resolve(data.id)
+                  resolve(data.provider)
                 } else {
                   message.error(msg || $t(RESPONSE_TIPS.error))
                   reject(msg || $t(RESPONSE_TIPS.error))

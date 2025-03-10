@@ -28,7 +28,7 @@ const OnlineModelList: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedProviderID, setSelectedProviderID] = useState('')
   const [selectedProviderName, setSelectedProviderName] = useState('')
-  const [showDrawerFooterLeft, setShowDrawerFooterLeft] = useState(false)
+  const [currentEditDrawerData, setCurrentEditDrawerData] = useState<any>()
 
   const handleEdit = (record: ModelListData) => {
     setEntity({
@@ -117,7 +117,7 @@ const OnlineModelList: React.FC = () => {
   // 更新抽屉底部
   const updateEntityData = (data: any) => {
     // 0 常规，1 自定义
-      setShowDrawerFooterLeft(!data.type)
+    setCurrentEditDrawerData(data)
     setFooterLeft(
       <a target="_blank" rel="noopener noreferrer" href={data?.getApikeyUrl} className="flex items-center gap-[8px]">
         <span>{$t('从 (0) 获取 API KEY', [data?.name])}</span>
@@ -269,7 +269,7 @@ const OnlineModelList: React.FC = () => {
         onAddNewBtnClick={() => setDrawerOpen(true)}
       />
       <DrawerWithFooter
-        title={entity ? $t('编辑供应商') : $t('添加供应商')}
+        title={currentEditDrawerData?.isNewProvider ? $t('编辑供应商( (0) )', [currentEditDrawerData.name]) : entity ? $t('编辑供应商') : $t('添加供应商')}
         open={drawerOpen}
         width="30%"
         onClose={() => {
@@ -284,7 +284,7 @@ const OnlineModelList: React.FC = () => {
             return res
           })
         }
-        footerLeft={showDrawerFooterLeft ? footerLeft : undefined}
+        footerLeft={!currentEditDrawerData?.type ? footerLeft : undefined}
         submitAccess=""
       >
         <AiSettingModalContent
