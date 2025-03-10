@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	ai_model "github.com/APIParkLab/APIPark/service/ai-model"
-	"github.com/google/uuid"
 	"net/http"
 	"sort"
 	"time"
+
+	ai_model "github.com/APIParkLab/APIPark/service/ai-model"
+	"github.com/google/uuid"
 
 	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
 
@@ -586,7 +587,7 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 				return err
 			}
 		}
-		_, has := p.GetModel(input.DefaultLLM)
+		model, has := p.GetModel(input.DefaultLLM)
 		if !has {
 			return fmt.Errorf("ai provider model not found")
 		}
@@ -647,7 +648,6 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 				p.SetURI(uri)
 			}
 		}
-		/**
 		if *pInfo.Status == 0 {
 			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
 				{
@@ -682,7 +682,6 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 				Attr: cfg,
 			}, newKey(defaultKey),
 		}, true)
-		*/
 
 		return nil
 	})
