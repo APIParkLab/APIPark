@@ -58,11 +58,16 @@ const AddModels = forwardRef<addModelsContentHandle, addModelContentProps>((prop
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           const templates = data.templates || []
-          setTemplateList(templates.map((template: any) => ({
+          const emptyTemplate = {
+            key: '自定义（空模板）',
+            label: $t('自定义（空模板）'),
+            config: '{\n  \n}'
+          }
+          setTemplateList([emptyTemplate, ...templates.map((template: any) => ({
             key: template.id,
             label: `${template.providerName} ${template.modelName}`,
             config: template.modelParameters
-          })))
+          }))])
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
         }
@@ -72,15 +77,15 @@ const AddModels = forwardRef<addModelsContentHandle, addModelContentProps>((prop
   useEffect(() => {
     getModelTemplateList()
     form.setFieldsValue({
-      access_configuration: accessConfig || '{}',
-      model_parameters: modelParameters || '{}',
+      access_configuration: accessConfig || '{\n  \n}',
+      model_parameters: modelParameters || '{\n  \n}',
       name: modelName || ''
     })
   }, [])
 
   const modelParameterClick = ({ key }: { key: string }) => {
     const config = templateList.find((item) => item.key === key)?.config
-    form.setFieldValue('model_parameters', config || '{}')
+    form.setFieldValue('model_parameters', config || '{\n  \n}')
   }
 
   /**
