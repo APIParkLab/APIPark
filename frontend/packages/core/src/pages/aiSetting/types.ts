@@ -37,6 +37,7 @@ export interface AISettingEntityItem {
   name?: string
   type?: number
   model_config?: ModelConfigItem
+  isNewProvider?: boolean
 }
 export interface ModelDetailData extends ModelListData {
   enable: boolean
@@ -63,7 +64,7 @@ export type AiProviderLlmsItems = {
   logo: string
   scopes: ('chat' | 'completions')[]
   config: string
-  name?: string
+  name: string
 }
 
 export type AiProviderDefaultConfig = {
