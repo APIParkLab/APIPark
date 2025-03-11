@@ -3,6 +3,7 @@ package ai_model
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/APIParkLab/APIPark/common"
 	ai_model "github.com/APIParkLab/APIPark/module/ai-model"
 	model_dto "github.com/APIParkLab/APIPark/module/ai-model/dto"
 	"github.com/gin-gonic/gin"
@@ -22,8 +23,8 @@ func (i *imlProviderModelController) GetModelParametersTemplate(ctx *gin.Context
 }
 
 func (i *imlProviderModelController) UpdateProviderModel(ctx *gin.Context, provider string, input *model_dto.EditModel) error {
-	if strings.TrimSpace(input.Name) == "" {
-		return fmt.Errorf("name is empty")
+	if !common.ModelNameValid(input.Name) {
+		return fmt.Errorf("model name is invalid(a-zA-Z0-9-_.:)")
 	}
 	if strings.TrimSpace(input.Id) == "" {
 		return fmt.Errorf("id is empty")
@@ -54,8 +55,8 @@ func (i *imlProviderModelController) DeleteProviderModel(ctx *gin.Context, provi
 }
 
 func (i *imlProviderModelController) AddProviderModel(ctx *gin.Context, provider string, input *model_dto.Model) (*model_dto.SimpleModel, error) {
-	if strings.TrimSpace(input.Name) == "" {
-		return nil, fmt.Errorf("name is empty")
+	if !common.ModelNameValid(input.Name) {
+		return nil, fmt.Errorf("model name illegal(a-zA-Z0-9-_.:)")
 	}
 	if strings.TrimSpace(provider) == "" {
 		return nil, fmt.Errorf("provider is empty")

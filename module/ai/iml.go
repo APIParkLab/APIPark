@@ -198,13 +198,13 @@ func (i *imlProviderModule) Delete(ctx context.Context, id string) error {
 }
 
 func (i *imlProviderModule) AddProvider(ctx context.Context, input *ai_dto.NewProvider) (*ai_dto.SimpleProvider, error) {
-	if has := i.providerService.CheckNameDuplicate(ctx, input.Name); has {
+	// uuid = name
+	if has := i.providerService.CheckUuidDuplicate(ctx, input.Name); has {
 		return nil, fmt.Errorf("provider `%s` duplicate", input.Name)
 	}
-	id := uuid.New().String()
 	config, defaultLLM := "{\"base_url\": \"\", \"api_key\": \"\"}", ""
 	if err := i.providerService.Create(ctx, &ai.CreateProvider{
-		Id:         id,
+		Id:         input.Name,
 		Name:       input.Name,
 		DefaultLLM: defaultLLM,
 		Config:     config,
@@ -213,10 +213,10 @@ func (i *imlProviderModule) AddProvider(ctx context.Context, input *ai_dto.NewPr
 		return nil, err
 	}
 	// register provider
-	iProvider, _ := model_runtime.NewCustomizeProvider(id, input.Name, []model_runtime.IModel{}, "", "")
-	model_runtime.Register(id, iProvider)
+	iProvider, _ := model_runtime.NewCustomizeProvider(input.Name, input.Name, []model_runtime.IModel{}, "", "")
+	model_runtime.Register(input.Name, iProvider)
 	return &ai_dto.SimpleProvider{
-		Id:            id,
+		Id:            input.Name,
 		Name:          input.Name,
 		DefaultConfig: config,
 		Logo:          model_runtime.GetCustomizeLogo(),
@@ -482,6 +482,8 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		model, has := p.DefaultModel(model_runtime.ModelTypeLLM)
 		if !has || model == nil {
 			defaultLLM, _ = model_runtime.NewCustomizeModel("", "", "", "", "")
+		} else {
+			defaultLLM = model
 		}
 	}
 

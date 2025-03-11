@@ -5,6 +5,7 @@ import (
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 	model_dto "github.com/APIParkLab/APIPark/module/ai-model/dto"
 	"github.com/APIParkLab/APIPark/service/ai"
+	ai_api "github.com/APIParkLab/APIPark/service/ai-api"
 	ai_model "github.com/APIParkLab/APIPark/service/ai-model"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -19,6 +20,7 @@ var (
 
 type imlProviderModelModule struct {
 	providerService      ai.IProviderService            `autowired:""`
+	aiApiService         ai_api.IAPIService             `autowired:""`
 	providerModelService ai_model.IProviderModelService `autowired:""`
 	transaction          store.ITransaction             `autowired:""`
 }
@@ -91,6 +93,11 @@ func (i *imlProviderModelModule) DeleteProviderModel(ctx *gin.Context, provider 
 	if modelInfo == nil || modelInfo.Provider != provider {
 		return fmt.Errorf("model not found")
 	}
+	// check model in use
+	countMapByModel, _ := i.aiApiService.CountMapByModel(ctx, "", map[string]interface{}{"model": id})
+	if countValue, has := countMapByModel[id]; has && countValue > 0 {
+		return fmt.Errorf("model in use")
+	}
 	if err := i.providerModelService.Delete(ctx, id); err != nil {
 		return err
 	}
@@ -103,14 +110,6 @@ func (i *imlProviderModelModule) AddProviderModel(ctx *gin.Context, provider str
 	p, has := model_runtime.GetProvider(provider)
 	if !has {
 		return nil, fmt.Errorf("ai provider not found")
-	}
-	// check provider exist
-	providerInfo, err := i.providerService.Get(ctx, provider)
-	if err != nil {
-		return nil, err
-	}
-	if providerInfo == nil {
-		return nil, fmt.Errorf("provider not found")
 	}
 	// check model name duplicate
 	if has := i.providerModelService.CheckNameDuplicate(ctx, provider, input.Name, ""); has {
