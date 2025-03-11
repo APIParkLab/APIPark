@@ -1,6 +1,7 @@
 package service_dto
 
 import (
+	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
 	"github.com/APIParkLab/APIPark/service/service"
 	"github.com/eolinker/go-common/auto"
 )
@@ -151,7 +152,7 @@ func ToService(model *service.Service) *Service {
 		provider := auto.UUID(model.AdditionalConfig["provider"])
 		s.Provider = &provider
 		s.ProviderType = "local"
-		if provider.Id != "ollama" {
+		if provider.Id != ai_provider_local.ProviderLocal {
 			s.ProviderType = "online"
 		}
 		modelId := model.AdditionalConfig["model"]

@@ -5,13 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	ai_model "github.com/APIParkLab/APIPark/service/ai-model"
 	"net/http"
 	"strings"
 
-	"github.com/eolinker/eosc/log"
+	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
 
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
+	ai_model "github.com/APIParkLab/APIPark/service/ai-model"
+
+	"github.com/eolinker/eosc/log"
 
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
 	ai_api "github.com/APIParkLab/APIPark/service/ai-api"
@@ -239,27 +241,41 @@ func (i *imlAPIModule) List(ctx context.Context, keyword string, serviceId strin
 		if err != nil {
 			return item
 		}
-		p, has := model_runtime.GetProvider(aiModel.Provider)
-		if has {
-			item.Provider = ai_api_dto.ProviderItem{
-				Id:   p.ID(),
-				Name: p.Name(),
-				Logo: "",
-			}
-			m, has := p.GetModel(t.Model)
-			if has {
-				item.Model = ai_api_dto.ModelItem{
-					Id:   m.ID(),
-					Name: m.Name(),
-					Logo: "",
-				}
-			}
-		} else {
+		item.ModelType = ai_api_dto.ModelType(aiModel.Type)
+		if item.ModelType == ai_api_dto.ModelTypeLocal {
 			item.Model = ai_api_dto.ModelItem{
 				Id:   aiModel.Id,
-				Name: "unknown",
+				Name: aiModel.Id,
+			}
+			item.Provider = ai_api_dto.ProviderItem{
+				Id:   ai_provider_local.ProviderLocal,
+				Name: ai_provider_local.ProviderLocal,
+				Logo: "",
+			}
+		} else {
+			p, has := model_runtime.GetProvider(aiModel.Provider)
+			if has {
+				item.Provider = ai_api_dto.ProviderItem{
+					Id:   p.ID(),
+					Name: p.Name(),
+					Logo: "",
+				}
+				m, has := p.GetModel(t.Model)
+				if has {
+					item.Model = ai_api_dto.ModelItem{
+						Id:   m.ID(),
+						Name: m.Name(),
+						Logo: "",
+					}
+				}
+			} else {
+				item.Model = ai_api_dto.ModelItem{
+					Id:   aiModel.Id,
+					Name: "unknown",
+				}
 			}
 		}
+
 		return item
 	}), nil
 }

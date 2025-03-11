@@ -82,8 +82,8 @@ func (i *imlBalanceModule) Create(ctx context.Context, input *ai_balance_dto.Cre
 		modelName = input.Model
 		base = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
 	case ai_balance_dto.ModelTypeLocal:
-		input.Provider = "ollama"
-		providerName = "Ollama"
+		input.Provider = ai_provider_local.ProviderLocal
+		providerName = ai_provider_local.ProviderLocal
 		modelName = input.Model
 		v, has := i.settingService.Get(ctx, "system.ai_model.ollama_address")
 		if !has {
@@ -119,7 +119,7 @@ func newRelease(item *ai_balance.Balance, base string) *gateway.DynamicRelease {
 	cfg := make(map[string]interface{})
 	cfg["provider"] = item.Provider
 	cfg["model"] = item.Model
-	cfg["model_config"] = ai_provider_local.OllamaConfig
+	cfg["model_config"] = ai_provider_local.LocalConfig
 	cfg["base"] = base
 	cfg["priority"] = item.Priority
 	return &gateway.DynamicRelease{
@@ -155,7 +155,7 @@ func (i *imlBalanceModule) Sort(ctx context.Context, input *ai_balance_dto.Sort)
 	releases := make([]*gateway.DynamicRelease, 0, len(list))
 	for _, item := range list {
 		base := v
-		if item.Provider != "ollama" {
+		if item.Provider != ai_provider_local.ProviderLocal {
 			p, has := model_runtime.GetProvider(item.Provider)
 			if !has {
 				continue
@@ -259,7 +259,7 @@ func (i *imlBalanceModule) syncGateway(ctx context.Context, clusterId string, re
 }
 
 func (i *imlBalanceModule) getLocalBalances(ctx context.Context, v string) ([]*gateway.DynamicRelease, error) {
-	balances, err := i.balanceService.Search(ctx, "", map[string]interface{}{"provider": "ollama"}, "priority asc")
+	balances, err := i.balanceService.Search(ctx, "", map[string]interface{}{"provider": ai_provider_local.ProviderLocal}, "priority asc")
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +274,7 @@ func (i *imlBalanceModule) getLocalBalances(ctx context.Context, v string) ([]*g
 	releases := make([]*gateway.DynamicRelease, 0, len(balances))
 	for _, item := range balances {
 		base := v
-		if item.Provider != "ollama" {
+		if item.Provider != ai_provider_local.ProviderLocal {
 			p, has := model_runtime.GetProvider(item.Provider)
 			if !has {
 				continue
@@ -298,12 +298,12 @@ func (i *imlBalanceModule) getBalances(ctx context.Context) ([]*gateway.DynamicR
 	releases := make([]*gateway.DynamicRelease, 0, len(balances))
 	for _, item := range balances {
 		base := v
-		if item.Provider != "ollama" {
+		if item.Provider != ai_provider_local.ProviderLocal {
 			p, has := model_runtime.GetProvider(item.Provider)
 			if !has {
 				continue
 			}
-			base = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
+			base = fmt.Sprintf("%s://%s%s", p.URI().Scheme(), p.URI().Host(), p.URI().Path())
 		}
 		releases = append(releases, newRelease(item, base))
 	}
