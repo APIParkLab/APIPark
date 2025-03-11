@@ -25,6 +25,7 @@ type AiPromptVariable struct {
 
 type AiModel struct {
 	Id       string `json:"id"`
+	Name     string `json:"name"`
 	Config   string `json:"config"`
 	Provider string `json:"provider"`
 	Type     string `json:"type"`
