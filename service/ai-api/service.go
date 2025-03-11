@@ -17,6 +17,7 @@ type IAPIService interface {
 	CountMapByModel(ctx context.Context, keyword string, conditions map[string]interface{}) (map[string]int64, error)
 	CountByModel(ctx context.Context, model string) (int64, error)
 	CountByProvider(ctx context.Context, provider string) (int64, error)
+	UpdateAIProvider(ctx context.Context, providerId string, ids ...string) error
 	DeleteByService(ctx context.Context, serviceId string) error
 }
 
