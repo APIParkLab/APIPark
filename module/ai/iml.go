@@ -648,10 +648,9 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		if info.Type == 1 {
 			uri, uriErr := model_runtime.GetCustomizeProviderURI(input.Config, false)
 			if uriErr != nil {
-				p.SetURI(uri)
-			} else {
 				return uriErr
 			}
+			p.SetURI(uri)
 		}
 		if *pInfo.Status == 0 {
 			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{

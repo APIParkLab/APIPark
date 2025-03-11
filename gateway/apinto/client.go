@@ -14,6 +14,10 @@ type ClientDriver struct {
 	client admin_client.Client
 }
 
+func (c *ClientDriver) Hash() gateway.IHashClient {
+	return NewHashClient(c.client)
+}
+
 func (c *ClientDriver) Strategy() gateway.IStrategyClient {
 	return NewStrategyClient(c.client)
 }
