@@ -26,7 +26,7 @@ const (
 	// CheckPathIPPortExp (scheme://)?ip:port
 	CheckPathIPPortExp = `([a-zA-z]+://)?((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}:[0-9]+`
 	// EnglishOrNumberOrSpecialChars a-zA-Z0-9-_.:
-	EnglishOrNumberOrSpecialChars = `^(?i)[-:._a-z0-9]+$`
+	EnglishOrNumberOrSpecialChars = `^(?i)[-/:._a-z0-9]+$`
 )
 
 var (

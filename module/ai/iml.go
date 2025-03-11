@@ -671,9 +671,9 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		}
 		cfg := make(map[string]interface{})
 		cfg["provider"] = info.Id
-		cfg["model"] = info.DefaultLLM
+		cfg["model"] = model.Name()
 		cfg["model_config"] = model.DefaultConfig()
-		cfg["base"] = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
+		cfg["base"] = fmt.Sprintf("%s://%s%s", p.URI().Scheme(), p.URI().Host(), p.URI().Path())
 		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
 			{
 				BasicItem: &gateway.BasicItem{

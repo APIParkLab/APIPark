@@ -30,14 +30,14 @@ provider_credential_schema:
       placeholder:
         zh_Hans: 在此输入您的 API Key
         en_US: Enter your API Key
-    - variable: secret_key
+    - variable: base_url
       label:
-        en_US: Secret Key
-      type: secret-input
-      required: true
+        en_US: https://qianfan.baidubce.com/v2
+      type: text-input
+      required: false
       placeholder:
-        zh_Hans: 在此输入您的 Secret Key
-        en_US: Enter your Secret Key
-address: https://aip.baidubce.com
+        zh_Hans: 在此输入您的 Base URL
+        en_US: Enter your Base URL
+address: https://qianfan.baidubce.com/v2
 recommend: true
 sort: 7

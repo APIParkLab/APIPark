@@ -27,6 +27,14 @@ provider_credential_schema:
       placeholder:
         zh_Hans: 在此输入您的 API Key
         en_US: Enter your API Key
-address: https://api.minimax.chat
+    - variable: base_url
+      label:
+        en_US: https://api.minimax.chat/v1
+      type: text-input
+      required: false
+      placeholder:
+        zh_Hans: 在此输入您的 Base URL
+        en_US: Enter your Base URL
+address: https://api.minimax.chat/v1
 recommend: true
 sort: 5
