@@ -100,4 +100,22 @@ model_credential_schema:
       show_on:
         - variable: huggingfacehub_api_type
           value: inference_endpoints
-address: https://api-inference.huggingface.co
+provider_credential_schema:
+  credential_form_schemas:
+    - variable: api_key
+      label:
+        en_US: API Key
+      type: secret-input
+      required: true
+      placeholder:
+        zh_Hans: 在此输入您的 API Key
+        en_US: Enter your API Key
+    - variable: base_url
+      label:
+        en_US: https://router.huggingface.co/hf-inference/v1
+      type: text-input
+      required: false
+      placeholder:
+        zh_Hans: 在此输入您的 Base URL
+        en_US: Enter your Base URL
+address: https://router.huggingface.co/hf-inference/v1
