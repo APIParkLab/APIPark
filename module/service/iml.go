@@ -2,11 +2,16 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/APIParkLab/APIPark/gateway"
+
+	"github.com/APIParkLab/APIPark/service/cluster"
 
 	ai_local "github.com/APIParkLab/APIPark/service/ai-local"
 
@@ -68,6 +73,7 @@ type imlServiceModule struct {
 	serviceTagService service_tag.ITagService `autowired:""`
 	apiService        api.IAPIService         `autowired:""`
 	apiDocService     api_doc.IAPIDocService  `autowired:""`
+	clusterService    cluster.IClusterService `autowired:""`
 	transaction       store.ITransaction      `autowired:""`
 
 	serviceModelMappingService service_model_mapping.IServiceModelMappingService `autowired:""`
@@ -464,15 +470,35 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 				if err != nil {
 					return err
 				}
+
 			}
 		}
-		err = i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
-			Sid:     id,
-			Content: input.ModelMapping,
-		})
-		if err != nil {
-			return err
+		if input.ModelMapping != nil {
+			m := make(map[string]string)
+			err = json.Unmarshal([]byte(*input.ModelMapping), &m)
+			if err != nil {
+				return err
+			}
+			err = i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
+				Sid:     id,
+				Content: *input.ModelMapping,
+			})
+			if err != nil {
+				return err
+			}
+			client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
+			if err != nil {
+				return err
+			}
+			err = client.Hash().Online(ctx, &gateway.HashRelease{
+				HashKey: fmt.Sprintf("%s:%s", gateway.KeyServiceMapping, id),
+				HashMap: m,
+			})
+			if err != nil {
+				return err
+			}
 		}
+
 		return nil
 	})
 	if err != nil {
@@ -491,7 +517,22 @@ func (i *imlServiceModule) Delete(ctx context.Context, id string) error {
 			return fmt.Errorf("service has apis, can not delete")
 		}
 
-		return i.serviceService.Delete(ctx, id)
+		err = i.serviceService.Delete(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		err = i.serviceModelMappingService.Delete(ctx, id)
+		if err != nil {
+			return err
+		}
+		client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
+		if err != nil {
+			return err
+		}
+		return client.Hash().Offline(ctx, &gateway.HashRelease{
+			HashKey: fmt.Sprintf("%s:%s", gateway.KeyServiceMapping, id),
+		})
 	})
 	return err
 }
