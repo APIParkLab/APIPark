@@ -46,7 +46,7 @@ func (s *imlServiceGetSoftDelete[T, E]) List(ctx context.Context, uuids ...strin
 			where = append(where, "uuid = ?")
 			args = append(args, uuids[0])
 		} else {
-			where = append(where, "uuid in ?")
+			where = append(where, "uuid in (?)")
 			args = append(args, uuids)
 		}
 	}
