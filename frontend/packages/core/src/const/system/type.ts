@@ -30,6 +30,7 @@ export type SystemConfigFieldType = {
     serviceKind:'ai'|'rest';
     catalogue?:string | string[];
     approvalType?:string;
+    modelMapping?: string;
 };
 
 export type SystemSubServiceTableListItem = {

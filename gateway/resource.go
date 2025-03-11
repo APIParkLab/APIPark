@@ -15,6 +15,8 @@ type IApplicationClient IResourceClient[ApplicationRelease]
 
 type IServiceClient IResourceClient[ServiceRelease]
 
+type IHashClient IResourceClient[HashRelease]
+
 type ISubscribeClient IResourceClient[SubscribeRelease]
 
 type IStrategyClient IResourceClient[eosc.Base[StrategyRelease]]
@@ -131,6 +133,11 @@ func (d *DynamicRelease) UnmarshalJSON(bytes []byte) error {
 type ServiceRelease struct {
 	ID   string
 	Apis []string
+}
+
+type HashRelease struct {
+	HashKey string
+	HashMap map[string]string
 }
 
 type SubscribeRelease struct {

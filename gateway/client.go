@@ -23,6 +23,7 @@ type IClientDriver interface {
 	Subscribe() ISubscribeClient
 	Strategy() IStrategyClient
 	Dynamic(resource string) (IDynamicClient, error)
+	Hash() IHashClient
 	PluginSetting() IPluginSetting
 	Commit(ctx context.Context) error
 	Rollback(ctx context.Context) error
