@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	ai_model "github.com/APIParkLab/APIPark/service/ai-model"
 	"net/http"
 	"strings"
 
@@ -32,11 +33,12 @@ var (
 )
 
 type imlAPIModule struct {
-	serviceService service.IServiceService `autowired:""`
-	apiDocService  api_doc.IAPIDocService  `autowired:""`
-	aiAPIService   ai_api.IAPIService      `autowired:""`
-	apiService     api.IAPIService         `autowired:""`
-	transaction    store.ITransaction      `autowired:""`
+	serviceService service.IServiceService        `autowired:""`
+	apiDocService  api_doc.IAPIDocService         `autowired:""`
+	aiAPIService   ai_api.IAPIService             `autowired:""`
+	aiModelService ai_model.IProviderModelService `autowired:""`
+	apiService     api.IAPIService                `autowired:""`
+	transaction    store.ITransaction             `autowired:""`
 }
 
 func (i *imlAPIModule) getAPIDoc(ctx context.Context, serviceId string) (*openapi3.T, error) {
@@ -242,19 +244,20 @@ func (i *imlAPIModule) List(ctx context.Context, keyword string, serviceId strin
 			item.Provider = ai_api_dto.ProviderItem{
 				Id:   p.ID(),
 				Name: p.Name(),
-				Logo: p.Logo(),
+				Logo: "",
 			}
 			m, has := p.GetModel(t.Model)
 			if has {
 				item.Model = ai_api_dto.ModelItem{
 					Id:   m.ID(),
-					Logo: m.Logo(),
+					Name: m.Name(),
+					Logo: "",
 				}
 			}
 		} else {
-
 			item.Model = ai_api_dto.ModelItem{
-				Id: aiModel.Id,
+				Id:   aiModel.Id,
+				Name: "unknown",
 			}
 		}
 		return item
@@ -280,6 +283,15 @@ func (i *imlAPIModule) Get(ctx context.Context, serviceId string, apiId string) 
 	aiModel, err := ConvertStruct[ai_api_dto.AiModel](apiInfo.AdditionalConfig["ai_model"])
 	if err != nil {
 		return nil, err
+	}
+	if aiModel.Name == "" {
+		// get provider model
+		modelInfo, _ := i.aiModelService.Get(ctx, aiModel.Id)
+		if modelInfo != nil {
+			aiModel.Name = modelInfo.Name
+		} else {
+			aiModel.Name = aiModel.Id
+		}
 	}
 
 	return &ai_api_dto.API{

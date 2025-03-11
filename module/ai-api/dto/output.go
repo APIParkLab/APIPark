@@ -66,6 +66,7 @@ type APIItem struct {
 
 type ModelItem struct {
 	Id   string `json:"id"`
+	Name string `json:"name"`
 	Logo string `json:"logo"`
 }
 
