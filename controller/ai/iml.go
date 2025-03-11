@@ -26,7 +26,7 @@ func (i *imlProviderController) Delete(ctx *gin.Context, id string) error {
 
 func (i *imlProviderController) AddProvider(ctx *gin.Context, input *ai_dto.NewProvider) (*ai_dto.SimpleProvider, error) {
 	if !common.ModelNameValid(input.Name) {
-		return nil, fmt.Errorf("name illegal(a-zA-Z0-9-_.:)")
+		return nil, fmt.Errorf("name illegal(a-zA-Z0-9-_.:/)")
 	}
 	return i.module.AddProvider(ctx, input)
 }
