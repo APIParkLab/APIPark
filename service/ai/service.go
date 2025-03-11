@@ -15,7 +15,7 @@ type IProviderService interface {
 	universally.IServiceDelete
 	//Save(ctx context.Context, id string, cfg *SetProvider) error
 	//MaxPriority(ctx context.Context) (int, error)
-	CheckNameDuplicate(ctx context.Context, name string) bool
+	CheckUuidDuplicate(ctx context.Context, uuid string) bool
 }
 
 func init() {
