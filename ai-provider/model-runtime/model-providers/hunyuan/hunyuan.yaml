@@ -23,20 +23,36 @@ configurate_methods:
   - predefined-model
 provider_credential_schema:
   credential_form_schemas:
-    - variable: secret_id
+#    - variable: secret_id
+#      label:
+#        en_US: Secret ID
+#      type: secret-input
+#      required: true
+#      placeholder:
+#        zh_Hans: 在此输入您的 Secret ID
+#        en_US: Enter your Secret ID
+#    - variable: secret_key
+#      label:
+#        en_US: Secret Key
+#      type: secret-input
+#      required: true
+#      placeholder:
+#        zh_Hans: 在此输入您的 Secret Key
+#        en_US: Enter your Secret Key
+    - variable: api_key
       label:
-        en_US: Secret ID
+        en_US: API Key
       type: secret-input
       required: true
       placeholder:
-        zh_Hans: 在此输入您的 Secret ID
-        en_US: Enter your Secret ID
-    - variable: secret_key
+        zh_Hans: 在此输入您的 API Key
+        en_US: Enter your API Key
+    - variable: base_url
       label:
-        en_US: Secret Key
-      type: secret-input
-      required: true
+        en_US: https://api.hunyuan.cloud.tencent.com/v1
+      type: text-input
+      required: false
       placeholder:
-        zh_Hans: 在此输入您的 Secret Key
-        en_US: Enter your Secret Key
-address: https://hunyuan.tencentcloudapi.com
+        zh_Hans: 在此输入您的 Base URL
+        en_US: Enter your Base URL
+address: https://api.hunyuan.cloud.tencent.com/v1
