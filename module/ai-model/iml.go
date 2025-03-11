@@ -111,14 +111,6 @@ func (i *imlProviderModelModule) AddProviderModel(ctx *gin.Context, provider str
 	if !has {
 		return nil, fmt.Errorf("ai provider not found")
 	}
-	// check provider exist
-	providerInfo, err := i.providerService.Get(ctx, provider)
-	if err != nil {
-		return nil, err
-	}
-	if providerInfo == nil {
-		return nil, fmt.Errorf("provider not found")
-	}
 	// check model name duplicate
 	if has := i.providerModelService.CheckNameDuplicate(ctx, provider, input.Name, ""); has {
 		return nil, fmt.Errorf("model name: `%s` duplicate", input.Name)
