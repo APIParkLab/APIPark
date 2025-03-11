@@ -349,7 +349,7 @@ provider_credential_schema:
         en_US: Enter your APIKey
     - variable: base_url
       label:
-        en_US: Base URL
+        en_US: https://ark.cn-beijing.volces.com/api/v3
       required: true
       placeholder:
         zh_Hans: 在此输入您的 Base url

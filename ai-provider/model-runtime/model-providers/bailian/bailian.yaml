@@ -21,7 +21,7 @@ configurate_methods:
   - customizable-model
 provider_credential_schema:
   credential_form_schemas:
-    - variable: dashscope_api_key
+    - variable: api_key
       label:
         en_US: API Key
       type: secret-input
@@ -29,4 +29,12 @@ provider_credential_schema:
       placeholder:
         zh_Hans: 在此输入您的 API Key
         en_US: Enter your API Key
-address: https://dashscope.aliyuncs.com
+    - variable: base_url
+      label:
+        en_US: https://dashscope.aliyuncs.com/compatible-mode/v1
+      type: text-input
+      required: false
+      placeholder:
+        zh_Hans: 在此输入您的 Base URL
+        en_US: Enter your Base URL
+address: https://dashscope.aliyuncs.com/compatible-mode/v1
