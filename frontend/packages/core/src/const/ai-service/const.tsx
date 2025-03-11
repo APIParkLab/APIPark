@@ -19,11 +19,11 @@ export const AI_SERVICE_ROUTER_TABLE_COLUMNS: PageProColumns<AiServiceRouterTabl
   },
   {
     title: '模型',
-    dataIndex: ['model', 'logo'],
+    dataIndex: ['model', 'name'],
     ellipsis: true,
     render: (_: React.ReactNode, entity: AiServiceRouterTableListItem) => (
       <div className="flex items-center gap-[2px] ">
-        <span>{entity.model.id}</span>
+        <span>{entity.model.name}</span>
       </div>
     )
   },
