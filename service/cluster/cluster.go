@@ -80,7 +80,7 @@ func (s *imlClusterService) GetLabels(ctx context.Context, ids ...string) map[st
 		}
 		return map[string]string{o.UUID: o.Name}
 	}
-	list, err := s.store.ListQuery(ctx, "uuid in ?", []interface{}{ids}, "id")
+	list, err := s.store.ListQuery(ctx, "uuid in (?)", []interface{}{ids}, "id")
 	if err != nil {
 		return nil
 	}

@@ -337,11 +337,11 @@ func (i *imlProviderModule) SimpleConfiguredProviders(ctx context.Context, all b
 
 	healthProvider := make(map[string]struct{})
 	if all {
-		healthProvider["ollama"] = struct{}{}
+		healthProvider[ai_provider_local.ProviderLocal] = struct{}{}
 		items = append(items, &ai_dto.SimpleProviderItem{
-			Id:            "ollama",
-			Name:          "Ollama",
-			Logo:          ai_provider_local.OllamaSvg,
+			Id:            ai_provider_local.ProviderLocal,
+			Name:          ai_provider_local.ProviderLocal,
+			Logo:          ai_provider_local.LocalSvg,
 			Configured:    true,
 			DefaultConfig: "",
 			Status:        ai_dto.ProviderEnabled,
@@ -792,7 +792,7 @@ type imlAIApiModule struct {
 
 func (i *imlAIApiModule) APIs(ctx context.Context, keyword string, providerId string, start int64, end int64, page int, pageSize int, sortCondition string, asc bool, models []string, serviceIds []string) ([]*ai_dto.APIItem, *ai_dto.Condition, int64, error) {
 	modelItems := make([]*ai_dto.BasicInfo, 0)
-	if providerId == "ollama" {
+	if providerId == ai_provider_local.ProviderLocal {
 		items, err := i.aiLocalModelService.Search(ctx, "", nil, "update_at desc")
 		if err != nil {
 			return nil, nil, 0, err
