@@ -70,8 +70,8 @@ type imlProviderService struct {
 //	return i.store.Save(ctx, info)
 //}
 
-func (i *imlProviderService) CheckNameDuplicate(ctx context.Context, name string) bool {
-	v, _ := i.store.First(ctx, map[string]interface{}{"name": name})
+func (i *imlProviderService) CheckUuidDuplicate(ctx context.Context, uuid string) bool {
+	v, _ := i.store.First(ctx, map[string]interface{}{"uuid": uuid})
 
 	return v != nil
 }
