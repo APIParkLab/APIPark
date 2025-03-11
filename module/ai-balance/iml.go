@@ -279,7 +279,7 @@ func (i *imlBalanceModule) getLocalBalances(ctx context.Context, v string) ([]*g
 			if !has {
 				continue
 			}
-			base = fmt.Sprintf("%s://%s", p.URI().Scheme(), p.URI().Host())
+			base = fmt.Sprintf("%s://%s%s", p.URI().Scheme(), p.URI().Host(), p.URI().Path())
 		}
 		releases = append(releases, newRelease(item, base))
 	}
