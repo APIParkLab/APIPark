@@ -138,7 +138,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         const localModelList = data.llms?.map((x: any) => {
-          return { ...x, label: x.id, value: x.id }
+          return { ...x, label: x.name || x.id, value: x.id }
         })
         setModelList(localModelList)
         if (setDefaultLlm && localModelList.length > 0) {
