@@ -80,7 +80,7 @@ const AiServiceInsideRouterCreate = () => {
             timeout,
             retry,
             aiPrompt: { variables: variables, prompt: prompt },
-            aiModel: { id: defaultLlm?.id, provider: defaultLlm?.provider, config: defaultLlm?.config, type: defaultLlm?.type },
+            aiModel: { id: defaultLlm?.id, provider: defaultLlm?.provider, config: defaultLlm?.config, type: defaultLlm?.type, name: defaultLlm?.name },
             disabled
           }
           return fetchData<BasicResponse<null>>('service/ai-router', {
@@ -230,7 +230,8 @@ const AiServiceInsideRouterCreate = () => {
                 return {
                   ...prev,
                   logo: llmSetting?.logo,
-                  scopes: llmSetting?.scopes
+                  scopes: llmSetting?.scopes,
+                  name: llmSetting?.name
                 } as AiProviderDefaultConfig & { config: string }
               })
             }
@@ -273,7 +274,8 @@ const AiServiceInsideRouterCreate = () => {
                 return {
                   ...prev,
                   logo: llmSetting?.logo,
-                  scopes: llmSetting?.scopes
+                  scopes: llmSetting?.scopes,
+                  name: llmSetting?.name
                 } as AiProviderDefaultConfig & { config: string }
               })
             }

@@ -156,7 +156,7 @@ const ModelsDetailTable = (props: { providerID?: string }) => {
         const tableData = response.data.llms.map((item) => {
           return {
             ...item,
-            modelValue: `${response.data.provider.id}/${item.id}`
+            modelValue: `${response.data.provider.id}/${item.name}`
           }
         })
         return {

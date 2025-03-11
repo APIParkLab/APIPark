@@ -104,6 +104,7 @@ export type AiServiceRouterTableListItem = {
     model:{
         id:string
         logo:string
+        name:string
     }
 };
 
