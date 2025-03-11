@@ -54,7 +54,7 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 			}
 			plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
-					"model":    input.AiModel.Id,
+					"model":    input.AiModel.Name,
 					"provider": provider,
 					"config":   input.AiModel.Config,
 				},
@@ -113,7 +113,7 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 			}
 			proxy.Plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
-					"model":    input.AiModel.Id,
+					"model":    input.AiModel.Name,
 					"provider": provider,
 					"config":   input.AiModel.Config,
 				},
