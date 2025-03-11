@@ -10,6 +10,7 @@ import (
 type IServiceModelMappingService interface {
 	Get(ctx context.Context, sid string) (*ModelMapping, error)
 	Save(ctx context.Context, input *Save) error
+	Delete(ctx context.Context, sid string) error
 }
 
 func init() {

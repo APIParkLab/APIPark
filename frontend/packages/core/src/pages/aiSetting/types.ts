@@ -18,16 +18,26 @@ export interface ModelListData {
   status: ModelStatus
   state?: ModelDeployStatus
   apiCount: number
+  modelCount: number
   keyCount: number
   isDisabled?: boolean
   keys: KeyData[]
   canDelete: boolean
 }
 
+export type ModelConfigItem = {
+  access_configuration_status: boolean
+  access_configuration_demo: string
+}
+
 export interface AISettingEntityItem {
   id: string | undefined
   status?: ModelStatus | undefined
   defaultLlm: string | undefined
+  name?: string
+  type?: number
+  model_config?: ModelConfigItem
+  isNewProvider?: boolean
 }
 export interface ModelDetailData extends ModelListData {
   enable: boolean
@@ -46,6 +56,7 @@ export type AiSettingListItem = {
   enable: boolean
   configured: boolean
   priority?: number
+  type?: string | number
 }
 
 export type AiProviderLlmsItems = {
@@ -53,6 +64,7 @@ export type AiProviderLlmsItems = {
   logo: string
   scopes: ('chat' | 'completions')[]
   config: string
+  name: string
 }
 
 export type AiProviderDefaultConfig = {

@@ -105,7 +105,9 @@ func (i *imlProviderModule) OnInit() {
 				}
 			} else {
 				provider, _ := model_runtime.NewCustomizeProvider(p.Id, p.Name, iModels, p.DefaultLLM, p.Config)
-				model_runtime.Register(p.Id, provider)
+				if provider != nil {
+					model_runtime.Register(p.Id, provider)
+				}
 			}
 		}
 		i.transaction.Transaction(ctx, func(ctx context.Context) error {
@@ -644,9 +646,11 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 		}
 		// customize provider
 		if info.Type == 1 {
-			if uri, uriErr := model_runtime.GetCustomizeProviderURI(input.Config, false); uriErr != nil {
-				p.SetURI(uri)
+			uri, uriErr := model_runtime.GetCustomizeProviderURI(input.Config, false)
+			if uriErr != nil {
+				return uriErr
 			}
+			p.SetURI(uri)
 		}
 		if *pInfo.Status == 0 {
 			return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
