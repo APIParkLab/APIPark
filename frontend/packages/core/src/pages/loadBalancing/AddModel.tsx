@@ -182,7 +182,9 @@ const AddLoadBalancingModel = forwardRef<LoadBalancingHandle>((props, ref: any) 
       {modelType === 'online' && (
         <Form.Item<LoadModelDetailData> label={$t('模型供应商')} name="provider" rules={[{ required: true }]}>
           <Select
+            showSearch
             className="w-INPUT_NORMAL"
+            filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
             placeholder={$t(PLACEHOLDER.select)}
             loading={modelProviderLoading}
             options={modelProviderData?.map((x) => ({
@@ -191,7 +193,8 @@ const AddLoadBalancingModel = forwardRef<LoadBalancingHandle>((props, ref: any) 
                 <div className="flex items-center gap-[10px]">
                   <span>{x.name}</span>
                 </div>
-              )
+              ),
+              searchText: x.name.toLowerCase()
             }))}
             onChange={(e) => {
               modelProviderChange(e)
@@ -201,8 +204,10 @@ const AddLoadBalancingModel = forwardRef<LoadBalancingHandle>((props, ref: any) 
       )}
       <Form.Item label={$t('模型')} name="model" className="mt-[16px]" rules={[{ required: true }]}>
         <Select
+          showSearch
           className="w-INPUT_NORMAL"
           placeholder={$t(PLACEHOLDER.input)}
+          filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
           loading={llmListLoading}
           options={
             llmList?.map((x) => ({
@@ -212,7 +217,8 @@ const AddLoadBalancingModel = forwardRef<LoadBalancingHandle>((props, ref: any) 
                     <span>{x.name || x.id}</span>
                     { modelType === 'online' &&x?.scopes?.map((s: any) => <Tag key={s}>{s?.toLocaleUpperCase()}</Tag>)}
                   </div>
-                )
+                ),
+                searchText: x.name.toLowerCase()
               }))
           }
           onChange={(value) => {
