@@ -97,6 +97,10 @@ func NewModel(data string, logo string) (IModel, error) {
 	params := make(ParamValidator, 0, len(cfg.ParameterRules))
 	defaultConfig := make(map[string]interface{})
 	for _, p := range cfg.ParameterRules {
+		if (p.Default == nil || p.Default == "" || p.Default == 0 || p.Default == false) && !p.Required {
+			defaultConfig[p.Name] = nil
+			continue
+		}
 		t := p.Type
 		if t == "" {
 			t = ParameterTypeStr
