@@ -61,12 +61,7 @@ func (i *imlProviderModelModule) UpdateProviderModel(ctx *gin.Context, provider 
 	if modelInfo == nil || modelInfo.Provider != provider {
 		return fmt.Errorf("model not found")
 	}
-	// check model name duplicate
-	if has := i.providerModelService.CheckNameDuplicate(ctx, provider, input.Name, input.Id); has {
-		return fmt.Errorf("model name: `%s` duplicate", input.Name)
-	}
 	if err := i.providerModelService.Save(ctx, input.Id, &ai_model.Model{
-		Name:                &input.Name,
 		AccessConfiguration: &input.AccessConfiguration,
 		ModelParameters:     &input.ModelParameters,
 	}); err != nil {
@@ -114,6 +109,10 @@ func (i *imlProviderModelModule) AddProviderModel(ctx *gin.Context, provider str
 	// check model name duplicate
 	if has := i.providerModelService.CheckNameDuplicate(ctx, provider, input.Name, ""); has {
 		return nil, fmt.Errorf("model name: `%s` duplicate", input.Name)
+	}
+	// check provider model exist
+	if _, has := p.GetModel(input.Name); has {
+		return nil, fmt.Errorf("provider model already exist")
 	}
 	id := uuid.New().String()
 	typeValue := "chat"
