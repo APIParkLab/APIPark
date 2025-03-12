@@ -72,10 +72,13 @@ func (i *imlProviderModelService) CheckNameDuplicate(ctx context.Context, provid
 	v, _ := i.store.First(ctx, map[string]interface{}{"provider": provider, "name": name})
 	if v == nil {
 		return false
-	} else if excludeId != "" && v.UUID != excludeId {
-		return true
+	} else {
+		if excludeId == "" {
+			return true
+		} else {
+			return v.UUID != excludeId
+		}
 	}
-	return false
 }
 
 func (i *imlProviderModelService) OnComplete() {

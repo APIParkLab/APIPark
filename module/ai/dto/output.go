@@ -37,15 +37,16 @@ type ModelConfig struct {
 }
 
 type ConfiguredProviderItem struct {
-	Id         string         `json:"id"`
-	Name       string         `json:"name"`
-	Logo       string         `json:"logo"`
-	DefaultLLM string         `json:"default_llm"`
-	Status     ProviderStatus `json:"status"`
-	APICount   int64          `json:"api_count"`
-	KeyCount   int64          `json:"key_count"`
-	ModelCount int64          `json:"model_count"`
-	CanDelete  bool           `json:"can_delete"`
+	Id             string         `json:"id"`
+	Name           string         `json:"name"`
+	Logo           string         `json:"logo"`
+	DefaultLLM     string         `json:"default_llm"`
+	DefaultLLMName string         `json:"default_llm_name"`
+	Status         ProviderStatus `json:"status"`
+	APICount       int64          `json:"api_count"`
+	KeyCount       int64          `json:"key_count"`
+	ModelCount     int64          `json:"model_count"`
+	CanDelete      bool           `json:"can_delete"`
 }
 
 type KeyStatus struct {

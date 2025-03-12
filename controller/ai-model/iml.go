@@ -24,7 +24,7 @@ func (i *imlProviderModelController) GetModelParametersTemplate(ctx *gin.Context
 
 func (i *imlProviderModelController) UpdateProviderModel(ctx *gin.Context, provider string, input *model_dto.EditModel) error {
 	if !common.ModelNameValid(input.Name) {
-		return fmt.Errorf("model name is invalid(a-zA-Z0-9-_.:)")
+		return fmt.Errorf("model name is invalid(a-zA-Z0-9-_.:/)")
 	}
 	if strings.TrimSpace(input.Id) == "" {
 		return fmt.Errorf("id is empty")
@@ -56,7 +56,7 @@ func (i *imlProviderModelController) DeleteProviderModel(ctx *gin.Context, provi
 
 func (i *imlProviderModelController) AddProviderModel(ctx *gin.Context, provider string, input *model_dto.Model) (*model_dto.SimpleModel, error) {
 	if !common.ModelNameValid(input.Name) {
-		return nil, fmt.Errorf("model name illegal(a-zA-Z0-9-_.:)")
+		return nil, fmt.Errorf("model name illegal(a-zA-Z0-9-_.:/)")
 	}
 	if strings.TrimSpace(provider) == "" {
 		return nil, fmt.Errorf("provider is empty")
