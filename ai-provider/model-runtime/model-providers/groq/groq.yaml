@@ -32,7 +32,7 @@ provider_credential_schema:
         en_US: Enter your API Key
     - variable: base_url
       label:
-        en_US: https://router.huggingface.co/hf-inference/v1
+        en_US: https://api.groq.com/openai/v1
       type: text-input
       required: false
       placeholder:
