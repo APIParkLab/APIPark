@@ -1,4 +1,4 @@
-model: claude-3-sonnet@20240229
+model: google/claude-3-sonnet@20240229
 label:
   en_US: Claude 3 Sonnet
 model_type: llm
