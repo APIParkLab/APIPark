@@ -456,7 +456,7 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 	if !has {
 		return nil, fmt.Errorf("ai provider not found")
 	}
-
+	providerModelConfig := p.GetModelConfig()
 	info, err := i.providerService.Get(ctx, id)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -466,7 +466,6 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		if !has {
 			defaultLLM, _ = model_runtime.NewCustomizeModel("", "", "", "", "")
 		}
-		providerModelConfig := p.GetModelConfig()
 		return &ai_dto.Provider{
 			Id:               p.ID(),
 			Name:             p.Name(),
@@ -505,8 +504,8 @@ func (i *imlProviderModule) Provider(ctx context.Context, id string) (*ai_dto.Pr
 		Configured: true,
 		Type:       info.Type,
 		ModelConfig: ai_dto.ModelConfig{
-			AccessConfigurationStatus: false,
-			AccessConfigurationDemo:   "",
+			AccessConfigurationStatus: providerModelConfig.AccessConfigurationStatus,
+			AccessConfigurationDemo:   providerModelConfig.AccessConfigurationDemo,
 		},
 	}, nil
 }
