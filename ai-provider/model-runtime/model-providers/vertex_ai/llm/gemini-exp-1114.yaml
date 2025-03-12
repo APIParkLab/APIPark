@@ -1,4 +1,4 @@
-model: gemini-exp-1114
+model: google/gemini-exp-1114
 label:
   en_US: Gemini exp 1114
 model_type: llm
