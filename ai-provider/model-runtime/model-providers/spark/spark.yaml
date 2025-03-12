@@ -20,12 +20,20 @@ configurate_methods:
   - predefined-model
 provider_credential_schema:
   credential_form_schemas:
-    - variable: api_password
+    - variable: api_key
       label:
-        en_US: APIPassword
+        en_US: API Key
       type: secret-input
       required: true
       placeholder:
-        zh_Hans: 在此输入您的 APIPassword
-        en_US: Enter your APIPassword
-address: https://spark-api-open.xf-yun.com
+        zh_Hans: 在此输入您的 API Key
+        en_US: Enter your API Key
+    - variable: base_url
+      label:
+        en_US: https://spark-api-open.xf-yun.com/v1
+      type: text-input
+      required: false
+      placeholder:
+        zh_Hans: 在此输入您的 Base URL
+        en_US: Enter your Base URL
+address: https://spark-api-open.xf-yun.com/v1
