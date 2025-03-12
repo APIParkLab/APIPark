@@ -59,7 +59,7 @@ func (s *imlServiceGet[T, E]) List(ctx context.Context, uuids ...string) ([]*T, 
 			where = append(where, "uuid = ?")
 			args = append(args, uuids[0])
 		} else {
-			where = append(where, "uuid in ?")
+			where = append(where, "uuid in (?)")
 			args = append(args, uuids)
 		}
 	}

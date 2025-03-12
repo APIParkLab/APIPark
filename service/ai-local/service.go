@@ -14,6 +14,7 @@ type ILocalModelService interface {
 	universally.IServiceEdit[EditLocalModel]
 	universally.IServiceDelete
 	DefaultModel(ctx context.Context) (*LocalModel, error)
+	UpdateProvider(ctx context.Context, provider string, ids ...string) error
 }
 
 type ILocalModelPackageService interface {

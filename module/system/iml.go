@@ -49,7 +49,7 @@ func (i *imlSettingModule) Set(ctx context.Context, input *system_dto.InputSetti
 			}
 		}
 		if input.OllamaAddress != nil {
-			ai_provider_local.ResetOllamaAddress(*input.OllamaAddress)
+			ai_provider_local.ResetLocalAddress(*input.OllamaAddress)
 		}
 		return nil
 	})
@@ -61,7 +61,7 @@ func (i *imlSettingModule) OnInit() {
 
 		address, has := i.settingService.Get(ctx, "system.ai_model.ollama_address")
 		if has {
-			ai_provider_local.ResetOllamaAddress(address)
+			ai_provider_local.ResetLocalAddress(address)
 		}
 
 	})

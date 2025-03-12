@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
+
 	"github.com/APIParkLab/APIPark/model/plugin_model"
 	ai_api "github.com/APIParkLab/APIPark/module/ai-api"
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
@@ -48,7 +50,7 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 			}
 		}
 		if input.AiModel != nil {
-			provider := "ollama"
+			provider := ai_provider_local.ProviderLocal
 			if input.AiModel.Type != "local" {
 				provider = input.AiModel.Provider
 			}
@@ -107,7 +109,7 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 		}
 		//var upstream *string
 		if input.AiModel != nil {
-			provider := "ollama"
+			provider := ai_provider_local.ProviderLocal
 			if input.AiModel.Type != "local" {
 				provider = input.AiModel.Provider
 			}
