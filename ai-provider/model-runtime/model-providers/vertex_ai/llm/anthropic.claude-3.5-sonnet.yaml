@@ -1,4 +1,4 @@
-model: claude-3-5-sonnet@20240620
+model: google/claude-3-5-sonnet@20240620
 label:
   en_US: Claude 3.5 Sonnet
 model_type: llm
