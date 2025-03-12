@@ -1,4 +1,4 @@
-model: gemini-pro-experimental
+model: google/gemini-pro-experimental
 label:
   en_US: Gemini Pro Experimental
 model_type: llm
