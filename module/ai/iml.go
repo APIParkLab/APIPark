@@ -219,7 +219,7 @@ func (i *imlProviderModule) AddProvider(ctx context.Context, input *ai_dto.NewPr
 		Id:            input.Name,
 		Name:          input.Name,
 		DefaultConfig: config,
-		Logo:          model_runtime.GetCustomizeLogo(),
+		Logo:          iProvider.Logo(),
 	}, nil
 }
 
@@ -280,17 +280,21 @@ func (i *imlProviderModule) ConfiguredProviders(ctx context.Context, keyword str
 			continue
 		}
 		apiCount := aiAPIMap[l.Id]
-
+		defaultLLMName := ""
+		if defaultModel, has := p.GetModel(l.DefaultLLM); has {
+			defaultLLMName = defaultModel.Name()
+		}
 		providers = append(providers, &ai_dto.ConfiguredProviderItem{
-			Id:         l.Id,
-			Name:       l.Name,
-			Logo:       p.Logo(),
-			DefaultLLM: l.DefaultLLM,
-			Status:     ai_dto.ToProviderStatus(l.Status),
-			APICount:   apiCount,
-			KeyCount:   keyMap[l.Id],
-			CanDelete:  apiCount < 1,
-			ModelCount: int64(len(p.Models())),
+			Id:             l.Id,
+			Name:           l.Name,
+			Logo:           p.Logo(),
+			DefaultLLM:     l.DefaultLLM,
+			DefaultLLMName: defaultLLMName,
+			Status:         ai_dto.ToProviderStatus(l.Status),
+			APICount:       apiCount,
+			KeyCount:       keyMap[l.Id],
+			CanDelete:      apiCount < 1,
+			ModelCount:     int64(len(p.Models())),
 		})
 	}
 
