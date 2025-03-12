@@ -1,4 +1,4 @@
-model: claude-3-haiku@20240307
+model: google/claude-3-haiku@20240307
 label:
   en_US: Claude 3 Haiku
 model_type: llm
