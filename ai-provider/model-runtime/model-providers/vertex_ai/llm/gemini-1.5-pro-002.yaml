@@ -1,4 +1,4 @@
-model: gemini-1.5-pro-002
+model: google/gemini-1.5-pro-002
 label:
   en_US: Gemini 1.5 Pro 002
 model_type: llm

@@ -1,4 +1,4 @@
-model: gemini-flash-experimental
+model: google/gemini-flash-experimental
 label:
   en_US: Gemini Flash Experimental
 model_type: llm

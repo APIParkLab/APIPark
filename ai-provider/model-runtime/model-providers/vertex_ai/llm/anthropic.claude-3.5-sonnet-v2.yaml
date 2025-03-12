@@ -1,4 +1,4 @@
-model: claude-3-5-sonnet-v2@20241022
+model: google/claude-3-5-sonnet-v2@20241022
 label:
   en_US: Claude 3.5 Sonnet v2
 model_type: llm
