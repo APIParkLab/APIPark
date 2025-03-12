@@ -172,12 +172,14 @@ func (i *imlProviderModule) Delete(ctx context.Context, id string) error {
 			return err
 		}
 
+		// delete register customize provider
+		if p, _ := i.providerService.Get(ctx, id); p != nil && p.Type != 0 {
+			model_runtime.Remove(id)
+		}
 		err = i.providerService.Delete(ctx, id)
 		if err != nil {
 			return err
 		}
-		// delete register provider
-		model_runtime.Remove(id)
 		releases := make([]*gateway.DynamicRelease, 0, len(keys))
 		for _, key := range keys {
 			releases = append(releases, newKey(key))
