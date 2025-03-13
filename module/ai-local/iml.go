@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	ai_balance "github.com/APIParkLab/APIPark/service/ai-balance"
 
@@ -60,6 +61,7 @@ func (i *imlLocalModel) SyncLocalModels(ctx context.Context, address string) err
 	if err != nil {
 		return err
 	}
+
 	return i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
 }
 
@@ -246,7 +248,7 @@ func (i *imlLocalModel) pullHook(fn ...func() error) func(msg ai_provider_local.
 				v, _ := i.settingService.Get(ctx, "system.ai_model.ollama_address")
 
 				cfg := make(map[string]interface{})
-				cfg["provider"] = "ollama"
+				cfg["provider"] = ai_provider_local.ProviderLocal
 				cfg["model"] = msg.Model
 				cfg["model_config"] = ai_provider_local.LocalConfig
 				cfg["priority"] = 0
@@ -448,7 +450,7 @@ func (i *imlLocalModel) Enable(ctx context.Context, model string) error {
 			}
 			v, _ := i.settingService.Get(ctx, "system.ai_model.ollama_address")
 			cfg := make(map[string]interface{})
-			cfg["provider"] = "ollama"
+			cfg["provider"] = ai_provider_local.ProviderLocal
 			cfg["model"] = info.Id
 			cfg["model_config"] = ai_provider_local.LocalConfig
 			cfg["priority"] = 0
@@ -615,14 +617,14 @@ func (i *imlLocalModel) getLocalModels(ctx context.Context, v string) ([]*gatewa
 			return nil, errors.New("ollama_address not set")
 		}
 	}
-
+	provider := ai_provider_local.ProviderLocal
 	releases := make([]*gateway.DynamicRelease, 0, len(list))
 	for _, l := range list {
 		if l.State != ai_local_dto.LocalModelStateNormal.Int() {
 			continue
 		}
 		cfg := make(map[string]interface{})
-		cfg["provider"] = "ollama"
+		cfg["provider"] = provider
 		cfg["model"] = l.Id
 		cfg["model_config"] = ai_provider_local.LocalConfig
 		cfg["base"] = v
@@ -639,6 +641,25 @@ func (i *imlLocalModel) getLocalModels(ctx context.Context, v string) ([]*gatewa
 			Attr: cfg,
 		})
 	}
+	releases = append(releases, &gateway.DynamicRelease{
+		BasicItem: &gateway.BasicItem{
+			ID:          fmt.Sprintf("%s-key", ai_provider_local.ProviderLocal),
+			Description: "auto generate key",
+			Resource:    "ai-key",
+			Version:     time.Now().Format("20060102150405"),
+			MatchLabels: map[string]string{
+				"module": "ai-key",
+			},
+		},
+		Attr: map[string]interface{}{
+			"expired":  0,
+			"config":   fmt.Sprintf("{\"base\":\"%s\"}", v),
+			"provider": provider,
+			"priority": 1,
+			"disabled": true,
+		},
+	})
+
 	return releases, nil
 }
 
