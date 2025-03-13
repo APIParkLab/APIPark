@@ -1,5 +1,5 @@
 import { App, Col, Form, Input, Row, Table, Tooltip } from 'antd'
-import { forwardRef, useEffect, useImperativeHandle, useMemo } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react'
 import {
   PublishApprovalInfoType,
   PublishApprovalModalHandle,
@@ -36,6 +36,7 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
     const [form] = Form.useForm()
     const { fetchData } = useFetch()
     const { state } = useGlobalContext()
+    const versionInputRef = useRef<Input>(null)
 
     const save: (operate: 'pass' | 'refuse') => Promise<boolean | string> = (operate) => {
       if (type === 'view') {
@@ -140,6 +141,12 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
 
     useEffect(() => {
       form.setFieldsValue({ opinion: '', ...data })
+      // 如果是添加模式且insidePage为true，自动聚焦版本号输入框
+      if (type === 'add' && insidePage && versionInputRef.current) {
+        setTimeout(() => {
+          versionInputRef.current?.focus()
+        }, 100)
+      }
     }, [])
 
     const translatedUpstreamColumns = useMemo(
@@ -335,7 +342,12 @@ export const PublishApprovalModalContent = forwardRef<PublishApprovalModalHandle
             {insidePage && (
               <>
                 <Form.Item label={$t('版本号')} name="version" rules={[{ required: true, whitespace: true }]}>
-                  <Input className="w-INPUT_NORMAL" disabled={type !== 'add'} placeholder={$t(PLACEHOLDER.input)} />
+                  <Input 
+                    className="w-INPUT_NORMAL" 
+                    disabled={type !== 'add'} 
+                    placeholder={$t(PLACEHOLDER.input)}
+                    ref={versionInputRef}
+                  />
                 </Form.Item>
 
                 <Form.Item label={$t('版本说明')} name="versionRemark">

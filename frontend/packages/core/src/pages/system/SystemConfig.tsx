@@ -450,9 +450,14 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
                 >
                   {providerOptionList && providerOptionList.length > 0 ? (
                     <Select
+                      showSearch
                       className="w-INPUT_NORMAL"
+                      filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
                       placeholder={$t(PLACEHOLDER.input)}
-                      options={providerOptionList}
+                      options={providerOptionList.map((x) => ({
+                        ...x,
+                        searchText: x.name.toLowerCase()
+                      }))}
                       onChange={(e) => {
                         modelProviderChange(e)
                       }}
@@ -467,7 +472,16 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
                   )}
                 </Form.Item>
                 <Form.Item<AiServiceConfigFieldType> label={$t('默认模型')} name="model" rules={[{ required: true }]}>
-                  <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} options={modelList}></Select>
+                  <Select
+                    showSearch
+                    filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
+                    className="w-INPUT_NORMAL"
+                    placeholder={$t(PLACEHOLDER.input)}
+                    options={modelList ? modelList.map((x) => ({
+                      ...x,
+                      searchText: x.name.toLowerCase()
+                    })) : []}
+                  ></Select>
                 </Form.Item>
               </>
             )}
