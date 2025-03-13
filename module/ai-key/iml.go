@@ -383,12 +383,12 @@ func (i *imlKeyModule) UpdateKeyStatus(ctx context.Context, providerId string, i
 			}
 			releases := []*gateway.DynamicRelease{{
 				BasicItem: &gateway.BasicItem{
-					ID:       id,
+					ID:       fmt.Sprintf("%s-%s", providerId, id),
 					Resource: "ai-key",
 				},
 				Attr: nil,
 			}}
-			return i.syncGateway(ctx, providerId, releases, false)
+			return i.syncGateway(ctx, cluster.DefaultClusterID, releases, false)
 		}
 		if info.Status == ai_key_dto.KeyDisable.Int() || info.Status == ai_key_dto.KeyExceed.Int() {
 			// 超额 或 停用状态，可启用
@@ -411,7 +411,7 @@ func (i *imlKeyModule) UpdateKeyStatus(ctx context.Context, providerId string, i
 				return err
 			}
 			releases := []*gateway.DynamicRelease{newKey(info)}
-			return i.syncGateway(ctx, providerId, releases, true)
+			return i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
 		}
 		return nil
 	})

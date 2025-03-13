@@ -354,7 +354,8 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 		if !has {
 			return nil, fmt.Errorf("model %s not found", pv.DefaultLLM)
 		}
-		modelId = m.ID()
+		//modelId = m.ID()
+		modelId = m.Name()
 		modelCfg = m.DefaultConfig()
 
 	}
