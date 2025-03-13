@@ -512,8 +512,8 @@ func (i *imlLocalModel) OnInit() {
 		})
 		models, version := ai_provider_local.ModelsCanInstall()
 		for _, model := range models {
-
 			if v, ok := oldModels[model.Id]; ok {
+				delete(oldModels, model.Id)
 				if v.Version == version {
 					continue
 				}
@@ -541,7 +541,7 @@ func (i *imlLocalModel) OnInit() {
 					return
 				}
 			}
-			delete(oldModels, model.Id)
+
 		}
 		for id := range oldModels {
 			err = i.localModelPackageService.Delete(ctx, id)

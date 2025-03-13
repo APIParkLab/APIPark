@@ -21,7 +21,7 @@ type imlLocalModelService struct {
 }
 
 func (i *imlLocalModelService) UpdateProvider(ctx context.Context, provider string, ids ...string) error {
-	_, err := i.store.UpdateWhere(ctx, map[string]interface{}{"provider": provider}, map[string]interface{}{"uuid": ids})
+	_, err := i.store.UpdateField(ctx, "provider", provider, "uuid in (?)", ids)
 	return err
 }
 
