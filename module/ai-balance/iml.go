@@ -220,7 +220,8 @@ func (i *imlBalanceModule) Delete(ctx context.Context, id string) error {
 		return i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
 			{
 				BasicItem: &gateway.BasicItem{
-					ID: id,
+					ID:       id,
+					Resource: "ai-provider",
 				},
 			},
 		}, false)
