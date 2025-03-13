@@ -20,6 +20,15 @@ configurate_methods:
   - predefined-model
 provider_credential_schema:
   credential_form_schemas:
+    - variable: vertex_api_base
+      label:
+        zh_Hans: API Base
+        en_US: API Base
+      type: text-input
+      required: true
+      placeholder:
+        zh_Hans: 在此输入您的 API Base
+        en_US: Enter your API Base
     - variable: vertex_project_id
       label:
         en_US: Project ID
@@ -36,12 +45,12 @@ provider_credential_schema:
         en_US: Enter your Google Cloud Location
     - variable: vertex_service_account_key
       label:
-        en_US: Service Account Key (Leave blank if you use Application Default Credentials)
+        en_US: Enter your Google Cloud Service Account Key in base64 format
       type: secret-input
-      required: false
+      required: true
       placeholder:
         en_US: Enter your Google Cloud Service Account Key in base64 format
 address: https://api.openai.com
 model_config:
   access_configuration_status: true
-  access_configuration_demo: "{\"vertex_service_account_key\": \"\", \"vertex_location\": \"\", \"vertex_project_id\": \"\"}"
+  access_configuration_demo: "{\"vertex_location\": \"\", \"vertex_project_id\": \"\", \"vertex_model\":\"\"}"
