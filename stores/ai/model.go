@@ -138,7 +138,8 @@ type LocalModelPackage struct {
 	Name        string `gorm:"type:varchar(100);not null;column:name;comment:名称"`
 	Size        string `gorm:"type:varchar(100);not null;column:size;comment:模型大小"`
 	Hash        string `gorm:"type:varchar(100);not null;column:hash;comment:模型hash"`
-	Description string `gorm:"type:varchar(255);not null;column:description;comment:描述"`
+	Description string `gorm:"type:varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;not null;column:description;comment:描述"`
+	Text        string `gorm:"type:varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;not null;column:text;comment:描述"`
 	Version     string `gorm:"type:varchar(100);not null;column:version;comment:版本"`
 	IsPopular   bool   `gorm:"type:tinyint(1);not null;column:is_popular;comment:是否热门"`
 }
@@ -187,4 +188,3 @@ func (i *ProviderModel) TableName() string {
 func (i *ProviderModel) IdValue() int64 {
 	return i.Id
 }
-

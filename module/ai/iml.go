@@ -694,7 +694,6 @@ func (i *imlProviderModule) UpdateProviderConfig(ctx context.Context, id string,
 			}, newKey(defaultKey),
 		}, true)
 
-		return nil
 	})
 }
 
