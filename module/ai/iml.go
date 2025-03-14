@@ -201,12 +201,9 @@ func (i *imlProviderModule) Delete(ctx context.Context, id string) error {
 }
 
 func (i *imlProviderModule) AddProvider(ctx context.Context, input *ai_dto.NewProvider) (*ai_dto.SimpleProvider, error) {
-	switch input.Type {
-	case "customize":
-		_, has := model_runtime.GetProvider(strings.ToLower(input.Name))
-		if has {
-			return nil, fmt.Errorf("provider `%s` duplicate", input.Name)
-		}
+	_, has := model_runtime.GetProvider(strings.ToLower(input.Name))
+	if has {
+		return nil, fmt.Errorf("provider `%s` duplicate", input.Name)
 	}
 	// uuid = name
 	if has := i.providerService.CheckUuidDuplicate(ctx, input.Name); has {
@@ -249,7 +246,7 @@ func (i *imlProviderModule) SimpleProvider(ctx context.Context, id string) (*ai_
 
 func (i *imlProviderModule) ConfiguredProviders(ctx context.Context, keyword string) ([]*ai_dto.ConfiguredProviderItem, error) {
 	// 获取已配置的AI服务商
-	list, err := i.providerService.Search(ctx, keyword, nil, "update_at")
+	list, err := i.providerService.Search(ctx, keyword, nil, "update_at desc")
 	if err != nil {
 		return nil, fmt.Errorf("get provider list error:%v", err)
 	}

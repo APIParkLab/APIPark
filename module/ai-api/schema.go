@@ -23,10 +23,30 @@ func genOperation(summary string, description string, variables []*ai_api_dto.Ai
 	operation := openapi3.NewOperation()
 	operation.Summary = summary
 	operation.Description = description
+	operation.AddParameter(&openapi3.Parameter{
+		Name:     "Authorization",
+		In:       "header",
+		Required: true,
+		Example:  "Bearer {your_apipark_apikey}",
+	})
 	operation.RequestBody = genRequestBody(variables)
 	operation.Responses = &openapi3.Responses{}
 	operation.Responses.Set("200", genResponse())
 	return operation
+}
+
+func genRequestHeaders() openapi3.Parameters {
+	return openapi3.Parameters{
+		{
+			Value: &openapi3.Parameter{
+				Name:        "Authorization",
+				In:          "header",
+				Description: "your_apipark_apikey", // 替换Prompt的变量列表
+				Required:    true,
+				Example:     "your_apipark_apikey",
+			},
+		},
+	}
 }
 
 func genRequestParameters(variables []*ai_api_dto.AiPromptVariable) openapi3.Parameters {
