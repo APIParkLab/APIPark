@@ -396,15 +396,36 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 				}
 			}
 		}
-
-		err := i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
-			Sid:     input.Id,
-			Content: input.ModelMapping,
-		})
+		err := i.serviceService.Create(ctx, mo)
 		if err != nil {
 			return err
 		}
-		return i.serviceService.Create(ctx, mo)
+		if input.ModelMapping != "" {
+			m := make(map[string]string)
+			err = json.Unmarshal([]byte(input.ModelMapping), &m)
+			if err != nil {
+				return err
+			}
+			err = i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
+				Sid:     input.Id,
+				Content: input.ModelMapping,
+			})
+			if err != nil {
+				return err
+			}
+			client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
+			if err != nil {
+				return err
+			}
+			err = client.Hash().Online(ctx, &gateway.HashRelease{
+				HashKey: fmt.Sprintf("%s:%s", gateway.KeyServiceMapping, input.Id),
+				HashMap: m,
+			})
+			if err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 	if err != nil {
 		return nil, err
@@ -473,7 +494,7 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 
 			}
 		}
-		if input.ModelMapping != nil {
+		if input.ModelMapping != nil && *input.ModelMapping != "" {
 			m := make(map[string]string)
 			err = json.Unmarshal([]byte(*input.ModelMapping), &m)
 			if err != nil {
