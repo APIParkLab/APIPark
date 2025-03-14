@@ -1,7 +1,7 @@
 provider: bailian
 label:
   zh_Hans: 阿里云百炼
-  en_US: bailian
+  en_US: BaiLian
 icon_small:
   en_US: icon_s_en.svg
 icon_large:

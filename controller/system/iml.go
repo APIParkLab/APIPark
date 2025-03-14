@@ -395,36 +395,36 @@ func (i *imlInitController) createAIService(ctx context.Context, teamID string, 
 		if err != nil {
 			return err
 		}
-		path := fmt.Sprintf("/%s/demo_translation_api", strings.Trim(input.Prefix, "/"))
+		path := fmt.Sprintf("/%s/chat/completions", strings.Trim(input.Prefix, "/"))
 		timeout := 300000
 		retry := 0
 		aiPrompt := &ai_api_dto.AiPrompt{
-			Variables: []*ai_api_dto.AiPromptVariable{
-				{
-					Key:         "source_lang",
-					Description: "",
-					Require:     true,
-				},
-				{
-					Key:         "target_lang",
-					Description: "",
-					Require:     true,
-				},
-				{
-					Key:         "text",
-					Description: "",
-					Require:     true,
-				},
-			},
-			Prompt: "You need to translate {{source_lang}} into {{target_lang}}, and the following is the content that needs to be translated.\n---\n{{text}}",
+			//Variables: []*ai_api_dto.AiPromptVariable{
+			//	{
+			//		Key:         "source_lang",
+			//		Description: "",
+			//		Require:     true,
+			//	},
+			//	{
+			//		Key:         "target_lang",
+			//		Description: "",
+			//		Require:     true,
+			//	},
+			//	{
+			//		Key:         "text",
+			//		Description: "",
+			//		Require:     true,
+			//	},
+			//},
+			//Prompt: "You need to translate {{source_lang}} into {{target_lang}}, and the following is the content that needs to be translated.\n---\n{{text}}",
 		}
 		aiModel := &ai_api_dto.AiModel{
 			Id:       m.ID(),
 			Config:   m.DefaultConfig(),
 			Provider: providerId,
 		}
-		name := "Demo Translation API"
-		description := "A demo that shows you how to use a prompt to create a Translation API."
+		name := "Demo Chat API"
+		description := "A demo that shows you how to use a prompt to create a Chat API."
 		apiId := uuid.New().String()
 		err = i.aiAPIModule.Create(
 			ctx,
