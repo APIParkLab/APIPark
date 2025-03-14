@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
 
 	ai_model "github.com/APIParkLab/APIPark/service/ai-model"
@@ -200,6 +201,13 @@ func (i *imlProviderModule) Delete(ctx context.Context, id string) error {
 }
 
 func (i *imlProviderModule) AddProvider(ctx context.Context, input *ai_dto.NewProvider) (*ai_dto.SimpleProvider, error) {
+	switch input.Type {
+	case "customize":
+		_, has := model_runtime.GetProvider(strings.ToLower(input.Name))
+		if has {
+			return nil, fmt.Errorf("provider `%s` duplicate", input.Name)
+		}
+	}
 	// uuid = name
 	if has := i.providerService.CheckUuidDuplicate(ctx, input.Name); has {
 		return nil, fmt.Errorf("provider `%s` duplicate", input.Name)

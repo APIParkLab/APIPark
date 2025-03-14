@@ -17,4 +17,5 @@ type Sort struct {
 
 type NewProvider struct {
 	Name string `json:"name"`
+	Type string `json:"type"`
 }
