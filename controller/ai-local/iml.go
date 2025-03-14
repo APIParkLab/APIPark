@@ -267,7 +267,7 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 	})
 
 	return func() error {
-		path := fmt.Sprintf("/%s/chat", strings.Trim(prefix, "/"))
+		path := fmt.Sprintf("/%s/chat/completions", strings.Trim(prefix, "/"))
 		timeout := 300000
 		retry := 0
 		aiPrompt := &ai_api_dto.AiPrompt{
