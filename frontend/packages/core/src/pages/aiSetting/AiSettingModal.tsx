@@ -283,8 +283,9 @@ const AiSettingModalContent = forwardRef<AiSettingModalContentHandle, AiSettingM
       ),
       onOk: () => {
         return addModelModalRef.current?.save().then((res) => {
-          if (res === true) {
+          if (res) {
             getLlmList(lastLlmID)
+            form.setFieldValue('defaultLlm', res)
           }
         })
       },
