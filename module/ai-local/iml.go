@@ -614,7 +614,8 @@ func (i *imlLocalModel) getLocalModels(ctx context.Context, v string) ([]*gatewa
 		var has bool
 		v, has = i.settingService.Get(ctx, "system.ai_model.ollama_address")
 		if !has {
-			return nil, errors.New("ollama_address not set")
+			//return nil, errors.New("ollama_address not set")
+			return nil, nil
 		}
 	}
 	provider := ai_provider_local.ProviderLocal
