@@ -473,7 +473,7 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 
 			}
 		}
-		if input.ModelMapping != nil {
+		if input.ModelMapping != nil && *input.ModelMapping != "" {
 			m := make(map[string]string)
 			err = json.Unmarshal([]byte(*input.ModelMapping), &m)
 			if err != nil {

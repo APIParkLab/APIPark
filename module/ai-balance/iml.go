@@ -268,7 +268,8 @@ func (i *imlBalanceModule) getLocalBalances(ctx context.Context, v string) ([]*g
 		var has bool
 		v, has = i.settingService.Get(ctx, "system.ai_model.ollama_address")
 		if !has {
-			return nil, fmt.Errorf("ollama address not found")
+			//return nil, fmt.Errorf("ollama address not found")
+			return nil, nil
 		}
 	}
 
@@ -294,7 +295,8 @@ func (i *imlBalanceModule) getBalances(ctx context.Context) ([]*gateway.DynamicR
 	}
 	v, has := i.settingService.Get(ctx, "system.ai_model.ollama_address")
 	if !has {
-		return nil, fmt.Errorf("ollama address not found")
+		//return nil, fmt.Errorf("ollama address not found")
+		return nil, nil
 	}
 	releases := make([]*gateway.DynamicRelease, 0, len(balances))
 	for _, item := range balances {
@@ -305,6 +307,10 @@ func (i *imlBalanceModule) getBalances(ctx context.Context) ([]*gateway.DynamicR
 				continue
 			}
 			base = fmt.Sprintf("%s://%s%s", p.URI().Scheme(), p.URI().Host(), p.URI().Path())
+		} else {
+			if v == "" {
+				continue
+			}
 		}
 		releases = append(releases, newRelease(item, base))
 	}
