@@ -27,7 +27,7 @@ func genOperation(summary string, description string, variables []*ai_api_dto.Ai
 		Name:     "Authorization",
 		In:       "header",
 		Required: true,
-		Example:  "Bearer {your_apipark_apikey}",
+		Example:  "{your_apipark_apikey}",
 	})
 	operation.RequestBody = genRequestBody(variables)
 	operation.Responses = &openapi3.Responses{}
