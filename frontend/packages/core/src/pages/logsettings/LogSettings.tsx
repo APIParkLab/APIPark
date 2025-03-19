@@ -40,7 +40,7 @@ const LogSettings = () => {
   const menuData = useMemo(() => {
     const newMenu = menuItems?.map((x: DynamicMenuItem) => {
       return getItem(
-        <Link to={`template/${x.name}`}>{$t(x.title)}</Link>,
+        <Link to={`/logsettings/template/${x.name}`}>{$t(x.title)}</Link>,
         x.name,
         undefined,
         undefined,
