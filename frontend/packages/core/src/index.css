@@ -666,6 +666,15 @@ p{
   display: none;
 }
 
+.apipark-layout-base-menu-horizontal-menu-item {
+  padding-right: 0px !important;
+  padding-left: 0px !important;
+}
+.apipark-layout-base-menu-horizontal-item-title {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
 .ant-pro-table-list-toolbar-setting-items{
   position:absolute;
   top:18px;
