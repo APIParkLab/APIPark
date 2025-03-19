@@ -56,7 +56,7 @@ body:
           label: Environment
           description: Share your environment details. Reports without proper environment details will likely be closed.
           value: |
-              - APINTO Dashboard version:
+              - ApiPark version:
               - Operating system (run `uname -a`):
       validations:
           required: true
