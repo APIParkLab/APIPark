@@ -1,0 +1,243 @@
+{
+  "moonshot": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "response_format": ""
+  },
+  "cohere": {
+    "temperature": "temperature",
+    "p": "top_p",
+    "k": "",
+    "presence_penalty": "presence_penalty",
+    "frequency_penalty": "frequency_penalty",
+    "max_tokens": "max_tokens",
+    "preamble_override": "",
+    "prompt_truncation": ""
+  },
+  "zhipuai": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "do_sample": "",
+    "max_tokens": "max_tokens",
+    "web_search": "",
+    "response_format": "",
+    "stream": "",
+    "return_type": ""
+  },
+  "chatglm": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens"
+  },
+  "mistralai": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "safe_prompt": "",
+    "random_seed": ""
+  },
+  "openrouter": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "top_k": "",
+    "context_length_exceeded_behavior": "",
+    "response_format": "response_format",
+    "presence_penalty": "presence_penalty",
+    "frequency_penalty": "frequency_penalty",
+    "seed": ""
+  },
+  "siliconflow": {
+    "max_tokens": "max_tokens",
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "frequency_penalty": "frequency_penalty",
+    "top_k": "",
+    "response_format": "",
+    "seed": "",
+    "repetition_penalty": ""
+  },
+  "google": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "top_k": "",
+    "max_output_tokens": "max_tokens",
+    "json_schema": "json_schema",
+    "max_tokens_to_sample": "max_tokens",
+    "response_format": "response_format"
+  },
+  "fireworks": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "top_k": "",
+    "max_tokens": "max_tokens",
+    "context_length_exceeded_behavior": "",
+    "response_format": "response_format"
+  },
+  "authropic": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "top_k": "",
+    "max_tokens": "max_tokens",
+    "response_format": "response_format"
+  },
+  "groq": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "response_format": ""
+  },
+  "novita": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "frequency_penalty": "frequency_penalty",
+    "presence_penalty": "presence_penalty"
+  },
+  "wenxin": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "presence_penalty": "presence_penalty",
+    "frequency_penalty": "frequency_penalty",
+    "response_format": "response_format",
+    "disable_search": "",
+    "min_output_tokens": "max_tokens",
+    "max_output_tokens": "max_tokens"
+  },
+  "vertex_ai": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "top_k": "",
+    "max_output_tokens": "max_tokens",
+    "json_schema": "json_schema",
+    "presence_penalty": "presence_penalty",
+    "frequency_penalty": "frequency_penalty",
+    "max_tokens": "max_tokens"
+  },
+  "fakegpt": {
+    "max_tokens": "max_tokens",
+    "temperature": "temperature",
+    "top_p": "",
+    "top_k": ""
+  },
+  "minimax": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "mask_sensitive_info": "",
+    "presence_penalty": "presence_penalty",
+    "frequency_penalty": "frequency_penalty",
+    "plugin_web_search": ""
+  },
+  "deepseek": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "logprobs": "",
+    "top_logprobs": "",
+    "frequency_penalty": "frequency_penalty",
+    "response_format": ""
+  },
+  "bedrock": {
+    "max_tokens": "max_tokens",
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "top_k": "top_k",
+    "response_format": "response_format",
+    "max_gen_len": "max_tokens",
+    "max_new_tokens": "max_tokens",
+    "p": "top_p",
+    "k": "",
+    "presence_penalty": "presence_penalty",
+    "frequency_penalty": "frequency_penalty",
+    "topP": "top_p",
+    "maxTokens": "max_tokens",
+    "count_penalty": "",
+    "maxTokenCount": "max_tokens"
+  },
+  "zhinao": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "frequency_penalty": "frequency_penalty",
+    "presence_penalty": "presence_penalty"
+  },
+  "stepfun": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens"
+  },
+  "hunyuan": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "enable_enhance": ""
+  },
+  "yi": {
+    "temperature": "temperature",
+    "max_tokens": "max_tokens",
+    "top_p": "top_p"
+  },
+  "baichuan": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "top_k": "",
+    "max_tokens": "max_tokens",
+    "with_search_enhance": "",
+    "presence_penalty": "presence_penalty",
+    "frequency_penalty": "frequency_penalty",
+    "res_format": ""
+  },
+  "nvidia": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "frequency_penalty": "frequency_penalty",
+    "presence_penalty": "presence_penalty",
+    "random_seed": "",
+    "frequency_penalt": "frequency_penalty"
+  },
+  "upstage": {
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "max_tokens": "max_tokens",
+    "seed": ""
+  },
+  "perfxcloud": {
+    "temperature": "temperature",
+    "max_tokens": "max_tokens",
+    "top_p": "top_p",
+    "top_k": "",
+    "repetition_penalty": ""
+  },
+  "tongyi": {
+    "temperature": "temperature",
+    "max_tokens": "max_tokens",
+    "top_p": "top_p",
+    "top_k": "",
+    "seed": "",
+    "repetition_penalty": "",
+    "response_format": "response_format",
+    "enable_search": "",
+    "frequency_penalty": "frequency_penalty"
+  },
+  "spark": {
+    "temperature": "temperature",
+    "max_tokens": "max_tokens",
+    "top_k": "",
+    "show_ref_label": ""
+  },
+  "openAI": {
+    "max_tokens": "max_tokens",
+    "reasoning_effort": "",
+    "response_format": "response_format",
+    "temperature": "temperature",
+    "top_p": "top_p",
+    "presence_penalty": "presence_penalty",
+    "frequency_penalty": "frequency_penalty",
+    "seed": "",
+    "json_schema": "json_schema"
+  }
+}

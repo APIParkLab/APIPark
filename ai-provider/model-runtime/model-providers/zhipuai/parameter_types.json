@@ -1,0 +1,10 @@
+{
+  "temperature": "float",
+  "top_p": "float",
+  "do_sample": "boolean",
+  "max_tokens": "int",
+  "web_search": "boolean",
+  "response_format": "string",
+  "stream": "boolean",
+  "return_type": "string"
+}

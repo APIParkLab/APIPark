@@ -1,0 +1,6 @@
+{
+  "temperature": "temperature",
+  "max_tokens": "max_tokens",
+  "top_k": "",
+  "show_ref_label": ""
+}

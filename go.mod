@@ -15,6 +15,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/google/uuid v1.6.0
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
+	github.com/mark3labs/mcp-go v0.17.0
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/ollama/ollama v0.5.8
 	github.com/urfave/cli v1.22.16
@@ -63,6 +64,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
+	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.13 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
@@ -84,4 +86,4 @@ require (
 //replace github.com/eolinker/ap-account => ../../eolinker/ap-account
 
 //
-//replace github.com/eolinker/go-common => ../../eolinker/go-common
+replace github.com/eolinker/go-common => ../../eolinker/go-common

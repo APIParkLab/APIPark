@@ -1,0 +1,9 @@
+{
+  "temperature": "float",
+  "top_p": "float",
+  "max_tokens": "int",
+  "logprobs": "boolean",
+  "top_logprobs": "int",
+  "frequency_penalty": "float",
+  "response_format": "string"
+}

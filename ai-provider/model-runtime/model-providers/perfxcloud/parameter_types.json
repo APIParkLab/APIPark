@@ -1,0 +1,7 @@
+{
+  "temperature": "float",
+  "max_tokens": "int",
+  "top_p": "float",
+  "top_k": "int",
+  "repetition_penalty": "float"
+}

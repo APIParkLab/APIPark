@@ -1,0 +1,10 @@
+{
+  "temperature": "temperature",
+  "p": "top_p",
+  "k": "",
+  "presence_penalty": "presence_penalty",
+  "frequency_penalty": "frequency_penalty",
+  "max_tokens": "max_tokens",
+  "preamble_override": "",
+  "prompt_truncation": ""
+}

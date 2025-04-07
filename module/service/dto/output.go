@@ -56,6 +56,7 @@ type ServiceItem struct {
 	Provider    *auto.Label    `json:"provider,omitempty" aolabel:"ai_provider"`
 	State       string         `json:"state"`
 	CanDelete   bool           `json:"can_delete"`
+	EnableMCP   bool           `json:"enable_mcp"`
 }
 
 type AppItem struct {
@@ -101,11 +102,12 @@ type Service struct {
 	ProviderType string         `json:"provider_type,omitempty"`
 	Model        string         `json:"model,omitempty"`
 	ApprovalType string         `json:"approval_type"`
-	AsServer     bool           `json:"as_server"`
-	AsApp        bool           `json:"as_app"`
 	ServiceKind  string         `json:"service_kind"`
 	State        string         `json:"state"`
 	ModelMapping string         `json:"model_mapping"`
+	AsServer     bool           `json:"as_server"`
+	AsApp        bool           `json:"as_app"`
+	EnableMCP    bool           `json:"enable_mcp"`
 }
 
 type App struct {
@@ -139,6 +141,7 @@ func ToService(model *service.Service) *Service {
 		AsServer:     model.AsServer,
 		AsApp:        model.AsApp,
 		ServiceKind:  model.Kind.String(),
+		EnableMCP:    model.EnableMCP,
 	}
 	state := FromServiceState(model.State)
 	if state == ServiceStateNormal {

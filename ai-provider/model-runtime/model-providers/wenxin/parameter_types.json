@@ -1,0 +1,11 @@
+{
+  "temperature": "float",
+  "top_p": "float",
+  "max_tokens": "int",
+  "presence_penalty": "float",
+  "frequency_penalty": "float",
+  "response_format": "",
+  "disable_search": "boolean",
+  "min_output_tokens": "int",
+  "max_output_tokens": "int"
+}

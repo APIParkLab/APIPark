@@ -35,43 +35,6 @@ func genOperation(summary string, description string, variables []*ai_api_dto.Ai
 	return operation
 }
 
-func genRequestHeaders() openapi3.Parameters {
-	return openapi3.Parameters{
-		{
-			Value: &openapi3.Parameter{
-				Name:        "Authorization",
-				In:          "header",
-				Description: "your_apipark_apikey", // 替换Prompt的变量列表
-				Required:    true,
-				Example:     "your_apipark_apikey",
-			},
-		},
-	}
-}
-
-func genRequestParameters(variables []*ai_api_dto.AiPromptVariable) openapi3.Parameters {
-	return openapi3.Parameters{
-		{
-			Value: &openapi3.Parameter{
-				Name:        "variables",
-				In:          "body",
-				Description: "Replace the variable list of Prompt", // 替换Prompt的变量列表
-				Schema:      genVariableSchema(variables).NewRef(),
-				Required:    true,
-			},
-		},
-		{
-			Value: &openapi3.Parameter{
-				Name:        "messages",
-				In:          "body",
-				Description: "Chat Message",
-				Schema:      messagesSchemaRef,
-				Required:    true,
-			},
-		},
-	}
-}
-
 func genRequestBody(variables []*ai_api_dto.AiPromptVariable) *openapi3.RequestBodyRef {
 	requestBody := openapi3.NewRequestBody()
 	requestBody.Content = openapi3.NewContentWithSchema(genRequestBodySchema(variables), []string{"application/json"})
@@ -96,6 +59,10 @@ func genRequestBodySchema(variables []*ai_api_dto.AiPromptVariable) *openapi3.Sc
 		result.WithProperty("variables", genVariableSchema(variables))
 		result.WithRequired([]string{"variables", "messages"})
 	}
+	streamSchema := openapi3.NewBoolSchema()
+	streamSchema.Title = "stream"
+	streamSchema.Description = "Whether to stream the response"
+	result.WithProperty("stream", streamSchema)
 
 	result.WithPropertyRef("messages", messagesSchemaRef)
 

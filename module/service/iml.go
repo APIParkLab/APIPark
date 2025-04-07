@@ -9,6 +9,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/eolinker/go-common/register"
+
+	"github.com/mark3labs/mcp-go/mcp"
+
+	mcp_server "github.com/APIParkLab/APIPark/mcp-server"
+
+	"github.com/APIParkLab/APIPark/service/release"
+
 	"github.com/APIParkLab/APIPark/gateway"
 
 	"github.com/APIParkLab/APIPark/service/cluster"
@@ -17,9 +25,9 @@ import (
 
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 
-	"github.com/eolinker/eosc/log"
-
 	"github.com/APIParkLab/APIPark/resources/access"
+	"github.com/eolinker/eosc/log"
+	"github.com/eolinker/go-common/server"
 
 	"github.com/eolinker/ap-account/service/role"
 
@@ -76,7 +84,81 @@ type imlServiceModule struct {
 	clusterService    cluster.IClusterService `autowired:""`
 	transaction       store.ITransaction      `autowired:""`
 
+	releaseService             release.IReleaseService                           `autowired:""`
 	serviceModelMappingService service_model_mapping.IServiceModelMappingService `autowired:""`
+}
+
+func (i *imlServiceModule) OnInit() {
+	register.Handle(func(v server.Server) {
+		ctx := context.Background()
+		services, err := i.serviceService.ServiceList(ctx)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		for _, s := range services {
+			err = i.updateMCPServer(ctx, s.Id, s.Name, "1.0")
+			if err != nil {
+				log.Error(err)
+				return
+			}
+		}
+	})
+}
+
+func (i *imlServiceModule) updateMCPServer(ctx context.Context, sid string, name string, version string) error {
+	r, err := i.releaseService.GetRunning(ctx, sid)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
+		return err
+	}
+	_, _, apiDocCommit, _, _, err := i.releaseService.GetReleaseInfos(ctx, r.UUID)
+	if err != nil {
+		return fmt.Errorf("get release info error: %w", err)
+	}
+	commitDoc, err := i.apiDocService.GetDocCommit(ctx, apiDocCommit.Commit)
+	if err != nil {
+		return fmt.Errorf("get api doc commit error: %w", err)
+	}
+	mcpInfo, err := mcp_server.ConvertMCPFromOpenAPI3Data([]byte(commitDoc.Data.Content))
+	if err != nil {
+		return fmt.Errorf("convert mcp from openapi3 data error: %w", err)
+	}
+	tools := make([]mcp_server.ITool, 0, len(mcpInfo.Apis))
+	for _, a := range mcpInfo.Apis {
+		toolOptions := make([]mcp.ToolOption, 0, len(a.Params)+2)
+		toolOptions = append(toolOptions, mcp.WithDescription(a.Description))
+		for _, v := range a.Params {
+			vSchema, err := v.MarshalJSON()
+			if err != nil {
+				return fmt.Errorf("marshal param schema error: %w", err)
+			}
+			key := fmt.Sprintf("%s#%s", v.In, v.Name)
+			description := fmt.Sprintf("%s\nparam schema is %s", v.Description, string(vSchema))
+			param := mcp.WithString(key, mcp.Description(description))
+			if v.Required {
+				param = mcp.WithString(key, mcp.Description(description), mcp.Required())
+			}
+
+			toolOptions = append(toolOptions, param)
+		}
+		if a.Body != nil {
+			bodySchema, err := json.Marshal(a.Body)
+			if err != nil {
+				return fmt.Errorf("marshal body schema error: %w", err)
+			}
+			toolOptions = append(toolOptions, mcp.WithString("body", mcp.Description(fmt.Sprintf("body schema is %s", string(bodySchema)))))
+		}
+		tools = append(tools, mcp_server.NewTool(a.Summary, a.Path, a.Method, a.ContentType, toolOptions...))
+	}
+	mcp_server.SetSSEServer(sid, name, version, tools...)
+	return nil
+}
+
+func (i *imlServiceModule) deleteMCPServer(ctx context.Context, sid string) {
+	mcp_server.DelSSEServer(sid)
 }
 
 func (i *imlServiceModule) ExportAll(ctx context.Context) ([]*service_dto.ExportService, error) {
@@ -305,6 +387,7 @@ func toServiceItem(model *service.Service) *service_dto.ServiceItem {
 		CreateTime:  auto.TimeLabel(model.CreateTime),
 		UpdateTime:  auto.TimeLabel(model.UpdateTime),
 		Team:        auto.UUID(model.Team),
+		EnableMCP:   model.EnableMCP,
 		ServiceKind: model.Kind.String(),
 	}
 	state := service_dto.FromServiceState(model.State)
@@ -351,6 +434,7 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 		ApprovalType:     service.ApprovalType(input.ApprovalType),
 		AdditionalConfig: make(map[string]string),
 		Kind:             service.Kind(input.Kind),
+		EnableMCP:        input.EnableMCP,
 	}
 	if mo.ServiceType == service.PublicService && mo.Catalogue == "" {
 		return nil, fmt.Errorf("catalogue can not be empty")
@@ -425,6 +509,14 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 				return err
 			}
 		}
+		if input.EnableMCP {
+			err = i.updateMCPServer(ctx, input.Id, input.Name, "1.0")
+			if err != nil {
+				return err
+			}
+		} else {
+			i.deleteMCPServer(ctx, input.Id)
+		}
 		return nil
 	})
 	if err != nil {
@@ -467,6 +559,7 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 			Catalogue:        input.Catalogue,
 			AdditionalConfig: &info.AdditionalConfig,
 			ApprovalType:     &approvalType,
+			EnableMCP:        input.EnableMCP,
 		}
 		if input.State != nil {
 			state := service_dto.ServiceState(*input.State).Int()
@@ -520,6 +613,21 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 			}
 		}
 
+		if input.EnableMCP != nil {
+			if *input.EnableMCP {
+				name := info.Name
+				if input.Name != nil {
+					name = *input.Name
+				}
+				err = i.updateMCPServer(ctx, id, name, "1.0")
+				if err != nil {
+					return err
+				}
+			} else {
+				i.deleteMCPServer(ctx, id)
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -551,9 +659,15 @@ func (i *imlServiceModule) Delete(ctx context.Context, id string) error {
 		if err != nil {
 			return err
 		}
-		return client.Hash().Offline(ctx, &gateway.HashRelease{
+
+		err = client.Hash().Offline(ctx, &gateway.HashRelease{
 			HashKey: fmt.Sprintf("%s:%s", gateway.KeyServiceMapping, id),
 		})
+		if err != nil {
+			return err
+		}
+		i.deleteMCPServer(ctx, id)
+		return nil
 	})
 	return err
 }

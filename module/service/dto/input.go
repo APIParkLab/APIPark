@@ -24,6 +24,7 @@ type CreateService struct {
 	AsApp        *bool    `json:"as_app"`
 	AsServer     *bool    `json:"as_server"`
 	ModelMapping string   `json:"model_mapping"`
+	EnableMCP    bool     `json:"enable_mcp"`
 }
 
 type EditService struct {
@@ -38,6 +39,7 @@ type EditService struct {
 	ApprovalType *string   `json:"approval_type"`
 	State        *string   `json:"state"`
 	ModelMapping *string   `json:"model_mapping"`
+	EnableMCP    *bool     `json:"enable_mcp"`
 }
 
 type CreateApp struct {

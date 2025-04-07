@@ -178,6 +178,7 @@ func createEntityHandler(i *Create) *service.Service {
 		Catalogue:        i.Catalogue,
 		AsServer:         i.AsServer,
 		AsApp:            i.AsApp,
+		EnableMCP:        i.EnableMCP,
 	}
 }
 func updateHandler(e *service.Service, i *Edit) {
@@ -208,6 +209,9 @@ func updateHandler(e *service.Service, i *Edit) {
 	}
 	if i.State != nil {
 		e.State = *i.State
+	}
+	if i.EnableMCP != nil {
+		e.EnableMCP = *i.EnableMCP
 	}
 	e.UpdateAt = time.Now()
 }
