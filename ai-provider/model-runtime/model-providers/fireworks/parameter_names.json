@@ -1,8 +1,0 @@
-{
-  "temperature": "temperature",
-  "top_p": "top_p",
-  "top_k": "",
-  "max_tokens": "max_tokens",
-  "context_length_exceeded_behavior": "",
-  "response_format": "response_format"
-}

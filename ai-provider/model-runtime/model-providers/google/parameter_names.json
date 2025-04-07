@@ -1,9 +1,0 @@
-{
-  "temperature": "temperature",
-  "top_p": "top_p",
-  "top_k": "",
-  "max_output_tokens": "max_tokens",
-  "json_schema": "json_schema",
-  "max_tokens_to_sample": "max_tokens",
-  "response_format": "response_format"
-}

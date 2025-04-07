@@ -1,5 +1,0 @@
-{
-  "temperature": "float",
-  "max_tokens": "int",
-  "top_p": "float"
-}
