@@ -10,6 +10,11 @@ import (
 type IMcpController interface {
 	MCPHandle(ctx *gin.Context)
 	GlobalMCPHandle(ctx *gin.Context)
+	GlobalHandleSSE(ctx *gin.Context)
+	GlobalHandleMessage(ctx *gin.Context)
+	ServiceHandleSSE(ctx *gin.Context)
+	ServiceHandleMessage(ctx *gin.Context)
+	GlobalMCPConfig(ctx *gin.Context) (string, error)
 }
 
 func init() {

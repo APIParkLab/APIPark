@@ -1,6 +1,11 @@
 package mcp
 
 import (
+	"fmt"
+	"net/http"
+	"strings"
+	"sync"
+
 	mcp_server "github.com/APIParkLab/APIPark/mcp-server"
 	"github.com/APIParkLab/APIPark/module/mcp"
 	"github.com/APIParkLab/APIPark/module/system"
@@ -15,7 +20,26 @@ var _ IMcpController = (*imlMcpController)(nil)
 type imlMcpController struct {
 	settingModule system.ISettingModule `autowired:""`
 	mcpModule     mcp.IMcpModule        `autowired:""`
-	server        *server.SSEServer
+	sessionKeys   sync.Map
+	server        http.Handler
+	openServer    http.Handler
+}
+
+var mcpDefaultConfig = `{
+  "mcpServers": {
+    "%s": {
+      "url": "%s"
+    }
+  }
+}
+`
+
+func (i *imlMcpController) GlobalMCPConfig(ctx *gin.Context) (string, error) {
+	cfg := i.settingModule.Get(ctx)
+	if cfg.SitePrefix == "" {
+		return "", fmt.Errorf("site prefix is empty")
+	}
+	return fmt.Sprintf(mcpDefaultConfig, "APIPark-MCP-Server", fmt.Sprintf("%s/openapi/v1/%s/sse?apikey={your_api_key}", strings.TrimSuffix(cfg.SitePrefix, "/"), mcp_server.GlobalBasePath)), nil
 }
 
 func (i *imlMcpController) OnComplete() {
@@ -38,15 +62,8 @@ func (i *imlMcpController) OnComplete() {
 	)
 	s.AddTool(
 		mcp2.NewTool(
-			"apipark_subscriber_authorization_list",
-			mcp2.WithDescription("This tool is a standardized MCP (Model Context Protocol) interface provided by the Apipark platform, designed to retrieve authorization credentials for subscribers who have access to specific services. By invoking this tool, users obtain critical authentication metadata (e.g., API keys, OAuth tokens) required to securely invoke APIs via apipark_invoke_api, ensuring compliant and permission-bound integrations."),
-			mcp2.WithString("service", mcp2.Description("Service ID"), mcp2.Required()),
-		),
-		i.mcpModule.SubscriberAuthorizations)
-	s.AddTool(
-		mcp2.NewTool(
 			"apipark_invoke_api",
-			mcp2.WithDescription("This tool is a core MCP (Model Context Protocol) interface provided by the Apipark platform, enabling users to programmatically invoke APIs using metadata from apipark_service_api_list (API schemas) and credentials from apipark_subscriber_authorization_list. It acts as a unified gateway for executing API requests with built-in authentication, parameter validation, and error handling, returning structured responses for integration workflows."),
+			mcp2.WithDescription("This tool is a core MCP (Model Context Protocol) interface provided by the Apipark platform, enabling users to programmatically invoke APIs using metadata from apipark_service_api_list (API schemas). It acts as a unified gateway for executing API requests with built-in authentication, parameter validation, and error handling, returning structured responses for integration workflows."),
 			mcp2.WithString("path", mcp2.Description("API path"), mcp2.Required()),
 			mcp2.WithString("method", mcp2.Description("API method"), mcp2.Required()),
 			mcp2.WithString("content-type", mcp2.Description("API Request Content-Type. If method is POST,PUT,PATCH, it must be set. If not set, it will be ignored.")),
@@ -56,17 +73,69 @@ func (i *imlMcpController) OnComplete() {
 		),
 		i.mcpModule.Invoke,
 	)
-	i.server = server.NewSSEServer(s, server.WithBasePath(mcp_server.GlobalBasePath))
+	i.server = server.NewSSEServer(s, server.WithBasePath(fmt.Sprintf("/api/v1/%s", mcp_server.GlobalBasePath)))
+	i.openServer = server.NewSSEServer(s, server.WithBasePath(fmt.Sprintf("/openapi/v1/%s", strings.Trim(mcp_server.GlobalBasePath, "/"))))
 }
 
 func (i *imlMcpController) GlobalMCPHandle(ctx *gin.Context) {
 	cfg := i.settingModule.Get(ctx)
 	req := ctx.Request.WithContext(utils.SetGatewayInvoke(ctx.Request.Context(), cfg.InvokeAddress))
+
 	i.server.ServeHTTP(ctx.Writer, req)
+}
+
+func (i *imlMcpController) GlobalHandleSSE(ctx *gin.Context) {
+	i.handleSSE(ctx, i.openServer)
+}
+
+func (i *imlMcpController) handleSSE(ctx *gin.Context, server http.Handler) {
+	apikey := ctx.Request.URL.Query().Get("apikey")
+	writer := &ResponseWriter{
+		Writer:    ctx.Writer,
+		sessionId: make(chan string),
+	}
+	defer close(writer.sessionId)
+	sessionId := ""
+	go func() {
+		var ok bool
+		sessionId, ok = <-writer.sessionId
+		if !ok {
+			return
+		}
+		i.sessionKeys.Store(sessionId, apikey)
+	}()
+	server.ServeHTTP(writer, ctx.Request)
+	i.sessionKeys.Delete(sessionId)
+}
+
+func (i *imlMcpController) GlobalHandleMessage(ctx *gin.Context) {
+	i.handleMessage(ctx, i.openServer)
 }
 
 func (i *imlMcpController) MCPHandle(ctx *gin.Context) {
 	cfg := i.settingModule.Get(ctx)
+
 	req := ctx.Request.WithContext(utils.SetGatewayInvoke(ctx.Request.Context(), cfg.InvokeAddress))
 	mcp_server.ServeHTTP(ctx.Writer, req)
+}
+
+func (i *imlMcpController) ServiceHandleSSE(ctx *gin.Context) {
+	i.handleSSE(ctx, mcp_server.DefaultMCPServer())
+}
+
+func (i *imlMcpController) ServiceHandleMessage(ctx *gin.Context) {
+	i.handleMessage(ctx, mcp_server.DefaultMCPServer())
+}
+
+func (i *imlMcpController) handleMessage(ctx *gin.Context, server http.Handler) {
+	sessionId := ctx.Request.URL.Query().Get("sessionId")
+	apikey, ok := i.sessionKeys.Load(sessionId)
+	if !ok {
+		ctx.String(403, "sessionId not found")
+		return
+	}
+	cfg := i.settingModule.Get(ctx)
+	req := ctx.Request.WithContext(utils.SetGatewayInvoke(ctx.Request.Context(), cfg.InvokeAddress))
+	req = req.WithContext(utils.SetLabel(req.Context(), "apikey", apikey.(string)))
+	server.ServeHTTP(ctx.Writer, req)
 }

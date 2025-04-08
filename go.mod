@@ -16,6 +16,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
 	github.com/mark3labs/mcp-go v0.17.0
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/ollama/ollama v0.5.8
 	github.com/urfave/cli v1.22.16

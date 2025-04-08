@@ -19,6 +19,13 @@ type ITool interface {
 	RegisterMCP(s *server.MCPServer)
 }
 
+const (
+	MCPBody   = "Body"
+	MCPHeader = "Header"
+	MCPQuery  = "Query"
+	MCPPath   = "Path"
+)
+
 type Tool struct {
 	name        string
 	url         string
@@ -56,26 +63,33 @@ func (t *Tool) RegisterMCP(s *server.MCPServer) {
 		headers := make(map[string]string)
 		body := ""
 		for k, v := range request.Params.Arguments {
-			if k == "body" {
+			if k == "Body" {
 				tmp, _ := json.Marshal(v)
 				body = string(tmp)
 				continue
 			}
-			sps := strings.SplitN(k, "#", 2)
-			if len(sps) != 2 {
-				return nil, fmt.Errorf("invalid key %s", k)
+			tmp, ok := v.(map[string]interface{})
+			if !ok {
+				continue
 			}
-			switch sps[0] {
-			case "query":
-				queries.Set(sps[1], v.(string))
-			case "header":
-				headers[sps[1]] = v.(string)
-			case "path":
-				p, ok := v.(string)
-				if !ok {
-					return nil, fmt.Errorf("invalid path %s", v)
+			switch k {
+			case MCPHeader:
+				for kk, vv := range tmp {
+					headers[kk] = fmt.Sprintf("%v", vv)
 				}
-				path = strings.Replace(path, fmt.Sprintf("{%s}", sps[1]), p, -1)
+
+			case MCPQuery:
+				for kk, vv := range tmp {
+					queries.Set(kk, fmt.Sprintf("%v", vv))
+				}
+			case MCPPath:
+				for kk, vv := range tmp {
+					p, ok := vv.(string)
+					if !ok {
+						return nil, fmt.Errorf("invalid path %s", v)
+					}
+					path = strings.Replace(path, fmt.Sprintf("{%s}", kk), p, -1)
+				}
 			}
 		}
 		u.Path = path
@@ -91,6 +105,11 @@ func (t *Tool) RegisterMCP(s *server.MCPServer) {
 		if t.contentType != "" {
 			req.Header.Set("Content-Type", t.contentType)
 		}
+		apikey := utils.Label(ctx, "apikey")
+		if apikey != "" {
+			req.Header.Set("Authorization", utils.Md5(apikey))
+		}
+
 		resp, err := client.Do(req)
 		if err != nil {
 			return nil, err

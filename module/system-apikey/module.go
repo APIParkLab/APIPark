@@ -6,6 +6,7 @@ import (
 
 	"github.com/eolinker/go-common/autowire"
 
+	"github.com/APIParkLab/APIPark/gateway"
 	system_apikey_dto "github.com/APIParkLab/APIPark/module/system-apikey/dto"
 )
 
@@ -19,7 +20,9 @@ type IAPIKeyModule interface {
 }
 
 func init() {
+	apikeyModule := new(imlAPIKeyModule)
 	autowire.Auto[IAPIKeyModule](func() reflect.Value {
-		return reflect.ValueOf(new(imlAPIKeyModule))
+		gateway.RegisterInitHandleFunc(apikeyModule.initGateway)
+		return reflect.ValueOf(apikeyModule)
 	})
 }

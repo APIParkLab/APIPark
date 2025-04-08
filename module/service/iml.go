@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mitchellh/mapstructure"
+
 	"github.com/eolinker/go-common/register"
 
 	"github.com/mark3labs/mcp-go/mcp"
@@ -19,9 +21,8 @@ import (
 
 	"github.com/APIParkLab/APIPark/gateway"
 
-	"github.com/APIParkLab/APIPark/service/cluster"
-
 	ai_local "github.com/APIParkLab/APIPark/service/ai-local"
+	"github.com/APIParkLab/APIPark/service/cluster"
 
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 
@@ -106,6 +107,45 @@ func (i *imlServiceModule) OnInit() {
 	})
 }
 
+func (i *imlServiceModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
+	services, err := i.serviceService.ServiceList(ctx)
+	if err != nil {
+		return err
+	}
+	subscribeReleases := make([]*gateway.SubscribeRelease, 0, len(services))
+	hashReleases := make([]*gateway.HashRelease, 0, len(services))
+	for _, s := range services {
+		subscribeReleases = append(subscribeReleases, &gateway.SubscribeRelease{
+			Service:     s.Id,
+			Application: "apipark-global",
+			Expired:     "0",
+		})
+
+		modelMap, err := i.serviceModelMappingService.Get(ctx, s.Id)
+		if err != nil {
+			return err
+		}
+		if modelMap.Content == "" {
+			continue
+		}
+		m := make(map[string]string)
+		err = json.Unmarshal([]byte(modelMap.Content), &m)
+		if err != nil {
+			return err
+		}
+		hashReleases = append(hashReleases, &gateway.HashRelease{
+			HashKey: fmt.Sprintf("%s:%s", gateway.KeyServiceMapping, s.Id),
+			HashMap: m,
+		})
+
+	}
+	err = clientDriver.Subscribe().Online(ctx, subscribeReleases...)
+	if err != nil {
+		return err
+	}
+	return clientDriver.Hash().Online(ctx, hashReleases...)
+}
+
 func (i *imlServiceModule) updateMCPServer(ctx context.Context, sid string, name string, version string) error {
 	r, err := i.releaseService.GetRunning(ctx, sid)
 	if err != nil {
@@ -130,26 +170,50 @@ func (i *imlServiceModule) updateMCPServer(ctx context.Context, sid string, name
 	for _, a := range mcpInfo.Apis {
 		toolOptions := make([]mcp.ToolOption, 0, len(a.Params)+2)
 		toolOptions = append(toolOptions, mcp.WithDescription(a.Description))
+		headers := make(map[string]interface{})
+		queries := make(map[string]interface{})
+		path := make(map[string]interface{})
 		for _, v := range a.Params {
-			vSchema, err := v.MarshalJSON()
-			if err != nil {
-				return fmt.Errorf("marshal param schema error: %w", err)
+			p := map[string]interface{}{
+				"type":        "string",
+				"required":    v.Required,
+				"description": v.Description,
 			}
-			key := fmt.Sprintf("%s#%s", v.In, v.Name)
-			description := fmt.Sprintf("%s\nparam schema is %s", v.Description, string(vSchema))
-			param := mcp.WithString(key, mcp.Description(description))
-			if v.Required {
-				param = mcp.WithString(key, mcp.Description(description), mcp.Required())
+			switch v.In {
+			case "header":
+				headers[v.Name] = p
+			case "query":
+				queries[v.Name] = p
+			case "path":
+				path[v.Name] = p
 			}
-
-			toolOptions = append(toolOptions, param)
+		}
+		if len(headers) > 0 {
+			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPHeader, mcp.Properties(headers), mcp.Description("request headers.")))
+		}
+		if len(queries) > 0 {
+			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPQuery, mcp.Properties(queries), mcp.Description("request queries.")))
+		}
+		if len(path) > 0 {
+			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPPath, mcp.Properties(path), mcp.Description("request path params.")))
 		}
 		if a.Body != nil {
-			bodySchema, err := json.Marshal(a.Body)
-			if err != nil {
-				return fmt.Errorf("marshal body schema error: %w", err)
+			type Schema struct {
+				Type       string                 `mapstructure:"type"`
+				Properties map[string]interface{} `mapstructure:"properties"`
+				Items      interface{}            `mapstructure:"items"`
 			}
-			toolOptions = append(toolOptions, mcp.WithString("body", mcp.Description(fmt.Sprintf("body schema is %s", string(bodySchema)))))
+			var tmp Schema
+			err = mapstructure.Decode(a.Body, &tmp)
+			if err != nil {
+				return err
+			}
+			switch tmp.Type {
+			case "object":
+				toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPBody, mcp.Properties(tmp.Properties), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
+			case "array":
+				toolOptions = append(toolOptions, mcp.WithArray(mcp_server.MCPBody, mcp.Items(tmp.Items), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
+			}
 		}
 		tools = append(tools, mcp_server.NewTool(a.Summary, a.Path, a.Method, a.ContentType, toolOptions...))
 	}
@@ -484,6 +548,18 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 		if err != nil {
 			return err
 		}
+		client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
+		if err != nil {
+			return err
+		}
+		err = client.Subscribe().Online(ctx, &gateway.SubscribeRelease{
+			Service:     mo.Id,
+			Application: "apipark-global",
+			Expired:     "0",
+		})
+		if err != nil {
+			return err
+		}
 		if input.ModelMapping != "" {
 			m := make(map[string]string)
 			err = json.Unmarshal([]byte(input.ModelMapping), &m)
@@ -497,10 +573,7 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 			if err != nil {
 				return err
 			}
-			client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
-			if err != nil {
-				return err
-			}
+
 			err = client.Hash().Online(ctx, &gateway.HashRelease{
 				HashKey: fmt.Sprintf("%s:%s", gateway.KeyServiceMapping, input.Id),
 				HashMap: m,
@@ -509,6 +582,7 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 				return err
 			}
 		}
+
 		if input.EnableMCP {
 			err = i.updateMCPServer(ctx, input.Id, input.Name, "1.0")
 			if err != nil {
@@ -587,6 +661,18 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 
 			}
 		}
+		client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
+		if err != nil {
+			return err
+		}
+		err = client.Subscribe().Online(ctx, &gateway.SubscribeRelease{
+			Service:     id,
+			Application: "apipark-global",
+			Expired:     "0",
+		})
+		if err != nil {
+			return err
+		}
 		if input.ModelMapping != nil && *input.ModelMapping != "" {
 			m := make(map[string]string)
 			err = json.Unmarshal([]byte(*input.ModelMapping), &m)
@@ -600,10 +686,7 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 			if err != nil {
 				return err
 			}
-			client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
-			if err != nil {
-				return err
-			}
+
 			err = client.Hash().Online(ctx, &gateway.HashRelease{
 				HashKey: fmt.Sprintf("%s:%s", gateway.KeyServiceMapping, id),
 				HashMap: m,
@@ -656,6 +739,14 @@ func (i *imlServiceModule) Delete(ctx context.Context, id string) error {
 			return err
 		}
 		client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
+		if err != nil {
+			return err
+		}
+		err = client.Subscribe().Offline(ctx, &gateway.SubscribeRelease{
+			Service:     id,
+			Application: "apipark-global",
+			Expired:     "0",
+		})
 		if err != nil {
 			return err
 		}

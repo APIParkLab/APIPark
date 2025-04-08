@@ -4,6 +4,8 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/APIParkLab/APIPark/gateway"
+
 	strategy_filter "github.com/APIParkLab/APIPark/strategy-filter"
 
 	"github.com/APIParkLab/APIPark/module/system"
@@ -64,6 +66,7 @@ type IExportAppModule interface {
 func init() {
 	serviceModule := new(imlServiceModule)
 	autowire.Auto[IServiceModule](func() reflect.Value {
+		gateway.RegisterInitHandleFunc(serviceModule.initGateway)
 		return reflect.ValueOf(serviceModule)
 	})
 

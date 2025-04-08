@@ -235,6 +235,7 @@ var (
 
 func (i *imlMcpModule) Invoke(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	gatewayInvoke := utils.GatewayInvoke(ctx)
+
 	if gatewayInvoke == "" {
 		return nil, fmt.Errorf("gateway invoke is required")
 	}
@@ -305,6 +306,10 @@ func (i *imlMcpModule) Invoke(ctx context.Context, req mcp.CallToolRequest) (*mc
 	}
 	request.Header = headerParam
 	request.Header.Set("Content-Type", contentType)
+	apikey := utils.Label(ctx, "apikey")
+	if apikey != "" {
+		request.Header.Set("Authorization", utils.Md5(apikey))
+	}
 
 	resp, err := client.Do(request)
 	if err != nil {

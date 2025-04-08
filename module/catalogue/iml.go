@@ -389,8 +389,8 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 	mcpAccessConfig := ""
 	if s.EnableMCP {
 		if sitePrefix != "" {
-			mcpAccessAddress = fmt.Sprintf("%s%s/%s/sse", strings.TrimSuffix(sitePrefix, "/"), mcp_server.ServiceBasePath, s.Id)
-			mcpAccessConfig = fmt.Sprintf(mcpDefaultConfig, s.Name, mcpAccessAddress)
+			mcpAccessAddress = fmt.Sprintf("%s/openapi/v1/%s/%s/sse?apikey={your_api_key}", strings.TrimSuffix(sitePrefix, "/"), mcp_server.ServiceBasePath, s.Id)
+			mcpAccessConfig = fmt.Sprintf(mcpDefaultConfig, fmt.Sprintf("APIPark/%s", s.Name), mcpAccessAddress)
 		}
 
 	}

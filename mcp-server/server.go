@@ -12,8 +12,8 @@ import (
 
 var (
 	mcpServer       = NewServer()
-	ServiceBasePath = "/api/v1/mcp/service"
-	GlobalBasePath  = "/openapi/v1/mcp/global"
+	ServiceBasePath = "mcp/service"
+	GlobalBasePath  = "mcp/global"
 )
 
 func NewServer() *Server {
@@ -35,8 +35,7 @@ func (s *Server) Del(path string) {
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	serviceId := getServiceId(r.URL.Path)
-	sseServer, has := s.sseServers.Get(serviceId)
+	sseServer, has := s.sseServers.Get(trimPath(r.URL.Path))
 	if has {
 		sseServer.ServeHTTP(w, r)
 		return
@@ -45,12 +44,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func getServiceId(path string) string {
-	id := strings.TrimPrefix(path, ServiceBasePath)
-	id = strings.Trim(id, "/")
-	id = strings.TrimSuffix(id, "/message")
-	id = strings.TrimSuffix(id, "/sse")
-	return id
+func trimPath(path string) string {
+	path = strings.TrimSuffix(path, "/")
+	path = strings.TrimSuffix(path, "/message")
+	path = strings.TrimSuffix(path, "/sse")
+	return path
 }
 
 func SetSSEServer(sid string, name string, version string, tools ...ITool) {
@@ -58,14 +56,23 @@ func SetSSEServer(sid string, name string, version string, tools ...ITool) {
 	for _, tool := range tools {
 		tool.RegisterMCP(s)
 	}
-	sseServer := server.NewSSEServer(s, server.WithBasePath(fmt.Sprintf("%s/%s", ServiceBasePath, sid)))
-	mcpServer.Set(sid, sseServer)
+	apiPath := fmt.Sprintf("/api/v1/%s/%s", ServiceBasePath, sid)
+	openAPIPath := fmt.Sprintf("/openapi/v1/%s/%s", ServiceBasePath, sid)
+	mcpServer.Set(apiPath, server.NewSSEServer(s, server.WithBasePath(apiPath)))
+	mcpServer.Set(openAPIPath, server.NewSSEServer(s, server.WithBasePath(openAPIPath)))
 }
 
 func DelSSEServer(sid string) {
-	mcpServer.Del(sid)
+	apiPath := fmt.Sprintf("/api/v1/%s/%s", ServiceBasePath, sid)
+	openAPIPath := fmt.Sprintf("/openapi/v1/%s/%s", ServiceBasePath, sid)
+	mcpServer.Del(apiPath)
+	mcpServer.Del(openAPIPath)
 }
 
 func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	mcpServer.ServeHTTP(w, r)
+}
+
+func DefaultMCPServer() *Server {
+	return mcpServer
 }
