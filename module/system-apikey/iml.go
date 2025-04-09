@@ -2,9 +2,16 @@ package system_apikey
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
+	application_authorization "github.com/APIParkLab/APIPark/service/application-authorization"
+
+	"github.com/APIParkLab/APIPark/service/service"
+
 	"github.com/APIParkLab/APIPark/service/cluster"
+
+	team_member "github.com/APIParkLab/APIPark/service/team-member"
 
 	"github.com/eolinker/go-common/store"
 
@@ -22,9 +29,56 @@ import (
 var _ IAPIKeyModule = new(imlAPIKeyModule)
 
 type imlAPIKeyModule struct {
-	apikeyService system_apikey.IAPIKeyService `autowired:""`
-	clusterServer cluster.IClusterService      `autowired:""`
-	transaction   store.ITransaction           `autowired:""`
+	apikeyService                   system_apikey.IAPIKeyService                    `autowired:""`
+	clusterServer                   cluster.IClusterService                         `autowired:""`
+	teamMemberService               team_member.ITeamMemberService                  `autowired:""`
+	serviceService                  service.IServiceService                         `autowired:""`
+	applicationAuthorizationService application_authorization.IAuthorizationService `autowired:""`
+	transaction                     store.ITransaction                              `autowired:""`
+}
+
+func (i *imlAPIKeyModule) MyAPIKeys(ctx context.Context) ([]*system_apikey_dto.SimpleItem, error) {
+	members, err := i.teamMemberService.Members(ctx, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	if len(members) == 0 {
+		return nil, nil
+	}
+	teamIds := utils.SliceToSlice(members, func(m *team_member.Member) string {
+		return m.Come
+	})
+	apps, err := i.serviceService.AppListByTeam(ctx, teamIds...)
+	if err != nil {
+		return nil, err
+	}
+	appIds := utils.SliceToSlice(apps, func(a *service.Service) string {
+		return a.Id
+	})
+	auths, err := i.applicationAuthorizationService.ListByApp(ctx, appIds...)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*system_apikey_dto.SimpleItem, 0, len(auths))
+	for _, a := range auths {
+		if a.Type != "apikey" {
+			continue
+		}
+		m := make(map[string]string)
+		json.Unmarshal([]byte(a.Config), &m)
+		if m["apikey"] == "" {
+			continue
+		}
+		result = append(result, &system_apikey_dto.SimpleItem{
+			Id:      a.UUID,
+			Name:    a.Name,
+			Value:   m["apikey"],
+			Expired: a.ExpireTime,
+		})
+
+	}
+	return result, nil
+
 }
 
 func (i *imlAPIKeyModule) Create(ctx context.Context, input *system_apikey_dto.Create) error {

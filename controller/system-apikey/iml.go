@@ -12,6 +12,10 @@ type imlAPIKeyController struct {
 	apikeyModule system_apikey.IAPIKeyModule `autowired:""`
 }
 
+func (i *imlAPIKeyController) MyAPIKeys(ctx *gin.Context) ([]*system_apikey_dto.SimpleItem, error) {
+	return i.apikeyModule.MyAPIKeys(ctx)
+}
+
 func (i *imlAPIKeyController) Create(ctx *gin.Context, input *system_apikey_dto.Create) error {
 	return i.apikeyModule.Create(ctx, input)
 }

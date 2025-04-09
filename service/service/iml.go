@@ -25,6 +25,22 @@ type imlServiceService struct {
 	universally.IServiceEdit[Edit]
 }
 
+func (i *imlServiceService) AppListByTeam(ctx context.Context, teamId ...string) ([]*Service, error) {
+	if len(teamId) == 0 {
+		return nil, fmt.Errorf("team id is empty")
+	}
+	w := map[string]interface{}{
+		"team":      teamId,
+		"as_app":    true,
+		"is_delete": false,
+	}
+	list, err := i.store.List(ctx, w)
+	if err != nil {
+		return nil, err
+	}
+	return utils.SliceToSlice(list, FromEntity), nil
+}
+
 func (i *imlServiceService) ForceDelete(ctx context.Context, id string) error {
 	_, err := i.store.DeleteWhere(ctx, map[string]interface{}{"uuid": id})
 	return err
