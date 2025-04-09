@@ -182,6 +182,26 @@ system:
             value: 'manager'
             dependents:
               - system.settings.strategy.view
+      - name: mcp
+        value: 'mcp'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+              - system.settings.mcp.view
+      - name: apikey
+        value: 'apikey'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+              - system.settings.apikey.view
 team:
   - name: service
     value: 'service'

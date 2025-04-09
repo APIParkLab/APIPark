@@ -18,12 +18,16 @@ system:
       - system.settings.ai_provider.view
       - system.settings.api_gateway.manager
       - system.settings.api_gateway.view
+      - system.settings.apikey.view
+      - system.settings.apikey.manager
       - system.settings.data_source.manager
       - system.settings.data_source.view
       - system.settings.general.manager
       - system.settings.general.view
       - system.settings.log_configuration.manager
       - system.settings.log_configuration.view
+      - system.settings.mcp.view
+      - system.settings.mcp.manager
       - system.settings.role.view
       - system.settings.ssl_certificate.manager
       - system.settings.ssl_certificate.view
