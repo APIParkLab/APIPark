@@ -7,6 +7,11 @@ import (
 	"fmt"
 	"time"
 
+	mcp_server "github.com/APIParkLab/APIPark/mcp-server"
+	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
+	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/mitchellh/mapstructure"
+
 	strategy_driver "github.com/APIParkLab/APIPark/module/strategy/driver"
 	strategy_dto "github.com/APIParkLab/APIPark/module/strategy/dto"
 
@@ -50,6 +55,7 @@ type imlPublishModule struct {
 	releaseModule     releaseModule.IReleaseModule   `autowired:""`
 	publishService    publish.IPublishService        `autowired:""`
 	apiService        api.IAPIService                `autowired:""`
+	apiDocService     api_doc.IAPIDocService         `autowired:""`
 	upstreamService   upstream.IUpstreamService      `autowired:""`
 	strategyService   strategy.IStrategyService      `autowired:""`
 	releaseService    release.IReleaseService        `autowired:""`
@@ -515,24 +521,39 @@ func (m *imlPublishModule) Publish(ctx context.Context, serviceId string, id str
 		return err
 	}
 	hasError := false
-
-	for _, c := range clusters {
-		err = m.publish(ctx, flow.Id, c.Uuid, projectReleaseMap[c.Uuid])
-		if err != nil {
-			hasError = true
-			log.Error(err)
-			continue
+	return m.transaction.Transaction(ctx, func(ctx context.Context) error {
+		for _, c := range clusters {
+			err = m.publish(ctx, flow.Id, c.Uuid, projectReleaseMap[c.Uuid])
+			if err != nil {
+				hasError = true
+				log.Error(err)
+				continue
+			}
 		}
-	}
-	err = m.releaseService.SetRunning(ctx, serviceId, flow.Release)
-	if err != nil {
-		return err
-	}
-	status := publish.StatusDone
-	if hasError {
-		status = publish.StatusPublishError
-	}
-	return m.publishService.SetStatus(ctx, serviceId, id, status)
+		err = m.releaseService.SetRunning(ctx, serviceId, flow.Release)
+		if err != nil {
+			return err
+		}
+		status := publish.StatusDone
+		if hasError {
+			status = publish.StatusPublishError
+		}
+		if status == publish.StatusDone {
+			info, err := m.serviceService.Get(ctx, serviceId)
+			if err != nil {
+				return err
+			}
+			if info.EnableMCP {
+				err = m.updateMCPServer(ctx, serviceId, info.Name, flow.Version)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		return m.publishService.SetStatus(ctx, serviceId, id, status)
+	})
+
 }
 
 func (m *imlPublishModule) List(ctx context.Context, serviceId string, page, pageSize int) ([]*dto.Publish, int64, error) {
@@ -548,6 +569,81 @@ func (m *imlPublishModule) List(ctx context.Context, serviceId string, page, pag
 	return utils.SliceToSlice(list, func(s *publish.Publish) *dto.Publish {
 		return dto.FromModel(s, "")
 	}), total, nil
+}
+
+func (i *imlPublishModule) updateMCPServer(ctx context.Context, sid string, name string, version string) error {
+	r, err := i.releaseService.GetRunning(ctx, sid)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
+		return err
+	}
+	_, _, apiDocCommit, _, _, err := i.releaseService.GetReleaseInfos(ctx, r.UUID)
+	if err != nil {
+		return fmt.Errorf("get release info error: %w", err)
+	}
+	commitDoc, err := i.apiDocService.GetDocCommit(ctx, apiDocCommit.Commit)
+	if err != nil {
+		return fmt.Errorf("get api doc commit error: %w", err)
+	}
+	mcpInfo, err := mcp_server.ConvertMCPFromOpenAPI3Data([]byte(commitDoc.Data.Content))
+	if err != nil {
+		return fmt.Errorf("convert mcp from openapi3 data error: %w", err)
+	}
+	tools := make([]mcp_server.ITool, 0, len(mcpInfo.Apis))
+	for _, a := range mcpInfo.Apis {
+		toolOptions := make([]mcp.ToolOption, 0, len(a.Params)+2)
+		toolOptions = append(toolOptions, mcp.WithDescription(a.Description))
+		headers := make(map[string]interface{})
+		queries := make(map[string]interface{})
+		path := make(map[string]interface{})
+		for _, v := range a.Params {
+			p := map[string]interface{}{
+				"type":        "string",
+				"required":    v.Required,
+				"description": v.Description,
+			}
+			switch v.In {
+			case "header":
+				headers[v.Name] = p
+			case "query":
+				queries[v.Name] = p
+			case "path":
+				path[v.Name] = p
+			}
+		}
+		if len(headers) > 0 {
+			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPHeader, mcp.Properties(headers), mcp.Description("request headers.")))
+		}
+		if len(queries) > 0 {
+			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPQuery, mcp.Properties(queries), mcp.Description("request queries.")))
+		}
+		if len(path) > 0 {
+			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPPath, mcp.Properties(path), mcp.Description("request path params.")))
+		}
+		if a.Body != nil {
+			type Schema struct {
+				Type       string                 `mapstructure:"type"`
+				Properties map[string]interface{} `mapstructure:"properties"`
+				Items      interface{}            `mapstructure:"items"`
+			}
+			var tmp Schema
+			err = mapstructure.Decode(a.Body, &tmp)
+			if err != nil {
+				return err
+			}
+			switch tmp.Type {
+			case "object":
+				toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPBody, mcp.Properties(tmp.Properties), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
+			case "array":
+				toolOptions = append(toolOptions, mcp.WithArray(mcp_server.MCPBody, mcp.Items(tmp.Items), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
+			}
+		}
+		tools = append(tools, mcp_server.NewTool(a.Summary, a.Path, a.Method, a.ContentType, toolOptions...))
+	}
+	mcp_server.SetSSEServer(sid, name, version, tools...)
+	return nil
 }
 
 func (m *imlPublishModule) Detail(ctx context.Context, serviceId string, id string) (*dto.PublishDetail, error) {
