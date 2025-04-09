@@ -31,5 +31,5 @@ func (r *ResponseWriter) Write(bytes []byte) (int, error) {
 }
 
 func (r *ResponseWriter) WriteHeader(statusCode int) {
-	r.WriteHeader(statusCode)
+	r.Writer.WriteHeader(statusCode)
 }
