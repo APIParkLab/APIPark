@@ -91,8 +91,15 @@ const AIProviderSelect: React.FC<AIProviderSelectProps> = ({ value, onChange, so
           label: (
             <Space className="flex items-center">
               <span
-                className="flex items-center h-[20px] w-[20px]"
-                dangerouslySetInnerHTML={{ __html: provider.logo }}
+                className="flex items-center justify-center h-[20px] w-[20px] overflow-hidden"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                dangerouslySetInnerHTML={{ 
+                  __html: provider.logo.replace(/<svg/, '<svg style="max-width:100%;max-height:100%;width:auto;height:auto;"') 
+                }}
               ></span>
               <span>{provider.name}</span>
             </Space>

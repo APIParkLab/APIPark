@@ -16,6 +16,14 @@ type imlServiceModelMappingService struct {
 	store service.IServiceModelMappingStore `autowired:""`
 }
 
+func (i *imlServiceModelMappingService) Delete(ctx context.Context, sid string) error {
+	_, err := i.store.DeleteWhere(ctx, map[string]interface{}{"sid": sid})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (i *imlServiceModelMappingService) Get(ctx context.Context, sid string) (*ModelMapping, error) {
 	entity, err := i.store.First(ctx, map[string]interface{}{"sid": sid})
 	if err != nil {

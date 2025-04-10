@@ -3,6 +3,7 @@ package ai
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/APIParkLab/APIPark/common"
 	"strconv"
 	"strings"
 
@@ -24,8 +25,8 @@ func (i *imlProviderController) Delete(ctx *gin.Context, id string) error {
 }
 
 func (i *imlProviderController) AddProvider(ctx *gin.Context, input *ai_dto.NewProvider) (*ai_dto.SimpleProvider, error) {
-	if strings.TrimSpace(input.Name) == "" {
-		return nil, fmt.Errorf("name is empty")
+	if !common.ModelNameValid(input.Name) {
+		return nil, fmt.Errorf("name illegal(a-zA-Z0-9-_.:/)")
 	}
 	return i.module.AddProvider(ctx, input)
 }

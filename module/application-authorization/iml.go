@@ -110,7 +110,7 @@ func (i *imlAuthorizationModule) getApplications(ctx context.Context, appIds []s
 }
 
 func (i *imlAuthorizationModule) initGateway(ctx context.Context, partitionId string, clientDriver gateway.IClientDriver) error {
-	services, err := i.serviceService.List(ctx)
+	services, err := i.serviceService.AppList(ctx)
 	if err != nil {
 		return err
 	}

@@ -6,6 +6,14 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strings"
+	"time"
+
+	mcp_server "github.com/APIParkLab/APIPark/mcp-server"
+
+	"github.com/APIParkLab/APIPark/module/monitor/driver"
+
+	"github.com/APIParkLab/APIPark/service/monitor"
 
 	"github.com/APIParkLab/APIPark/service/setting"
 
@@ -63,6 +71,7 @@ type imlCatalogueModule struct {
 	transaction           store.ITransaction               `autowired:""`
 	clusterService        cluster.IClusterService          `autowired:""`
 	settingService        setting.ISettingService          `autowired:""`
+	monitorService        monitor.IMonitorService          `autowired:""`
 	root                  *Root
 }
 
@@ -122,6 +131,84 @@ func (i *imlCatalogueModule) ExportAll(ctx context.Context) ([]*catalogue_dto.Ex
 			Sort:   c.Sort,
 		}
 	}), nil
+}
+
+func (i *imlCatalogueModule) getExecutor(ctx context.Context, clusterId string) (driver.IExecutor, error) {
+	info, err := i.monitorService.GetByCluster(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+	return driver.CreateExecutor(info.Driver, info.Config)
+}
+
+func (i *imlCatalogueModule) statistics(ctx context.Context, clusterId string, groupBy string, start, end time.Time, wheres []monitor.MonWhereItem, limit int) (map[string]monitor.MonCommonData, error) {
+	executor, err := i.getExecutor(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+	result, err := executor.CommonStatistics(ctx, start, end, groupBy, limit, wheres)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (i *imlCatalogueModule) genCommonWheres(ctx context.Context, clusterIds ...string) ([]monitor.MonWhereItem, error) {
+
+	clusters, err := i.clusterService.List(ctx, clusterIds...)
+	if err != nil {
+		return nil, err
+	}
+	clusterIds = utils.SliceToSlice(clusters, func(item *cluster.Cluster) string {
+		return item.Uuid
+	})
+
+	wheres := make([]monitor.MonWhereItem, 0, 1)
+	nodes, err := i.clusterService.Nodes(ctx, clusterIds...)
+	if err != nil {
+		return nil, err
+	}
+	nodeIds := utils.SliceToSlice(nodes, func(s *cluster.Node) string {
+		return s.Name
+	})
+	wheres = append(wheres, monitor.MonWhereItem{
+		Key:       "node",
+		Operation: "in",
+		Values:    nodeIds,
+	})
+
+	return wheres, nil
+}
+
+func (i *imlCatalogueModule) ProviderStatistics(ctx context.Context, start, end time.Time, serviceIds ...string) (map[string]int64, error) {
+	clusterId := cluster.DefaultClusterID
+	_, err := i.clusterService.Get(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(serviceIds) > 0 {
+		wheres = append(wheres, monitor.MonWhereItem{
+			Key:       "provider",
+			Operation: "in",
+			Values:    serviceIds,
+		})
+	}
+	statisticMap, err := i.statistics(ctx, clusterId, "provider", start, end, wheres, 0)
+	if err != nil {
+		return nil, err
+	}
+	resultMap := make(map[string]int64)
+	for key, item := range statisticMap {
+		resultMap[key] = item.RequestTotal
+	}
+
+	return resultMap, nil
 }
 
 func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catalogue_dto.SubscribeService) error {
@@ -226,8 +313,16 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 		}
 		return nil
 	})
-
 }
+
+var mcpDefaultConfig = `{
+  "mcpServers": {
+    "%s": {
+      "url": "%s"
+    }
+  }
+}
+`
 
 func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*catalogue_dto.ServiceDetail, error) {
 	// 获取服务的基本信息
@@ -290,7 +385,15 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 	}
 	invokeAddress, _ := i.settingService.Get(ctx, setting.KeyInvokeAddress)
 	sitePrefix, _ := i.settingService.Get(ctx, setting.KeySitePrefix)
+	mcpAccessAddress := ""
+	mcpAccessConfig := ""
+	if s.EnableMCP {
+		if sitePrefix != "" {
+			mcpAccessAddress = fmt.Sprintf("%s/openapi/v1/%s/%s/sse?apikey={your_api_key}", strings.TrimSuffix(sitePrefix, "/"), mcp_server.ServiceBasePath, s.Id)
+			mcpAccessConfig = fmt.Sprintf(mcpDefaultConfig, fmt.Sprintf("APIPark/%s", s.Name), mcpAccessAddress)
+		}
 
+	}
 	return &catalogue_dto.ServiceDetail{
 		Name:        s.Name,
 		Description: s.Description,
@@ -308,8 +411,11 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 			ServiceKind:   s.Kind.String(),
 			InvokeAddress: invokeAddress,
 			SitePrefix:    sitePrefix,
+			EnableMCP:     s.EnableMCP,
 		},
-		APIDoc: apiDoc,
+		APIDoc:           apiDoc,
+		MCPServerAddress: mcpAccessAddress,
+		MCPAccessConfig:  mcpAccessConfig,
 	}, nil
 }
 
@@ -348,13 +454,11 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 		return nil, err
 	}
 
-	//// 获取服务API数量
-	//apiCountMap, err := i.apiDocService.LatestAPICountByServices(ctx, serviceIds...)
-	//if err != nil {
-	//	return nil, err
-	//}
-
 	subscriberCountMap, err := i.subscribeService.CountMapByService(ctx, subscribe.ApplyStatusSubscribe, serviceIds...)
+	if err != nil {
+		return nil, err
+	}
+	invokeStatisticMap, err := i.ProviderStatistics(ctx, time.Now().Add(-24*30*time.Hour), time.Now(), serviceIds...)
 	if err != nil {
 		return nil, err
 	}
@@ -375,6 +479,9 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 			SubscriberNum: subscriberCountMap[v.Id],
 			Description:   v.Description,
 			Logo:          v.Logo,
+			EnableMCP:     v.EnableMCP,
+			ServiceKind:   v.Kind.String(),
+			InvokeCount:   invokeStatisticMap[v.Id],
 		})
 	}
 	sort.Slice(result, func(i, j int) bool {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
+	"time"
 
 	ai_balance "github.com/APIParkLab/APIPark/service/ai-balance"
 
@@ -61,6 +61,7 @@ func (i *imlLocalModel) SyncLocalModels(ctx context.Context, address string) err
 	if err != nil {
 		return err
 	}
+
 	return i.syncGateway(ctx, cluster.DefaultClusterID, releases, true)
 }
 
@@ -73,8 +74,8 @@ func (i *imlLocalModel) SimpleList(ctx context.Context) ([]*ai_local_dto.SimpleI
 		return &ai_local_dto.SimpleItem{
 			Id:            s.Id,
 			Name:          s.Name,
-			DefaultConfig: ai_provider_local.OllamaConfig,
-			Logo:          ai_provider_local.OllamaSvg,
+			DefaultConfig: ai_provider_local.LocalConfig,
+			Logo:          ai_provider_local.LocalSvg,
 		}
 	}, func(l *ai_local.LocalModel) bool {
 		if l.State != ai_local_dto.LocalModelStateNormal.Int() && l.State != ai_local_dto.LocalModelStateDisable.Int() {
@@ -118,7 +119,7 @@ func (i *imlLocalModel) Search(ctx context.Context, keyword string) ([]*ai_local
 			APICount:   count,
 			CanDelete:  count < 1 && s.State != ai_local_dto.LocalModelStateDeploying.Int(),
 			UpdateTime: auto.TimeLabel(s.UpdateAt),
-			Provider:   "ollama",
+			Provider:   ai_provider_local.ProviderLocal,
 		}
 	}), nil
 }
@@ -247,9 +248,9 @@ func (i *imlLocalModel) pullHook(fn ...func() error) func(msg ai_provider_local.
 				v, _ := i.settingService.Get(ctx, "system.ai_model.ollama_address")
 
 				cfg := make(map[string]interface{})
-				cfg["provider"] = "ollama"
+				cfg["provider"] = ai_provider_local.ProviderLocal
 				cfg["model"] = msg.Model
-				cfg["model_config"] = ai_provider_local.OllamaConfig
+				cfg["model_config"] = ai_provider_local.LocalConfig
 				cfg["priority"] = 0
 				cfg["base"] = v
 
@@ -322,7 +323,7 @@ func (i *imlLocalModel) Deploy(ctx context.Context, model string, session string
 			err = i.localModelService.Create(ctx, &ai_local.CreateLocalModel{
 				Id:       model,
 				Name:     model,
-				Provider: "ollama",
+				Provider: ai_provider_local.ProviderLocal,
 				State:    ai_local_dto.LocalModelStateDeploying.Int(),
 			})
 
@@ -449,9 +450,9 @@ func (i *imlLocalModel) Enable(ctx context.Context, model string) error {
 			}
 			v, _ := i.settingService.Get(ctx, "system.ai_model.ollama_address")
 			cfg := make(map[string]interface{})
-			cfg["provider"] = "ollama"
+			cfg["provider"] = ai_provider_local.ProviderLocal
 			cfg["model"] = info.Id
-			cfg["model_config"] = ai_provider_local.OllamaConfig
+			cfg["model_config"] = ai_provider_local.LocalConfig
 			cfg["priority"] = 0
 			cfg["base"] = v
 
@@ -513,8 +514,8 @@ func (i *imlLocalModel) OnInit() {
 		})
 		models, version := ai_provider_local.ModelsCanInstall()
 		for _, model := range models {
-			delete(oldModels, model.Id)
 			if v, ok := oldModels[model.Id]; ok {
+				delete(oldModels, model.Id)
 				if v.Version == version {
 					continue
 				}
@@ -542,6 +543,7 @@ func (i *imlLocalModel) OnInit() {
 					return
 				}
 			}
+
 		}
 		for id := range oldModels {
 			err = i.localModelPackageService.Delete(ctx, id)
@@ -549,29 +551,57 @@ func (i *imlLocalModel) OnInit() {
 				return
 			}
 		}
-		installModels, err := ai_provider_local.ModelsInstalled()
-		if err != nil {
-			return
-		}
-		for _, model := range installModels {
-
-			id := strings.TrimSuffix(model.Name, ":latest")
-			name := strings.TrimSuffix(model.Name, ":latest")
-			_, err = i.localModelService.Get(ctx, id)
+		//installModels, err := ai_provider_local.ModelsInstalled()
+		//if err != nil {
+		//	return
+		//}
+		//for _, model := range installModels {
+		//
+		//	id := strings.TrimSuffix(model.Name, ":latest")
+		//	name := strings.TrimSuffix(model.Name, ":latest")
+		//	_, err = i.localModelService.Get(ctx, id)
+		//	if err != nil {
+		//		if !errors.Is(err, gorm.ErrRecordNotFound) {
+		//			return
+		//		}
+		//		err = i.localModelService.Create(ctx, &ai_local.CreateLocalModel{
+		//			Id:    id,
+		//			Name:  name,
+		//			State: 1,
+		//		})
+		//		if err != nil {
+		//			return
+		//		}
+		//	}
+		//}
+		i.transaction.Transaction(ctx, func(ctx context.Context) error {
+			localModels, err := i.localModelService.Search(ctx, "", map[string]interface{}{
+				"provider": "ollama",
+			})
 			if err != nil {
-				if !errors.Is(err, gorm.ErrRecordNotFound) {
-					return
-				}
-				err = i.localModelService.Create(ctx, &ai_local.CreateLocalModel{
-					Id:    id,
-					Name:  name,
-					State: 1,
-				})
-				if err != nil {
-					return
-				}
+				return err
 			}
-		}
+			if len(localModels) == 0 {
+				return nil
+			}
+			err = i.localModelService.UpdateProvider(ctx, ai_provider_local.ProviderLocal, utils.SliceToSlice(localModels, func(s *ai_local.LocalModel) string {
+				return s.Id
+			})...)
+			if err != nil {
+				return err
+			}
+
+			apis, err := i.aiAPIService.Search(ctx, "", map[string]interface{}{
+				"provider": "ollama",
+			})
+			if err != nil {
+				return err
+			}
+			return i.aiAPIService.UpdateAIProvider(ctx, ai_provider_local.ProviderLocal, utils.SliceToSlice(apis, func(s *ai_api.API) string {
+				return s.ID
+			})...)
+		})
+
 	})
 }
 
@@ -584,19 +614,20 @@ func (i *imlLocalModel) getLocalModels(ctx context.Context, v string) ([]*gatewa
 		var has bool
 		v, has = i.settingService.Get(ctx, "system.ai_model.ollama_address")
 		if !has {
-			return nil, errors.New("ollama_address not set")
+			//return nil, errors.New("ollama_address not set")
+			return nil, nil
 		}
 	}
-
+	provider := ai_provider_local.ProviderLocal
 	releases := make([]*gateway.DynamicRelease, 0, len(list))
 	for _, l := range list {
 		if l.State != ai_local_dto.LocalModelStateNormal.Int() {
 			continue
 		}
 		cfg := make(map[string]interface{})
-		cfg["provider"] = "ollama"
+		cfg["provider"] = provider
 		cfg["model"] = l.Id
-		cfg["model_config"] = ai_provider_local.OllamaConfig
+		cfg["model_config"] = ai_provider_local.LocalConfig
 		cfg["base"] = v
 		releases = append(releases, &gateway.DynamicRelease{
 			BasicItem: &gateway.BasicItem{
@@ -611,6 +642,25 @@ func (i *imlLocalModel) getLocalModels(ctx context.Context, v string) ([]*gatewa
 			Attr: cfg,
 		})
 	}
+	releases = append(releases, &gateway.DynamicRelease{
+		BasicItem: &gateway.BasicItem{
+			ID:          fmt.Sprintf("%s-key", ai_provider_local.ProviderLocal),
+			Description: "auto generate key",
+			Resource:    "ai-key",
+			Version:     time.Now().Format("20060102150405"),
+			MatchLabels: map[string]string{
+				"module": "ai-key",
+			},
+		},
+		Attr: map[string]interface{}{
+			"expired":  0,
+			"config":   fmt.Sprintf("{\"base\":\"%s\"}", v),
+			"provider": provider,
+			"priority": 1,
+			"disabled": true,
+		},
+	})
+
 	return releases, nil
 }
 

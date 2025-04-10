@@ -102,7 +102,7 @@ const AddModels = forwardRef<addModelsContentHandle, addModelContentProps>((prop
               ...value,
               id: modelID
             }
-            fetchData<BasicResponse<null>>('ai/provider/model', {
+            fetchData<BasicResponse<{ model: { id: string, name: string } }>>('ai/provider/model', {
               method: type === 'edit' ? 'PUT' : 'POST',
               eoParams: { provider: providerID },
               eoBody: finalValue,
@@ -112,7 +112,8 @@ const AddModels = forwardRef<addModelsContentHandle, addModelContentProps>((prop
                 const { code, msg } = response
                 if (code === STATUS_CODE.SUCCESS) {
                   message.success($t(RESPONSE_TIPS.success) || msg)
-                  resolve(true)
+                  const llmId = response.data?.model?.id
+                  resolve(llmId)
                 } else {
                   message.error(msg || $t(RESPONSE_TIPS.error))
                   reject(msg || $t(RESPONSE_TIPS.error))

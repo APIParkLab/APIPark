@@ -2,19 +2,33 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/mitchellh/mapstructure"
+
+	"github.com/eolinker/go-common/register"
+
+	"github.com/mark3labs/mcp-go/mcp"
+
+	mcp_server "github.com/APIParkLab/APIPark/mcp-server"
+
+	"github.com/APIParkLab/APIPark/service/release"
+
+	"github.com/APIParkLab/APIPark/gateway"
+
 	ai_local "github.com/APIParkLab/APIPark/service/ai-local"
+	"github.com/APIParkLab/APIPark/service/cluster"
 
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 
-	"github.com/eolinker/eosc/log"
-
 	"github.com/APIParkLab/APIPark/resources/access"
+	"github.com/eolinker/eosc/log"
+	"github.com/eolinker/go-common/server"
 
 	"github.com/eolinker/ap-account/service/role"
 
@@ -68,9 +82,147 @@ type imlServiceModule struct {
 	serviceTagService service_tag.ITagService `autowired:""`
 	apiService        api.IAPIService         `autowired:""`
 	apiDocService     api_doc.IAPIDocService  `autowired:""`
+	clusterService    cluster.IClusterService `autowired:""`
 	transaction       store.ITransaction      `autowired:""`
 
+	releaseService             release.IReleaseService                           `autowired:""`
 	serviceModelMappingService service_model_mapping.IServiceModelMappingService `autowired:""`
+}
+
+func (i *imlServiceModule) OnInit() {
+	register.Handle(func(v server.Server) {
+		ctx := context.Background()
+		services, err := i.serviceService.ServiceList(ctx)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		for _, s := range services {
+			err = i.updateMCPServer(ctx, s.Id, s.Name, "1.0")
+			if err != nil {
+				log.Error(err)
+				return
+			}
+		}
+	})
+}
+
+func (i *imlServiceModule) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
+	services, err := i.serviceService.ServiceList(ctx)
+	if err != nil {
+		return err
+	}
+	subscribeReleases := make([]*gateway.SubscribeRelease, 0, len(services))
+	hashReleases := make([]*gateway.HashRelease, 0, len(services))
+	for _, s := range services {
+		subscribeReleases = append(subscribeReleases, &gateway.SubscribeRelease{
+			Service:     s.Id,
+			Application: "apipark-global",
+			Expired:     "0",
+		})
+
+		modelMap, err := i.serviceModelMappingService.Get(ctx, s.Id)
+		if err != nil {
+			return err
+		}
+		if modelMap.Content == "" {
+			continue
+		}
+		m := make(map[string]string)
+		err = json.Unmarshal([]byte(modelMap.Content), &m)
+		if err != nil {
+			return err
+		}
+		hashReleases = append(hashReleases, &gateway.HashRelease{
+			HashKey: fmt.Sprintf("%s:%s", gateway.KeyServiceMapping, s.Id),
+			HashMap: m,
+		})
+
+	}
+	err = clientDriver.Subscribe().Online(ctx, subscribeReleases...)
+	if err != nil {
+		return err
+	}
+	return clientDriver.Hash().Online(ctx, hashReleases...)
+}
+
+func (i *imlServiceModule) updateMCPServer(ctx context.Context, sid string, name string, version string) error {
+	r, err := i.releaseService.GetRunning(ctx, sid)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
+		return err
+	}
+	_, _, apiDocCommit, _, _, err := i.releaseService.GetReleaseInfos(ctx, r.UUID)
+	if err != nil {
+		return fmt.Errorf("get release info error: %w", err)
+	}
+	commitDoc, err := i.apiDocService.GetDocCommit(ctx, apiDocCommit.Commit)
+	if err != nil {
+		return fmt.Errorf("get api doc commit error: %w", err)
+	}
+	mcpInfo, err := mcp_server.ConvertMCPFromOpenAPI3Data([]byte(commitDoc.Data.Content))
+	if err != nil {
+		return fmt.Errorf("convert mcp from openapi3 data error: %w", err)
+	}
+	tools := make([]mcp_server.ITool, 0, len(mcpInfo.Apis))
+	for _, a := range mcpInfo.Apis {
+		toolOptions := make([]mcp.ToolOption, 0, len(a.Params)+2)
+		toolOptions = append(toolOptions, mcp.WithDescription(a.Description))
+		headers := make(map[string]interface{})
+		queries := make(map[string]interface{})
+		path := make(map[string]interface{})
+		for _, v := range a.Params {
+			p := map[string]interface{}{
+				"type":        "string",
+				"required":    v.Required,
+				"description": v.Description,
+			}
+			switch v.In {
+			case "header":
+				headers[v.Name] = p
+			case "query":
+				queries[v.Name] = p
+			case "path":
+				path[v.Name] = p
+			}
+		}
+		if len(headers) > 0 {
+			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPHeader, mcp.Properties(headers), mcp.Description("request headers.")))
+		}
+		if len(queries) > 0 {
+			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPQuery, mcp.Properties(queries), mcp.Description("request queries.")))
+		}
+		if len(path) > 0 {
+			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPPath, mcp.Properties(path), mcp.Description("request path params.")))
+		}
+		if a.Body != nil {
+			type Schema struct {
+				Type       string                 `mapstructure:"type"`
+				Properties map[string]interface{} `mapstructure:"properties"`
+				Items      interface{}            `mapstructure:"items"`
+			}
+			var tmp Schema
+			err = mapstructure.Decode(a.Body, &tmp)
+			if err != nil {
+				return err
+			}
+			switch tmp.Type {
+			case "object":
+				toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPBody, mcp.Properties(tmp.Properties), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
+			case "array":
+				toolOptions = append(toolOptions, mcp.WithArray(mcp_server.MCPBody, mcp.Items(tmp.Items), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
+			}
+		}
+		tools = append(tools, mcp_server.NewTool(a.Summary, a.Path, a.Method, a.ContentType, toolOptions...))
+	}
+	mcp_server.SetSSEServer(sid, name, version, tools...)
+	return nil
+}
+
+func (i *imlServiceModule) deleteMCPServer(ctx context.Context, sid string) {
+	mcp_server.DelSSEServer(sid)
 }
 
 func (i *imlServiceModule) ExportAll(ctx context.Context) ([]*service_dto.ExportService, error) {
@@ -299,6 +451,7 @@ func toServiceItem(model *service.Service) *service_dto.ServiceItem {
 		CreateTime:  auto.TimeLabel(model.CreateTime),
 		UpdateTime:  auto.TimeLabel(model.UpdateTime),
 		Team:        auto.UUID(model.Team),
+		EnableMCP:   model.EnableMCP,
 		ServiceKind: model.Kind.String(),
 	}
 	state := service_dto.FromServiceState(model.State)
@@ -345,6 +498,7 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 		ApprovalType:     service.ApprovalType(input.ApprovalType),
 		AdditionalConfig: make(map[string]string),
 		Kind:             service.Kind(input.Kind),
+		EnableMCP:        input.EnableMCP,
 	}
 	if mo.ServiceType == service.PublicService && mo.Catalogue == "" {
 		return nil, fmt.Errorf("catalogue can not be empty")
@@ -390,15 +544,54 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 				}
 			}
 		}
-
-		err := i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
-			Sid:     input.Id,
-			Content: input.ModelMapping,
+		err := i.serviceService.Create(ctx, mo)
+		if err != nil {
+			return err
+		}
+		client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
+		if err != nil {
+			return err
+		}
+		err = client.Subscribe().Online(ctx, &gateway.SubscribeRelease{
+			Service:     mo.Id,
+			Application: "apipark-global",
+			Expired:     "0",
 		})
 		if err != nil {
 			return err
 		}
-		return i.serviceService.Create(ctx, mo)
+		if input.ModelMapping != "" {
+			m := make(map[string]string)
+			err = json.Unmarshal([]byte(input.ModelMapping), &m)
+			if err != nil {
+				return err
+			}
+			err = i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
+				Sid:     input.Id,
+				Content: input.ModelMapping,
+			})
+			if err != nil {
+				return err
+			}
+
+			err = client.Hash().Online(ctx, &gateway.HashRelease{
+				HashKey: fmt.Sprintf("%s:%s", gateway.KeyServiceMapping, input.Id),
+				HashMap: m,
+			})
+			if err != nil {
+				return err
+			}
+		}
+
+		if input.EnableMCP {
+			err = i.updateMCPServer(ctx, input.Id, input.Name, "1.0")
+			if err != nil {
+				return err
+			}
+		} else {
+			i.deleteMCPServer(ctx, input.Id)
+		}
+		return nil
 	})
 	if err != nil {
 		return nil, err
@@ -440,6 +633,7 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 			Catalogue:        input.Catalogue,
 			AdditionalConfig: &info.AdditionalConfig,
 			ApprovalType:     &approvalType,
+			EnableMCP:        input.EnableMCP,
 		}
 		if input.State != nil {
 			state := service_dto.ServiceState(*input.State).Int()
@@ -464,15 +658,59 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 				if err != nil {
 					return err
 				}
+
 			}
 		}
-		err = i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
-			Sid:     id,
-			Content: input.ModelMapping,
+		client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
+		if err != nil {
+			return err
+		}
+		err = client.Subscribe().Online(ctx, &gateway.SubscribeRelease{
+			Service:     id,
+			Application: "apipark-global",
+			Expired:     "0",
 		})
 		if err != nil {
 			return err
 		}
+		if input.ModelMapping != nil && *input.ModelMapping != "" {
+			m := make(map[string]string)
+			err = json.Unmarshal([]byte(*input.ModelMapping), &m)
+			if err != nil {
+				return err
+			}
+			err = i.serviceModelMappingService.Save(ctx, &service_model_mapping.Save{
+				Sid:     id,
+				Content: *input.ModelMapping,
+			})
+			if err != nil {
+				return err
+			}
+
+			err = client.Hash().Online(ctx, &gateway.HashRelease{
+				HashKey: fmt.Sprintf("%s:%s", gateway.KeyServiceMapping, id),
+				HashMap: m,
+			})
+			if err != nil {
+				return err
+			}
+		}
+
+		if input.EnableMCP != nil {
+			if *input.EnableMCP {
+				name := info.Name
+				if input.Name != nil {
+					name = *input.Name
+				}
+				err = i.updateMCPServer(ctx, id, name, "1.0")
+				if err != nil {
+					return err
+				}
+			} else {
+				i.deleteMCPServer(ctx, id)
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -491,7 +729,36 @@ func (i *imlServiceModule) Delete(ctx context.Context, id string) error {
 			return fmt.Errorf("service has apis, can not delete")
 		}
 
-		return i.serviceService.Delete(ctx, id)
+		err = i.serviceService.Delete(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		err = i.serviceModelMappingService.Delete(ctx, id)
+		if err != nil {
+			return err
+		}
+		client, err := i.clusterService.GatewayClient(ctx, cluster.DefaultClusterID)
+		if err != nil {
+			return err
+		}
+		err = client.Subscribe().Offline(ctx, &gateway.SubscribeRelease{
+			Service:     id,
+			Application: "apipark-global",
+			Expired:     "0",
+		})
+		if err != nil {
+			return err
+		}
+
+		err = client.Hash().Offline(ctx, &gateway.HashRelease{
+			HashKey: fmt.Sprintf("%s:%s", gateway.KeyServiceMapping, id),
+		})
+		if err != nil {
+			return err
+		}
+		i.deleteMCPServer(ctx, id)
+		return nil
 	})
 	return err
 }

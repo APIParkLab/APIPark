@@ -50,7 +50,7 @@ type IProviderInfo interface {
 }
 
 func GetCustomizeLogo() string {
-	logo, _ := providerDir.ReadFile("customize/assets/icon_s_en.svg")
+	logo, _ := providerDir.ReadFile("model-providers/customize/assets/icon_s_en.svg")
 
 	return string(logo)
 }

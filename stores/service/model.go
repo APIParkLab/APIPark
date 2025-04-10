@@ -24,6 +24,7 @@ type Service struct {
 	ApprovalType     int       `gorm:"type:tinyint(4);not null;column:approval_type;comment:审核类型"`
 	AsServer         bool      `gorm:"type:tinyint(1);not null;column:as_server;comment:是否为服务端项目"`
 	AsApp            bool      `gorm:"type:tinyint(1);not null;column:as_app;comment:是否为应用项目"`
+	EnableMCP        bool      `gorm:"type:tinyint(1);not null;column:enable_mcp;comment:是否启用MCP"`
 }
 
 func (p *Service) IdValue() int64 {

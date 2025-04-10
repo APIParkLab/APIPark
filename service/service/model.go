@@ -122,6 +122,7 @@ type Service struct {
 	State            int
 	AsServer         bool
 	AsApp            bool
+	EnableMCP        bool
 	ApprovalType     ApprovalType
 	CreateTime       time.Time
 	UpdateTime       time.Time
@@ -145,6 +146,7 @@ func FromEntity(e *service.Service) *Service {
 		ApprovalType:     ToApprovalType(e.ApprovalType),
 		AsServer:         e.AsServer,
 		AsApp:            e.AsApp,
+		EnableMCP:        e.EnableMCP,
 		State:            e.State,
 		CreateTime:       e.CreateAt,
 		UpdateTime:       e.UpdateAt,
@@ -167,6 +169,7 @@ type Create struct {
 	State            int
 	AsServer         bool
 	AsApp            bool
+	EnableMCP        bool
 }
 
 type Edit struct {
@@ -179,6 +182,7 @@ type Edit struct {
 	AdditionalConfig *map[string]string
 	State            *int
 	ApprovalType     *ApprovalType
+	EnableMCP        *bool
 }
 
 type CreateTag struct {

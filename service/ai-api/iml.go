@@ -23,6 +23,11 @@ type imlAPIService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlAPIService) UpdateAIProvider(ctx context.Context, providerId string, ids ...string) error {
+	_, err := i.store.UpdateField(ctx, "provider", providerId, "uuid in (?)", ids)
+	return err
+}
+
 func (i *imlAPIService) CountByProvider(ctx context.Context, provider string) (int64, error) {
 	return i.store.Count(ctx, "", map[string]interface{}{"provider": provider})
 }

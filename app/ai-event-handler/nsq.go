@@ -81,7 +81,7 @@ func convertInt(value interface{}) int {
 
 func genAIKey(key string, provider string) string {
 	keys := strings.Split(key, "@")
-	return strings.TrimSuffix(keys[0], fmt.Sprintf("-%s", provider))
+	return strings.TrimPrefix(keys[0], fmt.Sprintf("%s-", provider))
 }
 
 // HandleMessage 处理从 NSQ 读取的消息

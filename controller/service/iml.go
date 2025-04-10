@@ -296,7 +296,7 @@ func (i *imlServiceController) editAIService(ctx *gin.Context, id string, input 
 	if input.Provider == nil {
 		return nil, fmt.Errorf("provider is required")
 	}
-	if *input.Provider != "ollama" {
+	if *input.Provider != ai_provider_local.ProviderLocal {
 		_, has := model_runtime.GetProvider(*input.Provider)
 		if !has {
 			return nil, fmt.Errorf("provider not found")
@@ -330,7 +330,7 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 	modelId := ""
 	modelCfg := ""
 	modelType := "online"
-	if *input.Provider == "ollama" {
+	if *input.Provider == ai_provider_local.ProviderLocal {
 		modelType = "local"
 		list, err := i.aiLocalModel.SimpleList(ctx)
 		if err != nil {
@@ -340,7 +340,7 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 			return nil, fmt.Errorf("no local model")
 		}
 		modelId = list[0].Id
-		modelCfg = ai_provider_local.OllamaConfig
+		modelCfg = ai_provider_local.LocalConfig
 	} else {
 		pv, err := i.providerModule.Provider(ctx, *input.Provider)
 		if err != nil {
@@ -354,7 +354,8 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 		if !has {
 			return nil, fmt.Errorf("model %s not found", pv.DefaultLLM)
 		}
-		modelId = m.ID()
+		//modelId = m.ID()
+		modelId = m.Name()
 		modelCfg = m.DefaultConfig()
 
 	}
@@ -367,7 +368,7 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 			return err
 		}
 		prefix := strings.Replace(input.Prefix, ":", "_", -1)
-		path := fmt.Sprintf("/%s/chat", strings.Trim(prefix, "/"))
+		path := fmt.Sprintf("/%s/chat/completions", strings.Trim(prefix, "/"))
 		timeout := 300000
 		retry := 0
 		aiPrompt := &ai_api_dto.AiPrompt{

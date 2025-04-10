@@ -1,4 +1,4 @@
-model: gemini-2.0-flash-lite-preview-02-05
+model: google/gemini-2.0-flash-lite-preview-02-05
 label:
   en_US: Gemini 2.0 Flash Lite Preview 0205
 model_type: llm

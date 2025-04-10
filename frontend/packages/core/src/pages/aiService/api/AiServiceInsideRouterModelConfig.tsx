@@ -10,7 +10,7 @@ import { DefaultOptionType } from 'antd/es/select'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 
 export type AiServiceRouterModelConfigHandle = {
-  save: () => Promise<{ id: string; config: string, type: string, provider: string }>
+  save: () => Promise<{ id: string; config: string; type: string; provider: string }>
 }
 
 export type AiServiceRouterModelConfigProps = {
@@ -49,7 +49,7 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
 
     /**
      * 获取本地模型列表
-     * @param setDefaultValue 
+     * @param setDefaultValue
      */
     const getLocalLlmList = (setDefaultValue?: boolean) => {
       fetchData<LocalLlmType[]>('simple/ai/models/local/configured', {
@@ -113,12 +113,11 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           setProviderList(
-            data.providers
-              ?.map((x: SimpleAiProviderItem) => {
-                return { ...x, label: x.name, value: x.id }
-              })
+            data.providers?.map((x: SimpleAiProviderItem) => {
+              return { ...x, label: x.name, value: x.id }
+            })
           )
-        if (setDefaultValue && data.providers.length) {
+          if (setDefaultValue && data.providers.length) {
             const id = data.providers[0].id
             form.setFieldValue('provider', id)
             getLlmList(id)
@@ -179,9 +178,14 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
             rules={[{ required: true }]}
           >
             <Select
+              showSearch
               className="w-INPUT_NORMAL"
+              filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
               placeholder={$t(PLACEHOLDER.select)}
-              options={providerList}
+              options={providerList.map((x) => ({
+                ...x,
+                searchText: x.name.toLowerCase()
+              }))}
               onChange={(e) => {
                 getLlmList(e)
               }}
@@ -191,19 +195,20 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
 
         <Form.Item<AiServiceRouterModelConfigField> label={$t('模型')} name="id" rules={[{ required: true }]}>
           <Select
+            showSearch
             className="w-INPUT_NORMAL"
             placeholder={$t(PLACEHOLDER.select)}
-            options={
-              llmList?.map((x) => ({
-                value: x.id,
-                label: (
-                  <div className="flex items-center gap-[10px]" key={x.id}>
-                    <span>{x.name || x.id}</span>
-                    {modelType === 'online' && x?.scopes?.map((s: any) => <Tag>{s?.toLocaleUpperCase()}</Tag>)}
-                  </div>
-                )
-              }))
-            }
+            filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
+            options={llmList?.map((x) => ({
+              value: x.id,
+              label: (
+                <div className="flex items-center gap-[10px]" key={x.id}>
+                  <span>{x.name || x.id}</span>
+                  {modelType === 'online' && x?.scopes?.map((s: any) => <Tag>{s?.toLocaleUpperCase()}</Tag>)}
+                </div>
+              ),
+              searchText: x.name.toLowerCase()
+            }))}
             onChange={(e) => {
               form.setFieldValue('config', llmList.find((x) => x.id === e)?.config)
             }}

@@ -596,9 +596,9 @@ func (i *imlMonitorStatisticModule) TopAPIStatistics(ctx context.Context, limit 
 		} else {
 			statisticItem.IsRed = true
 			if key == "-" {
-				statisticItem.Name = "无API"
+				statisticItem.Name = "Unknown API"
 			} else {
-				statisticItem.Name = fmt.Sprintf("未知API-%s", key)
+				statisticItem.Name = fmt.Sprintf("Unknow-%s", key)
 			}
 		}
 		result = append(result, statisticItem)

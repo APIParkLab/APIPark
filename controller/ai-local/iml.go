@@ -245,7 +245,7 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 	}
 	serviceId := uuid.NewString()
 	prefix := fmt.Sprintf("/%s", serviceId[:8])
-	providerId := "ollama"
+	providerId := ai_provider_local.ProviderLocal
 	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		_, err = i.serviceModule.Create(ctx, teamID, &service_dto.CreateService{
 			Id:           serviceId,
@@ -267,7 +267,7 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 	})
 
 	return func() error {
-		path := fmt.Sprintf("/%s/chat", strings.Trim(prefix, "/"))
+		path := fmt.Sprintf("/%s/chat/completions", strings.Trim(prefix, "/"))
 		timeout := 300000
 		retry := 0
 		aiPrompt := &ai_api_dto.AiPrompt{
@@ -276,7 +276,7 @@ func (i *imlLocalModelController) initAILocalService(ctx context.Context, model 
 		}
 		aiModel := &ai_api_dto.AiModel{
 			Id:       model,
-			Config:   ai_provider_local.OllamaConfig,
+			Config:   ai_provider_local.LocalConfig,
 			Provider: providerId,
 			Type:     "local",
 		}

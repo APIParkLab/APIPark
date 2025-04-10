@@ -11,6 +11,7 @@ import (
 
 func (p *plugin) ServiceApis() []pm3.Api {
 	ignore.IgnorePath("login", http.MethodGet, "/api/v1/service/swagger/:id")
+	ignore.IgnorePath("login", http.MethodGet, "/api/v1/service/apidoc/:id")
 	return []pm3.Api{
 		// 项目
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/service/info", []string{"context", "query:service"}, []string{"service"}, p.serviceController.Get, access.SystemWorkspaceServiceViewAll, access.TeamTeamServiceView),
@@ -36,6 +37,7 @@ func (p *plugin) ServiceApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/service/doc", []string{"context", "query:service"}, []string{"doc"}, p.serviceController.ServiceDoc, access.SystemWorkspaceServiceViewAll, access.TeamServiceServiceIntroView),
 		pm3.CreateApiWidthDoc(http.MethodPut, "/api/v1/service/doc", []string{"context", "query:service", "body"}, nil, p.serviceController.SaveServiceDoc, access.SystemWorkspaceServiceManagerAll, access.TeamServiceServiceIntroManager),
 		pm3.CreateApiSimple(http.MethodGet, "/api/v1/service/swagger/:id", p.serviceController.Swagger),
+		pm3.CreateApiSimple(http.MethodGet, "/api/v1/service/apidoc/:id", p.serviceController.Swagger),
 		pm3.CreateApiSimple(http.MethodGet, "/api/v1/export/openapi/:id", p.serviceController.ExportSwagger),
 	}
 }

@@ -57,11 +57,13 @@ const ModelsDetailTable = (props: { providerID?: string }) => {
     {
       title: $t('模型名称'),
       ellipsis: true,
+      copyable: true,
       dataIndex: 'name'
     },
     {
       title: $t('模型类型'),
       ellipsis: true,
+      width: 100,
       dataIndex: 'type'
     },
     {
@@ -78,6 +80,7 @@ const ModelsDetailTable = (props: { providerID?: string }) => {
         </span>
       ),
       ellipsis: true,
+      copyable: true,
       dataIndex: 'modelValue'
     },
     ...operation
@@ -153,7 +156,7 @@ const ModelsDetailTable = (props: { providerID?: string }) => {
         const tableData = response.data.llms.map((item) => {
           return {
             ...item,
-            modelValue: `${response.data.provider.name}/${item.name}`
+            modelValue: `${response.data.provider.id}/${item.name}`
           }
         })
         return {
