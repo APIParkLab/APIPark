@@ -101,7 +101,6 @@ const McpKeyContainer = () => {
    * 编辑 API Key
    */
   const editKey = (key: any) => {
-    console.log('any', key)
     modal.confirm({
       title: $t('编辑'),
       content: (
@@ -145,7 +144,7 @@ const McpKeyContainer = () => {
               <div className="flex">
                 <div className="flex-1">
                   <p className="text-[14px] font-bold">{key.name}</p>
-                  <p className="flex">
+                  <div className="flex">
                     <span className="h-[26px] leading-[28px]">{key.value}</span>
                     <IconButton
                       name="copy"
@@ -162,7 +161,7 @@ const McpKeyContainer = () => {
                         }
                       }}
                     ></IconButton>
-                  </p>
+                  </div>
                 </div>
                 <div className="w-[30px] flex justify-center items-center">
                   <IconButton

@@ -254,16 +254,26 @@ export function useConnection({
       const apiPrefix = '/api/v1/';
       fullUrl = `${baseUrl}${apiPrefix}${proxyServerUrl}`;
     }
+    // let newSseUrl = ''
+    // if (sseUrl.startsWith('http://') || sseUrl.startsWith('https://')) {
+    //   // 如果是完整URL，直接使用
+    //   newSseUrl = sseUrl
+    // } else {
+    //   // 如果是相对路径，添加基础URL和API前缀
+    //   const baseUrl = window.location.origin;
+    //   const apiPrefix = '/api/v1/';
+    //   newSseUrl = `${baseUrl}${apiPrefix}${sseUrl}`;
+    // }
     const mcpProxyServerUrl = new URL(fullUrl);
-    mcpProxyServerUrl.searchParams.append("transportType", transportType);
-    if (transportType === "stdio") {
-      mcpProxyServerUrl.searchParams.append("command", command || '');
-      mcpProxyServerUrl.searchParams.append("args", args || '');
-      mcpProxyServerUrl.searchParams.append("env", JSON.stringify(env || {}));
-    } else {
-      mcpProxyServerUrl.searchParams.append("url", sseUrl);
-    }
-    console.log('sseUrl===', sseUrl)
+    // mcpProxyServerUrl.searchParams.append("transportType", transportType);
+    // if (transportType === "stdio") {
+    //   mcpProxyServerUrl.searchParams.append("command", command || '');
+    //   mcpProxyServerUrl.searchParams.append("args", args || '');
+    //   mcpProxyServerUrl.searchParams.append("env", JSON.stringify(env || {}));
+    // } else {
+    //   mcpProxyServerUrl.searchParams.append("url", newSseUrl);
+    // }
+    // console.log('sseUrl===', newSseUrl)
     try {
       // Inject auth manually instead of using SSEClientTransport, because we're
       // proxying through the inspector server first.
