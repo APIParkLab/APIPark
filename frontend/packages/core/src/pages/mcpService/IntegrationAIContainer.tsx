@@ -1,4 +1,4 @@
-import { App, Card, Select } from 'antd'
+import { App, Button, Card, Empty, Select } from 'antd'
 import { $t } from '@common/locales/index.ts'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { useEffect, useState } from 'react'
@@ -7,6 +7,9 @@ import { IconButton } from '@common/components/postcat/api/IconButton'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { useConnection } from './hook/useConnection'
+import { ClientRequest, Tool, ListToolsResultSchema } from '@modelcontextprotocol/sdk/types.js'
+import { z } from 'zod'
+import { useNavigate } from 'react-router-dom'
 
 type ConfigList = {
   openApi?: {
@@ -28,13 +31,26 @@ type ApiKeyItem = {
   value: string
 }
 
-const IntegrationAIContainer = ({ type, handleApiKeyChange }: { type: 'global' | 'service'; handleApiKeyChange: (value: string) => void }) => {
+const IntegrationAIContainer = ({
+  type,
+  handleToolsChange
+}: {
+  type: 'global' | 'service'
+  handleToolsChange: (value: Tool[]) => void
+}) => {
   const [activeTab, setActiveTab] = useState('mcp')
   const { message } = App.useApp()
   const [configContent, setConfigContent] = useState<string>('')
   const [apiKey, setApiKey] = useState<string>('')
   const [apiKeyList, setApiKeyList] = useState<{ value: string; label: string }[]>([])
   const [mcpServerUrl, setMcpServerUrl] = useState<string>('')
+  const navigator = useNavigate()
+  const [errors, setErrors] = useState<Record<string, string | null>>({
+    resources: null,
+    prompts: null,
+    tools: null
+  })
+
   const [tabContent, setTabContent] = useState<ConfigList>({
     mcp: {
       title: $t('MCP 配置'),
@@ -76,7 +92,6 @@ const IntegrationAIContainer = ({ type, handleApiKeyChange }: { type: 'global' |
 
   const handleChange = (value: string) => {
     setApiKey(value)
-    handleApiKeyChange(value)
   }
 
   /**
@@ -104,6 +119,10 @@ const IntegrationAIContainer = ({ type, handleApiKeyChange }: { type: 'global' |
       .catch((errorInfo) => {
         message.error(errorInfo || $t(RESPONSE_TIPS.error))
       })
+  }
+
+  const addKey = () => {
+    navigator('/mcpKey')
   }
 
   /**
@@ -136,6 +155,41 @@ const IntegrationAIContainer = ({ type, handleApiKeyChange }: { type: 'global' |
       })
   }
 
+  const clearError = (tabKey: keyof typeof errors) => {
+    setErrors((prev) => ({ ...prev, [tabKey]: null }))
+  }
+
+  const makeRequest = async <T extends z.ZodType>(request: ClientRequest, schema: T, tabKey?: keyof typeof errors) => {
+    try {
+      const response = await makeConnectionRequest(request, schema)
+      if (tabKey !== undefined) {
+        clearError(tabKey)
+      }
+      return response
+    } catch (e) {
+      const errorString = (e as Error).message ?? String(e)
+      if (tabKey !== undefined) {
+        setErrors((prev) => ({
+          ...prev,
+          [tabKey]: errorString
+        }))
+      }
+      throw e
+    }
+  }
+
+  const listTools = async () => {
+    const response = await makeRequest(
+      {
+        method: 'tools/list' as const,
+        params: {}
+      },
+      ListToolsResultSchema,
+      'tools'
+    )
+    handleToolsChange(response.tools)
+  }
+
   const {
     connectionStatus,
     serverCapabilities,
@@ -146,72 +200,54 @@ const IntegrationAIContainer = ({ type, handleApiKeyChange }: { type: 'global' |
     handleCompletion,
     completionsSupported,
     connect: connectMcpServer,
-    disconnect: disconnectMcpServer,
+    disconnect: disconnectMcpServer
   } = useConnection({
     transportType: 'sse',
-    sseUrl: mcpServerUrl,
-    proxyServerUrl: 'mcp/global/sse',
-    requestTimeout: 1000,
-  });
-  console.log('connectionStatus==================', connectionStatus);
-  // console.log('serverCapabilities==================', serverCapabilities);
-  // console.log('mcpClient==================', mcpClient);
-  // console.log('requestHistory==================', requestHistory);
-  // console.log('makeConnectionRequest==================', makeConnectionRequest);
-  // console.log('sendNotification==================', sendNotification);
-  // console.log('handleCompletion==================', handleCompletion);
-  // console.log('completionsSupported==================', completionsSupported);
-  // console.log('connectMcpServer==================', connectMcpServer);
-  // console.log('disconnectMcpServer==================', disconnectMcpServer);
-  // const useConnectAIagent = () => {
-  //   connectMcpServer()
-  // }
+    sseUrl: '',
+    proxyServerUrl: mcpServerUrl,
+    requestTimeout: 1000
+  })
 
   useEffect(() => {
-    type === 'global' && getGlobalMcpConfig()
+    if (type === 'global') {
+      getGlobalMcpConfig()
+      setMcpServerUrl('mcp/global/sse')
+    }
     initTabsData()
     getKeysList()
   }, [])
   useEffect(() => {
-    if (activeTab === 'openApi') {
-      setConfigContent(tabContent.openApi?.configContent || '')
-    } else if (activeTab === 'mcp') {
-      setConfigContent(tabContent.mcp.configContent || '')
+    if (activeTab === 'openApi' && tabContent?.openApi?.configContent) {
+      setConfigContent(tabContent?.openApi?.configContent?.replace('{your_api_key}', apiKey || '{your_api_key}'))
+    } else if (activeTab === 'mcp' && tabContent?.mcp?.configContent) {
+      setConfigContent(tabContent.mcp.configContent?.replace('{your_api_key}', apiKey || '{your_api_key}'))
     }
-  }, [tabContent, activeTab])
+  }, [apiKey, activeTab, tabContent])
+
   useEffect(() => {
-    if (configContent && apiKey) {
-      const parsedConfig = JSON.parse(configContent)
-      console.log('啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊parsedConfig', parsedConfig, apiKey)
-      let baseUrl = ''
-      if (parsedConfig?.mcpServers) {
-        // 获取 mcpServers 对象中的第一个键
-        const serverKey = Object.keys(parsedConfig.mcpServers)[0]
-        baseUrl = parsedConfig.mcpServers[serverKey]?.url
-      }
-      baseUrl = baseUrl.replace('{your_api_key}', apiKey)
-      if (mcpServerUrl === baseUrl) {
-        return
-      }
-      setMcpServerUrl(baseUrl)
-      console.log('啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊', mcpServerUrl)
+    if (mcpServerUrl) {
       if (connectionStatus === 'connected') {
         disconnectMcpServer()
       }
       connectMcpServer()
     }
-  }, [apiKey, configContent, connectMcpServer])
+  }, [mcpServerUrl])
+  useEffect(() => {
+    if (connectionStatus === 'connected') {
+      listTools()
+    }
+  }, [connectionStatus])
 
   return (
     <>
       <Card
         style={{ borderRadius: '10px' }}
-        className="w-[400px]"
+        className="w-[400px] h-fit"
         classNames={{
           body: 'p-[10px]'
         }}
       >
-        <p>
+        <p onClick={listTools}>
           <Icon
             icon="icon-park-solid:connection-point-two"
             className="align-text-bottom mr-[5px]"
@@ -278,34 +314,42 @@ const IntegrationAIContainer = ({ type, handleApiKeyChange }: { type: 'global' |
         {activeTab === 'mcp' && (
           <>
             <div className="tab-content font-semibold my-[10px]">API Key</div>
-            <Select value={apiKey} className="w-full" onChange={handleChange} options={apiKeyList} />
-            <Card
-              style={{ borderRadius: '5px' }}
-              className="w-full mt-[5px] "
-              classNames={{
-                body: 'p-[5px]'
-              }}
-            >
-              <div className="relative h-[25px]">
-                {apiKey}
-                <IconButton
-                  name="copy"
-                  onClick={() => handleCopy(configContent)}
-                  sx={{
-                    position: 'absolute',
-                    top: '0px',
-                    right: '5px',
-                    color: '#999',
-                    transition: 'none',
-                    '&.MuiButtonBase-root:hover': {
-                      background: 'transparent',
-                      color: '#3D46F2',
-                      transition: 'none'
-                    }
+            {apiKeyList.length ? (
+              <>
+                <Select value={apiKey} className="w-full" onChange={handleChange} options={apiKeyList} />
+                <Card
+                  style={{ borderRadius: '5px' }}
+                  className="w-full mt-[5px] "
+                  classNames={{
+                    body: 'p-[5px]'
                   }}
-                ></IconButton>
-              </div>
-            </Card>
+                >
+                  <div className="relative h-[25px]">
+                    {apiKey}
+                    <IconButton
+                      name="copy"
+                      onClick={() => handleCopy(configContent)}
+                      sx={{
+                        position: 'absolute',
+                        top: '0px',
+                        right: '5px',
+                        color: '#999',
+                        transition: 'none',
+                        '&.MuiButtonBase-root:hover': {
+                          background: 'transparent',
+                          color: '#3D46F2',
+                          transition: 'none'
+                        }
+                      }}
+                    ></IconButton>
+                  </div>
+                </Card>
+              </>
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={""}>
+                <Button onClick={addKey} type="primary">{$t('新增 API Key')}</Button>
+              </Empty>
+            )}
           </>
         )}
       </Card>
