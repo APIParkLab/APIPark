@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom'
 class InsidePageProps {
   showBanner?: boolean = true
   pageTitle: string | React.ReactNode = ''
-  tagList?: Array<{ label: string | ReactNode }> = []
+  tagList?: Array<{ label: string | ReactNode; className?: string; color?: string }> = []
   children: React.ReactNode
   showBtn?: boolean = false
   btnTitle?: string = ''
@@ -79,7 +79,7 @@ const InsidePage: FC<InsidePageProps> = ({
                     tagList?.length > 0 &&
                     tagList?.map((tag) => {
                       return (
-                        <Tag key={tag.label as string} bordered={false}>
+                        <Tag key={tag.label as string} bordered={false} color={tag.color} className={tag.className}>
                           {tag.label}
                         </Tag>
                       )
