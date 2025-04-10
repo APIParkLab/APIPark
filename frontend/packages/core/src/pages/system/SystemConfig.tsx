@@ -23,6 +23,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { SystemConfigFieldType, SystemConfigHandle } from '../../const/system/type.ts'
 import { useSystemContext } from '../../contexts/SystemContext.tsx'
 import { Codebox } from '@common/components/postcat/api/Codebox/index.tsx'
+import { useAiServiceContext } from '@core/contexts/AiServiceContext.tsx'
 
 export type SimpleAiProviderItem = EntityItem & {
   configured: boolean
@@ -39,6 +40,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
   const navigate = useNavigate()
   const { setBreadcrumb } = useBreadcrumb()
   const { setSystemInfo } = useSystemContext()
+  const { setAiServiceInfo } = useAiServiceContext()
   const [showClassify, setShowClassify] = useState<boolean>(true)
   const [showAI, setShowAI] = useState<boolean>(false)
   const [imageBase64, setImageBase64] = useState<string | null>(null)
@@ -274,6 +276,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
           if (code === STATUS_CODE.SUCCESS) {
             message.success(msg || $t(RESPONSE_TIPS.success))
             setSystemInfo(data.service)
+            setAiServiceInfo(data.service)
             return Promise.resolve(true)
           } else {
             message.error(msg || $t(RESPONSE_TIPS.error))
