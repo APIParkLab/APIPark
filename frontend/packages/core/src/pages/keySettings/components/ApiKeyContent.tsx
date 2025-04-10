@@ -26,7 +26,7 @@ const ApiKeyContent: React.FC<ApiKeyContentProps> = forwardRef(({ provider, enti
       form.setFieldsValue({
         name: entity.name,
         expire_time: isNeverExpire ? undefined : dayjs(entity.expire_time * 1000),
-        config: entity.config
+        config: entity.config ? JSON.stringify(JSON.parse(entity.config), null, 2) : ''
       })
     } catch (e) {
       form.setFieldsValue({

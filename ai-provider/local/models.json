@@ -10703,7 +10703,7 @@
     {
       "id": "llava",
       "name": "llava",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.7GB",
       "digest": "8dd30f6b0cb1",
       "provider": "",
@@ -10713,7 +10713,7 @@
     {
       "id": "llava:7b",
       "name": "llava:7b",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.7GB",
       "digest": "8dd30f6b0cb1",
       "provider": "",
@@ -10723,7 +10723,7 @@
     {
       "id": "llava:13b",
       "name": "llava:13b",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "8.0GB",
       "digest": "0d0eb4d7f485",
       "provider": "",
@@ -10733,7 +10733,7 @@
     {
       "id": "llava:34b",
       "name": "llava:34b",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "20GB",
       "digest": "3d2d24f46674",
       "provider": "",
@@ -10743,7 +10743,7 @@
     {
       "id": "llava:13b-v1.5-fp16",
       "name": "llava:13b-v1.5-fp16",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "27GB",
       "digest": "ce3bde71eaa7",
       "provider": "",
@@ -10753,7 +10753,7 @@
     {
       "id": "llava:13b-v1.5-q2_K",
       "name": "llava:13b-v1.5-q2_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "6.1GB",
       "digest": "3cdd3869f154",
       "provider": "",
@@ -10763,7 +10763,7 @@
     {
       "id": "llava:13b-v1.5-q3_K_L",
       "name": "llava:13b-v1.5-q3_K_L",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "7.6GB",
       "digest": "07b1b74ec398",
       "provider": "",
@@ -10773,7 +10773,7 @@
     {
       "id": "llava:13b-v1.5-q3_K_M",
       "name": "llava:13b-v1.5-q3_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "7.0GB",
       "digest": "61441e82808c",
       "provider": "",
@@ -10783,7 +10783,7 @@
     {
       "id": "llava:13b-v1.5-q3_K_S",
       "name": "llava:13b-v1.5-q3_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "6.3GB",
       "digest": "c860f869008d",
       "provider": "",
@@ -10793,7 +10793,7 @@
     {
       "id": "llava:13b-v1.5-q4_0",
       "name": "llava:13b-v1.5-q4_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "8.0GB",
       "digest": "e3b7997801dc",
       "provider": "",
@@ -10803,7 +10803,7 @@
     {
       "id": "llava:13b-v1.5-q4_1",
       "name": "llava:13b-v1.5-q4_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "8.8GB",
       "digest": "0ca30ff66062",
       "provider": "",
@@ -10813,7 +10813,7 @@
     {
       "id": "llava:13b-v1.5-q4_K_M",
       "name": "llava:13b-v1.5-q4_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "8.5GB",
       "digest": "d0a6a3f0e6c4",
       "provider": "",
@@ -10823,7 +10823,7 @@
     {
       "id": "llava:13b-v1.5-q4_K_S",
       "name": "llava:13b-v1.5-q4_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "8.1GB",
       "digest": "16939c152bd9",
       "provider": "",
@@ -10833,7 +10833,7 @@
     {
       "id": "llava:13b-v1.5-q5_0",
       "name": "llava:13b-v1.5-q5_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "9.6GB",
       "digest": "78e17026912a",
       "provider": "",
@@ -10843,7 +10843,7 @@
     {
       "id": "llava:13b-v1.5-q5_1",
       "name": "llava:13b-v1.5-q5_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "10GB",
       "digest": "b11f33bc65fa",
       "provider": "",
@@ -10853,7 +10853,7 @@
     {
       "id": "llava:13b-v1.5-q5_K_M",
       "name": "llava:13b-v1.5-q5_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "9.9GB",
       "digest": "48418b116e18",
       "provider": "",
@@ -10863,7 +10863,7 @@
     {
       "id": "llava:13b-v1.5-q5_K_S",
       "name": "llava:13b-v1.5-q5_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "9.6GB",
       "digest": "c7f4b8076a0e",
       "provider": "",
@@ -10873,7 +10873,7 @@
     {
       "id": "llava:13b-v1.5-q6_K",
       "name": "llava:13b-v1.5-q6_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "11GB",
       "digest": "3c085b55f924",
       "provider": "",
@@ -10883,7 +10883,7 @@
     {
       "id": "llava:13b-v1.5-q8_0",
       "name": "llava:13b-v1.5-q8_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "14GB",
       "digest": "4e00c435bb25",
       "provider": "",
@@ -10893,7 +10893,7 @@
     {
       "id": "llava:13b-v1.6",
       "name": "llava:13b-v1.6",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "8.0GB",
       "digest": "0d0eb4d7f485",
       "provider": "",
@@ -10903,7 +10903,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-fp16",
       "name": "llava:13b-v1.6-vicuna-fp16",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "27GB",
       "digest": "81e28406a4e9",
       "provider": "",
@@ -10913,7 +10913,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q2_K",
       "name": "llava:13b-v1.6-vicuna-q2_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.5GB",
       "digest": "87aecb135e2a",
       "provider": "",
@@ -10923,7 +10923,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q3_K_L",
       "name": "llava:13b-v1.6-vicuna-q3_K_L",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "7.6GB",
       "digest": "a2b56a2b8e79",
       "provider": "",
@@ -10933,7 +10933,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q3_K_M",
       "name": "llava:13b-v1.6-vicuna-q3_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "7.0GB",
       "digest": "2e48f094b51a",
       "provider": "",
@@ -10943,7 +10943,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q3_K_S",
       "name": "llava:13b-v1.6-vicuna-q3_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "6.3GB",
       "digest": "54ef03322645",
       "provider": "",
@@ -10953,7 +10953,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q4_0",
       "name": "llava:13b-v1.6-vicuna-q4_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "8.0GB",
       "digest": "0d0eb4d7f485",
       "provider": "",
@@ -10963,7 +10963,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q4_1",
       "name": "llava:13b-v1.6-vicuna-q4_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "8.8GB",
       "digest": "0b97528b26b0",
       "provider": "",
@@ -10973,7 +10973,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q4_K_M",
       "name": "llava:13b-v1.6-vicuna-q4_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "8.5GB",
       "digest": "0843119c3874",
       "provider": "",
@@ -10983,7 +10983,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q4_K_S",
       "name": "llava:13b-v1.6-vicuna-q4_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "8.1GB",
       "digest": "5e4cf96dfc4c",
       "provider": "",
@@ -10993,7 +10993,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q5_0",
       "name": "llava:13b-v1.6-vicuna-q5_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "9.6GB",
       "digest": "6e06e1393058",
       "provider": "",
@@ -11003,7 +11003,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q5_1",
       "name": "llava:13b-v1.6-vicuna-q5_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "10GB",
       "digest": "31f1d78cb272",
       "provider": "",
@@ -11013,7 +11013,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q5_K_M",
       "name": "llava:13b-v1.6-vicuna-q5_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "9.9GB",
       "digest": "446b10458a6a",
       "provider": "",
@@ -11023,7 +11023,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q5_K_S",
       "name": "llava:13b-v1.6-vicuna-q5_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "9.6GB",
       "digest": "53999e2c86c8",
       "provider": "",
@@ -11033,7 +11033,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q6_K",
       "name": "llava:13b-v1.6-vicuna-q6_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "11GB",
       "digest": "1c0a91e1e4d9",
       "provider": "",
@@ -11043,7 +11043,7 @@
     {
       "id": "llava:13b-v1.6-vicuna-q8_0",
       "name": "llava:13b-v1.6-vicuna-q8_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "14GB",
       "digest": "b25c4195f9e2",
       "provider": "",
@@ -11053,7 +11053,7 @@
     {
       "id": "llava:34b-v1.6",
       "name": "llava:34b-v1.6",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "20GB",
       "digest": "3d2d24f46674",
       "provider": "",
@@ -11063,7 +11063,7 @@
     {
       "id": "llava:34b-v1.6-fp16",
       "name": "llava:34b-v1.6-fp16",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "69GB",
       "digest": "89c50af82d5e",
       "provider": "",
@@ -11073,7 +11073,7 @@
     {
       "id": "llava:34b-v1.6-q2_K",
       "name": "llava:34b-v1.6-q2_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "14GB",
       "digest": "6326f59da4f1",
       "provider": "",
@@ -11083,7 +11083,7 @@
     {
       "id": "llava:34b-v1.6-q3_K_L",
       "name": "llava:34b-v1.6-q3_K_L",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "19GB",
       "digest": "7f9889648d1a",
       "provider": "",
@@ -11093,7 +11093,7 @@
     {
       "id": "llava:34b-v1.6-q3_K_M",
       "name": "llava:34b-v1.6-q3_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "17GB",
       "digest": "89e924fed7d4",
       "provider": "",
@@ -11103,7 +11103,7 @@
     {
       "id": "llava:34b-v1.6-q3_K_S",
       "name": "llava:34b-v1.6-q3_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "16GB",
       "digest": "a0376a205682",
       "provider": "",
@@ -11113,7 +11113,7 @@
     {
       "id": "llava:34b-v1.6-q4_0",
       "name": "llava:34b-v1.6-q4_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "20GB",
       "digest": "3d2d24f46674",
       "provider": "",
@@ -11123,7 +11123,7 @@
     {
       "id": "llava:34b-v1.6-q4_1",
       "name": "llava:34b-v1.6-q4_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "22GB",
       "digest": "96d20de28a1a",
       "provider": "",
@@ -11133,7 +11133,7 @@
     {
       "id": "llava:34b-v1.6-q4_K_M",
       "name": "llava:34b-v1.6-q4_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "21GB",
       "digest": "538ff4c5a8b8",
       "provider": "",
@@ -11143,7 +11143,7 @@
     {
       "id": "llava:34b-v1.6-q4_K_S",
       "name": "llava:34b-v1.6-q4_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "20GB",
       "digest": "787b2213f0db",
       "provider": "",
@@ -11153,7 +11153,7 @@
     {
       "id": "llava:34b-v1.6-q5_0",
       "name": "llava:34b-v1.6-q5_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "24GB",
       "digest": "b239e218bdf0",
       "provider": "",
@@ -11163,7 +11163,7 @@
     {
       "id": "llava:34b-v1.6-q5_1",
       "name": "llava:34b-v1.6-q5_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "27GB",
       "digest": "60926fd725ec",
       "provider": "",
@@ -11173,7 +11173,7 @@
     {
       "id": "llava:34b-v1.6-q5_K_M",
       "name": "llava:34b-v1.6-q5_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "25GB",
       "digest": "0eb2ab10d35c",
       "provider": "",
@@ -11183,7 +11183,7 @@
     {
       "id": "llava:34b-v1.6-q5_K_S",
       "name": "llava:34b-v1.6-q5_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "24GB",
       "digest": "cdd8d5db3870",
       "provider": "",
@@ -11193,7 +11193,7 @@
     {
       "id": "llava:34b-v1.6-q6_K",
       "name": "llava:34b-v1.6-q6_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "29GB",
       "digest": "8f572ea02185",
       "provider": "",
@@ -11203,7 +11203,7 @@
     {
       "id": "llava:34b-v1.6-q8_0",
       "name": "llava:34b-v1.6-q8_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "37GB",
       "digest": "959065f30849",
       "provider": "",
@@ -11213,7 +11213,7 @@
     {
       "id": "llava:7b-v1.5-fp16",
       "name": "llava:7b-v1.5-fp16",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "14GB",
       "digest": "337a5b25bada",
       "provider": "",
@@ -11223,7 +11223,7 @@
     {
       "id": "llava:7b-v1.5-q2_K",
       "name": "llava:7b-v1.5-q2_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "3.5GB",
       "digest": "33973d2589d1",
       "provider": "",
@@ -11233,7 +11233,7 @@
     {
       "id": "llava:7b-v1.5-q3_K_L",
       "name": "llava:7b-v1.5-q3_K_L",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.2GB",
       "digest": "057fefd59cdb",
       "provider": "",
@@ -11243,7 +11243,7 @@
     {
       "id": "llava:7b-v1.5-q3_K_M",
       "name": "llava:7b-v1.5-q3_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "3.9GB",
       "digest": "9d738df24288",
       "provider": "",
@@ -11253,7 +11253,7 @@
     {
       "id": "llava:7b-v1.5-q3_K_S",
       "name": "llava:7b-v1.5-q3_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "3.6GB",
       "digest": "605b68e0b568",
       "provider": "",
@@ -11263,7 +11263,7 @@
     {
       "id": "llava:7b-v1.5-q4_0",
       "name": "llava:7b-v1.5-q4_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.5GB",
       "digest": "cd3274b81a85",
       "provider": "",
@@ -11273,7 +11273,7 @@
     {
       "id": "llava:7b-v1.5-q4_1",
       "name": "llava:7b-v1.5-q4_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.9GB",
       "digest": "146a55d9df75",
       "provider": "",
@@ -11283,7 +11283,7 @@
     {
       "id": "llava:7b-v1.5-q4_K_M",
       "name": "llava:7b-v1.5-q4_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.7GB",
       "digest": "75a9333e75cd",
       "provider": "",
@@ -11293,7 +11293,7 @@
     {
       "id": "llava:7b-v1.5-q4_K_S",
       "name": "llava:7b-v1.5-q4_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.5GB",
       "digest": "d8d545afa5f0",
       "provider": "",
@@ -11303,7 +11303,7 @@
     {
       "id": "llava:7b-v1.5-q5_0",
       "name": "llava:7b-v1.5-q5_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.3GB",
       "digest": "339249626980",
       "provider": "",
@@ -11313,7 +11313,7 @@
     {
       "id": "llava:7b-v1.5-q5_1",
       "name": "llava:7b-v1.5-q5_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.7GB",
       "digest": "6d97e8715c53",
       "provider": "",
@@ -11323,7 +11323,7 @@
     {
       "id": "llava:7b-v1.5-q5_K_M",
       "name": "llava:7b-v1.5-q5_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.4GB",
       "digest": "4fb097b9cfa3",
       "provider": "",
@@ -11333,7 +11333,7 @@
     {
       "id": "llava:7b-v1.5-q5_K_S",
       "name": "llava:7b-v1.5-q5_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.3GB",
       "digest": "34f9b24f2315",
       "provider": "",
@@ -11343,7 +11343,7 @@
     {
       "id": "llava:7b-v1.5-q6_K",
       "name": "llava:7b-v1.5-q6_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "6.2GB",
       "digest": "df0203e92f79",
       "provider": "",
@@ -11353,7 +11353,7 @@
     {
       "id": "llava:7b-v1.5-q8_0",
       "name": "llava:7b-v1.5-q8_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "7.8GB",
       "digest": "c684b68b3f34",
       "provider": "",
@@ -11363,7 +11363,7 @@
     {
       "id": "llava:7b-v1.6",
       "name": "llava:7b-v1.6",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.7GB",
       "digest": "8dd30f6b0cb1",
       "provider": "",
@@ -11373,7 +11373,7 @@
     {
       "id": "llava:7b-v1.6-mistral-fp16",
       "name": "llava:7b-v1.6-mistral-fp16",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "15GB",
       "digest": "9fd1e5417c5f",
       "provider": "",
@@ -11383,7 +11383,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q2_K",
       "name": "llava:7b-v1.6-mistral-q2_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "3.3GB",
       "digest": "52e0ce44a5f5",
       "provider": "",
@@ -11393,7 +11393,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q3_K_L",
       "name": "llava:7b-v1.6-mistral-q3_K_L",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.4GB",
       "digest": "a48bbc9b567b",
       "provider": "",
@@ -11403,7 +11403,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q3_K_M",
       "name": "llava:7b-v1.6-mistral-q3_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.1GB",
       "digest": "25a00600f8b4",
       "provider": "",
@@ -11413,7 +11413,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q3_K_S",
       "name": "llava:7b-v1.6-mistral-q3_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "3.8GB",
       "digest": "2b9c055fe6a2",
       "provider": "",
@@ -11423,7 +11423,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q4_0",
       "name": "llava:7b-v1.6-mistral-q4_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.7GB",
       "digest": "8dd30f6b0cb1",
       "provider": "",
@@ -11433,7 +11433,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q4_1",
       "name": "llava:7b-v1.6-mistral-q4_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.2GB",
       "digest": "8da3213068e6",
       "provider": "",
@@ -11443,7 +11443,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q4_K_M",
       "name": "llava:7b-v1.6-mistral-q4_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.0GB",
       "digest": "8d3fbd6ad3f4",
       "provider": "",
@@ -11453,7 +11453,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q4_K_S",
       "name": "llava:7b-v1.6-mistral-q4_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.8GB",
       "digest": "2878e8c79f6e",
       "provider": "",
@@ -11463,7 +11463,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q5_0",
       "name": "llava:7b-v1.6-mistral-q5_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.6GB",
       "digest": "b8f63553f521",
       "provider": "",
@@ -11473,7 +11473,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q5_1",
       "name": "llava:7b-v1.6-mistral-q5_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "6.1GB",
       "digest": "eda0b3f3b09b",
       "provider": "",
@@ -11483,7 +11483,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q5_K_M",
       "name": "llava:7b-v1.6-mistral-q5_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.8GB",
       "digest": "244b7e3d3d5a",
       "provider": "",
@@ -11493,7 +11493,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q5_K_S",
       "name": "llava:7b-v1.6-mistral-q5_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.6GB",
       "digest": "62dc434a7ae8",
       "provider": "",
@@ -11503,7 +11503,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q6_K",
       "name": "llava:7b-v1.6-mistral-q6_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "6.6GB",
       "digest": "8781169d7f8f",
       "provider": "",
@@ -11513,7 +11513,7 @@
     {
       "id": "llava:7b-v1.6-mistral-q8_0",
       "name": "llava:7b-v1.6-mistral-q8_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "8.3GB",
       "digest": "c2973e390e84",
       "provider": "",
@@ -11523,7 +11523,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-fp16",
       "name": "llava:7b-v1.6-vicuna-fp16",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "14GB",
       "digest": "bb8da134bacb",
       "provider": "",
@@ -11533,7 +11533,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q2_K",
       "name": "llava:7b-v1.6-vicuna-q2_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "3.2GB",
       "digest": "6321163f3833",
       "provider": "",
@@ -11543,7 +11543,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q3_K_L",
       "name": "llava:7b-v1.6-vicuna-q3_K_L",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.2GB",
       "digest": "0127d9087e07",
       "provider": "",
@@ -11553,7 +11553,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q3_K_M",
       "name": "llava:7b-v1.6-vicuna-q3_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "3.9GB",
       "digest": "7004e1f24eb1",
       "provider": "",
@@ -11563,7 +11563,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q3_K_S",
       "name": "llava:7b-v1.6-vicuna-q3_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "3.6GB",
       "digest": "7701df672950",
       "provider": "",
@@ -11573,7 +11573,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q4_0",
       "name": "llava:7b-v1.6-vicuna-q4_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.5GB",
       "digest": "b6cbe07f1d5e",
       "provider": "",
@@ -11583,7 +11583,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q4_1",
       "name": "llava:7b-v1.6-vicuna-q4_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.9GB",
       "digest": "f8a27e237e97",
       "provider": "",
@@ -11593,7 +11593,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q4_K_M",
       "name": "llava:7b-v1.6-vicuna-q4_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.7GB",
       "digest": "15360a9e0fb9",
       "provider": "",
@@ -11603,7 +11603,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q4_K_S",
       "name": "llava:7b-v1.6-vicuna-q4_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.5GB",
       "digest": "5006a8a41d2b",
       "provider": "",
@@ -11613,7 +11613,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q5_0",
       "name": "llava:7b-v1.6-vicuna-q5_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.3GB",
       "digest": "6a2bb61a611a",
       "provider": "",
@@ -11623,7 +11623,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q5_1",
       "name": "llava:7b-v1.6-vicuna-q5_1",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.7GB",
       "digest": "1bd37032ec33",
       "provider": "",
@@ -11633,7 +11633,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q5_K_M",
       "name": "llava:7b-v1.6-vicuna-q5_K_M",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.4GB",
       "digest": "b22b0c041223",
       "provider": "",
@@ -11643,7 +11643,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q5_K_S",
       "name": "llava:7b-v1.6-vicuna-q5_K_S",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "5.3GB",
       "digest": "4aaa19502e34",
       "provider": "",
@@ -11653,7 +11653,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q6_K",
       "name": "llava:7b-v1.6-vicuna-q6_K",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "6.2GB",
       "digest": "11bd55683f9c",
       "provider": "",
@@ -11663,7 +11663,7 @@
     {
       "id": "llava:7b-v1.6-vicuna-q8_0",
       "name": "llava:7b-v1.6-vicuna-q8_0",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "7.8GB",
       "digest": "6da20a71d9bb",
       "provider": "",
@@ -11673,7 +11673,7 @@
     {
       "id": "llava:v1.6",
       "name": "llava:v1.6",
-      "description": "🌋 LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
+      "description": "LLaVA is a novel end-to-end trained large multimodal model that combines a vision encoder and Vicuna for general-purpose visual and language understanding. Updated to version 1.6.",
       "size": "4.7GB",
       "digest": "8dd30f6b0cb1",
       "provider": "",
@@ -35753,7 +35753,7 @@
     {
       "id": "smollm",
       "name": "smollm",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "991MB",
       "digest": "95f6557a0f0f",
       "provider": "",
@@ -35763,7 +35763,7 @@
     {
       "id": "smollm:135m",
       "name": "smollm:135m",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "92MB",
       "digest": "b0b2a4617438",
       "provider": "",
@@ -35773,7 +35773,7 @@
     {
       "id": "smollm:360m",
       "name": "smollm:360m",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "229MB",
       "digest": "b3ba1ccba2b8",
       "provider": "",
@@ -35783,7 +35783,7 @@
     {
       "id": "smollm:1.7b",
       "name": "smollm:1.7b",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "991MB",
       "digest": "95f6557a0f0f",
       "provider": "",
@@ -35793,7 +35793,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-fp16",
       "name": "smollm:1.7b-base-v0.2-fp16",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "3.4GB",
       "digest": "64f31ee84d1c",
       "provider": "",
@@ -35803,7 +35803,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q2_K",
       "name": "smollm:1.7b-base-v0.2-q2_K",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "675MB",
       "digest": "b013da007877",
       "provider": "",
@@ -35813,7 +35813,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q3_K_L",
       "name": "smollm:1.7b-base-v0.2-q3_K_L",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "933MB",
       "digest": "9656463272fe",
       "provider": "",
@@ -35823,7 +35823,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q3_K_M",
       "name": "smollm:1.7b-base-v0.2-q3_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "860MB",
       "digest": "9acc25818892",
       "provider": "",
@@ -35833,7 +35833,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q3_K_S",
       "name": "smollm:1.7b-base-v0.2-q3_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "777MB",
       "digest": "596523cb1def",
       "provider": "",
@@ -35843,7 +35843,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q4_0",
       "name": "smollm:1.7b-base-v0.2-q4_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "991MB",
       "digest": "97f3f0aef2df",
       "provider": "",
@@ -35853,7 +35853,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q4_1",
       "name": "smollm:1.7b-base-v0.2-q4_1",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.1GB",
       "digest": "0c1bb3471f92",
       "provider": "",
@@ -35863,7 +35863,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q4_K_M",
       "name": "smollm:1.7b-base-v0.2-q4_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.1GB",
       "digest": "8dec12ffec4a",
       "provider": "",
@@ -35873,7 +35873,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q4_K_S",
       "name": "smollm:1.7b-base-v0.2-q4_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "999MB",
       "digest": "9b3d36b6e0c2",
       "provider": "",
@@ -35883,7 +35883,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q5_0",
       "name": "smollm:1.7b-base-v0.2-q5_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.2GB",
       "digest": "7eddfb294e53",
       "provider": "",
@@ -35893,7 +35893,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q5_1",
       "name": "smollm:1.7b-base-v0.2-q5_1",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.3GB",
       "digest": "fde4c91abcce",
       "provider": "",
@@ -35903,7 +35903,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q5_K_M",
       "name": "smollm:1.7b-base-v0.2-q5_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.2GB",
       "digest": "7daaf6f561d8",
       "provider": "",
@@ -35913,7 +35913,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q5_K_S",
       "name": "smollm:1.7b-base-v0.2-q5_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.2GB",
       "digest": "4f0e5ec42d5b",
       "provider": "",
@@ -35923,7 +35923,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q6_K",
       "name": "smollm:1.7b-base-v0.2-q6_K",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.4GB",
       "digest": "9cf3be2645b6",
       "provider": "",
@@ -35933,7 +35933,7 @@
     {
       "id": "smollm:1.7b-base-v0.2-q8_0",
       "name": "smollm:1.7b-base-v0.2-q8_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.8GB",
       "digest": "d1f91cd676ad",
       "provider": "",
@@ -35943,7 +35943,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-fp16",
       "name": "smollm:1.7b-instruct-v0.2-fp16",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "3.4GB",
       "digest": "b07e591ca9ba",
       "provider": "",
@@ -35953,7 +35953,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q2_K",
       "name": "smollm:1.7b-instruct-v0.2-q2_K",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "675MB",
       "digest": "da8ba92e42b1",
       "provider": "",
@@ -35963,7 +35963,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q3_K_L",
       "name": "smollm:1.7b-instruct-v0.2-q3_K_L",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "933MB",
       "digest": "88ef3062260e",
       "provider": "",
@@ -35973,7 +35973,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q3_K_M",
       "name": "smollm:1.7b-instruct-v0.2-q3_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "860MB",
       "digest": "728c1f932b06",
       "provider": "",
@@ -35983,7 +35983,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q3_K_S",
       "name": "smollm:1.7b-instruct-v0.2-q3_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "777MB",
       "digest": "c35438da7180",
       "provider": "",
@@ -35993,7 +35993,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q4_0",
       "name": "smollm:1.7b-instruct-v0.2-q4_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "991MB",
       "digest": "95f6557a0f0f",
       "provider": "",
@@ -36003,7 +36003,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q4_1",
       "name": "smollm:1.7b-instruct-v0.2-q4_1",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.1GB",
       "digest": "77d7238b232e",
       "provider": "",
@@ -36013,7 +36013,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q4_K_M",
       "name": "smollm:1.7b-instruct-v0.2-q4_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.1GB",
       "digest": "dd7299829a14",
       "provider": "",
@@ -36023,7 +36023,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q4_K_S",
       "name": "smollm:1.7b-instruct-v0.2-q4_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "999MB",
       "digest": "35eec1a7014d",
       "provider": "",
@@ -36033,7 +36033,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q5_0",
       "name": "smollm:1.7b-instruct-v0.2-q5_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.2GB",
       "digest": "8391060f29db",
       "provider": "",
@@ -36043,7 +36043,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q5_1",
       "name": "smollm:1.7b-instruct-v0.2-q5_1",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.3GB",
       "digest": "ce91dd1d7380",
       "provider": "",
@@ -36053,7 +36053,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q5_K_M",
       "name": "smollm:1.7b-instruct-v0.2-q5_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.2GB",
       "digest": "91d16f72a7b3",
       "provider": "",
@@ -36063,7 +36063,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q5_K_S",
       "name": "smollm:1.7b-instruct-v0.2-q5_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.2GB",
       "digest": "489a893ac8a7",
       "provider": "",
@@ -36073,7 +36073,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q6_K",
       "name": "smollm:1.7b-instruct-v0.2-q6_K",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.4GB",
       "digest": "ecdf9864899c",
       "provider": "",
@@ -36083,7 +36083,7 @@
     {
       "id": "smollm:1.7b-instruct-v0.2-q8_0",
       "name": "smollm:1.7b-instruct-v0.2-q8_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "1.8GB",
       "digest": "4afeb8de9eec",
       "provider": "",
@@ -36093,7 +36093,7 @@
     {
       "id": "smollm:135m-base-v0.2-fp16",
       "name": "smollm:135m-base-v0.2-fp16",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "271MB",
       "digest": "1d0f00cec918",
       "provider": "",
@@ -36103,7 +36103,7 @@
     {
       "id": "smollm:135m-base-v0.2-q2_K",
       "name": "smollm:135m-base-v0.2-q2_K",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "88MB",
       "digest": "e2048e8ac78d",
       "provider": "",
@@ -36113,7 +36113,7 @@
     {
       "id": "smollm:135m-base-v0.2-q3_K_L",
       "name": "smollm:135m-base-v0.2-q3_K_L",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "98MB",
       "digest": "c2e22813067a",
       "provider": "",
@@ -36123,7 +36123,7 @@
     {
       "id": "smollm:135m-base-v0.2-q3_K_M",
       "name": "smollm:135m-base-v0.2-q3_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "94MB",
       "digest": "a5ab45ae2e2e",
       "provider": "",
@@ -36133,7 +36133,7 @@
     {
       "id": "smollm:135m-base-v0.2-q3_K_S",
       "name": "smollm:135m-base-v0.2-q3_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "88MB",
       "digest": "102433ffd9fb",
       "provider": "",
@@ -36143,7 +36143,7 @@
     {
       "id": "smollm:135m-base-v0.2-q4_0",
       "name": "smollm:135m-base-v0.2-q4_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "92MB",
       "digest": "528415e872e5",
       "provider": "",
@@ -36153,7 +36153,7 @@
     {
       "id": "smollm:135m-base-v0.2-q4_1",
       "name": "smollm:135m-base-v0.2-q4_1",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "98MB",
       "digest": "edecca7cff90",
       "provider": "",
@@ -36163,7 +36163,7 @@
     {
       "id": "smollm:135m-base-v0.2-q4_K_M",
       "name": "smollm:135m-base-v0.2-q4_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "105MB",
       "digest": "3177ecf5d3b5",
       "provider": "",
@@ -36173,7 +36173,7 @@
     {
       "id": "smollm:135m-base-v0.2-q4_K_S",
       "name": "smollm:135m-base-v0.2-q4_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "102MB",
       "digest": "2aa760d22716",
       "provider": "",
@@ -36183,7 +36183,7 @@
     {
       "id": "smollm:135m-base-v0.2-q5_0",
       "name": "smollm:135m-base-v0.2-q5_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "105MB",
       "digest": "825973a56945",
       "provider": "",
@@ -36193,7 +36193,7 @@
     {
       "id": "smollm:135m-base-v0.2-q5_1",
       "name": "smollm:135m-base-v0.2-q5_1",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "112MB",
       "digest": "065d585f86d9",
       "provider": "",
@@ -36203,7 +36203,7 @@
     {
       "id": "smollm:135m-base-v0.2-q5_K_M",
       "name": "smollm:135m-base-v0.2-q5_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "112MB",
       "digest": "34545da0aa92",
       "provider": "",
@@ -36213,7 +36213,7 @@
     {
       "id": "smollm:135m-base-v0.2-q5_K_S",
       "name": "smollm:135m-base-v0.2-q5_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "110MB",
       "digest": "4aef8aaa4469",
       "provider": "",
@@ -36223,7 +36223,7 @@
     {
       "id": "smollm:135m-base-v0.2-q6_K",
       "name": "smollm:135m-base-v0.2-q6_K",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "138MB",
       "digest": "b11338fff65a",
       "provider": "",
@@ -36233,7 +36233,7 @@
     {
       "id": "smollm:135m-base-v0.2-q8_0",
       "name": "smollm:135m-base-v0.2-q8_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "145MB",
       "digest": "fcdc33f9909d",
       "provider": "",
@@ -36243,7 +36243,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-fp16",
       "name": "smollm:135m-instruct-v0.2-fp16",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "271MB",
       "digest": "95d01a081beb",
       "provider": "",
@@ -36253,7 +36253,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q2_K",
       "name": "smollm:135m-instruct-v0.2-q2_K",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "88MB",
       "digest": "e14a680b0b22",
       "provider": "",
@@ -36263,7 +36263,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q3_K_L",
       "name": "smollm:135m-instruct-v0.2-q3_K_L",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "98MB",
       "digest": "aede666c7e16",
       "provider": "",
@@ -36273,7 +36273,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q3_K_M",
       "name": "smollm:135m-instruct-v0.2-q3_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "94MB",
       "digest": "f5db1ab329b1",
       "provider": "",
@@ -36283,7 +36283,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q3_K_S",
       "name": "smollm:135m-instruct-v0.2-q3_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "88MB",
       "digest": "3ae895b5e9ea",
       "provider": "",
@@ -36293,7 +36293,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q4_0",
       "name": "smollm:135m-instruct-v0.2-q4_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "92MB",
       "digest": "b0b2a4617438",
       "provider": "",
@@ -36303,7 +36303,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q4_1",
       "name": "smollm:135m-instruct-v0.2-q4_1",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "98MB",
       "digest": "bbf7e14150a9",
       "provider": "",
@@ -36313,7 +36313,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q4_K_M",
       "name": "smollm:135m-instruct-v0.2-q4_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "105MB",
       "digest": "7eedbf45baa1",
       "provider": "",
@@ -36323,7 +36323,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q4_K_S",
       "name": "smollm:135m-instruct-v0.2-q4_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "102MB",
       "digest": "45013939c7c9",
       "provider": "",
@@ -36333,7 +36333,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q5_0",
       "name": "smollm:135m-instruct-v0.2-q5_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "105MB",
       "digest": "33187e134422",
       "provider": "",
@@ -36343,7 +36343,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q5_1",
       "name": "smollm:135m-instruct-v0.2-q5_1",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "112MB",
       "digest": "51f73e9aa3f5",
       "provider": "",
@@ -36353,7 +36353,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q5_K_M",
       "name": "smollm:135m-instruct-v0.2-q5_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "112MB",
       "digest": "a8975f4dc03b",
       "provider": "",
@@ -36363,7 +36363,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q5_K_S",
       "name": "smollm:135m-instruct-v0.2-q5_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "110MB",
       "digest": "52d3fabb63ee",
       "provider": "",
@@ -36373,7 +36373,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q6_K",
       "name": "smollm:135m-instruct-v0.2-q6_K",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "138MB",
       "digest": "dd1e60cf54df",
       "provider": "",
@@ -36383,7 +36383,7 @@
     {
       "id": "smollm:135m-instruct-v0.2-q8_0",
       "name": "smollm:135m-instruct-v0.2-q8_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "145MB",
       "digest": "6fbf8e918862",
       "provider": "",
@@ -36393,7 +36393,7 @@
     {
       "id": "smollm:360m-base-v0.2-fp16",
       "name": "smollm:360m-base-v0.2-fp16",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "726MB",
       "digest": "417c81308b94",
       "provider": "",
@@ -36403,7 +36403,7 @@
     {
       "id": "smollm:360m-base-v0.2-q2_K",
       "name": "smollm:360m-base-v0.2-q2_K",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "219MB",
       "digest": "e5e1a58c7d0c",
       "provider": "",
@@ -36413,7 +36413,7 @@
     {
       "id": "smollm:360m-base-v0.2-q3_K_L",
       "name": "smollm:360m-base-v0.2-q3_K_L",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "246MB",
       "digest": "d13db1d8af29",
       "provider": "",
@@ -36423,7 +36423,7 @@
     {
       "id": "smollm:360m-base-v0.2-q3_K_M",
       "name": "smollm:360m-base-v0.2-q3_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "235MB",
       "digest": "66875ceb33a7",
       "provider": "",
@@ -36433,7 +36433,7 @@
     {
       "id": "smollm:360m-base-v0.2-q3_K_S",
       "name": "smollm:360m-base-v0.2-q3_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "219MB",
       "digest": "8aba991b34bf",
       "provider": "",
@@ -36443,7 +36443,7 @@
     {
       "id": "smollm:360m-base-v0.2-q4_0",
       "name": "smollm:360m-base-v0.2-q4_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "229MB",
       "digest": "32ed02cfe24e",
       "provider": "",
@@ -36453,7 +36453,7 @@
     {
       "id": "smollm:360m-base-v0.2-q4_1",
       "name": "smollm:360m-base-v0.2-q4_1",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "249MB",
       "digest": "74c8ae01b04d",
       "provider": "",
@@ -36463,7 +36463,7 @@
     {
       "id": "smollm:360m-base-v0.2-q4_K_M",
       "name": "smollm:360m-base-v0.2-q4_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "271MB",
       "digest": "d3b4961678c3",
       "provider": "",
@@ -36473,7 +36473,7 @@
     {
       "id": "smollm:360m-base-v0.2-q4_K_S",
       "name": "smollm:360m-base-v0.2-q4_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "260MB",
       "digest": "81b950fac810",
       "provider": "",
@@ -36483,7 +36483,7 @@
     {
       "id": "smollm:360m-base-v0.2-q5_0",
       "name": "smollm:360m-base-v0.2-q5_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "268MB",
       "digest": "319a822c1baa",
       "provider": "",
@@ -36493,7 +36493,7 @@
     {
       "id": "smollm:360m-base-v0.2-q5_1",
       "name": "smollm:360m-base-v0.2-q5_1",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "288MB",
       "digest": "1c350d9f5c43",
       "provider": "",
@@ -36503,7 +36503,7 @@
     {
       "id": "smollm:360m-base-v0.2-q5_K_M",
       "name": "smollm:360m-base-v0.2-q5_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "290MB",
       "digest": "bf2e3336142d",
       "provider": "",
@@ -36513,7 +36513,7 @@
     {
       "id": "smollm:360m-base-v0.2-q5_K_S",
       "name": "smollm:360m-base-v0.2-q5_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "283MB",
       "digest": "05dad743d112",
       "provider": "",
@@ -36523,7 +36523,7 @@
     {
       "id": "smollm:360m-base-v0.2-q6_K",
       "name": "smollm:360m-base-v0.2-q6_K",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "367MB",
       "digest": "6006320b3839",
       "provider": "",
@@ -36533,7 +36533,7 @@
     {
       "id": "smollm:360m-base-v0.2-q8_0",
       "name": "smollm:360m-base-v0.2-q8_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "386MB",
       "digest": "dd417453fb49",
       "provider": "",
@@ -36543,7 +36543,7 @@
     {
       "id": "smollm:360m-instruct-v0.2-fp16",
       "name": "smollm:360m-instruct-v0.2-fp16",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "726MB",
       "digest": "d0475be06ee3",
       "provider": "",
@@ -36553,7 +36553,7 @@
     {
       "id": "smollm:360m-instruct-v0.2-q2_K",
       "name": "smollm:360m-instruct-v0.2-q2_K",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "219MB",
       "digest": "1dfe94149c4d",
       "provider": "",
@@ -36563,7 +36563,7 @@
     {
       "id": "smollm:360m-instruct-v0.2-q3_K_L",
       "name": "smollm:360m-instruct-v0.2-q3_K_L",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "246MB",
       "digest": "6f711219bd5f",
       "provider": "",
@@ -36573,7 +36573,7 @@
     {
       "id": "smollm:360m-instruct-v0.2-q3_K_M",
       "name": "smollm:360m-instruct-v0.2-q3_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "235MB",
       "digest": "4ecfcbc87975",
       "provider": "",
@@ -36583,7 +36583,7 @@
     {
       "id": "smollm:360m-instruct-v0.2-q3_K_S",
       "name": "smollm:360m-instruct-v0.2-q3_K_S",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "219MB",
       "digest": "359f743b44a1",
       "provider": "",
@@ -36593,7 +36593,7 @@
     {
       "id": "smollm:360m-instruct-v0.2-q4_0",
       "name": "smollm:360m-instruct-v0.2-q4_0",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "229MB",
       "digest": "b3ba1ccba2b8",
       "provider": "",
@@ -36603,7 +36603,7 @@
     {
       "id": "smollm:360m-instruct-v0.2-q4_1",
       "name": "smollm:360m-instruct-v0.2-q4_1",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "249MB",
       "digest": "4a28c336aedd",
       "provider": "",
@@ -36613,7 +36613,7 @@
     {
       "id": "smollm:360m-instruct-v0.2-q4_K_M",
       "name": "smollm:360m-instruct-v0.2-q4_K_M",
-      "description": "🪐 A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
+      "description": "A family of small models with 135M, 360M, and 1.7B parameters, trained on a new high-quality dataset.",
       "size": "271MB",
       "digest": "535cb302b6b9",
       "provider": "",
@@ -43183,7 +43183,7 @@
     {
       "id": "dolphin3",
       "name": "dolphin3",
-      "description": "Dolphin 3.0 Llama 3.1 8B 🐬 is the next generation of the Dolphin series of instruct-tuned models designed to be the ultimate general purpose local model, enabling coding, math, agentic, function calling, and general use cases.",
+      "description": "Dolphin 3.0 Llama 3.1 8B  is the next generation of the Dolphin series of instruct-tuned models designed to be the ultimate general purpose local model, enabling coding, math, agentic, function calling, and general use cases.",
       "size": "4.9GB",
       "digest": "d5ab9ae8e1f2",
       "provider": "",
@@ -43193,7 +43193,7 @@
     {
       "id": "dolphin3:8b",
       "name": "dolphin3:8b",
-      "description": "Dolphin 3.0 Llama 3.1 8B 🐬 is the next generation of the Dolphin series of instruct-tuned models designed to be the ultimate general purpose local model, enabling coding, math, agentic, function calling, and general use cases.",
+      "description": "Dolphin 3.0 Llama 3.1 8B  is the next generation of the Dolphin series of instruct-tuned models designed to be the ultimate general purpose local model, enabling coding, math, agentic, function calling, and general use cases.",
       "size": "4.9GB",
       "digest": "d5ab9ae8e1f2",
       "provider": "",
@@ -43203,7 +43203,7 @@
     {
       "id": "dolphin3:8b-llama3.1-fp16",
       "name": "dolphin3:8b-llama3.1-fp16",
-      "description": "Dolphin 3.0 Llama 3.1 8B 🐬 is the next generation of the Dolphin series of instruct-tuned models designed to be the ultimate general purpose local model, enabling coding, math, agentic, function calling, and general use cases.",
+      "description": "Dolphin 3.0 Llama 3.1 8B  is the next generation of the Dolphin series of instruct-tuned models designed to be the ultimate general purpose local model, enabling coding, math, agentic, function calling, and general use cases.",
       "size": "16GB",
       "digest": "b0941c6f3226",
       "provider": "",
@@ -43213,7 +43213,7 @@
     {
       "id": "dolphin3:8b-llama3.1-q4_K_M",
       "name": "dolphin3:8b-llama3.1-q4_K_M",
-      "description": "Dolphin 3.0 Llama 3.1 8B 🐬 is the next generation of the Dolphin series of instruct-tuned models designed to be the ultimate general purpose local model, enabling coding, math, agentic, function calling, and general use cases.",
+      "description": "Dolphin 3.0 Llama 3.1 8B  is the next generation of the Dolphin series of instruct-tuned models designed to be the ultimate general purpose local model, enabling coding, math, agentic, function calling, and general use cases.",
       "size": "4.9GB",
       "digest": "d5ab9ae8e1f2",
       "provider": "",
@@ -43223,7 +43223,7 @@
     {
       "id": "dolphin3:8b-llama3.1-q8_0",
       "name": "dolphin3:8b-llama3.1-q8_0",
-      "description": "Dolphin 3.0 Llama 3.1 8B 🐬 is the next generation of the Dolphin series of instruct-tuned models designed to be the ultimate general purpose local model, enabling coding, math, agentic, function calling, and general use cases.",
+      "description": "Dolphin 3.0 Llama 3.1 8B  is the next generation of the Dolphin series of instruct-tuned models designed to be the ultimate general purpose local model, enabling coding, math, agentic, function calling, and general use cases.",
       "size": "8.5GB",
       "digest": "e3310b61ffdb",
       "provider": "",
@@ -59063,7 +59063,7 @@
     {
       "id": "magicoder",
       "name": "magicoder",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "3.8GB",
       "digest": "8007de06f5d9",
       "provider": "",
@@ -59073,7 +59073,7 @@
     {
       "id": "magicoder:7b",
       "name": "magicoder:7b",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "3.8GB",
       "digest": "8007de06f5d9",
       "provider": "",
@@ -59083,7 +59083,7 @@
     {
       "id": "magicoder:7b-s-cl",
       "name": "magicoder:7b-s-cl",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "3.8GB",
       "digest": "8007de06f5d9",
       "provider": "",
@@ -59093,7 +59093,7 @@
     {
       "id": "magicoder:7b-s-cl-fp16",
       "name": "magicoder:7b-s-cl-fp16",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "13GB",
       "digest": "859e1ae4f566",
       "provider": "",
@@ -59103,7 +59103,7 @@
     {
       "id": "magicoder:7b-s-cl-q2_K",
       "name": "magicoder:7b-s-cl-q2_K",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "2.8GB",
       "digest": "86fd329c64b6",
       "provider": "",
@@ -59113,7 +59113,7 @@
     {
       "id": "magicoder:7b-s-cl-q3_K_L",
       "name": "magicoder:7b-s-cl-q3_K_L",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "3.6GB",
       "digest": "2bf1232fd9c1",
       "provider": "",
@@ -59123,7 +59123,7 @@
     {
       "id": "magicoder:7b-s-cl-q3_K_M",
       "name": "magicoder:7b-s-cl-q3_K_M",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "3.3GB",
       "digest": "b2a3d9987ff3",
       "provider": "",
@@ -59133,7 +59133,7 @@
     {
       "id": "magicoder:7b-s-cl-q3_K_S",
       "name": "magicoder:7b-s-cl-q3_K_S",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "2.9GB",
       "digest": "b7e2d7a303f8",
       "provider": "",
@@ -59143,7 +59143,7 @@
     {
       "id": "magicoder:7b-s-cl-q4_0",
       "name": "magicoder:7b-s-cl-q4_0",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "3.8GB",
       "digest": "8007de06f5d9",
       "provider": "",
@@ -59153,7 +59153,7 @@
     {
       "id": "magicoder:7b-s-cl-q4_1",
       "name": "magicoder:7b-s-cl-q4_1",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "4.2GB",
       "digest": "b29bf322a686",
       "provider": "",
@@ -59163,7 +59163,7 @@
     {
       "id": "magicoder:7b-s-cl-q4_K_M",
       "name": "magicoder:7b-s-cl-q4_K_M",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "4.1GB",
       "digest": "902b6b028113",
       "provider": "",
@@ -59173,7 +59173,7 @@
     {
       "id": "magicoder:7b-s-cl-q4_K_S",
       "name": "magicoder:7b-s-cl-q4_K_S",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "3.9GB",
       "digest": "42b56dd9b1da",
       "provider": "",
@@ -59183,7 +59183,7 @@
     {
       "id": "magicoder:7b-s-cl-q5_0",
       "name": "magicoder:7b-s-cl-q5_0",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "4.7GB",
       "digest": "10fa66c827ee",
       "provider": "",
@@ -59193,7 +59193,7 @@
     {
       "id": "magicoder:7b-s-cl-q5_1",
       "name": "magicoder:7b-s-cl-q5_1",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "5.1GB",
       "digest": "7da1fdad5251",
       "provider": "",
@@ -59203,7 +59203,7 @@
     {
       "id": "magicoder:7b-s-cl-q5_K_M",
       "name": "magicoder:7b-s-cl-q5_K_M",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "4.8GB",
       "digest": "057c4f587f41",
       "provider": "",
@@ -59213,7 +59213,7 @@
     {
       "id": "magicoder:7b-s-cl-q5_K_S",
       "name": "magicoder:7b-s-cl-q5_K_S",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "4.7GB",
       "digest": "ce0b81d40da6",
       "provider": "",
@@ -59223,7 +59223,7 @@
     {
       "id": "magicoder:7b-s-cl-q6_K",
       "name": "magicoder:7b-s-cl-q6_K",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "5.5GB",
       "digest": "cf853951ae4a",
       "provider": "",
@@ -59233,7 +59233,7 @@
     {
       "id": "magicoder:7b-s-cl-q8_0",
       "name": "magicoder:7b-s-cl-q8_0",
-      "description": "🎩 Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
+      "description": "Magicoder is a family of 7B parameter models trained on 75K synthetic instruction data using OSS-Instruct, a novel approach to enlightening LLMs with open-source code snippets.",
       "size": "7.2GB",
       "digest": "96b5e4193464",
       "provider": "",

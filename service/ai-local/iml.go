@@ -20,6 +20,11 @@ type imlLocalModelService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlLocalModelService) UpdateProvider(ctx context.Context, provider string, ids ...string) error {
+	_, err := i.store.UpdateField(ctx, "provider", provider, "uuid in (?)", ids)
+	return err
+}
+
 func (i *imlLocalModelService) DefaultModel(ctx context.Context) (*LocalModel, error) {
 	info, err := i.store.First(ctx, map[string]interface{}{"state": 1})
 	if err != nil {

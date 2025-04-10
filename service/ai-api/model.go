@@ -76,6 +76,7 @@ func FromEntity(e *api.AiAPIInfo) *API {
 		Updater:          e.Updater,
 		Disable:          e.Disable,
 		UseToken:         e.UseToken,
+		Provider:         e.Provider,
 		Type:             e.Type,
 		AdditionalConfig: cfg,
 	}

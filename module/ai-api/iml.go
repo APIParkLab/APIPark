@@ -8,9 +8,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/eolinker/eosc/log"
+	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
 
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
+	ai_model "github.com/APIParkLab/APIPark/service/ai-model"
+
+	"github.com/eolinker/eosc/log"
 
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
 	ai_api "github.com/APIParkLab/APIPark/service/ai-api"
@@ -32,11 +35,12 @@ var (
 )
 
 type imlAPIModule struct {
-	serviceService service.IServiceService `autowired:""`
-	apiDocService  api_doc.IAPIDocService  `autowired:""`
-	aiAPIService   ai_api.IAPIService      `autowired:""`
-	apiService     api.IAPIService         `autowired:""`
-	transaction    store.ITransaction      `autowired:""`
+	serviceService service.IServiceService        `autowired:""`
+	apiDocService  api_doc.IAPIDocService         `autowired:""`
+	aiAPIService   ai_api.IAPIService             `autowired:""`
+	aiModelService ai_model.IProviderModelService `autowired:""`
+	apiService     api.IAPIService                `autowired:""`
+	transaction    store.ITransaction             `autowired:""`
 }
 
 func (i *imlAPIModule) getAPIDoc(ctx context.Context, serviceId string) (*openapi3.T, error) {
@@ -237,26 +241,41 @@ func (i *imlAPIModule) List(ctx context.Context, keyword string, serviceId strin
 		if err != nil {
 			return item
 		}
-		p, has := model_runtime.GetProvider(aiModel.Provider)
-		if has {
-			item.Provider = ai_api_dto.ProviderItem{
-				Id:   p.ID(),
-				Name: p.Name(),
-				Logo: p.Logo(),
+		item.ModelType = ai_api_dto.ModelType(aiModel.Type)
+		if item.ModelType == ai_api_dto.ModelTypeLocal {
+			item.Model = ai_api_dto.ModelItem{
+				Id:   aiModel.Id,
+				Name: aiModel.Id,
 			}
-			m, has := p.GetModel(t.Model)
-			if has {
-				item.Model = ai_api_dto.ModelItem{
-					Id:   m.ID(),
-					Logo: m.Logo(),
-				}
+			item.Provider = ai_api_dto.ProviderItem{
+				Id:   ai_provider_local.ProviderLocal,
+				Name: ai_provider_local.ProviderLocal,
+				Logo: "",
 			}
 		} else {
-
-			item.Model = ai_api_dto.ModelItem{
-				Id: aiModel.Id,
+			p, has := model_runtime.GetProvider(aiModel.Provider)
+			if has {
+				item.Provider = ai_api_dto.ProviderItem{
+					Id:   p.ID(),
+					Name: p.Name(),
+					Logo: "",
+				}
+				m, has := p.GetModel(t.Model)
+				if has {
+					item.Model = ai_api_dto.ModelItem{
+						Id:   m.ID(),
+						Name: m.Name(),
+						Logo: "",
+					}
+				}
+			} else {
+				item.Model = ai_api_dto.ModelItem{
+					Id:   aiModel.Id,
+					Name: "unknown",
+				}
 			}
 		}
+
 		return item
 	}), nil
 }
@@ -280,6 +299,15 @@ func (i *imlAPIModule) Get(ctx context.Context, serviceId string, apiId string) 
 	aiModel, err := ConvertStruct[ai_api_dto.AiModel](apiInfo.AdditionalConfig["ai_model"])
 	if err != nil {
 		return nil, err
+	}
+	if aiModel.Name == "" {
+		// get provider model
+		modelInfo, _ := i.aiModelService.Get(ctx, aiModel.Id)
+		if modelInfo != nil {
+			aiModel.Name = modelInfo.Name
+		} else {
+			aiModel.Name = aiModel.Id
+		}
 	}
 
 	return &ai_api_dto.API{

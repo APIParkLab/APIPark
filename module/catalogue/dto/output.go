@@ -18,15 +18,19 @@ type ServiceItem struct {
 	Logo          string       `json:"logo"`
 	ApiNum        int64        `json:"api_num"`
 	SubscriberNum int64        `json:"subscriber_num"`
+	InvokeCount   int64        `json:"invoke_count"`
+	EnableMCP     bool         `json:"enable_mcp"`
+	ServiceKind   string       `json:"service_kind"`
 }
 
 type ServiceDetail struct {
-	Name        string        `json:"name"`
-	Description string        `json:"description"`
-	Document    string        `json:"document"`
-	Basic       *ServiceBasic `json:"basic"`
-	//Apis        []*ServiceApi `json:"apis"`
-	APIDoc string `json:"api_doc"`
+	Name             string        `json:"name"`
+	Description      string        `json:"description"`
+	Document         string        `json:"document"`
+	Basic            *ServiceBasic `json:"basic"`
+	APIDoc           string        `json:"api_doc"`
+	MCPServerAddress string        `json:"mcp_server_address"`
+	MCPAccessConfig  string        `json:"mcp_access_config"`
 }
 
 type ServiceBasic struct {
@@ -42,6 +46,7 @@ type ServiceBasic struct {
 	ServiceKind   string         `json:"service_kind"`
 	InvokeAddress string         `json:"invoke_address"`
 	SitePrefix    string         `json:"site_prefix"`
+	EnableMCP     bool           `json:"enable_mcp"`
 }
 
 type ServiceApiBasic struct {

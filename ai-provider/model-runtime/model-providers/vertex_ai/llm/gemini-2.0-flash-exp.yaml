@@ -1,4 +1,4 @@
-model: gemini-2.0-flash-exp
+model: google/gemini-2.0-flash-exp
 label:
   en_US: Gemini 2.0 Flash Exp
 model_type: llm

@@ -80,7 +80,7 @@ const AiServiceInsideRouterCreate = () => {
             timeout,
             retry,
             aiPrompt: { variables: variables, prompt: prompt },
-            aiModel: { id: defaultLlm?.id, provider: defaultLlm?.provider, config: defaultLlm?.config, type: defaultLlm?.type },
+            aiModel: { id: defaultLlm?.id, provider: defaultLlm?.provider, config: defaultLlm?.config, type: defaultLlm?.type, name: defaultLlm?.name },
             disabled
           }
           return fetchData<BasicResponse<null>>('service/ai-router', {
@@ -162,7 +162,8 @@ const AiServiceInsideRouterCreate = () => {
                 provider: aiModel?.provider,
                 id: aiModel?.id,
                 config: aiModel.config,
-                type: aiModel?.type
+                type: aiModel?.type,
+                name: aiModel?.name
               }) as AiProviderDefaultConfig & { config: string }
           )
           getDefaultModelConfig({
@@ -216,8 +217,8 @@ const AiServiceInsideRouterCreate = () => {
                   provider: localId,
                   name: aiServiceInfo?.name,
                   config: llmSetting?.defaultConfig || '',
+                  ...(llmSetting ?? {}),
                   type: 'local',
-                  ...(llmSetting ?? {})
                 } as AiProviderDefaultConfig & { config: string }
               })
             }
@@ -229,7 +230,8 @@ const AiServiceInsideRouterCreate = () => {
                 return {
                   ...prev,
                   logo: llmSetting?.logo,
-                  scopes: llmSetting?.scopes
+                  scopes: llmSetting?.scopes,
+                  name: llmSetting?.name
                 } as AiProviderDefaultConfig & { config: string }
               })
             }
@@ -259,8 +261,8 @@ const AiServiceInsideRouterCreate = () => {
                   provider: data.provider.id,
                   name: data.provider.name,
                   config: llmSetting?.config || '',
+                  ...(llmSetting ?? {}),
                   type: 'online',
-                  ...(llmSetting ?? {})
                 } as AiProviderDefaultConfig & { config: string }
               })
             }
@@ -272,7 +274,8 @@ const AiServiceInsideRouterCreate = () => {
                 return {
                   ...prev,
                   logo: llmSetting?.logo,
-                  scopes: llmSetting?.scopes
+                  scopes: llmSetting?.scopes,
+                  name: llmSetting?.name
                 } as AiProviderDefaultConfig & { config: string }
               })
             }
@@ -385,7 +388,7 @@ const AiServiceInsideRouterCreate = () => {
                 className="flex items-center  h-[24px] ai-setting-svg-container "
                 dangerouslySetInnerHTML={{ __html: defaultLlm?.logo || '' }}
               ></span>
-              <span>{defaultLlm?.id || defaultLlm?.defaultLlm}</span>
+              <span>{defaultLlm?.name || defaultLlm?.id || defaultLlm?.defaultLlm}</span>
               {defaultLlm?.scopes?.map((x) => <Tag>{x?.toLocaleUpperCase()}</Tag>)}
             </div>
           </Button>

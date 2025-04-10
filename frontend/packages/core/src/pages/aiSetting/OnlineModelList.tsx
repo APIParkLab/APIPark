@@ -87,7 +87,7 @@ const OnlineModelList: React.FC = () => {
           keyword: searchWord,
           page: params.current
         },
-        eoTransformKeys: ['default_llm', 'api_count', 'key_count', 'model_count', 'can_delete']
+        eoTransformKeys: ['default_llm', 'default_llm_name', 'api_count', 'key_count', 'model_count', 'can_delete']
       })
 
       if (response.code === STATUS_CODE.SUCCESS) {
@@ -195,7 +195,7 @@ const OnlineModelList: React.FC = () => {
     {
       title: $t('默认模型'),
       ellipsis: true,
-      dataIndex: 'defaultLlm'
+      dataIndex: 'defaultLlmName'
     },
     {
       title: $t('Models'),

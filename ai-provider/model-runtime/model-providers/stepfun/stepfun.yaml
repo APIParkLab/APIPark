@@ -31,6 +31,14 @@ provider_credential_schema:
       placeholder:
         zh_Hans: 在此输入您的 API Key
         en_US: Enter your API Key
+    - variable: base_url
+      label:
+        en_US: https://api.stepfun.com/v1
+      type: text-input
+      required: false
+      placeholder:
+        zh_Hans: 在此输入您的 Base URL
+        en_US: Enter your Base URL
 model_credential_schema:
   model:
     label:
@@ -79,4 +87,4 @@ model_credential_schema:
           label:
             en_US: Tool Call
             zh_Hans: Tool Call
-address: https://api.stepfun.com
+address: https://api.stepfun.com/v1

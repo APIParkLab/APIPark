@@ -25,6 +25,8 @@ const (
 	CIDRIpv4Exp = `^(?:(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([1-9]|[1-2]\d|3[0-2]))?$`
 	// CheckPathIPPortExp (scheme://)?ip:port
 	CheckPathIPPortExp = `([a-zA-z]+://)?((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}:[0-9]+`
+	// EnglishOrNumberOrSpecialChars a-zA-Z0-9-_.:
+	EnglishOrNumberOrSpecialChars = `^(?i)[-/:._a-z0-9]+$`
 )
 
 var (
@@ -47,6 +49,8 @@ var (
 	restfulPathMatchRegexp = regexp.MustCompile(`({[0-9a-zA-Z-_]+})+`)
 	//restfulParamMatchRegexp 匹配restful参数 {xxx}
 	restfulParamMatchRegexp = regexp.MustCompile(`^{[0-9a-zA-Z-_]+}$`)
+	// modelNameRegexp match model name
+	modelNameRegexp = regexp.MustCompile(EnglishOrNumberOrSpecialChars)
 )
 
 func IsMatchString(regexpPattern RegexpPattern, s string) error {
@@ -128,4 +132,9 @@ func ReplaceRestfulPath(path, replaceStr string) string {
 // CheckPathContainsIPPort 检查路径中是否包含xxx://ip:port
 func CheckPathContainsIPPort(path string) bool {
 	return checkIPPortRegexp.MatchString(path)
+}
+
+// ModelNameValid check model name is valid
+func ModelNameValid(param string) bool {
+	return modelNameRegexp.MatchString(param)
 }

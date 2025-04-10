@@ -1,8 +1,13 @@
 package core
 
 import (
-	ai_model "github.com/APIParkLab/APIPark/controller/ai-model"
 	"net/http"
+
+	system_apikey "github.com/APIParkLab/APIPark/controller/system-apikey"
+
+	"github.com/APIParkLab/APIPark/controller/mcp"
+
+	ai_model "github.com/APIParkLab/APIPark/controller/ai-model"
 
 	ai_balance "github.com/APIParkLab/APIPark/controller/ai-balance"
 
@@ -102,6 +107,8 @@ type plugin struct {
 	settingController           system.ISettingController                          `autowired:""`
 	initController              system.IInitController                             `autowired:""`
 	logController               log.ILogController                                 `autowired:""`
+	mcpController               mcp.IMcpController                                 `autowired:""`
+	systemAPIKeyController      system_apikey.IAPIKeyController                    `autowired:""`
 	apis                        []pm3.Api
 }
 
@@ -128,6 +135,8 @@ func (p *plugin) OnComplete() {
 	p.apis = append(p.apis, p.logApis()...)
 	p.apis = append(p.apis, p.aiLocalApis()...)
 	p.apis = append(p.apis, p.aiBalanceAPIs()...)
+	p.apis = append(p.apis, p.mcpAPIs()...)
+	p.apis = append(p.apis, p.systemApikeyApis()...)
 }
 
 func (p *plugin) Name() string {

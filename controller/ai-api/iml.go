@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
+
 	"github.com/APIParkLab/APIPark/model/plugin_model"
 	ai_api "github.com/APIParkLab/APIPark/module/ai-api"
 	ai_api_dto "github.com/APIParkLab/APIPark/module/ai-api/dto"
@@ -48,13 +50,13 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 			}
 		}
 		if input.AiModel != nil {
-			provider := "ollama"
+			provider := ai_provider_local.ProviderLocal
 			if input.AiModel.Type != "local" {
 				provider = input.AiModel.Provider
 			}
 			plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
-					"model":    input.AiModel.Id,
+					"model":    input.AiModel.Name,
 					"provider": provider,
 					"config":   input.AiModel.Config,
 				},
@@ -63,6 +65,7 @@ func (i *imlAPIController) Create(ctx *gin.Context, serviceId string, input *ai_
 
 		_, err = i.routerModule.Create(ctx, serviceId, &router_dto.Create{
 			Id:   input.Id,
+			Name: input.Name,
 			Path: input.Path,
 			Methods: []string{
 				http.MethodPost,
@@ -106,13 +109,13 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 		}
 		//var upstream *string
 		if input.AiModel != nil {
-			provider := "ollama"
+			provider := ai_provider_local.ProviderLocal
 			if input.AiModel.Type != "local" {
 				provider = input.AiModel.Provider
 			}
 			proxy.Plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
-					"model":    input.AiModel.Id,
+					"model":    input.AiModel.Name,
 					"provider": provider,
 					"config":   input.AiModel.Config,
 				},
@@ -130,6 +133,7 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 		}
 
 		_, err = i.routerModule.Edit(ctx, serviceId, apiId, &router_dto.Edit{
+			Name:        input.Name,
 			Description: input.Description,
 			Proxy:       proxy,
 			Path:        input.Path,

@@ -2,6 +2,7 @@ package openapi
 
 import (
 	application_authorization "github.com/APIParkLab/APIPark/controller/application-authorization"
+	"github.com/APIParkLab/APIPark/controller/mcp"
 	"github.com/eolinker/go-common/pm3"
 )
 
@@ -13,6 +14,7 @@ var (
 type plugin struct {
 	apis                    []pm3.Api
 	authorizationController application_authorization.IAuthorizationController `autowired:""`
+	mcpController           mcp.IMcpController                                 `autowired:""`
 }
 
 func (p *plugin) Middlewares() []pm3.IMiddleware {
@@ -30,4 +32,5 @@ func (p *plugin) Name() string {
 }
 func (p *plugin) OnComplete() {
 	p.apis = p.appAuthorizationApis()
+	p.apis = append(p.apis, p.mcpAPIs()...)
 }
