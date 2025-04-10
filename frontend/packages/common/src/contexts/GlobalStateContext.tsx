@@ -204,7 +204,7 @@ const mockData = [
             access: ''
           },
           {
-            name: 'MCP Key',
+            name: 'API Key',
             key: 'mcpKey',
             path: '/mcpKey',
             icon: 'material-symbols:key',
