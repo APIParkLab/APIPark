@@ -11,10 +11,10 @@ import { normFile } from '@common/utils/uploadPic.ts'
 import { validateUrlSlash } from '@common/utils/validate.ts'
 import { RouterParams } from '@core/components/aoplatform/RenderRoutes.tsx'
 import { AiServiceConfigFieldType } from '@core/const/ai-service/type.ts'
-import { SERVICE_APPROVAL_OPTIONS } from '@core/const/system/const.tsx'
+import { MCP_OPTIONS, SERVICE_APPROVAL_OPTIONS } from '@core/const/system/const.tsx'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { CategorizesType } from '@market/const/serviceHub/type.ts'
-import { App, Button, Form, Input, Radio, Row, Select, Tooltip, TreeSelect, Upload } from 'antd'
+import { App, Button, Form, Input, Radio, RadioChangeEvent, Row, Select, Switch, Tooltip, TreeSelect, Upload } from 'antd'
 import { DefaultOptionType } from 'antd/es/cascader'
 import { RcFile, UploadChangeParam, UploadFile, UploadProps } from 'antd/es/upload/interface'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
@@ -23,6 +23,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { SystemConfigFieldType, SystemConfigHandle } from '../../const/system/type.ts'
 import { useSystemContext } from '../../contexts/SystemContext.tsx'
 import { Codebox } from '@common/components/postcat/api/Codebox/index.tsx'
+import { useAiServiceContext } from '@core/contexts/AiServiceContext.tsx'
 
 export type SimpleAiProviderItem = EntityItem & {
   configured: boolean
@@ -39,6 +40,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
   const navigate = useNavigate()
   const { setBreadcrumb } = useBreadcrumb()
   const { setSystemInfo } = useSystemContext()
+  const { setAiServiceInfo } = useAiServiceContext()
   const [showClassify, setShowClassify] = useState<boolean>(true)
   const [showAI, setShowAI] = useState<boolean>(false)
   const [imageBase64, setImageBase64] = useState<string | null>(null)
@@ -274,6 +276,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
           if (code === STATUS_CODE.SUCCESS) {
             message.success(msg || $t(RESPONSE_TIPS.success))
             setSystemInfo(data.service)
+            setAiServiceInfo(data.service)
             return Promise.resolve(true)
           } else {
             message.error(msg || $t(RESPONSE_TIPS.error))
@@ -359,9 +362,34 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
       form.setFieldValue('team', teamId)
       form.setFieldValue('serviceType', 'public')
       form.setFieldValue('approvalType', 'auto')
+      form.setFieldValue('enable_mcp', false)
     }
     return form.setFieldsValue({})
   }, [serviceId])
+
+  const handleMcpChange = (e: RadioChangeEvent) => {
+    if (e.target.value) {
+      return
+    }
+    modal.confirm({
+      title: $t('关闭 MCP'),
+      content: $t('关闭后将无法通过MCP方式调用服务'),
+      onOk: () => {
+        form.setFieldValue('enable_mcp', false)
+      },
+      onCancel: () => {
+        form.setFieldValue('enable_mcp', true)
+      },
+      width: 600,
+      okText: $t('确认'),
+      okButtonProps: {
+        danger: true
+      },
+      cancelText: $t('取消'),
+      closable: true,
+      icon: <></>
+    })
+  }
 
   const deleteSystemModal = async () => {
     modal.confirm({
@@ -387,6 +415,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
     () => SERVICE_APPROVAL_OPTIONS.map((x) => ({ ...x, label: $t(x.label) })),
     [state.language]
   )
+  const mcpOptions = useMemo(() => MCP_OPTIONS.map((x) => ({ ...x, label: $t(x.label) })), [state.language])
 
   return (
     <>
@@ -440,6 +469,9 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
                 </Radio.Group>
               </Form.Item>
             )}
+            <Form.Item<AiServiceConfigFieldType> label={$t('MCP')} name="enable_mcp" rules={[{ required: true }]}>
+              <Radio.Group className="flex flex-col" options={mcpOptions} onChange={serviceId ? handleMcpChange : undefined}/>
+            </Form.Item>
             {showAI && (
               <>
                 <Form.Item<AiServiceConfigFieldType>
@@ -477,10 +509,14 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
                     filterOption={(input, option) => (option?.searchText ?? '').includes(input.toLowerCase())}
                     className="w-INPUT_NORMAL"
                     placeholder={$t(PLACEHOLDER.input)}
-                    options={modelList ? modelList.map((x) => ({
-                      ...x,
-                      searchText: x.name.toLowerCase()
-                    })) : []}
+                    options={
+                      modelList
+                        ? modelList.map((x) => ({
+                            ...x,
+                            searchText: x.name.toLowerCase()
+                          }))
+                        : []
+                    }
                   ></Select>
                 </Form.Item>
               </>

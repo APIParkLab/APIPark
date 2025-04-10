@@ -8,7 +8,7 @@ import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
 import { useFetch } from '@common/hooks/http.ts'
 import { $t } from '@common/locales/index.ts'
-import { App } from 'antd'
+import { App, Tag } from 'antd'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SERVICE_KIND_OPTIONS, SYSTEM_TABLE_COLUMNS } from '../../const/system/const.tsx'
@@ -176,10 +176,16 @@ const SystemList: FC = () => {
         x.valueEnum = teamList
       }
       if ((x.dataIndex as string) === 'service_kind') {
-        x.valueEnum = {}
-        SERVICE_KIND_OPTIONS.forEach((option) => {
-          ;(x.valueEnum as any)[option.value] = { text: $t(option.label) }
-        })
+        x.render = (dom: React.ReactNode, record: any) => (
+          <span
+            className={`text-[13px] `}
+          >
+            {$t(SERVICE_KIND_OPTIONS.find((x) => x.value === record.service_kind)?.label || '-')}
+            {record.enable_mcp && (
+              <Tag color="#ffc107" className="text-[#000] ml-[5px]">MCP</Tag>
+            )}
+          </span>
+        )
       }
       if ((x.dataIndex as string) === 'state') {
         x.render = (dom: React.ReactNode, record: any) => (

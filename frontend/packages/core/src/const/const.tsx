@@ -801,6 +801,22 @@ export const routerMap: Map<string, RouterMapConfig> = new Map([
     }
   ],
   [
+    'mcpService',
+    {
+      type: 'module',
+      lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/mcpService/McpServiceContainer')),
+      key: 'mcpService'
+    }
+  ],
+  [
+    'mcpKey',
+    {
+      type: 'module',
+      lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/mcpService/McpKeyContainer')),
+      key: 'mcpKey'
+    }
+  ],
+  [
     'loadBalancing',
     {
       type: 'module',
