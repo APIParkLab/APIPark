@@ -1,7 +1,7 @@
 import InsidePage from '@common/components/aoplatform/InsidePage'
 import { IconButton } from '@common/components/postcat/api/IconButton'
 import { $t } from '@common/locales/index.ts'
-import { Button, Card, App } from 'antd'
+import { Button, Card, App, Empty } from 'antd'
 import { useFetch } from '@common/hooks/http'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useEffect, useRef, useState } from 'react'
@@ -139,17 +139,36 @@ const McpKeyContainer = () => {
           {$t('新增 API Key')}
         </Button>
         <div className="api-key-container mt-[20px]">
-          {keys.map((key, index) => (
-            <Card style={{ width: 600, borderRadius: '10px' }} key={index} className="mt-[10px]">
-              <div className="flex">
-                <div className="flex-1">
-                  <p className="text-[14px] font-bold">{key.name}</p>
-                  <div className="flex">
-                    <span className="h-[26px] leading-[28px]">{key.value}</span>
+          {keys.length ? (
+            keys.map((key, index) => (
+              <Card style={{ width: 600, borderRadius: '10px' }} key={index} className="mt-[10px]">
+                <div className="flex">
+                  <div className="flex-1">
+                    <p className="text-[14px] font-bold">{key.name}</p>
+                    <div className="flex">
+                      <span className="h-[26px] leading-[28px]">{key.value}</span>
+                      <IconButton
+                        name="copy"
+                        onClick={() => {
+                          copyCode(key?.value)
+                        }}
+                        sx={{
+                          color: '#333',
+                          transition: 'none',
+                          '&.MuiButtonBase-root:hover': {
+                            background: 'transparent',
+                            color: '#3D46F2',
+                            transition: 'none'
+                          }
+                        }}
+                      ></IconButton>
+                    </div>
+                  </div>
+                  <div className="w-[30px] flex justify-center items-center">
                     <IconButton
-                      name="copy"
+                      name="edit"
                       onClick={() => {
-                        copyCode(key?.value)
+                        editKey(key)
                       }}
                       sx={{
                         color: '#333',
@@ -161,35 +180,26 @@ const McpKeyContainer = () => {
                         }
                       }}
                     ></IconButton>
+                    <IconButton
+                      name="delete"
+                      onClick={() => {
+                        deleteKey(key.id)
+                      }}
+                      sx={{
+                        color: '#333',
+                        transition: 'none',
+                        '&.MuiButtonBase-root:hover': { background: 'transparent', color: 'red', transition: 'none' }
+                      }}
+                    ></IconButton>
                   </div>
                 </div>
-                <div className="w-[30px] flex justify-center items-center">
-                  <IconButton
-                    name="edit"
-                    onClick={() => {
-                      editKey(key)
-                    }}
-                    sx={{
-                      color: '#333',
-                      transition: 'none',
-                      '&.MuiButtonBase-root:hover': { background: 'transparent', color: '#3D46F2', transition: 'none' }
-                    }}
-                  ></IconButton>
-                  <IconButton
-                    name="delete"
-                    onClick={() => {
-                      deleteKey(key.id)
-                    }}
-                    sx={{
-                      color: '#333',
-                      transition: 'none',
-                      '&.MuiButtonBase-root:hover': { background: 'transparent', color: 'red', transition: 'none' }
-                    }}
-                  ></IconButton>
-                </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ))
+          ) : (
+            <>
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>
+            </>
+          )}
         </div>
       </InsidePage>
     </>
