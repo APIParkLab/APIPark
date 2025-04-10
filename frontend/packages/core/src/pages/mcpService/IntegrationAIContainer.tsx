@@ -6,6 +6,7 @@ import ReactJson from 'react-json-view'
 import { IconButton } from '@common/components/postcat/api/IconButton'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
+import { useConnection } from './hook/useConnection'
 
 type ConfigList = {
   openApi?: {
@@ -31,8 +32,9 @@ const IntegrationAIContainer = ({ type, handleApiKeyChange }: { type: 'global' |
   const [activeTab, setActiveTab] = useState('mcp')
   const { message } = App.useApp()
   const [configContent, setConfigContent] = useState<string>('')
-  const [apiKey, setApiKey] = useState<string>('暂无数据')
+  const [apiKey, setApiKey] = useState<string>('')
   const [apiKeyList, setApiKeyList] = useState<{ value: string; label: string }[]>([])
+  const [mcpServerUrl, setMcpServerUrl] = useState<string>('')
   const [tabContent, setTabContent] = useState<ConfigList>({
     mcp: {
       title: $t('MCP 配置'),
@@ -134,6 +136,37 @@ const IntegrationAIContainer = ({ type, handleApiKeyChange }: { type: 'global' |
       })
   }
 
+  const {
+    connectionStatus,
+    serverCapabilities,
+    mcpClient,
+    requestHistory,
+    makeRequest: makeConnectionRequest,
+    sendNotification,
+    handleCompletion,
+    completionsSupported,
+    connect: connectMcpServer,
+    disconnect: disconnectMcpServer,
+  } = useConnection({
+    transportType: 'sse',
+    sseUrl: mcpServerUrl,
+    proxyServerUrl: 'mcp/global/sse',
+    requestTimeout: 1000,
+  });
+  console.log('connectionStatus==================', connectionStatus);
+  // console.log('serverCapabilities==================', serverCapabilities);
+  // console.log('mcpClient==================', mcpClient);
+  // console.log('requestHistory==================', requestHistory);
+  // console.log('makeConnectionRequest==================', makeConnectionRequest);
+  // console.log('sendNotification==================', sendNotification);
+  // console.log('handleCompletion==================', handleCompletion);
+  // console.log('completionsSupported==================', completionsSupported);
+  // console.log('connectMcpServer==================', connectMcpServer);
+  // console.log('disconnectMcpServer==================', disconnectMcpServer);
+  // const useConnectAIagent = () => {
+  //   connectMcpServer()
+  // }
+
   useEffect(() => {
     type === 'global' && getGlobalMcpConfig()
     initTabsData()
@@ -146,6 +179,29 @@ const IntegrationAIContainer = ({ type, handleApiKeyChange }: { type: 'global' |
       setConfigContent(tabContent.mcp.configContent || '')
     }
   }, [tabContent, activeTab])
+  useEffect(() => {
+    if (configContent && apiKey) {
+      const parsedConfig = JSON.parse(configContent)
+      console.log('啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊parsedConfig', parsedConfig, apiKey)
+      let baseUrl = ''
+      if (parsedConfig?.mcpServers) {
+        // 获取 mcpServers 对象中的第一个键
+        const serverKey = Object.keys(parsedConfig.mcpServers)[0]
+        baseUrl = parsedConfig.mcpServers[serverKey]?.url
+      }
+      baseUrl = baseUrl.replace('{your_api_key}', apiKey)
+      if (mcpServerUrl === baseUrl) {
+        return
+      }
+      setMcpServerUrl(baseUrl)
+      console.log('啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊', mcpServerUrl)
+      if (connectionStatus === 'connected') {
+        disconnectMcpServer()
+      }
+      connectMcpServer()
+    }
+  }, [apiKey, configContent, connectMcpServer])
+
   return (
     <>
       <Card
