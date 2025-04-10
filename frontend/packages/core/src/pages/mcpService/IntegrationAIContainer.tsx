@@ -1,7 +1,7 @@
 import { App, Button, Card, Empty, Select } from 'antd'
 import { $t } from '@common/locales/index.ts'
 import { Icon } from '@iconify/react/dist/iconify.js'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ReactJson from 'react-json-view'
 import { IconButton } from '@common/components/postcat/api/IconButton'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
@@ -207,15 +207,45 @@ const IntegrationAIContainer = ({
     proxyServerUrl: mcpServerUrl,
     requestTimeout: 1000
   })
-
+  // 使用 useRef 保存最新的连接状态和断开函数
+  const connectionStatusRef = useRef(connectionStatus)
+  const disconnectFnRef = useRef(disconnectMcpServer)
+  
+  // 当连接状态或断开函数变化时更新 ref
   useEffect(() => {
-    if (type === 'global') {
-      getGlobalMcpConfig()
-      setMcpServerUrl('mcp/global/sse')
+    connectionStatusRef.current = connectionStatus
+    disconnectFnRef.current = disconnectMcpServer
+  }, [connectionStatus, disconnectMcpServer])
+  
+  // 仅在组件加载时执行初始化逻辑
+  useEffect(() => {
+    // 局部函数，仅在此 effect 执行期间存在
+    const setupComponent = () => {
+      if (type === 'global') {
+        getGlobalMcpConfig()
+        setMcpServerUrl('mcp/global/sse')
+      }
+      initTabsData()
+      getKeysList()
     }
-    initTabsData()
-    getKeysList()
-  }, [])
+    
+    // 执行初始化
+    setupComponent()
+    
+    // 返回清理函数，只会在组件卸载时执行
+    return () => {
+      try {
+        // 使用 ref 中保存的最新函数强制断开连接
+        const disconnectFn = disconnectFnRef.current
+        if (disconnectFn) {
+          disconnectFn()
+        }
+        
+      } catch (err) {
+        console.error('断开连接时出错:', err)
+      }
+    }
+  }, [type])
   useEffect(() => {
     if (activeTab === 'openApi' && tabContent?.openApi?.configContent) {
       setConfigContent(tabContent?.openApi?.configContent?.replace('{your_api_key}', apiKey || '{your_api_key}'))
@@ -247,7 +277,7 @@ const IntegrationAIContainer = ({
           body: 'p-[10px]'
         }}
       >
-        <p onClick={listTools}>
+        <p>
           <Icon
             icon="icon-park-solid:connection-point-two"
             className="align-text-bottom mr-[5px]"
@@ -346,8 +376,10 @@ const IntegrationAIContainer = ({
                 </Card>
               </>
             ) : (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={""}>
-                <Button onClick={addKey} type="primary">{$t('新增 API Key')}</Button>
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={''}>
+                <Button onClick={addKey} type="primary">
+                  {$t('新增 API Key')}
+                </Button>
               </Empty>
             )}
           </>
