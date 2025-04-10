@@ -222,6 +222,26 @@ const mockData = {
     },
     {
       driver: 'apipark.builtIn.component',
+      name: 'mcpService',
+      router: [
+        {
+          path: 'mcpService',
+          type: 'normal'
+        }
+      ]
+    },
+    {
+      driver: 'apipark.builtIn.component',
+      name: 'mcpKey',
+      router: [
+        {
+          path: 'mcpKey',
+          type: 'normal'
+        }
+      ]
+    },
+    {
+      driver: 'apipark.builtIn.component',
       name: 'loadBalancing',
       router: [
         {

@@ -228,6 +228,7 @@ const AiServiceInsidePage: FC = () => {
         <InsidePage
           pageTitle={aiServiceInfo?.name || '-'}
           tagList={[
+            ...(aiServiceInfo?.enable_mcp ? [{ label: 'MCP', color: '#ffc107', className: 'text-[#000]' }] : []),
             {
               label: (
                 <Paragraph className="mb-0" copyable={serviceId ? { text: serviceId } : false}>
