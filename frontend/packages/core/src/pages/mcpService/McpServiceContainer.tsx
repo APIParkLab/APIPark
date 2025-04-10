@@ -1,11 +1,14 @@
 import InsidePage from "@common/components/aoplatform/InsidePage"
 import { $t } from '@common/locales/index.ts'
-import { Card } from "antd"
 import IntegrationAIContainer from "./IntegrationAIContainer"
+import { Tool } from "@modelcontextprotocol/sdk/types.js"
+import { useState } from "react"
+import McpToolsContainer from "./McpToolsContainer"
 
 const McpServiceContainer = () => {
-  const handleApiKeyChange = (value: string) => {
-    console.log(value)
+  const [tools, setTools] = useState<Tool[]>([]);
+  const handleToolsChange = (value: Tool[]) => {
+    setTools(value)
   }
   return (
     <>
@@ -15,11 +18,10 @@ const McpServiceContainer = () => {
         showBorder={false}
         scrollPage={false}
       >
+        
         <div className="flex mt-[10px] pr-[40px]">
-        <Card style={{ borderRadius: '10px' }} className="flex-1 w-[400px] mr-[10px]">
-          444
-        </Card>
-        <IntegrationAIContainer type={'global'} handleApiKeyChange={handleApiKeyChange}></IntegrationAIContainer>
+          <McpToolsContainer tools={tools} />
+          <IntegrationAIContainer type={'global'} handleToolsChange={handleToolsChange}></IntegrationAIContainer>
         </div>
       </InsidePage>
     </>
