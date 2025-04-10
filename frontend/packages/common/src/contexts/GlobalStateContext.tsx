@@ -197,6 +197,20 @@ const mockData = [
         path: '/datasourcing',
         children: [
           {
+            name: 'MCP 服务',
+            key: 'mcpService',
+            path: '/mcpService',
+            icon: 'ph:network-x',
+            access: ''
+          },
+          {
+            name: 'API Key',
+            key: 'mcpKey',
+            path: '/mcpKey',
+            icon: 'material-symbols:key',
+            access: ''
+          },
+          {
             name: '数据源',
             key: 'datasourcing',
             path: '/datasourcing',

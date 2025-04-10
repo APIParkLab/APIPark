@@ -31,6 +31,7 @@ export type SystemConfigFieldType = {
     catalogue?:string | string[];
     approvalType?:string;
     modelMapping?: string;
+    enable_mcp?: boolean;
 };
 
 export type SystemSubServiceTableListItem = {

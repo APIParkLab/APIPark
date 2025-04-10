@@ -21,6 +21,7 @@ export type AiServiceConfigFieldType = {
     catalogue?:string | string[];
     approvalType?:string;
     providerType?:string
+    enable_mcp?: boolean
 };
 
 export type AiServiceSubServiceTableListItem = {

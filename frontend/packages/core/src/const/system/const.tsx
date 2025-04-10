@@ -362,6 +362,10 @@ export const SERVICE_APPROVAL_OPTIONS = [
   { label: '无需审核：允许任何消费者调用该服务', value: 'auto' },
   { label: '人工审核：仅允许通过人工审核的消费者调用该服务', value: 'manual' }
 ]
+export const MCP_OPTIONS = [
+  { label: '关闭', value: false },
+  { label: '开启：AI Agent 等产品能够通过 MCP 方式调用服务', value: true }
+]
 export const SERVICE_KIND_OPTIONS = [
   { label: 'REST', value: 'rest' },
   { label: 'AI', value: 'ai' }
