@@ -12,6 +12,7 @@ import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
 import { ServiceDetailType } from '@market/const/serviceHub/type'
 import useCopyToClipboard from '@common/hooks/copy'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 
 type ConfigList = {
   openApi?: {
@@ -54,6 +55,7 @@ const IntegrationAIContainer = ({
   const [apiKey, setApiKey] = useState<string>('')
   const [apiKeyList, setApiKeyList] = useState<{ value: string; label: string }[]>([])
   const [mcpServerUrl, setMcpServerUrl] = useState<string>('')
+  const { state } = useGlobalContext()
   const navigator = useNavigate()
   const { copyToClipboard } = useCopyToClipboard()
   const [errors, setErrors] = useState<Record<string, string | null>>({
@@ -242,6 +244,9 @@ const IntegrationAIContainer = ({
   useEffect(() => {
     setupComponent()
   }, [service])
+  useEffect(() => {
+    initTabsData()
+  }, [state.language])
   useEffect(() => {
     if (type === 'service') {
       currentTab === 'MCP' ? setActiveTab('mcp') : setActiveTab('openApi')
