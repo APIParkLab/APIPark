@@ -2,12 +2,12 @@ import { Icon } from '@iconify/react/dist/iconify.js'
 import { Tool } from '@modelcontextprotocol/sdk/types.js'
 import { Card } from 'antd'
 
-const McpToolsContainer = ({ tools = [] }: { tools: Tool[] }) => {
+const McpToolsContainer = ({ tools = [], customClassName }: { tools: Tool[]; customClassName?: string }) => {
   return (
     <>
       <Card
         style={{ borderRadius: '10px' }}
-        className={`w-full flex-1 mr-[10px]`}
+        className={`w-full flex-1 mr-[10px] ${customClassName}`}
         classNames={{
           body: 'p-[10px]'
         }}

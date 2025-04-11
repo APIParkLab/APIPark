@@ -922,5 +922,18 @@
   "Kea608112": "載入預設模板",
   "Kee7de862": "編輯供應商( (0) )",
   "Kb0e0aeda": "新增 API 金鑰",
-  "K9d81999c": "API 金鑰可用於調用系統級 Open API 和 MCP。"
+  "K9d81999c": "API 金鑰可用於調用系統級 Open API 和 MCP。",
+  "Ka7ca8fde": "OpenAPI & MCP 呼叫地址",
+  "K6e9c928f": "MCP 設定",
+  "Kb6d0eb39": "Open API 文件",
+  "Ke6908f16": "AI 代理整合",
+  "Kf106bc62": "MCP 服務",
+  "K7c2bfeff": "MCP 服務作為 AI 模型與 API 之間的橋樑，允許智能助手（如 Claude）動態發現並呼叫 Gateway 上的 API，而無需繁瑣的手動設定或自訂整合。",
+  "K30595880": "關閉 MCP",
+  "Kc081047c": "關閉後將無法透過 MCP 方式呼叫服務",
+  "K373c8ab3": "MCP",
+  "K3ba29a85": "API",
+  "K3d52b756": "30 天內呼叫次數",
+  "Ke959f135": "開啟：AI Agent 等產品能夠透過 MCP 方式呼叫服務",
+  "Ka73a5801": "了解"
 }

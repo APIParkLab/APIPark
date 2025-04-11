@@ -853,5 +853,18 @@
   "Kea608112": "载入预置模板",
   "Kee7de862": "编辑供应商( (0) )",
   "Kb0e0aeda": "新增 API Key",
-  "K9d81999c": "API 密钥可用于调用系统级 Open API 和 MCP。"
+  "K9d81999c": "API 密钥可用于调用系统级 Open API 和 MCP。",
+  "Ka7ca8fde": "OpenAPI & MCP 调用地址",
+  "K6e9c928f": "MCP 配置",
+  "Kb6d0eb39": "Open API 文档",
+  "Ke6908f16": "AI 代理集成",
+  "Kf106bc62": "MCP 服务",
+  "K7c2bfeff": "MCP Service 充当 AI 模型与 API 之间的桥梁，允许智能助手（如 Claude）动态发现和调用 Gateway 上的 API，无需繁琐的手动配置或自定义集成。",
+  "K30595880": "关闭 MCP",
+  "Kc081047c": "关闭后将无法通过MCP方式调用服务",
+  "K373c8ab3": "MCP",
+  "K3ba29a85": "API",
+  "K3d52b756": "30天内调用次数",
+  "Ke959f135": "开启：AI Agent 等产品能够通过 MCP 方式调用服务",
+  "Ka73a5801": "了解"
 }
