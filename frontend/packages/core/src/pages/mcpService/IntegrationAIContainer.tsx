@@ -10,6 +10,7 @@ import { useConnection } from './hook/useConnection'
 import { ClientRequest, Tool, ListToolsResultSchema } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
+import useCopyToClipboard from '@common/hooks/copy'
 
 type ConfigList = {
   openApi?: {
@@ -45,6 +46,7 @@ const IntegrationAIContainer = ({
   const [apiKeyList, setApiKeyList] = useState<{ value: string; label: string }[]>([])
   const [mcpServerUrl, setMcpServerUrl] = useState<string>('')
   const navigator = useNavigate()
+  const { copyToClipboard } = useCopyToClipboard()
   const [errors, setErrors] = useState<Record<string, string | null>>({
     resources: null,
     prompts: null,
@@ -85,7 +87,7 @@ const IntegrationAIContainer = ({
    */
   const handleCopy = async (value: string): Promise<void> => {
     if (value) {
-      await navigator.clipboard.writeText(value)
+      copyToClipboard(value)
       message.success($t(RESPONSE_TIPS.copySuccess))
     }
   }
