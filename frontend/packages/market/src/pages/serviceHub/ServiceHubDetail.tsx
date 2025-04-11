@@ -136,7 +136,8 @@ servers:
         'enable_mcp',
         'mcp_server_address',
         'mcp_access_config',
-        'openapi_address'
+        'openapi_address',
+        'invoke_count'
       ]
     }).then((response) => {
       const { code, data, msg } = response
