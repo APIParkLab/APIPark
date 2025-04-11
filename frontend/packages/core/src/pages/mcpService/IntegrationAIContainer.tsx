@@ -397,7 +397,7 @@ const IntegrationAIContainer = ({
                     {apiKey}
                     <IconButton
                       name="copy"
-                      onClick={() => handleCopy(configContent)}
+                      onClick={() => handleCopy(apiKey)}
                       sx={{
                         position: 'absolute',
                         top: '0px',

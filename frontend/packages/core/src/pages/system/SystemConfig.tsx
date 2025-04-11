@@ -378,10 +378,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
         form.setFieldValue('enable_mcp', true)
       },
       width: 600,
-      okText: $t('确认'),
-      okButtonProps: {
-        danger: true
-      },
+      okText: $t('了解'),
       cancelText: $t('取消'),
       closable: true,
       icon: <></>
