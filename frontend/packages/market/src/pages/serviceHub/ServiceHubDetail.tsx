@@ -1,4 +1,4 @@
-import { ApiFilled, ArrowLeftOutlined } from '@ant-design/icons'
+import { ApiFilled, ApiOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const.tsx'
 import { EntityItem, RouterParams } from '@common/const/type.ts'
 import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
@@ -6,15 +6,26 @@ import { useFetch } from '@common/hooks/http.ts'
 import { $t } from '@common/locales/index.ts'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { approvalTypeTranslate } from '@market/const/serviceHub/const.tsx'
-import { App, Avatar, Button, Descriptions, Divider, Tabs } from 'antd'
+import { App, Avatar, Button, Card, Descriptions, Divider, Tabs, Tag, Tooltip } from 'antd'
 import { DefaultOptionType } from 'antd/es/cascader'
 import DOMPurify from 'dompurify'
-import { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ApplyServiceHandle, ServiceBasicInfoType, ServiceDetailType } from '../../const/serviceHub/type.ts'
 import { ApplyServiceModal } from './ApplyServiceModal.tsx'
 import ServiceHubApiDocument from './ServiceHubApiDocument.tsx'
-import Integrate from './integrate.tsx'
+import { SERVICE_KIND_OPTIONS } from '@core/const/system/const.tsx'
+import IntegrationAIContainer from '@core/pages/mcpService/IntegrationAIContainer.tsx'
+import { Tool } from '@modelcontextprotocol/sdk/types.js'
+import McpToolsContainer from '@core/pages/mcpService/McpToolsContainer.tsx'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
+
+type TabItemType = {
+  key: string
+  label: string
+  children: React.ReactNode
+  icon?: React.ReactNode
+}
 
 const ServiceHubDetail = () => {
   const { serviceId } = useParams<RouterParams>()
@@ -28,6 +39,14 @@ const ServiceHubDetail = () => {
   const { modal, message } = App.useApp()
   const [mySystemOptionList, setMySystemOptionList] = useState<DefaultOptionType[]>()
   const [service, setService] = useState<ServiceDetailType>()
+  const [serviceMetrics, setServiceMetrics] = useState<{ title: string; icon: React.ReactNode; value: string }[]>([])
+  const [serviceTags, setServiceTags] = useState<
+    { color: string; textColor: string; title: string; content: React.ReactNode }[]
+  >([])
+  const [tools, setTools] = useState<Tool[]>([])
+  const [tabItem, setTabItem] = useState<TabItemType[]>([])
+  const [currentTab, setCurrentTab] = useState('')
+  const { state } = useGlobalContext()
   const navigate = useNavigate()
 
   const modifyApiDoc = (apiDoc: string, apiPrefix: string) => {
@@ -60,7 +79,11 @@ const ServiceHubDetail = () => {
         'invoke_address',
         'approval_type',
         'service_kind',
-        'site_prefix'
+        'site_prefix',
+        'enable_mcp',
+        'mcp_server_address',
+        'mcp_access_config',
+        'openapi_address'
       ]
     }).then((response) => {
       const { code, data, msg } = response
@@ -73,10 +96,64 @@ const ServiceHubDetail = () => {
         setServiceName(data.service.name)
         setServiceDesc(data.service.description)
         setServiceDoc(DOMPurify.sanitize(data.service.document))
+        setServiceMetricsList(data.service.basic)
+        setTabItemList(data.service.basic)
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
       }
     })
+  }
+
+  const handleTabChange = (value: any) => {
+    setCurrentTab(value)
+  }
+
+  const setServiceMetricsList = (serviceBasicInfo: ServiceBasicInfoType) => {
+    // 设置服务指标数据
+    setServiceMetrics([
+      {
+        title: 'API 数量',
+        icon: <ApiOutlined className="mr-[1px] text-[14px] h-[14px] w-[14px]" />,
+        value: serviceBasicInfo.apiNum.toString()
+      },
+      {
+        title: '接入消费者数量',
+        icon: <Icon icon="tabler:api-app" width="14" height="14" />,
+        value: serviceBasicInfo.appNum.toString()
+      },
+      {
+        title: '30天内调用次数',
+        icon: <Icon icon="iconoir:graph-up" width="14" height="14" />,
+        value: formatInvokeCount(serviceBasicInfo.invokeCount ?? 0)
+      }
+    ])
+    // 设置服务标签数据
+    const tags = [
+      {
+        color: '#7371fc1b',
+        textColor: 'text-theme',
+        title: serviceBasicInfo?.catalogue?.name || '-',
+        content: serviceBasicInfo?.catalogue?.name || '-'
+      },
+      {
+        color: '#fbe5e5',
+        textColor: 'text-[#000]',
+        title: serviceBasicInfo?.serviceKind || '-',
+        content: SERVICE_KIND_OPTIONS.find((x) => x.value === serviceBasicInfo?.serviceKind)?.label || '-'
+      }
+    ]
+
+    // 如果启用了MCP，添加MCP标签
+    if (serviceBasicInfo?.enableMcp) {
+      tags.push({
+        color: '#ffc107',
+        textColor: 'text-[#000]',
+        title: 'MCP',
+        content: 'MCP'
+      })
+    }
+
+    setServiceTags(tags)
   }
 
   useEffect(() => {
@@ -134,120 +211,234 @@ const ServiceHubDetail = () => {
     })
   }
 
-  const items = [
-    {
-      key: 'introduction',
-      label: $t('介绍'),
-      children: (
-        <>
-          <div
-            className="p-btnbase preview-document mb-PAGE_INSIDE_B"
-            dangerouslySetInnerHTML={{ __html: serviceDoc || '' }}
-          ></div>
-        </>
-      ),
-      icon: <Icon icon="ic:baseline-space-dashboard" width="14" height="14" />
-    },
-    {
-      key: 'api-document',
-      label: $t('API 文档'),
-      children: (
-        <div
-          className={`p-btnbase  ${serviceBasicInfo?.serviceKind?.toLocaleLowerCase() === 'ai' ? 'ai-service-api-preview' : ''}`}
-        >
-          <ServiceHubApiDocument service={service!} />
-        </div>
-      ),
-      icon: <ApiFilled />
-    },
-    {
-      key: 'api-integrate',
-      label: $t('集成'),
-      children: (
-        <div
-          className={`p-btnbase  ${serviceBasicInfo?.serviceKind?.toLocaleLowerCase() === 'ai' ? 'ai-service-api-preview' : ''}`}
-        >
-          <Integrate service={service!} />
-        </div>
-      ),
-      icon: <Icon icon="icon-park-solid:whole-site-accelerator" width="15" height="15" />
+  const handleToolsChange = (value: Tool[]) => {
+    setTools(value)
+  }
+  // 格式化调用次数，添加K和M单位
+  const formatInvokeCount = (count: number | null | undefined): string => {
+    if (count === null || count === undefined) return '-'
+    if (count >= 1000000) {
+      const value = Math.floor(count / 100000) / 10
+      return `${value}M`
     }
-  ]
+    if (count >= 1000) {
+      const value = Math.floor(count / 100) / 10
+      return `${value}K`
+    }
+    return count.toString()
+  }
+
+  /**
+   * 定义一个更新标签项的函数，在serviceBasicInfo或tools变化时调用
+   */
+  const updateTabItems = useCallback(() => {
+    if (!serviceBasicInfo) return
+    const descriptionItem = [
+      {
+        label: $t('供应方'),
+        value: serviceBasicInfo?.team?.name || '-',
+        className: 'pb-[10px]'
+      },
+      {
+        label: $t('版本'),
+        value: serviceBasicInfo?.version || '-',
+        className: 'pb-[10px]'
+      },
+      {
+        label: $t('更新时间'),
+        value: serviceBasicInfo?.updateTime || '-',
+        className: 'pb-[10px]',
+        isTimeString: true
+      },
+      {
+        label: $t('审核'),
+        value: serviceBasicInfo?.approvalType ? $t(approvalTypeTranslate[serviceBasicInfo?.approvalType] || '-') : '-',
+        className: 'pb-[0px]'
+      }
+    ]
+    const items: TabItemType[] = [
+      {
+        key: 'introduction',
+        label: $t('介绍'),
+        children: (
+          <>
+            <Card
+              style={{
+                borderRadius: '10px'
+              }}
+              className="w-full h-[calc(100vh-420px)] overflow-auto"
+              classNames={{
+                body: 'p-[10px]'
+              }}
+            >
+              <Card
+                style={{
+                  borderRadius: '10px'
+                }}
+                className={`w-full`}
+                classNames={{
+                  body: 'p-[15px] h-auto bg-[#f8f8f8]'
+                }}
+              >
+                <Descriptions column={1}>
+                  {descriptionItem.map((item, index) => (
+                    <Descriptions.Item key={index} label={item.label} className={item.className}>
+                      {item.isTimeString ? (
+                        <span className="truncate" title={item.value}>
+                          {item.value}
+                        </span>
+                      ) : (
+                        item.value
+                      )}
+                    </Descriptions.Item>
+                  ))}
+                </Descriptions>
+              </Card>
+              <div
+                className="p-btnbase preview-document mb-PAGE_INSIDE_B"
+                dangerouslySetInnerHTML={{ __html: serviceDoc || '' }}
+              ></div>
+            </Card>
+          </>
+        ),
+        icon: <Icon icon="ic:baseline-space-dashboard" width="14" height="14" />
+      },
+      {
+        key: 'api-document',
+        label: $t('API'),
+        children: (
+          <Card
+            style={{
+              borderRadius: '10px'
+            }}
+            className="w-full h-[calc(100vh-420px)] overflow-auto"
+            classNames={{
+              body: 'p-[10px] pt-[0px]'
+            }}
+          >
+            <ServiceHubApiDocument service={service!} />
+          </Card>
+        ),
+        icon: <ApiFilled />
+      }
+    ]
+    if (serviceBasicInfo.enableMcp) {
+      items.push({
+        key: 'MCP',
+        label: 'MCP',
+        children: <McpToolsContainer tools={tools} customClassName="h-[calc(100vh-420px)] overflow-auto" />,
+        icon: <Icon icon="ph:network-x-fill" width="15" height="15" />
+      })
+    }
+    setTabItem(items)
+  }, [serviceBasicInfo, serviceDoc, service, tools, state.language])
+
+  /**
+   * 当初始化serviceBasicInfo时调用的函数
+   * @param _serviceBasicInfo
+   */
+  const setTabItemList = (_serviceBasicInfo: ServiceBasicInfoType) => {
+    // 只调用更新函数，更新将由useEffect处理
+    updateTabItems()
+  }
+  useEffect(() => {
+    if (serviceBasicInfo) {
+      updateTabItems()
+    }
+  }, [tools, updateTabItems, serviceBasicInfo])
 
   return (
-    <section className="grid grid-cols-5 h-full mr-PAGE_INSIDE_X">
-      <section className="col-span-4 border-0 border-r-[1px] border-solid border-BORDER flex flex-col overflow-hidden">
-        <section className="flex flex-col gap-btnbase p-btnbase">
-          <div className="text-[18px] leading-[25px] pb-[12px]">
-            <Button type="text" onClick={() => navigate(`/serviceHub/list`)}>
-              <ArrowLeftOutlined className="max-h-[14px]" />
-              {$t('返回')}
-            </Button>
-          </div>
-          <div className="flex">
-            {/* <Avatar shape="square" size={50} className=" bg-[linear-gradient(135deg,white,#f0f0f0)] text-[#333] rounded-[12px]" > {service?.name?.substring(0,1)}</Avatar> */}
-            <Avatar
-              shape="square"
-              size={50}
-              className={`rounded-[12px] border-none rounded-[12px] ${serviceBasicInfo?.logo ? 'bg-[linear-gradient(135deg,white,#f0f0f0)]' : 'bg-theme'}`}
-              src={
-                serviceBasicInfo?.logo ? (
-                  <img
-                    src={serviceBasicInfo?.logo}
-                    alt="Logo"
-                    style={{ maxWidth: '200px', width: '45px', height: '45px', objectFit: 'unset' }}
-                  />
-                ) : undefined
-              }
-              icon={serviceBasicInfo?.logo ? '' : <iconpark-icon name="auto-generate-api"></iconpark-icon>}
-            >
-              {' '}
-            </Avatar>
-
-            <div className="pl-[20px] w-[calc(100%-50px)]">
-              <p className="text-[14px] h-[20px] leading-[20px] truncate font-bold flex items-center gap-[4px]">
+    <div className="pr-[40px]">
+      <header>
+        <Button type="text" onClick={() => navigate(`/serviceHub/list`)}>
+          <ArrowLeftOutlined className="max-h-[14px]" />
+          {$t('返回')}
+        </Button>
+      </header>
+      <Card
+        style={{
+          borderRadius: '10px',
+          background: 'linear-gradient(35deg, rgb(246, 246, 260) 0%, rgb(255, 255, 255) 40%)'
+        }}
+        className={`w-full mt-[20px]`}
+        classNames={{
+          body: 'p-[15px] h-[180px]'
+        }}
+      >
+        <div className="service-info">
+          <div className="flex items-center">
+            <div>
+              <Avatar
+                shape="square"
+                size={50}
+                className={`rounded-[12px] border-none rounded-[12px] ${serviceBasicInfo?.logo ? 'bg-[linear-gradient(135deg,white,#f0f0f0)]' : 'bg-theme'}`}
+                src={
+                  serviceBasicInfo?.logo ? (
+                    <img
+                      src={serviceBasicInfo?.logo}
+                      alt="Logo"
+                      style={{ maxWidth: '200px', width: '45px', height: '45px', objectFit: 'unset' }}
+                    />
+                  ) : undefined
+                }
+                icon={serviceBasicInfo?.logo ? '' : <Icon icon="tabler:api-app" />}
+              >
+                {' '}
+              </Avatar>
+            </div>
+            <div className="pl-[20px] w-[calc(100%-50px)] overflow-hidden">
+              <p className="text-[14px] h-[20px] leading-[20px] truncate font-bold w-full flex items-center gap-[4px]">
                 {serviceName}
               </p>
-              <div className="mt-[10px] flex flex-col gap-btnrbase font-normal">
-                <p>{serviceDesc || '-'}</p>
-                <p className="flex items-center gap-[4px]">
-                  <Icon icon="ic:baseline-link" width="18" height="18" />
-                  <span className="font-bold">{$t('Base URL')}</span>: {serviceBasicInfo?.invokeAddress || '-'}
-                </p>
-                <div>
-                  <Button type="primary" onClick={() => openModal('apply')}>
-                    {$t('申请')}
-                  </Button>
-                </div>
+              <div className="mt-[5px] h-[20px] flex items-center font-normal">
+                {serviceTags.map((tag, index) => (
+                  <Tag
+                    key={index}
+                    color={tag.color}
+                    className={`${tag.textColor} font-normal border-0 mr-[12px] max-w-[150px] truncate`}
+                    bordered={false}
+                    title={tag.title}
+                  >
+                    {tag.content}
+                  </Tag>
+                ))}
+                {serviceMetrics.map((item, index) => (
+                  <Tooltip key={index} title={$t(item.title)}>
+                    <span className="mr-[12px] flex items-center">
+                      <span className="h-[14px] mr-[4px] flex items-center">{item.icon}</span>
+                      <span className="font-normal text-[14px]">{item.value}</span>
+                    </span>
+                  </Tooltip>
+                ))}
               </div>
             </div>
           </div>
-        </section>
-        <Tabs className="p-btnbase pr-0 overflow-hidden [&>.ant-tabs-content-holder]:overflow-auto" items={items} />
-      </section>
-      <section className="col-span-1 p-btnbase px-btnrbase">
-        <Descriptions title={$t('服务信息')} column={1} size={'small'}>
-          <Descriptions.Item label={$t('接入消费者')}>{serviceBasicInfo?.appNum ?? '-'}</Descriptions.Item>
-          <Descriptions.Item label={$t('供应方')}>{serviceBasicInfo?.team?.name || '-'}</Descriptions.Item>
-          <Descriptions.Item label={$t('审核')}>
-            {serviceBasicInfo?.approvalType ? $t(approvalTypeTranslate[serviceBasicInfo?.approvalType] || '-') : '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label={$t('分类')}>{serviceBasicInfo?.catalogue?.name || '-'}</Descriptions.Item>
-          <Descriptions.Item label={$t('标签')}>
-            {serviceBasicInfo?.tags?.map((x) => x.name)?.join(',') || '-'}
-          </Descriptions.Item>
-        </Descriptions>
-        <Divider />
-        <Descriptions column={1}>
-          <Descriptions.Item label={$t('版本')}>{serviceBasicInfo?.version || '-'}</Descriptions.Item>
-          <Descriptions.Item label={$t('更新时间')}>
-            <span className="truncate" title={serviceBasicInfo?.updateTime}>
-              {serviceBasicInfo?.updateTime || '-'}
-            </span>
-          </Descriptions.Item>
-        </Descriptions>
-      </section>
-    </section>
+          <span className="line-clamp-2 mt-[15px] text-[12px] text-[#666]" title={serviceDesc}>
+            {serviceDesc || $t('暂无服务描述')}
+          </span>
+        </div>
+        <div className="absolute bottom-[15px]">
+          <Button type="primary" onClick={() => openModal('apply')}>
+            {$t('申请')}
+          </Button>
+        </div>
+      </Card>
+      <div className="flex">
+        <Tabs
+          className="p-btnbase pr-0 overflow-hidden [&>.ant-tabs-content-holder]:overflow-auto w-full flex-1 mr-[10px]"
+          onChange={handleTabChange}
+          items={tabItem}
+        />
+        <IntegrationAIContainer
+          service={service}
+          currentTab={currentTab}
+          serviceId={serviceId}
+          customClassName="mt-[70px] max-h-[calc(100vh-420px)] overflow-auto"
+          type={'service'}
+          handleToolsChange={handleToolsChange}
+        ></IntegrationAIContainer>
+      </div>
+    </div>
   )
 }
 

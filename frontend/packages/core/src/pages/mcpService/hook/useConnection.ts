@@ -284,7 +284,6 @@ export function useConnection({
       // if (token) {
       //   headers["Authorization"] = `Bearer ${token}`;
       // }
-
       // 创建SSE客户端传输层
       const clientTransport = new SSEClientTransport(mcpProxyServerUrl, {
         eventSourceInit: {
