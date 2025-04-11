@@ -392,8 +392,12 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 			mcpAccessAddress = fmt.Sprintf("%s/openapi/v1/%s/%s/sse?apikey={your_api_key}", strings.TrimSuffix(sitePrefix, "/"), mcp_server.ServiceBasePath, s.Id)
 			mcpAccessConfig = fmt.Sprintf(mcpDefaultConfig, fmt.Sprintf("APIPark/%s", s.Name), mcpAccessAddress)
 		}
-
 	}
+	invokeMap, err := i.ProviderStatistics(ctx, time.Now().Add(-24*30*time.Hour), time.Now(), s.Id)
+	if err != nil {
+		return nil, err
+	}
+
 	return &catalogue_dto.ServiceDetail{
 		Name:        s.Name,
 		Description: s.Description,
@@ -412,6 +416,7 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 			InvokeAddress: invokeAddress,
 			SitePrefix:    sitePrefix,
 			EnableMCP:     s.EnableMCP,
+			InvokeCount:   invokeMap[s.Id],
 		},
 		APIDoc:           apiDoc,
 		MCPServerAddress: mcpAccessAddress,
