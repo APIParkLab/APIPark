@@ -52,9 +52,10 @@ const ServiceHubDetail = () => {
   const modifyApiDoc = (apiDoc: string, apiPrefix: string) => {
     if (!apiDoc) return ''
     if (!apiPrefix) return apiDoc
+
     try {
       const openApiSpec = JSON.parse(apiDoc)
-      // 遍历并修改 paths，给每个路径添加前缀
+      // 遍历并修改paths，给每个路径添加前缀
       const modifiedPaths: Record<string, unknown> = {}
       for (const [path, pathItem] of Object.entries(openApiSpec.paths)) {
         modifiedPaths[apiPrefix + path] = pathItem
@@ -62,7 +63,59 @@ const ServiceHubDetail = () => {
       openApiSpec.paths = modifiedPaths
       return JSON.stringify(openApiSpec)
     } catch (err) {
-      console.warn('拼接api前缀失败', err)
+      // 针对YAML格式或特殊格式的文本，直接进行字符串处理
+      try {
+        if (apiDoc.includes('paths:') && apiDoc.includes('openapi:')) {
+          // 在paths:后面的路径前添加前缀
+          // 找到paths:行的位置
+          const pathsIndex = apiDoc.indexOf('paths:')
+          if (pathsIndex !== -1) {
+            try {
+              // 在paths:之后的每个路径(以/开头的行)添加前缀
+              let result = apiDoc.substring(0, pathsIndex + 6) // 包含'paths:'
+              const rest = apiDoc.substring(pathsIndex + 6)
+
+              // 添加servers部分
+              if (!apiDoc.includes('servers:')) {
+                const serverConfig = `info:
+    title: API Space API
+    version: 1.0.0
+openapi: 3.0.1
+servers:
+  - url: ${apiPrefix}
+    description: 默认服务器
+`
+                result = serverConfig + result.substring(result.indexOf('paths:'))
+              }
+
+              // 处理路径
+              const lines = rest.split('\n')
+
+              for (let i = 0; i < lines.length; i++) {
+                const line = lines[i]
+                const trimmedLine = line.trim()
+
+                // 检测是否是路径行
+                if (trimmedLine.match(/^\//)) {
+                  // 这是一个路径行
+                  const indentation = line.substring(0, line.indexOf('/'))
+                  const pathWithoutIndent = line.substring(line.indexOf('/'))
+                  lines[i] = indentation + apiPrefix + pathWithoutIndent
+                }
+              }
+
+              return result + lines.join('\n')
+            } catch (yamlProcessingError) {
+              console.warn('处理YAML格式的API文档时出错', yamlProcessingError)
+              // 处理失败时返回原始文档
+              return apiDoc
+            }
+          }
+        }
+      } catch (outerError) {
+        console.warn('拼接api前缀失败', outerError)
+        return apiDoc
+      }
     }
     return apiDoc
   }
