@@ -160,7 +160,7 @@ const ServiceHubList: FC = () => {
                       classNames={{ header: 'border-b-[0px] p-[20px] ', body: 'pt-0 h-[110px]' }}
                       onClick={() => showDocumentDetail(item)}
                     >
-                      <span className="line-clamp-3  text-[12px] text-[#666] " style={{ 'word-break': 'auto-phrase' }}>
+                      <span className="line-clamp-3  text-[12px] text-[#666]" title={item.description}>
                         {item.description || $t('暂无服务描述')}
                       </span>
                       <CardAction service={item} />
@@ -283,7 +283,7 @@ const CardAction = (props: { service: ServiceHubTableListItem }) => {
       <Tooltip title={$t('接入消费者数量')}>
         <span className="mr-[12px] flex items-center">
           <span className="h-[14px] mr-[4px] flex items-center ">
-            <iconpark-icon size="14px" name="auto-generate-api"></iconpark-icon>
+            <Icon icon="tabler:api-app" width="14" height="14" />
           </span>
           <span className="font-normal text-[14px]">{service.subscriberNum ?? '-'}</span>
         </span>
@@ -293,7 +293,7 @@ const CardAction = (props: { service: ServiceHubTableListItem }) => {
           <span className="h-[14px] mr-[4px] flex items-center ">
             <Icon icon="iconoir:graph-up" width="14" height="14" />
           </span>
-          <span className="font-normal text-[14px]">{formatInvokeCount(service.invokeCount)}</span>
+          <span className="font-normal text-[14px]">{formatInvokeCount(service.invokeCount ?? 0)}</span>
         </span>
       </Tooltip>
     </div>

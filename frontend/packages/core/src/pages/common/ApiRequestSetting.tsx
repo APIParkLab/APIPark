@@ -86,9 +86,9 @@ export default function ApiRequestSetting() {
           </Form.Item>
 
           <Form.Item<ApiRequestSettingFieldType>
-            label={$t('集成地址')}
+            label={$t('OpenAPI & MCP 调用地址')}
             name="sitePrefix"
-            rules={[{ whitespace: true }]}
+            rules={[{ required: true, whitespace: true }]}
             extra={$t('与外部平台集成时，获取 API 市场中文档信息的域名')}
           >
             <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} />
