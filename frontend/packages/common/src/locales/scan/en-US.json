@@ -498,7 +498,7 @@
   "K370a3eb2": "Service Marketplace",
   "Kf7ec36d": "Service Details",
   "K58ca9485": "Subscribe",
-  "K59cdbec3": "Intro",
+  "K59cdbec3": "Readme",
   "K4aa9ed2c": "Subscribe",
   "K6c060779": "Service Information",
   "Kb97544cb": "Provider",
@@ -900,5 +900,17 @@
   "Kea608112": "Load Preset Template",
   "Kee7de862": "Edit Provider( (0) )",
   "Kb0e0aeda": "New API Key",
-  "K9d81999c": "The API Key can be used to call system-level Open API and MCP."
+  "K9d81999c": "The API Key can be used to call system-level Open API and MCP.",
+  "Ka7ca8fde": "OpenAPI & MCP Invocation Address",
+  "K6e9c928f": "MCP Config",
+  "Kb6d0eb39": "Open API Docs",
+  "Ke6908f16": "Integration to AI Agent",
+  "Kf106bc62": "MCP Service",
+  "K7c2bfeff": "MCP Service acts as a bridge between AI models and APIs, enabling intelligent assistants (such as Claude) to dynamically discover and invoke APIs on the Gateway without the need for tedious manual configuration or custom integration.",
+  "K30595880": "Disable MCP",
+  "Kc081047c": "After turning it off, you won’t be able to use the service through the MCP.",
+  "K373c8ab3": "MCP",
+  "K3ba29a85": "API",
+  "K3d52b756": "Number of invocations within 30 days",
+  "Ke959f135": "Enable: AI Agent and other products can invoke services through MCP."
 }
