@@ -419,6 +419,7 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 			InvokeCount:   invokeMap[s.Id],
 		},
 		APIDoc:           apiDoc,
+		OpenAPIAddress:   fmt.Sprintf("%s/api/v1/service/apidoc/%s", strings.TrimSuffix(sitePrefix, "/"), s.Id),
 		MCPServerAddress: mcpAccessAddress,
 		MCPAccessConfig:  mcpAccessConfig,
 	}, nil

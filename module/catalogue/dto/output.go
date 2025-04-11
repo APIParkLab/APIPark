@@ -29,6 +29,7 @@ type ServiceDetail struct {
 	Document         string        `json:"document"`
 	Basic            *ServiceBasic `json:"basic"`
 	APIDoc           string        `json:"api_doc"`
+	OpenAPIAddress   string        `json:"openapi_address"`
 	MCPServerAddress string        `json:"mcp_server_address"`
 	MCPAccessConfig  string        `json:"mcp_access_config"`
 }
