@@ -46,6 +46,7 @@ type ServiceBasic struct {
 	ServiceKind   string         `json:"service_kind"`
 	InvokeAddress string         `json:"invoke_address"`
 	SitePrefix    string         `json:"site_prefix"`
+	InvokeCount   int64          `json:"invoke_count"`
 	EnableMCP     bool           `json:"enable_mcp"`
 }
 
