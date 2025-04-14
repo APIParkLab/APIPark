@@ -201,14 +201,14 @@ const mockData = [
             key: 'mcpService',
             path: '/mcpService',
             icon: 'ph:network-x',
-            access: ''
+            access: 'system.settings.mcp.view'
           },
           {
             name: 'API Key',
             key: 'mcpKey',
             path: '/mcpKey',
             icon: 'material-symbols:key',
-            access: ''
+            access: 'system.settings.apikey.view'
           },
           {
             name: '数据源',
