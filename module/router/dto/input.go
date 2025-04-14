@@ -80,9 +80,10 @@ func ToServiceProxy(proxy *InputProxy) *api.Proxy {
 	}
 	headers := utils.SliceToSlice(proxy.Headers, func(h *Header) *api.Header {
 		return &api.Header{
-			Key:   h.Key,
-			Value: h.Value,
-			Opt:   h.Opt,
+			Key:     h.Key,
+			Value:   h.Value,
+			Opt:     h.Opt,
+			OptType: h.OptType,
 		}
 	})
 
