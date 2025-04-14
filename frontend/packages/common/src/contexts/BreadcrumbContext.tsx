@@ -18,5 +18,19 @@ export const useBreadcrumb = () => {
 export const BreadcrumbProvider = ({ children }: unknown) => {
   const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItemType[]>([])
 
-  return <BreadcrumbContext.Provider value={{ setBreadcrumb, breadcrumb }}>{children}</BreadcrumbContext.Provider>
+  return (
+    <BreadcrumbContext.Provider
+      value={{
+        setBreadcrumb: (newItems) => {
+          newItems.slice(0, newItems.length - 1).forEach((item) => {
+            item.title = <span className="cursor-pointer hover:text-[#2196f3]">{item.title}</span>
+          })
+          setBreadcrumb(newItems)
+        },
+        breadcrumb
+      }}
+    >
+      {children}
+    </BreadcrumbContext.Provider>
+  )
 }

@@ -1,7 +1,7 @@
 import { ActionType, ParamsType } from "@ant-design/pro-components";
 import { App, Button, Divider } from "antd";
 import { useState, useRef, useEffect, useMemo, FC } from "react";
-import { useParams, Link, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList";
 import { PublishApprovalModalContent } from "@common/components/aoplatform/PublishApprovalModalContent";
 import { PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN, PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN, PublishApplyStatusEnum, PublishStatusEnum, PublishTableStatusColorClass } from "@common/const/approval/const";
@@ -44,6 +44,7 @@ const SystemInsidePublicList:FC = ()=>{
     const [drawerData, setDrawerData] = useState<PublishTableListItem|PublishVersionTableListItem >({} as PublishTableListItem)
     const [drawerOkTitle, setDrawerOkTitle] = useState<string>('确认')
     const [isOkToPublish, setIsOkToPublish] = useState<boolean>(false)
+    const navigateTo = useNavigate()
     const getSystemPublishList = (params?: ParamsType & {
         pageSize?: number | undefined;
         current?: number | undefined;
@@ -351,7 +352,8 @@ const SystemInsidePublicList:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>{$t('服务')}</Link>
+                title: $t('服务'),
+                onClick: () => navigateTo('/service/list')
             },
             {
                 title:$t('发布')

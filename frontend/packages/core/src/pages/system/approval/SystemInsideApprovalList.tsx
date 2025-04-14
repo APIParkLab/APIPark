@@ -1,7 +1,7 @@
 
 import {ActionType} from "@ant-design/pro-components";
 import  {FC, useEffect, useMemo, useRef, useState} from "react";
-import {Link, useLocation, useParams} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx";
 import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {App, Button} from "antd";
@@ -40,6 +40,7 @@ const SystemInsideApprovalList:FC = ()=>{
     const [approvalBtnLoading,setApprovalBtnLoading] = useState<boolean>(false)
     const [memberValueEnum, setMemberValueEnum] = useState<SimpleMemberItem[]>([])
     const {accessData,state} = useGlobalContext()
+    const navigator = useNavigate()
 
     const openModal = async (type:'approval'|'view',entity:SubscribeApprovalTableListItem)=>{
         message.loading($t(RESPONSE_TIPS.loading))
@@ -143,7 +144,8 @@ const SystemInsideApprovalList:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>{$t('服务')}</Link>
+                title: $t('服务'),
+                onClick: () => navigator('/service/list')
             },
             {
                 title:$t('订阅审核')
