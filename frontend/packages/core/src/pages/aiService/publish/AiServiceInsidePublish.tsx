@@ -28,7 +28,8 @@ const AiServiceInsidePublic:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>{$t('服务')}</Link>
+                title: $t('服务'),
+                onClick: () => navigateTo('/service/list')
             },
             {
                 title:$t('发布')

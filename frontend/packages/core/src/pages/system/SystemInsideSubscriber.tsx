@@ -20,7 +20,7 @@ import { RouterParams } from '@core/components/aoplatform/RenderRoutes.tsx'
 import { App, Form, TreeSelect } from 'antd'
 import { DefaultOptionType } from 'antd/es/cascader'
 import { FC, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { SYSTEM_SUBSCRIBER_TABLE_COLUMNS } from '../../const/system/const.tsx'
 import {
   SimpleSystemItem,
@@ -39,6 +39,7 @@ const SystemInsideSubscriber: FC = () => {
   const pageListRef = useRef<ActionType>(null)
   const [memberValueEnum, setMemberValueEnum] = useState<SimpleMemberItem[]>([])
   const { accessData, state } = useGlobalContext()
+  const navigator = useNavigate()
   const getSystemSubscriber = () => {
     return fetchData<BasicResponse<{ subscribers: SystemSubscriberTableListItem[] }>>(
       'service/subscribers',
@@ -163,7 +164,8 @@ const SystemInsideSubscriber: FC = () => {
   useEffect(() => {
     setBreadcrumb([
       {
-        title: <Link to={`/service/list`}>{$t('服务')}</Link>
+        title: $t('服务'),
+        onClick: () => navigator('/service/list')
       },
       {
         title: $t('订阅方管理')

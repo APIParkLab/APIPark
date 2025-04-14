@@ -4,6 +4,7 @@ import { $t } from '@common/locales'
 import { Button, Tag } from 'antd'
 import { FC, ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
+import TopBreadcrumb from './Breadcrumb'
 
 class InsidePageProps {
   showBanner?: boolean = true
@@ -64,14 +65,7 @@ const InsidePage: FC<InsidePageProps> = ({
             <></>
           ) : (
             <div className={customPadding ? '' : 'mb-[30px]'}>
-              {backUrl && (
-                <div className="text-[18px] leading-[25px] mb-[12px]">
-                  <Button type="text" onClick={goBack}>
-                    <ArrowLeftOutlined className="max-h-[14px]" />
-                    {$t('返回')}
-                  </Button>
-                </div>
-              )}
+              {backUrl && <TopBreadcrumb handleBackCallback={() => goBack()} />}
               <div className="flex justify-between mb-[20px] items-center ">
                 <div className="flex items-center gap-TAG_LEFT">
                   <div className="text-theme text-[26px] ">{pageTitle}</div>

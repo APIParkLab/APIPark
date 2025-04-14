@@ -19,6 +19,7 @@ import IntegrationAIContainer from '@core/pages/mcpService/IntegrationAIContaine
 import { Tool } from '@modelcontextprotocol/sdk/types.js'
 import McpToolsContainer from '@core/pages/mcpService/McpToolsContainer.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
+import TopBreadcrumb from '@common/components/aoplatform/Breadcrumb.tsx'
 
 type TabItemType = {
   key: string
@@ -220,8 +221,16 @@ servers:
 
   useEffect(() => {
     getMySelectList()
-    setBreadcrumb([{ title: <Link to={`/serviceHub/list`}>{$t('服务市场')}</Link> }, { title: $t('服务详情') }])
   }, [])
+  useEffect(() => {
+    setBreadcrumb([
+      {
+        title: $t('API 门户'),
+        onClick: () => navigate(`/serviceHub/list`)
+      },
+      { title: $t('服务详情') }
+    ])
+  }, [state.language])
 
   const getMySelectList = () => {
     setMySystemOptionList([])
@@ -404,10 +413,7 @@ servers:
   return (
     <div className="pr-[40px]">
       <header>
-        <Button type="text" onClick={() => navigate(`/serviceHub/list`)}>
-          <ArrowLeftOutlined className="max-h-[14px]" />
-          {$t('返回')}
-        </Button>
+        <TopBreadcrumb handleBackCallback={() => navigate(`/serviceHub/list`)} />
       </header>
       <Card
         style={{
