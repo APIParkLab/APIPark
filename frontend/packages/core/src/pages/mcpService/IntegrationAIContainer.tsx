@@ -142,7 +142,7 @@ const IntegrationAIContainer = ({
    * 获取 API Key 列表
    */
   const getKeysList = () => {
-    fetchData<BasicResponse<null>>(type === 'global' ? 'simple/system/apikeys' : 'my/apikeys', {
+    fetchData<BasicResponse<null>>(type === 'global' ? 'simple/system/apikeys' : `my/apikeys/${serviceId}`, {
       method: 'GET'
     })
       .then((response) => {
