@@ -100,7 +100,7 @@ export const SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
   {
     title: '类型',
     dataIndex: 'service_kind',
-    width: 100,
+    width: 120,
     ellipsis: true
   },
   {
