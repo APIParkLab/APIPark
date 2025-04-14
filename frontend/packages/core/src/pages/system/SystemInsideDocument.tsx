@@ -94,7 +94,7 @@ const ServiceInsideDocument = () => {
         onClick: () => navigator('/service/list')
       },
       {
-        title: $t('说明文档')
+        title: $t('使用说明')
       }
     ])
     getServiceDoc()

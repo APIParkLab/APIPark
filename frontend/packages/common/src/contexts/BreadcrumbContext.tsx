@@ -23,7 +23,7 @@ export const BreadcrumbProvider = ({ children }: unknown) => {
       value={{
         setBreadcrumb: (newItems) => {
           newItems.slice(0, newItems.length - 1).forEach((item) => {
-            item.title = <span className="cursor-pointer hover:text-[#2196f3]">{item.title}</span>
+            item.title = <span className="cursor-pointer hover:text-theme">{item.title}</span>
           })
           setBreadcrumb(newItems)
         },
