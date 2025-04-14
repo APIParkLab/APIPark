@@ -21,6 +21,7 @@ import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import AiServiceRouterModelConfig, { AiServiceRouterModelConfigHandle } from './AiServiceInsideRouterModelConfig'
 import { AiProviderDefaultConfig, AiProviderLlmsItems } from '@core/pages/aiSetting/types'
+import { useBreadcrumb } from '@common/contexts/BreadcrumbContext'
 
 type AiServiceRouterField = {
   name: string
@@ -66,6 +67,7 @@ const AiServiceInsideRouterCreate = () => {
   const [variablesTableRef, setVariablesTableRef] = useState<MutableRefObject<EditableFormInstance<T> | undefined>>()
   const { state } = useGlobalContext()
   const [resultPath, setResultPath] = useState<string>('')
+  const { setBreadcrumb } = useBreadcrumb()
 
   const onFinish = () => {
     return variablesTableRef?.current
@@ -289,6 +291,19 @@ const AiServiceInsideRouterCreate = () => {
   }
 
   useEffect(() => {
+    setBreadcrumb([
+      {
+        title: $t('服务'),
+        onClick: () => navigator('/service/list')
+      },
+      {
+        title:$t('API'),
+        onClick: () => navigator(backUrl)
+      },
+      {
+        title: routeId ? $t('编辑 API') : $t('添加 API')
+      }
+    ])
     !routeId && aiServiceInfo?.provider && getDefaultModelConfig()
   }, [aiServiceInfo])
 
@@ -362,11 +377,6 @@ const AiServiceInsideRouterCreate = () => {
   const onClose = () => {
     setDrawerType(undefined)
   }
-
-  const apiPathMatchRulesOptions = useMemo(
-    () => API_PATH_MATCH_RULES.map((x) => ({ label: $t(x.label), value: x.value })),
-    [state.language]
-  )
 
   return (
     <InsidePage

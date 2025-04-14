@@ -357,7 +357,8 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
       getSystemInfo()
       setBreadcrumb([
         {
-          title: <Link to={`/service/list`}>{$t('服务')}</Link>
+          title: $t('服务'),
+          onClick: () => navigate('/service/list')
         },
         {
           title: $t('设置')

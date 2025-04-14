@@ -1,6 +1,7 @@
 import WithPermission from '@common/components/aoplatform/WithPermission.tsx'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const.tsx'
 import { EntityItem } from '@common/const/type.ts'
+import { useBreadcrumb } from '@common/contexts/BreadcrumbContext'
 import { useFetch } from '@common/hooks/http.ts'
 import { $t } from '@common/locales'
 import { RouterParams } from '@core/components/aoplatform/RenderRoutes'
@@ -9,7 +10,7 @@ import { App, Button } from 'antd'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/default.css'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 const ServiceInsideDocument = () => {
   const { message } = App.useApp()
   const [updater, setUpdater] = useState<string>()
@@ -18,7 +19,8 @@ const ServiceInsideDocument = () => {
   const [doc, setDoc] = useState<string>()
   const { fetchData } = useFetch()
   const { serviceId, teamId } = useParams<RouterParams>()
-
+  const { setBreadcrumb } = useBreadcrumb()
+  const navigator = useNavigate()
   const save = () => {
     fetchData<
       BasicResponse<{
@@ -86,6 +88,15 @@ const ServiceInsideDocument = () => {
   }
 
   useEffect(() => {
+    setBreadcrumb([
+      {
+        title: $t('服务'),
+        onClick: () => navigator('/service/list')
+      },
+      {
+        title: $t('使用说明')
+      }
+    ])
     getServiceDoc()
   }, [])
 

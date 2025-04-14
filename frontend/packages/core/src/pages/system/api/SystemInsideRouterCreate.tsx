@@ -26,6 +26,7 @@ import {
   SystemInsideRouterCreateHandle,
   SystemInsideRouterCreateProps
 } from '../../../const/system/type.ts'
+import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 
 const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, SystemInsideRouterCreateProps>(
   (props, ref) => {
@@ -38,6 +39,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
     const { state } = useGlobalContext()
     const { apiPrefix, prefixForce } = useSystemContext()
     const navigator = useNavigate()
+    const { setBreadcrumb } = useBreadcrumb()
+  
 
     const onFinish = () => {
       return Promise.all([proxyRef.current?.validate?.(), form.validateFields()]).then(([, formValue]) => {
@@ -144,6 +147,19 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
     }
 
     useEffect(() => {
+      setBreadcrumb([
+        {
+          title: $t('服务'),
+          onClick: () => navigator('/service/list')
+        },
+        {
+          title:$t('API'),
+          onClick: () => navigator(`/service/${teamId}/inside/${serviceId}/route`)
+        },
+        {
+          title: routeId ? $t('编辑 API') : $t('添加 API')
+        }
+      ])
       if (routeId) {
         getRouterConfig()
       } else {
