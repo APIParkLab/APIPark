@@ -2,8 +2,9 @@ package application_authorization
 
 import (
 	"context"
-	"github.com/APIParkLab/APIPark/module/system"
 	"reflect"
+
+	"github.com/APIParkLab/APIPark/module/system"
 
 	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
 
@@ -31,6 +32,9 @@ type IAuthorizationModule interface {
 	Detail(ctx context.Context, appId string, aid string) ([]application_authorization_dto.DetailItem, error)
 	// Info 获取项目鉴权详情
 	Info(ctx context.Context, appId string, aid string) (*application_authorization_dto.Authorization, error)
+
+	CheckAPIKeyAuthorization(ctx context.Context, serviceId string, apikey string) (bool, error)
+
 	//ExportAll(ctx context.Context) ([]*application_authorization_dto.ExportAuthorization, error)
 }
 

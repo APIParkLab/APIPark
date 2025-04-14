@@ -3,7 +3,7 @@ package auth_driver
 import (
 	"encoding/json"
 	"fmt"
-	
+
 	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
 )
 
@@ -83,6 +83,6 @@ func generateStruct[T any](cfg interface{}) (*T, error) {
 			return nil, err
 		}
 	}
-	
+
 	return result, nil
 }

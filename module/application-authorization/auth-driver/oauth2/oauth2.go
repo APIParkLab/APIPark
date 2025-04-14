@@ -3,9 +3,9 @@ package oauth2
 import (
 	"encoding/json"
 	"strconv"
-	
+
 	auth_driver "github.com/APIParkLab/APIPark/module/application-authorization/auth-driver"
-	
+
 	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
 )
 
@@ -33,7 +33,7 @@ func (cfg *Config) ID() string {
 }
 
 func (cfg *Config) Valid() ([]byte, error) {
-	
+
 	if cfg.HashSecret && !cfg.Hashed {
 		// 未加密
 		secret, err := hashSecret([]byte(cfg.ClientSecret), 0, 0, 0)
@@ -48,9 +48,9 @@ func (cfg *Config) Valid() ([]byte, error) {
 }
 
 func (cfg *Config) Detail() []application_authorization_dto.DetailItem {
-	
+
 	redirectURLs, _ := json.Marshal(cfg.RedirectUrls)
-	
+
 	return []application_authorization_dto.DetailItem{
 		{Key: "客户端ID", Value: cfg.ClientId},
 		{Key: "客户端密钥", Value: cfg.ClientSecret},

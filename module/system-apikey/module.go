@@ -18,6 +18,7 @@ type IAPIKeyModule interface {
 	Search(ctx context.Context, keyword string) ([]*system_apikey_dto.Item, error)
 	SimpleList(ctx context.Context) ([]*system_apikey_dto.SimpleItem, error)
 	MyAPIKeys(ctx context.Context) ([]*system_apikey_dto.SimpleItem, error)
+	MyAPIKeysByService(ctx context.Context, serviceId string) ([]*system_apikey_dto.SimpleItem, error)
 }
 
 func init() {
