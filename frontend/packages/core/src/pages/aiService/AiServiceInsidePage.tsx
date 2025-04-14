@@ -221,6 +221,10 @@ const AiServiceInsidePage: FC = () => {
   useEffect(() => {
     serviceId && getAiServiceInfo()
   }, [serviceId])
+  // 创建一个回调函数
+  const onSaveCallback = () => {
+    getAiServiceInfo()
+  }
 
   return (
     <>
@@ -251,7 +255,7 @@ const AiServiceInsidePage: FC = () => {
             <div
               className={` ${['setting', 'upstream'].indexOf(activeMenu!) !== -1 ? '' : ''} w-full h-full flex flex-1 flex-col overflow-auto bg-MAIN_BG  pt-[20px] pl-[20px] pb-PAGE_INSIDE_B `}
             >
-              <Outlet />
+              <Outlet context={{ onSaveComplete: onSaveCallback }} />
             </div>
           </div>
         </InsidePage>
