@@ -254,6 +254,21 @@ export const PERMISSION_DEFINITION = [
         anyOf: [{ backend: ['system.settings.ai_balance.manager'] }]
       }
     },
+    'system.settings.mcp.manager': {
+      granted: {
+        anyOf: [{ backend: ['system.settings.mcp.manager'] }]
+      }
+    },
+    'system.settings.mcp.view': {
+      granted: {
+        anyOf: [{ backend: ['system.settings.mcp.view'] }]
+      }
+    },
+    'system.settings.apikey.view': {
+      granted: {
+        anyOf: [{ backend: ['system.settings.apikey.view'] }]
+      }
+    },
     'system.devops.policy.view': {
       granted: {
         anyOf: [{ backend: ['system.settings.strategy.view'] }]
