@@ -39,6 +39,20 @@ export const ServiceHubGroup = ({ children, filterOption, dispatch }: ServiceHub
     dispatch({ type: SERVICE_HUB_LIST_ACTIONS.LIST_LOADING, payload: false })
   }
 
+  // 递归获取所有分类ID（包括子分类）
+  const getAllCategoryIds = (categories: CategorizesType[]): string[] => {
+    let ids: string[] = []
+    categories.forEach((category) => {
+      // 添加当前分类ID
+      ids.push(category.id)
+      // 如果有子分类，递归获取子分类ID
+      if (category.children && category.children.length > 0) {
+        ids = [...ids, ...getAllCategoryIds(category.children)]
+      }
+    })
+    return ids
+  }
+
   const getTagAndServiceClassifyList = () => {
     fetchData<BasicResponse<{ catalogues: CategorizesType[]; tags: EntityItem[] }>>('catalogues', {
       method: 'GET'
@@ -50,9 +64,11 @@ export const ServiceHubGroup = ({ children, filterOption, dispatch }: ServiceHub
           type: SERVICE_HUB_LIST_ACTIONS.GET_TAGS,
           payload: [...data.tags, { id: 'empty', name: $t('无标签') }]
         })
+        // 使用递归函数获取所有分类ID
+        const allCategoryIds = getAllCategoryIds(data.catalogues)
         dispatch({
           type: SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_CATE,
-          payload: [...data.catalogues.map((x: CategorizesType) => x.id)]
+          payload: allCategoryIds
         })
         dispatch({
           type: SERVICE_HUB_LIST_ACTIONS.SET_SELECTED_TAG,
@@ -116,7 +132,7 @@ export const ServiceHubGroup = ({ children, filterOption, dispatch }: ServiceHub
             <div className="mt-[20px] ml-[20px] pr-[10px] ">
               <p className="text-[18px] h-[25px] leading-[25px] font-bold mb-[15px]">{$t('分类')}</p>
               <Tree
-                className={`no-selected-tree ${transferToTreeData(filterOption.categoriesList).filter((x) => x.children && x.children.length > 0).length > 0 ? '' : 'no-first-switch-tree'}`}
+                className={`no-selected-tree service-hub-custom-switcher ${transferToTreeData(filterOption.categoriesList).filter((x) => x.children && x.children.length > 0).length > 0 ? '' : 'no-first-switch-tree'}`}
                 checkable
                 blockNode={true}
                 checkedKeys={filterOption.selectedCate}
@@ -130,7 +146,7 @@ export const ServiceHubGroup = ({ children, filterOption, dispatch }: ServiceHub
             <div className="ml-[20px] pr-[10px]">
               <p className="text-[18px] h-[25px] leading-[25px] font-bold mb-[15px]">{$t('标签')}</p>
               <Tree
-                className="no-first-switch-tree no-selected-tree"
+                className="no-first-switch-tree no-selected-tree service-hub-custom-switcher"
                 checkable
                 blockNode={true}
                 checkedKeys={filterOption.selectedTag}

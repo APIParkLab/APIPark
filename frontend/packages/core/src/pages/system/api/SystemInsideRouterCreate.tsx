@@ -262,8 +262,12 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
                   </Form.Item>
                   <Form.Item<SystemApiProxyFieldType>
                     name="path"
+                    dependencies={['pathMatch']}
                     rules={[
-                      { required: true, whitespace: true },
+                      ({ getFieldValue }) => ({
+                        required: getFieldValue('pathMatch') !== 'prefix',
+                        whitespace: true
+                      }),
                       {
                         validator: validateUrlSlash
                       }

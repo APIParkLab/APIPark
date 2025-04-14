@@ -85,7 +85,7 @@ export const SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
     title: '服务名称',
     dataIndex: 'name',
     ellipsis: true,
-    width: 160,
+    width: 220,
     fixed: 'left',
     sorter: (a, b) => {
       return a.name.localeCompare(b.name)
@@ -100,24 +100,20 @@ export const SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
   {
     title: '类型',
     dataIndex: 'service_kind',
-    width: 140,
+    width: 100,
     ellipsis: true
   },
   {
     title: '所属团队',
     dataIndex: ['team', 'name'],
-    ellipsis: true
-  },
-  {
-    title: '状态',
-    width: 140,
-    dataIndex: 'state',
-    ellipsis: true
+    ellipsis: true,
+    width: 200
   },
   {
     title: 'API 数量',
     dataIndex: 'apiNum',
     ellipsis: true,
+    width: 140,
     sorter: (a, b) => {
       return a.apiNum - b.apiNum
     }
