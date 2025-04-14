@@ -10,6 +10,9 @@ import { useConnection } from './hook/useConnection'
 import { ClientRequest, Tool, ListToolsResultSchema } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
+import { ServiceDetailType } from '@market/const/serviceHub/type'
+import useCopyToClipboard from '@common/hooks/copy'
+import { useGlobalContext } from '@common/contexts/GlobalStateContext'
 
 type ConfigList = {
   openApi?: {
@@ -33,18 +36,28 @@ type ApiKeyItem = {
 
 const IntegrationAIContainer = ({
   type,
-  handleToolsChange
+  handleToolsChange,
+  customClassName,
+  service,
+  serviceId,
+  currentTab
 }: {
   type: 'global' | 'service'
   handleToolsChange: (value: Tool[]) => void
+  customClassName?: string
+  service?: ServiceDetailType
+  serviceId?: string
+  currentTab?: string
 }) => {
-  const [activeTab, setActiveTab] = useState('mcp')
+  const [activeTab, setActiveTab] = useState(type === 'service' ? 'openApi' : 'mcp')
   const { message } = App.useApp()
   const [configContent, setConfigContent] = useState<string>('')
   const [apiKey, setApiKey] = useState<string>('')
   const [apiKeyList, setApiKeyList] = useState<{ value: string; label: string }[]>([])
   const [mcpServerUrl, setMcpServerUrl] = useState<string>('')
+  const { state } = useGlobalContext()
   const navigator = useNavigate()
+  const { copyToClipboard } = useCopyToClipboard()
   const [errors, setErrors] = useState<Record<string, string | null>>({
     resources: null,
     prompts: null,
@@ -64,14 +77,14 @@ const IntegrationAIContainer = ({
     const params: ConfigList = {
       mcp: {
         title: $t('MCP 配置'),
-        configContent: '',
+        configContent: service?.mcpAccessConfig || '',
         apiKeys: []
       }
     }
-    if (type === 'global') {
+    if (type === 'service') {
       params.openApi = {
         title: $t('Open API 文档'),
-        configContent: '',
+        configContent: service?.openapiAddress || '',
         apiKeys: []
       }
     }
@@ -85,7 +98,7 @@ const IntegrationAIContainer = ({
    */
   const handleCopy = async (value: string): Promise<void> => {
     if (value) {
-      await navigator.clipboard.writeText(value)
+      copyToClipboard(value)
       message.success($t(RESPONSE_TIPS.copySuccess))
     }
   }
@@ -129,7 +142,7 @@ const IntegrationAIContainer = ({
    * 获取 API Key 列表
    */
   const getKeysList = () => {
-    fetchData<BasicResponse<null>>(type === 'global' ? 'simple/system/apikeys' : '', {
+    fetchData<BasicResponse<null>>(type === 'global' ? 'simple/system/apikeys' : 'my/apikeys', {
       method: 'GET'
     })
       .then((response) => {
@@ -210,28 +223,37 @@ const IntegrationAIContainer = ({
   // 使用 useRef 保存最新的连接状态和断开函数
   const connectionStatusRef = useRef(connectionStatus)
   const disconnectFnRef = useRef(disconnectMcpServer)
-  
+
   // 当连接状态或断开函数变化时更新 ref
   useEffect(() => {
     connectionStatusRef.current = connectionStatus
     disconnectFnRef.current = disconnectMcpServer
   }, [connectionStatus, disconnectMcpServer])
-  
+
+  const setupComponent = () => {
+    initTabsData()
+    if (type === 'global') {
+      getGlobalMcpConfig()
+      setMcpServerUrl('mcp/global/sse')
+    } else {
+      service?.basic.enableMcp && setMcpServerUrl(`mcp/service/${serviceId}/sse`)
+    }
+    getKeysList()
+  }
+
+  useEffect(() => {
+    setupComponent()
+  }, [service])
+  useEffect(() => {
+    initTabsData()
+  }, [state.language])
+  useEffect(() => {
+    if (type === 'service') {
+      currentTab === 'MCP' ? setActiveTab('mcp') : setActiveTab('openApi')
+    }
+  }, [currentTab])
   // 仅在组件加载时执行初始化逻辑
   useEffect(() => {
-    // 局部函数，仅在此 effect 执行期间存在
-    const setupComponent = () => {
-      if (type === 'global') {
-        getGlobalMcpConfig()
-        setMcpServerUrl('mcp/global/sse')
-      }
-      initTabsData()
-      getKeysList()
-    }
-    
-    // 执行初始化
-    setupComponent()
-    
     // 返回清理函数，只会在组件卸载时执行
     return () => {
       try {
@@ -240,7 +262,6 @@ const IntegrationAIContainer = ({
         if (disconnectFn) {
           disconnectFn()
         }
-        
       } catch (err) {
         console.error('断开连接时出错:', err)
       }
@@ -248,11 +269,11 @@ const IntegrationAIContainer = ({
   }, [type])
   useEffect(() => {
     if (activeTab === 'openApi' && tabContent?.openApi?.configContent) {
-      setConfigContent(tabContent?.openApi?.configContent?.replace('{your_api_key}', apiKey || '{your_api_key}'))
+      setConfigContent(tabContent?.openApi?.configContent)
     } else if (activeTab === 'mcp' && tabContent?.mcp?.configContent) {
       setConfigContent(tabContent.mcp.configContent?.replace('{your_api_key}', apiKey || '{your_api_key}'))
     }
-  }, [apiKey, activeTab, tabContent])
+  }, [service, apiKey, activeTab, tabContent])
 
   useEffect(() => {
     if (mcpServerUrl) {
@@ -272,7 +293,7 @@ const IntegrationAIContainer = ({
     <>
       <Card
         style={{ borderRadius: '10px' }}
-        className="w-[400px] h-fit"
+        className={`w-[400px] h-fit ${customClassName}`}
         classNames={{
           body: 'p-[10px]'
         }}
@@ -287,7 +308,7 @@ const IntegrationAIContainer = ({
           {$t('AI 代理集成')}
         </p>
         <div className="tab-container mt-3">
-          {type === 'service' && (
+          {type === 'service' && service?.basic.enableMcp && (
             <div className="tab-nav flex rounded-md overflow-hidden border border-solid border-[#3D46F2] w-fit">
               <div
                 className={`tab-item px-5 py-1.5 cursor-pointer text-sm transition-colors ${activeTab === 'openApi' ? 'bg-[#3D46F2] text-white' : 'bg-white text-[#3D46F2]'}`}
@@ -308,21 +329,39 @@ const IntegrationAIContainer = ({
           </div>
           {/* 标签页内容区域 */}
           <div className="bg-[#0a0b21] text-white p-4 rounded-md my-2 font-mono text-sm overflow-auto relative">
-            <ReactJson
-              src={configContent ? JSON.parse(configContent) : {}}
-              theme="monokai"
-              indentWidth={2}
-              displayDataTypes={false}
-              displayObjectSize={false}
-              name={false}
-              collapsed={false}
-              enableClipboard={false}
-              style={{
-                backgroundColor: 'transparent',
-                wordBreak: 'break-word',
-                whiteSpace: 'normal'
-              }}
-            />
+            {activeTab === 'mcp' ? (
+              <ReactJson
+                src={
+                  configContent
+                    ? typeof configContent === 'string'
+                      ? (() => {
+                          try {
+                            return JSON.parse(configContent);
+                          } catch (e) {
+                            return {};
+                          }
+                        })()
+                      : configContent
+                    : {}
+                }
+                theme="monokai"
+                indentWidth={2}
+                displayDataTypes={false}
+                displayObjectSize={false}
+                name={false}
+                collapsed={false}
+                enableClipboard={false}
+                style={{
+                  backgroundColor: 'transparent',
+                  wordBreak: 'break-word',
+                  whiteSpace: 'normal'
+                }}
+              />
+            ) : (
+              <>
+                <pre className="whitespace-pre-wrap break-words">{configContent || ''}</pre>
+              </>
+            )}
             <IconButton
               name="copy"
               onClick={() => handleCopy(configContent)}
@@ -358,7 +397,7 @@ const IntegrationAIContainer = ({
                     {apiKey}
                     <IconButton
                       name="copy"
-                      onClick={() => handleCopy(configContent)}
+                      onClick={() => handleCopy(apiKey)}
                       sx={{
                         position: 'absolute',
                         top: '0px',

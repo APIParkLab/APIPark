@@ -12,6 +12,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { VirtuosoGrid } from 'react-virtuoso'
 import { CategorizesType, ServiceHubTableListItem } from '../../const/serviceHub/type.ts'
 import ServiceHubGroup from './ServiceHubGroup.tsx'
+import { SERVICE_KIND_OPTIONS } from '@core/const/system/const.tsx'
+import { Icon } from '@iconify/react/dist/iconify.js'
 
 export enum SERVICE_HUB_LIST_ACTIONS {
   GET_CATEGORIES = 'GET_CATEGORIES',
@@ -103,7 +105,7 @@ const ServiceHubList: FC = () => {
     dispatch({ type: SERVICE_HUB_LIST_ACTIONS.LIST_LOADING, payload: true })
     fetchData<BasicResponse<{ services: ServiceHubTableListItem }>>('catalogue/services', {
       method: 'GET',
-      eoTransformKeys: ['api_num', 'subscriber_num']
+      eoTransformKeys: ['api_num', 'subscriber_num', 'enable_mcp', 'service_kind', 'invoke_count']
     })
       .then((response) => {
         const { code, data, msg } = response
@@ -154,13 +156,14 @@ const ServiceHubList: FC = () => {
                   <div className="pt-[20px]">
                     <Card
                       title={CardTitle(item)}
-                      className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[180px] m-0 transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]"
-                      classNames={{ header: 'border-b-[0px] p-[20px] ', body: 'pt-0' }}
+                      className="shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] overflow-visible cursor-pointer h-[200px] m-0 transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.05]"
+                      classNames={{ header: 'border-b-[0px] p-[20px] ', body: 'pt-0 h-[110px]' }}
                       onClick={() => showDocumentDetail(item)}
                     >
-                      <span className="line-clamp-3  text-[12px] text-[#666] " style={{ 'word-break': 'auto-phrase' }}>
+                      <span className="line-clamp-3  text-[12px] text-[#666]" title={item.description}>
                         {item.description || $t('暂无服务描述')}
                       </span>
+                      <CardAction service={item} />
                     </Card>
                   </div>
                 )
@@ -229,23 +232,70 @@ const CardTitle = (service: ServiceHubTableListItem) => {
           >
             {service.catalogue?.name || '-'}
           </Tag>
-
-          <Tooltip title={$t('API 数量')}>
-            <span className="mr-[12px] flex items-center">
-              <ApiOutlined className="mr-[1px] text-[14px] h-[14px] w-[14px]" />
-              <span className="font-normal text-[14px]">{service.apiNum ?? '-'}</span>
-            </span>
-          </Tooltip>
-          <Tooltip title={$t('接入消费者数量')}>
-            <span className="mr-[12px] flex items-center">
-              <span className="h-[14px] mr-[4px] flex items-center ">
-                <iconpark-icon size="14px" name="auto-generate-api"></iconpark-icon>
-              </span>
-              <span className="font-normal text-[14px]">{service.subscriberNum ?? '-'}</span>
-            </span>
-          </Tooltip>
+          <Tag
+            color="#fbe5e5"
+            className="text-[#000] font-normal border-0 mr-[12px] max-w-[150px] truncate"
+            bordered={false}
+            title={service.serviceKind || '-'}
+          >
+            {SERVICE_KIND_OPTIONS.find((x) => x.value === service.serviceKind)?.label || '-'}
+          </Tag>
+          {service?.enableMcp && (
+            <Tag
+              color="#ffc107"
+              className="text-[#000] font-normal border-0 mr-[12px] max-w-[150px] truncate"
+              bordered={false}
+              title={'MCP'}
+            >
+              MCP
+            </Tag>
+          )}
         </div>
       </div>
+    </div>
+  )
+}
+
+// 格式化调用次数，添加K和M单位
+const formatInvokeCount = (count: number | null | undefined): string => {
+  if (count === null || count === undefined) return '-'
+  if (count >= 1000000) {
+    const value = Math.floor(count / 100000) / 10
+    return `${value}M`
+  }
+  if (count >= 1000) {
+    const value = Math.floor(count / 100) / 10
+    return `${value}K`
+  }
+  return count.toString()
+}
+
+const CardAction = (props: { service: ServiceHubTableListItem }) => {
+  const { service } = props
+  return (
+    <div className="absolute bottom-[20px] h-[20px] flex items-center font-normal">
+      <Tooltip title={$t('API 数量')}>
+        <span className="mr-[12px] flex items-center">
+          <ApiOutlined className="mr-[1px] text-[14px] h-[14px] w-[14px]" />
+          <span className="font-normal text-[14px]">{service.apiNum ?? '-'}</span>
+        </span>
+      </Tooltip>
+      <Tooltip title={$t('接入消费者数量')}>
+        <span className="mr-[12px] flex items-center">
+          <span className="h-[14px] mr-[4px] flex items-center ">
+            <Icon icon="tabler:api-app" width="14" height="14" />
+          </span>
+          <span className="font-normal text-[14px]">{service.subscriberNum ?? '-'}</span>
+        </span>
+      </Tooltip>
+      <Tooltip title={$t('30天内调用次数')}>
+        <span className="mr-[12px] flex items-center">
+          <span className="h-[14px] mr-[4px] flex items-center ">
+            <Icon icon="iconoir:graph-up" width="14" height="14" />
+          </span>
+          <span className="font-normal text-[14px]">{formatInvokeCount(service.invokeCount ?? 0)}</span>
+        </span>
+      </Tooltip>
     </div>
   )
 }

@@ -2,14 +2,20 @@ import InsidePage from "@common/components/aoplatform/InsidePage"
 import { $t } from '@common/locales/index.ts'
 import IntegrationAIContainer from "./IntegrationAIContainer"
 import { Tool } from "@modelcontextprotocol/sdk/types.js"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import McpToolsContainer from "./McpToolsContainer"
+import { useGlobalContext } from "@common/contexts/GlobalStateContext"
 
 const McpServiceContainer = () => {
   const [tools, setTools] = useState<Tool[]>([]);
+  const [, forceUpdate] = useState<unknown>(null)
+  const { state } = useGlobalContext()
   const handleToolsChange = (value: Tool[]) => {
     setTools(value)
   }
+  useEffect(() => {
+    forceUpdate({})
+  }, [state.language])
   return (
     <>
       <InsidePage

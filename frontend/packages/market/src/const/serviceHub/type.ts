@@ -17,6 +17,8 @@ export type ServiceBasicInfoType = {
   approvalType: 'auto' | 'manual'
   serviceKind: 'ai' | 'rest'
   sitePrefix?: string
+  enableMcp: boolean
+  invokeCount: number
 }
 
 export type ServiceDetailType = {
@@ -25,6 +27,9 @@ export type ServiceDetailType = {
   basic: ServiceBasicInfoType
   apiDoc: string
   applied: boolean
+  mcpServerAddress?: string
+  mcpAccessConfig?: string
+  openapiAddress?: string
 }
 
 export type ServiceHubCategoryConfigFieldType = {
@@ -54,9 +59,12 @@ export type ServiceHubTableListItem = {
   tags?: EntityItem[]
   catalogue: EntityItem
   apiNum: number
-  subscribeNum: number
+  subscriberNum: number
   description: string
   logo: string
+  enableMcp: boolean
+  serviceKind: 'ai' | 'rest'
+  invokeCount: number
 }
 
 export type ApplyServiceProps = {

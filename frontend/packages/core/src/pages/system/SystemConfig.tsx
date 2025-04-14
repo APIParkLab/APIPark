@@ -14,11 +14,23 @@ import { AiServiceConfigFieldType } from '@core/const/ai-service/type.ts'
 import { MCP_OPTIONS, SERVICE_APPROVAL_OPTIONS } from '@core/const/system/const.tsx'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { CategorizesType } from '@market/const/serviceHub/type.ts'
-import { App, Button, Form, Input, Radio, RadioChangeEvent, Row, Select, Switch, Tooltip, TreeSelect, Upload } from 'antd'
+import {
+  App,
+  Button,
+  Form,
+  Input,
+  Radio,
+  RadioChangeEvent,
+  Row,
+  Select,
+  Tooltip,
+  TreeSelect,
+  Upload
+} from 'antd'
 import { DefaultOptionType } from 'antd/es/cascader'
 import { RcFile, UploadChangeParam, UploadFile, UploadProps } from 'antd/es/upload/interface'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import { SystemConfigFieldType, SystemConfigHandle } from '../../const/system/type.ts'
 import { useSystemContext } from '../../contexts/SystemContext.tsx'
@@ -43,6 +55,8 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
   const [showAI, setShowAI] = useState<boolean>(false)
   const [imageBase64, setImageBase64] = useState<string | null>(null)
   const [tagOptionList, setTagOptionList] = useState<DefaultOptionType[]>([])
+  const context = useOutletContext<{ onSaveComplete?: () => void }>()
+  const onSaveComplete = context?.onSaveComplete
   const [serviceClassifyOptionList, setServiceClassifyOptionList] = useState<DefaultOptionType[]>()
   const [uploadLoading, setUploadLoading] = useState<boolean>(false)
   const { checkPermission, accessInit, getGlobalAccessData, state, aiConfigFlushed, setAiConfigFlushed } =
@@ -274,6 +288,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
           if (code === STATUS_CODE.SUCCESS) {
             message.success(msg || $t(RESPONSE_TIPS.success))
             setSystemInfo(data.service)
+            onSaveComplete?.()
             return Promise.resolve(true)
           } else {
             message.error(msg || $t(RESPONSE_TIPS.error))
@@ -378,10 +393,7 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
         form.setFieldValue('enable_mcp', true)
       },
       width: 600,
-      okText: $t('确认'),
-      okButtonProps: {
-        danger: true
-      },
+      okText: $t('了解'),
       cancelText: $t('取消'),
       closable: true,
       icon: <></>
@@ -467,7 +479,11 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
               </Form.Item>
             )}
             <Form.Item<AiServiceConfigFieldType> label={$t('MCP')} name="enable_mcp" rules={[{ required: true }]}>
-              <Radio.Group className="flex flex-col" options={mcpOptions} onChange={serviceId ? handleMcpChange : undefined}/>
+              <Radio.Group
+                className="flex flex-col"
+                options={mcpOptions}
+                onChange={serviceId ? handleMcpChange : undefined}
+              />
             </Form.Item>
             {showAI && (
               <>
