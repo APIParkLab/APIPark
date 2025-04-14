@@ -6,6 +6,8 @@ import (
 	"strings"
 	"sync"
 
+	application_authorization "github.com/APIParkLab/APIPark/module/application-authorization"
+
 	mcp_server "github.com/APIParkLab/APIPark/mcp-server"
 	"github.com/APIParkLab/APIPark/module/mcp"
 	"github.com/APIParkLab/APIPark/module/system"
@@ -18,11 +20,12 @@ import (
 var _ IMcpController = (*imlMcpController)(nil)
 
 type imlMcpController struct {
-	settingModule system.ISettingModule `autowired:""`
-	mcpModule     mcp.IMcpModule        `autowired:""`
-	sessionKeys   sync.Map
-	server        http.Handler
-	openServer    http.Handler
+	settingModule       system.ISettingModule                          `autowired:""`
+	authorizationModule application_authorization.IAuthorizationModule `autowired:""`
+	mcpModule           mcp.IMcpModule                                 `autowired:""`
+	sessionKeys         sync.Map
+	server              http.Handler
+	openServer          http.Handler
 }
 
 var mcpDefaultConfig = `{
@@ -85,11 +88,12 @@ func (i *imlMcpController) GlobalMCPHandle(ctx *gin.Context) {
 }
 
 func (i *imlMcpController) GlobalHandleSSE(ctx *gin.Context) {
-	i.handleSSE(ctx, i.openServer)
+	apikey := ctx.Request.URL.Query().Get("apikey")
+	i.handleSSE(ctx, i.openServer, apikey)
 }
 
-func (i *imlMcpController) handleSSE(ctx *gin.Context, server http.Handler) {
-	apikey := ctx.Request.URL.Query().Get("apikey")
+func (i *imlMcpController) handleSSE(ctx *gin.Context, server http.Handler, apikey string) {
+
 	writer := &ResponseWriter{
 		Writer:    ctx.Writer,
 		sessionId: make(chan string),
@@ -120,7 +124,23 @@ func (i *imlMcpController) MCPHandle(ctx *gin.Context) {
 }
 
 func (i *imlMcpController) ServiceHandleSSE(ctx *gin.Context) {
-	i.handleSSE(ctx, mcp_server.DefaultMCPServer())
+	apikey := ctx.Request.URL.Query().Get("apikey")
+	serviceId := ctx.Param("serviceId")
+	if serviceId == "" {
+		ctx.AbortWithStatusJSON(403, gin.H{"code": -1, "msg": "invalid service id", "success": "fail"})
+		return
+	}
+	ok, err := i.authorizationModule.CheckAPIKeyAuthorization(ctx, serviceId, apikey)
+	if err != nil {
+		ctx.AbortWithStatusJSON(403, gin.H{"code": -1, "msg": err.Error(), "success": "fail"})
+		return
+	}
+	if !ok {
+		ctx.AbortWithStatusJSON(403, gin.H{"code": -1, "msg": "invalid apikey", "success": "fail"})
+		return
+	}
+
+	i.handleSSE(ctx, mcp_server.DefaultMCPServer(), apikey)
 }
 
 func (i *imlMcpController) ServiceHandleMessage(ctx *gin.Context) {

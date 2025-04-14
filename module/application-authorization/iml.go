@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/APIParkLab/APIPark/service/subscribe"
+
 	application_authorization "github.com/APIParkLab/APIPark/service/application-authorization"
 
 	"github.com/eolinker/eosc/log"
@@ -36,9 +38,78 @@ var (
 
 type imlAuthorizationModule struct {
 	serviceService       service.IServiceService                         `autowired:""`
+	subscribeService     subscribe.ISubscribeService                     `autowired:""`
 	authorizationService application_authorization.IAuthorizationService `autowired:""`
 	clusterService       cluster.IClusterService                         `autowired:""`
 	transaction          store.ITransaction                              `autowired:""`
+}
+
+func (i *imlAuthorizationModule) CheckAPIKeyAuthorization(ctx context.Context, serviceId string, apikey string) (bool, error) {
+	list, err := i.subscribeService.ListBySubscribeStatus(ctx, serviceId, subscribe.ApplyStatusSubscribe)
+	if err != nil {
+		return false, err
+	}
+	if len(list) < 1 {
+		return false, fmt.Errorf("no application found")
+	}
+	appIds := utils.SliceToSlice(list, func(s *subscribe.Subscribe) string {
+		return s.Application
+	})
+	authorizations, err := i.authorizationService.ListByApp(ctx, appIds...)
+	if err != nil {
+		return false, err
+	}
+	for _, a := range authorizations {
+		if a.Type != "apikey" {
+			continue
+		}
+		cfg := make(map[string]interface{})
+		if a.Config != "" {
+			json.Unmarshal([]byte(a.Config), &cfg)
+		}
+		if cfg["apikey"] == apikey {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (i *imlAuthorizationModule) AuthorizationsByService(ctx context.Context, serviceId string, authorizationType string) ([]*application_authorization_dto.Authorization, error) {
+	list, err := i.subscribeService.ListBySubscribeStatus(ctx, serviceId, subscribe.ApplyStatusSubscribe)
+	if err != nil {
+		return nil, err
+	}
+	if len(list) < 1 {
+		return nil, fmt.Errorf("no application found")
+	}
+	appIds := utils.SliceToSlice(list, func(s *subscribe.Subscribe) string {
+		return s.Application
+	})
+	authorizations, err := i.authorizationService.ListByApp(ctx, appIds...)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*application_authorization_dto.Authorization, 0, len(authorizations))
+	for _, a := range authorizations {
+		if authorizationType != "" && a.Type != authorizationType {
+			continue
+		}
+		cfg := make(map[string]interface{})
+		if a.Config != "" {
+			json.Unmarshal([]byte(a.Config), &cfg)
+		}
+		result = append(result, &application_authorization_dto.Authorization{
+			UUID:           a.UUID,
+			Name:           a.Name,
+			Driver:         a.Type,
+			Position:       a.Position,
+			TokenName:      a.TokenName,
+			Config:         cfg,
+			ExpireTime:     a.ExpireTime,
+			HideCredential: a.HideCredential,
+		})
+	}
+	return result, nil
 }
 
 func (i *imlAuthorizationModule) ExportAll(ctx context.Context) ([]*application_authorization_dto.ExportAuthorization, error) {
