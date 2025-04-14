@@ -144,9 +144,10 @@ type Proxy struct {
 }
 
 type Header struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-	Opt   string `json:"opt"`
+	Key     string `json:"key"`
+	Value   string `json:"value"`
+	Opt     string `json:"opt"`
+	OptType string `json:"opt_type"`
 }
 
 type Router struct {
