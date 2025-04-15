@@ -16,7 +16,7 @@ type IAPIKeyController interface {
 	Search(ctx *gin.Context, keyword string) ([]*system_apikey_dto.Item, error)
 	SimpleList(ctx *gin.Context) ([]*system_apikey_dto.SimpleItem, error)
 	MyAPIKeys(ctx *gin.Context) ([]*system_apikey_dto.SimpleItem, error)
-	MyAPIKeysByService(ctx *gin.Context, serviceId string) ([]*system_apikey_dto.SimpleItem, error)
+	MyAPIKeysByService(ctx *gin.Context, serviceId string) ([]*system_apikey_dto.AuthorizationItem, error)
 }
 
 func init() {

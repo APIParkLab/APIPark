@@ -24,6 +24,12 @@ type SimpleItem struct {
 	Expired int64  `json:"expired"`
 }
 
+type AuthorizationItem struct {
+	Id      string       `json:"id"`
+	Name    string       `json:"name"`
+	Apikeys []SimpleItem `json:"apikeys"`
+}
+
 func ToAPIKey(e *system_apikey.APIKey) *APIKey {
 	return &APIKey{
 		Item: ToAPIKeyItem(e),
