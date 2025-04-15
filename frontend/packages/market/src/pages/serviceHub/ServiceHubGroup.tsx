@@ -119,7 +119,7 @@ export const ServiceHubGroup = ({ children, filterOption, dispatch }: ServiceHub
 
   return (
     <div className="flex flex-1 h-full">
-      <div className="w-[220px] border-0 border-solid border-r-[1px] border-r-BORDER">
+      <div className="w-[220px] border-0">
         <div className=" h-full">
           <Input
             className="rounded-SEARCH_RADIUS m-[10px] h-[40px] bg-[#f8f8f8] w-[200px]"

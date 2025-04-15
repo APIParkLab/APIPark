@@ -204,6 +204,8 @@ const ManagementConfig = forwardRef<ManagementConfigHandle, ManagementConfigProp
             {dataShowType === 'list' && (
               <Form.Item<ManagementConfigFieldType> label={$t('所属团队')} name="team" rules={[{ required: true }]}>
                 <Select
+                  showSearch
+                  optionFilterProp="label"
                   className="w-INPUT_NORMAL"
                   disabled={type === 'edit'}
                   placeholder={$t(PLACEHOLDER.input)}

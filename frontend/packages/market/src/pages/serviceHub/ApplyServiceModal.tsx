@@ -70,6 +70,8 @@ export const ApplyServiceModal = forwardRef<ApplyServiceHandle, ApplyServiceProp
         </Row>
         <Form.Item label={$t('消费者')} name="applications" rules={[{ required: true }]}>
           <Select
+            showSearch
+            optionFilterProp="label"
             className="w-INPUT_NORMAL"
             disabled={reApply}
             placeholder={$t('搜索或选择消费者')}

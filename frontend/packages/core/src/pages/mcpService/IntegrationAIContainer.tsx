@@ -1,7 +1,7 @@
-import { App, Button, Card, Empty, Select } from 'antd'
+import { App, Button, Card, CascaderProps, Empty, Select } from 'antd'
 import { $t } from '@common/locales/index.ts'
 import { Icon } from '@iconify/react/dist/iconify.js'
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import ReactJson from 'react-json-view'
 import { IconButton } from '@common/components/postcat/api/IconButton'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom'
 import { ServiceDetailType } from '@market/const/serviceHub/type'
 import useCopyToClipboard from '@common/hooks/copy'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext'
+import { Cascader } from 'antd/lib'
 
 type ConfigList = {
   openApi?: {
@@ -33,27 +34,49 @@ type ApiKeyItem = {
   name: string
   value: string
 }
+interface Option {
+  value: string
+  label: string
+  children?: Option[]
+}
 
-const IntegrationAIContainer = ({
-  type,
-  handleToolsChange,
-  customClassName,
-  service,
-  serviceId,
-  currentTab
-}: {
+type ServiceApiKeyList = {
+  id: string
+  name: string
+  apikeys: Array<{
+    id: string
+    name: string
+    value: string
+    expired: number
+  }>
+}
+export interface IntegrationAIContainerRef {
+  getServiceKeysList: () => void;
+}
+export interface IntegrationAIContainerProps {
   type: 'global' | 'service'
   handleToolsChange: (value: Tool[]) => void
   customClassName?: string
   service?: ServiceDetailType
   serviceId?: string
   currentTab?: string
-}) => {
+  openModal?: (type: 'apply') => void
+}
+export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, IntegrationAIContainerProps>(
+  ({
+    type,
+    handleToolsChange,
+    customClassName,
+    service,
+    serviceId,
+  currentTab,
+  openModal
+}: IntegrationAIContainerProps, ref) => {
   const [activeTab, setActiveTab] = useState(type === 'service' ? 'openApi' : 'mcp')
   const { message } = App.useApp()
   const [configContent, setConfigContent] = useState<string>('')
   const [apiKey, setApiKey] = useState<string>('')
-  const [apiKeyList, setApiKeyList] = useState<{ value: string; label: string }[]>([])
+  const [apiKeyList, setApiKeyList] = useState<any[]>([])
   const [mcpServerUrl, setMcpServerUrl] = useState<string>('')
   const { state } = useGlobalContext()
   const navigator = useNavigate()
@@ -103,8 +126,11 @@ const IntegrationAIContainer = ({
     }
   }
 
-  const handleChange = (value: string) => {
+  const handleSelectChange = (value: string) => {
     setApiKey(value)
+  }
+  const handleChange: CascaderProps<Option>['onChange'] = (value) => {
+    setApiKey(value.at(-1) || '')
   }
 
   /**
@@ -139,10 +165,10 @@ const IntegrationAIContainer = ({
   }
 
   /**
-   * 获取 API Key 列表
+   * 获取全局 API Key 列表
    */
-  const getKeysList = () => {
-    fetchData<BasicResponse<null>>(type === 'global' ? 'simple/system/apikeys' : `my/apikeys/${serviceId}`, {
+  const getGlobalKeysList = () => {
+    fetchData<BasicResponse<null>>('simple/system/apikeys', {
       method: 'GET'
     })
       .then((response) => {
@@ -158,6 +184,39 @@ const IntegrationAIContainer = ({
               })
             )
             setApiKey(data.apikeys[0].value)
+          }
+        } else {
+          message.error(msg || $t(RESPONSE_TIPS.error))
+        }
+      })
+      .catch((errorInfo) => {
+        message.error(errorInfo || $t(RESPONSE_TIPS.error))
+      })
+  }
+  useImperativeHandle(ref, () => ({
+    getServiceKeysList
+  }))
+  /**
+   * 获取服务 API Key 列表
+   */
+  const getServiceKeysList = () => {
+    fetchData<BasicResponse<null>>(`my/apikeys/${serviceId}`, {
+      method: 'GET'
+    })
+      .then((response) => {
+        const { code, msg, data } = response
+        if (code === STATUS_CODE.SUCCESS) {
+          if (data.apps && data.apps.length > 0) {
+            // 转换数据结构为 Cascader 所需格式
+            const transformedData = data.apps.map((app: ServiceApiKeyList) => ({
+              value: app.id,
+              label: app.name,
+              children: app.apikeys.map((key) => ({
+                ...key,
+                label: key.name
+              }))
+            }))
+            setApiKeyList(transformedData)
           }
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
@@ -238,7 +297,11 @@ const IntegrationAIContainer = ({
     } else {
       service?.basic.enableMcp && setMcpServerUrl(`mcp/service/${serviceId}/sse`)
     }
-    getKeysList()
+    if (type === 'global') {
+      getGlobalKeysList()
+    } else {
+      getServiceKeysList()
+    }
   }
 
   useEffect(() => {
@@ -307,125 +370,164 @@ const IntegrationAIContainer = ({
           />
           {$t('AI 代理集成')}
         </p>
-        <div className="tab-container mt-3">
-          {type === 'service' && service?.basic.enableMcp && (
-            <div className="tab-nav flex rounded-md overflow-hidden border border-solid border-[#3D46F2] w-fit">
-              <div
-                className={`tab-item px-5 py-1.5 cursor-pointer text-sm transition-colors ${activeTab === 'openApi' ? 'bg-[#3D46F2] text-white' : 'bg-white text-[#3D46F2]'}`}
-                onClick={() => setActiveTab('openApi')}
-              >
-                Open API
+        {type === 'service' && service?.basic.enableMcp && (
+          <div className="mt-3 tab-nav flex rounded-md overflow-hidden border border-solid border-[#3D46F2] w-fit">
+            <div
+              className={`tab-item px-5 py-1.5 cursor-pointer text-sm transition-colors ${activeTab === 'openApi' ? 'bg-[#3D46F2] text-white' : 'bg-white text-[#3D46F2]'}`}
+              onClick={() => setActiveTab('openApi')}
+            >
+              Open API
+            </div>
+            <div
+              className={`tab-item px-5 py-1.5 cursor-pointer text-sm transition-colors ${activeTab === 'mcp' ? 'bg-[#3D46F2] text-white' : 'bg-white text-[#3D46F2]'}`}
+              onClick={() => setActiveTab('mcp')}
+            >
+              MCP
+            </div>
+          </div>
+        )}
+        {type === 'service' && !apiKeyList.length ? (
+          <>
+            <Card
+              style={{ borderRadius: '10px' }}
+              className={`w-full mt-3`}
+              classNames={{
+                body: 'p-[10px]'
+              }}
+            >
+              <div className="flex flex-col items-center justify-center py-3">
+                <span className="text-[14px] mb-5">{$t('请先订阅该服务')}</span>
+                <Button type="primary" onClick={() => openModal?.('apply')}>
+                  {$t('申请')}
+                </Button>
               </div>
-              <div
-                className={`tab-item px-5 py-1.5 cursor-pointer text-sm transition-colors ${activeTab === 'mcp' ? 'bg-[#3D46F2] text-white' : 'bg-white text-[#3D46F2]'}`}
-                onClick={() => setActiveTab('mcp')}
-              >
-                MCP
+            </Card>
+          </>
+        ) : (
+          <>
+            <div className="tab-container mt-3">
+              <div className="tab-content font-semibold mt-[10px]">
+                {activeTab === 'openApi' ? tabContent.openApi?.title : tabContent.mcp.title}
+              </div>
+              {/* 标签页内容区域 */}
+              <div className="bg-[#0a0b21] text-white p-4 rounded-md my-2 font-mono text-sm overflow-auto relative">
+                {activeTab === 'mcp' ? (
+                  <ReactJson
+                    src={
+                      configContent
+                        ? typeof configContent === 'string'
+                          ? (() => {
+                              try {
+                                return JSON.parse(configContent)
+                              } catch (e) {
+                                return {}
+                              }
+                            })()
+                          : configContent
+                        : {}
+                    }
+                    theme="monokai"
+                    indentWidth={2}
+                    displayDataTypes={false}
+                    displayObjectSize={false}
+                    name={false}
+                    collapsed={false}
+                    enableClipboard={false}
+                    style={{
+                      backgroundColor: 'transparent',
+                      wordBreak: 'break-word',
+                      whiteSpace: 'normal'
+                    }}
+                  />
+                ) : (
+                  <>
+                    <pre className="whitespace-pre-wrap break-words">{configContent || ''}</pre>
+                  </>
+                )}
+                <IconButton
+                  name="copy"
+                  onClick={() => handleCopy(configContent)}
+                  sx={{
+                    position: 'absolute',
+                    top: '5px',
+                    right: '5px',
+                    color: '#999',
+                    transition: 'none',
+                    '&.MuiButtonBase-root:hover': {
+                      background: 'transparent',
+                      color: '#3D46F2',
+                      transition: 'none'
+                    }
+                  }}
+                ></IconButton>
               </div>
             </div>
-          )}
-          <div className="tab-content font-semibold mt-[10px]">
-            {activeTab === 'openApi' ? tabContent.openApi?.title : tabContent.mcp.title}
-          </div>
-          {/* 标签页内容区域 */}
-          <div className="bg-[#0a0b21] text-white p-4 rounded-md my-2 font-mono text-sm overflow-auto relative">
-            {activeTab === 'mcp' ? (
-              <ReactJson
-                src={
-                  configContent
-                    ? typeof configContent === 'string'
-                      ? (() => {
-                          try {
-                            return JSON.parse(configContent);
-                          } catch (e) {
-                            return {};
-                          }
-                        })()
-                      : configContent
-                    : {}
-                }
-                theme="monokai"
-                indentWidth={2}
-                displayDataTypes={false}
-                displayObjectSize={false}
-                name={false}
-                collapsed={false}
-                enableClipboard={false}
-                style={{
-                  backgroundColor: 'transparent',
-                  wordBreak: 'break-word',
-                  whiteSpace: 'normal'
-                }}
-              />
-            ) : (
+            {activeTab === 'mcp' && (
               <>
-                <pre className="whitespace-pre-wrap break-words">{configContent || ''}</pre>
+                <div className="tab-content font-semibold my-[10px]">API Key</div>
+                {apiKeyList.length ? (
+                  <>
+                    {type === 'global' ? (
+                      <>
+                        <Select
+                          showSearch
+                          optionFilterProp="label"
+                          value={apiKey}
+                          className="w-full"
+                          onChange={handleSelectChange}
+                          options={apiKeyList}
+                        />
+                        <Card
+                          style={{ borderRadius: '5px' }}
+                          className="w-full mt-[5px] "
+                          classNames={{
+                            body: 'p-[5px]'
+                          }}
+                        >
+                          <div className="relative h-[25px]">
+                            {apiKey}
+                            <IconButton
+                              name="copy"
+                              onClick={() => handleCopy(apiKey)}
+                              sx={{
+                                position: 'absolute',
+                                top: '0px',
+                                right: '5px',
+                                color: '#999',
+                                transition: 'none',
+                                '&.MuiButtonBase-root:hover': {
+                                  background: 'transparent',
+                                  color: '#3D46F2',
+                                  transition: 'none'
+                                }
+                              }}
+                            ></IconButton>
+                          </div>
+                        </Card>
+                      </>
+                    ) : (
+                      <>
+                        <Cascader
+                          allowClear={false}
+                          options={apiKeyList}
+                          onChange={handleChange}
+                          placeholder={$t('选择 API Key')}
+                        />
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={''}>
+                    <Button onClick={addKey} type="primary">
+                      {$t('新增 API Key')}
+                    </Button>
+                  </Empty>
+                )}
               </>
-            )}
-            <IconButton
-              name="copy"
-              onClick={() => handleCopy(configContent)}
-              sx={{
-                position: 'absolute',
-                top: '5px',
-                right: '5px',
-                color: '#999',
-                transition: 'none',
-                '&.MuiButtonBase-root:hover': {
-                  background: 'transparent',
-                  color: '#3D46F2',
-                  transition: 'none'
-                }
-              }}
-            ></IconButton>
-          </div>
-        </div>
-        {activeTab === 'mcp' && (
-          <>
-            <div className="tab-content font-semibold my-[10px]">API Key</div>
-            {apiKeyList.length ? (
-              <>
-                <Select value={apiKey} className="w-full" onChange={handleChange} options={apiKeyList} />
-                <Card
-                  style={{ borderRadius: '5px' }}
-                  className="w-full mt-[5px] "
-                  classNames={{
-                    body: 'p-[5px]'
-                  }}
-                >
-                  <div className="relative h-[25px]">
-                    {apiKey}
-                    <IconButton
-                      name="copy"
-                      onClick={() => handleCopy(apiKey)}
-                      sx={{
-                        position: 'absolute',
-                        top: '0px',
-                        right: '5px',
-                        color: '#999',
-                        transition: 'none',
-                        '&.MuiButtonBase-root:hover': {
-                          background: 'transparent',
-                          color: '#3D46F2',
-                          transition: 'none'
-                        }
-                      }}
-                    ></IconButton>
-                  </div>
-                </Card>
-              </>
-            ) : (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={''}>
-                <Button onClick={addKey} type="primary">
-                  {$t('新增 API Key')}
-                </Button>
-              </Empty>
             )}
           </>
         )}
       </Card>
     </>
   )
-}
-
-export default IntegrationAIContainer
+})

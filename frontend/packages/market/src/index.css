@@ -1053,6 +1053,11 @@ p{
 .ant-table-wrapper .ant-table{
   scrollbar-color: none !important;
 }
+.ant-select .ant-select-clear {
+  height:16px !important;
+  width: 16px !important;
+  top: 45%;
+}
 
 .eo_page_drag .ant-table-body{
   overflow-y: auto !important;

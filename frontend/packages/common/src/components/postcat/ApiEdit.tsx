@@ -234,12 +234,16 @@ export default function ApiEdit({
       <>
         <Space.Compact className="w-full mb-btnybase">
           <Select
+            showSearch
+            optionFilterProp="label"
             className="w-[15%] min-w-[100px]"
             value={apiInfo?.protocol || 'HTTP'}
             disabled={true}
             options={protocolOptionList}
           />
           <Select
+            showSearch
+            optionFilterProp="label"
             className="w-[15%] min-w-[100px]"
             value={apiInfo?.method}
             disabled={true}

@@ -301,7 +301,13 @@ const FilterForm = forwardRef<FilterFormHandle, FilterFormProps>(
     return (
       <Form form={form} layout="vertical" onValuesChange={handleValuesChange}>
         <Form.Item name="name" label={$t('属性名称')} rules={[{ required: true }]}>
-          <Select disabled={disabled} onChange={handleTypeChange} options={filterOptionsList} />
+          <Select
+            showSearch
+            optionFilterProp="label"
+            disabled={disabled}
+            onChange={handleTypeChange}
+            options={filterOptionsList}
+          />
         </Form.Item>
         <Form.Item
           name="values"

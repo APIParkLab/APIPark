@@ -30,7 +30,10 @@ const SystemInsideApiProxy = forwardRef<SystemInsideApiProxyHandle,SystemInsideA
     const ProxyHeadeerConfig = useMemo(()=>PROXY_HEADER_CONFIG.map((x)=>({
             ...x, 
             ...(x.key === 'optType' ? {
-                component: <Select className="w-INPUT_NORMAL" options={UPSTREAM_PROXY_HEADER_TYPE_OPTIONS.map((x)=>({...x, label:$t(x.label)}))}/>
+                component: <Select
+                showSearch
+                optionFilterProp="label"
+                className="w-INPUT_NORMAL" options={UPSTREAM_PROXY_HEADER_TYPE_OPTIONS.map((x)=>({...x, label:$t(x.label)}))}/>
             } : {})
         }))
     ,[state.language])
