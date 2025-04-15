@@ -41,7 +41,7 @@ type imlAPIKeyModule struct {
 	transaction                     store.ITransaction                              `autowired:""`
 }
 
-func (i *imlAPIKeyModule) MyAPIKeysByService(ctx context.Context, serviceId string) ([]*system_apikey_dto.SimpleItem, error) {
+func (i *imlAPIKeyModule) MyAPIKeysByService(ctx context.Context, serviceId string) ([]*system_apikey_dto.AuthorizationItem, error) {
 	list, err := i.subscribeService.ListBySubscribeStatus(ctx, serviceId, subscribe.ApplyStatusSubscribe)
 	if err != nil {
 		return nil, err
@@ -66,14 +66,16 @@ func (i *imlAPIKeyModule) MyAPIKeysByService(ctx context.Context, serviceId stri
 	if err != nil {
 		return nil, err
 	}
-	appIds := utils.SliceToSlice(apps, func(a *service.Service) string {
-		return a.Id
-	}, func(s *service.Service) bool {
-		if _, ok := appMap[s.Id]; !ok {
-			return false
+	appInfoMap := make(map[string]*service.Service)
+	appIds := make([]string, 0, len(apps))
+	for _, a := range apps {
+		if _, ok := appMap[a.Id]; !ok {
+			continue
 		}
-		return true
-	})
+		appInfoMap[a.Id] = a
+		appIds = append(appIds, a.Id)
+	}
+
 	if len(appIds) < 1 {
 		return nil, fmt.Errorf("no app found")
 	}
@@ -81,9 +83,14 @@ func (i *imlAPIKeyModule) MyAPIKeysByService(ctx context.Context, serviceId stri
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*system_apikey_dto.SimpleItem, 0, len(auths))
+	result := make(map[string]*system_apikey_dto.AuthorizationItem)
 	for _, a := range auths {
 		if a.Type != "apikey" {
+			continue
+		}
+
+		appInfo, ok := appInfoMap[a.Application]
+		if !ok {
 			continue
 		}
 		m := make(map[string]string)
@@ -91,7 +98,14 @@ func (i *imlAPIKeyModule) MyAPIKeysByService(ctx context.Context, serviceId stri
 		if m["apikey"] == "" {
 			continue
 		}
-		result = append(result, &system_apikey_dto.SimpleItem{
+		if _, ok := result[appInfo.Id]; !ok {
+			result[appInfo.Id] = &system_apikey_dto.AuthorizationItem{
+				Id:      appInfo.Id,
+				Name:    appInfo.Name,
+				Apikeys: []system_apikey_dto.SimpleItem{},
+			}
+		}
+		result[appInfo.Id].Apikeys = append(result[appInfo.Id].Apikeys, system_apikey_dto.SimpleItem{
 			Id:      a.UUID,
 			Name:    a.Name,
 			Value:   m["apikey"],
@@ -99,7 +113,9 @@ func (i *imlAPIKeyModule) MyAPIKeysByService(ctx context.Context, serviceId stri
 		})
 
 	}
-	return result, nil
+	return utils.MapToSlice(result, func(k string, t *system_apikey_dto.AuthorizationItem) *system_apikey_dto.AuthorizationItem {
+		return t
+	}), nil
 }
 
 func (i *imlAPIKeyModule) MyAPIKeys(ctx context.Context) ([]*system_apikey_dto.SimpleItem, error) {
