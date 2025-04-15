@@ -324,6 +324,8 @@ const TeamInsideMember: FC = () => {
           render: (_, entity) => (
             <WithPermission access="team.team.member.edit">
               <Select
+                showSearch
+                optionFilterProp="label"
                 className="w-full"
                 mode="multiple"
                 maxTagCount="responsive"

@@ -1109,6 +1109,11 @@ p{
   width: 16px !important;
   justify-content:center;
 }
+.ant-select .ant-select-clear {
+  height:16px !important;
+  width: 16px !important;
+  top: 45%;
+}
 
 .ant-table-wrapper .ant-table{
   scrollbar-color: none !important;

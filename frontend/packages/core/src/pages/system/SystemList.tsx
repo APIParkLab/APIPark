@@ -180,10 +180,24 @@ const SystemList: FC = () => {
           <span
             className={`text-[13px] `}
           >
-            {$t(SERVICE_KIND_OPTIONS.find((x) => x.value === record.service_kind)?.label || '-')}
-            {record.enable_mcp && (
-              <Tag color="#ffc107" className="text-[#000] ml-[5px]">MCP</Tag>
-            )}
+            <Tag
+              color={`#${record.service_kind === 'ai' ? 'EADEFF' : 'DEFFE7'}`}
+              className={`text-[#000] font-normal border-0 mr-[10px] max-w-[150px] truncate`}
+              bordered={false}
+              title={record.service_kind || '-'}
+            >
+              {SERVICE_KIND_OPTIONS.find((x) => x.value === record.service_kind)?.label || '-'}
+            </Tag>
+          {record?.enable_mcp && (
+            <Tag
+              color="#FFF0C1"
+              className="text-[#000] font-normal border-0 mr-[12px] max-w-[150px] truncate"
+              bordered={false}
+              title={'MCP'}
+            >
+              MCP
+            </Tag>
+          )}
           </span>
         )
       }

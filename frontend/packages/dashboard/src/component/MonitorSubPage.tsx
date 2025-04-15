@@ -181,6 +181,8 @@ export default function MonitorSubPage(props: MonitorSubPageProps) {
           <div>
             <label className="inline-block  whitespace-nowrap">服务：</label>
             <Select
+              showSearch
+              optionFilterProp="label"
               className="w-[346px]"
               mode="multiple"
               maxTagCount={1}

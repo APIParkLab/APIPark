@@ -205,6 +205,8 @@ const TeamConfig = forwardRef<TeamConfigHandle, TeamConfigProps>((props, ref) =>
                 rules={[{ required: true }]}
               >
                 <Select
+                  showSearch
+                  optionFilterProp="label"
                   className="w-INPUT_NORMAL"
                   placeholder={$t(PLACEHOLDER.select)}
                   options={managerOption}

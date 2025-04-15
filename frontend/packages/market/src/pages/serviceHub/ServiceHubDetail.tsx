@@ -15,7 +15,7 @@ import { ApplyServiceHandle, ServiceBasicInfoType, ServiceDetailType } from '../
 import { ApplyServiceModal } from './ApplyServiceModal.tsx'
 import ServiceHubApiDocument from './ServiceHubApiDocument.tsx'
 import { SERVICE_KIND_OPTIONS } from '@core/const/system/const.tsx'
-import IntegrationAIContainer from '@core/pages/mcpService/IntegrationAIContainer.tsx'
+import { IntegrationAIContainer, IntegrationAIContainerRef } from '@core/pages/mcpService/IntegrationAIContainer.tsx'
 import { Tool } from '@modelcontextprotocol/sdk/types.js'
 import McpToolsContainer from '@core/pages/mcpService/McpToolsContainer.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
@@ -48,6 +48,7 @@ const ServiceHubDetail = () => {
   const [tabItem, setTabItem] = useState<TabItemType[]>([])
   const [currentTab, setCurrentTab] = useState('')
   const { state } = useGlobalContext()
+  const integrationAIContainerRef = useRef<IntegrationAIContainerRef>(null)
   const navigate = useNavigate()
 
   const modifyApiDoc = (apiDoc: string, apiPrefix: string) => {
@@ -191,7 +192,7 @@ servers:
         content: serviceBasicInfo?.catalogue?.name || '-'
       },
       {
-        color: '#fbe5e5',
+        color: `#${serviceBasicInfo?.serviceKind === 'ai' ? 'EADEFF' : 'DEFFE7'}`,
         textColor: 'text-[#000]',
         title: serviceBasicInfo?.serviceKind || '-',
         content: SERVICE_KIND_OPTIONS.find((x) => x.value === serviceBasicInfo?.serviceKind)?.label || '-'
@@ -201,7 +202,7 @@ servers:
     // 如果启用了MCP，添加MCP标签
     if (serviceBasicInfo?.enableMcp) {
       tags.push({
-        color: '#ffc107',
+        color: '#FFF0C1',
         textColor: 'text-[#000]',
         title: 'MCP',
         content: 'MCP'
@@ -263,7 +264,9 @@ servers:
       ),
       onOk: () => {
         return applyRef.current?.apply().then((res) => {
-          // if(res === true) setApplied(true)
+          if (res === true) {
+            integrationAIContainerRef.current?.getServiceKeysList()
+          }
         })
       },
       okText: $t('确认'),
@@ -490,11 +493,13 @@ servers:
           items={tabItem}
         />
         <IntegrationAIContainer
+          ref={integrationAIContainerRef}
           service={service}
           currentTab={currentTab}
           serviceId={serviceId}
           customClassName="mt-[70px] max-h-[calc(100vh-420px)] overflow-auto"
           type={'service'}
+          openModal={openModal}
           handleToolsChange={handleToolsChange}
         ></IntegrationAIContainer>
       </div>
