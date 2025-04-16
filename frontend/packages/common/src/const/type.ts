@@ -81,6 +81,7 @@ export type MatchItem = {
 export type EntityItem = {
   id: string
   name: string
+  isSubscribed: boolean
 }
 
 export type DynamicMenuItem = {
