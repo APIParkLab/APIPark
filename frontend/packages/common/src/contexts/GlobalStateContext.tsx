@@ -99,10 +99,31 @@ const mockData = [
     icon: 'ic:baseline-bar-chart',
     children: [
       {
-        name: '运行视图',
-        key: 'analytics',
-        path: '/analytics',
-        icon: 'ic:baseline-bar-chart',
+        name: '总览',
+        key: 'analyticsTotal',
+        path: '/analytics/total',
+        icon: 'material-symbols:bar-chart',
+        access: 'system.analysis.run_view.view'
+      },
+      {
+        name: '服务',
+        key: 'analyticsSubscriber',
+        path: '/analytics/subscriber/list',
+        icon: 'ic:baseline-blinds-closed',
+        access: 'system.analysis.run_view.view'
+      },
+      {
+        name: '消费者',
+        key: 'analyticsProvider',
+        path: '/analytics/provider/list',
+        icon: 'ic:baseline-apps',
+        access: 'system.analysis.run_view.view'
+      },
+      {
+        name: 'API',
+        key: 'analyticsApi',
+        path: '/analytics/api/list',
+        icon: 'gravity-ui:plug-connection',
         access: 'system.analysis.run_view.view'
       }
     ],
@@ -201,14 +222,14 @@ const mockData = [
             key: 'mcpService',
             path: '/mcpService',
             icon: 'ph:network-x',
-            access: ''
+            access: 'system.settings.mcp.view'
           },
           {
             name: 'API Key',
             key: 'mcpKey',
             path: '/mcpKey',
             icon: 'material-symbols:key',
-            access: ''
+            access: 'system.settings.apikey.view'
           },
           {
             name: '数据源',

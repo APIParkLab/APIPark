@@ -85,7 +85,7 @@ export const SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
     title: '服务名称',
     dataIndex: 'name',
     ellipsis: true,
-    width: 160,
+    width: 220,
     fixed: 'left',
     sorter: (a, b) => {
       return a.name.localeCompare(b.name)
@@ -100,24 +100,20 @@ export const SYSTEM_TABLE_COLUMNS: PageProColumns<SystemTableListItem>[] = [
   {
     title: '类型',
     dataIndex: 'service_kind',
-    width: 140,
+    width: 120,
     ellipsis: true
   },
   {
     title: '所属团队',
     dataIndex: ['team', 'name'],
-    ellipsis: true
-  },
-  {
-    title: '状态',
-    width: 140,
-    dataIndex: 'state',
-    ellipsis: true
+    ellipsis: true,
+    width: 200
   },
   {
     title: 'API 数量',
     dataIndex: 'apiNum',
     ellipsis: true,
+    width: 140,
     sorter: (a, b) => {
       return a.apiNum - b.apiNum
     }
@@ -363,7 +359,7 @@ export const SERVICE_APPROVAL_OPTIONS = [
   { label: '人工审核：仅允许通过人工审核的消费者调用该服务', value: 'manual' }
 ]
 export const MCP_OPTIONS = [
-  { label: '关闭', value: false },
+  { label: '禁用', value: false },
   { label: '开启：AI Agent 等产品能够通过 MCP 方式调用服务', value: true }
 ]
 export const SERVICE_KIND_OPTIONS = [

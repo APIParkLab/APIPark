@@ -357,7 +357,8 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
       getSystemInfo()
       setBreadcrumb([
         {
-          title: <Link to={`/service/list`}>{$t('服务')}</Link>
+          title: $t('服务'),
+          onClick: () => navigate('/service/list')
         },
         {
           title: $t('设置')
@@ -550,6 +551,8 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
             {!onEdit && (
               <Form.Item<SystemConfigFieldType> label={$t('所属团队')} name="team" rules={[{ required: true }]}>
                 <Select
+                  showSearch
+                  optionFilterProp="label"
                   className="w-INPUT_NORMAL"
                   disabled={onEdit}
                   placeholder={$t(PLACEHOLDER.input)}
@@ -626,6 +629,8 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
 
             <Form.Item<SystemConfigFieldType> label={$t('标签')} name="tags">
               <Select
+                showSearch
+                optionFilterProp="label"
                 className="w-INPUT_NORMAL"
                 mode="tags"
                 placeholder={$t(PLACEHOLDER.select)}

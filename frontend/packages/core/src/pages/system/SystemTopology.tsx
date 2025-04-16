@@ -28,6 +28,8 @@ export default function SystemTopology() {
   const { systemInfo } = useSystemContext()
   const { setBreadcrumb } = useBreadcrumb()
   const [zoomNum, setZoomNum] = useState<number>(1)
+  const navigate = useNavigate()
+
 
   const getNodeData = () => {
     fetchData<BasicResponse<SystemTopologyResponse>>('service/topology', {
@@ -105,7 +107,8 @@ export default function SystemTopology() {
     getNodeData()
     setBreadcrumb([
       {
-        title: <Link to={`/service/list`}>{$t('服务')}</Link>
+        title: $t('服务'),
+        onClick: () => navigate('/service/list')
       },
       {
         title: $t('调用拓扑图')

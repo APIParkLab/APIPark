@@ -14,6 +14,7 @@ import FilterTable from "../FilterTable"
 import { DataMaskingConfigHandle ,DataMaskingConfigFieldType, PolicyMatchType} from "@common/const/policy/type"
 import {PolicyOptions} from '@common/const/policy/consts'
 import {v4 as uuidv4} from 'uuid'
+import { useBreadcrumb } from "@common/contexts/BreadcrumbContext"
 
 const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
     const { message,modal } = App.useApp()
@@ -24,6 +25,7 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
     const { state } = useGlobalContext()
     const [ loading, setLoading ] = useState<boolean>(false)
     const navigator = useNavigate()
+    const { setBreadcrumb } = useBreadcrumb()
 
     useImperativeHandle(ref, () => ({
         save:onFinish
@@ -78,6 +80,19 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
     };
 
     useEffect(() => {
+        setBreadcrumb([
+            {
+              title: $t('服务'),
+              onClick: () => navigator('/service/list')
+            },
+            {
+              title:$t('服务策略'),
+              onClick: () => navigator(serviceId ? `/service/${teamId}/aiInside/${serviceId}/servicepolicy` : '')
+            },
+            {
+              title: policyId !== undefined ? $t('编辑服务策略') : $t('添加服务策略')
+            }
+          ])
         if (policyId !== undefined) {
             setOnEdit(true);
             getPolicyInfo();
@@ -96,7 +111,7 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
             showBorder={false}
             scrollPage={false}
             className="overflow-y-auto"
-            backUrl={serviceId ? '../list' : undefined}
+            backUrl={serviceId ? `/service/${teamId}/aiInside/${serviceId}/servicepolicy` : undefined}
             >
             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} spinning={loading} wrapperClassName=' pb-PAGE_INSIDE_B pr-PAGE_INSIDE_X'>
                 <WithPermission access={onEdit ? [`${ serviceId === undefined ? 'system.devops':'team.service'}.policy.edit`] :''}>
@@ -124,8 +139,13 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
                                 name="type"
                                 rules={[{ required: true }]}
                             >
-                                <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} options={policyOptions} >
-                                </Select>
+                                <Select
+                                    showSearch
+                                    optionFilterProp="label"
+                                    className="w-INPUT_NORMAL"
+                                    placeholder={$t(PLACEHOLDER.input)}
+                                    options={policyOptions}
+                                ></Select>
                             </Form.Item>
 
                             <Form.Item<DataMaskingConfigFieldType>

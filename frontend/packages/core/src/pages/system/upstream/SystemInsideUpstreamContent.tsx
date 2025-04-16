@@ -8,7 +8,7 @@ import EditableTable from "@common/components/aoplatform/EditableTable.tsx";
 import EditableTableWithModal from "@common/components/aoplatform/EditableTableWithModal.tsx";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { UPSTREAM_TYPE_OPTIONS, SYSTEM_UPSTREAM_GLOBAL_CONFIG_TABLE_COLUMNS, schemeOptions, UPSTREAM_BALANCE_OPTIONS, UPSTREAM_PASS_HOST_OPTIONS, PROXY_HEADER_CONFIG, UPSTREAM_PROXY_HEADER_TYPE_OPTIONS } from "../../../const/system/const.tsx";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
 import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE } from "@common/const/const.tsx";
 import { useFetch } from "@common/hooks/http.ts";
@@ -36,6 +36,7 @@ const SystemInsideUpstreamContent= forwardRef<SystemInsideUpstreamContentHandle>
     const { setBreadcrumb } = useBreadcrumb()
     const [form] = Form.useForm();
     const {state} = useGlobalContext()
+    const navigate = useNavigate()
 
     useImperativeHandle(ref, () => ({
         save:()=>formRef.current?.save()
@@ -110,7 +111,8 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
     useEffect(() => {
         setBreadcrumb([
             {
-                title: <Link to={`/service/list`}>{$t('服务')}</Link>
+                title: $t('服务'),
+                onClick: () => navigate('/service/list')
             },
             {
                 title: $t('上游')
@@ -127,7 +129,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
     const ProxyHeadeerConfig = useMemo(()=>PROXY_HEADER_CONFIG.map((x)=>({
         ...x, 
         ...(x.key === 'optType' ? {
-            component: <Select className="w-INPUT_NORMAL" options={UPSTREAM_PROXY_HEADER_TYPE_OPTIONS.map((x)=>({...x, label:$t(x.label)}))}/>
+            component: <Select showSearch optionFilterProp="label" className="w-INPUT_NORMAL" options={UPSTREAM_PROXY_HEADER_TYPE_OPTIONS.map((x)=>({...x, label:$t(x.label)}))}/>
         } : {})
     }))
 ,[state.language])
@@ -173,7 +175,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
                                     name="scheme"
                                     rules={[{ required: true }]}
                                 >
-                                <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={schemeOptions}>
+                                <Select showSearch optionFilterProp="label" className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={schemeOptions}>
                                 </Select>
                                 </Form.Item>
 
@@ -190,7 +192,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
                                     name="passHost"
                                     rules={[{ required: true }]}
                                 >
-                                    <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={passHostOptions} onChange={(val)=>setFormShowHost(val === 'rewrite')}>
+                                    <Select showSearch optionFilterProp="label" className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={passHostOptions} onChange={(val)=>setFormShowHost(val === 'rewrite')}>
                                     </Select>
                                 </Form.Item>
 

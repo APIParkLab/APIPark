@@ -1,7 +1,7 @@
 import { ActionType, ParamsType } from "@ant-design/pro-components";
 import { App, Button, Divider } from "antd";
 import { useState, useRef, useEffect, useMemo, FC } from "react";
-import { useParams, Link, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList";
 import { PublishApprovalModalContent } from "@common/components/aoplatform/PublishApprovalModalContent";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes";
@@ -45,6 +45,7 @@ const AiServiceInsidePublicList:FC = ()=>{
     const [drawerData, setDrawerData] = useState<PublishTableListItem|PublishVersionTableListItem >({} as PublishTableListItem)
     const [drawerOkTitle, setDrawerOkTitle] = useState<string>('确认')
     const [isOkToPublish, setIsOkToPublish] = useState<boolean>(false)
+    const navigator = useNavigate()
     const getAiServicePublishList = (params?: ParamsType & {
         pageSize?: number | undefined;
         current?: number | undefined;
@@ -352,10 +353,11 @@ const AiServiceInsidePublicList:FC = ()=>{
     useEffect(() => {
         setBreadcrumb([
             {
-                title:<Link to={`/service/list`}>{$t('服务')}</Link>
+                title: $t('服务'),
+                onClick: () => navigator('/service/list')
             },
             {
-                title:$t('发布')
+                title: $t('发布')
             }
         ])
         getMemberList()

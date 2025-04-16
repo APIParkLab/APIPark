@@ -1,6 +1,6 @@
 import InsidePage from "@common/components/aoplatform/InsidePage"
 import { $t } from '@common/locales/index.ts'
-import IntegrationAIContainer from "./IntegrationAIContainer"
+import { IntegrationAIContainer } from "./IntegrationAIContainer"
 import { Tool } from "@modelcontextprotocol/sdk/types.js"
 import { useEffect, useState } from "react"
 import McpToolsContainer from "./McpToolsContainer"

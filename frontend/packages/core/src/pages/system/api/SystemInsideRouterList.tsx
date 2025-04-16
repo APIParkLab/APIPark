@@ -159,17 +159,20 @@ const SystemInsideRouterList: FC = () => {
   }
 
   useEffect(() => {
+    getMemberList()
+    manualReloadTable()
+  }, [serviceId])
+  useEffect(() => {
     setBreadcrumb([
       {
-        title: <Link to={`/service/list`}>{$t('服务')}</Link>
+        title: $t('服务'),
+        onClick: () => navigator('/service/list')
       },
       {
         title: $t('路由')
       }
     ])
-    getMemberList()
-    manualReloadTable()
-  }, [serviceId])
+  }, [state.language])
 
   const columns = useMemo(() => {
     return [...SYSTEM_API_TABLE_COLUMNS].map((x) => {

@@ -60,7 +60,13 @@ export type DashboardSettingEditProps = {
                                 name="driver"
                                 rules={[{ required: true }]}
                             >
-                                <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={[...DASHBOARD_SETTING_DRIVER_OPTION_LIST]}/>
+                                <Select
+                                    showSearch
+                                    optionFilterProp="label"
+                                    className="w-INPUT_NORMAL"
+                                    placeholder={$t(PLACEHOLDER.select)}
+                                    options={[...DASHBOARD_SETTING_DRIVER_OPTION_LIST]}
+                                />
                             </Form.Item>
 
                             <Form.Item<PartitionDashboardConfigFieldType>

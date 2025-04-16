@@ -1109,6 +1109,11 @@ p{
   width: 16px !important;
   justify-content:center;
 }
+.ant-select .ant-select-clear {
+  height:16px !important;
+  width: 16px !important;
+  top: 45%;
+}
 
 .ant-table-wrapper .ant-table{
   scrollbar-color: none !important;
@@ -1212,6 +1217,38 @@ p{
 .no-first-switch-tree .ant-tree-switcher{
   display: none;
 }
+
+/* 将折叠图标移到右侧 */
+.service-hub-custom-switcher .ant-tree-switcher {
+  position: absolute !important;
+  right: 0 !important;
+  left: auto !important;
+  z-index: 10 !important;
+}
+
+/* 设置节点内容宽度 */
+.service-hub-custom-switcher .ant-tree-node-content-wrapper {
+  width: calc(100% - 24px) !important;
+  padding-left: 8px !important;
+  padding-right: 24px !important;
+  box-sizing: border-box !important;
+}
+
+/* 强制控制标题元素的样式 */
+.service-hub-custom-switcher .ant-tree-title {
+  display: inline-block !important;
+  width: calc(100% - 10px) !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  vertical-align: middle !important;
+}
+
+/* 确保选中框的间距 */
+.service-hub-custom-switcher .ant-tree-checkbox {
+  margin-right: 8px !important;
+}
+
 
 .no-selected-tree .ant-tree-node-selected{
   background-color: transparent !important;

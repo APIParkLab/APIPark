@@ -480,6 +480,8 @@ const MemberList = () => {
               render: (_, entity) => (
                 <WithPermission access="system.organization.member.edit">
                   <Select
+                    showSearch
+                    optionFilterProp="label"
                     className="w-full"
                     mode="multiple"
                     value={entity.roles?.map((x: EntityItem) => x.id)}

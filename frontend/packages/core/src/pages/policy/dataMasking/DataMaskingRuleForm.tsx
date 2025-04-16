@@ -146,6 +146,8 @@ const DataMaskRuleForm: React.FC<DataMaskRuleFormProps> = ({
       <Form form={form} layout="vertical" className="p-4">
         <Form.Item name={['match', 'type']} label={$t('匹配类型')} rules={[{ required: true }]}>
           <Select
+            showSearch
+            optionFilterProp="label"
             placeholder={$t(PLACEHOLDER.select)}
             onChange={handleMatchTypeChange}
             options={matchRuleOptions}
@@ -156,6 +158,8 @@ const DataMaskRuleForm: React.FC<DataMaskRuleFormProps> = ({
           <Form.Item name={['match', 'value']} label={$t('匹配值')} rules={[{ required: true }]}>
             {matchType === 'inner' ? (
               <Select
+                showSearch
+                optionFilterProp="label"
                 placeholder={$t(PLACEHOLDER.select)}
                 onChange={handleMatchValueChange}
                 options={dataFormatOptions}
@@ -168,6 +172,8 @@ const DataMaskRuleForm: React.FC<DataMaskRuleFormProps> = ({
 
         <Form.Item name={['mask', 'type']} label={$t('脱敏类型')} rules={[{ required: true }]}>
           <Select
+            showSearch
+            optionFilterProp="label"
             placeholder={$t(PLACEHOLDER.select)}
             onChange={handleMaskTypeChange}
             options={
@@ -197,6 +203,8 @@ const DataMaskRuleForm: React.FC<DataMaskRuleFormProps> = ({
               rules={[{ required: true }]}
             >
               <Select
+                showSearch
+                optionFilterProp="label"
                 placeholder={$t(PLACEHOLDER.select)}
                 onChange={handleReplaceTypeChange}
                 options={dataMaskReplaceStrOptions}

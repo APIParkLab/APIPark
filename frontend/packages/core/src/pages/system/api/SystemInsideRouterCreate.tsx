@@ -26,6 +26,7 @@ import {
   SystemInsideRouterCreateHandle,
   SystemInsideRouterCreateProps
 } from '../../../const/system/type.ts'
+import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 
 const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, SystemInsideRouterCreateProps>(
   (props, ref) => {
@@ -38,6 +39,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
     const { state } = useGlobalContext()
     const { apiPrefix, prefixForce } = useSystemContext()
     const navigator = useNavigate()
+    const { setBreadcrumb } = useBreadcrumb()
+  
 
     const onFinish = () => {
       return Promise.all([proxyRef.current?.validate?.(), form.validateFields()]).then(([, formValue]) => {
@@ -144,6 +147,19 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
     }
 
     useEffect(() => {
+      setBreadcrumb([
+        {
+          title: $t('服务'),
+          onClick: () => navigator('/service/list')
+        },
+        {
+          title:$t('API'),
+          onClick: () => navigator(`/service/${teamId}/inside/${serviceId}/route`)
+        },
+        {
+          title: routeId ? $t('编辑 API') : $t('添加 API')
+        }
+      ])
       if (routeId) {
         getRouterConfig()
       } else {
@@ -163,6 +179,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
             ...item,
             component: (
               <Select
+                showSearch
+                optionFilterProp="label"
                 className="w-INPUT_NORMAL"
                 options={Object.entries(MatchPositionEnum)?.map(([key, value]) => {
                   return { label: $t(value), value: key }
@@ -176,6 +194,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
             ...item,
             component: (
               <Select
+                showSearch
+                optionFilterProp="label"
                 className="w-INPUT_NORMAL"
                 options={Object.entries(MatchTypeEnum)?.map(([key, value]) => {
                   return { label: $t(value), value: key }
@@ -236,6 +256,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
 
               <Form.Item<SystemApiProxyFieldType> label={$t('请求协议')} name="protocols" rules={[{ required: true }]}>
                 <Select
+                  showSearch
+                  optionFilterProp="label"
                   className="w-INPUT_NORMAL"
                   placeholder={$t(PLACEHOLDER.select)}
                   mode="multiple"
@@ -255,6 +277,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
                     noStyle
                   >
                     <Select
+                      showSearch
+                      optionFilterProp="label"
                       placeholder={$t(PLACEHOLDER.select)}
                       options={apiPathMatchRulesOptions}
                       className="w-[30%] min-w-[100px]"
@@ -262,8 +286,12 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
                   </Form.Item>
                   <Form.Item<SystemApiProxyFieldType>
                     name="path"
+                    dependencies={['pathMatch']}
                     rules={[
-                      { required: true, whitespace: true },
+                      ({ getFieldValue }) => ({
+                        required: getFieldValue('pathMatch') !== 'prefix',
+                        whitespace: true
+                      }),
                       {
                         validator: validateUrlSlash
                       }
@@ -287,6 +315,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
 
               <Form.Item<SystemApiProxyFieldType> label={$t('请求方式')} name="methods" rules={[{ required: true }]}>
                 <Select
+                  showSearch
+                  optionFilterProp="label"
                   className="w-INPUT_NORMAL"
                   placeholder={$t(PLACEHOLDER.select)}
                   mode="multiple"

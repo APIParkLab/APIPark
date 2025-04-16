@@ -2,7 +2,7 @@ import WithPermission from '@common/components/aoplatform/WithPermission'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
-import { App, Col, Form, Input, Row, Select } from 'antd'
+import { App, Col, Form, Input, Row, Select, Tooltip } from 'antd'
 import { forwardRef, useEffect, useImperativeHandle } from 'react'
 import { ApplyServiceHandle, ApplyServiceProps } from '../../const/serviceHub/type'
 
@@ -70,11 +70,23 @@ export const ApplyServiceModal = forwardRef<ApplyServiceHandle, ApplyServiceProp
         </Row>
         <Form.Item label={$t('消费者')} name="applications" rules={[{ required: true }]}>
           <Select
+            showSearch
+            optionFilterProp="label"
             className="w-INPUT_NORMAL"
             disabled={reApply}
             placeholder={$t('搜索或选择消费者')}
             mode="multiple"
             options={mySystemOptionList?.filter((x) => x.value !== entity.id)}
+            optionRender={(option) => {
+              if (option.data.disabled) {
+                return (
+                  <Tooltip title={$t('该消费者已订阅')}>
+                    <div>{option.data.label}</div>
+                  </Tooltip>
+                )
+              }
+              return <div>{option.data.label}</div>
+            }}
           />
         </Form.Item>
         {entity.approvalType === 'manual' && (
