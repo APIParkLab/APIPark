@@ -72,22 +72,32 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
   currentTab,
   openModal
 }: IntegrationAIContainerProps, ref) => {
+  /** 当前激活的标签 */
   const [activeTab, setActiveTab] = useState(type === 'service' ? 'openApi' : 'mcp')
+  /** 弹窗组件 */
   const { message } = App.useApp()
+  /** 配置内容 */
   const [configContent, setConfigContent] = useState<string>('')
+  /** 当前选中 API Key */
   const [apiKey, setApiKey] = useState<string>('')
+  /** API Key 列表 */
   const [apiKeyList, setApiKeyList] = useState<any[]>([])
+  /** Cascader Key 列表 */
   const [cascaderKeyList, setCascaderKeyList] = useState<string[]>([])
+  /** MCP 服务器地址 */
   const [mcpServerUrl, setMcpServerUrl] = useState<string>('')
+  /** 全局状态 */
   const { state } = useGlobalContext()
   const navigator = useNavigate()
+  /** 复制组件 */
   const { copyToClipboard } = useCopyToClipboard()
+  /** 错误提示 */
   const [errors, setErrors] = useState<Record<string, string | null>>({
     resources: null,
     prompts: null,
     tools: null
   })
-
+  /** 标签内容 */
   const [tabContent, setTabContent] = useState<ConfigList>({
     mcp: {
       title: $t('MCP 配置'),
@@ -95,8 +105,12 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
       apiKeys: []
     }
   })
+  /** HTTP 请求 */
   const { fetchData } = useFetch()
 
+  /**
+   * 初始化标签数据
+  */
   const initTabsData = () => {
     const params: ConfigList = {
       mcp: {
@@ -127,10 +141,18 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
     }
   }
 
+  /**
+   * 选择 API Key
+   * @param value
+   */
   const handleSelectChange = (value: string) => {
     setApiKey(value)
   }
-  const handleChange: CascaderProps<Option>['onChange'] = (value) => {
+  /**
+   * Cascader 选择
+   * @param value
+   */
+  const handleCascaderChange: CascaderProps<Option>['onChange'] = (value) => {
     setApiKey(value.at(-1) || '')
     setCascaderKeyList(value)
   }
@@ -162,6 +184,9 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
       })
   }
 
+  /**
+   * 全局 MCP 跳转
+   */
   const addKey = () => {
     navigator('/mcpKey')
   }
@@ -195,9 +220,14 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
         message.error(errorInfo || $t(RESPONSE_TIPS.error))
       })
   }
+  
+  /**
+   * 抛出获取服务 API Key 列表
+   */
   useImperativeHandle(ref, () => ({
     getServiceKeysList
   }))
+
   /**
    * 获取服务 API Key 列表
    */
@@ -232,10 +262,16 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
       })
   }
 
+  /**
+   * 清除错误提示
+   */
   const clearError = (tabKey: keyof typeof errors) => {
     setErrors((prev) => ({ ...prev, [tabKey]: null }))
   }
 
+  /**
+   * 发送请求
+   */
   const makeRequest = async <T extends z.ZodType>(request: ClientRequest, schema: T, tabKey?: keyof typeof errors) => {
     try {
       const response = await makeConnectionRequest(request, schema)
@@ -255,6 +291,9 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
     }
   }
 
+  /**
+   * 获取 MCP 的 tools
+   */
   const listTools = async () => {
     const response = await makeRequest(
       {
@@ -267,6 +306,9 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
     handleToolsChange(response.tools)
   }
 
+  /**
+   * 初始化连接 mcp
+   */
   const {
     connectionStatus,
     serverCapabilities,
@@ -294,34 +336,44 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
     disconnectFnRef.current = disconnectMcpServer
   }, [connectionStatus, disconnectMcpServer])
 
+  /**
+   * 初始化数据
+   */
   const setupComponent = () => {
     initTabsData()
     if (type === 'global') {
       getGlobalMcpConfig()
       setMcpServerUrl('mcp/global/sse')
-    } else {
-      service?.basic.enableMcp && setMcpServerUrl(`mcp/service/${serviceId}/sse`)
-    }
-    if (type === 'global') {
       getGlobalKeysList()
     } else {
+      service?.basic.enableMcp && setMcpServerUrl(`mcp/service/${serviceId}/sse`)
       getServiceKeysList()
     }
   }
-
+  /**
+   * 初始化数据
+   */
   useEffect(() => {
     setupComponent()
   }, [service])
+  /**
+   * 初始化标签数据
+   */
   useEffect(() => {
     initTabsData()
     type === 'global' && getGlobalMcpConfig()
   }, [state.language])
+  /**
+   * 切换标签
+   */
   useEffect(() => {
     if (type === 'service') {
       currentTab === 'MCP' ? setActiveTab('mcp') : setActiveTab('openApi')
     }
   }, [currentTab])
-  // 仅在组件加载时执行初始化逻辑
+  /**
+   * 仅在组件加载时执行初始化逻辑
+   */
   useEffect(() => {
     // 返回清理函数，只会在组件卸载时执行
     return () => {
@@ -336,6 +388,9 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
       }
     }
   }, [type])
+  /**
+   * 切换标签时更新配置内容
+   */
   useEffect(() => {
     if (activeTab === 'openApi' && tabContent?.openApi?.configContent) {
       setConfigContent(tabContent?.openApi?.configContent)
@@ -343,7 +398,9 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
       setConfigContent(tabContent.mcp.configContent?.replace('{your_api_key}', apiKey || '{your_api_key}'))
     }
   }, [service, apiKey, activeTab, tabContent])
-
+  /**
+   * 连接 MCP 服务器
+   */
   useEffect(() => {
     if (mcpServerUrl) {
       if (connectionStatus === 'connected') {
@@ -352,6 +409,9 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
       connectMcpServer()
     }
   }, [mcpServerUrl, ...(type === 'global' ? [state.language] : [])])
+  /**
+   * 获取 MCP tools
+   */
   useEffect(() => {
     if (connectionStatus === 'connected') {
       listTools()
@@ -518,7 +578,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
                           allowClear={false}
                           options={apiKeyList}
                           value={cascaderKeyList}
-                          onChange={handleChange}
+                          onChange={handleCascaderChange}
                           placeholder={$t('选择 API Key')}
                         />
                       </>
