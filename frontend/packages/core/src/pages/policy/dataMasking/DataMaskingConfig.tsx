@@ -139,8 +139,13 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
                                 name="type"
                                 rules={[{ required: true }]}
                             >
-                                <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} options={policyOptions} >
-                                </Select>
+                                <Select
+                                    showSearch
+                                    optionFilterProp="label"
+                                    className="w-INPUT_NORMAL"
+                                    placeholder={$t(PLACEHOLDER.input)}
+                                    options={policyOptions}
+                                ></Select>
                             </Form.Item>
 
                             <Form.Item<DataMaskingConfigFieldType>

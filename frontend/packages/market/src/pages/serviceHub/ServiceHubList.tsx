@@ -45,7 +45,7 @@ export const initialServiceHubListState = {
   selectedTag: [] as string[],
   keyword: '',
   getCateAndTagData: false,
-  listLoading: false
+  listLoading: true
 }
 
 function reducer(state: typeof initialServiceHubListState, action: ServiceHubListActionType) {
@@ -142,7 +142,13 @@ const ServiceHubList: FC = () => {
         <Spin
           className="h-full"
           wrapperClassName="h-full"
-          indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
+          indicator={
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ transform: 'scale(1.5)' }}>
+                <LoadingOutlined style={{ fontSize: 30 }} spin />
+              </div>
+            </div>
+          }
           spinning={filterOption.listLoading}
         >
           {filterOption.showServicesList && filterOption.showServicesList.length > 0 ? (
@@ -189,7 +195,12 @@ const ServiceHubList: FC = () => {
               }}
             />
           ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            <>
+              {!filterOption.listLoading &&
+                (!filterOption.showServicesList || filterOption.showServicesList.length === 0) && (
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                )}
+            </>
           )}
         </Spin>
       </div>
@@ -225,7 +236,7 @@ const CardTitle = (service: ServiceHubTableListItem) => {
         <div className="mt-[10px] h-[20px] flex items-center font-normal">
           <Tag
             color="#7371fc1b"
-            className="text-theme font-normal border-0 mr-[12px] max-w-[150px] truncate"
+            className="text-theme font-normal border-0 mr-[12px] max-w-[100px] truncate"
             key={service.id}
             bordered={false}
             title={service.catalogue?.name || '-'}
@@ -233,8 +244,8 @@ const CardTitle = (service: ServiceHubTableListItem) => {
             {service.catalogue?.name || '-'}
           </Tag>
           <Tag
-            color="#fbe5e5"
-            className="text-[#000] font-normal border-0 mr-[12px] max-w-[150px] truncate"
+            color={`#${service.serviceKind === 'ai' ? 'EADEFF' : 'DEFFE7'}`}
+            className={`text-[#000] font-normal border-0 mr-[12px] max-w-[150px] truncate`}
             bordered={false}
             title={service.serviceKind || '-'}
           >
@@ -242,7 +253,7 @@ const CardTitle = (service: ServiceHubTableListItem) => {
           </Tag>
           {service?.enableMcp && (
             <Tag
-              color="#ffc107"
+              color="#FFF0C1"
               className="text-[#000] font-normal border-0 mr-[12px] max-w-[150px] truncate"
               bordered={false}
               title={'MCP'}

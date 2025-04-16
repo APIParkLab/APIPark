@@ -200,6 +200,8 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
           <div className="flex flex-nowrap items-center pt-btnybase mr-btnybase">
             <label className="inline-block whitespace-nowrap">{$t('服务')}：</label>
             <Select
+              showSearch
+              optionFilterProp="label"
               className="w-[346px]"
               value={queryData?.services}
               options={projectOptionList}
@@ -216,6 +218,8 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
           <div className="flex flex-nowrap items-center pt-btnybase mr-btnybase">
             <label className=" whitespace-nowrap inline-block w-[42px] text-right">API ：</label>
             <Select
+              showSearch
+              optionFilterProp="label"
               className="w-[346px]"
               value={queryData?.apis}
               options={apiOptionList}

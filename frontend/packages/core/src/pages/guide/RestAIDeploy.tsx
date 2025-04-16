@@ -106,6 +106,8 @@ const RestAIDeploy = forwardRef<RestAIDeployHandle, any>((props: any, ref: any) 
         </Form.Item>
         <Form.Item label={$t('所属团队')} name="team" className="mt-[16px]" rules={[{ required: true }]}>
           <Select
+            showSearch
+            optionFilterProp="label"
             className="w-INPUT_NORMAL"
             placeholder={$t(PLACEHOLDER.input)}
             options={teamList}

@@ -65,6 +65,8 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
     const prefixSelector = (
       <Form.Item name="position" noStyle>
         <Select
+          showSearch
+          optionFilterProp="label"
           style={{ width: 90 }}
           options={[
             { label: 'Header', value: 'Header' },
@@ -127,6 +129,8 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
 
         <Form.Item<EditAuthFieldType> label={$t('鉴权类型')} name="driver" rules={[{ required: true }]}>
           <Select
+            showSearch
+            optionFilterProp="label"
             disabled={type === 'edit'}
             className="w-INPUT_NORMAL"
             options={[
@@ -179,6 +183,8 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
                     rules={[{ required: true }]}
                   >
                     <Select
+                      showSearch
+                      optionFilterProp="label"
                       className="w-INPUT_NORMAL"
                       options={ALGORITHM_ITEM}
                       onChange={(value) => {
@@ -205,6 +211,8 @@ export const ManagementAuthorityConfig = forwardRef<ManagementAuthorityConfigHan
 
                   <Form.Item<EditAuthFieldType> label={$t('校验字段')} name={['config', 'claimsToVerify']}>
                     <Select
+                      showSearch
+                      optionFilterProp="label"
                       className="w-INPUT_NORMAL"
                       mode="multiple"
                       options={[

@@ -129,7 +129,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
     const ProxyHeadeerConfig = useMemo(()=>PROXY_HEADER_CONFIG.map((x)=>({
         ...x, 
         ...(x.key === 'optType' ? {
-            component: <Select className="w-INPUT_NORMAL" options={UPSTREAM_PROXY_HEADER_TYPE_OPTIONS.map((x)=>({...x, label:$t(x.label)}))}/>
+            component: <Select showSearch optionFilterProp="label" className="w-INPUT_NORMAL" options={UPSTREAM_PROXY_HEADER_TYPE_OPTIONS.map((x)=>({...x, label:$t(x.label)}))}/>
         } : {})
     }))
 ,[state.language])
@@ -175,7 +175,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
                                     name="scheme"
                                     rules={[{ required: true }]}
                                 >
-                                <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={schemeOptions}>
+                                <Select showSearch optionFilterProp="label" className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={schemeOptions}>
                                 </Select>
                                 </Form.Item>
 
@@ -192,7 +192,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
                                     name="passHost"
                                     rules={[{ required: true }]}
                                 >
-                                    <Select className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={passHostOptions} onChange={(val)=>setFormShowHost(val === 'rewrite')}>
+                                    <Select showSearch optionFilterProp="label" className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.select)} options={passHostOptions} onChange={(val)=>setFormShowHost(val === 'rewrite')}>
                                     </Select>
                                 </Form.Item>
 

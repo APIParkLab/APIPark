@@ -171,6 +171,8 @@ const AddLoadBalancingModel = forwardRef<LoadBalancingHandle>((props, ref: any) 
     >
       <Form.Item<LoadModelDetailData> label={$t('模型类型')} name="type" rules={[{ required: true }]}>
         <Select
+          showSearch
+          optionFilterProp="label"
           className="w-INPUT_NORMAL"
           placeholder={$t(PLACEHOLDER.select)}
           options={modelTypeList}

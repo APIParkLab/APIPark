@@ -163,6 +163,8 @@ const AiServiceRouterModelConfig = forwardRef<AiServiceRouterModelConfigHandle, 
       >
         <Form.Item<AiServiceRouterModelConfigField> label={$t('模型类型')} name="type" rules={[{ required: true }]}>
           <Select
+            showSearch
+            optionFilterProp="label"
             className="w-INPUT_NORMAL"
             placeholder={$t(PLACEHOLDER.select)}
             options={modelTypeList}

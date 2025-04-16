@@ -15,7 +15,7 @@ import { ApplyServiceHandle, ServiceBasicInfoType, ServiceDetailType } from '../
 import { ApplyServiceModal } from './ApplyServiceModal.tsx'
 import ServiceHubApiDocument from './ServiceHubApiDocument.tsx'
 import { SERVICE_KIND_OPTIONS } from '@core/const/system/const.tsx'
-import IntegrationAIContainer from '@core/pages/mcpService/IntegrationAIContainer.tsx'
+import { IntegrationAIContainer, IntegrationAIContainerRef } from '@core/pages/mcpService/IntegrationAIContainer.tsx'
 import { Tool } from '@modelcontextprotocol/sdk/types.js'
 import McpToolsContainer from '@core/pages/mcpService/McpToolsContainer.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
@@ -48,6 +48,7 @@ const ServiceHubDetail = () => {
   const [tabItem, setTabItem] = useState<TabItemType[]>([])
   const [currentTab, setCurrentTab] = useState('')
   const { state } = useGlobalContext()
+  const integrationAIContainerRef = useRef<IntegrationAIContainerRef>(null)
   const navigate = useNavigate()
 
   const modifyApiDoc = (apiDoc: string, apiPrefix: string) => {
@@ -191,7 +192,7 @@ servers:
         content: serviceBasicInfo?.catalogue?.name || '-'
       },
       {
-        color: '#fbe5e5',
+        color: `#${serviceBasicInfo?.serviceKind === 'ai' ? 'EADEFF' : 'DEFFE7'}`,
         textColor: 'text-[#000]',
         title: serviceBasicInfo?.serviceKind || '-',
         content: SERVICE_KIND_OPTIONS.find((x) => x.value === serviceBasicInfo?.serviceKind)?.label || '-'
@@ -201,7 +202,7 @@ servers:
     // 如果启用了MCP，添加MCP标签
     if (serviceBasicInfo?.enableMcp) {
       tags.push({
-        color: '#ffc107',
+        color: '#FFF0C1',
         textColor: 'text-[#000]',
         title: 'MCP',
         content: 'MCP'
@@ -234,16 +235,28 @@ servers:
 
   const getMySelectList = () => {
     setMySystemOptionList([])
-    fetchData<BasicResponse<{ app: EntityItem[] }>>('apps/can_subscribe', { method: 'GET' }).then((response) => {
+    fetchData<BasicResponse<{ app: EntityItem[] }>>('apps/can_subscribe', {
+      method: 'GET',
+      eoParams: { service: serviceId },
+      eoTransformKeys: ['is_subscribed']
+    }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         setMySystemOptionList(
-          data.app?.map((x: EntityItem) => {
-            return {
-              label: x.name,
-              value: x.id
-            }
-          })
+          data.app
+            ?.sort((a: EntityItem, b: EntityItem) => {
+              // 已订阅的排在后面
+              if (a.isSubscribed && !b.isSubscribed) return 1
+              if (!a.isSubscribed && b.isSubscribed) return -1
+              return 0
+            })
+            .map((x: EntityItem) => {
+              return {
+                label: x.name,
+                value: x.id,
+                disabled: x.isSubscribed // 已订阅的设为禁用
+              }
+            })
         )
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
@@ -263,7 +276,10 @@ servers:
       ),
       onOk: () => {
         return applyRef.current?.apply().then((res) => {
-          // if(res === true) setApplied(true)
+          if (res === true) {
+            integrationAIContainerRef.current?.getServiceKeysList()
+            getMySelectList()
+          }
         })
       },
       okText: $t('确认'),
@@ -490,11 +506,13 @@ servers:
           items={tabItem}
         />
         <IntegrationAIContainer
+          ref={integrationAIContainerRef}
           service={service}
           currentTab={currentTab}
           serviceId={serviceId}
           customClassName="mt-[70px] max-h-[calc(100vh-420px)] overflow-auto"
           type={'service'}
+          openModal={openModal}
           handleToolsChange={handleToolsChange}
         ></IntegrationAIContainer>
       </div>

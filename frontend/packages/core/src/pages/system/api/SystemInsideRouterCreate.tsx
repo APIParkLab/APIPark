@@ -179,6 +179,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
             ...item,
             component: (
               <Select
+                showSearch
+                optionFilterProp="label"
                 className="w-INPUT_NORMAL"
                 options={Object.entries(MatchPositionEnum)?.map(([key, value]) => {
                   return { label: $t(value), value: key }
@@ -192,6 +194,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
             ...item,
             component: (
               <Select
+                showSearch
+                optionFilterProp="label"
                 className="w-INPUT_NORMAL"
                 options={Object.entries(MatchTypeEnum)?.map(([key, value]) => {
                   return { label: $t(value), value: key }
@@ -252,6 +256,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
 
               <Form.Item<SystemApiProxyFieldType> label={$t('请求协议')} name="protocols" rules={[{ required: true }]}>
                 <Select
+                  showSearch
+                  optionFilterProp="label"
                   className="w-INPUT_NORMAL"
                   placeholder={$t(PLACEHOLDER.select)}
                   mode="multiple"
@@ -271,6 +277,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
                     noStyle
                   >
                     <Select
+                      showSearch
+                      optionFilterProp="label"
                       placeholder={$t(PLACEHOLDER.select)}
                       options={apiPathMatchRulesOptions}
                       className="w-[30%] min-w-[100px]"
@@ -307,6 +315,8 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
 
               <Form.Item<SystemApiProxyFieldType> label={$t('请求方式')} name="methods" rules={[{ required: true }]}>
                 <Select
+                  showSearch
+                  optionFilterProp="label"
                   className="w-INPUT_NORMAL"
                   placeholder={$t(PLACEHOLDER.select)}
                   mode="multiple"

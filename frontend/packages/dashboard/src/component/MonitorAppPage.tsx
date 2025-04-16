@@ -176,6 +176,8 @@ export default function MonitorAppPage(props: MonitorAppPageProps) {
           <div>
             <label className="inline-block  whitespace-nowrap">{$t('消费者')}：</label>
             <Select
+              showSearch
+              optionFilterProp="label"
               className="w-[346px]"
               mode="multiple"
               maxTagCount={1}
