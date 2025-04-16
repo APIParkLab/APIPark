@@ -164,7 +164,7 @@ export default function MonitorAppPage(props: MonitorAppPageProps) {
   }
 
   return (
-    <div className="h-full overflow-hidden">
+    <div className="h-full overflow-hidden pr-PAGE_INSIDE_X">
       <div className="pl-btnbase pr-btnrbase pb-btnybase">
         <TimeRangeSelector
           initialTimeButton={timeButton}

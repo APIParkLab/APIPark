@@ -187,7 +187,7 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
   }
 
   return (
-    <div className="overflow-hidden h-full">
+    <div className="overflow-hidden h-full pr-PAGE_INSIDE_X">
       <ScrollableSection>
         <div className="pl-btnbase pr-btnrbase pb-btnbase content-before">
           <TimeRangeSelector
