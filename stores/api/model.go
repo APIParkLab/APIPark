@@ -34,6 +34,7 @@ type Info struct {
 	Updater     string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"` // 更新人
 	UpdateAt    time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:更新时间"`
 	Disable     bool      `gorm:"type:tinyint(1);not null;column:disable;comment:是否禁用 0:否 1:是"`
+	IsDelete    bool      `gorm:"type:tinyint(1);not null;column:is_delete;comment:是否删除 0:否 1:是"`
 }
 
 func (i *Info) TableName() string {

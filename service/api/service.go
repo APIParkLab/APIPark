@@ -13,6 +13,7 @@ import (
 type IAPIService interface {
 	universally.IServiceGet[API]
 	universally.IServiceDelete
+	DeleteAPIInfo(ctx context.Context, aid string) error
 	CountByService(ctx context.Context, service string) (int64, error)
 	CountMapByService(ctx context.Context, service ...string) (map[string]int64, error)
 	Exist(ctx context.Context, aid string, api *Exist) error

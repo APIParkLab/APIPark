@@ -351,7 +351,14 @@ func (i *imlRouterModule) Delete(ctx context.Context, serviceId string, apiId st
 	if err != nil {
 		return err
 	}
-	return i.apiService.Delete(ctx, apiId)
+	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		err = i.apiService.Delete(ctx, apiId)
+		if err != nil {
+			return err
+		}
+		return i.apiService.DeleteAPIInfo(ctx, apiId)
+	})
+
 }
 
 func (i *imlRouterModule) Prefix(ctx context.Context, serviceId string) (string, error) {
