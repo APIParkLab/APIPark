@@ -278,6 +278,7 @@ servers:
         return applyRef.current?.apply().then((res) => {
           if (res === true) {
             integrationAIContainerRef.current?.getServiceKeysList()
+            getMySelectList()
           }
         })
       },

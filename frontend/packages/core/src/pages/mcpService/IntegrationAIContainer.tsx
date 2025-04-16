@@ -204,7 +204,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
   const getServiceKeysList = () => {
     fetchData<BasicResponse<null>>(`my/app/apikeys`, {
       method: 'GET',
-      eoParams: { serviceId }
+      eoParams: { service: serviceId }
     })
       .then((response) => {
         const { code, msg, data } = response
@@ -225,8 +225,6 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
               setCascaderKeyList([data.apps[0].id, data.apps[0].apikeys[0].value])
             }
           }
-        } else {
-          message.error(msg || $t(RESPONSE_TIPS.error))
         }
       })
       .catch((errorInfo) => {
