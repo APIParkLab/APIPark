@@ -169,7 +169,7 @@ export default function MonitorSubPage(props: MonitorSubPageProps) {
   }
 
   return (
-    <div className="overflow-hidden h-full">
+    <div className="overflow-hidden h-full pr-PAGE_INSIDE_X">
       <div className="pl-btnbase pr-btnrbase pb-btnybase">
         <TimeRangeSelector
           initialTimeButton={timeButton}
