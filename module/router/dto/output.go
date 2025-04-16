@@ -84,9 +84,10 @@ func FromServiceProxy(proxy *api.Proxy) *Proxy {
 		Retry:   proxy.Retry,
 		Headers: utils.SliceToSlice(proxy.Headers, func(header *api.Header) *Header {
 			return &Header{
-				Key:   header.Key,
-				Value: header.Value,
-				Opt:   header.Opt,
+				Key:     header.Key,
+				Value:   header.Value,
+				Opt:     header.Opt,
+				OptType: header.OptType,
 			}
 		}),
 		Extends: proxy.Extends,
@@ -104,9 +105,10 @@ type Proxy struct {
 }
 
 type Header struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-	Opt   string `json:"opt"`
+	Key     string `json:"key"`
+	Value   string `json:"value"`
+	Opt     string `json:"opt"`
+	OptType string `json:"optType"`
 }
 
 type Export struct {

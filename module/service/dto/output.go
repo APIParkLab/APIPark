@@ -86,6 +86,12 @@ type SimpleAppItem struct {
 	Description string     `json:"description"`
 }
 
+type SubscribeAppItem struct {
+	Id           string `json:"id"`
+	Name         string `json:"name"`
+	IsSubscribed bool   `json:"is_subscribed"`
+}
+
 type Service struct {
 	Id           string         `json:"id"`
 	Name         string         `json:"name"`

@@ -159,6 +159,7 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 				return &gateway.ProxyHeader{
 					Key:   h.Key,
 					Value: h.Value,
+					Opt:   h.OptType,
 				}
 			})
 			apiInfo.Retry = proxy.Retry
@@ -633,12 +634,17 @@ func (i *imlPublishModule) updateMCPServer(ctx context.Context, sid string, name
 			if err != nil {
 				return err
 			}
+			//switch a.ContentType {
+			//case "application/json":
 			switch tmp.Type {
 			case "object":
 				toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPBody, mcp.Properties(tmp.Properties), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
 			case "array":
 				toolOptions = append(toolOptions, mcp.WithArray(mcp_server.MCPBody, mcp.Items(tmp.Items), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
 			}
+			//case "application/x-www-form-urlencoded":
+			//	toolOptions = append(toolOptions, mcp.WithString(mcp_server.MCPBody, mcp.Items(tmp.Items), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
+
 		}
 		tools = append(tools, mcp_server.NewTool(a.Summary, a.Path, a.Method, a.ContentType, toolOptions...))
 	}

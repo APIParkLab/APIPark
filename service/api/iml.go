@@ -41,6 +41,12 @@ type imlAPIService struct {
 	universally.IServiceDelete
 }
 
+func (i *imlAPIService) DeleteAPIInfo(ctx context.Context, aid string) error {
+	return i.apiInfoStore.SoftDelete(ctx, map[string]interface{}{
+		"uuid": aid,
+	})
+}
+
 func (i *imlAPIService) DeleteByService(ctx context.Context, serviceId string) error {
 	return i.store.SoftDelete(ctx, map[string]interface{}{
 		"service": serviceId,

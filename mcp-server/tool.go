@@ -64,8 +64,25 @@ func (t *Tool) RegisterMCP(s *server.MCPServer) {
 		body := ""
 		for k, v := range request.Params.Arguments {
 			if k == "Body" {
-				tmp, _ := json.Marshal(v)
-				body = string(tmp)
+				switch a := v.(type) {
+				case string:
+					body = a
+				case map[string]interface{}:
+					switch t.contentType {
+					case "application/json":
+						tmp, _ := json.Marshal(a)
+						body = string(tmp)
+					case "application/x-www-form-urlencoded":
+						bodyValue := url.Values{}
+						for kk, vv := range a {
+							bodyValue.Set(kk, fmt.Sprintf("%v", vv))
+						}
+						body = bodyValue.Encode()
+					}
+				default:
+					tmp, _ := json.Marshal(a)
+					body = string(tmp)
+				}
 				continue
 			}
 			tmp, ok := v.(map[string]interface{})

@@ -12,6 +12,10 @@ type imlAPIKeyController struct {
 	apikeyModule system_apikey.IAPIKeyModule `autowired:""`
 }
 
+func (i *imlAPIKeyController) MyAPIKeysByService(ctx *gin.Context, serviceId string) ([]*system_apikey_dto.AuthorizationItem, error) {
+	return i.apikeyModule.MyAPIKeysByService(ctx, serviceId)
+}
+
 func (i *imlAPIKeyController) MyAPIKeys(ctx *gin.Context) ([]*system_apikey_dto.SimpleItem, error) {
 	return i.apikeyModule.MyAPIKeys(ctx)
 }

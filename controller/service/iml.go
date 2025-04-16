@@ -542,8 +542,9 @@ type imlAppController struct {
 	authModule application_authorization.IAuthorizationModule `autowired:""`
 }
 
-func (i *imlAppController) SearchCanSubscribe(ctx *gin.Context, serviceId string) ([]*service_dto.SimpleAppItem, error) {
-	return i.module.SearchCanSubscribe(ctx, serviceId)
+func (i *imlAppController) SearchCanSubscribe(ctx *gin.Context, serviceId string) ([]*service_dto.SubscribeAppItem, error) {
+	items, _, err := i.module.SearchCanSubscribe(ctx, serviceId)
+	return items, err
 }
 
 func (i *imlAppController) Search(ctx *gin.Context, teamId string, keyword string) ([]*service_dto.AppItem, error) {

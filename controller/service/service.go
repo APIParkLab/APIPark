@@ -44,7 +44,7 @@ type IAppController interface {
 	// SimpleApps 获取简易项目列表
 	SimpleApps(ctx *gin.Context, keyword string) ([]*service_dto.SimpleAppItem, error)
 	MySimpleApps(ctx *gin.Context, keyword string) ([]*service_dto.SimpleAppItem, error)
-	SearchCanSubscribe(ctx *gin.Context, keyword string) ([]*service_dto.SimpleAppItem, error)
+	SearchCanSubscribe(ctx *gin.Context, serviceId string) ([]*service_dto.SubscribeAppItem, error)
 	GetApp(ctx *gin.Context, appId string) (*service_dto.App, error)
 	DeleteApp(ctx *gin.Context, appId string) error
 }
