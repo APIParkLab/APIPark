@@ -515,7 +515,10 @@ func (i *imlCatalogueModule) recurseUpdateSort(ctx context.Context, parent strin
 		if len(item.Children) < 1 {
 			continue
 		}
-		return i.recurseUpdateSort(ctx, item.Id, item.Children)
+		err = i.recurseUpdateSort(ctx, item.Id, item.Children)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
