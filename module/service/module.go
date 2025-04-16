@@ -51,7 +51,7 @@ type IAppModule interface {
 	UpdateApp(ctx context.Context, appId string, input *service_dto.UpdateApp) (*service_dto.App, error)
 	Search(ctx context.Context, teamId string, keyword string) ([]*service_dto.AppItem, error)
 	SearchMyApps(ctx context.Context, teamId string, keyword string) ([]*service_dto.AppItem, error)
-	SearchCanSubscribe(ctx context.Context, serviceId string) ([]*service_dto.SimpleAppItem, error)
+	SearchCanSubscribe(ctx context.Context, serviceId string) ([]*service_dto.SubscribeAppItem, bool, error)
 	// SimpleApps 获取简易项目列表
 	SimpleApps(ctx context.Context, keyword string) ([]*service_dto.SimpleAppItem, error)
 	MySimpleApps(ctx context.Context, keyword string) ([]*service_dto.SimpleAppItem, error)

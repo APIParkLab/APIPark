@@ -32,6 +32,7 @@ type ServiceDetail struct {
 	OpenAPIAddress   string        `json:"openapi_address"`
 	MCPServerAddress string        `json:"mcp_server_address"`
 	MCPAccessConfig  string        `json:"mcp_access_config"`
+	CanSubscribe     bool          `json:"can_subscribe"`
 }
 
 type ServiceBasic struct {

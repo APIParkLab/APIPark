@@ -3,6 +3,7 @@ package catalogue
 import (
 	"github.com/APIParkLab/APIPark/module/catalogue"
 	catalogue_dto "github.com/APIParkLab/APIPark/module/catalogue/dto"
+	"github.com/APIParkLab/APIPark/module/service"
 	"github.com/APIParkLab/APIPark/module/tag"
 	tag_dto "github.com/APIParkLab/APIPark/module/tag/dto"
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ var (
 
 type imlCatalogueController struct {
 	catalogueModule catalogue.ICatalogueModule `autowired:""`
+	appModule       service.IAppModule         `autowired:""`
 	tagModule       tag.ITagModule             `autowired:""`
 }
 
@@ -26,7 +28,17 @@ func (i *imlCatalogueController) Subscribe(ctx *gin.Context, subscribeInfo *cata
 }
 
 func (i *imlCatalogueController) ServiceDetail(ctx *gin.Context, sid string) (*catalogue_dto.ServiceDetail, error) {
-	return i.catalogueModule.ServiceDetail(ctx, sid)
+	detail, err := i.catalogueModule.ServiceDetail(ctx, sid)
+	if err != nil {
+		return nil, err
+	}
+	_, canSubscribe, err := i.appModule.SearchCanSubscribe(ctx, sid)
+	if err != nil {
+		return nil, err
+	}
+	detail.CanSubscribe = canSubscribe
+	return detail, nil
+
 }
 
 func (i *imlCatalogueController) Search(ctx *gin.Context, keyword string) ([]*catalogue_dto.Item, []*tag_dto.Item, error) {
