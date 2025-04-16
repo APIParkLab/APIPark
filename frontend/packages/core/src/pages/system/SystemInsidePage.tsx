@@ -234,7 +234,7 @@ const SystemInsidePage: FC = () => {
         <InsidePage
           pageTitle={systemInfo?.name || '-'}
           tagList={[
-            ...(systemInfo?.enable_mcp ? [{ label: 'MCP', color: '#ffc107', className: 'text-[#000]' }] : []),
+            ...(systemInfo?.enable_mcp ? [{ label: 'MCP', color: '#FFF0C1', className: 'text-[#000]' }] : []),
             {
               label: (
                 <Paragraph className="mb-0" copyable={serviceId ? { text: serviceId } : false}>
