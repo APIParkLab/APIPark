@@ -742,6 +742,12 @@ func (i *imlServiceModule) Delete(ctx context.Context, id string) error {
 		if err != nil {
 			return err
 		}
+		err = client.Project().Offline(ctx, &gateway.ProjectRelease{
+			Id: id,
+		})
+		if err != nil {
+			return err
+		}
 		err = client.Subscribe().Offline(ctx, &gateway.SubscribeRelease{
 			Service:     id,
 			Application: "apipark-global",

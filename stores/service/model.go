@@ -77,7 +77,7 @@ func (t *Tag) TableName() string {
 type Doc struct {
 	Id       int64     `gorm:"column:id;type:BIGINT(20);AUTO_INCREMENT;NOT NULL;comment:id;primary_key;comment:主键ID;"`
 	Sid      string    `gorm:"size:36;not null;column:sid;comment:服务id;uniqueIndex:unique_sid;"`
-	Doc      string    `gorm:"type:text;column:content;comment:内容"`
+	Doc      string    `gorm:"type:longtext;column:content;comment:内容"`
 	CreateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:create_at;comment:创建时间"`
 	UpdateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;column:update_at;comment:修改时间" json:"update_at"`
 	Creator  string    `gorm:"type:varchar(36);not null;column:creator;comment:创建者"`
