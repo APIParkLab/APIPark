@@ -310,6 +310,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
   }, [service])
   useEffect(() => {
     initTabsData()
+    type === 'global' && getGlobalMcpConfig()
   }, [state.language])
   useEffect(() => {
     if (type === 'service') {
