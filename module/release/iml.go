@@ -78,17 +78,14 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 		return "", fmt.Errorf("cluster not set:%w", err)
 	}
 
-	apis, err := m.apiService.ListInfoForService(ctx, proInfo.Id)
+	apis, err := m.apiService.ListForService(ctx, proInfo.Id)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return "", errors.New("api not found")
-		}
 		return "", err
 	}
 	if len(apis) == 0 {
 		return "", errors.New("api not found")
 	}
-	apiUUIDS := utils.SliceToSlice(apis, func(a *api.Info) string {
+	apiUUIDS := utils.SliceToSlice(apis, func(a *api.API) string {
 		return a.UUID
 	})
 	apiProxy, err := m.apiService.ListLatestCommitProxy(ctx, apiUUIDS...)
@@ -122,10 +119,10 @@ func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *
 			return c.Key, c.UUID
 		})
 	})
-
+	apiInfos, err := m.apiService.ListInfo(ctx, apiUUIDS...)
 	var newRelease *release.Release
 	err = m.transaction.Transaction(ctx, func(ctx context.Context) error {
-		for _, a := range apis {
+		for _, a := range apiInfos {
 			err = m.apiService.SaveRequest(ctx, a.UUID, &api.Request{
 				Path:      a.Path,
 				Methods:   a.Methods,
