@@ -235,16 +235,28 @@ servers:
 
   const getMySelectList = () => {
     setMySystemOptionList([])
-    fetchData<BasicResponse<{ app: EntityItem[] }>>('apps/can_subscribe', { method: 'GET' }).then((response) => {
+    fetchData<BasicResponse<{ app: EntityItem[] }>>('apps/can_subscribe', {
+      method: 'GET',
+      eoParams: { service: serviceId },
+      eoTransformKeys: ['is_subscribed']
+    }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         setMySystemOptionList(
-          data.app?.map((x: EntityItem) => {
-            return {
-              label: x.name,
-              value: x.id
-            }
-          })
+          data.app
+            ?.sort((a: EntityItem, b: EntityItem) => {
+              // 已订阅的排在后面
+              if (a.isSubscribed && !b.isSubscribed) return 1
+              if (!a.isSubscribed && b.isSubscribed) return -1
+              return 0
+            })
+            .map((x: EntityItem) => {
+              return {
+                label: x.name,
+                value: x.id,
+                disabled: x.isSubscribed // 已订阅的设为禁用
+              }
+            })
         )
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
