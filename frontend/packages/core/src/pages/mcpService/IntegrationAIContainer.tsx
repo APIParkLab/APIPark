@@ -77,6 +77,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
   const [configContent, setConfigContent] = useState<string>('')
   const [apiKey, setApiKey] = useState<string>('')
   const [apiKeyList, setApiKeyList] = useState<any[]>([])
+  const [cascaderKeyList, setCascaderKeyList] = useState<string[]>([])
   const [mcpServerUrl, setMcpServerUrl] = useState<string>('')
   const { state } = useGlobalContext()
   const navigator = useNavigate()
@@ -131,6 +132,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
   }
   const handleChange: CascaderProps<Option>['onChange'] = (value) => {
     setApiKey(value.at(-1) || '')
+    setCascaderKeyList(value)
   }
 
   /**
@@ -218,6 +220,10 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
               }))
             }))
             setApiKeyList(transformedData)
+            if (data.apps[0].apikeys?.length) {
+              setApiKey(data.apps[0].apikeys[0].value)
+              setCascaderKeyList([data.apps[0].id, data.apps[0].apikeys[0].value])
+            }
           }
         } else {
           message.error(msg || $t(RESPONSE_TIPS.error))
@@ -510,8 +516,10 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
                     ) : (
                       <>
                         <Cascader
+                          className='w-full'
                           allowClear={false}
                           options={apiKeyList}
+                          value={cascaderKeyList}
                           onChange={handleChange}
                           placeholder={$t('选择 API Key')}
                         />
