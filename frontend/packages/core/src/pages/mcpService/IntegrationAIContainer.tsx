@@ -200,8 +200,9 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
    * 获取服务 API Key 列表
    */
   const getServiceKeysList = () => {
-    fetchData<BasicResponse<null>>(`my/apikeys/${serviceId}`, {
-      method: 'GET'
+    fetchData<BasicResponse<null>>(`my/app/apikeys`, {
+      method: 'GET',
+      eoParams: { serviceId }
     })
       .then((response) => {
         const { code, msg, data } = response
@@ -345,7 +346,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
       }
       connectMcpServer()
     }
-  }, [mcpServerUrl])
+  }, [mcpServerUrl, ...(type === 'global' ? [state.language] : [])])
   useEffect(() => {
     if (connectionStatus === 'connected') {
       listTools()
