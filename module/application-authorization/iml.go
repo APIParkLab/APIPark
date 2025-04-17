@@ -200,10 +200,12 @@ func (i *imlAuthorizationModule) initGateway(ctx context.Context, partitionId st
 }
 
 func (i *imlAuthorizationModule) online(ctx context.Context, s *service.Service) error {
-
 	clusters, err := i.clusterService.List(ctx)
 	if err != nil {
 		return err
+	}
+	if len(clusters) < 1 {
+		return nil
 	}
 	authorizations, err := i.authorizationService.ListByApp(ctx, s.Id)
 	if err != nil {

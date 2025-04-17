@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -268,6 +269,8 @@ func (i *imlMcpModule) Invoke(ctx context.Context, req mcp.CallToolRequest) (*mc
 				for _, value := range v {
 					queryParam.Add(k, value)
 				}
+			case float64:
+				queryParam.Add(k, strconv.FormatFloat(v, 'e', -1, 64))
 			default:
 				return nil, fmt.Errorf("invalid query param type: %T", v)
 			}
