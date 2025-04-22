@@ -718,7 +718,8 @@ func (i *imlProviderModule) getAiProviders(ctx context.Context) ([]*gateway.Dyna
 		}
 		model, has := driver.GetModel(l.DefaultLLM)
 		if !has {
-			return nil, fmt.Errorf("model not found: %s", l.DefaultLLM)
+			continue
+			//return nil, fmt.Errorf("model not found: %s", l.DefaultLLM)
 		}
 		cfg := make(map[string]interface{})
 		cfg["provider"] = l.Id
