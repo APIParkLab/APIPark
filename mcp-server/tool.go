@@ -124,7 +124,7 @@ func (t *Tool) RegisterMCP(s *server.MCPServer) {
 		}
 		apikey := utils.Label(ctx, "apikey")
 		if apikey != "" {
-			req.Header.Set("Authorization", utils.Md5(apikey))
+			req.Header.Set("Authorization", apikey)
 		}
 
 		resp, err := client.Do(req)
