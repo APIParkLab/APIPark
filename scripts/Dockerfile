@@ -1,10 +1,14 @@
 # 名称：apipark通用镜像
-# 创建时间：2022-10-25
-FROM centos:7.9.2009
-MAINTAINER liujian
+FROM alpine:latest
+
+RUN sed -i 's|https://dl-cdn.alpinelinux.org/alpine|https://mirrors.aliyun.com/alpine|g' /etc/apk/repositories  \
+    && apk update \
+    && apk add --no-cache curl tzdata bind-tools
 
 ENV TZ=Asia/Shanghai
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/timezone
 
 ARG APP
 
