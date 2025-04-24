@@ -746,7 +746,9 @@ func (i *imlServiceModule) Delete(ctx context.Context, id string) error {
 			Id: id,
 		})
 		if err != nil {
-			return err
+			if err.Error() != "nil" {
+				return err
+			}
 		}
 		err = client.Subscribe().Offline(ctx, &gateway.SubscribeRelease{
 			Service:     id,

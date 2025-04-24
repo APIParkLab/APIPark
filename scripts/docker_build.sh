@@ -10,6 +10,11 @@ BuildMode=$3
 if [[ "${BuildMode}" == "" ]];then
   BuildMode="all"
 fi
+
+if [[ "${ARCH}" == "" ]];then
+  ARCH="amd64"
+fi
+
 # 编译可执行文件
 ./scripts/build.sh "cmd" "" "${BuildMode}" ${ARCH}
 
@@ -22,12 +27,11 @@ mkdir -p scripts/cmd/ && cp cmd/${APP} scripts/cmd/ && cp cmd/apipark_ai_event_l
 VERSION=$(gen_version)
 
 
-if [[ "${ARCH}" == "" ]];then
-  ARCH="amd64"
-fi
 
-OPTIONS=""
-if [[ "${ARCH}" == "arm" ]];then
+SYS_ARCH=$(arch)
+if [[ (${SYS_ARCH} == "aarch64" || ${SYS_ARCH} == "arm64") && $ARCH == "amd64" ]];then
+  OPTIONS="--platform=linux/amd64"
+elif [[ ${SYS_ARCH}  == "amd64" && $ARCH == "arm64" ]];then
   OPTIONS="--platform=linux/arm64"
 fi
 
