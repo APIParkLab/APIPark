@@ -9,7 +9,7 @@ import { RouterParams } from '@core/components/aoplatform/RenderRoutes.tsx'
 import { AiServiceConfigFieldType } from '@core/const/ai-service/type.ts'
 import { App, Menu, MenuProps } from 'antd'
 import { ItemType, MenuItemGroupType, MenuItemType } from 'antd/es/menu/interface'
-import Paragraph from 'antd/es/typography/Paragraph'
+import ServiceInfoCard from '@common/components/aoplatform/serviceInfoCard.tsx'
 import { cloneDeep } from 'lodash-es'
 import { FC, useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -67,6 +67,7 @@ const AiServiceInsidePage: FC = () => {
         'assets',
         null,
         [
+          getItem(<Link to="./overview">{$t('总览')}</Link>, 'overview', undefined, undefined, undefined, ''),
           getItem(
             <Link to="./route">{$t('API 路由')}</Link>,
             'route',
@@ -149,7 +150,8 @@ const AiServiceInsidePage: FC = () => {
                 'project.myAiService.topology.view'
               )
             : null,
-          getItem(<Link to="./setting">{$t('设置')}</Link>, 'setting', undefined, undefined, undefined, '')
+          getItem(<Link to="./setting">{$t('设置')}</Link>, 'setting', undefined, undefined, undefined, ''),
+          getItem(<Link to="./logs">{$t('日志')}</Link>, 'logs', undefined, undefined, undefined, '')
         ],
         'group'
       )
@@ -202,7 +204,7 @@ const AiServiceInsidePage: FC = () => {
     } else if (serviceId !== currentUrl.split('/')[currentUrl.split('/').length - 1]) {
       setActiveMenu(currentUrl.split('/')[currentUrl.split('/').length - 1])
     } else {
-      setActiveMenu('route')
+      setActiveMenu('overview')
     }
   }, [currentUrl])
 
@@ -231,17 +233,8 @@ const AiServiceInsidePage: FC = () => {
       {showMenu ? (
         <InsidePage
           pageTitle={aiServiceInfo?.name || '-'}
-          tagList={[
-            ...(aiServiceInfo?.enable_mcp ? [{ label: 'MCP', color: '#FFF0C1', className: 'text-[#000]' }] : []),
-            {
-              label: (
-                <Paragraph className="mb-0" copyable={serviceId ? { text: serviceId } : false}>
-                  {$t('服务 ID')}：{serviceId || '-'}
-                </Paragraph>
-              )
-            }
-          ]}
           backUrl="/service/list"
+          customBanner={<ServiceInfoCard serviceId={serviceId} teamId={teamId} />}
         >
           <div className="flex flex-1 h-full">
             <Menu

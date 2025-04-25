@@ -15,7 +15,7 @@ export type AiServiceConfigFieldType = {
     logoFile?:UploadFile;
     tags?:Array<string>;
     description?: string;
-    team?:string;
+    team?:EntityItem;
     master?:string;
     serviceType?:'public'|'inner';
     catalogue?:string | string[];

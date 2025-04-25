@@ -20,6 +20,7 @@ import { Tool } from '@modelcontextprotocol/sdk/types.js'
 import McpToolsContainer from '@core/pages/mcpService/McpToolsContainer.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
 import TopBreadcrumb from '@common/components/aoplatform/Breadcrumb.tsx'
+import ServiceInfoCard from '@common/components/aoplatform/serviceInfoCard.tsx'
 
 type TabItemType = {
   key: string
@@ -32,18 +33,12 @@ const ServiceHubDetail = () => {
   const { serviceId } = useParams<RouterParams>()
   const { setBreadcrumb } = useBreadcrumb()
   const [serviceBasicInfo, setServiceBasicInfo] = useState<ServiceBasicInfoType>()
-  const [serviceName, setServiceName] = useState<string>()
-  const [serviceDesc, setServiceDesc] = useState<string>()
   const [serviceDoc, setServiceDoc] = useState<string>()
   const { fetchData } = useFetch()
   const applyRef = useRef<ApplyServiceHandle>(null)
   const { modal, message } = App.useApp()
   const [mySystemOptionList, setMySystemOptionList] = useState<DefaultOptionType[]>()
   const [service, setService] = useState<ServiceDetailType>()
-  const [serviceMetrics, setServiceMetrics] = useState<{ title: string; icon: React.ReactNode; value: string }[]>([])
-  const [serviceTags, setServiceTags] = useState<
-    { color: string; textColor: string; title: string; content: React.ReactNode }[]
-  >([])
   const [tools, setTools] = useState<Tool[]>([])
   const [tabItem, setTabItem] = useState<TabItemType[]>([])
   const [currentTab, setCurrentTab] = useState('')
@@ -149,10 +144,7 @@ servers:
           apiDoc: modifyApiDoc(data.service.apiDoc, data.service.basic?.invokeAddress)
         })
         setServiceBasicInfo(data.service.basic)
-        setServiceName(data.service.name)
-        setServiceDesc(data.service.description)
         setServiceDoc(DOMPurify.sanitize(data.service.document))
-        setServiceMetricsList(data.service.basic)
         setTabItemList(data.service.basic)
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
@@ -162,54 +154,6 @@ servers:
 
   const handleTabChange = (value: any) => {
     setCurrentTab(value)
-  }
-
-  const setServiceMetricsList = (serviceBasicInfo: ServiceBasicInfoType) => {
-    // 设置服务指标数据
-    setServiceMetrics([
-      {
-        title: 'API 数量',
-        icon: <ApiOutlined className="mr-[1px] text-[14px] h-[14px] w-[14px]" />,
-        value: serviceBasicInfo.apiNum.toString()
-      },
-      {
-        title: '接入消费者数量',
-        icon: <Icon icon="tabler:api-app" width="14" height="14" />,
-        value: serviceBasicInfo.appNum.toString()
-      },
-      {
-        title: '30天内调用次数',
-        icon: <Icon icon="iconoir:graph-up" width="14" height="14" />,
-        value: formatInvokeCount(serviceBasicInfo.invokeCount ?? 0)
-      }
-    ])
-    // 设置服务标签数据
-    const tags = [
-      {
-        color: '#7371fc1b',
-        textColor: 'text-theme',
-        title: serviceBasicInfo?.catalogue?.name || '-',
-        content: serviceBasicInfo?.catalogue?.name || '-'
-      },
-      {
-        color: `#${serviceBasicInfo?.serviceKind === 'ai' ? 'EADEFF' : 'DEFFE7'}`,
-        textColor: 'text-[#000]',
-        title: serviceBasicInfo?.serviceKind || '-',
-        content: SERVICE_KIND_OPTIONS.find((x) => x.value === serviceBasicInfo?.serviceKind)?.label || '-'
-      }
-    ]
-
-    // 如果启用了MCP，添加MCP标签
-    if (serviceBasicInfo?.enableMcp) {
-      tags.push({
-        color: '#FFF0C1',
-        textColor: 'text-[#000]',
-        title: 'MCP',
-        content: 'MCP'
-      })
-    }
-
-    setServiceTags(tags)
   }
 
   useEffect(() => {
@@ -270,7 +214,7 @@ servers:
       content: (
         <ApplyServiceModal
           ref={applyRef}
-          entity={{ ...serviceBasicInfo!, name: serviceName!, id: serviceId! }}
+          entity={{ ...serviceBasicInfo!, name: service?.name || '', id: serviceId! }}
           mySystemOptionList={mySystemOptionList!}
         />
       ),
@@ -292,19 +236,6 @@ servers:
 
   const handleToolsChange = (value: Tool[]) => {
     setTools(value)
-  }
-  // 格式化调用次数，添加K和M单位
-  const formatInvokeCount = (count: number | null | undefined): string => {
-    if (count === null || count === undefined) return '-'
-    if (count >= 1000000) {
-      const value = Math.floor(count / 100000) / 10
-      return `${value}M`
-    }
-    if (count >= 1000) {
-      const value = Math.floor(count / 100) / 10
-      return `${value}K`
-    }
-    return count.toString()
   }
 
   /**
@@ -431,74 +362,21 @@ servers:
       <header>
         <TopBreadcrumb handleBackCallback={() => navigate(`/serviceHub/list`)} />
       </header>
-      <Card
-        style={{
-          borderRadius: '10px',
-          background: 'linear-gradient(35deg, rgb(246, 246, 260) 0%, rgb(255, 255, 255) 40%)'
+      <ServiceInfoCard
+        serviceBasicInfo={{
+          ...serviceBasicInfo,
+          serviceName: service?.name || '',
+          serviceDesc: service?.description || ''
         }}
-        className={`w-full mt-[20px]`}
-        classNames={{
-          body: 'p-[15px] h-[180px]'
-        }}
-      >
-        <div className="service-info">
-          <div className="flex items-center">
-            <div>
-              <Avatar
-                shape="square"
-                size={50}
-                className={`rounded-[12px] border-none rounded-[12px] ${serviceBasicInfo?.logo ? 'bg-[linear-gradient(135deg,white,#f0f0f0)]' : 'bg-theme'}`}
-                src={
-                  serviceBasicInfo?.logo ? (
-                    <img
-                      src={serviceBasicInfo?.logo}
-                      alt="Logo"
-                      style={{ maxWidth: '200px', width: '45px', height: '45px', objectFit: 'unset' }}
-                    />
-                  ) : undefined
-                }
-                icon={serviceBasicInfo?.logo ? '' : <Icon icon="tabler:api-app" />}
-              >
-                {' '}
-              </Avatar>
-            </div>
-            <div className="pl-[20px] w-[calc(100%-50px)] overflow-hidden">
-              <p className="text-[14px] h-[20px] leading-[20px] truncate font-bold w-full flex items-center gap-[4px]">
-                {serviceName}
-              </p>
-              <div className="mt-[5px] h-[20px] flex items-center font-normal">
-                {serviceTags.map((tag, index) => (
-                  <Tag
-                    key={index}
-                    color={tag.color}
-                    className={`${tag.textColor} font-normal border-0 mr-[12px] max-w-[150px] truncate`}
-                    bordered={false}
-                    title={tag.title}
-                  >
-                    {tag.content}
-                  </Tag>
-                ))}
-                {serviceMetrics.map((item, index) => (
-                  <Tooltip key={index} title={$t(item.title)}>
-                    <span className="mr-[12px] flex items-center">
-                      <span className="h-[14px] mr-[4px] flex items-center">{item.icon}</span>
-                      <span className="font-normal text-[14px]">{item.value}</span>
-                    </span>
-                  </Tooltip>
-                ))}
-              </div>
-            </div>
-          </div>
-          <span className="line-clamp-2 mt-[15px] text-[12px] text-[#666]" title={serviceDesc}>
-            {serviceDesc || $t('暂无服务描述')}
-          </span>
-        </div>
-        <div className="absolute bottom-[15px]">
-          <Button type="primary" onClick={() => openModal('apply')}>
-            {$t('申请')}
-          </Button>
-        </div>
-      </Card>
+        customClassName="mt-[20px]"
+        actionSlot={
+          <>
+            <Button type="primary" onClick={() => openModal('apply')}>
+              {$t('申请')}
+            </Button>
+          </>
+        }
+      />
       <div className="flex">
         <Tabs
           className="p-btnbase pr-0 overflow-hidden [&>.ant-tabs-content-holder]:overflow-auto w-full flex-1 mr-[10px]"
