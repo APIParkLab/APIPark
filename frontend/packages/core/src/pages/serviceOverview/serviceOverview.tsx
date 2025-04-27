@@ -67,8 +67,13 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
         'request_total',
         'token_total',
         'avg_token',
+        'max_token',
+        'min_token',
         'avg_request_per_subscriber',
-        'avg_token_per_subscriber'
+        'avg_token_per_subscriber',
+        'input_token',
+        'output_token',
+        'total_token'
       ],
       eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
     }).then((response) => {
@@ -80,42 +85,38 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
           apiNum: 3,
           serviceKind: 'ai',
           avaliableMonitor: false,
+          maxToken: 100,
+          minToken: 1,
           requestOverview: [
             {
               '2xx': 1.0,
               '4xx': 2.0,
               '5xx': 3.0,
-              fsdf: 4.0
             },
             {
               '2xx': 2.0,
               '4xx': 3.0,
               '5xx': 4.0,
-              fsdf: 5.0
             },
             {
               '2xx': 3.0,
               '4xx': 4.0,
               '5xx': 5.0,
-              fsdf: 6.0
             },
             {
               '2xx': 4.0,
               '4xx': 5.0,
               '5xx': 6.0,
-              fsdf: 7.0
             },
             {
               '2xx': 5.0,
               '4xx': 6.0,
               '5xx': 7.0,
-              fsdf: 8.0
             },
             {
               '2xx': 6.0,
               '4xx': 7.0,
               '5xx': 8.0,
-              fsdf: 9.0
             }
           ],
           tokenOverview: [
@@ -152,7 +153,36 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
           ],
           avgTokenOverview: [11, 231, 343, 1414, 25, 362],
           avgRequestPerSubscriberOverview: [1, 2, 3, 4, 5, 6],
-          avgTokenPerSubscriberOverview: [4, 5, 1, 11, 4, 9],
+          avgTokenPerSubscriberOverview: [{
+            inputToken: 1.0,
+            outputToken: 2.0,
+            totalToken: 3.0
+          },
+          {
+            inputToken: 22.0,
+            outputToken: 3.0,
+            totalToken: 44.0
+          },
+          {
+            inputToken: 42.0,
+            outputToken: 15.0,
+            totalToken: 6.0
+          },
+          {
+            inputToken: 5.0,
+            outputToken: 16.0,
+            totalToken: 7.0
+          },
+          {
+            inputToken: 6.0,
+            outputToken: 37.0,
+            totalToken: 8.0
+          },
+          {
+            inputToken: 64.0,
+            outputToken: 7.0,
+            totalToken: 8.0
+          }],
           requestTotal: '12 GB',
           tokenTotal: '14 GB',
           avgToken: '1 k',
@@ -208,6 +238,8 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
         data: serviceOverview.avgResponseTimeOverview,
         value: serviceOverview.avgResponseTime,
         date: serviceOverview.date,
+        max: serviceOverview.maxResponseTime,
+        min: serviceOverview.minResponseTime,
         type: 'area'
       },
       // 平均请求
@@ -264,6 +296,8 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
         data: serviceOverview.avgTokenOverview,
         value: serviceOverview.avgToken,
         date: serviceOverview.date,
+        min: serviceOverview.minToken,
+        max: serviceOverview.maxToken,
         type: 'area'
       },
       // 平均请求
@@ -276,7 +310,10 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
       // 评价 token 消耗
       setBarChartInfoData({
         title: $t('平均 Token/订阅者统计'),
-        data: serviceOverview.avgTokenPerSubscriberOverview,
+        data: serviceOverview.avgTokenPerSubscriberOverview.map((item: { inputToken: number; outputToken: number }) => ({
+          inputToken: item.inputToken,
+          outputToken: item.outputToken
+        })),
         value: serviceOverview.avgTokenPerSubscriber,
         date: serviceOverview.date
       })
@@ -301,6 +338,8 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
         'avg_traffic_per_subscriber_overview',
         'request_total',
         'traffic_total',
+        'max_response_time',
+        'min_response_time',
         'avg_response_time',
         'avg_request_per_subscriber',
         'avg_traffic_per_subscriber'
@@ -315,6 +354,8 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
           apiNum: 3,
           serviceKind: 'ai',
           avaliableMonitor: false,
+          maxResponseTime: 110,
+          minResponseTime: 31,
           requestOverview: [
             {
               '2xx': 1.0,
