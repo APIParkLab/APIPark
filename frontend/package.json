@@ -50,7 +50,8 @@
     "vite-tsconfig-paths": "^4.3.2",
     "react-json-view": "^1.21.3",
     "zod": "^3.23.8",
-    "@modelcontextprotocol/sdk": "^1.9.0"
+    "@modelcontextprotocol/sdk": "^1.9.0",
+    "echarts-for-react": "^3.0.2"
   },
   "devDependencies": {
     "@ant-design/cssinjs": "^1.18.2",
