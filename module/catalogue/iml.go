@@ -181,8 +181,16 @@ func (i *imlCatalogueModule) genCommonWheres(ctx context.Context, clusterIds ...
 }
 
 func (i *imlCatalogueModule) ProviderStatistics(ctx context.Context, start, end time.Time, serviceIds ...string) (map[string]int64, error) {
+	// 判断是否配置influxdb
 	clusterId := cluster.DefaultClusterID
-	_, err := i.clusterService.Get(ctx, clusterId)
+	_, err := i.monitorService.Get(ctx, clusterId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return make(map[string]int64), nil
+		}
+		return nil, err
+	}
+	_, err = i.clusterService.Get(ctx, clusterId)
 	if err != nil {
 		return nil, err
 	}
