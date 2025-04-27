@@ -2,7 +2,6 @@ import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons'
 import G6, { EdgeConfig, Graph, NodeConfig } from '@antv/g6'
 import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { EntityItem } from '@common/const/type'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext'
 import { useFetch } from '@common/hooks/http'
 import { $t } from '@common/locales'
 import { getNodeSpacing } from '@common/utils/systemRunning'
@@ -10,7 +9,7 @@ import { RouterParams } from '@core/components/aoplatform/RenderRoutes'
 import { App, Button } from 'antd'
 import { debounce } from 'lodash-es'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { RELATIVE_PICTURE_NODE_FONTSIZE } from '../../const/system-running/const'
 import { GraphData } from '../../const/system-running/type'
 import { SYSTEM_TOPOLOGY_NODE_TYPE_COLOR_MAP } from '../../const/system/const'
@@ -26,9 +25,7 @@ export default function SystemTopology() {
   const [graph, setGraph] = useState<Graph | null>(null)
   const { fetchData } = useFetch()
   const { systemInfo } = useSystemContext()
-  const { setBreadcrumb } = useBreadcrumb()
   const [zoomNum, setZoomNum] = useState<number>(1)
-  const navigate = useNavigate()
 
 
   const getNodeData = () => {
@@ -105,15 +102,6 @@ export default function SystemTopology() {
 
   useEffect(() => {
     getNodeData()
-    setBreadcrumb([
-      {
-        title: $t('服务'),
-        onClick: () => navigate('/service/list')
-      },
-      {
-        title: $t('调用拓扑图')
-      }
-    ])
   }, [serviceId])
 
   useEffect(() => {

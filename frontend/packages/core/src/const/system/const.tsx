@@ -243,6 +243,12 @@ export const MATCH_CONFIG: ConfigField<MatchItem>[] = [
 
 export const SYSTEM_API_TABLE_COLUMNS: PageProColumns<SystemApiTableListItem>[] = [
   {
+    title: '名称',
+    dataIndex: 'name',
+    width: 200,
+    ellipsis: true
+  },
+  {
     title: 'URL',
     dataIndex: 'requestPath',
     ellipsis: true

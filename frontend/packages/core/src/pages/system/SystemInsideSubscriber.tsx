@@ -11,7 +11,6 @@ import {
   STATUS_CODE
 } from '@common/const/const.tsx'
 import { SimpleMemberItem } from '@common/const/type.ts'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
 import { useFetch } from '@common/hooks/http.ts'
 import { $t } from '@common/locales/index.ts'
@@ -20,7 +19,7 @@ import { RouterParams } from '@core/components/aoplatform/RenderRoutes.tsx'
 import { App, Form, TreeSelect } from 'antd'
 import { DefaultOptionType } from 'antd/es/cascader'
 import { FC, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { SYSTEM_SUBSCRIBER_TABLE_COLUMNS } from '../../const/system/const.tsx'
 import {
   SimpleSystemItem,
@@ -31,7 +30,6 @@ import {
 } from '../../const/system/type.ts'
 
 const SystemInsideSubscriber: FC = () => {
-  const { setBreadcrumb } = useBreadcrumb()
   const { modal, message } = App.useApp()
   const { fetchData } = useFetch()
   const { serviceId, teamId } = useParams<RouterParams>()
@@ -39,7 +37,6 @@ const SystemInsideSubscriber: FC = () => {
   const pageListRef = useRef<ActionType>(null)
   const [memberValueEnum, setMemberValueEnum] = useState<SimpleMemberItem[]>([])
   const { accessData, state } = useGlobalContext()
-  const navigator = useNavigate()
   const getSystemSubscriber = () => {
     return fetchData<BasicResponse<{ subscribers: SystemSubscriberTableListItem[] }>>(
       'service/subscribers',
@@ -162,15 +159,6 @@ const SystemInsideSubscriber: FC = () => {
   ]
 
   useEffect(() => {
-    setBreadcrumb([
-      {
-        title: $t('服务'),
-        onClick: () => navigator('/service/list')
-      },
-      {
-        title: $t('订阅方管理')
-      }
-    ])
     getMemberList()
     manualReloadTable()
   }, [serviceId])

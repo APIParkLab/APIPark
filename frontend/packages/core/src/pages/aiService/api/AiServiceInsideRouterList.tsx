@@ -3,7 +3,6 @@ import PageList, { PageProColumns } from '@common/components/aoplatform/PageList
 import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission.tsx'
 import { BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const.tsx'
 import { SimpleMemberItem } from '@common/const/type.ts'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
 import { useFetch } from '@common/hooks/http.ts'
 import { $t } from '@common/locales/index.ts'
@@ -17,7 +16,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 
 const AiServiceInsideRouterList: FC = () => {
   const [searchWord, setSearchWord] = useState<string>('')
-  const { setBreadcrumb } = useBreadcrumb()
   const { modal, message } = App.useApp()
   const [tableListDataSource, setTableListDataSource] = useState<AiServiceRouterTableListItem[]>([])
   const [tableHttpReload, setTableHttpReload] = useState(true)
@@ -162,17 +160,6 @@ const AiServiceInsideRouterList: FC = () => {
     getMemberList()
     manualReloadTable()
   }, [serviceId])
-  useEffect(() => {
-    setBreadcrumb([
-      {
-        title: $t('服务'),
-        onClick: () => navigator('/service/list')
-      },
-      {
-        title: $t('路由')
-      }
-    ])
-  }, [state.language])
 
   const columns = useMemo(() => {
     return [...AI_SERVICE_ROUTER_TABLE_COLUMNS].map((x) => {

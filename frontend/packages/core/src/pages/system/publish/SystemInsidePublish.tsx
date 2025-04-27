@@ -1,14 +1,12 @@
 
 import { Tabs } from "antd"
 import { useState, useEffect, FC, useMemo } from "react"
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
-import { useBreadcrumb } from "@common/contexts/BreadcrumbContext"
+import { Outlet, useLocation, useNavigate } from "react-router-dom"
 import { SYSTEM_PUBLISH_TAB_ITEMS } from "../../../const/system/const"
 import { $t } from "@common/locales"
 import { useGlobalContext } from "@common/contexts/GlobalStateContext"
 
 const SystemInsidePublic:FC = ()=>{
-    const { setBreadcrumb } = useBreadcrumb()
     const query =new URLSearchParams(useLocation().search)
     const location = useLocation()
     const currentUrl = location.pathname
@@ -25,18 +23,6 @@ const SystemInsidePublic:FC = ()=>{
         setPageStatus(Number(query.get('status') ||0) as 0|1)
     }, [currentUrl]);
 
-    useEffect(() => {
-        setBreadcrumb([
-            {
-                title: $t('服务'),
-                onClick: () => navigateTo('/service/list')
-            },
-            {
-                title:$t('发布')
-            }
-        ])
-    }, []);
-    
     const tabItems = useMemo(()=>SYSTEM_PUBLISH_TAB_ITEMS?.map((x)=>({...x, label:$t(x.label as string) })),[state.language])
     return (
         <>
