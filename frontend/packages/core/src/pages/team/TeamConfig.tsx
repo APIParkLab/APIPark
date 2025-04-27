@@ -9,7 +9,6 @@ import { useFetch } from '@common/hooks/http.ts'
 import { DefaultOptionType } from 'antd/es/cascader'
 import { TeamConfigFieldType } from '../../const/team/type.ts'
 import WithPermission from '@common/components/aoplatform/WithPermission.tsx'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 import { useTeamContext } from '../../contexts/TeamContext.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
 import { $t } from '@common/locales/index.ts'
@@ -32,7 +31,6 @@ const TeamConfig = forwardRef<TeamConfigHandle, TeamConfigProps>((props, ref) =>
   const currentUrl = location.pathname
   const { fetchData } = useFetch()
   const [managerOption, setManagerOption] = useState<DefaultOptionType[]>([])
-  const { setBreadcrumb } = useBreadcrumb()
   const { setTeamInfo } = useTeamContext()
   const { checkPermission, accessInit, state } = useGlobalContext()
   const pageType = useMemo(() => {
@@ -133,15 +131,6 @@ const TeamConfig = forwardRef<TeamConfigHandle, TeamConfigProps>((props, ref) =>
         .catch((errorInfo) => reject(errorInfo))
     })
   }
-  useEffect(() => {
-    setBreadcrumb([
-      {
-        title: $t('团队'),
-        onClick: () => navigateTo('/team/list')
-      },
-      { title: $t('设置') }
-    ])
-  }, [state.language])
   useEffect(() => {
 
     getManagerList()

@@ -173,9 +173,10 @@ servers:
         title: $t('API 门户'),
         onClick: () => navigate(`/serviceHub/list`)
       },
+      { title: service?.name || '-' },
       { title: $t('服务详情') }
     ])
-  }, [state.language])
+  }, [state.language, service])
 
   const getMySelectList = () => {
     setMySystemOptionList([])
