@@ -957,5 +957,8 @@
   "K6b882d4a": "Avg Token per Subscriber",
   "K6c2d93b6": "Failed to load data, please try again",
   "Kf5eeb9c5": "Avg Token per Subscriber",
-  "K1639a17a": "API Routes Docs"
+  "K1639a17a": "API Routes Docs",
+  "K33bc1ad1": "Input Token",
+  "Ke00ff18b": "Output Token",
+  "K81140e5b": "Total Token"
 }

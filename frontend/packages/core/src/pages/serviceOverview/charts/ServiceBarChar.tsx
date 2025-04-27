@@ -20,10 +20,16 @@ type ServiceBarCharProps = {
   height?: number
 }
 
+
 const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharProps) => {
   const chartRef = useRef<ECharts>(null)
   const [option, setOption] = useState<EChartsOption | undefined>({})
   const [detaultColor] = useState('#5470c6')
+  const tokenMap = {
+    inputToken: $t('输入 Token'),
+    outputToken: $t('输出 Token'),
+    totalToken: $t('总 Token')
+  }
   const setChartOption = (dataInfo: BarChartInfo) => {
     const isNumberArray = typeof dataInfo.data[0] !== 'object'
     const legendData = isNumberArray ? [dataInfo.title] : dataInfo.data.map((item) => item.name)
@@ -42,7 +48,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
       // 为每个数据系列添加一行
       data.forEach((item, index) => {
         const color = item.color
-        const name = item.name
+        const name = tokenMap[item.name as keyof typeof tokenMap] || item.name
         const value = item.value[dataInfo.date.indexOf(params.name)] || 0
 
         const marker = `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${color};"></span>`
@@ -86,9 +92,14 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
         containLabel: true
       },
       tooltip: {
-        trigger: 'item',
-        formatter: function (params: { name: string; color: string; seriesIndex?: number }) {
-          return tooltipFormatter(params)
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        },
+        formatter: function (params: any) {
+          // 如果是数组，取第一个参数的name
+          const param = Array.isArray(params) ? params[0] : params
+          return tooltipFormatter(param)
         }
       },
       legend: {

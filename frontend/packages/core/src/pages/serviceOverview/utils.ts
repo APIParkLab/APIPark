@@ -29,6 +29,9 @@ export const setBarChartInfoData = ({ title, value, data, date }: BarData) => {
     '2xx': '#7EC26A',
     '4xx': '#F2CF59',
     '5xx': '#F17975',
+    inputToken:'#7EC26A',
+    outputToken: '#F2CF59',
+    totalToken: '#F17975',
     '200': '#7EC26A',
     '400': '#F2CF59',
     '500': '#F17975'

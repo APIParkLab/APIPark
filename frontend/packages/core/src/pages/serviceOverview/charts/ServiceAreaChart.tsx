@@ -7,7 +7,10 @@ type AreaChartInfo = {
   value: string
   date: string[]
   data: number[]
+  max: string
+  min: string
 }
+
 type ServiceAreaCharProps = {
   customClassNames?: string
   dataInfo?: AreaChartInfo
@@ -101,15 +104,15 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
         <div className="text-[16px] text-[#999]">{$t(dataInfo?.title || '')}</div>
         <div className="relative top-[-6px]">
           <span className="text-[30px] font-bold">{dataInfo?.value}</span>
-          <div className="absolute top-[5px] right-[8%] flex flex-col items-end">
-            <div className="flex items-center mb-1">
+          <div className="absolute top-[5px] right-[8%] grid grid-cols-[auto_auto] gap-y-1 justify-items-end">
+            <div className="flex justify-center items-center">
               <span className="text-[#ff4683] text-[9px]">▲</span>
-              <span className="ml-1">381 T/s</span>
             </div>
-            <div className="flex items-center">
+            <span className="ml-1 text-right">{dataInfo?.max}</span>
+            <div className="flex justify-center items-center">
               <span className="text-[#4bdb6a] text-[9px]">▼</span>
-              <span className="ml-1">381 T/s</span>
             </div>
+            <span className="ml-1 text-right">{dataInfo?.min}</span>
           </div>
         </div>
       </div>

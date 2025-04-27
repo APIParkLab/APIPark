@@ -60,6 +60,8 @@ export default function DashboardTotal() {
         'request_total',
         'token_total',
         'avg_token',
+        'min_token',
+        'max_token',
         'avg_request_per_subscriber',
         'avg_token_per_subscriber'
       ],
@@ -138,9 +140,42 @@ export default function DashboardTotal() {
               '5xx': 8.0
             }
           ],
+          minToken: '1 k',
+          maxToken: '10 k',
           avgTokenOverview: [11, 231, 343, 1414, 25, 362],
           avgRequestPerSubscriberOverview: [1, 2, 3, 4, 5, 6],
-          avgTokenPerSubscriberOverview: [4, 5, 1, 11, 4, 9],
+          avgTokenPerSubscriberOverview: [
+            {
+              inputToken: 1.0,
+              outputToken: 2.0,
+              totalToken: 3.0
+            },
+            {
+              inputToken: 22.0,
+              outputToken: 3.0,
+              totalToken: 44.0
+            },
+            {
+              inputToken: 42.0,
+              outputToken: 15.0,
+              totalToken: 6.0
+            },
+            {
+              inputToken: 5.0,
+              outputToken: 16.0,
+              totalToken: 7.0
+            },
+            {
+              inputToken: 6.0,
+              outputToken: 37.0,
+              totalToken: 8.0
+            },
+            {
+              inputToken: 64.0,
+              outputToken: 7.0,
+              totalToken: 8.0
+            }
+          ],
           requestTotal: '12 GB',
           tokenTotal: '14 GB',
           avgToken: '1 k',
@@ -172,6 +207,8 @@ export default function DashboardTotal() {
         'request_total',
         'traffic_total',
         'avg_response_time',
+        'max_response_time',
+        'min_response_time',
         'avg_request_per_subscriber',
         'avg_traffic_per_subscriber'
       ],
@@ -254,15 +291,17 @@ export default function DashboardTotal() {
           avgResponseTimeOverview: [123, 232, 443, 54, 125, 61],
           avgTrafficPerSubscriberOverview: [44, 235, 11, 114, 234, 239],
           requestTotal: '11 GB',
+          minResponseTime: '1 k',
+          maxResponseTime: '102 k',
           trafficTotal: '22 GB',
           avgResponseTime: '33 k',
           avgRequestPerSubscriber: '44 k',
           avgTrafficPerSubscriber: '55 k',
           date: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
         }
-        // 设置 REST 服务数据
+        // 存储 REST 服务数据
         setRestServiceOverview(serviceOverview)
-        // 存储 REST 报表数据
+        // 设置 REST 报表数据
         setRestChartInfoData(serviceOverview)
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
@@ -299,6 +338,8 @@ export default function DashboardTotal() {
         data: serviceOverview.avgResponseTimeOverview,
         value: serviceOverview.avgResponseTime,
         date: serviceOverview.date,
+        min: serviceOverview.minResponseTime,
+        max: serviceOverview.maxResponseTime,
         type: 'area'
       },
       // 平均请求
@@ -347,6 +388,8 @@ export default function DashboardTotal() {
         data: serviceOverview.avgTokenOverview,
         value: serviceOverview.avgToken,
         date: serviceOverview.date,
+        min: serviceOverview.minToken,
+        max: serviceOverview.maxToken,
         type: 'area'
       },
       // 平均请求
@@ -359,7 +402,12 @@ export default function DashboardTotal() {
       // 平均 token 消耗
       setBarChartInfoData({
         title: $t('平均 Token/订阅者统计'),
-        data: serviceOverview.avgTokenPerSubscriberOverview,
+        data: serviceOverview.avgTokenPerSubscriberOverview.map(
+          (item: { inputToken: number; outputToken: number }) => ({
+            inputToken: item.inputToken,
+            outputToken: item.outputToken
+          })
+        ),
         value: serviceOverview.avgTokenPerSubscriber,
         date: serviceOverview.date
       })
