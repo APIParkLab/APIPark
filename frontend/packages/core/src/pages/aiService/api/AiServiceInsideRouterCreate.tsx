@@ -291,19 +291,6 @@ const AiServiceInsideRouterCreate = () => {
   }
 
   useEffect(() => {
-    setBreadcrumb([
-      {
-        title: $t('服务'),
-        onClick: () => navigator('/service/list')
-      },
-      {
-        title:$t('API'),
-        onClick: () => navigator(backUrl)
-      },
-      {
-        title: routeId ? $t('编辑 API') : $t('添加 API')
-      }
-    ])
     !routeId && aiServiceInfo?.provider && getDefaultModelConfig()
   }, [aiServiceInfo])
 

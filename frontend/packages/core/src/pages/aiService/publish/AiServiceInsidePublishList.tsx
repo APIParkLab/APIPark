@@ -9,7 +9,6 @@ import { PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN, PUBLISH_APPROVAL_VERSION_IN
 import { BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { SimpleMemberItem } from "@common/const/type.ts";
 import { MemberTableListItem } from "../../../const/member/type";
-import { useBreadcrumb } from "@common/contexts/BreadcrumbContext";
 import { useFetch } from "@common/hooks/http";
 import WithPermission from "@common/components/aoplatform/WithPermission";
 import { AiServicePublishReleaseItem } from "../../../const/system/type";
@@ -23,7 +22,6 @@ import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter
 import { $t } from "@common/locales";
 
 const AiServiceInsidePublicList:FC = ()=>{
-    const { setBreadcrumb } = useBreadcrumb()
     const { modal,message } = App.useApp()
     const pageListRef = useRef<ActionType>(null);
     const [tableHttpReload, setTableHttpReload] = useState(true);
@@ -45,7 +43,6 @@ const AiServiceInsidePublicList:FC = ()=>{
     const [drawerData, setDrawerData] = useState<PublishTableListItem|PublishVersionTableListItem >({} as PublishTableListItem)
     const [drawerOkTitle, setDrawerOkTitle] = useState<string>('确认')
     const [isOkToPublish, setIsOkToPublish] = useState<boolean>(false)
-    const navigator = useNavigate()
     const getAiServicePublishList = (params?: ParamsType & {
         pageSize?: number | undefined;
         current?: number | undefined;
@@ -351,15 +348,6 @@ const AiServiceInsidePublicList:FC = ()=>{
     ]
 
     useEffect(() => {
-        setBreadcrumb([
-            {
-                title: $t('服务'),
-                onClick: () => navigator('/service/list')
-            },
-            {
-                title: $t('发布')
-            }
-        ])
         getMemberList()
         manualReloadTable()
     }, [serviceId]);

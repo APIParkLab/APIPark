@@ -1,8 +1,7 @@
 import {ActionType} from "@ant-design/pro-components";
 import  {FC, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
-import {Link, useNavigate, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import {App, Form,TreeSelect} from "antd";
-import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {useFetch} from "@common/hooks/http.ts";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
 import {BasicResponse, COLUMNS_TITLE, DELETE_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE} from "@common/const/const.tsx";
@@ -18,7 +17,6 @@ import { checkAccess } from "@common/utils/permission.ts";
 import { $t } from "@common/locales/index.ts";
 
 const AiServiceInsideSubscriber:FC = ()=>{
-    const { setBreadcrumb } = useBreadcrumb()
     const { modal,message } = App.useApp()
     const {fetchData} = useFetch()
     const {serviceId, teamId} = useParams<RouterParams>()
@@ -26,7 +24,6 @@ const AiServiceInsideSubscriber:FC = ()=>{
     const pageListRef = useRef<ActionType>(null);
     const [memberValueEnum, setMemberValueEnum] = useState<SimpleMemberItem[]>([])
     const {accessData,state} = useGlobalContext()
-    const navigator = useNavigate()
     const getAiServiceSubscriber = ()=>{
         return fetchData<BasicResponse<{subscribers:AiServiceSubscriberTableListItem[]}>>('service/subscribers',{method:'GET',eoParams:{service:serviceId,team:teamId},eoTransformKeys:['apply_time']}).then(response=>{
             const {code,data,msg} = response
@@ -120,15 +117,6 @@ const AiServiceInsideSubscriber:FC = ()=>{
     ]
 
     useEffect(() => {
-        setBreadcrumb([
-            {
-                title: $t('服务'),
-                onClick: () => navigator('/service/list')
-            },
-            {
-                title:$t('订阅方管理')
-            }
-        ])
         getMemberList()
         manualReloadTable()
     }, [serviceId]);

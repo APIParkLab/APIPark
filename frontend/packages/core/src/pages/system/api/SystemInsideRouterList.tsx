@@ -3,7 +3,6 @@ import PageList, { PageProColumns } from '@common/components/aoplatform/PageList
 import TableBtnWithPermission from '@common/components/aoplatform/TableBtnWithPermission.tsx'
 import { BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const.tsx'
 import { SimpleMemberItem } from '@common/const/type.ts'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
 import { useFetch } from '@common/hooks/http.ts'
 import { $t } from '@common/locales/index.ts'
@@ -11,13 +10,12 @@ import { checkAccess } from '@common/utils/permission.ts'
 import { RouterParams } from '@core/components/aoplatform/RenderRoutes.tsx'
 import { App, Divider, Typography } from 'antd'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { SYSTEM_API_TABLE_COLUMNS } from '../../../const/system/const.tsx'
 import { SystemApiTableListItem } from '../../../const/system/type.ts'
 
 const SystemInsideRouterList: FC = () => {
   const [searchWord, setSearchWord] = useState<string>('')
-  const { setBreadcrumb } = useBreadcrumb()
   const { modal, message } = App.useApp()
   const [tableListDataSource, setTableListDataSource] = useState<SystemApiTableListItem[]>([])
   const [tableHttpReload, setTableHttpReload] = useState(true)
@@ -162,17 +160,6 @@ const SystemInsideRouterList: FC = () => {
     getMemberList()
     manualReloadTable()
   }, [serviceId])
-  useEffect(() => {
-    setBreadcrumb([
-      {
-        title: $t('服务'),
-        onClick: () => navigator('/service/list')
-      },
-      {
-        title: $t('路由')
-      }
-    ])
-  }, [state.language])
 
   const columns = useMemo(() => {
     return [...SYSTEM_API_TABLE_COLUMNS].map((x) => {

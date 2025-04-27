@@ -97,6 +97,7 @@ export type SystemApiProxyType = {
 export type SystemApiProxyFieldType = {
     protocols: string[];
     id:string;
+    name:string
     description?:string;
     disable:boolean;
     path:string;

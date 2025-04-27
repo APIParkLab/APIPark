@@ -9,13 +9,12 @@ import { $t } from '@common/locales/index.ts'
 import { RouterParams } from '@core/components/aoplatform/RenderRoutes.tsx'
 import { Button, Empty, Spin, Upload, message } from 'antd'
 import { forwardRef, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import {
   SystemApiDetail,
   SystemInsideApiDocumentHandle,
   SystemInsideApiDocumentProps
 } from '../../../const/system/type.ts'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 
 const SystemInsideApiDocument = forwardRef<
   SystemInsideApiDocumentHandle,
@@ -26,18 +25,7 @@ const SystemInsideApiDocument = forwardRef<
   const [apiDetail, setApiDetail] = useState<SystemApiDetail>()
   const [loading, setLoading] = useState<boolean>(false)
   const [showEditor, setShowEditor] = useState<boolean>(false)
-  const { setBreadcrumb } = useBreadcrumb()
-  const navigator = useNavigate()
   useEffect(() => {
-    setBreadcrumb([
-      {
-        title: $t('服务'),
-        onClick: () => navigator('/service/list')
-      },
-      {
-        title: $t('API 文档')
-      }
-    ])
     getApiDetail()
   }, [])
 

@@ -186,7 +186,7 @@
   "K617f34f1": "Updated By",
   "K6ebca204": "Update Time",
   "Kabfe9512": "Save",
-  "K51d1eb5d": "API",
+  "K51d1eb5d": "API Routes",
   "Ka2b6d281": "API Docs",
   "Kdefa9caa": "Usage Instructions",
   "K36856e71": "Publish",
@@ -210,7 +210,7 @@
   "K469e475a": "Max Retry Times",
   "K8a35059b": "Model Settings",
   "Kf9dcef3a": "API",
-  "K6134bbe8": "Add API",
+  "K6134bbe8": "Add API Route",
   "Kf85b83a0": "Enter URL to Search",
   "Kcf9f90b8": "Model Provider",
   "Kfede1c7c": "Model",
@@ -956,5 +956,6 @@
   "K8158a6e4": "Avg Traffic per Subscriber",
   "K6b882d4a": "Avg Token per Subscriber",
   "K6c2d93b6": "Failed to load data, please try again",
-  "Kf5eeb9c5": "Avg Token per Subscriber"
+  "Kf5eeb9c5": "Avg Token per Subscriber",
+  "K1639a17a": "API Route Docs"
 }

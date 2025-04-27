@@ -15,6 +15,7 @@ import { Link, Outlet, useLocation, useNavigate, useParams } from 'react-router-
 import { SystemConfigFieldType } from '../../const/system/type.ts'
 import { useSystemContext } from '../../contexts/SystemContext.tsx'
 import ServiceInfoCard from '@common/components/aoplatform/serviceInfoCard.tsx'
+import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 
 const SystemInsidePage: FC = () => {
   const { message } = App.useApp()
@@ -27,6 +28,7 @@ const SystemInsidePage: FC = () => {
   const [activeMenu, setActiveMenu] = useState<string>()
   const navigateTo = useNavigate()
   const [showMenu, setShowMenu] = useState<boolean>(false)
+  const { setBreadcrumb } = useBreadcrumb()
 
   const getSystemInfo = () => {
     fetchData<BasicResponse<{ service: SystemConfigFieldType }>>('service/info', {
@@ -76,7 +78,7 @@ const SystemInsidePage: FC = () => {
             'team.service.router.view'
           ),
           getItem(
-            <Link to="./api">{$t('API 文档')}</Link>,
+            <Link to="./api">{$t('API 路由文档')}</Link>,
             'api',
             undefined,
             undefined,
@@ -217,10 +219,19 @@ const SystemInsidePage: FC = () => {
   }, [accessData])
 
   useEffect(() => {
+    setBreadcrumb([
+      {
+        title: $t('服务'),
+        onClick: () => navigateTo('/service/list')
+      },
+      {
+        title: systemInfo?.name || ''
+      }
+    ])
     if (activeMenu && serviceId === currentUrl.split('/')[currentUrl.split('/').length - 1]) {
       navigateTo(`/service/${teamId}/inside/${serviceId}/${activeMenu}`)
     }
-  }, [activeMenu])
+  }, [activeMenu, systemInfo, state.language])
 
   useEffect(() => {
     serviceId && getSystemInfo()

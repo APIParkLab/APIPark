@@ -1,14 +1,13 @@
 import { ActionType, ParamsType } from "@ant-design/pro-components";
 import { App, Button, Divider } from "antd";
 import { useState, useRef, useEffect, useMemo, FC } from "react";
-import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList";
 import { PublishApprovalModalContent } from "@common/components/aoplatform/PublishApprovalModalContent";
 import { PUBLISH_APPROVAL_RECORD_INNER_TABLE_COLUMN, PUBLISH_APPROVAL_VERSION_INNER_TABLE_COLUMN, PublishApplyStatusEnum, PublishStatusEnum, PublishTableStatusColorClass } from "@common/const/approval/const";
 import { BasicResponse, COLUMNS_TITLE, DELETE_TIPS, RESPONSE_TIPS, STATUS_CODE } from "@common/const/const";
 import { RouterParams, SimpleMemberItem } from "@common/const/type.ts";
 import { MemberTableListItem } from "../../../const/member/type";
-import { useBreadcrumb } from "@common/contexts/BreadcrumbContext";
 import { useFetch } from "@common/hooks/http";
 import WithPermission from "@common/components/aoplatform/WithPermission";
 import { SystemPublishReleaseItem } from "../../../const/system/type";
@@ -22,7 +21,6 @@ import { DrawerWithFooter } from "@common/components/aoplatform/DrawerWithFooter
 import { $t } from "@common/locales";
 
 const SystemInsidePublicList:FC = ()=>{
-    const { setBreadcrumb } = useBreadcrumb()
     const { modal,message } = App.useApp()
     const pageListRef = useRef<ActionType>(null);
     const [tableHttpReload, setTableHttpReload] = useState(true);
@@ -44,7 +42,6 @@ const SystemInsidePublicList:FC = ()=>{
     const [drawerData, setDrawerData] = useState<PublishTableListItem|PublishVersionTableListItem >({} as PublishTableListItem)
     const [drawerOkTitle, setDrawerOkTitle] = useState<string>('确认')
     const [isOkToPublish, setIsOkToPublish] = useState<boolean>(false)
-    const navigateTo = useNavigate()
     const getSystemPublishList = (params?: ParamsType & {
         pageSize?: number | undefined;
         current?: number | undefined;
@@ -350,15 +347,6 @@ const SystemInsidePublicList:FC = ()=>{
     ]
 
     useEffect(() => {
-        setBreadcrumb([
-            {
-                title: $t('服务'),
-                onClick: () => navigateTo('/service/list')
-            },
-            {
-                title:$t('发布')
-            }
-        ])
         getMemberList()
         manualReloadTable()
     }, [serviceId]);

@@ -6,33 +6,21 @@ import { LoadingOutlined } from '@ant-design/icons'
 import EmptySVG from '@common/assets/empty.svg'
 import { $t } from '@common/locales/index.ts'
 import ApiDocument from '@common/components/aoplatform/ApiDocument.tsx'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { RouterParams } from '@core/components/aoplatform/RenderRoutes.tsx'
 import {
   AiServiceInsideApiDocumentHandle,
   AiServiceInsideApiDocumentProps,
   AiServiceApiDetail
 } from '@core/const/ai-service/type.ts'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext'
 
 const AiServiceInsideApiDocument = forwardRef<AiServiceInsideApiDocumentHandle, AiServiceInsideApiDocumentProps>(() => {
   const { serviceId, teamId } = useParams<RouterParams>()
   const { fetchData } = useFetch()
   const [apiDetail, setApiDetail] = useState<AiServiceApiDetail>()
   const [loading, setLoading] = useState<boolean>(false)
-  const { setBreadcrumb } = useBreadcrumb()
-  const navigator = useNavigate()
 
   useEffect(() => {
-    setBreadcrumb([
-      {
-        title: $t('服务'),
-        onClick: () => navigator('/service/list')
-      },
-      {
-        title: $t('API 文档')
-      }
-    ])
     getApiDetail()
   }, [])
 

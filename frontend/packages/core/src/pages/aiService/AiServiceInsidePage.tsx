@@ -14,6 +14,7 @@ import { cloneDeep } from 'lodash-es'
 import { FC, useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useAiServiceContext } from '../../contexts/AiServiceContext.tsx'
+import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 const APP_MODE = import.meta.env.VITE_APP_MODE
 
 const AiServiceInsidePage: FC = () => {
@@ -27,6 +28,7 @@ const AiServiceInsidePage: FC = () => {
   const [activeMenu, setActiveMenu] = useState<string>()
   const navigateTo = useNavigate()
   const [showMenu, setShowMenu] = useState<boolean>(false)
+  const { setBreadcrumb } = useBreadcrumb()
 
   const getAiServiceInfo = () => {
     fetchData<BasicResponse<{ service: AiServiceConfigFieldType }>>('service/info', {
@@ -77,7 +79,7 @@ const AiServiceInsidePage: FC = () => {
             'team.service.router.view'
           ),
           getItem(
-            <Link to="./api">{$t('API 文档')}</Link>,
+            <Link to="./api">{$t('API 路由文档')}</Link>,
             'api',
             undefined,
             undefined,
@@ -215,10 +217,19 @@ const AiServiceInsidePage: FC = () => {
   }, [accessData])
 
   useEffect(() => {
+    setBreadcrumb([
+      {
+        title: $t('服务'),
+        onClick: () => navigateTo('/service/list')
+      },
+      {
+        title: aiServiceInfo?.name || ''
+      }
+    ])
     if (activeMenu && serviceId === currentUrl.split('/')[currentUrl.split('/').length - 1]) {
       navigateTo(`/service/${teamId}/aiInside/${serviceId}/${activeMenu}`)
     }
-  }, [activeMenu])
+  }, [activeMenu, state.language, aiServiceInfo])
 
   useEffect(() => {
     serviceId && getAiServiceInfo()
