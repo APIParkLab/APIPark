@@ -1,8 +1,7 @@
 import PageList, { PageProColumns } from '@common/components/aoplatform/PageList.tsx'
 import { ActionType } from '@ant-design/pro-components'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
+import { useParams } from 'react-router-dom'
 import { App, Button, Modal, Select } from 'antd'
 import { BasicResponse, COLUMNS_TITLE, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const.tsx'
 import { useFetch } from '@common/hooks/http.ts'
@@ -59,7 +58,6 @@ export const addMemberToDepartment = (
 
 const TeamInsideMember: FC = () => {
   const [searchWord, setSearchWord] = useState<string>('')
-  const { setBreadcrumb } = useBreadcrumb()
   const { modal, message } = App.useApp()
   const { fetchData } = useFetch()
   const { teamId } = useParams<RouterParams>()
@@ -73,7 +71,6 @@ const TeamInsideMember: FC = () => {
   const [addMemberBtnDisabled, setAddMemberBtnDisabled] = useState<boolean>(true)
   const [allMemberSelectedDepartIds, setAllMemberSelectedDepartIds] = useState<string[]>([])
   const [roleList, setRoleList] = useState<EntityItem[]>([])
-  const navigator = useNavigate()
 
   const operation: PageProColumns<TeamMemberTableListItem>[] = [
     {
@@ -355,13 +352,6 @@ const TeamInsideMember: FC = () => {
   }, [teamId])
 
   useEffect(() => {
-    setBreadcrumb([
-      {
-        title: $t('团队'),
-        onClick: () => navigator('/team/list')
-      },
-      { title: $t('成员') }
-    ])
     getRoleList()
   }, [state.language])
 
