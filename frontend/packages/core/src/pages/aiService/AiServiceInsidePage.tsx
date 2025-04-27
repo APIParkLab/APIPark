@@ -79,7 +79,7 @@ const AiServiceInsidePage: FC = () => {
             'team.service.router.view'
           ),
           getItem(
-            <Link to="./api">{$t('API 路由文档')}</Link>,
+            <Link to="./api">{$t('API 文档')}</Link>,
             'api',
             undefined,
             undefined,
