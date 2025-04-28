@@ -5,8 +5,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/APIParkLab/APIPark/module/monitor"
+	monitor_dto "github.com/APIParkLab/APIPark/module/monitor/dto"
 
 	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
 
@@ -66,20 +70,72 @@ var (
 )
 
 type imlServiceController struct {
-	module          service.IServiceModule     `autowired:""`
-	docModule       service.IServiceDocModule  `autowired:""`
-	subscribeModule subscribe.ISubscribeModule `autowired:""`
-	aiAPIModule     ai_api.IAPIModule          `autowired:""`
-	routerModule    router.IRouterModule       `autowired:""`
-	apiDocModule    api_doc.IAPIDocModule      `autowired:""`
-	providerModule  ai.IProviderModule         `autowired:""`
-	aiLocalModel    ai_local.ILocalModelModule `autowired:""`
-	appModule       service.IAppModule         `autowired:""`
-	upstreamModule  upstream.IUpstreamModule   `autowired:""`
-	settingModule   system.ISettingModule      `autowired:""`
-	teamModule      team.ITeamModule           `autowired:""`
-	catalogueModule catalogue.ICatalogueModule `autowired:""`
-	transaction     store.ITransaction         `autowired:""`
+	module          service.IServiceModule          `autowired:""`
+	docModule       service.IServiceDocModule       `autowired:""`
+	subscribeModule subscribe.ISubscribeModule      `autowired:""`
+	aiAPIModule     ai_api.IAPIModule               `autowired:""`
+	routerModule    router.IRouterModule            `autowired:""`
+	apiDocModule    api_doc.IAPIDocModule           `autowired:""`
+	providerModule  ai.IProviderModule              `autowired:""`
+	aiLocalModel    ai_local.ILocalModelModule      `autowired:""`
+	appModule       service.IAppModule              `autowired:""`
+	upstreamModule  upstream.IUpstreamModule        `autowired:""`
+	settingModule   system.ISettingModule           `autowired:""`
+	teamModule      team.ITeamModule                `autowired:""`
+	catalogueModule catalogue.ICatalogueModule      `autowired:""`
+	monitorModule   monitor.IMonitorStatisticModule `autowired:""`
+	transaction     store.ITransaction              `autowired:""`
+}
+
+func (i *imlServiceController) AIChartOverview(ctx *gin.Context, serviceId string, start string, end string) (*monitor_dto.ChartAIOverview, error) {
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, err
+	}
+	if serviceId == "" {
+		return nil, fmt.Errorf("service is required")
+	}
+	return i.monitorModule.AIChartOverview(ctx, serviceId, s, e)
+}
+
+func (i *imlServiceController) RestChartOverview(ctx *gin.Context, serviceId string, start string, end string) (*monitor_dto.ChartRestOverview, error) {
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, err
+	}
+	if serviceId == "" {
+		return nil, fmt.Errorf("service is required")
+	}
+	return i.monitorModule.RestChartOverview(ctx, serviceId, s, e)
+}
+
+func formatTime(start string, end string) (int64, int64, error) {
+	s, err := strconv.ParseInt(start, 10, 64)
+	if err != nil {
+		return 0, 0, fmt.Errorf("parse start time %s error: %w", start, err)
+	}
+	e, err := strconv.ParseInt(end, 10, 64)
+	if err != nil {
+		return 0, 0, fmt.Errorf("parse end time %s error: %w", end, err)
+	}
+	return s, e, nil
+}
+
+func (i *imlServiceController) Top10(ctx *gin.Context, serviceId string, start string, end string) ([]*monitor_dto.TopN, []*monitor_dto.TopN, error) {
+	if serviceId == "" {
+		return nil, nil, fmt.Errorf("serviceId is required")
+	}
+	info, err := i.module.Get(ctx, serviceId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return i.monitorModule.Top(ctx, serviceId, s, e, 10, info.ServiceKind)
 }
 
 func (i *imlServiceController) QuickCreateAIService(ctx *gin.Context, input *service_dto.QuickCreateAIService) error {

@@ -138,3 +138,58 @@ type MonitorCluster struct {
 	Name   string `json:"name"`
 	Enable bool   `json:"enable"`
 }
+
+type ChartOverview struct {
+}
+
+type StatusCodeOverview struct {
+	Status2xx int64 `json:"2xx"` //状态码2xx数
+	Status4xx int64 `json:"4xx"`
+	Status5xx int64 `json:"5xx"` //状态码5xx数
+}
+
+type TokenOverview struct {
+	TotalToken  int64 `json:"total_token"` //总token流量
+	OutputToken int64 `json:"output_token"`
+	InputToken  int64 `json:"input_token"` //最小token流量
+}
+
+type ChartAIOverview struct {
+	RequestOverview                 []*StatusCodeOverview `json:"request_overview"`
+	AvgRequestPerSubscriber         string                `json:"avg_request_per_subscriber"`          //请求概况
+	AvgRequestPerSubscriberOverview []int64               `json:"avg_request_per_subscriber_overview"` //平均响应时间概况
+	RequestTotal                    string                `json:"request_total"`
+	TokenTotal                      string                `json:"token_total"`    //总token流量
+	TokenOverview                   []*TokenOverview      `json:"token_overview"` //token概况
+	AvgTokenOverview                []int64               `json:"avg_token_overview"`
+	AvgTokenPerSubscriberOverview   []*TokenOverview      `json:"avg_token_per_subscriber_overview"`
+	AvgToken                        string                `json:"avg_token"`
+	MaxToken                        string                `json:"max_token"`
+	MinToken                        string                `json:"min_token"`
+	AvgTokenPerSubscriber           string                `json:"avg_token_per_subscriber"`
+	Date                            []string              `json:"date"`
+}
+
+type ChartRestOverview struct {
+	RequestOverview                 []*StatusCodeOverview `json:"request_overview"` //请求概况
+	AvgRequestPerSubscriber         string                `json:"avg_request_per_subscriber"`
+	AvgRequestPerSubscriberOverview []int64               `json:"avg_request_per_subscriber_overview"` //平均响应时间概况
+	RequestTotal                    string                `json:"request_total"`
+	TrafficOverview                 []*StatusCodeOverview `json:"traffic_overview"`           //流量概况
+	AvgResponseTimeOverview         []int64               `json:"avg_response_time_overview"` //平均响应时间概况
+	AvgTrafficPerSubscriberOverview []int64               `json:"avg_traffic_per_subscriber_overview"`
+	TrafficTotal                    string                `json:"traffic_total"`
+	AvgResponseTime                 string                `json:"avg_response_time"` //平均响应时间
+	MaxResponseTime                 string                `json:"max_response_time"` //最大响应时间
+	MinResponseTime                 string                `json:"min_response_time"` //最小响应时间
+	AvgTrafficPerSubscriber         string                `json:"avg_traffic_per_subscriber"`
+	Date                            []string              `json:"date"`
+}
+
+type TopN struct {
+	Id      string `json:"id"`
+	Name    string `json:"name"`
+	Request string `json:"request"`
+	Traffic string `json:"traffic,omitempty"`
+	Token   string `json:"token,omitempty"`
+}

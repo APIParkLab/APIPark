@@ -22,6 +22,11 @@ type IMonitorStatisticController interface {
 
 	InvokeTrendInner(ctx *gin.Context, dataType string, typ string, api string, provider string, subscriber string, input *monitor_dto.CommonInput) (*monitor_dto.MonInvokeCountTrend, string, error)
 	StatisticsInner(ctx *gin.Context, dataType string, typ string, id string, input *monitor_dto.StatisticInput) (interface{}, error)
+
+	ChartRestOverview(ctx *gin.Context, start string, end string) (*monitor_dto.ChartRestOverview, error)
+	ChartAIOverview(ctx *gin.Context, start string, end string) (*monitor_dto.ChartAIOverview, error)
+	AITopN(ctx *gin.Context, start string, end string, limit string) ([]*monitor_dto.TopN, []*monitor_dto.TopN, error)
+	RestTopN(ctx *gin.Context, start string, end string, limit string) ([]*monitor_dto.TopN, []*monitor_dto.TopN, error)
 }
 
 type IMonitorConfigController interface {

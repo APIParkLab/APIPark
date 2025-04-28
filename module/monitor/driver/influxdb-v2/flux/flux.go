@@ -14,7 +14,7 @@ import (
 type IFluxQuery interface {
 	CommonStatistics(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, groupBy, filters string, statisticsConf []*StatisticsFilterConf, limit int) (map[string]*FluxStatistics, error)
 	CommonProxyStatistics(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, groupBy, filters string, statisticsConf []*StatisticsFilterConf, limit int) (map[string]*FluxStatistics, error)
-	CommonTendency(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, table, filters string, dataFields []string, every, windowOffset string) ([]time.Time, map[string][]int64, error)
+	CommonTendency(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, table, filters string, dataFields []string, every, windowOffset string, fn AggregateFn) ([]time.Time, map[string][]int64, error)
 	// CommonQueryOnce 查询只返回一条结果
 	CommonQueryOnce(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, filters string, fieldsConf *StatisticsFilterConf) (map[string]interface{}, error)
 	CommonWarnStatistics(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, groupBy, filters string, statisticsConf *StatisticsFilterConf) (map[string]*FluxWarnStatistics, error)
@@ -61,6 +61,9 @@ func (f *fluxQuery) CommonStatistics(ctx context.Context, queryApi api.QueryAPI,
 		totalRequest := common.FmtIntFromInterface(maps["request"])
 		maxRequest := common.FmtIntFromInterface(maps["request_max"])
 		minRequest := common.FmtIntFromInterface(maps["request_min"])
+		totalToken := common.FmtIntFromInterface(maps["total_token"])
+		maxToken := common.FmtIntFromInterface(maps["total_token_max"])
+		minToken := common.FmtIntFromInterface(maps["total_token_min"])
 
 		resultMap[key] = &FluxStatistics{
 			Total:        total,
@@ -73,6 +76,9 @@ func (f *fluxQuery) CommonStatistics(ctx context.Context, queryApi api.QueryAPI,
 			TotalRequest: totalRequest,
 			RequestMax:   maxRequest,
 			RequestMin:   minRequest,
+			TotalToken:   totalToken,
+			TokenMax:     maxToken,
+			TokenMin:     minToken,
 		}
 	}
 
@@ -128,10 +134,10 @@ func (f *fluxQuery) CommonProxyStatistics(ctx context.Context, queryApi api.Quer
 	return resultMap, nil
 }
 
-func (f *fluxQuery) CommonTendency(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, table, filters string, dataFields []string, every, windowOffset string) ([]time.Time, map[string][]int64, error) {
+func (f *fluxQuery) CommonTendency(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, table, filters string, dataFields []string, every, windowOffset string, fn AggregateFn) ([]time.Time, map[string][]int64, error) {
 	fieldConditions := f.assembleTendencyFieldCondition(dataFields)
 	//拼装请求
-	query := f.assembleTendencyFlux(start, end, bucket, table, filters, fieldConditions, every, windowOffset)
+	query := f.assembleTendencyFlux(start, end, bucket, table, filters, fieldConditions, every, windowOffset, fn)
 
 	log.Info("flux sql=", query)
 	result, err := queryApi.Query(ctx, query)
@@ -148,15 +154,12 @@ func (f *fluxQuery) CommonTendency(ctx context.Context, queryApi api.QueryAPI, s
 	//初始返回内容
 	dates := make([]time.Time, 0, len(resultList))
 	resultMap := make(map[string][]int64, len(dataFields))
-	for _, field := range dataFields {
-		resultMap[field] = make([]int64, 0, len(resultList))
-	}
-
 	for _, res := range resultList {
 		for _, field := range dataFields {
 			resultMap[field] = append(resultMap[field], common.FmtIntFromInterface(res[field]))
 		}
 		t, _ := res["_time"].(time.Time)
+
 		dates = append(dates, t)
 	}
 
@@ -270,7 +273,7 @@ from(bucket: "%s")
 	}
 
 	return fmt.Sprintf(`
-union(tables: [ 
+union(tables: [
 %s
 ])
 |> pivot(rowKey: ["%s"], columnKey: ["_field"], valueColumn: "_value")
@@ -278,20 +281,41 @@ union(tables: [
 `, strings.Join(streams, ",\n"), groupBy, limitStr)
 }
 
-func (f *fluxQuery) assembleTendencyFlux(start, end time.Time, bucket, table, filters, fieldConditions, every string, windowOffset string) string {
+type AggregateFn string
+
+const (
+	SumFn AggregateFn = "sum"
+	MaxFn AggregateFn = "max"
+	MinFn AggregateFn = "min"
+	AvgFn AggregateFn = "mean"
+)
+
+var (
+	fns = map[AggregateFn]struct{}{
+		SumFn: {},
+		MaxFn: {},
+		MinFn: {},
+	}
+)
+
+func (f *fluxQuery) assembleTendencyFlux(start, end time.Time, bucket, table, filters, fieldConditions, every, windowOffset string, fn AggregateFn) string {
 	windowOffsetFlux := ""
 	if windowOffset != "" {
 		windowOffsetFlux = fmt.Sprintf(", offset: %s", windowOffset)
 	}
+	if _, ok := fns[fn]; !ok {
+		fn = SumFn
+	}
+
 	return fmt.Sprintf(`from(bucket: "%s")
   |> range(start: %d, stop: %d)
   |> filter(fn: (r) => r["_measurement"] == "%s")
   %s
   %s
   |> group(columns: ["_field"])
-  |> aggregateWindow(every: %s, fn: sum, location: {offset: 0ns, zone: "Asia/Shanghai"}, timeSrc: "_start"%s)
+  |> aggregateWindow(every: %s, fn: %s, location: {offset: 0ns, zone: "Asia/Shanghai"}, timeSrc: "_start"%s)
   |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")`, bucket, start.Unix(), end.Unix(), table,
-		filters, fieldConditions, every, windowOffsetFlux)
+		filters, fieldConditions, every, string(fn), windowOffsetFlux)
 
 }
 
