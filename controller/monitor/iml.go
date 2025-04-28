@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/APIParkLab/APIPark/module/monitor"
@@ -15,6 +16,66 @@ var (
 
 type imlMonitorStatisticController struct {
 	module monitor.IMonitorStatisticModule `autowired:""`
+}
+
+func (i *imlMonitorStatisticController) ChartRestOverview(ctx *gin.Context, start string, end string) (*monitor_dto.ChartRestOverview, error) {
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, err
+	}
+	return i.module.RestChartOverview(ctx, "", s, e)
+}
+
+func (i *imlMonitorStatisticController) ChartAIOverview(ctx *gin.Context, start string, end string) (*monitor_dto.ChartAIOverview, error) {
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, err
+	}
+	return i.module.AIChartOverview(ctx, "", s, e)
+}
+
+func (i *imlMonitorStatisticController) AITopN(ctx *gin.Context, start string, end string, limit string) ([]*monitor_dto.TopN, []*monitor_dto.TopN, error) {
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, nil, err
+	}
+	l, err := strconv.Atoi(limit)
+	if err != nil {
+		if limit == "" {
+			l = 10
+		} else {
+			return nil, nil, fmt.Errorf("parse limit %s error: %w", limit, err)
+		}
+	}
+	return i.module.Top(ctx, "", s, e, l, "ai")
+}
+
+func formatTime(start string, end string) (int64, int64, error) {
+	s, err := strconv.ParseInt(start, 10, 64)
+	if err != nil {
+		return 0, 0, fmt.Errorf("parse start time %s error: %w", start, err)
+	}
+	e, err := strconv.ParseInt(end, 10, 64)
+	if err != nil {
+		return 0, 0, fmt.Errorf("parse end time %s error: %w", end, err)
+	}
+	return s, e, nil
+}
+
+func (i *imlMonitorStatisticController) RestTopN(ctx *gin.Context, start string, end string, limit string) ([]*monitor_dto.TopN, []*monitor_dto.TopN, error) {
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, nil, err
+	}
+	l, err := strconv.Atoi(limit)
+	if err != nil {
+		if limit == "" {
+			l = 10
+		} else {
+			return nil, nil, fmt.Errorf("parse limit %s error: %w", limit, err)
+		}
+	}
+	return i.module.Top(ctx, "", s, e, l, "rest")
 }
 
 func (i *imlMonitorStatisticController) Statistics(ctx *gin.Context, dataType string, input *monitor_dto.StatisticInput) (interface{}, error) {

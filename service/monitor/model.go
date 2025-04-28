@@ -157,3 +157,29 @@ type MonTrendValues struct {
 	Names  []string
 	Values [][]interface{}
 }
+
+type StatusCodeOverview struct {
+	Status2xx   int64
+	Status4xx   int64
+	Status5xx   int64
+	StatusTotal int64
+}
+
+type TokenOverview struct {
+	InputToken  int64
+	OutputToken int64
+	TotalToken  int64
+}
+
+type TopN struct {
+	Key     string
+	Request int64
+	Token   int64
+	Traffic int64
+}
+
+type Aggregate struct {
+	Max int64
+	Min int64
+	Avg int64
+}

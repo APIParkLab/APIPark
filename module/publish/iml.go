@@ -66,28 +66,28 @@ type imlPublishModule struct {
 
 func (m *imlPublishModule) initGateway(ctx context.Context, partitionId string, clientDriver gateway.IClientDriver) error {
 	return nil
-	projects, err := m.serviceService.List(ctx)
-	if err != nil {
-		return err
-	}
-	projectIds := utils.SliceToSlice(projects, func(p *service.Service) string {
-		return p.Id
-	})
-	for _, projectId := range projectIds {
-		releaseInfo, err := m.GetProjectRelease(ctx, projectId, partitionId)
-		if err != nil {
-			return err
-		}
-		if releaseInfo == nil {
-			continue
-		}
-
-		err = clientDriver.Project().Online(ctx, releaseInfo)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	//projects, err := m.serviceService.List(ctx)
+	//if err != nil {
+	//	return err
+	//}
+	//projectIds := utils.SliceToSlice(projects, func(p *service.Service) string {
+	//	return p.Id
+	//})
+	//for _, projectId := range projectIds {
+	//	releaseInfo, err := m.GetProjectRelease(ctx, projectId, partitionId)
+	//	if err != nil {
+	//		return err
+	//	}
+	//	if releaseInfo == nil {
+	//		continue
+	//	}
+	//
+	//	err = clientDriver.Project().Online(ctx, releaseInfo)
+	//	if err != nil {
+	//		return err
+	//	}
+	//}
+	//return nil
 }
 
 func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID string, commitId string) (*gateway.ProjectRelease, error) {
@@ -109,6 +109,10 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 		case release.CommitStrategy:
 			strategyCommitIds = append(strategyCommitIds, c.Commit)
 		}
+	}
+	serviceInfo, err := m.serviceService.Get(ctx, projectID)
+	if err != nil {
+		return nil, err
 	}
 
 	apiInfos, err := m.apiService.ListInfo(ctx, apiIds...)
@@ -140,6 +144,9 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 			},
 			Path:    a.Path,
 			Methods: a.Methods,
+			Labels: map[string]string{
+				"api_kind": serviceInfo.Kind.String(),
+			},
 			//Service: a.Upstream,
 		}
 		if hasUpstream {

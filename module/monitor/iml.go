@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/APIParkLab/APIPark/gateway"
@@ -41,6 +42,374 @@ type imlMonitorStatisticModule struct {
 	clusterService               cluster.IClusterService         `autowired:""`
 	monitorService               monitor.IMonitorService         `autowired:""`
 	apiService                   api.IAPIService                 `autowired:""`
+}
+
+func (i *imlMonitorStatisticModule) genOverviewWhere(ctx context.Context, serviceId string, apiKind []string) ([]monitor.MonWhereItem, error) {
+	clusterId := cluster.DefaultClusterID
+	_, err := i.clusterService.Get(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+	wheres, err := i.genCommonWheres(ctx, clusterId)
+	if err != nil {
+		return nil, err
+	}
+	if serviceId != "" {
+		wheres = append(wheres, monitor.MonWhereItem{
+			Key:       "provider",
+			Operation: "=",
+			Values:    []string{serviceId},
+		})
+	}
+	if len(apiKind) > 0 {
+		wheres = append(wheres, monitor.MonWhereItem{
+			Key:       "api_kind",
+			Operation: "in",
+			Values:    apiKind,
+		})
+	}
+	return wheres, nil
+}
+
+func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, serviceId string, start int64, end int64) (*monitor_dto.ChartAIOverview, error) {
+	wheres, err := i.genOverviewWhere(ctx, serviceId, []string{"ai"})
+	if err != nil {
+		return nil, err
+	}
+	executor, err := i.getExecutor(ctx, cluster.DefaultClusterID)
+	if err != nil {
+		return nil, err
+	}
+
+	serviceIds := make([]string, 0)
+	// 从数据库中获取相关信息
+	if serviceId == "" {
+		// 获取全部服务
+		list, err := i.serviceService.ServiceListByKind(ctx, service.AIService)
+		if err != nil {
+
+			return nil, err
+		}
+		serviceIds = utils.SliceToSlice(list, func(t *service.Service) string {
+			return t.Id
+		})
+	} else {
+		serviceIds = append(serviceIds, serviceId)
+	}
+	appMap := make(map[string]struct{})
+	for _, sId := range serviceIds {
+		items, err := i.subscribeService.ListBySubscribeStatus(ctx, sId, subscribe.ApplyStatusSubscribe)
+		if err != nil {
+			return nil, err
+		}
+		for _, item := range items {
+			appMap[item.Application] = struct{}{}
+		}
+	}
+	subscriberNum := int64(len(appMap))
+	var wg sync.WaitGroup
+	wg.Add(2)
+	errChan := make(chan error, 2)
+	result := new(monitor_dto.ChartAIOverview)
+	go func() {
+		defer wg.Done()
+		date, summary, items, err := executor.RequestOverview(ctx, formatTimeByMinute(start), formatTimeByMinute(end), wheres)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		result.Date = utils.SliceToSlice(date, func(t time.Time) string {
+			return t.Format("2006/01/02 15:04")
+		})
+		result.AvgRequestPerSubscriberOverview = make([]int64, 0, len(items))
+		result.RequestOverview = make([]*monitor_dto.StatusCodeOverview, 0, len(items))
+		for _, item := range items {
+			result.AvgRequestPerSubscriberOverview = append(result.AvgRequestPerSubscriberOverview, item.StatusTotal/subscriberNum)
+			result.RequestOverview = append(result.RequestOverview, &monitor_dto.StatusCodeOverview{
+				Status2xx: item.Status2xx,
+				Status4xx: item.Status4xx,
+				Status5xx: item.Status5xx,
+			})
+		}
+		result.AvgRequestPerSubscriber = formatCount(summary.StatusTotal / subscriberNum)
+		result.RequestTotal = formatCount(summary.StatusTotal)
+	}()
+
+	go func() {
+		defer wg.Done()
+		startTime := formatTimeByMinute(start)
+		endTime := formatTimeByMinute(end)
+		_, summary, items, err := executor.TokenOverview(ctx, startTime, endTime, wheres)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		timeInterval := getTimeInterval(startTime, endTime)
+		result.TokenOverview = make([]*monitor_dto.TokenOverview, 0, len(items))
+		result.AvgTokenOverview = make([]int64, 0, len(items))
+		result.AvgTokenPerSubscriberOverview = make([]*monitor_dto.TokenOverview, 0, len(items))
+		var maxToken, minToken int64 = 0, 0
+		for _, item := range items {
+			if maxToken < item.TotalToken {
+				maxToken = item.TotalToken
+			}
+			if minToken == 0 || minToken > item.TotalToken {
+				minToken = item.TotalToken
+			}
+			result.TokenOverview = append(result.TokenOverview, &monitor_dto.TokenOverview{
+				TotalToken:  item.TotalToken,
+				OutputToken: item.OutputToken,
+				InputToken:  item.InputToken,
+			})
+			result.AvgTokenOverview = append(result.AvgTokenOverview, item.TotalToken/timeInterval)
+			result.AvgTokenPerSubscriberOverview = append(result.AvgTokenPerSubscriberOverview, &monitor_dto.TokenOverview{
+				TotalToken:  item.TotalToken / subscriberNum,
+				OutputToken: item.OutputToken / subscriberNum,
+				InputToken:  item.InputToken / subscriberNum,
+			})
+
+		}
+		result.AvgTokenPerSubscriber = formatCount(summary.TotalToken / subscriberNum)
+		result.MaxToken = fmt.Sprintf("%s/s", formatCount(maxToken/timeInterval))
+		result.MinToken = fmt.Sprintf("%s/s", formatCount(minToken/timeInterval))
+		result.AvgToken = fmt.Sprintf("%s/s", formatCount(summary.OutputToken/timeInterval))
+		result.TokenTotal = formatCount(summary.TotalToken)
+	}()
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
+	errs := make([]error, 0, 2)
+	// 收集错误
+	for err := range errChan {
+		errs = append(errs, err)
+	}
+
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("errors occurred: %v", errs)
+	}
+	return result, nil
+}
+
+func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, serviceId string, start int64, end int64) (*monitor_dto.ChartRestOverview, error) {
+	wheres, err := i.genOverviewWhere(ctx, serviceId, []string{"rest"})
+	if err != nil {
+		return nil, err
+	}
+	executor, err := i.getExecutor(ctx, cluster.DefaultClusterID)
+	if err != nil {
+		return nil, err
+	}
+
+	serviceIds := make([]string, 0)
+	// 从数据库中获取相关信息
+	if serviceId == "" {
+		// 获取全部服务
+		list, err := i.serviceService.ServiceListByKind(ctx, service.RestService)
+		if err != nil {
+			return nil, err
+		}
+		serviceIds = utils.SliceToSlice(list, func(t *service.Service) string {
+			return t.Id
+		})
+	} else {
+		serviceIds = append(serviceIds, serviceId)
+	}
+	appMap := make(map[string]struct{})
+	for _, sId := range serviceIds {
+		items, err := i.subscribeService.ListBySubscribeStatus(ctx, sId, subscribe.ApplyStatusSubscribe)
+		if err != nil {
+			return nil, err
+		}
+		for _, item := range items {
+			appMap[item.Id] = struct{}{}
+		}
+	}
+	subscriberNum := int64(len(appMap))
+	var wg sync.WaitGroup
+	wg.Add(3)
+	errChan := make(chan error, 2)
+	result := new(monitor_dto.ChartRestOverview)
+	go func() {
+		defer wg.Done()
+		date, summary, items, err := executor.RequestOverview(ctx, formatTimeByMinute(start), formatTimeByMinute(end), wheres)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		result.Date = utils.SliceToSlice(date, func(t time.Time) string {
+			return t.Format("2006/01/02 15:04")
+		})
+		result.AvgRequestPerSubscriberOverview = make([]int64, 0, len(items))
+		result.RequestOverview = make([]*monitor_dto.StatusCodeOverview, 0, len(items))
+		for _, item := range items {
+			result.AvgRequestPerSubscriberOverview = append(result.AvgRequestPerSubscriberOverview, item.StatusTotal/int64(subscriberNum))
+			result.RequestOverview = append(result.RequestOverview, &monitor_dto.StatusCodeOverview{
+				Status2xx: item.Status2xx,
+				Status4xx: item.Status4xx,
+				Status5xx: item.Status5xx,
+			})
+		}
+		result.AvgRequestPerSubscriber = formatCount(summary.StatusTotal / subscriberNum)
+		result.RequestTotal = formatCount(summary.StatusTotal)
+	}()
+
+	go func() {
+		defer wg.Done()
+		startTime := formatTimeByMinute(start)
+		endTime := formatTimeByMinute(end)
+		_, summary, items, err := executor.AvgResponseTimeOverview(ctx, startTime, endTime, wheres)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		result.AvgResponseTimeOverview = items
+		result.AvgResponseTime = fmt.Sprintf("%dms", summary.Avg)
+		result.MaxResponseTime = fmt.Sprintf("%dms", summary.Max)
+		result.MinResponseTime = fmt.Sprintf("%dms", summary.Min)
+	}()
+
+	go func() {
+		defer wg.Done()
+		startTime := formatTimeByMinute(start)
+		endTime := formatTimeByMinute(end)
+		_, summary, items, err := executor.TrafficOverviewByStatusCode(ctx, startTime, endTime, wheres)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		result.TrafficOverview = make([]*monitor_dto.StatusCodeOverview, 0, len(items))
+		result.AvgTrafficPerSubscriberOverview = make([]int64, 0, len(items))
+		for _, item := range items {
+			result.TrafficOverview = append(result.TrafficOverview, &monitor_dto.StatusCodeOverview{
+				Status2xx: item.Status2xx,
+				Status4xx: item.Status4xx,
+				Status5xx: item.Status5xx,
+			})
+			result.AvgTrafficPerSubscriberOverview = append(result.AvgTrafficPerSubscriberOverview, item.StatusTotal/subscriberNum)
+		}
+		result.AvgTrafficPerSubscriber = formatCount(summary.StatusTotal / subscriberNum)
+	}()
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
+	errs := make([]error, 0, 3)
+	// 收集错误
+	for err := range errChan {
+		errs = append(errs, err)
+	}
+
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("errors occurred: %v", errs)
+	}
+	return result, nil
+}
+
+func generateTopN(id string, name string, item *monitor.TopN, apiKind string) *monitor_dto.TopN {
+	n := &monitor_dto.TopN{
+		Id:      id,
+		Name:    name,
+		Request: formatCount(item.Request),
+	}
+	switch apiKind {
+	case "rest":
+		n.Traffic = formatByte(item.Traffic)
+	case "ai":
+		n.Token = formatCount(item.Token)
+	}
+	return n
+}
+
+func (i *imlMonitorStatisticModule) Top(ctx context.Context, serviceId string, start int64, end int64, limit int, apiKind string) ([]*monitor_dto.TopN, []*monitor_dto.TopN, error) {
+	wheres, err := i.genOverviewWhere(ctx, serviceId, []string{apiKind})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	executor, err := i.getExecutor(ctx, cluster.DefaultClusterID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	errChan := make(chan error, 2)
+	var wg sync.WaitGroup
+	apisResult, consumersResult := make([]*monitor_dto.TopN, 0), make([]*monitor_dto.TopN, 0)
+	var errs []error
+
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		result, err := executor.TopN(ctx, formatTimeByMinute(start), formatTimeByMinute(end), limit, "api", wheres)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		if len(result) < 1 {
+			return
+		}
+		apiIds := utils.SliceToSlice(result, func(t *monitor.TopN) string {
+			return t.Key
+		})
+		apis, err := i.apiService.ListInfo(ctx, apiIds...)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		apiMap := utils.SliceToMap(apis, func(t *api.Info) string {
+			return t.UUID
+		})
+		for _, item := range result {
+			if v, ok := apiMap[item.Key]; ok {
+				apisResult = append(apisResult, generateTopN(v.UUID, v.Name, item, apiKind))
+			}
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		result, err := executor.TopN(ctx, formatTimeByMinute(start), formatTimeByMinute(end), limit, "app", wheres)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		if len(result) < 1 {
+			return
+		}
+		appIds := utils.SliceToSlice(result, func(t *monitor.TopN) string {
+			return t.Key
+		})
+		apps, err := i.serviceService.AppList(ctx, appIds...)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		appMap := utils.SliceToMap(apps, func(t *service.Service) string {
+			return t.Id
+		})
+		for _, item := range result {
+			if v, ok := appMap[item.Key]; ok {
+				consumersResult = append(consumersResult, generateTopN(v.Id, v.Name, item, apiKind))
+			}
+		}
+	}()
+
+	// 收集所有错误
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
+
+	// 收集错误
+	for err := range errChan {
+		errs = append(errs, err)
+	}
+
+	if len(errs) > 0 {
+		return nil, nil, fmt.Errorf("errors occurred: %v", errs)
+	}
+	return apisResult, consumersResult, nil
 }
 
 func (i *imlMonitorStatisticModule) ApiStatistics(ctx context.Context, input *monitor_dto.StatisticInput) ([]*monitor_dto.ApiStatisticBasicItem, error) {

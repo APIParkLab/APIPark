@@ -11,6 +11,7 @@ import (
 
 type Item struct {
 	Id          string         `json:"id"`
+	Name        string         `json:"name"`
 	Methods     []string       `json:"methods"`
 	Protocols   []string       `json:"protocols"`
 	Path        string         `json:"request_path"`
