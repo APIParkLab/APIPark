@@ -115,7 +115,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
         .then((response) => {
           const { code, data, msg } = response
           if (code === STATUS_CODE.SUCCESS) {
-            const { disable, protocols, path, methods, description, match, proxy } = data.router
+            const { disable, protocols, path, name, methods, description, match, proxy } = data.router
             let newPath = path
             let pathMatch = 'full'
             if (prefixForce && path?.startsWith(apiPrefix + '/')) {
@@ -128,6 +128,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
             form.setFieldsValue({
               disable,
               protocols,
+              name,
               path: newPath,
               pathMatch,
               methods,
