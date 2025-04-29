@@ -190,6 +190,25 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
       setChartOption(dataInfo)
     }
   }, [dataInfo, JSON.stringify(dataInfo)])
+  
+  // 添加窗口大小变化监听，实现自适应
+  useEffect(() => {
+    // 定义resize处理函数
+    const handleResize = () => {
+      const echartsInstance = chartRef.current?.getEchartsInstance()
+      if (echartsInstance) {
+        echartsInstance.resize()
+      }
+    }
+    
+    // 添加监听
+    window.addEventListener('resize', handleResize)
+    
+    // 组件卸载时移除监听
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
   return (
     <div className={`w-full ${customClassNames}`}>
       <div className="absolute top-[10px] left-[10px] w-full">

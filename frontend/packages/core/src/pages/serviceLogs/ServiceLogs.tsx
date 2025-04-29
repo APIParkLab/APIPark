@@ -11,7 +11,7 @@ import { BasicResponse, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const'
 import { useFetch } from '@common/hooks/http'
 import LogDetail, { HttpStatusColor } from './LogDetail'
 import { useParams } from 'react-router-dom'
-import { ActionType } from '@ant-design/pro-components'
+import { ActionType, ParamsType } from '@ant-design/pro-components'
 import { getTime } from '@dashboard/utils/dashboard'
 
 export type LogItem = {
@@ -66,9 +66,7 @@ const ServiceLogs = ({ serviceType }: { serviceType: 'aiService' | 'restService'
       if (x.dataIndex === 'status') {
         x.render = (text: any, record: any) => (
           <>
-            <div className="w-full">
-              {renderStatusWithColor(record.status)}
-            </div>
+            <div className="w-full">{renderStatusWithColor(record.status)}</div>
           </>
         )
       }
@@ -79,73 +77,62 @@ const ServiceLogs = ({ serviceType }: { serviceType: 'aiService' | 'restService'
     })
   }, [state.language])
 
-    /**
-     * 根据状态码返回对应颜色的文本
-     * @param status 状态
-     * @returns
-     */
-    const renderStatusWithColor = (status: string | number) => {
-      // 获取状态码首位数字
-      const firstDigit = status.toString().charAt(0)
-      let color = ''
-      switch (firstDigit) {
-        case '2':
-          color = HttpStatusColor.SUCCESS
-          break
-        case '4':
-          color = HttpStatusColor.CLIENT_ERROR
-          break
-        case '5':
-          color = HttpStatusColor.SERVER_ERROR
-          break
-        default:
-          break
-      }
-      return color ? <span style={{ color }}>{status}</span> : status
+  /**
+   * 根据状态码返回对应颜色的文本
+   * @param status 状态
+   * @returns
+   */
+  const renderStatusWithColor = (status: string | number) => {
+    // 获取状态码首位数字
+    const firstDigit = status.toString().charAt(0)
+    let color = ''
+    switch (firstDigit) {
+      case '2':
+        color = HttpStatusColor.SUCCESS
+        break
+      case '4':
+        color = HttpStatusColor.CLIENT_ERROR
+        break
+      case '5':
+        color = HttpStatusColor.SERVER_ERROR
+        break
+      default:
+        break
     }
+    return color ? <span style={{ color }}>{status}</span> : status
+  }
 
   /**
    * 获取 AI 列表数据
    * @param dataType
    * @returns
    */
-  const getAiServiceLogList = () => {
+  const getAiServiceLogList = (
+    params: ParamsType & {
+      pageSize?: number | undefined
+      current?: number | undefined
+      keyword?: string | undefined
+    }
+  ) => {
     return fetchData<BasicResponse<{ log: LogItem[] }>>(`service/logs/ai`, {
       method: 'GET',
       eoParams: {
         service: serviceId,
         team: teamId,
         start: timeRange?.start,
-        end: timeRange?.end
+        end: timeRange?.end,
+        page: params?.current,
+        page_size:params?.pageSize
       },
-      eoTransformKeys: ['log_time', 'response_time', 'token_per_second'],
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      eoTransformKeys: ['log_time', 'response_time', 'token_per_second']
     })
       .then((response) => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           // 保存数据
           return {
-            data: [
-              {
-                id: '123123',
-                api: {
-                  id: '444',
-                  name: 'api1'
-                },
-                ip: '127.0.0.1',
-                status: 200,
-                logTime: '2023-01-01 00:00:00',
-                token: 123,
-                consumers: {
-                  id: '333',
-                  name: 'consumers333'
-                },
-                model: 'GPT444',
-                tokenPerSecond: '123m/s'
-              }
-            ],
-            total: 1,
+            data: data.logs,
+            total: data.total,
             success: true
           }
         } else {
@@ -162,44 +149,33 @@ const ServiceLogs = ({ serviceType }: { serviceType: 'aiService' | 'restService'
    * @param dataType
    * @returns
    */
-  const getRestServiceLogList = () => {
+  const getRestServiceLogList = (
+    params: ParamsType & {
+      pageSize?: number | undefined
+      current?: number | undefined
+      keyword?: string | undefined
+    }
+  ) => {
+    console.log('params===', params)
     return fetchData<BasicResponse<{ log: LogItem[] }>>(`service/logs/rest`, {
       method: 'GET',
       eoParams: {
         service: serviceId,
         team: teamId,
         start: timeRange?.start,
-        end: timeRange?.end
+        end: timeRange?.end,
+        page: params?.current,
+        page_size:params?.pageSize
       },
-      eoTransformKeys: ['log_time', 'response_time', 'token_per_second'],
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      eoTransformKeys: ['log_time', 'response_time', 'token_per_second']
     })
       .then((response) => {
         const { code, data, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
-          const data = []
-          for (let i = 0; i < 100; i++) {
-            data.push({
-              id: '123123' + i,
-              api: {
-                id: '444' + i,
-                name: 'api1' + i
-              },
-              ip: '127.0.0.1',
-              status: 200,
-              logTime: '2023-01-01 00:00:00',
-              responseTime: '1111-01-01 00:00:00',
-              traffic: '123',
-              consumers: {
-                id: '123' + i,
-                name: 'consumers222' + i
-              }
-            })
-          }
           // 保存数据
           return {
-            data: data,
-            total: data.length,
+            data: data.logs,
+            total: data.total,
             success: true
           }
         } else {
@@ -260,7 +236,13 @@ const ServiceLogs = ({ serviceType }: { serviceType: 'aiService' | 'restService'
             id={`${serviceType}_logs`}
             columns={[...columns]}
             minVirtualHeight={430}
-            request={async () => (serviceType === 'aiService' ? getAiServiceLogList() : getRestServiceLogList())}
+            request={async (
+              params: ParamsType & {
+                pageSize?: number | undefined
+                current?: number | undefined
+                keyword?: string | undefined
+              }
+            ) => (serviceType === 'aiService' ? getAiServiceLogList(params) : getRestServiceLogList(params))}
             onRowClick={(row: LogItem) => handleRowClick(row)}
           />
         </div>
