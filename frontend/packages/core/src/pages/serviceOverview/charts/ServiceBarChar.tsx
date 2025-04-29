@@ -34,7 +34,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
     const isNumberArray = typeof dataInfo.data[0] !== 'object'
     const legendData = isNumberArray ? [dataInfo.title] : dataInfo.data.map((item) => item.name)
     const tooltipFormatter = (params: { name: string; color: string; seriesIndex?: number }) => {
-      let tooltipContent = `<div style="width:140px;padding:8px;">
+      let tooltipContent = `<div style="min-width:140px;padding:8px;">
                           <div>${isNumberArray ? '' : params.name}</div>`
       const data = isNumberArray
         ? [
@@ -52,8 +52,8 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
         const value = item.value[dataInfo.date.indexOf(params.name)] || 0
 
         const marker = `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${color};"></span>`
-        tooltipContent += `<div style="margin-top: ${index === 0 ? 8 : 4}px;">
-                          ${marker} ${name} <span style="float:right;font-weight:bold;">${value}</span>
+        tooltipContent += `<div style="margin-top: ${index === 0 ? 8 : 4}px; display: flex; justify-content: space-between; align-items: center;">
+                          <div>${marker} ${name}</div> <div style="font-weight:bold; margin-left: 20px;">${value}</div>
                         </div>`
       })
 

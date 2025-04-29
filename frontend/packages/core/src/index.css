@@ -1164,11 +1164,11 @@ p{
 .ranking-list .ant-table-tbody:not(tbody) .ant-table-cell{
   padding: 10px 10px !important;
 }
-.ranking-list .ant-table-header .ant-table-thead th{
+.ranking-list .ant-table-container .ant-table-thead th{
   background-color: #fff !important;
   padding: 10px 10px !important;
 }
-.ranking-list .ant-table-header .ant-table-thead th::before{
+.ranking-list .ant-table-container .ant-table-thead th::before{
   display: none;
 }
 

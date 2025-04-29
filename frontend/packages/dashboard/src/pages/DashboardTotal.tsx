@@ -63,130 +63,18 @@ export default function DashboardTotal() {
         'min_token',
         'max_token',
         'avg_request_per_subscriber',
-        'avg_token_per_subscriber'
-      ],
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+        'avg_token_per_subscriber',
+        'input_token',
+        'output_token',
+        'total_token'
+      ]
     }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
-        const serviceOverview = {
-          requestOverview: [
-            {
-              '2xx': 1.0,
-              '4xx': 2.0,
-              '5xx': 3.0,
-              fsdf: 4.0
-            },
-            {
-              '2xx': 2.0,
-              '4xx': 3.0,
-              '5xx': 4.0,
-              fsdf: 5.0
-            },
-            {
-              '2xx': 3.0,
-              '4xx': 4.0,
-              '5xx': 5.0,
-              fsdf: 6.0
-            },
-            {
-              '2xx': 4.0,
-              '4xx': 5.0,
-              '5xx': 6.0,
-              fsdf: 7.0
-            },
-            {
-              '2xx': 5.0,
-              '4xx': 6.0,
-              '5xx': 7.0,
-              fsdf: 8.0
-            },
-            {
-              '2xx': 6.0,
-              '4xx': 7.0,
-              '5xx': 8.0,
-              fsdf: 9.0
-            }
-          ],
-          tokenOverview: [
-            {
-              '2xx': 1.0,
-              '4xx': 2.0,
-              '5xx': 3.0
-            },
-            {
-              '2xx': 2.0,
-              '4xx': 3.0,
-              '5xx': 4.0
-            },
-            {
-              '2xx': 3.0,
-              '4xx': 4.0,
-              '5xx': 5.0
-            },
-            {
-              '2xx': 4.0,
-              '4xx': 5.0,
-              '5xx': 6.0
-            },
-            {
-              '2xx': 5.0,
-              '4xx': 6.0,
-              '5xx': 7.0
-            },
-            {
-              '2xx': 6.0,
-              '4xx': 7.0,
-              '5xx': 8.0
-            }
-          ],
-          minToken: '1 k',
-          maxToken: '10 k',
-          avgTokenOverview: [11, 231, 343, 1414, 25, 362],
-          avgRequestPerSubscriberOverview: [1, 2, 3, 4, 5, 6],
-          avgTokenPerSubscriberOverview: [
-            {
-              inputToken: 1.0,
-              outputToken: 2.0,
-              totalToken: 3.0
-            },
-            {
-              inputToken: 22.0,
-              outputToken: 3.0,
-              totalToken: 44.0
-            },
-            {
-              inputToken: 42.0,
-              outputToken: 15.0,
-              totalToken: 6.0
-            },
-            {
-              inputToken: 5.0,
-              outputToken: 16.0,
-              totalToken: 7.0
-            },
-            {
-              inputToken: 6.0,
-              outputToken: 37.0,
-              totalToken: 8.0
-            },
-            {
-              inputToken: 64.0,
-              outputToken: 7.0,
-              totalToken: 8.0
-            }
-          ],
-          requestTotal: '12 GB',
-          tokenTotal: '14 GB',
-          avgToken: '1 k',
-          avgRequestPerSubscriber: '2 k',
-          avgTokenPerSubscriber: '3 k',
-          date: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-        }
         // 存储 AI 服务数据
-        setAiServiceOverview(serviceOverview)
+        setAiServiceOverview(data?.overview)
         // 设置 AI 报表数据
-        setAiChartInfoData(serviceOverview)
+        setAiChartInfoData(data?.overview)
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
       }
@@ -211,98 +99,14 @@ export default function DashboardTotal() {
         'min_response_time',
         'avg_request_per_subscriber',
         'avg_traffic_per_subscriber'
-      ],
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      ]
     }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
-        const serviceOverview = {
-          requestOverview: [
-            {
-              '2xx': 33.0,
-              '4xx': 44.0,
-              '5xx': 5.0,
-              fsdf: 6.0
-            },
-            {
-              '2xx': 123.0,
-              '4xx': 324.0,
-              '5xx': 112.0,
-              fsdf: 44.0
-            },
-            {
-              '2xx': 234.0,
-              '4xx': 436.0,
-              '5xx': 123.0,
-              fsdf: 4.0
-            },
-            {
-              '2xx': 4.0,
-              '4xx': 234.0,
-              '5xx': 1233.0,
-              fsdf: 7.0
-            },
-            {
-              '2xx': 5.0,
-              '4xx': 233.0,
-              '5xx': 7123.0,
-              fsdf: 8.0
-            },
-            {
-              '2xx': 444.0,
-              '4xx': 7.0,
-              '5xx': 8.0,
-              fsdf: 9.0
-            }
-          ],
-          trafficOverview: [
-            {
-              '2xx': 1123.0,
-              '4xx': 23.0,
-              '5xx': 3.0
-            },
-            {
-              '2xx': 112.0,
-              '4xx': 233.0,
-              '5xx': 44.0
-            },
-            {
-              '2xx': 3.0,
-              '4xx': 1234.0,
-              '5xx': 445.0
-            },
-            {
-              '2xx': 14.0,
-              '4xx': 2345.0,
-              '5xx': 6.0
-            },
-            {
-              '2xx': 132.0,
-              '4xx': 346.0,
-              '5xx': 37.0
-            },
-            {
-              '2xx': 613.0,
-              '4xx': 47.0,
-              '5xx': 81.0
-            }
-          ],
-          avgRequestPerSubscriberOverview: [345, 23, 12, 123, 43, 2],
-          avgResponseTimeOverview: [123, 232, 443, 54, 125, 61],
-          avgTrafficPerSubscriberOverview: [44, 235, 11, 114, 234, 239],
-          requestTotal: '11 GB',
-          minResponseTime: '1 k',
-          maxResponseTime: '102 k',
-          trafficTotal: '22 GB',
-          avgResponseTime: '33 k',
-          avgRequestPerSubscriber: '44 k',
-          avgTrafficPerSubscriber: '55 k',
-          date: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-        }
         // 存储 REST 服务数据
-        setRestServiceOverview(serviceOverview)
+        setRestServiceOverview(data?.overview)
         // 设置 REST 报表数据
-        setRestChartInfoData(serviceOverview)
+        setRestChartInfoData(data?.overview)
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
       }
@@ -375,7 +179,10 @@ export default function DashboardTotal() {
       // token 消耗总数
       setBarChartInfoData({
         title: $t('Token'),
-        data: serviceOverview.tokenOverview,
+        data: serviceOverview.tokenOverview.map((item: { inputToken: number; outputToken: number }) => ({
+          inputToken: item.inputToken,
+          outputToken: item.outputToken
+        })),
         value: serviceOverview.tokenTotal,
         date: serviceOverview.date
       })
@@ -420,82 +227,15 @@ export default function DashboardTotal() {
       `monitor/overview/top10/${activeTab === 'AI' ? 'ai' : 'rest'}`,
       {
         method: 'GET',
-        eoParams: { start: timeRange?.start, end: timeRange?.end },
-        eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+        eoParams: { start: timeRange?.start, end: timeRange?.end }
       }
     ).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
-        const aiServiceOverview = {
-          apis: [
-            {
-              id: '123',
-              name: 'Model 21',
-              request: 100,
-              token: 100
-            },
-            {
-              id: '456',
-              name: 'Model 22',
-              request: 200,
-              token: 400
-            },
-            {
-              id: '45611',
-              name: 'Model 3',
-              request: 3200,
-              token: 4400
-            },
-            {
-              id: '4536',
-              name: 'Model 4',
-              request: 1200,
-              token: 4200
-            }
-          ],
-          consumers: [
-            {
-              id: '6666',
-              name: 'Customer 1',
-              request: 100,
-              token: 100
-            }
-          ]
-        }
-        const restServiceOverview = {
-          apis: [
-            {
-              id: '123',
-              name: 'Model 1',
-              request: 100,
-              traffic: 100
-            },
-            {
-              id: '456',
-              name: 'Model 2',
-              request: 200,
-              traffic: 300
-            },
-            {
-              id: '12333',
-              name: 'Model 123',
-              request: 200,
-              traffic: 300
-            }
-          ],
-          consumers: [
-            {
-              id: '6666',
-              name: 'Customer 1',
-              request: 100,
-              traffic: 100
-            }
-          ]
-        }
         // 设置排名表格数据
         setTopRankingList({
-          'TOP API': activeTab === 'AI' ? aiServiceOverview.apis : restServiceOverview.apis,
-          'TOP Consumer': activeTab === 'AI' ? aiServiceOverview.consumers : restServiceOverview.consumers
+          'TOP API': data.apis,
+          'TOP Consumer': data.consumers
         })
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
@@ -581,44 +321,49 @@ export default function DashboardTotal() {
           }
           spinning={dashboardLoading}
         >
-          <div className="mt-[20px] flex mb-[10px]">
-            {barChartInfo?.map((item: BarChartInfo, index: number) => (
-              <Card
-                key={index}
-                className={`flex-1 cursor-pointer rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
-                classNames={{
-                  body: 'p-[15px]'
-                }}
-              >
-                <ServiceBarChar key={index} height={400} dataInfo={item} customClassNames="flex-1"></ServiceBarChar>
-              </Card>
-            ))}
+          <div className="mr-[40px]">
+            <div className="mt-[20px] flex mb-[10px]">
+              {barChartInfo?.map((item: BarChartInfo, index: number) => (
+                <Card
+                  key={index}
+                  className={`flex-1 cursor-pointer rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
+                  classNames={{
+                    body: 'p-[15px]'
+                  }}
+                >
+                  <ServiceBarChar key={index} height={400} dataInfo={item} customClassNames="flex-1"></ServiceBarChar>
+                </Card>
+              ))}
+            </div>
+            <div className="flex mb-[10px]">
+              {perBarChartInfo?.map((item: any, index: number) => (
+                <Card
+                  key={index}
+                  className={`flex-1 cursor-pointer rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
+                  classNames={{
+                    body: 'p-[15px]'
+                  }}
+                >
+                  {item.type === 'area' ? (
+                    <>
+                      <ServiceAreaChart
+                        key={index}
+                        height={250}
+                        dataInfo={item}
+                        customClassNames="flex-1 relative"
+                      ></ServiceAreaChart>
+                    </>
+                  ) : (
+                    <ServiceBarChar key={index} height={250} dataInfo={item} customClassNames="flex-1"></ServiceBarChar>
+                  )}
+                </Card>
+              ))}
+            </div>
+            <RankingList
+              topRankingList={topRankingList}
+              serviceType={activeTab === 'AI' ? 'aiService' : 'restService'}
+            />
           </div>
-          <div className="flex mb-[10px]">
-            {perBarChartInfo?.map((item: any, index: number) => (
-              <Card
-                key={index}
-                className={`flex-1 cursor-pointer rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
-                classNames={{
-                  body: 'p-[15px]'
-                }}
-              >
-                {item.type === 'area' ? (
-                  <>
-                    <ServiceAreaChart
-                      key={index}
-                      height={250}
-                      dataInfo={item}
-                      customClassNames="flex-1 relative"
-                    ></ServiceAreaChart>
-                  </>
-                ) : (
-                  <ServiceBarChar key={index} height={250} dataInfo={item} customClassNames="flex-1"></ServiceBarChar>
-                )}
-              </Card>
-            ))}
-          </div>
-          <RankingList topRankingList={topRankingList} serviceType={activeTab === 'AI' ? 'aiService' : 'restService'} />
         </Spin>
       </ScrollableSection>
     </div>
