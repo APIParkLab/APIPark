@@ -319,7 +319,7 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
           {barChartInfo?.map((item: BarChartInfo, index: number) => (
             <Card
               key={index}
-              className={`flex-1 rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
+              className={`flex-1 min-w-[430px] rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
               classNames={{
                 body: 'py-[15px] px-[0px]'
               }}
@@ -332,7 +332,7 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
           {perBarChartInfo?.map((item: any, index: number) => (
             <Card
               key={index}
-              className={`flex-1 rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
+              className={`flex-1 rounded-[10px] min-w-[284px] ${index > 0 ? 'ml-[10px]' : ''}`}
               classNames={{
                 body: 'py-[15px] px-[0px]'
               }}

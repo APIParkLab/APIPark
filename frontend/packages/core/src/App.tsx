@@ -6,6 +6,7 @@ import { PluginEventHubProvider } from '@common/contexts/PluginEventHubContext'
 import { PluginSlotHubProvider } from '@common/contexts/PluginSlotHubContext'
 import useInitializeMonaco from '@common/hooks/useInitializeMonaco'
 import { $t } from '@common/locales'
+import { registerApiparkTheme } from '@common/const/charts/initChartTheme'
 import RenderRoutes from '@core/components/aoplatform/RenderRoutes'
 import { App as AppAntd, ConfigProvider } from 'antd'
 import { useMemo } from 'react'
@@ -129,6 +130,9 @@ const antdComponentThemeToken = {
     }
   }
 }
+
+// 注册 ECharts 主题
+registerApiparkTheme()
 
 function App() {
   const { locale } = useLocaleContext()
