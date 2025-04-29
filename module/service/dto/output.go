@@ -221,3 +221,18 @@ type ExportApp struct {
 	Description string `json:"description"`
 	Team        string `json:"team"`
 }
+
+type Overview struct {
+	Id               string     `json:"id"`
+	Name             string     `json:"name"`
+	Description      string     `json:"description"`
+	EnableMCP        bool       `json:"enable_mcp"`
+	ServiceKind      string     `json:"service_kind"`
+	SubscriberNum    int64      `json:"subscriber_num"`
+	InvokeNum        int64      `json:"invoke_num"`
+	Logo             string     `json:"logo"`
+	AvailableMonitor bool       `json:"available_monitor"`
+	IsReleased       bool       `json:"is_released"`
+	Catalogue        auto.Label `json:"catalogue" aolabel:"catalogue"`
+	APINum           int64      `json:"api_num"`
+}
