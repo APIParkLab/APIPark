@@ -3,7 +3,6 @@ import {ActionType} from "@ant-design/pro-components";
 import  {FC, useEffect, useMemo, useRef, useState} from "react";
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import PageList, { PageProColumns } from "@common/components/aoplatform/PageList.tsx";
-import {useBreadcrumb} from "@common/contexts/BreadcrumbContext.tsx";
 import {App, Button} from "antd";
 import {
     SUBSCRIBE_APPROVAL_INNER_DONE_TABLE_COLUMN,
@@ -26,7 +25,6 @@ import { SubscribeApprovalInfoType } from "@common/const/approval/type.tsx";
 import { $t } from "@common/locales";
 
 const AiServiceInsideApprovalList:FC = ()=>{
-    const { setBreadcrumb } = useBreadcrumb()
     const { modal,message } = App.useApp()
     const {serviceId, teamId} = useParams<RouterParams>();
     const [init, setInit] = useState<boolean>(true)
@@ -40,7 +38,6 @@ const AiServiceInsideApprovalList:FC = ()=>{
     const [approvalBtnLoading,setApprovalBtnLoading] = useState<boolean>(false)
     const [memberValueEnum, setMemberValueEnum] = useState<SimpleMemberItem[]>([])
     const {accessData,state} = useGlobalContext()
-    const navigator = useNavigate()
 
     const openModal = async (type:'approval'|'view',entity:SubscribeApprovalTableListItem)=>{
         message.loading($t(RESPONSE_TIPS.loading))
@@ -142,15 +139,6 @@ const AiServiceInsideApprovalList:FC = ()=>{
     }, [query]);
 
     useEffect(() => {
-        setBreadcrumb([
-            {
-                title: $t('服务'),
-                onClick: () => navigator('/service/list')
-            },
-            {
-                title:$t('订阅审核')
-            }
-        ])
         getMemberList()
         manualReloadTable()
     }, [serviceId]);

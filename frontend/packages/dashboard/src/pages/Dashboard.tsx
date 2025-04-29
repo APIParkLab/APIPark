@@ -16,7 +16,7 @@ export default function Dashboard() {
   const { message } = App.useApp()
   const [clusters, setClusters] = useState<Array<{ id: string; name: string; enable: boolean }>>([])
   const [enabledClusters, setEnabledClusters] = useState<Array<EntityItem>>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const getClusters = () => {
     setLoading(true)
     fetchData<BasicResponse<{ clusters: Array<{ id: string; name: string; enable: boolean }> }>>(
@@ -50,11 +50,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <Spin
-        wrapperClassName="h-full w-full pb-PAGE_INSIDE_B "
-        indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
-        spinning={loading}
-      >
+      <Spin wrapperClassName="h-full w-full pb-PAGE_INSIDE_B " indicator={<></>} spinning={loading}>
         {!loading && (
           <>
             {enabledClusters.length > 0 ? (

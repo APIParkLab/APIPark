@@ -8,11 +8,10 @@ import EditableTable from "@common/components/aoplatform/EditableTable.tsx";
 import EditableTableWithModal from "@common/components/aoplatform/EditableTableWithModal.tsx";
 import WithPermission from "@common/components/aoplatform/WithPermission.tsx";
 import { UPSTREAM_TYPE_OPTIONS, SYSTEM_UPSTREAM_GLOBAL_CONFIG_TABLE_COLUMNS, schemeOptions, UPSTREAM_BALANCE_OPTIONS, UPSTREAM_PASS_HOST_OPTIONS, PROXY_HEADER_CONFIG, UPSTREAM_PROXY_HEADER_TYPE_OPTIONS } from "../../../const/system/const.tsx";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { RouterParams } from "@core/components/aoplatform/RenderRoutes.tsx";
 import { BasicResponse, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE, VALIDATE_MESSAGE } from "@common/const/const.tsx";
 import { useFetch } from "@common/hooks/http.ts";
-import { useBreadcrumb } from "@common/contexts/BreadcrumbContext.tsx";
 import { $t } from "@common/locales/index.ts";
 import { useGlobalContext } from "@common/contexts/GlobalStateContext.tsx";
 
@@ -33,10 +32,8 @@ const SystemInsideUpstreamContent= forwardRef<SystemInsideUpstreamContentHandle>
     const {fetchData} = useFetch()
     const [, forceUpdate] = useState<unknown>(null);
     const [formShowHost, setFormShowHost] =  useState<boolean>(false);
-    const { setBreadcrumb } = useBreadcrumb()
     const [form] = Form.useForm();
     const {state} = useGlobalContext()
-    const navigate = useNavigate()
 
     useImperativeHandle(ref, () => ({
         save:()=>formRef.current?.save()
@@ -109,16 +106,7 @@ const globalConfigNodesRule: FormItemProps['rules'] = [
   ];
 
     useEffect(() => {
-        setBreadcrumb([
-            {
-                title: $t('服务'),
-                onClick: () => navigate('/service/list')
-            },
-            {
-                title: $t('上游')
-            }])
-
-            getUpstreamInfo();
+        getUpstreamInfo();
     }, [serviceId]);
 
     const typeOptions = useMemo(()=>UPSTREAM_TYPE_OPTIONS.map(x=>({...x, label:$t(x.label)})),[state.language])

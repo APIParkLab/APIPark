@@ -14,6 +14,8 @@ import { FC, useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { SystemConfigFieldType } from '../../const/system/type.ts'
 import { useSystemContext } from '../../contexts/SystemContext.tsx'
+import ServiceInfoCard from '@common/components/aoplatform/serviceInfoCard.tsx'
+import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 
 const SystemInsidePage: FC = () => {
   const { message } = App.useApp()
@@ -26,12 +28,13 @@ const SystemInsidePage: FC = () => {
   const [activeMenu, setActiveMenu] = useState<string>()
   const navigateTo = useNavigate()
   const [showMenu, setShowMenu] = useState<boolean>(false)
+  const { setBreadcrumb } = useBreadcrumb()
 
   const getSystemInfo = () => {
     fetchData<BasicResponse<{ service: SystemConfigFieldType }>>('service/info', {
       method: 'GET',
       eoParams: { team: teamId, service: serviceId }
-    }).then(response => {
+    }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         setSystemInfo(data.service)
@@ -47,7 +50,7 @@ const SystemInsidePage: FC = () => {
     fetchData<BasicResponse<{ prefix: string; force: boolean }>>('service/router/define', {
       method: 'GET',
       eoParams: { service: serviceId, team: teamId }
-    }).then(response => {
+    }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         setApiPrefix(data.prefix)
@@ -65,6 +68,7 @@ const SystemInsidePage: FC = () => {
         'assets',
         null,
         [
+          getItem(<Link to="./overview">{$t('总览')}</Link>, 'overview', undefined, undefined, undefined, ''),
           getItem(
             <Link to="./route">{$t('API 路由')}</Link>,
             'route',
@@ -146,9 +150,10 @@ const SystemInsidePage: FC = () => {
         null,
         [
           // APP_MODE === 'pro' ? getItem(<Link to="./topology">{$t('调用拓扑图')}</Link>, 'topology',undefined,undefined,undefined,'project.mySystem.topology.view'):null,
+          getItem(<Link to="./setting">{$t('设置')}</Link>, 'setting', undefined, undefined, undefined, ''),
           getItem(
-            <Link to="./setting">{$t('设置')}</Link>,
-            'setting',
+            <Link to="./logs">{$t('日志')}</Link>,
+            'logs',
             undefined,
             undefined,
             undefined,
@@ -166,12 +171,11 @@ const SystemInsidePage: FC = () => {
       const newMenu = cloneDeep(menu)
       return newMenu!.filter((m: MenuItemGroupType) => {
         if (m && m.children && m.children.length > 0) {
-          m.children = m.children.filter(c => {
+          m.children = m.children.filter((c) => {
             if (!c) return false
             return (c as MenuItemType & { access: string }).access
               ? checkPermission(
-                  (c as MenuItemType & { access: string })
-                    .access as keyof (typeof PERMISSION_DEFINITION)[0]
+                  (c as MenuItemType & { access: string }).access as keyof (typeof PERMISSION_DEFINITION)[0]
                 )
               : true
           })
@@ -180,12 +184,8 @@ const SystemInsidePage: FC = () => {
       })
     }
     const filteredMenu = filterMenu(SYSTEM_PAGE_MENU_ITEMS as MenuItemGroupType<MenuItemType>[])
-    const menu =
-      (activeMenu ?? filteredMenu[0]?.children)
-        ? filteredMenu[0]?.children?.[0]?.key
-        : filteredMenu[0]?.key
-    if (menu && currentUrl.split('/')[-1] !== menu)
-      navigateTo(`/service/${teamId}/inside/${serviceId}/${menu}`)
+    const menu = (activeMenu ?? filteredMenu[0]?.children) ? filteredMenu[0]?.children?.[0]?.key : filteredMenu[0]?.key
+    if (menu && currentUrl.split('/')[-1] !== menu) navigateTo(`/service/${teamId}/inside/${serviceId}/${menu}`)
     return filteredMenu || []
   }, [accessData, accessInit, SYSTEM_PAGE_MENU_ITEMS])
 
@@ -208,7 +208,7 @@ const SystemInsidePage: FC = () => {
     } else if (serviceId !== currentUrl.split('/')[currentUrl.split('/').length - 1]) {
       setActiveMenu(currentUrl.split('/')[currentUrl.split('/').length - 1])
     } else {
-      setActiveMenu('route')
+      setActiveMenu('overview')
     }
   }, [currentUrl])
 
@@ -219,10 +219,19 @@ const SystemInsidePage: FC = () => {
   }, [accessData])
 
   useEffect(() => {
+    setBreadcrumb([
+      {
+        title: $t('服务'),
+        onClick: () => navigateTo('/service/list')
+      },
+      {
+        title: systemInfo?.name || ''
+      }
+    ])
     if (activeMenu && serviceId === currentUrl.split('/')[currentUrl.split('/').length - 1]) {
       navigateTo(`/service/${teamId}/inside/${serviceId}/${activeMenu}`)
     }
-  }, [activeMenu])
+  }, [activeMenu, systemInfo, state.language])
 
   useEffect(() => {
     serviceId && getSystemInfo()
@@ -233,16 +242,7 @@ const SystemInsidePage: FC = () => {
       {showMenu ? (
         <InsidePage
           pageTitle={systemInfo?.name || '-'}
-          tagList={[
-            ...(systemInfo?.enable_mcp ? [{ label: 'MCP', color: '#FFF0C1', className: 'text-[#000]' }] : []),
-            {
-              label: (
-                <Paragraph className="mb-0" copyable={serviceId ? { text: serviceId } : false}>
-                  {$t('服务 ID')}：{serviceId || '-'}
-                </Paragraph>
-              )
-            }
-          ]}
+          customBanner={<ServiceInfoCard serviceId={serviceId} teamId={teamId} />}
           backUrl="/service/list"
         >
           <div className="flex flex-1 h-full">

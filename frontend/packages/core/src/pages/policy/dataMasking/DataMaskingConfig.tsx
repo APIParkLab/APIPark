@@ -80,19 +80,6 @@ const DataMaskingConfig = forwardRef<DataMaskingConfigHandle>((_,ref) => {
     };
 
     useEffect(() => {
-        setBreadcrumb([
-            {
-              title: $t('服务'),
-              onClick: () => navigator('/service/list')
-            },
-            {
-              title:$t('服务策略'),
-              onClick: () => navigator(serviceId ? `/service/${teamId}/aiInside/${serviceId}/servicepolicy` : '')
-            },
-            {
-              title: policyId !== undefined ? $t('编辑服务策略') : $t('添加服务策略')
-            }
-          ])
         if (policyId !== undefined) {
             setOnEdit(true);
             getPolicyInfo();

@@ -7,15 +7,16 @@ import { PageProColumns } from '@common/components/aoplatform/PageList'
 
 export const AI_SERVICE_ROUTER_TABLE_COLUMNS: PageProColumns<AiServiceRouterTableListItem>[] = [
   {
+    title: '名称',
+    dataIndex: 'name',
+    width: 200,
+    ellipsis: true
+  },
+  {
     title: 'URL',
     dataIndex: 'requestPath',
     ellipsis: true,
     width: 200
-  },
-  {
-    title: '名称',
-    dataIndex: 'name',
-    ellipsis: true
   },
   {
     title: '模型',

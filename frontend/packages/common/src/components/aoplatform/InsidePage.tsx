@@ -26,6 +26,7 @@ class InsidePageProps {
   scrollInsidePage?: boolean = false
   customPadding?: boolean
   customBtn?: ReactNode
+  customBanner?: ReactNode
 }
 
 const InsidePage: FC<InsidePageProps> = ({
@@ -46,7 +47,8 @@ const InsidePage: FC<InsidePageProps> = ({
   scrollPage = true,
   scrollInsidePage = false,
   customPadding = false,
-  customBtn
+  customBtn,
+  customBanner
 }) => {
   const navigate = useNavigate()
 
@@ -61,8 +63,13 @@ const InsidePage: FC<InsidePageProps> = ({
         <div
           className={`border-[0px] mr-PAGE_INSIDE_X ${showBorder ? 'border-solid border-b-[1px] border-BORDER' : ''} ${headerClassName}`}
         >
-          {!pageTitle && !description && !backUrl && !customBtn ? (
+          {!pageTitle && !description && !backUrl && !customBtn && !customBanner ? (
             <></>
+          ) : customBanner ? (
+            <div className={customPadding ? '' : 'mb-[15px]'}>
+              {backUrl && <TopBreadcrumb handleBackCallback={() => goBack()} />}
+              {customBanner}
+            </div>
           ) : (
             <div className={customPadding ? '' : 'mb-[30px]'}>
               {backUrl && <TopBreadcrumb handleBackCallback={() => goBack()} />}

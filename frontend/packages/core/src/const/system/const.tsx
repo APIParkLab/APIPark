@@ -13,6 +13,7 @@ import {
 } from './type'
 
 import { PageProColumns } from '@common/components/aoplatform/PageList'
+import { LogItem } from '@core/pages/serviceLogs/ServiceLogs'
 
 export enum SubscribeEnum {
   Rejected = 0,
@@ -241,6 +242,12 @@ export const MATCH_CONFIG: ConfigField<MatchItem>[] = [
 ]
 
 export const SYSTEM_API_TABLE_COLUMNS: PageProColumns<SystemApiTableListItem>[] = [
+  {
+    title: '名称',
+    dataIndex: 'name',
+    width: 200,
+    ellipsis: true
+  },
   {
     title: 'URL',
     dataIndex: 'requestPath',
@@ -498,5 +505,126 @@ export const SYSTEM_PUBLISH_ONLINE_COLUMNS = [
     ellipsis: {
       showTitle: true
     }
+  }
+]
+
+/** AI 服务排行 */
+export const AI_SERVICE_TOP_RANKING_LIST: PageProColumns<any>[] = [
+  {
+    title: '名称',
+    dataIndex: 'name',
+    ellipsis: true
+  },
+  {
+    title: '请求总数',
+    dataIndex: 'request',
+    ellipsis: true
+  },
+  {
+    title: 'Token',
+    dataIndex: 'token',
+    ellipsis: true
+  }
+]
+
+/** REST 服务排行 */
+export const REST_SERVICE_TOP_RANKING_LIST: PageProColumns<any>[] = [
+  {
+    title: '名称',
+    dataIndex: 'name',
+    ellipsis: true
+  },
+  {
+    title: '请求总数',
+    dataIndex: 'request',
+    ellipsis: true
+  },
+  {
+    title: '流量',
+    dataIndex: 'traffic',
+    ellipsis: true
+  }
+]
+
+/** REST 服务日志 */
+export const REST_SERVICE_LOG_LIST: PageProColumns<LogItem>[] = [
+  {
+    title: '时间',
+    dataIndex: 'logTime',
+    ellipsis: true
+  },
+  {
+    title: 'API / Tools',
+    dataIndex: ['api', 'name'],
+    ellipsis: true
+  },
+  {
+    title: '消费者',
+    dataIndex: ['consumers', 'name'],
+    ellipsis: true
+  },
+  {
+    title: 'HTTP 状态',
+    dataIndex: 'status',
+    ellipsis: true
+  },
+  {
+    title: 'IP',
+    dataIndex: 'ip',
+    ellipsis: true
+  },
+  {
+    title: '响应时间',
+    dataIndex: 'responseTime',
+    ellipsis: true
+  },
+  {
+    title: '流量',
+    dataIndex: 'traffic',
+    ellipsis: true
+  }
+]
+
+/** AI 服务日志 */
+export const AI_SERVICE_LOG_LIST: PageProColumns<LogItem>[] = [
+  {
+    title: '时间',
+    dataIndex: 'logTime',
+    ellipsis: true
+  },
+  {
+    title: 'API / Tools',
+    dataIndex: ['api', 'name'],
+    ellipsis: true
+  },
+  {
+    title: '消费者',
+    dataIndex: ['consumer', 'name'],
+    ellipsis: true
+  },
+  {
+    title: 'HTTP 状态',
+    dataIndex: 'status',
+    ellipsis: true
+  },
+  {
+    title: '模型',
+    dataIndex: 'model',
+    ellipsis: true
+  },
+  {
+    title: 'IP',
+    dataIndex: 'ip',
+    ellipsis: true
+  },
+  {
+    title: 'Token/s',
+    dataIndex: 'tokenPerSecond',
+    ellipsis: true
+  },
+  {
+    title: 'Token',
+    dataIndex: 'token',
+    ellipsis: true
   }
 ]

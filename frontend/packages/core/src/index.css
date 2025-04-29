@@ -1156,6 +1156,22 @@ p{
   align-items: center;
 }
 
+.ranking-list .ant-pro-table{
+  overflow: hidden;
+  border-radius: 10px;
+  border: none !important;
+}
+.ranking-list .ant-table-tbody:not(tbody) .ant-table-cell{
+  padding: 10px 10px !important;
+}
+.ranking-list .ant-table-container .ant-table-thead th{
+  background-color: #fff !important;
+  padding: 10px 10px !important;
+}
+.ranking-list .ant-table-container .ant-table-thead th::before{
+  display: none;
+}
+
 .ant-alert-info{
   background: #1784FC1A !important;
 }

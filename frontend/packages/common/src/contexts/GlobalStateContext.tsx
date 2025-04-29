@@ -87,8 +87,8 @@ const mockData = [
   },
   {
     name: 'API 市场',
-    key: 'serviceHub',
-    path: '/serviceHub',
+    key: 'portal',
+    path: '/portal',
     icon: 'ic:baseline-hub',
     access: 'system.api_portal.api_portal.view'
   },
@@ -107,15 +107,15 @@ const mockData = [
       },
       {
         name: '服务',
-        key: 'analyticsSubscriber',
-        path: '/analytics/subscriber/list',
+        key: 'analyticsService',
+        path: '/analytics/service/list',
         icon: 'ic:baseline-blinds-closed',
         access: 'system.analysis.run_view.view'
       },
       {
         name: '消费者',
-        key: 'analyticsProvider',
-        path: '/analytics/provider/list',
+        key: 'analyticsConsumer',
+        path: '/analytics/consumer/list',
         icon: 'ic:baseline-apps',
         access: 'system.analysis.run_view.view'
       },
@@ -253,7 +253,7 @@ const mockData = [
             access: 'system.settings.ssl_certificate.view'
           },
           {
-            name: '日志',
+            name: '日志输出',
             key: 'logsettings',
             path: '/logsettings',
             icon: 'ic:baseline-sticky-note-2',

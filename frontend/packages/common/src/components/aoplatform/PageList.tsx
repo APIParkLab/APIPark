@@ -58,7 +58,7 @@ interface PageListProps<T> extends ProTableProps<T, unknown>, RefAttributes<Acti
   delayLoading?: boolean
   noScroll?: boolean
   /* 前端分页的表格，需要传入该字段以支持后端搜索 */
-  manualReloadTable?: () => void,
+  manualReloadTable?: () => void
   customEmptyRender?: () => React.ReactNode
 }
 
@@ -109,6 +109,7 @@ const PageList = <T extends Record<string, unknown>>(
   const [allowTableClick, setAllowTableClick] = useState<boolean>(false)
   const { accessData, checkPermission, accessInit, state } = useGlobalContext()
   const [minTableWidth, setMinTableWidth] = useState<number>(0)
+  const [enableVirtual, setEnableVirtual] = useState(false)
 
   useImperativeHandle(ref, () => actionRef.current!)
 
@@ -301,7 +302,7 @@ const PageList = <T extends Record<string, unknown>>(
         <ProTable<T>
           actionRef={actionRef}
           columns={newColumns}
-          virtual
+          virtual={enableVirtual}
           scroll={noScroll ? undefined : { x: tableWidth, y: tableHeight }}
           size="middle"
           rowSelection={rowSelection}
@@ -327,6 +328,10 @@ const PageList = <T extends Record<string, unknown>>(
                   showListItemOption: false
                 }
               : false
+          }}
+          postData={(data: any) => {
+            setEnableVirtual(!!data?.length)
+            return data
           }}
           showSorterTooltip={false}
           columnsState={{ persistenceType: 'localStorage', persistenceKey: id }}
