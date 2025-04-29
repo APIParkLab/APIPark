@@ -260,46 +260,11 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
     fetchData<BasicResponse<{ log: AIServiceDetailType }>>('service/log/ai', {
       method: 'GET',
       eoParams: { log: selectedRow?.id, service: serviceId, team: teamId },
-      eoTransformKeys: ['is_system_consumer', 'log_time'],
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      eoTransformKeys: ['is_system_consumer', 'log_time']
     }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
-        // const result = data.log
-        const result = {
-          id: '123',
-          api: {
-            id: '222',
-            name: 'api222'
-          },
-          logTime: '2023-01-01 00:00:00',
-          consumer: {
-            id: '333',
-            name: 'consumers333'
-          },
-          isSystemConsumer: false,
-          status: '200',
-          provider: {
-            id: '444',
-            name: 'provider444'
-          },
-          model: 'model1',
-          ip: '1.1.1.1',
-          request: {
-            header:
-              '{\n  "mcpServers": {\n    "APIPark/test1234": {\n      "url": "http://swagger-demo.apinto.com/openapi/v1/mcp/service/c8bc25ca-8855-45cd-8bcc-239195b6c346/sse?apikey={your_api_key}"\n    }\n  }\n}',
-            body: '{\n  "mcpServers": {\n    "APIPark/44444": {\n      "url": "http://swagger-demo.apinto.com/openapi/v1/mcp/service/c8bc25ca-8855-45cd-8bcc-239195b6c346/sse?apikey={your_api_key}"\n    }\n  }\n}',
-            origin: '123',
-            token: 0
-          },
-          response: {
-            header:
-              '{\n  "mcpServers": {\n    "APIPark/44444": {\n      "url": "http://swagger-demo.apinto.com/openapi/v1/mcp/service/c8bc25ca-8855-45cd-8bcc-239195b6c346/sse?apikey={your_api_key}"\n    }\n  }\n}',
-            body: '{\n  "mcpServers": {\n    "APIPark/44444": {\n      "url": "http://swagger-demo.apinto.com/openapi/v1/mcp/service/c8bc25ca-8855-45cd-8bcc-239195b6c346/sse?apikey={your_api_key}"\n    }\n  }\n}',
-            origin: '312',
-            token: '333'
-          }
-        }
+        const result = data.log
         getAIServiceDescriptionItemsList({
           time: result.logTime,
           api: result.api.name,
@@ -329,36 +294,11 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
     fetchData<BasicResponse<{ log: RestServiceDetailType }>>('service/log/rest', {
       method: 'GET',
       eoParams: { log: selectedRow?.id, service: serviceId, team: teamId },
-      eoTransformKeys: ['is_system_consumer', 'log_time'],
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      eoTransformKeys: ['is_system_consumer', 'log_time']
     }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
-        const result = {
-          id: '123',
-          api: {
-            id: '222',
-            name: 'api222'
-          },
-          logTime: '2023-01-01 00:00:00',
-          consumer: {
-            id: '333',
-            name: 'consumers333'
-          },
-          isSystemConsumer: true,
-          status: '200',
-          ip: '1.1.1.1',
-          request: {
-            header:
-              '{\n  "mcpServers": {\n    "APIPark/test1234": {\n      "url": "http://swagger-demo.apinto.com/openapi/v1/mcp/service/c8bc25ca-8855-45cd-8bcc-239195b6c346/sse?apikey={your_api_key}"\n    }\n  }\n}',
-            origin: '123'
-          },
-          response: {
-            header:
-              '{\n  "mcpServers": {\n    "APIPark/44444": {\n      "url": "http://swagger-demo.apinto.com/openapi/v1/mcp/service/c8bc25ca-8855-45cd-8bcc-239195b6c346/sse?apikey={your_api_key}"\n    }\n  }\n}',
-            origin: '312'
-          }
-        }
+        const result = data.log
         getRestServiceDescriptionItemsList({
           time: result.logTime,
           api: result.api.name,

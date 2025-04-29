@@ -231,6 +231,25 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
       setChartOption(dataInfo)
     }
   }, [dataInfo, JSON.stringify(dataInfo)])
+
+  // 添加窗口大小变化监听，实现自适应
+  useEffect(() => {
+    // 定义resize处理函数
+    const handleResize = () => {
+      const echartsInstance = chartRef.current?.getEchartsInstance()
+      if (echartsInstance) {
+        echartsInstance.resize()
+      }
+    }
+    
+    // 添加监听
+    window.addEventListener('resize', handleResize)
+    
+    // 组件卸载时移除监听
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
   return (
     <div className={`w-full ${customClassNames}`}>
       <ECharts ref={chartRef} option={option} style={{ height: height || 400 }} opts={{ renderer: 'svg' }} />

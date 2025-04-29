@@ -599,7 +599,7 @@ export const AI_SERVICE_LOG_LIST: PageProColumns<LogItem>[] = [
   },
   {
     title: '消费者',
-    dataIndex: ['consumers', 'name'],
+    dataIndex: ['consumer', 'name'],
     ellipsis: true
   },
   {
