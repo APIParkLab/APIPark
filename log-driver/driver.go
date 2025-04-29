@@ -9,8 +9,8 @@ import (
 type ILogDriver interface {
 	LogInfo(clusterId string, id string) (*LogInfo, error)
 	LogCount(clusterId string, conditions map[string]string, spendHour int64, group string) (map[string]int64, error)
-	Logs(clusterId string, conditions map[string]string, start time.Time, end time.Time, limit int64, offset int64) ([]*Log, int64, error)
-	LogRecords(clusterId string, start time.Time, end time.Time) ([]*Log, error)
+	Logs(clusterId string, conditions map[string]string, start time.Time, end time.Time, limit int64, offset int64) ([]*LogItem, int64, error)
+	LogRecords(clusterId string, start time.Time, end time.Time) ([]*LogItem, error)
 }
 
 var (

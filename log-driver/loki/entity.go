@@ -63,11 +63,13 @@ type LogDetail struct {
 	RequestId          string      `json:"request_id"`
 	RequestMethod      string      `json:"request_method"`
 	RequestScheme      string      `json:"request_scheme"`
+	RequestHeader      string      `json:"request_header"`
 	RequestTime        string      `json:"request_time"`
 	RequestUri         string      `json:"request_uri"`
 	RequestBody        string      `json:"request_body"`
 	ProxyBody          string      `json:"proxy_body"`
 	ResponseBody       string      `json:"response_body"`
+	ResponseHeader     string      `json:"response_header"`
 	ProxyResponseBody  string      `json:"proxy_response_body"`
 	Service            string      `json:"service"`
 	Provider           string      `json:"provider"`

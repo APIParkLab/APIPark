@@ -62,6 +62,7 @@ var logFormatter = map[string]interface{}{
 		"$proxy_host",
 		"$proxy_header",
 		"$proxy_addr",
+		"$response_header",
 		"$response_headers",
 		"$status",
 		"$content_type",

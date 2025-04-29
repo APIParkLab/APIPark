@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type Log struct {
+type LogItem struct {
 	ID            string
 	Strategy      string
 	Service       string
@@ -26,10 +26,12 @@ type Log struct {
 }
 
 type LogInfo struct {
-	ID                string
+	*LogItem
 	ContentType       string
 	RequestBody       string
 	ProxyBody         string
 	ProxyResponseBody string
 	ResponseBody      string
+	RequestHeader     string
+	ResponseHeader    string
 }

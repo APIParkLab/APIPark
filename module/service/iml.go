@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"sort"
 	"strings"
 	"time"
@@ -93,6 +94,111 @@ type imlServiceModule struct {
 	logService                 log_service.ILogService                           `autowired:""`
 
 	transaction store.ITransaction `autowired:""`
+}
+
+func formatHeader(header string) string {
+	result, err := url.QueryUnescape(header)
+	if err != nil {
+		return header
+	}
+	result = strings.ReplaceAll(result, "&", "\n")
+	result = strings.ReplaceAll(result, "=", ": ")
+	return result
+}
+
+func (i *imlServiceModule) RestLogInfo(ctx context.Context, serviceId string, logId string) (*service_dto.RestLogInfo, error) {
+	c, err := i.clusterService.Get(ctx, cluster.DefaultClusterID)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s not found", cluster.DefaultClusterID)
+	}
+	info, err := i.logService.LogInfo(ctx, "loki", c.Cluster, logId)
+	if err != nil {
+		return nil, err
+	}
+	if info.Service != serviceId {
+		return nil, errors.New("service not match")
+	}
+
+	logInfo := &service_dto.RestLogInfo{
+		Id:           info.ID,
+		API:          auto.UUID(info.API),
+		Consumer:     auto.UUID(info.Consumer),
+		Status:       info.StatusCode,
+		Ip:           info.RemoteIP,
+		ResponseTime: common.FormatTime(info.ResponseTime),
+		Traffic:      common.FormatByte(info.Traffic),
+		LogTime:      auto.TimeLabel(info.RecordTime),
+		Request: service_dto.OriginRequest{
+			Header: formatHeader(info.RequestHeader),
+			Origin: info.RequestBody,
+		},
+		Response: service_dto.OriginRequest{
+			Header: formatHeader(info.ResponseHeader),
+			Origin: info.ResponseBody,
+		},
+	}
+
+	if info.Consumer == "apipark-global" {
+		logInfo.IsSystemConsumer = true
+		logInfo.Consumer = auto.Label{
+			Id:   info.Consumer,
+			Name: "System Consumer",
+		}
+	}
+	return logInfo, nil
+}
+
+func (i *imlServiceModule) AILogInfo(ctx context.Context, serviceId string, logId string) (*service_dto.AILogInfo, error) {
+	c, err := i.clusterService.Get(ctx, cluster.DefaultClusterID)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s not found", cluster.DefaultClusterID)
+	}
+	info, err := i.logService.LogInfo(ctx, "loki", c.Cluster, logId)
+	if err != nil {
+		return nil, err
+	}
+	if info.Service != serviceId {
+		return nil, errors.New("service not match")
+	}
+	response, err := parseAIResponse(info.ResponseBody)
+	if err != nil {
+		response = info.ResponseBody
+	}
+
+	logInfo := &service_dto.AILogInfo{
+		Id:       info.ID,
+		API:      auto.UUID(info.API),
+		Consumer: auto.UUID(info.Consumer),
+		Status:   info.StatusCode,
+		Ip:       info.RemoteIP,
+		Provider: auto.UUID(info.AIProvider),
+		Model:    info.AIModel,
+		LogTime:  auto.TimeLabel(info.RecordTime),
+		Request: service_dto.OriginAIRequest{
+			OriginRequest: service_dto.OriginRequest{
+				Header: formatHeader(info.RequestHeader),
+				Origin: info.RequestBody,
+			},
+			Body:  parseAIRequest(info.RequestBody),
+			Token: info.TotalToken,
+		},
+		Response: service_dto.OriginAIRequest{
+			OriginRequest: service_dto.OriginRequest{
+				Header: formatHeader(info.ResponseHeader),
+				Origin: info.ResponseBody,
+			},
+			Body:  response,
+			Token: info.TotalToken,
+		},
+	}
+	if info.Consumer == "apipark-global" {
+		logInfo.IsSystemConsumer = true
+		logInfo.Consumer = auto.Label{
+			Id:   info.Consumer,
+			Name: "System Consumer",
+		}
+	}
+	return logInfo, nil
 }
 
 func (i *imlServiceModule) RestLogs(ctx context.Context, serviceId string, start int64, end int64, page int, size int) ([]*service_dto.RestLogItem, int64, error) {
