@@ -63,7 +63,7 @@ const RankingList = ({ topRankingList, serviceType }: { topRankingList: RankingL
       {Object.keys(topRankingList)?.map((item: any, index: number) => (
         <Card
           key={index}
-          className={`flex-1 h-fit cursor-pointer rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
+          className={`flex-1 h-fit rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
           classNames={{
             body: 'p-[15px] pb-[0px]'
           }}
@@ -75,6 +75,7 @@ const RankingList = ({ topRankingList, serviceType }: { topRankingList: RankingL
             id={item}
             columns={[...columns]}
             minVirtualHeight={430}
+            noScroll
             request={() => getTableData(item)}
             showPagination={false}
             tableClass="ranking-list"

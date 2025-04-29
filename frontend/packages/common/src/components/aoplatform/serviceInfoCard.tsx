@@ -76,14 +76,14 @@ const ServiceInfoCard = ({
       method: 'GET',
       eoParams: { service: serviceId, team: teamId },
       eoTransformKeys: [
+        'api_num',
         'enable_mcp',
         'service_kind',
         'subscriber_num',
         'invoke_num',
         'avaliable_monitor',
         'is_released'
-      ],
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      ]
     }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {

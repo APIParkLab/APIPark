@@ -310,13 +310,11 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
         })
         setRequestInfoData({
           Header: result.request.header,
-          Body: result.request.body,
-          Origin: result.request.origin
+          Body: result.request.body
         })
         setResponseInfoData({
           Header: result.response.header,
-          Body: result.response.body,
-          Origin: result.response.origin
+          Body: result.response.body
         })
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
@@ -370,12 +368,10 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
           isSystemConsumer: result.isSystemConsumer
         })
         setRequestInfoData({
-          Header: result.request.header,
-          Origin: result.request.origin
+          Header: result.request.header
         })
         setResponseInfoData({
-          Header: result.response.header,
-          Origin: result.response.origin
+          Header: result.response.header
         })
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))

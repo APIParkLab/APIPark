@@ -74,126 +74,14 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
         'input_token',
         'output_token',
         'total_token'
-      ],
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      ]
     }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
-        const serviceOverview = {
-          enableMcp: true,
-          subscriberNum: 11,
-          apiNum: 3,
-          serviceKind: 'ai',
-          avaliableMonitor: false,
-          maxToken: 100,
-          minToken: 1,
-          requestOverview: [
-            {
-              '2xx': 1.0,
-              '4xx': 2.0,
-              '5xx': 3.0,
-            },
-            {
-              '2xx': 2.0,
-              '4xx': 3.0,
-              '5xx': 4.0,
-            },
-            {
-              '2xx': 3.0,
-              '4xx': 4.0,
-              '5xx': 5.0,
-            },
-            {
-              '2xx': 4.0,
-              '4xx': 5.0,
-              '5xx': 6.0,
-            },
-            {
-              '2xx': 5.0,
-              '4xx': 6.0,
-              '5xx': 7.0,
-            },
-            {
-              '2xx': 6.0,
-              '4xx': 7.0,
-              '5xx': 8.0,
-            }
-          ],
-          tokenOverview: [
-            {
-              '2xx': 1.0,
-              '4xx': 2.0,
-              '5xx': 3.0
-            },
-            {
-              '2xx': 2.0,
-              '4xx': 3.0,
-              '5xx': 4.0
-            },
-            {
-              '2xx': 3.0,
-              '4xx': 4.0,
-              '5xx': 5.0
-            },
-            {
-              '2xx': 4.0,
-              '4xx': 5.0,
-              '5xx': 6.0
-            },
-            {
-              '2xx': 5.0,
-              '4xx': 6.0,
-              '5xx': 7.0
-            },
-            {
-              '2xx': 6.0,
-              '4xx': 7.0,
-              '5xx': 8.0
-            }
-          ],
-          avgTokenOverview: [11, 231, 343, 1414, 25, 362],
-          avgRequestPerSubscriberOverview: [1, 2, 3, 4, 5, 6],
-          avgTokenPerSubscriberOverview: [{
-            inputToken: 1.0,
-            outputToken: 2.0,
-            totalToken: 3.0
-          },
-          {
-            inputToken: 22.0,
-            outputToken: 3.0,
-            totalToken: 44.0
-          },
-          {
-            inputToken: 42.0,
-            outputToken: 15.0,
-            totalToken: 6.0
-          },
-          {
-            inputToken: 5.0,
-            outputToken: 16.0,
-            totalToken: 7.0
-          },
-          {
-            inputToken: 6.0,
-            outputToken: 37.0,
-            totalToken: 8.0
-          },
-          {
-            inputToken: 64.0,
-            outputToken: 7.0,
-            totalToken: 8.0
-          }],
-          requestTotal: '12 GB',
-          tokenTotal: '14 GB',
-          avgToken: '1 k',
-          avgRequestPerSubscriber: '2 k',
-          avgTokenPerSubscriber: '3 k',
-          date: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-        }
         // 存储 AI 服务数据
-        setAiServiceOverview(serviceOverview)
+        setAiServiceOverview(data.overview)
         // 设置 AI 报表数据
-        setAiChartInfoData(serviceOverview)
+        setAiChartInfoData(data.overview)
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
       }
@@ -283,7 +171,10 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
       // token 消耗总数
       setBarChartInfoData({
         title: $t('Token'),
-        data: serviceOverview.tokenOverview,
+        data: serviceOverview.tokenOverview.map((item: { inputToken: number; outputToken: number }) => ({
+          inputToken: item.inputToken,
+          outputToken: item.outputToken
+        })),
         value: serviceOverview.tokenTotal,
         date: serviceOverview.date
       })
@@ -343,103 +234,14 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
         'avg_response_time',
         'avg_request_per_subscriber',
         'avg_traffic_per_subscriber'
-      ],
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      ]
     }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
-        const serviceOverview = {
-          enableMcp: true,
-          subscriberNum: 12,
-          apiNum: 3,
-          serviceKind: 'ai',
-          avaliableMonitor: false,
-          maxResponseTime: 110,
-          minResponseTime: 31,
-          requestOverview: [
-            {
-              '2xx': 1.0,
-              '4xx': 2.0,
-              '5xx': 3.0,
-              fsdf: 4.0
-            },
-            {
-              '2xx': 2.0,
-              '4xx': 3.0,
-              '5xx': 4.0,
-              fsdf: 5.0
-            },
-            {
-              '2xx': 3.0,
-              '4xx': 4.0,
-              '5xx': 5.0,
-              fsdf: 6.0
-            },
-            {
-              '2xx': 4.0,
-              '4xx': 5.0,
-              '5xx': 6.0,
-              fsdf: 7.0
-            },
-            {
-              '2xx': 5.0,
-              '4xx': 6.0,
-              '5xx': 7.0,
-              fsdf: 8.0
-            },
-            {
-              '2xx': 6.0,
-              '4xx': 7.0,
-              '5xx': 8.0,
-              fsdf: 9.0
-            }
-          ],
-          trafficOverview: [
-            {
-              '2xx': 1.0,
-              '4xx': 2.0,
-              '5xx': 3.0
-            },
-            {
-              '2xx': 2.0,
-              '4xx': 3.0,
-              '5xx': 4.0
-            },
-            {
-              '2xx': 3.0,
-              '4xx': 4.0,
-              '5xx': 5.0
-            },
-            {
-              '2xx': 4.0,
-              '4xx': 5.0,
-              '5xx': 6.0
-            },
-            {
-              '2xx': 5.0,
-              '4xx': 6.0,
-              '5xx': 7.0
-            },
-            {
-              '2xx': 6.0,
-              '4xx': 7.0,
-              '5xx': 8.0
-            }
-          ],
-          avgRequestPerSubscriberOverview: [1, 2, 3, 4, 5, 6],
-          avgResponseTimeOverview: [11, 231, 343, 1414, 25, 362],
-          avgTrafficPerSubscriberOverview: [4, 5, 1, 11, 4, 9],
-          requestTotal: '12 GB',
-          trafficTotal: '14 GB',
-          avgResponseTime: '1 k',
-          avgRequestPerSubscriber: '2 k',
-          avgTrafficPerSubscriber: '3 k',
-          date: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-        }
         // 存储 REST 服务数据
-        setRestServiceOverview(serviceOverview)
+        setRestServiceOverview(data.overview)
         // 设置 REST 报表数据
-        setRestChartInfoData(serviceOverview)
+        setRestChartInfoData(data.overview)
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
       }
@@ -451,42 +253,14 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
   const getTopRankingList = () => {
     fetchData<BasicResponse<{ overview: any }>>('service/monitor/top10', {
       method: 'GET',
-      eoParams: { service: serviceId, team: teamId, start: timeRange?.start, end: timeRange?.end },
-      eoApiPrefix: 'http://uat.apikit.com:11204/mockApi/aoplatform/api/v1/'
+      eoParams: { service: serviceId, team: teamId, start: timeRange?.start, end: timeRange?.end }
     }).then((response) => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
-        const serviceOverview = {
-          apis: [
-            {
-              id: '123',
-              name: 'Model 1',
-              request: 100,
-              traffic: 100,
-              token: 100
-            },
-            {
-              id: '456',
-              name: 'Model 2',
-              request: 200,
-              traffic: 300,
-              token: 400
-            }
-          ],
-          consumers: [
-            {
-              id: '6666',
-              name: 'Customer 1',
-              request: 100,
-              traffic: 100,
-              token: 100
-            }
-          ]
-        }
         // 设置排名表格数据
         setTopRankingList({
-          'TOP API': serviceOverview.apis,
-          'TOP Consumer': serviceOverview.consumers
+          'TOP API': data.apis,
+          'TOP Consumer': data.consumers
         })
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
@@ -531,7 +305,7 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
       }
       spinning={dashboardLoading}
     >
-      <div className="mr-PAGE_INSIDE_X">
+      <div className="mr-[30px]">
         <Indicator indicatorInfo={indicatorInfo} />
         <div className="mt-[20px]">
           <DateSelectFilter selectCallback={selectCallback} defaultTime={defaultTime} />

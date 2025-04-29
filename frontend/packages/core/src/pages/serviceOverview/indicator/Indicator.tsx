@@ -38,7 +38,8 @@ const Indicator = ({ indicatorInfo }: { indicatorInfo: any }) => {
               color={indicatorInfo?.enableMcp ? 'green' : 'primary'}
               className="w-full rounded-[10px]"
               variant="outlined"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation()
                 if (indicatorInfo?.enableMcp) {
                   window.open(`/serviceHub/detail/${indicatorInfo?.serviceId}`, '_blank')
                 } else {
