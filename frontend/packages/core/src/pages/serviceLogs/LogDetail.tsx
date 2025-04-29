@@ -103,7 +103,7 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
    */
   const renderStatusWithColor = (status: string) => {
     // 获取状态码首位数字
-    const firstDigit = status.charAt(0)
+    const firstDigit = String(status).charAt(0)
     let color = ''
     switch (firstDigit) {
       case '2':
@@ -308,10 +308,12 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
           isSystemConsumer: result.isSystemConsumer
         })
         setRequestInfoData({
-          Header: result.request.header
+          Header: result.request.header,
+          Body: result.response.body
         })
         setResponseInfoData({
-          Header: result.response.header
+          Header: result.response.header,
+          Body: result.response.body
         })
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))

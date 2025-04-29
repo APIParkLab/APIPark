@@ -69,7 +69,7 @@ const RankingList = ({ topRankingList, serviceType }: { topRankingList: RankingL
           }}
         >
           <div className="mb-[10px]">
-            <span className="text-[14px] text-[#999] font-medium">{item === 'TOP API' ? $t('API 使用排名') : $t('消费者使用排名')}</span>
+            <span className="text-[14px] text-[#888]" style={{ fontFamily: 'Microsoft YaHei' }}>{item === 'TOP API' ? $t('API 使用排名') : $t('消费者使用排名')}</span>
           </div>
           <PageList
             id={item}
