@@ -84,6 +84,14 @@ type imlServiceController struct {
 	transaction         store.ITransaction              `autowired:""`
 }
 
+func (i *imlServiceController) RestLogInfo(ctx *gin.Context, serviceId string, logId string) (*service_dto.RestLogInfo, error) {
+	return i.module.RestLogInfo(ctx, serviceId, logId)
+}
+
+func (i *imlServiceController) AILogInfo(ctx *gin.Context, serviceId string, logId string) (*service_dto.AILogInfo, error) {
+	return i.module.AILogInfo(ctx, serviceId, logId)
+}
+
 func (i *imlServiceController) AILogs(ctx *gin.Context, serviceId string, start string, end string, page string, size string) ([]*service_dto.AILogItem, int64, error) {
 	s, e, err := formatTime(start, end)
 	if err != nil {

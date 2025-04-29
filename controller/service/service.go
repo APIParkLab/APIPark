@@ -45,6 +45,8 @@ type IServiceController interface {
 	AILogs(ctx *gin.Context, serviceId string, start string, end string, page string, size string) ([]*service_dto.AILogItem, int64, error)
 
 	RestLogs(ctx *gin.Context, serviceId string, start string, end string, page string, size string) ([]*service_dto.RestLogItem, int64, error)
+	RestLogInfo(ctx *gin.Context, serviceId string, logId string) (*service_dto.RestLogInfo, error)
+	AILogInfo(ctx *gin.Context, serviceId string, logId string) (*service_dto.AILogInfo, error)
 }
 
 type IAppController interface {

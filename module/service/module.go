@@ -42,6 +42,8 @@ type IServiceModule interface {
 type ILogModule interface {
 	AILogs(ctx context.Context, serviceId string, start int64, end int64, page int, size int) ([]*service_dto.AILogItem, int64, error)
 	RestLogs(ctx context.Context, serviceId string, start int64, end int64, page int, size int) ([]*service_dto.RestLogItem, int64, error)
+	RestLogInfo(ctx context.Context, serviceId string, logId string) (*service_dto.RestLogInfo, error)
+	AILogInfo(ctx context.Context, serviceId string, logId string) (*service_dto.AILogInfo, error)
 }
 
 type IServiceDocModule interface {

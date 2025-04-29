@@ -83,10 +83,12 @@ type Item struct {
 }
 
 type Info struct {
-	ID                string
+	Item
 	ContentType       string
 	RequestBody       string
 	ProxyBody         string
 	ProxyResponseBody string
 	ResponseBody      string
+	RequestHeader     string
+	ResponseHeader    string
 }

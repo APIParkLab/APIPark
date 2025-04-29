@@ -44,12 +44,12 @@ func TestLoki(t *testing.T) {
 //	if err != nil {
 //		t.Fatalf("failed to send request: %v", err)
 //	}
-//	t.Log(time.Now().Sub(a))
+//	t.LogItem(time.Now().Sub(a))
 //	data, err := json.Marshal(result)
 //	if err != nil {
 //		t.Fatalf("failed to marshal data: %v", err)
 //	}
-//	t.Log(string(data))
+//	t.LogItem(string(data))
 //}
 //
 //func TestLokiLogCount(t *testing.T) {
@@ -67,7 +67,7 @@ func TestLoki(t *testing.T) {
 //	if err != nil {
 //		t.Fatalf("failed to marshal data: %v", err)
 //	}
-//	t.Log(string(data))
+//	t.LogItem(string(data))
 //}
 //
 //func TestLokiLogs(t *testing.T) {
@@ -83,7 +83,7 @@ func TestLoki(t *testing.T) {
 //	queries.Set("limit", "1")
 //	now = time.Now()
 //	result, err := send[map[string]interface{}](http.MethodGet, "http://localhost:3100/loki/api/v1/query_range", headers, queries, "")
-//	t.Log(time.Now().Sub(now))
+//	t.LogItem(time.Now().Sub(now))
 //	if err != nil {
 //		t.Fatalf("failed to send request: %v", err)
 //	}
@@ -91,5 +91,5 @@ func TestLoki(t *testing.T) {
 //	if err != nil {
 //		t.Fatalf("failed to marshal data: %v", err)
 //	}
-//	t.Log(string(data))
+//	t.LogItem(string(data))
 //}

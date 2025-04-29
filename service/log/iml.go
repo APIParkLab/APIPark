@@ -230,11 +230,32 @@ func (i *imlLogService) LogInfo(ctx context.Context, driver string, cluster stri
 		return nil, err
 	}
 	return &Info{
-		ID:                info.ID,
+		Item: Item{
+			ID:            info.ID,
+			Strategy:      info.Strategy,
+			Service:       info.Service,
+			API:           info.API,
+			Method:        info.Method,
+			Url:           info.Url,
+			RemoteIP:      info.RemoteIP,
+			Consumer:      info.Consumer,
+			Authorization: info.Authorization,
+			InputToken:    info.InputToken,
+			OutputToken:   info.OutputToken,
+			TotalToken:    info.TotalToken,
+			AIProvider:    info.AIProvider,
+			AIModel:       info.AIModel,
+			StatusCode:    info.StatusCode,
+			ResponseTime:  info.ResponseTime,
+			Traffic:       info.Traffic,
+			RecordTime:    info.RecordTime,
+		},
 		ContentType:       info.ContentType,
 		RequestBody:       info.RequestBody,
 		ProxyBody:         info.ProxyBody,
 		ProxyResponseBody: info.ProxyResponseBody,
 		ResponseBody:      info.ResponseBody,
+		RequestHeader:     info.RequestHeader,
+		ResponseHeader:    info.ResponseHeader,
 	}, nil
 }

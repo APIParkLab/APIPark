@@ -259,3 +259,42 @@ type RestLogItem struct {
 	ResponseTime string         `json:"response_time"`
 	Traffic      string         `json:"traffic"`
 }
+
+type RestLogInfo struct {
+	Id               string         `json:"id"`
+	API              auto.Label     `json:"api" aolabel:"api"`
+	Consumer         auto.Label     `json:"consumer" aolabel:"service"`
+	IsSystemConsumer bool           `json:"is_system_consumer"`
+	Status           int64          `json:"status"`
+	Ip               string         `json:"ip"`
+	ResponseTime     string         `json:"response_time"`
+	Traffic          string         `json:"traffic"`
+	LogTime          auto.TimeLabel `json:"log_time"`
+	Request          OriginRequest  `json:"request"`
+	Response         OriginRequest  `json:"response"`
+}
+
+type AILogInfo struct {
+	Id               string          `json:"id"`
+	API              auto.Label      `json:"api" aolabel:"api"`
+	Consumer         auto.Label      `json:"consumer" aolabel:"service"`
+	IsSystemConsumer bool            `json:"is_system_consumer"`
+	Status           int64           `json:"status"`
+	Ip               string          `json:"ip"`
+	Provider         auto.Label      `json:"provider" aolabel:"ai_provider"`
+	Model            string          `json:"model"`
+	LogTime          auto.TimeLabel  `json:"log_time"`
+	Request          OriginAIRequest `json:"request"`
+	Response         OriginAIRequest `json:"response"`
+}
+
+type OriginRequest struct {
+	Header string `json:"header"`
+	Origin string `json:"origin"`
+}
+
+type OriginAIRequest struct {
+	OriginRequest
+	Body  string `json:"body"`
+	Token int64  `json:"token"`
+}
