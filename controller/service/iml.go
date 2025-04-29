@@ -70,24 +70,54 @@ var (
 )
 
 type imlServiceController struct {
-	module          service.IServiceModule          `autowired:""`
-	docModule       service.IServiceDocModule       `autowired:""`
-	subscribeModule subscribe.ISubscribeModule      `autowired:""`
-	aiAPIModule     ai_api.IAPIModule               `autowired:""`
-	routerModule    router.IRouterModule            `autowired:""`
-	apiDocModule    api_doc.IAPIDocModule           `autowired:""`
-	providerModule  ai.IProviderModule              `autowired:""`
-	aiLocalModel    ai_local.ILocalModelModule      `autowired:""`
-	appModule       service.IAppModule              `autowired:""`
-	upstreamModule  upstream.IUpstreamModule        `autowired:""`
-	settingModule   system.ISettingModule           `autowired:""`
-	teamModule      team.ITeamModule                `autowired:""`
-	catalogueModule catalogue.ICatalogueModule      `autowired:""`
-	monitorModule   monitor.IMonitorStatisticModule `autowired:""`
-	transaction     store.ITransaction              `autowired:""`
+	module              service.IServiceModule          `autowired:""`
+	docModule           service.IServiceDocModule       `autowired:""`
+	subscribeModule     subscribe.ISubscribeModule      `autowired:""`
+	aiAPIModule         ai_api.IAPIModule               `autowired:""`
+	routerModule        router.IRouterModule            `autowired:""`
+	apiDocModule        api_doc.IAPIDocModule           `autowired:""`
+	providerModule      ai.IProviderModule              `autowired:""`
+	aiLocalModel        ai_local.ILocalModelModule      `autowired:""`
+	appModule           service.IAppModule              `autowired:""`
+	upstreamModule      upstream.IUpstreamModule        `autowired:""`
+	settingModule       system.ISettingModule           `autowired:""`
+	teamModule          team.ITeamModule                `autowired:""`
+	catalogueModule     catalogue.ICatalogueModule      `autowired:""`
+	monitorModule       monitor.IMonitorStatisticModule `autowired:""`
+	monitorConfigModule monitor.IMonitorConfigModule    `autowired:""`
+	transaction         store.ITransaction              `autowired:""`
 }
 
-func (i *imlServiceController) AIChartOverview(ctx *gin.Context, serviceId string, start string, end string) (*monitor_dto.ChartAIOverview, error) {
+func (i *imlServiceController) ServiceOverview(ctx *gin.Context, serviceId string) (*service_dto.Overview, error) {
+	o, err := i.module.ServiceOverview(ctx, serviceId)
+	if err != nil {
+		return nil, err
+	}
+	cfg, err := i.monitorConfigModule.GetMonitorConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(cfg.Config) < 1 {
+		return o, nil
+	}
+	statistics, err := i.monitorModule.ProviderStatistics(ctx, &monitor_dto.StatisticInput{
+		Services: []string{serviceId},
+		CommonInput: &monitor_dto.CommonInput{
+			Start: time.Now().Add(-24 * 30 * time.Hour).Unix(),
+			End:   time.Now().Unix(),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(statistics) < 1 {
+		return o, nil
+	}
+	o.InvokeNum = statistics[0].RequestTotal
+	return o, nil
+}
+
+func (i *imlServiceController) AIChartOverview(ctx *gin.Context, serviceId string, start string, end string) (*monitor_dto.ServiceChartAIOverview, error) {
 	s, e, err := formatTime(start, end)
 	if err != nil {
 		return nil, err
@@ -95,10 +125,35 @@ func (i *imlServiceController) AIChartOverview(ctx *gin.Context, serviceId strin
 	if serviceId == "" {
 		return nil, fmt.Errorf("service is required")
 	}
-	return i.monitorModule.AIChartOverview(ctx, serviceId, s, e)
+	so, err := i.module.ServiceOverview(ctx, serviceId)
+	if err != nil {
+		return nil, err
+	}
+	result := &monitor_dto.ServiceChartAIOverview{
+		EnableMCP:     so.EnableMCP,
+		SubscriberNum: so.SubscriberNum,
+		APINum:        so.APINum,
+		ServiceKind:   so.ServiceKind,
+	}
+	cfg, err := i.monitorConfigModule.GetMonitorConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(cfg.Config) < 1 {
+		return result, nil
+	}
+
+	o, err := i.monitorModule.AIChartOverview(ctx, serviceId, s, e)
+	if err != nil {
+		return nil, err
+	}
+
+	result.AvailableMonitor = true
+	result.ChartAIOverview = o
+	return result, nil
 }
 
-func (i *imlServiceController) RestChartOverview(ctx *gin.Context, serviceId string, start string, end string) (*monitor_dto.ChartRestOverview, error) {
+func (i *imlServiceController) RestChartOverview(ctx *gin.Context, serviceId string, start string, end string) (*monitor_dto.ServiceChartRestOverview, error) {
 	s, e, err := formatTime(start, end)
 	if err != nil {
 		return nil, err
@@ -106,7 +161,30 @@ func (i *imlServiceController) RestChartOverview(ctx *gin.Context, serviceId str
 	if serviceId == "" {
 		return nil, fmt.Errorf("service is required")
 	}
-	return i.monitorModule.RestChartOverview(ctx, serviceId, s, e)
+	so, err := i.module.ServiceOverview(ctx, serviceId)
+	if err != nil {
+		return nil, err
+	}
+	result := &monitor_dto.ServiceChartRestOverview{
+		EnableMCP:     so.EnableMCP,
+		SubscriberNum: so.SubscriberNum,
+		APINum:        so.APINum,
+		ServiceKind:   so.ServiceKind,
+	}
+	cfg, err := i.monitorConfigModule.GetMonitorConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(cfg.Config) < 1 {
+		return result, nil
+	}
+	o, err := i.monitorModule.RestChartOverview(ctx, serviceId, s, e)
+	if err != nil {
+		return nil, err
+	}
+	result.AvailableMonitor = true
+	result.ChartRestOverview = o
+	return result, nil
 }
 
 func formatTime(start string, end string) (int64, int64, error) {

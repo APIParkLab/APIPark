@@ -79,14 +79,53 @@ type imlServiceModule struct {
 	tagService        tag.ITagService                `autowired:""`
 	localModelService ai_local.ILocalModelService    `autowired:""`
 
-	serviceTagService service_tag.ITagService `autowired:""`
-	apiService        api.IAPIService         `autowired:""`
-	apiDocService     api_doc.IAPIDocService  `autowired:""`
-	clusterService    cluster.IClusterService `autowired:""`
-	transaction       store.ITransaction      `autowired:""`
+	serviceTagService service_tag.ITagService     `autowired:""`
+	apiService        api.IAPIService             `autowired:""`
+	apiDocService     api_doc.IAPIDocService      `autowired:""`
+	clusterService    cluster.IClusterService     `autowired:""`
+	subscribeServer   subscribe.ISubscribeService `autowired:""`
 
 	releaseService             release.IReleaseService                           `autowired:""`
 	serviceModelMappingService service_model_mapping.IServiceModelMappingService `autowired:""`
+
+	transaction store.ITransaction `autowired:""`
+}
+
+func (i *imlServiceModule) ServiceOverview(ctx context.Context, id string) (*service_dto.Overview, error) {
+	info, err := i.serviceService.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	apiCountMap, err := i.apiDocService.APICountByServices(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	subscribeMap, err := i.subscribeServer.CountMapByService(ctx, subscribe.ApplyStatusSubscribe, id)
+	if err != nil {
+		return nil, err
+	}
+	result := &service_dto.Overview{
+		Id:            info.Id,
+		Name:          info.Name,
+		Description:   info.Description,
+		EnableMCP:     info.EnableMCP,
+		ServiceKind:   info.Kind.String(),
+		SubscriberNum: subscribeMap[id],
+		Logo:          info.Logo,
+		Catalogue:     auto.UUID(info.Catalogue),
+		APINum:        apiCountMap[id],
+	}
+	_, err = i.releaseService.GetRunning(ctx, id)
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+	} else {
+		result.IsReleased = true
+	}
+
+	return result, nil
 }
 
 func (i *imlServiceModule) OnInit() {

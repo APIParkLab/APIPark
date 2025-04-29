@@ -442,9 +442,16 @@ func (e *executor) aggregateSummary(ctx context.Context, start time.Time, end ti
 	result := make(map[string]*monitor.Aggregate)
 	for _, field := range fields {
 		a := new(monitor.Aggregate)
-		a.Avg = int64(avgRes[field+"_avg"].(float64))
-		a.Min = minRes[field+"_min"].(int64)
-		a.Max = maxRes[field+"_max"].(int64)
+		if v, ok := avgRes[field+"_avg"]; ok {
+			a.Avg = int64(v.(float64))
+		}
+		if v, ok := maxRes[field+"_max"]; ok {
+			a.Min = v.(int64)
+		}
+		if v, ok := minRes[field+"_min"]; ok {
+			a.Min = v.(int64)
+		}
+
 		result[field] = a
 	}
 

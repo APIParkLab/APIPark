@@ -186,6 +186,24 @@ type ChartRestOverview struct {
 	Date                            []string              `json:"date"`
 }
 
+type ServiceChartRestOverview struct {
+	EnableMCP        bool   `json:"enable_mcp"`
+	SubscriberNum    int64  `json:"subscriber_num"`
+	APINum           int64  `json:"api_num"`
+	ServiceKind      string `json:"service_kind"`
+	AvailableMonitor bool   `json:"available_monitor"`
+	*ChartRestOverview
+}
+
+type ServiceChartAIOverview struct {
+	EnableMCP        bool   `json:"enable_mcp"`
+	SubscriberNum    int64  `json:"subscriber_num"`
+	APINum           int64  `json:"api_num"`
+	ServiceKind      string `json:"service_kind"`
+	AvailableMonitor bool   `json:"available_monitor"`
+	*ChartAIOverview
+}
+
 type TopN struct {
 	Id      string `json:"id"`
 	Name    string `json:"name"`

@@ -34,6 +34,8 @@ type IServiceModule interface {
 
 	//MySimple 获取我的简易项目列表
 	MySimple(ctx context.Context) ([]*service_dto.SimpleServiceItem, error)
+
+	ServiceOverview(ctx context.Context, id string) (*service_dto.Overview, error)
 }
 
 type IServiceDocModule interface {
