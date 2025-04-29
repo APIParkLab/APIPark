@@ -131,10 +131,12 @@ func (i *imlServiceModule) RestLogInfo(ctx context.Context, serviceId string, lo
 		Request: service_dto.OriginRequest{
 			Header: formatHeader(info.RequestHeader),
 			Origin: info.RequestBody,
+			Body:   info.RequestBody,
 		},
 		Response: service_dto.OriginRequest{
 			Header: formatHeader(info.ResponseHeader),
 			Origin: info.ResponseBody,
+			Body:   info.ResponseBody,
 		},
 	}
 
@@ -178,16 +180,18 @@ func (i *imlServiceModule) AILogInfo(ctx context.Context, serviceId string, logI
 			OriginRequest: service_dto.OriginRequest{
 				Header: formatHeader(info.RequestHeader),
 				Origin: info.RequestBody,
+				Body:   parseAIRequest(info.RequestBody),
 			},
-			Body:  parseAIRequest(info.RequestBody),
+
 			Token: info.InputToken,
 		},
 		Response: service_dto.OriginAIRequest{
 			OriginRequest: service_dto.OriginRequest{
 				Header: formatHeader(info.ResponseHeader),
 				Origin: info.ResponseBody,
+				Body:   response,
 			},
-			Body:  response,
+
 			Token: info.OutputToken,
 		},
 	}

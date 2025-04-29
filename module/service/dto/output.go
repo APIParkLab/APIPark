@@ -291,10 +291,10 @@ type AILogInfo struct {
 type OriginRequest struct {
 	Header string `json:"header"`
 	Origin string `json:"origin"`
+	Body   string `json:"body"`
 }
 
 type OriginAIRequest struct {
 	OriginRequest
-	Body  string `json:"body"`
-	Token int64  `json:"token"`
+	Token int64 `json:"token"`
 }
