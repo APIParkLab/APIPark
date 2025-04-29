@@ -309,7 +309,7 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
         })
         setRequestInfoData({
           Header: result.request.header,
-          Body: result.response.body
+          Body: result.request.body
         })
         setResponseInfoData({
           Header: result.response.header,
