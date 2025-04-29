@@ -535,7 +535,7 @@ export const routerMap: Map<string, RouterMapConfig> = new Map([
   ],
 
   [
-    'serviceHub',
+    'portal',
     {
       type: 'module',
       component: <Outlet />,
@@ -702,12 +702,12 @@ export const routerMap: Map<string, RouterMapConfig> = new Map([
       children: [
         {
           path: 'total',
-          key: 'analytics2',
+          key: 'analyticsTotal',
           lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@dashboard/pages/DashboardTotal.tsx'))
         },
         {
           path: ':dashboardType',
-          key: 'analytics3',
+          key: 'analyticsOther',
           component: <Outlet />,
           children: [
             {

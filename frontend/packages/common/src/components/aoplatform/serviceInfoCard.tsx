@@ -106,7 +106,7 @@ const ServiceInfoCard = ({
    * 打开服务详情页面
    */
   const openInPortal = () => {
-    window.open(`/serviceHub/detail/${serviceOverview?.id}`, '_blank')
+    window.open(`/portal/detail/${serviceOverview?.id}`, '_blank')
   }
 
   // 格式化调用次数，添加K和M单位

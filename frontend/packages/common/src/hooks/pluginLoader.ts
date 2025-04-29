@@ -112,10 +112,10 @@ const mockData = {
     },
     {
       driver: 'apipark.builtIn.component',
-      name: 'serviceHub',
+      name: 'portal',
       router: [
         {
-          path: 'serviceHub',
+          path: 'portal',
           type: 'normal'
         }
       ]

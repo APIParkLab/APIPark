@@ -171,7 +171,7 @@ servers:
     setBreadcrumb([
       {
         title: $t('API 门户'),
-        onClick: () => navigate(`/serviceHub/list`)
+        onClick: () => navigate(`/portal/list`)
       },
       { title: service?.name || '-' },
       { title: $t('服务详情') }
@@ -361,7 +361,7 @@ servers:
   return (
     <div className="pr-[40px]">
       <header>
-        <TopBreadcrumb handleBackCallback={() => navigate(`/serviceHub/list`)} />
+        <TopBreadcrumb handleBackCallback={() => navigate(`/portal/list`)} />
       </header>
       <ServiceInfoCard
         serviceBasicInfo={{
