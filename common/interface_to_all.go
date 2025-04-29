@@ -29,6 +29,8 @@ func FmtIntFromInterface(val interface{}) int64 {
 		return int64(ret)
 	case int:
 		return int64(ret)
+	case float64:
+		return int64(ret)
 	default:
 		return 0
 	}

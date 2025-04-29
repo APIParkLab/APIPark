@@ -159,8 +159,7 @@ func (f *fluxQuery) CommonTendency(ctx context.Context, queryApi api.QueryAPI, s
 			resultMap[field] = append(resultMap[field], common.FmtIntFromInterface(res[field]))
 		}
 		t, _ := res["_time"].(time.Time)
-
-		dates = append(dates, t)
+		dates = append(dates, t.In(time.Local))
 	}
 
 	return dates, resultMap, nil
