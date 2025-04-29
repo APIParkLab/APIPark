@@ -446,7 +446,7 @@ func (e *executor) aggregateSummary(ctx context.Context, start time.Time, end ti
 			a.Avg = int64(v.(float64))
 		}
 		if v, ok := maxRes[field+"_max"]; ok {
-			a.Min = v.(int64)
+			a.Max = v.(int64)
 		}
 		if v, ok := minRes[field+"_min"]; ok {
 			a.Min = v.(int64)

@@ -13,7 +13,8 @@
                     or
                     r._field == "timing" or r._field == "request" or r._field == "response" or r._field
                     ==
-                    "retry",
+                    "retry"
+                    or r._field == "total_token" or r._field == "input_token" or r._field == "output_token",
         )
         |> group(
             columns: [
