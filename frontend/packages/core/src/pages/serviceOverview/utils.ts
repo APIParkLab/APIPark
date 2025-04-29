@@ -3,15 +3,17 @@ export type BarData = {
   value: string
   date: string[]
   data: any[]
+  showXAxis?: boolean
 }
-export const setBarChartInfoData = ({ title, value, data, date }: BarData) => {
+export const setBarChartInfoData = ({ title, value, data, date, showXAxis }: BarData) => {
   // 首先获取所有的键名（假设所有对象的键名都一样）
   if (data.length === 0) {
     return {
       title,
       value,
       date,
-      data: []
+      data: [],
+      showXAxis: !!showXAxis
     }
   }
   if (typeof data[0] !== 'object') {
@@ -19,7 +21,8 @@ export const setBarChartInfoData = ({ title, value, data, date }: BarData) => {
       title,
       value,
       date,
-      data
+      data,
+      showXAxis: !!showXAxis
     }
   }
   // 从第一个对象中获取所有键名
@@ -56,6 +59,7 @@ export const setBarChartInfoData = ({ title, value, data, date }: BarData) => {
     title,
     value,
     date,
-    data: transformedData
+    data: transformedData,
+    showXAxis: !!showXAxis
   }
 }

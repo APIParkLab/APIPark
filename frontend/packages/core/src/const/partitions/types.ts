@@ -123,6 +123,7 @@ export type PartitionDataLogHeaderListFieldType = {
 export type PartitionDataLogConfigFieldType = {
   headers: PartitionDataLogHeaderListFieldType[]
   url: string
+  driver?: string
 }
 
 export const PARTITION_DATA_LOG_CONFIG_TABLE_COLUMNS: PageProColumns<PartitionDataLogConfigFieldType & { _id: string }>[] = [

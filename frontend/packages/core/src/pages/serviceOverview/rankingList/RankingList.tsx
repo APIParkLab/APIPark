@@ -65,7 +65,7 @@ const RankingList = ({ topRankingList, serviceType }: { topRankingList: RankingL
           key={index}
           className={`flex-1 h-fit rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
           classNames={{
-            body: 'p-[15px] pb-[0px]'
+            body: 'p-[15px]'
           }}
         >
           <div className="mb-[10px]">

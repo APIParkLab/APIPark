@@ -12,6 +12,7 @@ export type BarChartInfo = {
     color: string
     value: number[]
   }[]
+  showXAxis?: boolean
 }
 
 type ServiceBarCharProps = {
@@ -19,7 +20,6 @@ type ServiceBarCharProps = {
   dataInfo?: BarChartInfo
   height?: number
 }
-
 
 const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharProps) => {
   const chartRef = useRef<ECharts>(null)
@@ -33,6 +33,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
   const setChartOption = (dataInfo: BarChartInfo) => {
     const isNumberArray = typeof dataInfo.data[0] !== 'object'
     const legendData = isNumberArray ? [dataInfo.title] : dataInfo.data.map((item) => item.name)
+    const hasData = dataInfo.data && dataInfo.data.length > 0
     const tooltipFormatter = (params: { name: string; color: string; seriesIndex?: number }) => {
       let tooltipContent = `<div style="min-width:140px;padding:8px;">
                           <div>${isNumberArray ? '' : params.name}</div>`
@@ -63,8 +64,8 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
     const option: EChartsOption = {
       title: [
         {
-          text: '{titleStyle|' + $t(dataInfo.title) + '}\n{valueStyle|' + dataInfo.value + '}',
-          left: '4%',
+          text: '{titleStyle|' + $t(dataInfo.title) + '}\n\n{valueStyle|' + dataInfo.value + '}',
+          left: '2%',
           top: '0',
           textStyle: {
             rich: {
@@ -75,8 +76,8 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
                 lineHeight: 20
               },
               valueStyle: {
-                fontSize: 25,
-                color: '#000',
+                fontSize: 32,
+                color: '#101010',
                 fontWeight: 500,
                 lineHeight: 40
               }
@@ -85,10 +86,10 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
         }
       ],
       grid: {
-        left: '5%',
+        left: '3%',
         right: '3%',
-        bottom: '5%',
-        top: '100px',
+        bottom: '0%',
+        top: '110px',
         containLabel: true
       },
       tooltip: {
@@ -124,12 +125,14 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
           lineStyle: {
             color: '#ccc'
           }
-        }
+        },
+        show: false
       },
       yAxis: {
         type: 'value',
         name: '',
         min: 0,
+        minInterval: 1,
         splitLine: {
           lineStyle: {
             type: 'dashed',
@@ -140,6 +143,50 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
           formatter: '{value}'
         }
       },
+      // 添加数据缩放组件，实现鼠标放大缩小，后续可能需要
+      // dataZoom: [
+      //   {
+      //     type: 'inside', // 内置的数据区域缩放组件（使用鼠标滚轮缩放）
+      //     xAxisIndex: 0, // 设置缩放作用在第一个x轴
+      //     filterMode: 'filter',
+      //     start: 0,
+      //     end: 100
+      //   },
+      //   {
+      //     type: 'slider', // 滑动条型数据区域缩放组件
+      //     xAxisIndex: 0,
+      //     filterMode: 'filter',
+      //     height: 20,
+      //     bottom: 0,
+      //     start: 0,
+      //     end: 100,
+      //     handleIcon: 'path://M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+      //     handleSize: '80%',
+      //     handleStyle: {
+      //       color: '#fff',
+      //       shadowBlur: 3,
+      //       shadowColor: 'rgba(0, 0, 0, 0.6)',
+      //       shadowOffsetX: 2,
+      //       shadowOffsetY: 2
+      //     },
+      //     show: false // 默认隐藏底部的滑动条，可以改为 true 显示
+      //   }
+      // ],
+      // 添加空状态提示
+      graphic: !hasData
+        ? [
+            {
+              type: 'text',
+              left: 'center',
+              top: 'middle',
+              style: {
+                text: $t('暂无数据'),
+                fontSize: 14,
+                fill: '#999'
+              }
+            }
+          ]
+        : [],
       series: isNumberArray
         ? [
             {
@@ -171,10 +218,19 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
     setOption(option)
   }
 
+  // 使用深度监听来确保图表数据更新
   useEffect(() => {
     if (!dataInfo) return
-    setChartOption(dataInfo)
-  }, [dataInfo])
+    
+    // 直接获取 ECharts 实例并设置选项
+    const echartsInstance = chartRef.current?.getEchartsInstance()
+    if (echartsInstance) {
+      // 清除已有的图表
+      echartsInstance.clear()
+      // 重新设置选项
+      setChartOption(dataInfo)
+    }
+  }, [dataInfo, JSON.stringify(dataInfo)])
   return (
     <div className={`w-full ${customClassNames}`}>
       <ECharts ref={chartRef} option={option} style={{ height: height || 400 }} opts={{ renderer: 'svg' }} />

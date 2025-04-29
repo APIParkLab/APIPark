@@ -10,8 +10,8 @@ export default function DashboardList() {
   return (
     <>
       {dashboardType === 'api' && <DashboardApiList />}
-      {dashboardType === 'subscriber' && <DashboardProjectList />}
-      {dashboardType === 'provider' && <DashboardApplicationList />}
+      {dashboardType === 'service' && <DashboardProjectList />}
+      {dashboardType === 'consumer' && <DashboardApplicationList />}
     </>
   )
 }

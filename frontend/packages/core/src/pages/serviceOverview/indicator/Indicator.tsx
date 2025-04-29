@@ -18,33 +18,30 @@ const Indicator = ({ indicatorInfo }: { indicatorInfo: any }) => {
 
   /** 设置服务指标 */
   const setIndicatorList = () => {
+    const side = indicatorInfo?.serviceKind === 'ai' ? 'aiInside' : 'inside'
     setIndicator([
       {
         title: indicatorInfo?.enableMcp ? 'APIs / Tools' : 'APIs',
-        link: `/serviceHub/detail/${indicatorInfo?.serviceId}`,
+        link: `/service/${indicatorInfo?.teamId}/${side}/${indicatorInfo?.serviceId}/route`,
         content: indicatorInfo?.apiNum ?? 0
       },
       {
         title: $t('订阅数量'),
-        link: `/consumer/list/${indicatorInfo?.teamId}`,
+        link: `/service/${indicatorInfo?.teamId}/${side}/${indicatorInfo?.serviceId}/subscriber`,
         content: indicatorInfo?.subscriberNum ?? 0
       },
       {
         title: 'MCP',
+        link: `/service/${indicatorInfo?.teamId}/${side}/${indicatorInfo?.serviceId}/setting`,
         content: (
           <>
-            {/* green */}
             <Button
               color={indicatorInfo?.enableMcp ? 'green' : 'primary'}
               className="w-full rounded-[10px]"
               variant="outlined"
               onClick={(e) => {
                 e.stopPropagation()
-                if (indicatorInfo?.enableMcp) {
-                  window.open(`/serviceHub/detail/${indicatorInfo?.serviceId}`, '_blank')
-                } else {
-                  navigateTo(`/service/${indicatorInfo?.teamId}/aiInside/${indicatorInfo?.serviceId}/setting`)
-                }
+                navigateTo(`/service/${indicatorInfo?.teamId}/${side}/${indicatorInfo?.serviceId}/setting`)
               }}
             >
               {indicatorInfo?.enableMcp ? $t('已开启') : $t('开启 MCP')}
@@ -65,19 +62,23 @@ const Indicator = ({ indicatorInfo }: { indicatorInfo: any }) => {
       {indicatorList.map((item, index) => (
         <Card
           key={index}
-          className={`flex-1 cursor-pointer shadow-[0_5px_10px_0_rgba(0,0,0,0.05)] rounded-[10px] transition duration-500 hover:shadow-[0_5px_20px_0_rgba(0,0,0,0.15)] hover:scale-[1.02] ${index > 0 ? 'ml-[10px]' : ''}`}
+          className={`flex-1 cursor-pointer rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
           classNames={{
-            body: 'p-[15px]'
+            body: 'py-[20px] px-[18px]'
           }}
           onClick={() => {
-            window.open(item.link)
+            if (item.link) {
+              navigateTo(item.link)
+            }
           }}
         >
-          <div className="text-[14px] font-semibold text-gray-400 mb-[15px]">
+          <div className="text-[14px] text-[#888] mb-[10px]">
             {item.title}
             {item.link && <Icon icon="uiw:right" width="16" height="16" className="absolute top-[14px] right-[14px]" />}
           </div>
-          <div className={`${index < 2 ? 'text-[40px] font-semibold' : 'block mt-[30px]'}`}>{item.content}</div>
+          <div className={`${index < 2 ? 'text-[32px] font-medium text-[#101010]' : 'block mt-[30px]'}`}>
+            {item.content}
+          </div>
         </Card>
       ))}
     </div>

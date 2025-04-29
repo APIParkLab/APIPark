@@ -326,9 +326,9 @@ export default function DashboardTotal() {
               {barChartInfo?.map((item: BarChartInfo, index: number) => (
                 <Card
                   key={index}
-                  className={`flex-1 cursor-pointer rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
+                  className={`flex-1 rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
                   classNames={{
-                    body: 'p-[15px]'
+                    body: 'py-[15px] px-[0px]'
                   }}
                 >
                   <ServiceBarChar key={index} height={400} dataInfo={item} customClassNames="flex-1"></ServiceBarChar>
@@ -339,22 +339,22 @@ export default function DashboardTotal() {
               {perBarChartInfo?.map((item: any, index: number) => (
                 <Card
                   key={index}
-                  className={`flex-1 cursor-pointer rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
+                  className={`flex-1 rounded-[10px] ${index > 0 ? 'ml-[10px]' : ''}`}
                   classNames={{
-                    body: 'p-[15px]'
+                    body: 'py-[15px] px-[0px]'
                   }}
                 >
                   {item.type === 'area' ? (
                     <>
                       <ServiceAreaChart
                         key={index}
-                        height={250}
+                        height={270}
                         dataInfo={item}
                         customClassNames="flex-1 relative"
                       ></ServiceAreaChart>
                     </>
                   ) : (
-                    <ServiceBarChar key={index} height={250} dataInfo={item} customClassNames="flex-1"></ServiceBarChar>
+                    <ServiceBarChar key={index} height={270} dataInfo={item} customClassNames="flex-1"></ServiceBarChar>
                   )}
                 </Card>
               ))}

@@ -161,7 +161,7 @@ const PartitionInsideDashboardSetting: FC = () => {
                 className="overflow-hidden mt-[30px] w-full max-h-full flex flex-col justify-between"
                 title={
                   <div>
-                    <span className="text-MAIN_TEXT my-btnybase mr-btnbase"> {$t('数据日志')}</span>
+                    <span className="text-MAIN_TEXT my-btnybase mr-btnbase"> {$t('请求日志')}</span>
                     {!dataLogLoading && !dataLogData && <Tag color="#f50">{$t('未配置')}</Tag>}
                   </div>
                 }
@@ -220,6 +220,11 @@ export function DataLogConfigPreview(x: PartitionDataLogConfigFieldType) {
 
   return (
     <div className="flex flex-col gap-[4px] ">
+      <Row className="">
+        <Col className="font-bold text-right pr-[4px]">{$t('数据源')}：</Col>
+        {/* 先写死，或许会有选择列表，但现在可以不用 */}
+        <Col>Loki</Col>
+      </Row>
       <Row className="">
         <Col className="font-bold text-right pr-[4px]">{$t('请求前缀')}：</Col>
         <Col>{x?.url}</Col>

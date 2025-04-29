@@ -1,11 +1,15 @@
-import EditableTable from "@common/components/aoplatform/EditableTable"
-import WithPermission from "@common/components/aoplatform/WithPermission"
-import { BasicResponse, PLACEHOLDER, STATUS_CODE } from "@common/const/const"
-import { useFetch } from "@common/hooks/http"
-import { $t } from "@common/locales"
-import { PARTITION_DATA_LOG_CONFIG_TABLE_COLUMNS, PartitionDataLogConfigFieldType, PartitionDataLogHeaderListFieldType } from "@core/const/partitions/types"
-import { Button, Form, Input, message } from "antd"
-import { useEffect } from "react"
+import EditableTable from '@common/components/aoplatform/EditableTable'
+import WithPermission from '@common/components/aoplatform/WithPermission'
+import { BasicResponse, PLACEHOLDER, STATUS_CODE } from '@common/const/const'
+import { useFetch } from '@common/hooks/http'
+import { $t } from '@common/locales'
+import {
+  PARTITION_DATA_LOG_CONFIG_TABLE_COLUMNS,
+  PartitionDataLogConfigFieldType,
+  PartitionDataLogHeaderListFieldType
+} from '@core/const/partitions/types'
+import { Button, Form, Input, message, Select } from 'antd'
+import { useEffect } from 'react'
 
 export type DashboardPageShowStatus = 'view' | 'edit'
 export type DashboardSettingEditProps = {
@@ -15,7 +19,7 @@ export type DashboardSettingEditProps = {
 }
 const DataLogSettingEdit = (props: DashboardSettingEditProps) => {
   const { changeStatus, refreshData, data } = props
-  const [form] = Form.useForm();
+  const [form] = Form.useForm()
   const { fetchData } = useFetch()
 
   const onFinish = () => {
@@ -23,10 +27,16 @@ const DataLogSettingEdit = (props: DashboardSettingEditProps) => {
       const formData = {
         config: {
           url: value.url,
-          headers: value.headers.filter((item: PartitionDataLogHeaderListFieldType) => item.key).map((item: PartitionDataLogHeaderListFieldType) => ({key:item.key, value:item.value || ''}))
+          headers: value.headers
+            .filter((item: PartitionDataLogHeaderListFieldType) => item.key)
+            .map((item: PartitionDataLogHeaderListFieldType) => ({ key: item.key, value: item.value || '' }))
         }
       }
-      fetchData<BasicResponse<{ info: PartitionDataLogConfigFieldType }>>('log/loki', { method: 'POST', body: JSON.stringify(formData), eoParams: {} }).then(response => {
+      fetchData<BasicResponse<{ info: PartitionDataLogConfigFieldType }>>('log/loki', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+        eoParams: {}
+      }).then((response) => {
         const { code, msg } = response
         if (code === STATUS_CODE.SUCCESS) {
           message.success(msg || $t('操作成功，即将刷新页面'))
@@ -38,15 +48,26 @@ const DataLogSettingEdit = (props: DashboardSettingEditProps) => {
     })
   }
 
-  useEffect(() => { form.setFieldsValue(data) }, [data])
+  useEffect(() => {
+    form.setFieldsValue({
+      ...data,
+      headers: data?.headers?.length ? data.headers : [
+        {
+          key: '',
+          value: ''
+        }
+      ],
+      driver: 'loki'
+    })
+  }, [data])
 
   useEffect(() => {
-    return (form.setFieldsValue({}))
-  }, []);
+    return form.setFieldsValue({})
+  }, [])
   return (
     <>
       <div className="overflow-auto h-full">
-        <WithPermission access={''} >
+        <WithPermission access={''}>
           <Form
             form={form}
             className="mx-auto flex flex-col justify-between h-full"
@@ -55,23 +76,29 @@ const DataLogSettingEdit = (props: DashboardSettingEditProps) => {
             autoComplete="off"
           >
             <Form.Item<PartitionDataLogConfigFieldType>
-              label={$t("请求前缀")}
-              name="url"
+              label={$t('数据源类型')}
+              name="driver"
               rules={[{ required: true }]}
             >
+              <Select
+                showSearch
+                optionFilterProp="label"
+                className="w-INPUT_NORMAL"
+                placeholder={$t(PLACEHOLDER.select)}
+                options={[{ label: 'Loki', value: 'loki' }]}
+              ></Select>
+            </Form.Item>
+            <Form.Item<PartitionDataLogConfigFieldType> label={$t('请求前缀')} name="url" rules={[{ required: true }]}>
               <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} />
             </Form.Item>
 
-            <Form.Item<PartitionDataLogConfigFieldType>
-              label={$t("HTTP 头部")}
-              name="headers"
-            >
+            <Form.Item<PartitionDataLogConfigFieldType> label={$t('HTTP 头部')} name="headers">
               <EditableTable<PartitionDataLogConfigFieldType & { _id: string }>
                 configFields={PARTITION_DATA_LOG_CONFIG_TABLE_COLUMNS}
               />
             </Form.Item>
             <div className="flex gap-btnbase">
-              <WithPermission access='system.devops.data_source.edit'>
+              <WithPermission access="system.devops.data_source.edit">
                 <Button type="primary" htmlType="submit">
                   {$t('保存')}
                 </Button>
@@ -84,7 +111,7 @@ const DataLogSettingEdit = (props: DashboardSettingEditProps) => {
         </WithPermission>
       </div>
     </>
-  );
+  )
 }
 
-export default DataLogSettingEdit;
+export default DataLogSettingEdit
