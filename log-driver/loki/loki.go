@@ -132,6 +132,24 @@ func (d *Driver) LogCount(clusterId string, conditions map[string]string, spendH
 	return result, nil
 }
 
+func (d *Driver) LogRecords(clusterId string, start time.Time, end time.Time) ([]*log_driver.Log, error) {
+	if start.After(end) {
+		return nil, fmt.Errorf("start time is greater than end time")
+	}
+	queries := url.Values{}
+	queries.Set("query", fmt.Sprintf("{cluster=\"%s\"} | json", clusterId))
+	queries.Set("direction", "backward")
+	queries.Set("start", strconv.FormatInt(start.UnixNano(), 10))
+	queries.Set("end", strconv.FormatInt(end.UnixNano(), 10))
+	log.Debug("query is ", queries.Get("query"))
+	logs, err := d.recuseLogs(queries, end, 1)
+	if err != nil {
+		return nil, err
+	}
+
+	return logs, nil
+}
+
 func (d *Driver) Logs(clusterId string, conditions map[string]string, start time.Time, end time.Time, limit int64, offset int64) ([]*log_driver.Log, int64, error) {
 	if start.After(end) {
 		return nil, 0, fmt.Errorf("start time is greater than end time")
@@ -205,15 +223,24 @@ func (d *Driver) recuseLogs(queries url.Values, end time.Time, offset int64) ([]
 		}
 		detail := l.Stream
 		msec, _ := strconv.ParseInt(detail.Msec, 10, 64)
-
 		logs = append(logs, &log_driver.Log{
 			ID:            detail.RequestId,
+			Strategy:      detail.Strategy,
 			Service:       detail.Provider,
+			API:           detail.Api,
 			Method:        detail.RequestMethod,
 			Url:           detail.RequestUri,
 			RemoteIP:      detail.SrcIp,
 			Consumer:      detail.Application,
 			Authorization: detail.Authorization,
+			InputToken:    parseToInt64(detail.AIModelInputToken),
+			OutputToken:   parseToInt64(detail.AIModelOutputToken),
+			TotalToken:    parseToInt64(detail.AIModelTotalToken),
+			AIProvider:    detail.AIProvider,
+			AIModel:       detail.AIModel,
+			StatusCode:    parseToInt64(detail.Status),
+			ResponseTime:  parseToInt64(detail.RequestTime),
+			Traffic:       int64(len(detail.ResponseBody) + len(detail.RequestBody)),
 			RecordTime:    time.UnixMilli(msec),
 		})
 	}
@@ -221,6 +248,26 @@ func (d *Driver) recuseLogs(queries url.Values, end time.Time, offset int64) ([]
 		return logs[i].RecordTime.After(logs[j].RecordTime)
 	})
 	return logs, nil
+}
+
+func parseToInt64(v interface{}) int64 {
+	switch t := v.(type) {
+	case int:
+		return int64(t)
+	case int64:
+		return t
+	case string:
+		if v == "" {
+			return 0
+		}
+		i, err := strconv.ParseInt(t, 10, 64)
+		if err != nil {
+			return 0
+		}
+		return i
+	default:
+		return 0
+	}
 }
 
 func (d *Driver) logCount(clusterId string, conditions map[string]string, start time.Time, end time.Time) (int64, error) {

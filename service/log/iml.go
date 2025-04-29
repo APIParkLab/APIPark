@@ -23,7 +23,77 @@ var (
 )
 
 type imlLogService struct {
-	store log_source.ILogSourceStore `autowired:""`
+	store          log_source.ILogSourceStore `autowired:""`
+	logRecordStore log_source.ILogRecordStore `autowired:""`
+}
+
+func (i *imlLogService) LogRecordsByService(ctx context.Context, serviceId string, start time.Time, end time.Time, page int, size int) ([]*Item, int64, error) {
+	list, total, err := i.logRecordStore.ListPage(ctx, "`record_time` between ? and ? and `service` = ?", page, size, []interface{}{
+		start,
+		end,
+		serviceId,
+	}, "record_time desc")
+	if err != nil {
+		return nil, 0, err
+	}
+	return utils.SliceToSlice(list, func(s *log_source.LogRecord) *Item {
+		return &Item{
+			ID:            s.UUID,
+			Strategy:      s.Strategy,
+			Service:       s.Service,
+			API:           s.API,
+			Method:        s.Method,
+			Url:           s.Url,
+			RemoteIP:      s.RemoteIP,
+			Consumer:      s.Consumer,
+			Authorization: s.Authorization,
+			InputToken:    s.InputToken,
+			OutputToken:   s.OutputToken,
+			TotalToken:    s.TotalToken,
+			AIProvider:    s.AIProvider,
+			AIModel:       s.AIModel,
+			StatusCode:    s.StatusCode,
+			ResponseTime:  s.ResponseTime,
+			Traffic:       s.Traffic,
+			RecordTime:    s.RecordTime,
+		}
+	}), total, nil
+
+}
+
+func (i *imlLogService) InsertLog(ctx context.Context, driver string, input *InsertLog) error {
+	// 判断日志是否已存在，若已存在，则不插入
+	_, err := i.logRecordStore.First(ctx, map[string]interface{}{"uuid": input.ID})
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			log_print.Errorf("get log record %s error: %s", input.ID, err)
+			return err
+		}
+		return i.logRecordStore.Insert(ctx, &log_source.LogRecord{
+			UUID:          input.ID,
+			Driver:        input.Driver,
+			Service:       input.Service,
+			API:           input.API,
+			Strategy:      input.Strategy,
+			Method:        input.Method,
+			Url:           input.Url,
+			RemoteIP:      input.RemoteIP,
+			Consumer:      input.Consumer,
+			Authorization: input.Authorization,
+			InputToken:    input.InputToken,
+			OutputToken:   input.OutputToken,
+			TotalToken:    input.TotalToken,
+			AIProvider:    input.AIProvider,
+			AIModel:       input.AIModel,
+			StatusCode:    input.StatusCode,
+			ResponseTime:  input.ResponseTime,
+
+			Traffic:    input.Traffic,
+			RecordTime: input.RecordTime,
+		})
+	}
+	return nil
+
 }
 
 func (i *imlLogService) OnComplete() {
@@ -67,9 +137,10 @@ func (i *imlLogService) UpdateLogSource(ctx context.Context, driver string, inpu
 		if input.Config == nil || *input.Config == "" {
 			return errors.New("config is required")
 		}
+
 		now := time.Now()
 		userId := utils.UserId(ctx)
-		s = &log_source.Log{
+		s = &log_source.LogSource{
 			UUID:     input.ID,
 			Cluster:  *input.Cluster,
 			Driver:   driver,
@@ -79,10 +150,18 @@ func (i *imlLogService) UpdateLogSource(ctx context.Context, driver string, inpu
 			CreateAt: now,
 			UpdateAt: now,
 		}
+		if input.LastPullTime == nil {
+			s.LastPullAt = time.Now().Add(-24 * time.Hour)
+		} else {
+			s.LastPullAt = *input.LastPullTime
+		}
 
 	} else {
 		if input.Config != nil && *input.Config != "" {
 			s.Config = *input.Config
+		}
+		if input.LastPullTime != nil {
+			s.LastPullAt = *input.LastPullTime
 		}
 		s.Updater = utils.UserId(ctx)
 		s.UpdateAt = time.Now()
@@ -127,6 +206,10 @@ func (i *imlLogService) Logs(ctx context.Context, driver string, cluster string,
 		})
 	}
 	return result, count, nil
+}
+
+func (i *imlLogService) LogRecords(ctx context.Context, driver string, keyword string, start time.Time, end time.Time) ([]*Item, int64, error) {
+	panic(errors.New("not implemented"))
 }
 
 func (i *imlLogService) LogCount(ctx context.Context, driver string, cluster string, conditions map[string]string, spendHour int64, group string) (map[string]int64, error) {

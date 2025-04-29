@@ -8,15 +8,26 @@ import (
 )
 
 type ILogSourceStore interface {
-	store.IBaseStore[Log]
+	store.IBaseStore[LogSource]
 }
 
 type storeLogSource struct {
-	store.Store[Log]
+	store.Store[LogSource]
+}
+
+type ILogRecordStore interface {
+	store.IBaseStore[LogRecord]
+}
+
+type storeLogRecord struct {
+	store.Store[LogRecord]
 }
 
 func init() {
 	autowire.Auto[ILogSourceStore](func() reflect.Value {
 		return reflect.ValueOf(new(storeLogSource))
+	})
+	autowire.Auto[ILogRecordStore](func() reflect.Value {
+		return reflect.ValueOf(new(storeLogRecord))
 	})
 }

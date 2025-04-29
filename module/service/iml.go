@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/APIParkLab/APIPark/common"
+
 	"github.com/mitchellh/mapstructure"
 
 	"github.com/eolinker/go-common/register"
@@ -27,6 +29,7 @@ import (
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 
 	"github.com/APIParkLab/APIPark/resources/access"
+	log_service "github.com/APIParkLab/APIPark/service/log"
 	"github.com/eolinker/eosc/log"
 	"github.com/eolinker/go-common/server"
 
@@ -87,8 +90,49 @@ type imlServiceModule struct {
 
 	releaseService             release.IReleaseService                           `autowired:""`
 	serviceModelMappingService service_model_mapping.IServiceModelMappingService `autowired:""`
+	logService                 log_service.ILogService                           `autowired:""`
 
 	transaction store.ITransaction `autowired:""`
+}
+
+func (i *imlServiceModule) RestLogs(ctx context.Context, serviceId string, start int64, end int64, page int, size int) ([]*service_dto.RestLogItem, int64, error) {
+	list, total, err := i.logService.LogRecordsByService(ctx, serviceId, time.Unix(start, 0), time.Unix(end, 0), page, size)
+	if err != nil {
+		return nil, 0, err
+	}
+	return utils.SliceToSlice(list, func(s *log_service.Item) *service_dto.RestLogItem {
+		return &service_dto.RestLogItem{
+			Id:           s.ID,
+			API:          auto.UUID(s.API),
+			Status:       s.StatusCode,
+			LogTime:      auto.TimeLabel(s.RecordTime),
+			Ip:           s.RemoteIP,
+			Consumer:     auto.UUID(s.Consumer),
+			ResponseTime: common.FormatTime(s.ResponseTime),
+			Traffic:      common.FormatByte(s.Traffic),
+		}
+	}), total, nil
+}
+
+func (i *imlServiceModule) AILogs(ctx context.Context, serviceId string, start int64, end int64, page int, size int) ([]*service_dto.AILogItem, int64, error) {
+	list, total, err := i.logService.LogRecordsByService(ctx, serviceId, time.Unix(start, 0), time.Unix(end, 0), page, size)
+	if err != nil {
+		return nil, 0, err
+	}
+	return utils.SliceToSlice(list, func(s *log_service.Item) *service_dto.AILogItem {
+		return &service_dto.AILogItem{
+			Id:             s.ID,
+			API:            auto.UUID(s.API),
+			Status:         s.StatusCode,
+			LogTime:        auto.TimeLabel(s.RecordTime),
+			Ip:             s.RemoteIP,
+			Token:          s.TotalToken,
+			TokenPerSecond: s.TotalToken / s.ResponseTime,
+			Consumer:       auto.UUID(s.Consumer),
+			Provider:       auto.UUID(s.AIProvider),
+			Model:          s.AIModel,
+		}
+	}), total, nil
 }
 
 func (i *imlServiceModule) ServiceOverview(ctx context.Context, id string) (*service_dto.Overview, error) {

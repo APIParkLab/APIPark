@@ -236,3 +236,26 @@ type Overview struct {
 	Catalogue        auto.Label `json:"catalogue" aolabel:"catalogue"`
 	APINum           int64      `json:"api_num"`
 }
+
+type AILogItem struct {
+	Id             string         `json:"id"`
+	API            auto.Label     `json:"api" aolabel:"api"`
+	Status         int64          `json:"status"`
+	LogTime        auto.TimeLabel `json:"log_time"`
+	Ip             string         `json:"ip"`
+	Token          int64          `json:"token"`
+	TokenPerSecond int64          `json:"token_per_second"`
+	Consumer       auto.Label     `json:"consumer" aolabel:"service"`
+	Provider       auto.Label     `json:"provider" aolabel:"ai_provider"`
+	Model          string         `json:"model"`
+}
+type RestLogItem struct {
+	Id           string         `json:"id"`
+	API          auto.Label     `json:"api" aolabel:"api"`
+	Status       int64          `json:"status"`
+	LogTime      auto.TimeLabel `json:"log_time"`
+	Ip           string         `json:"ip"`
+	Consumer     auto.Label     `json:"consumer" aolabel:"service"`
+	ResponseTime string         `json:"response_time"`
+	Traffic      string         `json:"traffic"`
+}
