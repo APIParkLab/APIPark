@@ -41,6 +41,10 @@ type IServiceController interface {
 	RestChartOverview(ctx *gin.Context, serviceId string, start string, end string) (*monitor_dto.ServiceChartRestOverview, error)
 
 	ServiceOverview(ctx *gin.Context, serviceId string) (*service_dto.Overview, error)
+
+	AILogs(ctx *gin.Context, serviceId string, start string, end string, page string, size string) ([]*service_dto.AILogItem, int64, error)
+
+	RestLogs(ctx *gin.Context, serviceId string, start string, end string, page string, size string) ([]*service_dto.RestLogItem, int64, error)
 }
 
 type IAppController interface {

@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/APIParkLab/APIPark/common"
+
 	"github.com/APIParkLab/APIPark/gateway"
 	"github.com/eolinker/eosc/log"
 	"github.com/eolinker/go-common/auto"
@@ -131,8 +133,8 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 				Status5xx: item.Status5xx,
 			})
 		}
-		result.AvgRequestPerSubscriber = formatCount(summary.StatusTotal / subscriberNum)
-		result.RequestTotal = formatCount(summary.StatusTotal)
+		result.AvgRequestPerSubscriber = common.FormatCount(summary.StatusTotal / subscriberNum)
+		result.RequestTotal = common.FormatCount(summary.StatusTotal)
 	}()
 
 	go func() {
@@ -169,11 +171,11 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 			})
 
 		}
-		result.AvgTokenPerSubscriber = formatCount(summary.TotalToken / subscriberNum)
-		result.MaxToken = fmt.Sprintf("%s/s", formatCount(maxToken/timeInterval))
-		result.MinToken = fmt.Sprintf("%s/s", formatCount(minToken/timeInterval))
-		result.AvgToken = fmt.Sprintf("%s/s", formatCount(summary.OutputToken/timeInterval))
-		result.TokenTotal = formatCount(summary.TotalToken)
+		result.AvgTokenPerSubscriber = common.FormatCount(summary.TotalToken / subscriberNum)
+		result.MaxToken = fmt.Sprintf("%s/s", common.FormatCount(maxToken/timeInterval))
+		result.MinToken = fmt.Sprintf("%s/s", common.FormatCount(minToken/timeInterval))
+		result.AvgToken = fmt.Sprintf("%s/s", common.FormatCount(summary.OutputToken/timeInterval))
+		result.TokenTotal = common.FormatCount(summary.TotalToken)
 	}()
 	go func() {
 		wg.Wait()
@@ -250,8 +252,8 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 				Status5xx: item.Status5xx,
 			})
 		}
-		result.AvgRequestPerSubscriber = formatCount(summary.StatusTotal / subscriberNum)
-		result.RequestTotal = formatCount(summary.StatusTotal)
+		result.AvgRequestPerSubscriber = common.FormatCount(summary.StatusTotal / subscriberNum)
+		result.RequestTotal = common.FormatCount(summary.StatusTotal)
 	}()
 
 	go func() {
@@ -288,7 +290,7 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 			})
 			result.AvgTrafficPerSubscriberOverview = append(result.AvgTrafficPerSubscriberOverview, item.StatusTotal/subscriberNum)
 		}
-		result.AvgTrafficPerSubscriber = formatCount(summary.StatusTotal / subscriberNum)
+		result.AvgTrafficPerSubscriber = common.FormatCount(summary.StatusTotal / subscriberNum)
 	}()
 	go func() {
 		wg.Wait()
@@ -310,13 +312,13 @@ func generateTopN(id string, name string, item *monitor.TopN, apiKind string) *m
 	n := &monitor_dto.TopN{
 		Id:      id,
 		Name:    name,
-		Request: formatCount(item.Request),
+		Request: common.FormatCount(item.Request),
 	}
 	switch apiKind {
 	case "rest":
-		n.Traffic = formatByte(item.Traffic)
+		n.Traffic = common.FormatByte(item.Traffic)
 	case "ai":
-		n.Token = formatCount(item.Token)
+		n.Token = common.FormatCount(item.Token)
 	}
 	return n
 }
