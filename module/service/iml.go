@@ -180,7 +180,7 @@ func (i *imlServiceModule) AILogInfo(ctx context.Context, serviceId string, logI
 				Origin: info.RequestBody,
 			},
 			Body:  parseAIRequest(info.RequestBody),
-			Token: info.TotalToken,
+			Token: info.InputToken,
 		},
 		Response: service_dto.OriginAIRequest{
 			OriginRequest: service_dto.OriginRequest{
@@ -188,7 +188,7 @@ func (i *imlServiceModule) AILogInfo(ctx context.Context, serviceId string, logI
 				Origin: info.ResponseBody,
 			},
 			Body:  response,
-			Token: info.TotalToken,
+			Token: info.OutputToken,
 		},
 	}
 	if info.Consumer == "apipark-global" {
