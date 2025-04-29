@@ -22,13 +22,13 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
   const chartRef = useRef<ECharts>(null)
   const [option, setOption] = useState<EChartsOption | undefined>({})
   const setChartOption = (dataInfo: AreaChartInfo) => {
+    const hasData = dataInfo.data && dataInfo.data.length > 0
     const option = {
-      tooltip: {
+      tooltip: hasData ? {
         trigger: 'axis',
         formatter: function (value: any) {
           // 如果是数组，取第一个参数的name
           const param = Array.isArray(value) ? value[0] : value
-          console.log('params==', param)
           let tooltipContent = `<div style="min-width:140px;padding:8px;">`
           const marker = `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${param.color};"></span>`
           tooltipContent += `<div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
@@ -37,6 +37,8 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
           tooltipContent += '</div>'
           return tooltipContent
         }
+      } : {
+        show: false // 没有数据时不显示tooltip
       },
       title: [
         {
@@ -88,6 +90,7 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
       yAxis: {
         type: 'value',
         boundaryGap: [0, '5%'],
+        show: hasData, // 没有数据时不显示Y轴
         axisLine: {
           show: false
         },
@@ -129,7 +132,7 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
       //   }
       // ],
       // 添加空状态提示
-      graphic: !dataInfo.data.length
+      graphic: !hasData
         ? [
             {
               type: 'text',
@@ -225,7 +228,7 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
           </div>
         </div>
       </div>
-      <ECharts ref={chartRef} option={option} style={{ height: height || 400 }} opts={{ renderer: 'svg' }} />
+      <ECharts ref={chartRef} option={option} theme="apipark" style={{ height: height || 400 }} opts={{ renderer: 'svg' }} />
     </div>
   )
 }
