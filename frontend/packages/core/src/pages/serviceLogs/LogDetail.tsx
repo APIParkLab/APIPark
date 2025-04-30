@@ -161,7 +161,7 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
     setDescriptionItems([
       {
         key: 'time',
-        label: $t('时间'),
+        label: $t('时间戳'),
         children: time
       },
       {
@@ -213,7 +213,7 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
     setDescriptionItems([
       {
         key: 'time',
-        label: $t('时间'),
+        label: $t('时间戳'),
         children: time
       },
       {
