@@ -549,8 +549,10 @@ export const REST_SERVICE_TOP_RANKING_LIST: PageProColumns<any>[] = [
 /** REST 服务日志 */
 export const REST_SERVICE_LOG_LIST: PageProColumns<LogItem>[] = [
   {
-    title: '时间',
+    title: '时间戳',
     dataIndex: 'logTime',
+    copyable: false,
+    width: 180,
     ellipsis: true
   },
   {
@@ -571,11 +573,14 @@ export const REST_SERVICE_LOG_LIST: PageProColumns<LogItem>[] = [
   {
     title: 'IP',
     dataIndex: 'ip',
+    copyable: true,
+    width: 140,
     ellipsis: true
   },
   {
     title: '响应时间',
     dataIndex: 'responseTime',
+    width: 130,
     ellipsis: true
   },
   {
@@ -588,8 +593,10 @@ export const REST_SERVICE_LOG_LIST: PageProColumns<LogItem>[] = [
 /** AI 服务日志 */
 export const AI_SERVICE_LOG_LIST: PageProColumns<LogItem>[] = [
   {
-    title: '时间',
+    title: '时间戳',
     dataIndex: 'logTime',
+    copyable: false,
+    width: 200,
     ellipsis: true
   },
   {
@@ -615,6 +622,8 @@ export const AI_SERVICE_LOG_LIST: PageProColumns<LogItem>[] = [
   {
     title: 'IP',
     dataIndex: 'ip',
+    copyable: true,
+    width: 140,
     ellipsis: true
   },
   {
