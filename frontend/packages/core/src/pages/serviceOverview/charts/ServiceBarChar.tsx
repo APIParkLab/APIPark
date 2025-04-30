@@ -308,7 +308,10 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
             data: item.value
           }))
     }
-    setOption(option)
+    const echartsInstance = chartRef.current?.getEchartsInstance()
+    if (echartsInstance) {
+      echartsInstance.setOption(option)
+    }
   }
 
   // 使用深度监听来确保图表数据更新
