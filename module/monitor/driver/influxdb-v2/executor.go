@@ -363,41 +363,95 @@ func (e *executor) CommonStatistics(ctx context.Context, start, end time.Time, g
 	}
 
 	return resultMap, nil
+}
 
+func (e *executor) overviewByStatusCode(ctx context.Context, start, end time.Time, table string, wheres []monitor.MonWhereItem, statusCode []string, dataFields []string, fn flux.AggregateFn) ([]time.Time, map[string][]int64, error) {
+	newStartTime, every, windowOffset, bucket := getTimeIntervalAndBucket(start, end)
+	var returnDates []time.Time
+	var returnResult = make(map[string][]int64)
+	for _, s := range statusCode {
+		newWheres := make([]monitor.MonWhereItem, 0, len(wheres)+1)
+		newWheres = append(newWheres, wheres...)
+		newWheres = append(newWheres, monitor.MonWhereItem{
+			Key:       "status_code",
+			Operation: "=",
+			Values:    []string{s},
+		})
+		dates, result, err := e.fluxQuery.CommonTendency(ctx, e.openApi, newStartTime, end, bucket, table, formatFilter(newWheres), dataFields, every, windowOffset, fn)
+		if err != nil {
+			return nil, nil, err
+		}
+		if len(dates) > 0 {
+			returnDates = dates
+		}
+
+		for _, v := range dataFields {
+			key := fmt.Sprintf("%s_%s", s, v)
+			if _, ok := returnResult[key]; !ok {
+				returnResult[key] = make([]int64, 0, len(returnDates))
+			}
+			returnResult[key] = append(returnResult[key], result[v]...)
+		}
+	}
+
+	return returnDates, returnResult, nil
 }
 
 func (e *executor) TrafficOverviewByStatusCode(ctx context.Context, start time.Time, end time.Time, wheres []monitor.MonWhereItem) ([]time.Time, *monitor.StatusCodeOverview, []*monitor.StatusCodeOverview, error) {
-	newStartTime, every, windowOffset, bucket := getTimeIntervalAndBucket(start, end)
 
-	filters := formatFilter(wheres)
-
-	fieldsConditions := []string{"s2xx_request", "s4xx_request", "s5xx_request", "s2xx_response", "s4xx_response", "s5xx_response"}
-
-	dates, groupValues, err := e.fluxQuery.CommonTendency(ctx, e.openApi, newStartTime, end, bucket, "request", filters, fieldsConditions, every, windowOffset, flux.SumFn)
+	fieldsConditions := []string{"request", "response"}
+	statusFilters := []string{"2xx", "4xx", "5xx"}
+	dates, overview, err := e.overviewByStatusCode(ctx, start, end, "request", wheres, statusFilters, fieldsConditions, flux.SumFn)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	s2xxRequest := groupValues["s2xx_request"]
-	s4xxRequest := groupValues["s4xx_request"]
-	s5xxRequest := groupValues["s5xx_request"]
+	s2xxRequest := overview["2xx_request"]
+	s2xxRequestLen := len(s2xxRequest)
+	s4xxRequest := overview["4xx_request"]
+	s4xxRequestLen := len(s4xxRequest)
+	s5xxRequest := overview["5xx_request"]
+	s5xxRequestLen := len(s5xxRequest)
 
-	s2xxResponse := groupValues["s2xx_response"]
-	s4xxResponse := groupValues["s4xx_response"]
-	s5xxResponse := groupValues["s5xx_response"]
+	s2xxResponse := overview["2xx_response"]
+	s2xxResponseLen := len(s2xxResponse)
+	s4xxResponse := overview["4xx_response"]
+	s4xxResponseLen := len(s4xxResponse)
+	s5xxResponse := overview["5xx_response"]
+	s5xxResponseLen := len(s5xxResponse)
+
 	totalOverview := new(monitor.StatusCodeOverview)
 	result := make([]*monitor.StatusCodeOverview, 0, len(dates))
 	for i := range dates {
-		overview := new(monitor.StatusCodeOverview)
-		overview.Status2xx = s2xxRequest[i] + s2xxResponse[i]
-		overview.Status4xx = s4xxRequest[i] + s4xxResponse[i]
-		overview.Status5xx = s5xxRequest[i] + s5xxResponse[i]
-		overview.StatusTotal = overview.Status2xx + overview.Status4xx + overview.Status5xx
+		r := new(monitor.StatusCodeOverview)
+		if s2xxRequestLen > i {
+			r.Status2xx = s2xxRequest[i]
+			totalOverview.Status2xx += r.Status2xx
+		}
+		if s4xxRequestLen > i {
+			r.Status4xx = s4xxRequest[i]
+			totalOverview.Status4xx += r.Status4xx
+		}
+		if s5xxRequestLen > i {
+			r.Status5xx = s5xxRequest[i]
+			totalOverview.Status5xx += r.Status5xx
+		}
+		if s2xxResponseLen > i {
+			r.Status2xx += s2xxResponse[i]
+			totalOverview.Status2xx += r.Status2xx
+		}
+		if s4xxResponseLen > i {
+			r.Status4xx += s4xxResponse[i]
+			totalOverview.Status4xx += r.Status4xx
+		}
+		if s5xxResponseLen > i {
+			r.Status5xx += s5xxResponse[i]
+			totalOverview.Status5xx += r.Status5xx
+		}
+		r.StatusTotal += r.Status2xx + r.Status4xx + r.Status5xx
+		totalOverview.StatusTotal += r.StatusTotal
 
-		totalOverview.StatusTotal += overview.StatusTotal
-		totalOverview.Status2xx += overview.Status2xx
-		totalOverview.Status4xx += overview.Status4xx
-		totalOverview.Status5xx += overview.Status5xx
-		result = append(result, overview)
+		result = append(result, r)
+
 	}
 
 	return dates, totalOverview, result, nil
@@ -539,7 +593,7 @@ func (e *executor) TopN(ctx context.Context, start time.Time, end time.Time, lim
 		{
 			Measurement: "request",
 			AggregateFn: "sum()",
-			Fields:      []string{"total", "request", "total_token"},
+			Fields:      []string{"total", "request", "response", "total_token"},
 		},
 		{
 			Measurement: "proxy",
@@ -558,7 +612,7 @@ func (e *executor) TopN(ctx context.Context, start time.Time, end time.Time, lim
 		n.Key = key
 		n.Request = result.Total
 		n.Token = result.TotalToken
-		n.Traffic = result.TotalRequest
+		n.Traffic = result.TotalRequest + result.TotalResponse
 		topN = append(topN, n)
 	}
 
