@@ -20,7 +20,7 @@ export default function DashboardTotal() {
   /** 获取数据 */
   const { fetchData } = useFetch()
   /** 默认时间 */
-  const [defaultTime] = useState<TimeOption>('sevenDays')
+  const [defaultTime] = useState<TimeOption>('day')
   /** 当前选中的时间范围 */
   const [timeRange, setTimeRange] = useState<TimeRange | undefined>()
   /** 当前激活的标签 */
@@ -66,7 +66,12 @@ export default function DashboardTotal() {
         'avg_token_per_subscriber',
         'input_token',
         'output_token',
-        'total_token'
+        'total_token',
+        'request_2xx_total',
+        'request_4xx_total',
+        'request_5xx_total',
+        'input_token_total',
+        'output_token_total'
       ]
     }).then((response) => {
       const { code, data, msg } = response
@@ -98,7 +103,13 @@ export default function DashboardTotal() {
         'max_response_time',
         'min_response_time',
         'avg_request_per_subscriber',
-        'avg_traffic_per_subscriber'
+        'avg_traffic_per_subscriber',
+        'request_2xx_total',
+        'request_4xx_total',
+        'request_5xx_total',
+        'traffic_2xx_total',
+        'traffic_4xx_total',
+        'traffic_5xx_total'
       ]
     }).then((response) => {
       const { code, data, msg } = response
@@ -120,19 +131,29 @@ export default function DashboardTotal() {
     // 设置总数数据
     setBarChartInfo([
       // 服务请求次数
-      setBarChartInfoData({
-        title: $t('请求数'),
-        data: serviceOverview.requestOverview,
-        value: serviceOverview.requestTotal,
-        date: serviceOverview.date
-      }),
+      {
+        ...setBarChartInfoData({
+          title: $t('请求数'),
+          data: serviceOverview.requestOverview,
+          value: serviceOverview.requestTotal,
+          date: serviceOverview.date
+        }),
+        request2xxTotal: serviceOverview.request2xxTotal,
+        request4xxTotal: serviceOverview.request4xxTotal,
+        request5xxTotal: serviceOverview.request5xxTotal
+      },
       // 流量消耗总数
-      setBarChartInfoData({
-        title: $t('流量'),
-        data: serviceOverview.trafficOverview,
-        value: serviceOverview.trafficTotal,
-        date: serviceOverview.date
-      })
+      {
+        ...setBarChartInfoData({
+          title: $t('流量'),
+          data: serviceOverview.trafficOverview,
+          value: serviceOverview.trafficTotal,
+          date: serviceOverview.date
+        }),
+        traffic2xxTotal: serviceOverview.traffic2xxTotal,
+        traffic4xxTotal: serviceOverview.traffic4xxTotal,
+        traffic5xxTotal: serviceOverview.traffic5xxTotal
+      }
     ])
     // 设置平均值数据
     setPerBarChartInfo([
@@ -170,22 +191,31 @@ export default function DashboardTotal() {
     // 设置总数数据
     setBarChartInfo([
       // 服务请求次数
-      setBarChartInfoData({
-        title: $t('请求数'),
-        data: serviceOverview.requestOverview,
-        value: serviceOverview.requestTotal,
-        date: serviceOverview.date
-      }),
+      {
+        ...setBarChartInfoData({
+          title: $t('请求数'),
+          data: serviceOverview.requestOverview,
+          value: serviceOverview.requestTotal,
+          date: serviceOverview.date
+        }),
+        request2xxTotal: serviceOverview.request2xxTotal,
+        request4xxTotal: serviceOverview.request4xxTotal,
+        request5xxTotal: serviceOverview.request5xxTotal
+      },
       // token 消耗总数
-      setBarChartInfoData({
-        title: $t('Token'),
-        data: serviceOverview.tokenOverview.map((item: { inputToken: number; outputToken: number }) => ({
-          inputToken: item.inputToken,
-          outputToken: item.outputToken
-        })),
-        value: serviceOverview.tokenTotal,
-        date: serviceOverview.date
-      })
+      {
+        ...setBarChartInfoData({
+          title: $t('Token'),
+          data: serviceOverview.tokenOverview.map((item: { inputToken: number; outputToken: number }) => ({
+            inputToken: item.inputToken,
+            outputToken: item.outputToken
+          })),
+          value: serviceOverview.tokenTotal,
+          date: serviceOverview.date
+        }),
+        inputTokenTotal: serviceOverview.inputTokenTotal,
+        outputTokenTotal: serviceOverview.outputTokenTotal
+      }
     ])
     // 设置平均值数据
     setPerBarChartInfo([
@@ -331,7 +361,13 @@ export default function DashboardTotal() {
                     body: 'py-[15px] px-[0px]'
                   }}
                 >
-                  <ServiceBarChar key={index} height={400} dataInfo={item} customClassNames="flex-1"></ServiceBarChar>
+                  <ServiceBarChar
+                    showLegendIndicator={true}
+                    key={index}
+                    height={400}
+                    dataInfo={item}
+                    customClassNames="flex-1"
+                  ></ServiceBarChar>
                 </Card>
               ))}
             </div>
@@ -349,12 +385,19 @@ export default function DashboardTotal() {
                       <ServiceAreaChart
                         key={index}
                         height={270}
+                        showAvgLine={true}
                         dataInfo={item}
                         customClassNames="flex-1 relative"
                       ></ServiceAreaChart>
                     </>
                   ) : (
-                    <ServiceBarChar key={index} height={270} dataInfo={item} customClassNames="flex-1"></ServiceBarChar>
+                    <ServiceBarChar
+                      key={index}
+                      height={270}
+                      showAvgLine={true}
+                      dataInfo={item}
+                      customClassNames="flex-1"
+                    ></ServiceBarChar>
                   )}
                 </Card>
               ))}

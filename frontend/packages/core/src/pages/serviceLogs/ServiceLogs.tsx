@@ -45,7 +45,7 @@ const ServiceLogs = ({ serviceType }: { serviceType: 'aiService' | 'restService'
   /** 当前选中的时间范围 */
   const [timeRange, setTimeRange] = useState<TimeRange | undefined>()
   /** 默认时间 */
-  const [defaultTime] = useState<TimeOption>('sevenDays')
+  const [defaultTime] = useState<TimeOption>('day')
   /** 全局状态 */
   const { state } = useGlobalContext()
   /**
