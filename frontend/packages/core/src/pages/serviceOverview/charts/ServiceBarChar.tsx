@@ -13,15 +13,25 @@ export type BarChartInfo = {
     value: number[]
   }[]
   showXAxis?: boolean
+  inputTokenTotal?: string
+  outputTokenTotal?: string
+  request2xxTotal?: string
+  request4xxTotal?: string
+  request5xxTotal?: string
+  traffic2xxTotal?: string
+  traffic4xxTotal?: string
+  traffic5xxTotal?: string
 }
 
 type ServiceBarCharProps = {
   customClassNames?: string
   dataInfo?: BarChartInfo
   height?: number
+  showAvgLine?: boolean
+  showLegendIndicator?: boolean
 }
 
-const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharProps) => {
+const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showLegendIndicator }: ServiceBarCharProps) => {
   const chartRef = useRef<ECharts>(null)
   const [option, setOption] = useState<EChartsOption | undefined>({})
   // 使用从主题配置中导入的默认颜色，而不是硬编码的颜色值
@@ -29,8 +39,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
   const [hasData, setHasData] = useState(true)
   const tokenMap = {
     inputToken: $t('输入 Token'),
-    outputToken: $t('输出 Token'),
-    totalToken: $t('总 Token')
+    outputToken: $t('输出 Token')
   }
   const setChartOption = (dataInfo: BarChartInfo) => {
     const isNumberArray = typeof dataInfo.data[0] !== 'object'
@@ -53,7 +62,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
       // 为每个数据系列添加一行
       data.forEach((item, index) => {
         // 使用与柱状图相同的颜色策略，确保颜色一致性
-        const color = index < chartColors.length ? chartColors[index] : item.color
+        const color = item.color ? item.color : index < chartColors.length ? chartColors[index] : detaultColor
         const name = tokenMap[item.name as keyof typeof tokenMap] || item.name
         const value = item.value[dataInfo.date.indexOf(params.name)] || 0
 
@@ -97,30 +106,43 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
         top: '110px',
         containLabel: true
       },
-      tooltip: dataExists ? {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'shadow'
-        },
-        formatter: function (params: any) {
-          // 如果是数组，取第一个参数的name
-          const param = Array.isArray(params) ? params[0] : params
-          return tooltipFormatter(param)
-        }
-      } : {
-        show: false // 没有数据时不显示tooltip
-      },
+      tooltip: dataExists
+        ? {
+            trigger: 'axis',
+            axisPointer: {
+              type: 'shadow'
+            },
+            formatter: function (params: any) {
+              // 如果是数组，取第一个参数的name
+              const param = Array.isArray(params) ? params[0] : params
+              return tooltipFormatter(param)
+            }
+          }
+        : {
+            show: false // 没有数据时不显示tooltip
+          },
       legend: {
-        show: false,
+        show: !isNumberArray,
         data: legendData,
         right: '10px',
-        top: '30px',
+        top: '60px',
         itemWidth: 10,
         itemHeight: 10,
         textStyle: {
           color: '#333'
         },
-        icon: 'rect'
+        icon: 'rect',
+        formatter: function(name: string): string {
+          // 这里可以映射或自定义图例文本
+          const customNames: Record<string, string> = {
+            'inputToken': `${$t('输入 Token')} ${showLegendIndicator ? `(${dataInfo.inputTokenTotal})` : ''}`,
+            'outputToken': `${$t('输出 Token')} ${showLegendIndicator ? `(${dataInfo.outputTokenTotal})` : ''}`,
+            '2xx': `${'2xx'} ${showLegendIndicator ? `(${dataInfo.request2xxTotal || dataInfo.traffic2xxTotal})` : ''}`,
+            '4xx': `${'4xx'} ${showLegendIndicator ? `(${dataInfo.request4xxTotal || dataInfo.traffic4xxTotal})` : ''}`,
+            '5xx': `${'5xx'} ${showLegendIndicator ? `(${dataInfo.request5xxTotal || dataInfo.traffic5xxTotal})` : ''}`
+          };
+          return customNames[name] || name;
+        }
       },
       xAxis: {
         type: 'category',
@@ -209,6 +231,27 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
               itemStyle: {
                 color: detaultColor
               },
+              markLine: showAvgLine
+                ? {
+                    silent: false,
+                    symbol: 'none',
+                    lineStyle: {
+                      width: 1,
+                      type: 'dashed'
+                    },
+                    label: {
+                      position: 'insideEndTop',
+                      formatter: '{c}',
+                      color: '#000',
+                      fontSize: 10,
+                      backgroundColor: 'transparent',
+                      padding: [10, 4],
+                      borderRadius: 2,
+                      distance: -5
+                    },
+                    data: [{ type: 'average', name: 'Avg' }]
+                  }
+                : undefined,
               data: dataInfo.data
             }
           ]
@@ -216,12 +259,33 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
             name: item.name,
             type: 'bar',
             stack: '总量',
+            markLine: showAvgLine
+              ? {
+                  silent: false,
+                  symbol: 'none',
+                  lineStyle: {
+                    width: 1,
+                    type: 'dashed'
+                  },
+                  label: {
+                    position: 'insideEndTop',
+                    formatter: '{c}',
+                    color: '#000',
+                    fontSize: 10,
+                    backgroundColor: 'transparent',
+                    padding: [10, 4],
+                    borderRadius: 2,
+                    distance: -5
+                  },
+                  data: [{ type: 'average', name: 'Avg' }]
+                }
+              : undefined,
             emphasis: {
               focus: 'series'
             },
             itemStyle: {
               // 使用主题中的颜色列表，如果索引超出范围则使用项目自带的颜色
-              color: index < chartColors.length ? chartColors[index] : item.color
+              color: item.color ? item.color : index < chartColors.length ? chartColors[index] : detaultColor
             },
             data: item.value
           }))
@@ -232,7 +296,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
   // 使用深度监听来确保图表数据更新
   useEffect(() => {
     if (!dataInfo) return
-    
+
     // 直接获取 ECharts 实例并设置选项
     const echartsInstance = chartRef.current?.getEchartsInstance()
     if (echartsInstance) {
@@ -252,10 +316,10 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
         echartsInstance.resize()
       }
     }
-    
+
     // 添加监听
     window.addEventListener('resize', handleResize)
-    
+
     // 组件卸载时移除监听
     return () => {
       window.removeEventListener('resize', handleResize)
@@ -264,11 +328,11 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
   return (
     <div className={`w-full ${customClassNames}`}>
       <div style={!hasData ? { cursor: 'default', pointerEvents: 'none' } : {}}>
-        <ECharts 
-          ref={chartRef} 
-          option={option} 
-          style={{ height: height || 400 }} 
-          opts={{ renderer: 'svg' }} 
+        <ECharts
+          ref={chartRef}
+          option={option}
+          style={{ height: height || 400 }}
+          opts={{ renderer: 'svg' }}
           theme="apipark" // 这里应用主题名称，需要先在应用入口注册
         />
       </div>

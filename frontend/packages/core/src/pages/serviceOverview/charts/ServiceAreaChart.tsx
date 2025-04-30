@@ -16,9 +16,10 @@ type ServiceAreaCharProps = {
   customClassNames?: string
   dataInfo?: AreaChartInfo
   height?: number
+  showAvgLine?: boolean
 }
 
-const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCharProps) => {
+const ServiceAreaChart = ({ customClassNames, dataInfo, height, showAvgLine }: ServiceAreaCharProps) => {
   const chartRef = useRef<ECharts>(null)
   const [option, setOption] = useState<EChartsOption | undefined>({})
   const [hasData, setHasData] = useState(true)
@@ -159,6 +160,25 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
           itemStyle: {
             color: 'rgb(255, 70, 131)'
           },
+          markLine: showAvgLine ? {
+            silent: false,
+            symbol: 'none',
+            lineStyle: {
+              width: 1,
+              type: 'dashed'
+            },
+            label: {
+              position: 'insideEndTop',
+              formatter: '{c}',
+              color: '#000',
+              fontSize: 10,
+              backgroundColor: 'transparent',
+              padding: [10, 4],
+              borderRadius: 2,
+              distance: -5
+            },
+            data: [{ type: 'average', name: 'Avg' }]
+          } : undefined,
           areaStyle: {
             color: {
               type: 'linear',
