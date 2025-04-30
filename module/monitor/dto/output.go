@@ -159,8 +159,13 @@ type ChartAIOverview struct {
 	AvgRequestPerSubscriber         string                `json:"avg_request_per_subscriber"`          //请求概况
 	AvgRequestPerSubscriberOverview []int64               `json:"avg_request_per_subscriber_overview"` //平均响应时间概况
 	RequestTotal                    string                `json:"request_total"`
-	TokenTotal                      string                `json:"token_total"`    //总token流量
-	TokenOverview                   []*TokenOverview      `json:"token_overview"` //token概况
+	Request2xxTotal                 string                `json:"request_2xx_total"`
+	Request4xxTotal                 string                `json:"request_4xx_total"`
+	Request5xxTotal                 string                `json:"request_5xx_total"`
+	TokenTotal                      string                `json:"token_total"` //总token流量
+	InputTokenTotal                 string                `json:"input_token_total"`
+	OutputTokenTotal                string                `json:"output_token_total"` //最大token流量
+	TokenOverview                   []*TokenOverview      `json:"token_overview"`     //token概况
 	AvgTokenOverview                []int64               `json:"avg_token_overview"`
 	AvgTokenPerSubscriberOverview   []*TokenOverview      `json:"avg_token_per_subscriber_overview"`
 	AvgToken                        string                `json:"avg_token"`
@@ -174,16 +179,25 @@ type ChartRestOverview struct {
 	RequestOverview                 []*StatusCodeOverview `json:"request_overview"` //请求概况
 	AvgRequestPerSubscriber         string                `json:"avg_request_per_subscriber"`
 	AvgRequestPerSubscriberOverview []int64               `json:"avg_request_per_subscriber_overview"` //平均响应时间概况
-	RequestTotal                    string                `json:"request_total"`
-	TrafficOverview                 []*StatusCodeOverview `json:"traffic_overview"`           //流量概况
-	AvgResponseTimeOverview         []int64               `json:"avg_response_time_overview"` //平均响应时间概况
-	AvgTrafficPerSubscriberOverview []int64               `json:"avg_traffic_per_subscriber_overview"`
-	TrafficTotal                    string                `json:"traffic_total"`
-	AvgResponseTime                 string                `json:"avg_response_time"` //平均响应时间
-	MaxResponseTime                 string                `json:"max_response_time"` //最大响应时间
-	MinResponseTime                 string                `json:"min_response_time"` //最小响应时间
-	AvgTrafficPerSubscriber         string                `json:"avg_traffic_per_subscriber"`
-	Date                            []string              `json:"date"`
+
+	RequestTotal    string `json:"request_total"`
+	Request2xxTotal string `json:"request_2xx_total"`
+	Request4xxTotal string `json:"request_4xx_total"`
+	Request5xxTotal string `json:"request_5xx_total"`
+
+	TrafficOverview []*StatusCodeOverview `json:"traffic_overview"` //流量概况
+	Traffic2xxTotal string                `json:"traffic_2xx_total"`
+	Traffic4xxTotal string                `json:"traffic_4xx_total"` //流量概况
+	Traffic5xxTotal string                `json:"traffic_5xx_total"` //流量概况
+
+	AvgResponseTimeOverview         []int64  `json:"avg_response_time_overview"` //平均响应时间概况
+	AvgTrafficPerSubscriberOverview []int64  `json:"avg_traffic_per_subscriber_overview"`
+	TrafficTotal                    string   `json:"traffic_total"`
+	AvgResponseTime                 string   `json:"avg_response_time"` //平均响应时间
+	MaxResponseTime                 string   `json:"max_response_time"` //最大响应时间
+	MinResponseTime                 string   `json:"min_response_time"` //最小响应时间
+	AvgTrafficPerSubscriber         string   `json:"avg_traffic_per_subscriber"`
+	Date                            []string `json:"date"`
 }
 
 type ServiceChartRestOverview struct {

@@ -135,17 +135,20 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 		}
 		result.AvgRequestPerSubscriber = common.FormatCount(summary.StatusTotal / subscriberNum)
 		result.RequestTotal = common.FormatCount(summary.StatusTotal)
+		result.Request2xxTotal = common.FormatCount(summary.Status2xx)
+		result.Request4xxTotal = common.FormatCount(summary.Status4xx)
+		result.Request5xxTotal = common.FormatCount(summary.Status5xx)
 	}()
-	avgResponseTimes := make([]int64, 0)
+	sumResponseTimes := make([]int64, 0)
 	go func() {
 		defer wg.Done()
-		_, _, items, err := executor.AvgResponseTimeOverview(ctx, formatTimeByMinute(start), formatTimeByMinute(end), wheres)
+		_, _, items, err := executor.SumResponseTimeOverview(ctx, formatTimeByMinute(start), formatTimeByMinute(end), wheres)
 		if err != nil {
 			errChan <- err
 			return
 		}
 		for _, item := range items {
-			avgResponseTimes = append(avgResponseTimes, item)
+			sumResponseTimes = append(sumResponseTimes, item)
 		}
 	}()
 	totalTokens := make([]int64, 0)
@@ -183,10 +186,9 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 
 		}
 		result.AvgTokenPerSubscriber = common.FormatCount(summary.TotalToken / subscriberNum)
-		//result.MaxToken = fmt.Sprintf("%s/s", common.FormatCount(maxToken/timeInterval))
-		//result.MinToken = fmt.Sprintf("%s/s", common.FormatCount(minToken/timeInterval))
-		//result.AvgToken = fmt.Sprintf("%s/s", common.FormatCount(summary.OutputToken/timeInterval))
 		result.TokenTotal = common.FormatCount(summary.TotalToken)
+		result.InputTokenTotal = common.FormatCount(summary.InputToken)
+		result.OutputTokenTotal = common.FormatCount(summary.OutputToken)
 	}()
 	go func() {
 		wg.Wait()
@@ -204,9 +206,9 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 	var maxTokenPerSecond, minTokenPerSecond, avgTokenPerSecond int64 = 0, 0, 0
 	for index, token := range totalTokens {
 		var p int64 = 0
-		if len(avgResponseTimes) > index && avgResponseTimes[index] > 0 {
+		if len(sumResponseTimes) > index && sumResponseTimes[index] > 0 {
 			// 由于时间单位是ms，因此需要✖️1000
-			p = int64(float64(token) * 1000 / float64(avgResponseTimes[index]))
+			p = int64(float64(token) * 1000 / float64(sumResponseTimes[index]))
 		}
 		result.AvgTokenOverview = append(result.AvgTokenOverview, p)
 		if maxTokenPerSecond < p {
@@ -217,11 +219,11 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 		}
 		avgTokenPerSecond += p
 	}
-	if len(avgResponseTimes) > 0 {
-		result.AvgToken = fmt.Sprintf("%s/s", common.FormatCount(avgTokenPerSecond/int64(len(avgResponseTimes))))
+	if len(sumResponseTimes) > 0 {
+		result.AvgToken = fmt.Sprintf("%s Token/s", common.FormatCount(avgTokenPerSecond/int64(len(sumResponseTimes))))
 	}
-	result.MaxToken = fmt.Sprintf("%s/s", common.FormatCount(maxTokenPerSecond))
-	result.MinToken = fmt.Sprintf("%s/s", common.FormatCount(minTokenPerSecond))
+	result.MaxToken = fmt.Sprintf("%s Token/s", common.FormatCount(maxTokenPerSecond))
+	result.MinToken = fmt.Sprintf("%s Token/s", common.FormatCount(minTokenPerSecond))
 	return result, nil
 }
 
@@ -286,6 +288,9 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 		}
 		result.AvgRequestPerSubscriber = common.FormatCount(summary.StatusTotal / subscriberNum)
 		result.RequestTotal = common.FormatCount(summary.StatusTotal)
+		result.Request2xxTotal = common.FormatCount(summary.Status2xx)
+		result.Request4xxTotal = common.FormatCount(summary.Status4xx)
+		result.Request5xxTotal = common.FormatCount(summary.Status5xx)
 	}()
 
 	go func() {
@@ -298,9 +303,9 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 			return
 		}
 		result.AvgResponseTimeOverview = items
-		result.AvgResponseTime = fmt.Sprintf("%dms", summary.Avg)
-		result.MaxResponseTime = fmt.Sprintf("%dms", summary.Max)
-		result.MinResponseTime = fmt.Sprintf("%dms", summary.Min)
+		result.AvgResponseTime = fmt.Sprintf("%d ms", summary.Avg)
+		result.MaxResponseTime = fmt.Sprintf("%d ms", summary.Max)
+		result.MinResponseTime = fmt.Sprintf("%d ms", summary.Min)
 	}()
 
 	go func() {
@@ -323,6 +328,9 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 			result.AvgTrafficPerSubscriberOverview = append(result.AvgTrafficPerSubscriberOverview, item.StatusTotal/subscriberNum)
 		}
 		result.TrafficTotal = common.FormatByte(summary.StatusTotal)
+		result.Traffic2xxTotal = common.FormatByte(summary.Status2xx)
+		result.Traffic4xxTotal = common.FormatByte(summary.Status4xx)
+		result.Traffic5xxTotal = common.FormatByte(summary.Status5xx)
 		result.AvgTrafficPerSubscriber = common.FormatCount(summary.StatusTotal / subscriberNum)
 	}()
 	go func() {
