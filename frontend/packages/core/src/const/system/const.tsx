@@ -554,7 +554,7 @@ export const REST_SERVICE_LOG_LIST: PageProColumns<LogItem>[] = [
     ellipsis: true
   },
   {
-    title: 'API / Tools',
+    title: 'API / Tool',
     dataIndex: ['api', 'name'],
     ellipsis: true
   },
@@ -593,7 +593,7 @@ export const AI_SERVICE_LOG_LIST: PageProColumns<LogItem>[] = [
     ellipsis: true
   },
   {
-    title: 'API / Tools',
+    title: 'API / Tool',
     dataIndex: ['api', 'name'],
     ellipsis: true
   },
