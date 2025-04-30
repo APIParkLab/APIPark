@@ -15,6 +15,7 @@ type IFluxQuery interface {
 	CommonStatistics(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, groupBy, filters string, statisticsConf []*StatisticsFilterConf, limit int) (map[string]*FluxStatistics, error)
 	CommonProxyStatistics(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, groupBy, filters string, statisticsConf []*StatisticsFilterConf, limit int) (map[string]*FluxStatistics, error)
 	CommonTendency(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, table, filters string, dataFields []string, every, windowOffset string, fn AggregateFn) ([]time.Time, map[string][]int64, error)
+	CommonTendencyTag(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, table, filters, every, tag string) (int64, map[time.Time]int64, error)
 	// CommonQueryOnce 查询只返回一条结果
 	CommonQueryOnce(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, filters string, fieldsConf *StatisticsFilterConf) (map[string]interface{}, error)
 	CommonWarnStatistics(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, groupBy, filters string, statisticsConf *StatisticsFilterConf) (map[string]*FluxWarnStatistics, error)
@@ -171,6 +172,35 @@ func (f *fluxQuery) CommonTendency(ctx context.Context, queryApi api.QueryAPI, s
 	return dates, resultMap, nil
 }
 
+func (f *fluxQuery) CommonTendencyTag(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, table, filters, every, tag string) (int64, map[time.Time]int64, error) {
+	query := f.assembleTendencyTagFlux(start, end, bucket, table, filters, every, tag)
+	log.Info("flux sql=", query)
+	result, err := queryApi.Query(ctx, query)
+	if err != nil {
+		log.Error("flux err=", err)
+		return 0, nil, err
+	}
+	dateMap := map[time.Time]map[string]struct{}{}
+	tagMap := make(map[string]struct{})
+	defer result.Close()
+	for result.Next() {
+		date := result.Record().Values()["_time"].(time.Time).In(time.Local)
+		if _, ok := dateMap[date]; !ok {
+			dateMap[date] = map[string]struct{}{}
+		}
+		if vv, ok := result.Record().Values()[tag]; ok {
+			v := vv.(string)
+			tagMap[v] = struct{}{}
+			dateMap[date][v] = struct{}{}
+		}
+	}
+	returnMap := make(map[time.Time]int64)
+	for k, v := range dateMap {
+		returnMap[k] = int64(len(v))
+	}
+	return int64(len(tagMap)), returnMap, nil
+}
+
 func (f *fluxQuery) CommonQueryOnce(ctx context.Context, queryApi api.QueryAPI, start, end time.Time, bucket, filters string, fieldsConf *StatisticsFilterConf) (map[string]interface{}, error) {
 	query := f.getCircularMapFlux(start, end, bucket, filters, fieldsConf)
 
@@ -180,6 +210,7 @@ func (f *fluxQuery) CommonQueryOnce(ctx context.Context, queryApi api.QueryAPI, 
 		log.Error("flux err=", err)
 		return nil, err
 	}
+	defer result.Close()
 
 	for result.Next() {
 		return result.Record().Values(), nil
@@ -322,6 +353,17 @@ func (f *fluxQuery) assembleTendencyFlux(start, end time.Time, bucket, table, fi
   |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")`, bucket, start.Unix(), end.Unix(), table,
 		filters, fieldConditions, every, string(fn), windowOffsetFlux)
 
+}
+
+func (f *fluxQuery) assembleTendencyTagFlux(start, end time.Time, bucket, table, filters string, every, tag string) string {
+	return fmt.Sprintf(`
+from(bucket: "%s")
+  |> range(start: %d, stop: %d)
+  |> filter(fn: (r) => r["_measurement"] == "%s")
+  %s
+|> keep(columns: ["_time", "%s"])
+  |> window(every: %s)
+  |> distinct(column: "%s")`, bucket, start.Unix(), end.Unix(), table, filters, tag, every, tag)
 }
 
 // assembleTendencyFieldCondition 封装趋势图需要的Field数据

@@ -684,3 +684,11 @@ func (e *executor) TokenOverview(ctx context.Context, start time.Time, end time.
 	}
 	return dates, totalOverview, result, nil
 }
+
+func (e *executor) ConsumerOverview(ctx context.Context, start time.Time, end time.Time, wheres []monitor.MonWhereItem) (int64, map[time.Time]int64, error) {
+	newStartTime, every, _, bucket := getTimeIntervalAndBucket(start, end)
+	filters := formatFilter(wheres)
+
+	return e.fluxQuery.CommonTendencyTag(ctx, e.openApi, newStartTime, end, bucket, "request", filters, every, "app")
+
+}
