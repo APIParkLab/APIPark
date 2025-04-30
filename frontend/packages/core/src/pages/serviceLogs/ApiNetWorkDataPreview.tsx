@@ -35,7 +35,7 @@ const ApiNetWorkDataPreview = ({ configContent = {} }: { configContent?: { [key:
 
   return (
     <>
-      {Object.keys(configContent).map((item) => {
+      {Object.keys(configContent).filter((item) => !!configContent[item]).map((item) => {
         return (
           <div className="overflow-auto mb-[15px]">
             <div className="font-semibold text-[16px] mb-[10px]">{item}</div>
