@@ -161,7 +161,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
         type: 'value',
         name: '',
         min: 0,
-        minInterval: 1,
+        ...(showAvgLine ? {} : { minInterval: 1 }),
         show: dataExists, // 没有数据时不显示Y轴
         splitLine: {
           show: dataExists, // 没有数据时不显示网格线
