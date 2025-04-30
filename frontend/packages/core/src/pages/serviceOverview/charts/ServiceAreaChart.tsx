@@ -168,6 +168,7 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height, showAvgLine }: S
               type: 'dashed'
             },
             label: {
+              show: false,
               position: 'insideEndTop',
               formatter: '{c}',
               color: '#000',
@@ -176,6 +177,14 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height, showAvgLine }: S
               padding: [10, 4],
               borderRadius: 2,
               distance: -5
+            },
+            emphasis: {
+              lineStyle: {
+                width: 1  // 保持线条宽度不变，禁用默认的悬停加粗
+              },
+              label: {
+                show: false  // 悬停时不显示标签
+              }
             },
             data: [{ type: 'average', name: 'Avg' }]
           } : undefined,
@@ -202,7 +211,10 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height, showAvgLine }: S
         }
       ]
     }
-    setOption(option)
+    const echartsInstance = chartRef.current?.getEchartsInstance()
+    if (echartsInstance) {
+      echartsInstance.setOption(option)
+    }
   }
   // 使用深度监听来确保图表数据更新
   useEffect(() => {
