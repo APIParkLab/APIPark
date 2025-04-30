@@ -61,24 +61,30 @@ func (f *fluxQuery) CommonStatistics(ctx context.Context, queryApi api.QueryAPI,
 		totalRequest := common.FmtIntFromInterface(maps["request"])
 		maxRequest := common.FmtIntFromInterface(maps["request_max"])
 		minRequest := common.FmtIntFromInterface(maps["request_min"])
+		totalResponse := common.FmtIntFromInterface(maps["response"])
+		maxResponse := common.FmtIntFromInterface(maps["response_max"])
+		minResponse := common.FmtIntFromInterface(maps["response_min"])
 		totalToken := common.FmtIntFromInterface(maps["total_token"])
 		maxToken := common.FmtIntFromInterface(maps["total_token_max"])
 		minToken := common.FmtIntFromInterface(maps["total_token_min"])
 
 		resultMap[key] = &FluxStatistics{
-			Total:        total,
-			Success:      success,
-			ProxyTotal:   pTotal,
-			ProxySuccess: pSuccess,
-			TotalTiming:  totalTiming,
-			MaxTiming:    maxMinTiming,
-			MinTiming:    minTiming,
-			TotalRequest: totalRequest,
-			RequestMax:   maxRequest,
-			RequestMin:   minRequest,
-			TotalToken:   totalToken,
-			TokenMax:     maxToken,
-			TokenMin:     minToken,
+			Total:         total,
+			Success:       success,
+			ProxyTotal:    pTotal,
+			ProxySuccess:  pSuccess,
+			TotalTiming:   totalTiming,
+			MaxTiming:     maxMinTiming,
+			MinTiming:     minTiming,
+			TotalRequest:  totalRequest,
+			RequestMax:    maxRequest,
+			RequestMin:    minRequest,
+			TotalResponse: totalResponse,
+			ResponseMax:   maxResponse,
+			ResponseMin:   minResponse,
+			TotalToken:    totalToken,
+			TokenMax:      maxToken,
+			TokenMin:      minToken,
 		}
 	}
 

@@ -18,6 +18,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
                 "_measurement",
             ],
         )
@@ -36,6 +37,7 @@
           "cluster",
           "provider",
           "api_kind",
+          "status_code",
         ],
       )
       request_request
@@ -52,6 +54,7 @@
             "cluster",
             "provider",
             "api_kind",
+            "status_code",
           ],
           timeColumn: "_start",
       )
@@ -70,6 +73,7 @@
           "cluster",
           "provider",
           "api_kind",
+          "status_code",
         ],
       )
       request_request
@@ -87,6 +91,7 @@
           "cluster",
           "provider",
           "api_kind",
+          "status_code",
         ],
       )
 -
@@ -110,6 +115,7 @@
                     "cluster",
                     "provider",
                     "api_kind",
+                    "status_code",
                     "_measurement",
                 ],
             )
@@ -129,6 +135,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_response
@@ -145,6 +152,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -163,6 +171,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_response
@@ -180,6 +189,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
 -
@@ -203,6 +213,7 @@
                     "cluster",
                     "provider",
                     "api_kind",
+                    "status_code",
                     "_measurement",
                 ],
             )
@@ -221,7 +232,8 @@
                 "node",
                 "cluster",
                 "provider",
-                "api_kind", 
+                "api_kind",
+                "status_code",
             ],
         )
     request_retry
@@ -238,6 +250,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -256,6 +269,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
 -
@@ -279,6 +293,7 @@
                     "cluster",
                     "provider",
                     "api_kind",
+                    "status_code",
                     "_measurement",
                 ],
             )
@@ -298,6 +313,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_status
@@ -315,6 +331,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -333,6 +350,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -352,6 +370,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_status
@@ -370,6 +389,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
 -
@@ -393,6 +413,7 @@
                     "cluster",
                     "provider",
                     "api_kind",
+                    "status_code",
                     "_measurement",
                 ],
             )
@@ -412,6 +433,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_timing
@@ -428,6 +450,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -446,6 +469,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_timing
@@ -463,6 +487,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
 -
@@ -487,6 +512,7 @@
                     "cluster",
                     "provider",
                     "api_kind",
+                    "status_code",
                     "_measurement",
                 ],
             )
@@ -507,6 +533,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     proxy_timing
@@ -525,6 +552,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     proxy_timing
@@ -543,6 +571,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     proxy_timing
@@ -561,6 +590,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
 -
@@ -585,6 +615,7 @@
                     "cluster",
                     "provider",
                     "api_kind",
+                    "status_code",
                     "_measurement",
                 ],
             )
@@ -605,6 +636,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     proxy_status
@@ -623,6 +655,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -641,6 +674,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -661,6 +695,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     proxy_status
@@ -680,6 +715,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
 -
@@ -704,6 +740,7 @@
                     "cluster",
                     "provider",
                     "api_kind",
+                    "status_code",
                     "_measurement",
                 ],
             )
@@ -724,6 +761,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     proxy_request
@@ -741,6 +779,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -760,6 +799,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
 -
@@ -784,6 +824,7 @@
                     "cluster",
                     "provider",
                     "api_kind",
+                    "status_code",
                     "_measurement",
                 ],
             )
@@ -803,6 +844,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     proxy_response
@@ -820,6 +862,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -839,6 +882,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
 -
@@ -863,6 +907,7 @@
                     "cluster",
                     "provider",
                     "api_kind",
+                    "status_code",
                     "_measurement",
                 ],
             )
@@ -882,6 +927,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_input_token
@@ -899,6 +945,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -918,6 +965,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_input_token
@@ -936,6 +984,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
 -
@@ -960,6 +1009,7 @@
                     "cluster",
                     "provider",
                     "api_kind",
+                    "status_code",
                     "_measurement",
                 ],
             )
@@ -979,6 +1029,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_output_token
@@ -996,6 +1047,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -1015,6 +1067,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_output_token
@@ -1033,6 +1086,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
 
@@ -1041,7 +1095,6 @@
   cron: "* * * * *"
   offset: "32s"
   flux: |
-    
     request_total_token =
         from(bucket: "apinto")
             |> range(start: -1m)
@@ -1058,6 +1111,7 @@
                     "cluster",
                     "provider",
                     "api_kind",
+                    "status_code",
                     "_measurement",
                 ],
             )
@@ -1077,6 +1131,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_total_token
@@ -1094,6 +1149,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
             timeColumn: "_start",
         )
@@ -1113,6 +1169,7 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )
     request_total_token
@@ -1131,5 +1188,6 @@
                 "cluster",
                 "provider",
                 "api_kind",
+                "status_code",
             ],
         )

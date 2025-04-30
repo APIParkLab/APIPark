@@ -110,8 +110,8 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 	}
 	subscriberNum := int64(len(appMap))
 	var wg sync.WaitGroup
-	wg.Add(2)
-	errChan := make(chan error, 2)
+	wg.Add(3)
+	errChan := make(chan error, 3)
 	result := new(monitor_dto.ChartAIOverview)
 	go func() {
 		defer wg.Done()
@@ -136,7 +136,19 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 		result.AvgRequestPerSubscriber = common.FormatCount(summary.StatusTotal / subscriberNum)
 		result.RequestTotal = common.FormatCount(summary.StatusTotal)
 	}()
-
+	avgResponseTimes := make([]int64, 0)
+	go func() {
+		defer wg.Done()
+		_, _, items, err := executor.AvgResponseTimeOverview(ctx, formatTimeByMinute(start), formatTimeByMinute(end), wheres)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		for _, item := range items {
+			avgResponseTimes = append(avgResponseTimes, item)
+		}
+	}()
+	totalTokens := make([]int64, 0)
 	go func() {
 		defer wg.Done()
 		startTime := formatTimeByMinute(start)
@@ -146,7 +158,6 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 			errChan <- err
 			return
 		}
-		timeInterval := getTimeInterval(startTime, endTime)
 		result.TokenOverview = make([]*monitor_dto.TokenOverview, 0, len(items))
 		result.AvgTokenOverview = make([]int64, 0, len(items))
 		result.AvgTokenPerSubscriberOverview = make([]*monitor_dto.TokenOverview, 0, len(items))
@@ -163,7 +174,7 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 				OutputToken: item.OutputToken,
 				InputToken:  item.InputToken,
 			})
-			result.AvgTokenOverview = append(result.AvgTokenOverview, item.TotalToken/timeInterval)
+			totalTokens = append(totalTokens, item.TotalToken)
 			result.AvgTokenPerSubscriberOverview = append(result.AvgTokenPerSubscriberOverview, &monitor_dto.TokenOverview{
 				TotalToken:  item.TotalToken / subscriberNum,
 				OutputToken: item.OutputToken / subscriberNum,
@@ -172,9 +183,9 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 
 		}
 		result.AvgTokenPerSubscriber = common.FormatCount(summary.TotalToken / subscriberNum)
-		result.MaxToken = fmt.Sprintf("%s/s", common.FormatCount(maxToken/timeInterval))
-		result.MinToken = fmt.Sprintf("%s/s", common.FormatCount(minToken/timeInterval))
-		result.AvgToken = fmt.Sprintf("%s/s", common.FormatCount(summary.OutputToken/timeInterval))
+		//result.MaxToken = fmt.Sprintf("%s/s", common.FormatCount(maxToken/timeInterval))
+		//result.MinToken = fmt.Sprintf("%s/s", common.FormatCount(minToken/timeInterval))
+		//result.AvgToken = fmt.Sprintf("%s/s", common.FormatCount(summary.OutputToken/timeInterval))
 		result.TokenTotal = common.FormatCount(summary.TotalToken)
 	}()
 	go func() {
@@ -190,6 +201,27 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 	if len(errs) > 0 {
 		return nil, fmt.Errorf("errors occurred: %v", errs)
 	}
+	var maxTokenPerSecond, minTokenPerSecond, avgTokenPerSecond int64 = 0, 0, 0
+	for index, token := range totalTokens {
+		var p int64 = 0
+		if len(avgResponseTimes) > index && avgResponseTimes[index] > 0 {
+			// 由于时间单位是ms，因此需要✖️1000
+			p = int64(float64(token) * 1000 / float64(avgResponseTimes[index]))
+		}
+		result.AvgTokenOverview = append(result.AvgTokenOverview, p)
+		if maxTokenPerSecond < p {
+			maxTokenPerSecond = p
+		}
+		if minTokenPerSecond == 0 || minTokenPerSecond > p {
+			minTokenPerSecond = p
+		}
+		avgTokenPerSecond += p
+	}
+	if len(avgResponseTimes) > 0 {
+		result.AvgToken = fmt.Sprintf("%s/s", common.FormatCount(avgTokenPerSecond/int64(len(avgResponseTimes))))
+	}
+	result.MaxToken = fmt.Sprintf("%s/s", common.FormatCount(maxTokenPerSecond))
+	result.MinToken = fmt.Sprintf("%s/s", common.FormatCount(minTokenPerSecond))
 	return result, nil
 }
 
@@ -290,6 +322,7 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 			})
 			result.AvgTrafficPerSubscriberOverview = append(result.AvgTrafficPerSubscriberOverview, item.StatusTotal/subscriberNum)
 		}
+		result.TrafficTotal = common.FormatByte(summary.StatusTotal)
 		result.AvgTrafficPerSubscriber = common.FormatCount(summary.StatusTotal / subscriberNum)
 	}()
 	go func() {

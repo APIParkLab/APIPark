@@ -15,9 +15,9 @@ const (
 	tenDay  = 10 * oneDay
 	oneYear = 365 * oneDay
 
-	bucketMinuteRetention = (7 - 1) * oneDay
-	bucketHourRetention   = (90 - 1) * oneDay
-	bucketDayRetention    = (5*365 - 1) * oneDay
+	bucketMinuteRetention = (7) * oneDay
+	bucketHourRetention   = (90) * oneDay
+	bucketDayRetention    = (5 * 365) * oneDay
 
 	bucketMinute = "apinto/minute"
 	bucketHour   = "apinto/hour"
@@ -127,11 +127,11 @@ func getTimeIntervalAndBucket(startTime, endTime time.Time) (time.Time, string, 
 		switch minimumBucket {
 		case bucketMinute:
 			offset := ""
-			offsetTime := startTime.Minute() % 5
+			offsetTime := startTime.Minute() % 10
 			if offsetTime != 0 {
 				offset = fmt.Sprintf("%dm", offsetTime)
 			}
-			return startTime, "5m", offset, bucketMinute
+			return startTime, "10m", offset, bucketMinute
 
 		case bucketHour:
 			newStart := formatStartTimeHour(startTime, location)
@@ -148,7 +148,15 @@ func getTimeIntervalAndBucket(startTime, endTime time.Time) (time.Time, string, 
 	} else if diff <= tenDay {
 
 		switch minimumBucket {
-		case bucketMinute, bucketHour:
+		case bucketMinute:
+			offset := ""
+			offsetTime := startTime.Minute()
+			if offsetTime != 0 {
+				offset = fmt.Sprintf("%dm", offsetTime)
+			}
+			return startTime, "1h", offset, bucketMinute
+
+		case bucketHour:
 			newStart := formatStartTimeHour(startTime, location)
 			return newStart, "1h", "", bucketHour
 		case bucketDay:

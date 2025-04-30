@@ -10,9 +10,9 @@ const (
 	oneDay                = 24 * oneHour
 	tenDay                = 10 * oneDay
 	oneYear               = 365 * oneDay
-	bucketMinuteRetention = (7 - 1) * oneDay
-	bucketHourRetention   = (90 - 1) * oneDay
-	bucketDayRetention    = (5*365 - 1) * oneDay
+	bucketMinuteRetention = (7) * oneDay
+	bucketHourRetention   = (90) * oneDay
+	bucketDayRetention    = (5 * 365) * oneDay
 )
 
 // getTimeIntervalAndBucket 根据start和end来获取窗口时间间隔，窗口偏移量offset，以及使用的bucket, 查询的startTime也会格式化
