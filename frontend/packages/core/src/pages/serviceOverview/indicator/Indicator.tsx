@@ -72,11 +72,11 @@ const Indicator = ({ indicatorInfo }: { indicatorInfo: any }) => {
             }
           }}
         >
-          <div className="text-[14px] text-[#888] mb-[10px]">
+          <div className="text-[14px] text-[#999999] mb-[10px]" style={{ fontFamily: 'Microsoft YaHei' }}>
             {item.title}
             {item.link && <Icon icon="uiw:right" width="16" height="16" className="absolute top-[14px] right-[14px]" />}
           </div>
-          <div className={`${index < 2 ? 'text-[32px] font-medium text-[#101010]' : 'block mt-[30px]'}`}>
+          <div className={`${index < 2 ? 'text-[32px] font-medium text-[#101010]' : 'block mt-[30px]'}`} style={{ fontFamily: 'Microsoft YaHei' }}>
             {item.content}
           </div>
         </Card>
