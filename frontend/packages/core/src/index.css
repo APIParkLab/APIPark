@@ -1175,6 +1175,13 @@ p{
 .ant-alert-info{
   background: #1784FC1A !important;
 }
+.service-log-tab .ant-tabs .ant-tabs-nav .ant-tabs-tab{
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.service-log-tab .ant-tabs .ant-tabs-tab+.ant-tabs-tab {
+  margin-left: 15px;
+}
 
 .monaco-editor .find-widget .monaco-inputbox.synthetic-focus{
   outline-color: var(--primary-color) !important;

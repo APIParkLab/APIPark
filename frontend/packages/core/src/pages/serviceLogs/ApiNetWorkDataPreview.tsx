@@ -37,7 +37,7 @@ const ApiNetWorkDataPreview = ({ configContent = {} }: { configContent?: { [key:
     <>
       {Object.keys(configContent).map((item) => {
         return (
-          <div className="overflow-auto">
+          <div className="overflow-auto mb-[15px]">
             <div className="font-semibold text-[16px] mb-[10px]">{item}</div>
             <div className="bg-[#0a0b21] text-white p-4 rounded-md my-2 font-mono text-sm overflow-auto relative">
               {!configContent[item] ? (

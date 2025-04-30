@@ -26,6 +26,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
   const [option, setOption] = useState<EChartsOption | undefined>({})
   // 使用从主题配置中导入的默认颜色，而不是硬编码的颜色值
   const [detaultColor] = useState(defaultColor)
+  const [hasData, setHasData] = useState(true)
   const tokenMap = {
     inputToken: $t('输入 Token'),
     outputToken: $t('输出 Token'),
@@ -34,7 +35,9 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
   const setChartOption = (dataInfo: BarChartInfo) => {
     const isNumberArray = typeof dataInfo.data[0] !== 'object'
     const legendData = isNumberArray ? [dataInfo.title] : dataInfo.data.map((item) => item.name)
-    const hasData = dataInfo.data && dataInfo.data.length > 0
+    const dataExists = dataInfo.data && dataInfo.data.length > 0
+    // 更新hasData状态
+    setHasData(dataExists)
     const tooltipFormatter = (params: { name: string; color: string; seriesIndex?: number }) => {
       let tooltipContent = `<div style="min-width:140px;padding:8px;">
                           <div>${isNumberArray ? '' : params.name}</div>`
@@ -73,7 +76,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
             rich: {
               titleStyle: {
                 fontSize: 14,
-                color: '#999',
+                color: '#999999',
                 fontWeight: 'normal',
                 lineHeight: 20
               },
@@ -94,7 +97,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
         top: '110px',
         containLabel: true
       },
-      tooltip: hasData ? {
+      tooltip: dataExists ? {
         trigger: 'axis',
         axisPointer: {
           type: 'shadow'
@@ -137,9 +140,9 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
         name: '',
         min: 0,
         minInterval: 1,
-        show: hasData, // 没有数据时不显示Y轴
+        show: dataExists, // 没有数据时不显示Y轴
         splitLine: {
-          show: hasData, // 没有数据时不显示网格线
+          show: dataExists, // 没有数据时不显示网格线
           lineStyle: {
             type: 'dashed',
             color: '#eee'
@@ -179,7 +182,8 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
       //   }
       // ],
       // 添加空状态提示
-      graphic: !hasData
+      silent: !dataExists,
+      graphic: !dataExists
         ? [
             {
               type: 'text',
@@ -259,13 +263,15 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height }: ServiceBarCharPr
   }, [])
   return (
     <div className={`w-full ${customClassNames}`}>
-      <ECharts 
-        ref={chartRef} 
-        option={option} 
-        style={{ height: height || 400 }} 
-        opts={{ renderer: 'svg' }} 
-        theme="apipark" // 这里应用主题名称，需要先在应用入口注册
-      />
+      <div style={!hasData ? { cursor: 'default', pointerEvents: 'none' } : {}}>
+        <ECharts 
+          ref={chartRef} 
+          option={option} 
+          style={{ height: height || 400 }} 
+          opts={{ renderer: 'svg' }} 
+          theme="apipark" // 这里应用主题名称，需要先在应用入口注册
+        />
+      </div>
     </div>
   )
 }
