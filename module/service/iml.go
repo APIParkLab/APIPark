@@ -211,7 +211,7 @@ func (i *imlServiceModule) RestLogs(ctx context.Context, serviceId string, start
 		return nil, 0, err
 	}
 	return utils.SliceToSlice(list, func(s *log_service.Item) *service_dto.RestLogItem {
-		return &service_dto.RestLogItem{
+		item := &service_dto.RestLogItem{
 			Id:           s.ID,
 			API:          auto.UUID(s.API),
 			Status:       s.StatusCode,
@@ -221,6 +221,13 @@ func (i *imlServiceModule) RestLogs(ctx context.Context, serviceId string, start
 			ResponseTime: common.FormatTime(s.ResponseTime),
 			Traffic:      common.FormatByte(s.Traffic),
 		}
+		if s.Consumer == "apipark-global" {
+			item.Consumer = auto.Label{
+				Id:   s.Consumer,
+				Name: "System Consumer",
+			}
+		}
+		return item
 	}), total, nil
 }
 
@@ -230,18 +237,25 @@ func (i *imlServiceModule) AILogs(ctx context.Context, serviceId string, start i
 		return nil, 0, err
 	}
 	return utils.SliceToSlice(list, func(s *log_service.Item) *service_dto.AILogItem {
-		return &service_dto.AILogItem{
+		item := &service_dto.AILogItem{
 			Id:             s.ID,
 			API:            auto.UUID(s.API),
 			Status:         s.StatusCode,
 			LogTime:        auto.TimeLabel(s.RecordTime),
 			Ip:             s.RemoteIP,
 			Token:          s.TotalToken,
-			TokenPerSecond: s.TotalToken / s.ResponseTime,
+			TokenPerSecond: s.TotalToken * 1000 / s.ResponseTime,
 			Consumer:       auto.UUID(s.Consumer),
 			Provider:       auto.UUID(s.AIProvider),
 			Model:          s.AIModel,
 		}
+		if s.Consumer == "apipark-global" {
+			item.Consumer = auto.Label{
+				Id:   s.Consumer,
+				Name: "System Consumer",
+			}
+		}
+		return item
 	}), total, nil
 }
 
