@@ -112,7 +112,7 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
       // 服务请求次数
       {
         ...setBarChartInfoData({
-          title: $t('请求数'),
+          title: $t('请求次数'),
           data: serviceOverview.requestOverview,
           value: serviceOverview.requestTotal,
           date: serviceOverview.date
@@ -124,7 +124,7 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
       // 流量消耗总数
       {
         ...setBarChartInfoData({
-          title: $t('流量'),
+          title: $t('网络流量'),
           data: serviceOverview.trafficOverview,
           value: serviceOverview.trafficTotal,
           date: serviceOverview.date
@@ -149,7 +149,7 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
       },
       // 平均请求
       setBarChartInfoData({
-        title: $t('平均请求数'),
+        title: $t('平均每消费者的请求次数'),
         data: serviceOverview.avgRequestPerSubscriberOverview,
         value: serviceOverview.avgRequestPerSubscriber,
         date: serviceOverview.date,
@@ -157,7 +157,7 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
       }),
       // 平均流量消耗
       setBarChartInfoData({
-        title: $t('平均流量'),
+        title: $t('平均每消费者的网络流量'),
         data: serviceOverview.avgTrafficPerSubscriberOverview,
         value: serviceOverview.avgTrafficPerSubscriber,
         date: serviceOverview.date,
@@ -184,7 +184,7 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
       // 服务请求次数
       {
         ...setBarChartInfoData({
-          title: $t('请求数'),
+          title: $t('请求次数'),
           data: serviceOverview.requestOverview,
           value: serviceOverview.requestTotal,
           date: serviceOverview.date
@@ -196,7 +196,7 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
       // token 消耗总数
       {
         ...setBarChartInfoData({
-          title: $t('Token'),
+          title: $t('Token 消耗'),
           data: serviceOverview.tokenOverview.map((item: { inputToken: number; outputToken: number }) => ({
             inputToken: item.inputToken,
             outputToken: item.outputToken
@@ -212,7 +212,7 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
     setPerBarChartInfo([
       // 平均 token 消耗
       {
-        title: $t('平均 Token/s 统计'),
+        title: $t('平均 Token 消耗'),
         data: serviceOverview.avgTokenOverview,
         value: serviceOverview.avgToken,
         date: serviceOverview.date,
@@ -222,14 +222,14 @@ const ServiceOverview = ({ serviceType }: { serviceType: 'aiService' | 'restServ
       },
       // 平均请求
       setBarChartInfoData({
-        title: $t('平均请求数'),
+        title: $t('平均每消费者的请求次数'),
         data: serviceOverview.avgRequestPerSubscriberOverview,
         value: serviceOverview.avgRequestPerSubscriber,
         date: serviceOverview.date
       }),
       // 评价 token 消耗
       setBarChartInfoData({
-        title: $t('平均 Token/订阅者统计'),
+        title: $t('平均每消费者的 Token 消耗'),
         data: serviceOverview.avgTokenPerSubscriberOverview.map((item: { inputToken: number; outputToken: number }) => ({
           inputToken: item.inputToken,
           outputToken: item.outputToken

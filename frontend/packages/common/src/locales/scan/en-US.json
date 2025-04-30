@@ -966,5 +966,11 @@
   "Kc8bf447": "Request Log",
   "Kf8525cf2": "No Data",
   "K1be06929": "Response Time",
-  "K5e51f5d": "Timestamp"
+  "K5e51f5d": "Timestamp",
+  "K9d3f2d9d": "Requests",
+  "Ke2241377": "Traffic",
+  "K6c267c7b": "Avg Requests per Subscriber",
+  "K133d4291": "Avg Traffic per Subscriber",
+  "K37c5f1d0": "Token",
+  "Kb98264d4": "Avg Token per Subscriber"
 }

@@ -240,6 +240,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
                       type: 'dashed'
                     },
                     label: {
+                      show: false,
                       position: 'insideEndTop',
                       formatter: '{c}',
                       color: '#000',
@@ -248,6 +249,14 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
                       padding: [10, 4],
                       borderRadius: 2,
                       distance: -5
+                    },
+                    emphasis: {
+                      lineStyle: {
+                        width: 1  // 保持线条宽度不变，禁用默认的悬停加粗
+                      },
+                      label: {
+                        show: false  // 悬停时不显示标签
+                      }
                     },
                     data: [{ type: 'average', name: 'Avg' }]
                   }
@@ -268,6 +277,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
                     type: 'dashed'
                   },
                   label: {
+                    show: false,
                     position: 'insideEndTop',
                     formatter: '{c}',
                     color: '#000',
@@ -276,6 +286,14 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
                     padding: [10, 4],
                     borderRadius: 2,
                     distance: -5
+                  },
+                  emphasis: {
+                    lineStyle: {
+                      width: 1  // 保持线条宽度不变，禁用默认的悬停加粗
+                    },
+                    label: {
+                      show: false  // 悬停时不显示标签
+                    }
                   },
                   data: [{ type: 'average', name: 'Avg' }]
                 }
