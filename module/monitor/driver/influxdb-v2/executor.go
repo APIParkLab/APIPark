@@ -513,6 +513,34 @@ func (e *executor) aggregateSummary(ctx context.Context, start time.Time, end ti
 
 }
 
+func (e *executor) SumResponseTimeOverview(ctx context.Context, start time.Time, end time.Time, wheres []monitor.MonWhereItem) ([]time.Time, *monitor.Aggregate, []int64, error) {
+	newStartTime, every, windowOffset, bucket := getTimeIntervalAndBucket(start, end)
+	filters := formatFilter(wheres)
+
+	fieldsConditions := []string{"timing"}
+
+	agg, err := e.aggregateSummary(ctx, newStartTime, end, "request", bucket, filters, []string{"timing"})
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	dates, groupValues, err := e.fluxQuery.CommonTendency(ctx, e.openApi, newStartTime, end, bucket, "request", filters, fieldsConditions, every, windowOffset, flux.SumFn)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	timing := groupValues["timing"]
+	timingLen := len(timing)
+	result := make([]int64, 0, len(dates))
+	for i := range dates {
+		if timingLen > i {
+			result = append(result, timing[i])
+		}
+	}
+
+	return dates, agg["timing"], result, nil
+}
+
 func (e *executor) AvgResponseTimeOverview(ctx context.Context, start time.Time, end time.Time, wheres []monitor.MonWhereItem) ([]time.Time, *monitor.Aggregate, []int64, error) {
 	newStartTime, every, windowOffset, bucket := getTimeIntervalAndBucket(start, end)
 	filters := formatFilter(wheres)
