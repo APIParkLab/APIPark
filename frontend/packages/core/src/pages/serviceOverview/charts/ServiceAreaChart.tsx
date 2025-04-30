@@ -16,15 +16,19 @@ type ServiceAreaCharProps = {
   customClassNames?: string
   dataInfo?: AreaChartInfo
   height?: number
+  showAvgLine?: boolean
 }
 
-const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCharProps) => {
+const ServiceAreaChart = ({ customClassNames, dataInfo, height, showAvgLine }: ServiceAreaCharProps) => {
   const chartRef = useRef<ECharts>(null)
   const [option, setOption] = useState<EChartsOption | undefined>({})
+  const [hasData, setHasData] = useState(true)
   const setChartOption = (dataInfo: AreaChartInfo) => {
-    const hasData = dataInfo.data && dataInfo.data.length > 0
+    const dataExists = dataInfo.data && dataInfo.data.length > 0
+    // 更新hasData状态
+    setHasData(dataExists)
     const option = {
-      tooltip: hasData ? {
+      tooltip: dataExists ? {
         trigger: 'axis',
         formatter: function (value: any) {
           // 如果是数组，取第一个参数的name
@@ -49,7 +53,7 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
             rich: {
               titleStyle: {
                 fontSize: 14,
-                color: '#999',
+                color: '#999999',
                 fontWeight: 'normal',
                 lineHeight: 20
               },
@@ -90,7 +94,7 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
       yAxis: {
         type: 'value',
         boundaryGap: [0, '5%'],
-        show: hasData, // 没有数据时不显示Y轴
+        show: dataExists, // 没有数据时不显示Y轴
         axisLine: {
           show: false
         },
@@ -132,7 +136,8 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
       //   }
       // ],
       // 添加空状态提示
-      graphic: !hasData
+      silent: !dataExists,
+      graphic: !dataExists
         ? [
             {
               type: 'text',
@@ -155,6 +160,25 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
           itemStyle: {
             color: 'rgb(255, 70, 131)'
           },
+          markLine: showAvgLine ? {
+            silent: false,
+            symbol: 'none',
+            lineStyle: {
+              width: 1,
+              type: 'dashed'
+            },
+            label: {
+              position: 'insideEndTop',
+              formatter: '{c}',
+              color: '#000',
+              fontSize: 10,
+              backgroundColor: 'transparent',
+              padding: [10, 4],
+              borderRadius: 2,
+              distance: -5
+            },
+            data: [{ type: 'average', name: 'Avg' }]
+          } : undefined,
           areaStyle: {
             color: {
               type: 'linear',
@@ -228,7 +252,9 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height }: ServiceAreaCha
           </div>
         </div>
       </div>
-      <ECharts ref={chartRef} option={option} theme="apipark" style={{ height: height || 400 }} opts={{ renderer: 'svg' }} />
+      <div style={!hasData ? { cursor: 'default', pointerEvents: 'none' } : {}}>
+        <ECharts ref={chartRef} option={option} theme="apipark" style={{ height: height || 400 }} opts={{ renderer: 'svg' }} />
+      </div>
     </div>
   )
 }

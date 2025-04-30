@@ -45,7 +45,7 @@ const ServiceLogs = ({ serviceType }: { serviceType: 'aiService' | 'restService'
   /** 当前选中的时间范围 */
   const [timeRange, setTimeRange] = useState<TimeRange | undefined>()
   /** 默认时间 */
-  const [defaultTime] = useState<TimeOption>('sevenDays')
+  const [defaultTime] = useState<TimeOption>('day')
   /** 全局状态 */
   const { state } = useGlobalContext()
   /**
@@ -218,7 +218,7 @@ const ServiceLogs = ({ serviceType }: { serviceType: 'aiService' | 'restService'
   return (
     <Spin
       className="h-full pb-[20px]"
-      wrapperClassName="h-full min-h-[150px]"
+      wrapperClassName="h-full min-h-[150px] overflow-hidden"
       indicator={
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ transform: 'scale(1.5)' }}>
@@ -228,14 +228,13 @@ const ServiceLogs = ({ serviceType }: { serviceType: 'aiService' | 'restService'
       }
       spinning={dashboardLoading}
     >
-      <div className="mr-PAGE_INSIDE_X">
+      <div className="h-full mr-PAGE_INSIDE_X">
         <DateSelectFilter selectCallback={selectCallback} customClassNames={'pt-[0px]'} defaultTime={defaultTime} />
-        <div className="mt-[20px]">
+        <div style={{ height: 'calc(100% - -3px)' }} className="mt-[20px] overflow-hidden">
           <PageList
             ref={pageListRef}
             id={`${serviceType}_logs`}
             columns={[...columns]}
-            minVirtualHeight={430}
             request={async (
               params: ParamsType & {
                 pageSize?: number | undefined

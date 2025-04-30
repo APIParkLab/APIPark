@@ -161,7 +161,7 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
     setDescriptionItems([
       {
         key: 'time',
-        label: $t('时间'),
+        label: $t('时间戳'),
         children: time
       },
       {
@@ -213,7 +213,7 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
     setDescriptionItems([
       {
         key: 'time',
-        label: $t('时间'),
+        label: $t('时间戳'),
         children: time
       },
       {
@@ -349,7 +349,7 @@ const LogDetail = ({ selectedRow, serviceType, serviceId, teamId }: LogDetailPro
         }}
         contentStyle={{ fontWeight: '600' }}
       />
-      <div className="mt-[5px]">
+      <div className="mt-[5px] service-log-tab">
         <Tabs
           className="overflow-hidden h-full [&>.ant-tabs-content-holder]:overflow-auto global-policy-tabs"
           items={tabItems}
