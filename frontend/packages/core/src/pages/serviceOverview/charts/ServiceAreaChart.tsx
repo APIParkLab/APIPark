@@ -9,6 +9,7 @@ type AreaChartInfo = {
   data: number[]
   max: string
   min: string
+  originValue?: number
   showXAxis?: boolean
 }
 
@@ -17,9 +18,10 @@ type ServiceAreaCharProps = {
   dataInfo?: AreaChartInfo
   height?: number
   showAvgLine?: boolean
+  customMarkLineValue?: number
 }
 
-const ServiceAreaChart = ({ customClassNames, dataInfo, height, showAvgLine }: ServiceAreaCharProps) => {
+const ServiceAreaChart = ({ customClassNames, dataInfo, height, showAvgLine, customMarkLineValue }: ServiceAreaCharProps) => {
   const chartRef = useRef<ECharts>(null)
   const [option, setOption] = useState<EChartsOption | undefined>({})
   const [hasData, setHasData] = useState(true)
@@ -186,7 +188,9 @@ const ServiceAreaChart = ({ customClassNames, dataInfo, height, showAvgLine }: S
                 show: false  // 悬停时不显示标签
               }
             },
-            data: [{ type: 'average', name: 'Avg' }]
+            data: dataInfo?.originValue !== undefined ? 
+              [{ yAxis: dataInfo?.originValue, name: '自定义值' }] : 
+              [{ type: 'average', name: 'Avg' }]
           } : undefined,
           areaStyle: {
             color: {

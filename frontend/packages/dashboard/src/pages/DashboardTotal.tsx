@@ -4,7 +4,7 @@ import ScrollableSection from '@common/components/aoplatform/ScrollableSection'
 import { TimeRange } from '@common/components/aoplatform/TimeRangeSelector'
 import { useEffect, useState } from 'react'
 import DateSelectFilter, { TimeOption } from '@core/pages/serviceOverview/filter/DateSelectFilter'
-import { getTime } from '@dashboard/utils/dashboard'
+import { abbreviateFloat, formatBytes, formatDuration, formatNumberWithUnit, getTime } from '@dashboard/utils/dashboard'
 import { $t } from '@common/locales/index.ts'
 import { LoadingOutlined } from '@ant-design/icons'
 import { Card, Spin } from 'antd'
@@ -71,7 +71,11 @@ export default function DashboardTotal() {
         'request_4xx_total',
         'request_5xx_total',
         'input_token_total',
-        'output_token_total'
+        'output_token_total',
+        'max_request_per_subscriber',
+        'min_request_per_subscriber',
+        'max_token_per_subscriber',
+        'min_token_per_subscriber'
       ]
     }).then((response) => {
       const { code, data, msg } = response
@@ -109,7 +113,11 @@ export default function DashboardTotal() {
         'request_5xx_total',
         'traffic_2xx_total',
         'traffic_4xx_total',
-        'traffic_5xx_total'
+        'traffic_5xx_total',
+        'max_request_per_subscriber',
+        'min_request_per_subscriber',
+        'max_traffic_per_subscriber',
+        'min_traffic_per_subscriber'
       ]
     }).then((response) => {
       const { code, data, msg } = response
@@ -135,24 +143,24 @@ export default function DashboardTotal() {
         ...setBarChartInfoData({
           title: $t('请求次数'),
           data: serviceOverview.requestOverview,
-          value: serviceOverview.requestTotal,
+          value: formatNumberWithUnit(serviceOverview.requestTotal),
           date: serviceOverview.date
         }),
-        request2xxTotal: serviceOverview.request2xxTotal,
-        request4xxTotal: serviceOverview.request4xxTotal,
-        request5xxTotal: serviceOverview.request5xxTotal
+        request2xxTotal: formatNumberWithUnit(serviceOverview.request2xxTotal),
+        request4xxTotal: formatNumberWithUnit(serviceOverview.request4xxTotal),
+        request5xxTotal: formatNumberWithUnit(serviceOverview.request5xxTotal)
       },
       // 流量消耗总数
       {
         ...setBarChartInfoData({
           title: $t('网络流量'),
           data: serviceOverview.trafficOverview,
-          value: serviceOverview.trafficTotal,
+          value: formatBytes(serviceOverview.trafficTotal),
           date: serviceOverview.date
         }),
-        traffic2xxTotal: serviceOverview.traffic2xxTotal,
-        traffic4xxTotal: serviceOverview.traffic4xxTotal,
-        traffic5xxTotal: serviceOverview.traffic5xxTotal
+        traffic2xxTotal: formatBytes(serviceOverview.traffic2xxTotal),
+        traffic4xxTotal: formatBytes(serviceOverview.traffic4xxTotal),
+        traffic5xxTotal: formatBytes(serviceOverview.traffic5xxTotal)
       }
     ])
     // 设置平均值数据
@@ -161,26 +169,33 @@ export default function DashboardTotal() {
       {
         title: $t('平均响应时间'),
         data: serviceOverview.avgResponseTimeOverview,
-        value: serviceOverview.avgResponseTime,
+        value: formatDuration(serviceOverview.avgResponseTime),
+        originValue: serviceOverview.avgResponseTime,
         date: serviceOverview.date,
-        min: serviceOverview.minResponseTime,
-        max: serviceOverview.maxResponseTime,
+        min: formatDuration(serviceOverview.minResponseTime),
+        max: formatDuration(serviceOverview.maxResponseTime),
         type: 'area'
       },
       // 平均请求
-      setBarChartInfoData({
-        title: $t('平均每消费者的请求次数'),
-        data: serviceOverview.avgRequestPerSubscriberOverview,
-        value: serviceOverview.avgRequestPerSubscriber,
-        date: serviceOverview.date
-      }),
+      {
+        ...setBarChartInfoData({
+          title: $t('平均每消费者的请求次数'),
+          data: serviceOverview.avgRequestPerSubscriberOverview,
+          date: serviceOverview.date
+        }),
+        max: abbreviateFloat(serviceOverview.maxRequestPerSubscriber),
+        min: abbreviateFloat(serviceOverview.minRequestPerSubscriber)
+      },
       // 平均流量消耗
-      setBarChartInfoData({
-        title: $t('平均每消费者的网络流量'),
-        data: serviceOverview.avgTrafficPerSubscriberOverview,
-        value: serviceOverview.avgTrafficPerSubscriber,
-        date: serviceOverview.date
-      })
+      {
+        ...setBarChartInfoData({
+          title: $t('平均每消费者的网络流量'),
+          data: serviceOverview.avgTrafficPerSubscriberOverview,
+          date: serviceOverview.date
+        }),
+        max: formatBytes(serviceOverview.maxTrafficPerSubscriber),
+        min: formatBytes(serviceOverview.minTrafficPerSubscriber)
+      }
     ])
   }
 
@@ -195,12 +210,12 @@ export default function DashboardTotal() {
         ...setBarChartInfoData({
           title: $t('请求次数'),
           data: serviceOverview.requestOverview,
-          value: serviceOverview.requestTotal,
+          value: formatNumberWithUnit(serviceOverview.requestTotal),
           date: serviceOverview.date
         }),
-        request2xxTotal: serviceOverview.request2xxTotal,
-        request4xxTotal: serviceOverview.request4xxTotal,
-        request5xxTotal: serviceOverview.request5xxTotal
+        request2xxTotal: formatNumberWithUnit(serviceOverview.request2xxTotal),
+        request4xxTotal: formatNumberWithUnit(serviceOverview.request4xxTotal),
+        request5xxTotal: formatNumberWithUnit(serviceOverview.request5xxTotal)
       },
       // token 消耗总数
       {
@@ -210,11 +225,11 @@ export default function DashboardTotal() {
             inputToken: item.inputToken,
             outputToken: item.outputToken
           })),
-          value: serviceOverview.tokenTotal,
+          value: formatNumberWithUnit(serviceOverview.tokenTotal),
           date: serviceOverview.date
         }),
-        inputTokenTotal: serviceOverview.inputTokenTotal,
-        outputTokenTotal: serviceOverview.outputTokenTotal
+        inputTokenTotal: formatNumberWithUnit(serviceOverview.inputTokenTotal),
+        outputTokenTotal: formatNumberWithUnit(serviceOverview.outputTokenTotal)
       }
     ])
     // 设置平均值数据
@@ -223,31 +238,38 @@ export default function DashboardTotal() {
       {
         title: $t('平均 Token 消耗'),
         data: serviceOverview.avgTokenOverview,
-        value: serviceOverview.avgToken,
+        value: formatNumberWithUnit(serviceOverview.avgToken) + ' Token/s',
+        originValue: serviceOverview.avgToken,
         date: serviceOverview.date,
-        min: serviceOverview.minToken,
-        max: serviceOverview.maxToken,
+        min: formatNumberWithUnit(serviceOverview.minToken) + ' Token/s',
+        max: formatNumberWithUnit(serviceOverview.maxToken) + ' Token/s',
         type: 'area'
       },
       // 平均请求
-      setBarChartInfoData({
-        title: $t('平均每消费者的请求次数'),
-        data: serviceOverview.avgRequestPerSubscriberOverview,
-        value: serviceOverview.avgRequestPerSubscriber,
-        date: serviceOverview.date
-      }),
+      {
+        ...setBarChartInfoData({
+          title: $t('平均每消费者的请求次数'),
+          data: serviceOverview.avgRequestPerSubscriberOverview,
+          date: serviceOverview.date
+        }),
+        max: abbreviateFloat(serviceOverview.maxRequestPerSubscriber),
+        min: abbreviateFloat(serviceOverview.minRequestPerSubscriber)
+      },
       // 平均 token 消耗
-      setBarChartInfoData({
-        title: $t('平均每消费者的 Token 消耗'),
-        data: serviceOverview.avgTokenPerSubscriberOverview.map(
-          (item: { inputToken: number; outputToken: number }) => ({
-            inputToken: item.inputToken,
-            outputToken: item.outputToken
-          })
-        ),
-        value: serviceOverview.avgTokenPerSubscriber,
-        date: serviceOverview.date
-      })
+      {
+        ...setBarChartInfoData({
+          title: $t('平均每消费者的 Token 消耗'),
+          data: serviceOverview.avgTokenPerSubscriberOverview.map(
+            (item: { inputToken: number; outputToken: number }) => ({
+              inputToken: item.inputToken,
+              outputToken: item.outputToken
+            })
+          ),
+          date: serviceOverview.date
+        }),
+        max: abbreviateFloat(serviceOverview.maxTokenPerSubscriber),
+        min: abbreviateFloat(serviceOverview.minTokenPerSubscriber)
+      }
     ])
   }
 
@@ -394,7 +416,7 @@ export default function DashboardTotal() {
                     <ServiceBarChar
                       key={index}
                       height={270}
-                      showAvgLine={true}
+                      hideIndicatorValue={true}
                       dataInfo={item}
                       customClassNames="flex-1"
                     ></ServiceBarChar>
