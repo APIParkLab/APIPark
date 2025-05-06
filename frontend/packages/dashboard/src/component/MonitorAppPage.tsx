@@ -58,7 +58,17 @@ export default function MonitorAppPage(props: MonitorAppPageProps) {
     getMonitorData()
     getAppList()
   }, [])
-
+  /**
+   * 重置时间范围
+   */
+  let resetTimeRange = () => {}
+  /**
+   * 绑定时间范围组件
+   * @param instance
+   */
+  const bindRef = (instance: any) => {
+    resetTimeRange = instance.reset
+  }
   const getMonitorData = () => {
     let query = queryData
     if (!queryData || queryData.start === undefined) {
@@ -86,6 +96,7 @@ export default function MonitorAppPage(props: MonitorAppPageProps) {
   }
 
   const clearSearch = () => {
+    resetTimeRange()
     setTimeButton('hour')
     setDatePickerValue(null)
     setQueryData({ type: 'subscriber' })
@@ -163,10 +174,16 @@ export default function MonitorAppPage(props: MonitorAppPageProps) {
     setDrawerOpen(true)
   }
 
+  useEffect(() => {
+    setQueryBtnLoading(true)
+    getAppTableList()
+  }, [queryData])
+
   return (
     <div className="h-full overflow-hidden pr-PAGE_INSIDE_X">
       <div className="pl-btnbase pr-btnrbase pb-btnybase">
         <TimeRangeSelector
+          bindRef={bindRef}
           initialTimeButton={timeButton}
           onTimeButtonChange={setTimeButton}
           initialDatePickerValue={datePickerValue}
@@ -193,17 +210,6 @@ export default function MonitorAppPage(props: MonitorAppPageProps) {
           <div>
             <Button className="ml-btnybase" onClick={clearSearch}>
               {$t('重置')}
-            </Button>
-            <Button
-              type="primary"
-              loading={queryBtnLoading}
-              className="ml-btnybase"
-              onClick={() => {
-                setQueryBtnLoading(true)
-                getAppTableList()
-              }}
-            >
-              {$t('查询')}
             </Button>
             <Button className="ml-btnybase" loading={exportLoading} onClick={exportData}>
               {$t('导出')}

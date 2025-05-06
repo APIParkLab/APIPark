@@ -78,7 +78,17 @@ export default function MonitorDetailPage(props: MonitorDetailPageProps) {
   const monitorTableRef = useRef<MonitorTableHandler>(null)
   const [modalTitle, setModalTitle] = useState<string>($t('调用趋势'))
   const [queryBtnLoading, setQueryBtnLoading] = useState<boolean>(false)
-
+  /**
+   * 重置时间范围
+   */
+  let resetTimeRange = () => {}
+  /**
+   * 绑定时间范围组件
+   * @param instance
+   */
+  const bindRef = (instance: any) => {
+    resetTimeRange = instance.reset
+  }
   useEffect(() => {
     // 初始化数据
     getMonitorData()
@@ -144,6 +154,7 @@ export default function MonitorDetailPage(props: MonitorDetailPageProps) {
   }
 
   const clearSearch = () => {
+    resetTimeRange()
     setTimeButton('hour')
     setDatePickerValue(null)
     setQueryData(null)
@@ -178,11 +189,17 @@ export default function MonitorDetailPage(props: MonitorDetailPageProps) {
     setQueryData((pre) => ({ ...pre, ...timeRange }) as SearchBody)
   }
 
+  useEffect(() => {
+    setQueryBtnLoading(true)
+    getMonitorData()
+  }, [queryData])
+
   return (
     <div className="pb-[20px] h-full box-border flex flex-col">
       <div className="pl-btnbase pr-btnrbase pb-btnybase sticky top-[0] bg-[#fff] z-[10] shadow-SCROLL_TOP ">
         <div className="flex flex-nowrap items-center mr-btnybase">
           <TimeRangeSelector
+            bindRef={bindRef}
             initialTimeButton={timeButton}
             initialDatePickerValue={datePickerValue}
             onTimeButtonChange={setTimeButton}
@@ -191,16 +208,6 @@ export default function MonitorDetailPage(props: MonitorDetailPageProps) {
           />
           <Button className="ml-btnybase mt-btnybase" onClick={clearSearch}>
             {$t('重置')}
-          </Button>
-          <Button
-            className="ant-btn-primary ml-btnybase mt-btnybase"
-            loading={queryBtnLoading}
-            onClick={() => {
-              setQueryBtnLoading(true)
-              getMonitorData()
-            }}
-          >
-            {$t('查询')}
           </Button>
         </div>
       </div>
