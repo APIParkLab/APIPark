@@ -65,9 +65,11 @@ func (f *fluxQuery) CommonStatistics(ctx context.Context, queryApi api.QueryAPI,
 		totalResponse := common.FmtIntFromInterface(maps["response"])
 		maxResponse := common.FmtIntFromInterface(maps["response_max"])
 		minResponse := common.FmtIntFromInterface(maps["response_min"])
-		totalToken := common.FmtIntFromInterface(maps["total_token"])
-		maxToken := common.FmtIntFromInterface(maps["total_token_max"])
-		minToken := common.FmtIntFromInterface(maps["total_token_min"])
+		inputToken := common.FmtIntFromInterface(maps["input_token"])
+		outputToken := common.FmtIntFromInterface(maps["output_token"])
+		//totalToken := common.FmtIntFromInterface(maps["total_token"])
+		//maxToken := common.FmtIntFromInterface(maps["total_token_max"])
+		//minToken := common.FmtIntFromInterface(maps["total_token_min"])
 
 		resultMap[key] = &FluxStatistics{
 			Total:         total,
@@ -83,9 +85,7 @@ func (f *fluxQuery) CommonStatistics(ctx context.Context, queryApi api.QueryAPI,
 			TotalResponse: totalResponse,
 			ResponseMax:   maxResponse,
 			ResponseMin:   minResponse,
-			TotalToken:    totalToken,
-			TokenMax:      maxToken,
-			TokenMin:      minToken,
+			TotalToken:    inputToken + outputToken,
 		}
 	}
 
