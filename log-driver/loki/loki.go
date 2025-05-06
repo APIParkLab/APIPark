@@ -81,14 +81,37 @@ func (d *Driver) LogInfo(clusterId string, id string) (*log_driver.LogInfo, erro
 		return nil, fmt.Errorf("no log found")
 	}
 	stream := list[0].Stream
+	requestBody := stream.RequestBody
+	proxyRequestBody := stream.ProxyBody
+	proxyResponseBody := stream.ProxyResponseBody
+	responseBody := stream.ResponseBody
+	if len(list[0].Values) > 0 {
+		switch t := list[0].Values[0].(type) {
+		case []interface{}:
+			if len(t) > 1 {
+				v, ok := t[1].(string)
+				if !ok {
+					break
+				}
+				var tmp LogBodyDetail
+				err = json.Unmarshal([]byte(v), &tmp)
+				if err == nil {
+					requestBody = tmp.RequestBody
+					proxyRequestBody = tmp.ProxyBody
+					responseBody = tmp.ResponseBody
+					proxyResponseBody = tmp.ProxyBody
+				}
+			}
+		}
+	}
 	msec, _ := strconv.ParseInt(stream.Msec, 10, 64)
 	return &log_driver.LogInfo{
 		LogItem:           ToLogItem(stream, msec),
 		ContentType:       stream.ContentType,
-		RequestBody:       stream.RequestBody,
-		ProxyBody:         stream.ProxyBody,
-		ProxyResponseBody: stream.ProxyResponseBody,
-		ResponseBody:      stream.ResponseBody,
+		RequestBody:       requestBody,
+		ProxyBody:         proxyRequestBody,
+		ProxyResponseBody: proxyResponseBody,
+		ResponseBody:      responseBody,
 		RequestHeader:     stream.RequestHeader,
 		ResponseHeader:    stream.ResponseHeader,
 	}, nil

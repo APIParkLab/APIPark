@@ -270,7 +270,7 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 			consumerNum := consumerMap[date[index]]
 			avgRequestPerSubscriber := 0.0
 			if consumerNum != 0 {
-				avgRequestPerSubscriber = float64(summary.StatusTotal) / float64(consumerNum)
+				avgRequestPerSubscriber = float64(item.StatusTotal) / float64(consumerNum)
 				if avgRequestPerSubscriber > result.MaxRequestPerSubscriber {
 					result.MaxRequestPerSubscriber = avgRequestPerSubscriber
 				}
@@ -306,14 +306,13 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 			if item > result.MaxResponseTime {
 				result.MaxResponseTime = item
 			}
-			if result.MinResponseTime == 0 || item < result.MinResponseTime {
+
+			if item > 0 && (result.MinResponseTime == 0 || item < result.MinResponseTime) {
 				result.MinResponseTime = item
 			}
 		}
 		result.AvgResponseTimeOverview = items
 		result.AvgResponseTime = summary.Avg
-		//result.MaxResponseTime = summary.Max
-		//result.MinResponseTime = summary.Min
 	}()
 
 	go func() {
