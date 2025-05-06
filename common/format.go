@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func FormatCount(count int64) string {
+func FormatCountInt64(count int64) string {
 	switch {
 	case count < 1000:
 		return strconv.FormatInt(count, 10)
@@ -17,6 +17,21 @@ func FormatCount(count int64) string {
 		return fmt.Sprintf("%.1fB", float64(count)/1000000000)
 	default:
 		return fmt.Sprintf("%.1fT", float64(count)/1000000000000)
+	}
+}
+
+func FormatCountFloat64(count float64) string {
+	switch {
+	case count < 1000:
+		return fmt.Sprintf("%.1f", count)
+	case count < 1000000:
+		return fmt.Sprintf("%.1fK", count/1000)
+	case count < 1000000000:
+		return fmt.Sprintf("%.1fM", count/1000000)
+	case count < 1000000000000:
+		return fmt.Sprintf("%.1fB", count/1000000000)
+	default:
+		return fmt.Sprintf("%.1fT", count/1000000000000)
 	}
 }
 
