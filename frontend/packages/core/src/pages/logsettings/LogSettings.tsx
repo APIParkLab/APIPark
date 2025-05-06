@@ -68,7 +68,7 @@ const LogSettings = () => {
     <>
       <Skeleton className="m-btnbase w-calc-100vw-minus-padding-r" active loading={loading}>
         <InsidePage
-          pageTitle={$t('日志配置')}
+          pageTitle={$t('日志输出设置')}
           description={'APIPark ' + $t('提供详尽的 API 调用日志，帮助企业监控、分析和审计 API 的运行状况。')}
         >
           <div className="flex h-full">

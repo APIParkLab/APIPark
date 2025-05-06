@@ -26,7 +26,6 @@ import {
   SystemInsideRouterCreateHandle,
   SystemInsideRouterCreateProps
 } from '../../../const/system/type.ts'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 
 const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, SystemInsideRouterCreateProps>(
   (props, ref) => {
@@ -39,14 +38,12 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
     const { state } = useGlobalContext()
     const { apiPrefix, prefixForce } = useSystemContext()
     const navigator = useNavigate()
-    const { setBreadcrumb } = useBreadcrumb()
-  
 
     const onFinish = () => {
       return Promise.all([proxyRef.current?.validate?.(), form.validateFields()]).then(([, formValue]) => {
         const body = {
           ...formValue,
-          path: `${prefixForce ? apiPrefix + '/' : ''}${formValue.path.trim()}${formValue.pathMatch === 'prefix' ? '/*' : ''}`,
+          path: `${prefixForce ? apiPrefix + (!formValue.path?.trim() ? '': '/') : ''}${(formValue.path?.trim() || '')}${formValue.pathMatch === 'prefix' ? '/*' : ''}`,
           proxy: {
             ...formValue.proxy,
             path: formValue.proxy.path
@@ -118,7 +115,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
         .then((response) => {
           const { code, data, msg } = response
           if (code === STATUS_CODE.SUCCESS) {
-            const { disable, protocols, path, methods, description, match, proxy } = data.router
+            const { disable, protocols, path, name, methods, description, match, proxy } = data.router
             let newPath = path
             let pathMatch = 'full'
             if (prefixForce && path?.startsWith(apiPrefix + '/')) {
@@ -131,6 +128,7 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
             form.setFieldsValue({
               disable,
               protocols,
+              name,
               path: newPath,
               pathMatch,
               methods,
@@ -147,19 +145,6 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
     }
 
     useEffect(() => {
-      setBreadcrumb([
-        {
-          title: $t('服务'),
-          onClick: () => navigator('/service/list')
-        },
-        {
-          title:$t('API'),
-          onClick: () => navigator(`/service/${teamId}/inside/${serviceId}/route`)
-        },
-        {
-          title: routeId ? $t('编辑 API') : $t('添加 API')
-        }
-      ])
       if (routeId) {
         getRouterConfig()
       } else {
@@ -252,6 +237,14 @@ const SystemInsideRouterCreate = forwardRef<SystemInsideRouterCreateHandle, Syst
                 extra={$t('开启拦截后，网关会拦截所有该路径的请求，相当于防火墙禁用了特定路径的访问。')}
               >
                 <Switch />
+              </Form.Item>
+              <Form.Item<SystemApiProxyFieldType>
+                className="flex-1"
+                label={$t('路由名称')}
+                name="name"
+                rules={[{ required: true, whitespace: true }]}
+              >
+                <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)} />
               </Form.Item>
 
               <Form.Item<SystemApiProxyFieldType> label={$t('请求协议')} name="protocols" rules={[{ required: true }]}>

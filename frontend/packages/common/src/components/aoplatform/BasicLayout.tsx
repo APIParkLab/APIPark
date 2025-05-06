@@ -36,7 +36,7 @@ function BasicLayout({ project = 'core' }: { project: string }) {
   const { state, accessData, checkPermission, accessInit, dispatch, resetAccess, getGlobalAccessData, menuList } =
     useGlobalContext()
   const [pathname, setPathname] = useState(currentUrl)
-  const mainPage = project === 'core' ? '/service/list' : '/serviceHub/list'
+  const mainPage = project === 'core' ? '/service/list' : '/portal/list'
   const [menuItems, setMenuItems] = useState<MenuProps['items']>()
   const pluginSlotHub = usePluginSlotHub()
 

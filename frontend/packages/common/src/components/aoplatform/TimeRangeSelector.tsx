@@ -27,6 +27,7 @@ type TimeRangeSelectorProps = {
   bindRef?: any
   hideBtns?: TimeRangeButton[]
   defaultTimeButton?: TimeRangeButton
+  customClassNames?: string
 }
 const TimeRangeSelector = (props: TimeRangeSelectorProps) => {
   const {
@@ -38,7 +39,8 @@ const TimeRangeSelector = (props: TimeRangeSelectorProps) => {
     labelSize = 'default',
     bindRef,
     hideBtns = [],
-    defaultTimeButton = 'hour'
+    defaultTimeButton = 'hour',
+    customClassNames = 'pt-btnybase'
   } = props
   const [timeButton, setTimeButton] = useState(initialTimeButton || '')
   const [datePickerValue, setDatePickerValue] = useState<RangeValue>(initialDatePickerValue || [null, null])
@@ -110,8 +112,12 @@ const TimeRangeSelector = (props: TimeRangeSelectorProps) => {
     return current && current.valueOf() > dayjs().startOf('day').valueOf()
   }
 
+  useEffect(() => {
+    setTimeButton(initialTimeButton || '')
+  }, [initialTimeButton])
+
   return (
-    <div className="flex flex-nowrap items-center  pt-btnybase mr-btnybase">
+    <div className={`flex flex-nowrap items-center ${customClassNames} mr-btnybase`}>
       {!hideTitle && <label className={`whitespace-nowrap `}>{$t('时间')}：</label>}
       <Radio.Group className="whitespace-nowrap" value={timeButton} onChange={handleRadioChange} buttonStyle="solid">
         {hideBtns?.length && hideBtns.includes('hour') ? null : (

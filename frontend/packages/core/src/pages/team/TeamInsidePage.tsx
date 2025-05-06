@@ -16,6 +16,7 @@ import { PERMISSION_DEFINITION } from "@common/const/permissions.ts";
 import { TeamConfigType } from "@core/const/team/type.ts";
 import { $t } from "@common/locales/index.ts";
 import { getItem } from "@common/utils/navigation.tsx";
+import { useBreadcrumb } from "@common/contexts/BreadcrumbContext.tsx";
 
 const TeamInsidePage:FC = ()=> {
     const { message } = App.useApp()
@@ -26,6 +27,7 @@ const TeamInsidePage:FC = ()=> {
     const {getTeamAccessData,cleanTeamAccessData,accessData,checkPermission,teamDataFlushed,accessInit,state} = useGlobalContext()
     const navigateTo = useNavigate()
     const [activeMenu, setActiveMenu] = useState<string>()
+    const { setBreadcrumb } = useBreadcrumb()
 
     const onMenuClick: MenuProps['onClick'] = ({key}) => {
         setActiveMenu(key)
@@ -87,6 +89,16 @@ const TeamInsidePage:FC = ()=> {
             navigateTo(`/team/inside/${teamId}/${activeMenu}`)
         }
     },[activeMenu])
+
+    useEffect(()=>{
+        setBreadcrumb([
+            {
+              title: $t('团队'),
+              onClick: () => navigateTo('/team/list')
+            },
+            { title: teamInfo?.name || '-' }
+          ])
+    },[state.language, teamInfo])
 
     useEffect(()=>{
         getTeamInfo()

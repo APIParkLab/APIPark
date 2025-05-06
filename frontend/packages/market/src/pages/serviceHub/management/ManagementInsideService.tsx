@@ -254,7 +254,7 @@ export default function ManagementInsideService() {
                     <Button
                       type="text"
                       className="bg-[#7371fc20] hover:bg-[#7371fc19] text-theme"
-                      onClick={() => window.open(`/serviceHub/detail/${item.service.id}`, '_blank')}
+                      onClick={() => window.open(`/portal/detail/${item.service.id}`, '_blank')}
                     >
                       {$t('API 文档')}
                     </Button>

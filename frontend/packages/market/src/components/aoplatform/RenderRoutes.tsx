@@ -53,7 +53,7 @@ const PUBLIC_ROUTES: RouteConfig[] = [
     key: uuidv4(),
     children: [
       {
-        path: 'serviceHub',
+        path: 'portal',
         component: <Outlet />,
         key: uuidv4(),
         children: [
@@ -151,7 +151,7 @@ const PUBLIC_ROUTES: RouteConfig[] = [
       },
       {
         path: '*',
-        component: <Navigate to={'/serviceHub/list'} replace />,
+        component: <Navigate to={'/portal/list'} replace />,
         key: uuidv4()
       }
     ]

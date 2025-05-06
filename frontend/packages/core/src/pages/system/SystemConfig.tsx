@@ -2,7 +2,6 @@ import { LoadingOutlined } from '@ant-design/icons'
 import WithPermission from '@common/components/aoplatform/WithPermission.tsx'
 import { BasicResponse, DELETE_TIPS, PLACEHOLDER, RESPONSE_TIPS, STATUS_CODE } from '@common/const/const.tsx'
 import { EntityItem, MemberItem, SimpleTeamItem } from '@common/const/type.ts'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext.tsx'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
 import { useFetch } from '@common/hooks/http.ts'
 import { $t } from '@common/locales/index.ts'
@@ -49,7 +48,6 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
   const { fetchData } = useFetch()
   const [teamOptionList, setTeamOptionList] = useState<DefaultOptionType[]>()
   const navigate = useNavigate()
-  const { setBreadcrumb } = useBreadcrumb()
   const { setSystemInfo } = useSystemContext()
   const [showClassify, setShowClassify] = useState<boolean>(true)
   const [showAI, setShowAI] = useState<boolean>(false)
@@ -355,15 +353,6 @@ const SystemConfig = forwardRef<SystemConfigHandle>((_, ref) => {
     if (serviceId !== undefined) {
       setOnEdit(true)
       getSystemInfo()
-      setBreadcrumb([
-        {
-          title: $t('服务'),
-          onClick: () => navigate('/service/list')
-        },
-        {
-          title: $t('设置')
-        }
-      ])
     } else {
       getProviderOptionList()
       setOnEdit(false)

@@ -97,6 +97,20 @@ export const routerMap: Map<string, RouterMapConfig> = new Map([
               lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/system/SystemInsidePage.tsx')),
               children: [
                 {
+                  path: 'overview',
+                  key: 'restServiceInsideOverview',
+                  lazy: lazy(
+                    () => import(/* webpackChunkName: "[request]" */ '@core/pages/serviceOverview/RestServiceContainer')
+                  )
+                },
+                {
+                  path: 'logs',
+                  key: 'restServiceInsideLogs',
+                  lazy: lazy(
+                    () => import(/* webpackChunkName: "[request]" */ '@core/pages/serviceLogs/RestServiceLogsContainer')
+                  )
+                },
+                {
                   path: 'api',
                   key: 'restServiceInsideApi',
                   lazy: lazy(
@@ -268,6 +282,20 @@ export const routerMap: Map<string, RouterMapConfig> = new Map([
                 () => import(/* webpackChunkName: "[request]" */ '@core/pages/aiService/AiServiceInsidePage.tsx')
               ),
               children: [
+                {
+                  path: 'overview',
+                  key: 'aiServiceInsideOverview',
+                  lazy: lazy(
+                    () => import(/* webpackChunkName: "[request]" */ '@core/pages/serviceOverview/AiServiceContainer')
+                  )
+                },
+                {
+                  path: 'logs',
+                  key: 'aiServiceInsideLogs',
+                  lazy: lazy(
+                    () => import(/* webpackChunkName: "[request]" */ '@core/pages/serviceLogs/AiServiceLogsContainer')
+                  )
+                },
                 {
                   path: 'api',
                   key: 'aiServiceInsideApi',
@@ -507,7 +535,7 @@ export const routerMap: Map<string, RouterMapConfig> = new Map([
   ],
 
   [
-    'serviceHub',
+    'portal',
     {
       type: 'module',
       component: <Outlet />,
@@ -674,12 +702,12 @@ export const routerMap: Map<string, RouterMapConfig> = new Map([
       children: [
         {
           path: 'total',
-          key: 'analytics2',
+          key: 'analyticsTotal',
           lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@dashboard/pages/DashboardTotal.tsx'))
         },
         {
           path: ':dashboardType',
-          key: 'analytics3',
+          key: 'analyticsOther',
           component: <Outlet />,
           children: [
             {

@@ -8,9 +8,8 @@ import { App, Button } from 'antd'
 import { EntityItem } from '@common/const/type.ts'
 import WithPermission from '@common/components/aoplatform/WithPermission.tsx'
 import { RouterParams } from '@core/components/aoplatform/RenderRoutes'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { $t } from '@common/locales'
-import { useBreadcrumb } from '@common/contexts/BreadcrumbContext'
 const ServiceInsideDocument = () => {
   const { message } = App.useApp()
   const [updater, setUpdater] = useState<string>()
@@ -19,8 +18,6 @@ const ServiceInsideDocument = () => {
   const [doc, setDoc] = useState<string>()
   const { fetchData } = useFetch()
   const { serviceId, teamId } = useParams<RouterParams>()
-  const { setBreadcrumb } = useBreadcrumb()
-  const navigator = useNavigate()
 
   const save = () => {
     fetchData<
@@ -80,15 +77,6 @@ const ServiceInsideDocument = () => {
   }
 
   useEffect(() => {
-    setBreadcrumb([
-      {
-        title: $t('服务'),
-        onClick: () => navigator('/service/list')
-      },
-      {
-        title: $t('使用说明')
-      }
-    ])
     getServiceDoc()
   }, [])
 
