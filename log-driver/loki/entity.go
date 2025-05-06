@@ -49,7 +49,15 @@ type LogCount struct {
 }
 
 type LogInfo struct {
-	Stream *LogDetail `json:"stream"`
+	Stream *LogDetail    `json:"stream"`
+	Values []interface{} `json:"values"`
+}
+
+type LogBodyDetail struct {
+	RequestBody       string `json:"request_body"`
+	ProxyBody         string `json:"proxy_body"`
+	ResponseBody      string `json:"response_body"`
+	ProxyResponseBody string `json:"proxy_response_body"`
 }
 
 type LogDetail struct {
