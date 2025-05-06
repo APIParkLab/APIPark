@@ -1,6 +1,6 @@
 export type BarData = {
   title: string
-  value: string
+  value?: string
   date: string[]
   data: any[]
   showXAxis?: boolean
