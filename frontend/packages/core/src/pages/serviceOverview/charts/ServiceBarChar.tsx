@@ -21,6 +21,8 @@ export type BarChartInfo = {
   traffic2xxTotal?: string
   traffic4xxTotal?: string
   traffic5xxTotal?: string
+  max?: string | number
+  min?: string | number
 }
 
 type ServiceBarCharProps = {
@@ -29,9 +31,17 @@ type ServiceBarCharProps = {
   height?: number
   showAvgLine?: boolean
   showLegendIndicator?: boolean
+  hideIndicatorValue?: boolean
 }
 
-const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showLegendIndicator }: ServiceBarCharProps) => {
+const ServiceBarChar = ({
+  customClassNames,
+  dataInfo,
+  height,
+  showAvgLine,
+  showLegendIndicator,
+  hideIndicatorValue
+}: ServiceBarCharProps) => {
   const chartRef = useRef<ECharts>(null)
   const [option, setOption] = useState<EChartsOption | undefined>({})
   // 使用从主题配置中导入的默认颜色，而不是硬编码的颜色值
@@ -78,7 +88,10 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
     const option: EChartsOption = {
       title: [
         {
-          text: '{titleStyle|' + $t(dataInfo.title) + '}\n\n{valueStyle|' + dataInfo.value + '}',
+          text:
+            '{titleStyle|' +
+            $t(dataInfo.title) +
+            `}${hideIndicatorValue ? '' : '\n\n{valueStyle|' + dataInfo.value + '}'}`,
           left: '2%',
           top: '0',
           textStyle: {
@@ -125,23 +138,23 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
         show: !isNumberArray,
         data: legendData,
         right: '10px',
-        top: '60px',
+        top: hideIndicatorValue ? '10px' : '60px',
         itemWidth: 10,
         itemHeight: 10,
         textStyle: {
           color: '#333'
         },
         icon: 'rect',
-        formatter: function(name: string): string {
+        formatter: function (name: string): string {
           // 这里可以映射或自定义图例文本
           const customNames: Record<string, string> = {
-            'inputToken': `${$t('输入 Token')} ${showLegendIndicator ? `(${dataInfo.inputTokenTotal})` : ''}`,
-            'outputToken': `${$t('输出 Token')} ${showLegendIndicator ? `(${dataInfo.outputTokenTotal})` : ''}`,
+            inputToken: `${$t('输入 Token')} ${showLegendIndicator ? `(${dataInfo.inputTokenTotal})` : ''}`,
+            outputToken: `${$t('输出 Token')} ${showLegendIndicator ? `(${dataInfo.outputTokenTotal})` : ''}`,
             '2xx': `${'2xx'} ${showLegendIndicator ? `(${dataInfo.request2xxTotal || dataInfo.traffic2xxTotal})` : ''}`,
             '4xx': `${'4xx'} ${showLegendIndicator ? `(${dataInfo.request4xxTotal || dataInfo.traffic4xxTotal})` : ''}`,
             '5xx': `${'5xx'} ${showLegendIndicator ? `(${dataInfo.request5xxTotal || dataInfo.traffic5xxTotal})` : ''}`
-          };
-          return customNames[name] || name;
+          }
+          return customNames[name] || name
         }
       },
       xAxis: {
@@ -161,7 +174,7 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
         type: 'value',
         name: '',
         min: 0,
-        minInterval: 1,
+        ...(showAvgLine ? {} : { minInterval: 1 }),
         show: dataExists, // 没有数据时不显示Y轴
         splitLine: {
           show: dataExists, // 没有数据时不显示网格线
@@ -252,10 +265,10 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
                     },
                     emphasis: {
                       lineStyle: {
-                        width: 1  // 保持线条宽度不变，禁用默认的悬停加粗
+                        width: 1 // 保持线条宽度不变，禁用默认的悬停加粗
                       },
                       label: {
-                        show: false  // 悬停时不显示标签
+                        show: false // 悬停时不显示标签
                       }
                     },
                     data: [{ type: 'average', name: 'Avg' }]
@@ -289,10 +302,10 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
                   },
                   emphasis: {
                     lineStyle: {
-                      width: 1  // 保持线条宽度不变，禁用默认的悬停加粗
+                      width: 1 // 保持线条宽度不变，禁用默认的悬停加粗
                     },
                     label: {
-                      show: false  // 悬停时不显示标签
+                      show: false // 悬停时不显示标签
                     }
                   },
                   data: [{ type: 'average', name: 'Avg' }]
@@ -348,6 +361,24 @@ const ServiceBarChar = ({ customClassNames, dataInfo, height, showAvgLine, showL
   }, [])
   return (
     <div className={`w-full ${customClassNames}`}>
+      {
+        hideIndicatorValue && (
+        <div className="absolute top-[26px] left-[10px] w-full">
+          <div className="relative top-[5px]">
+            <div className="absolute top-[23px] right-[5%] grid grid-cols-[auto_auto] justify-items-end">
+              <div className="flex justify-center items-center">
+                <span className="text-[#FE564D] text-[9px]">▲</span>
+              </div>
+              <span className="ml-1 text-right">{dataInfo?.max}</span>
+              <div className="flex justify-center items-center">
+                <span className="text-[#27B148] text-[9px]">▼</span>
+              </div>
+              <span className="ml-1 text-right">{dataInfo?.min}</span>
+            </div>
+          </div>
+        </div>
+        )
+      }
       <div style={!hasData ? { cursor: 'default', pointerEvents: 'none' } : {}}>
         <ECharts
           ref={chartRef}
