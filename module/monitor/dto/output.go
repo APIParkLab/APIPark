@@ -162,48 +162,53 @@ type TokenFloatOverview struct {
 
 type ChartAIOverview struct {
 	RequestOverview                 []*StatusCodeOverview `json:"request_overview"`
-	AvgRequestPerSubscriber         string                `json:"avg_request_per_subscriber"`          //请求概况
 	AvgRequestPerSubscriberOverview []float64             `json:"avg_request_per_subscriber_overview"` //平均响应时间概况
-	RequestTotal                    string                `json:"request_total"`
-	Request2xxTotal                 string                `json:"request_2xx_total"`
-	Request4xxTotal                 string                `json:"request_4xx_total"`
-	Request5xxTotal                 string                `json:"request_5xx_total"`
-	TokenTotal                      string                `json:"token_total"` //总token流量
-	InputTokenTotal                 string                `json:"input_token_total"`
-	OutputTokenTotal                string                `json:"output_token_total"` //最大token流量
-	TokenOverview                   []*TokenOverview      `json:"token_overview"`     //token概况
-	AvgTokenOverview                []float64             `json:"avg_token_overview"`
-	AvgTokenPerSubscriberOverview   []*TokenFloatOverview `json:"avg_token_per_subscriber_overview"`
-	AvgToken                        string                `json:"avg_token"`
-	MaxToken                        string                `json:"max_token"`
-	MinToken                        string                `json:"min_token"`
-	AvgTokenPerSubscriber           string                `json:"avg_token_per_subscriber"`
-	Date                            []string              `json:"date"`
+	MaxRequestPerSubscriber         float64               `json:"max_request_per_subscriber"`
+	MinRequestPerSubscriber         float64               `json:"min_request_per_subscriber"`
+
+	RequestTotal                  int64                 `json:"request_total"`
+	Request2xxTotal               int64                 `json:"request_2xx_total"`
+	Request4xxTotal               int64                 `json:"request_4xx_total"`
+	Request5xxTotal               int64                 `json:"request_5xx_total"`
+	TokenTotal                    int64                 `json:"token_total"` //总token流量
+	InputTokenTotal               int64                 `json:"input_token_total"`
+	OutputTokenTotal              int64                 `json:"output_token_total"` //最大token流量
+	TokenOverview                 []*TokenOverview      `json:"token_overview"`     //token概况
+	AvgTokenOverview              []float64             `json:"avg_token_overview"`
+	AvgTokenPerSubscriberOverview []*TokenFloatOverview `json:"avg_token_per_subscriber_overview"`
+	AvgToken                      float64               `json:"avg_token"`
+	MaxToken                      float64               `json:"max_token"`
+	MinToken                      float64               `json:"min_token"`
+	Date                          []string              `json:"date"`
+	MaxTokenPerSubscriber         float64               `json:"max_token_per_subscriber"`
+	MinTokenPerSubscriber         float64               `json:"min_token_per_subscriber"`
 }
 
 type ChartRestOverview struct {
-	RequestOverview                 []*StatusCodeOverview `json:"request_overview"` //请求概况
-	AvgRequestPerSubscriber         string                `json:"avg_request_per_subscriber"`
+	RequestOverview                 []*StatusCodeOverview `json:"request_overview"`                    //请求概况
 	AvgRequestPerSubscriberOverview []float64             `json:"avg_request_per_subscriber_overview"` //平均响应时间概况
+	MaxRequestPerSubscriber         float64               `json:"max_request_per_subscriber"`
+	MinRequestPerSubscriber         float64               `json:"min_request_per_subscriber"`
 
-	RequestTotal    string `json:"request_total"`
-	Request2xxTotal string `json:"request_2xx_total"`
-	Request4xxTotal string `json:"request_4xx_total"`
-	Request5xxTotal string `json:"request_5xx_total"`
+	RequestTotal    int64 `json:"request_total"`
+	Request2xxTotal int64 `json:"request_2xx_total"`
+	Request4xxTotal int64 `json:"request_4xx_total"`
+	Request5xxTotal int64 `json:"request_5xx_total"`
 
 	TrafficOverview []*StatusCodeOverview `json:"traffic_overview"` //流量概况
-	Traffic2xxTotal string                `json:"traffic_2xx_total"`
-	Traffic4xxTotal string                `json:"traffic_4xx_total"` //流量概况
-	Traffic5xxTotal string                `json:"traffic_5xx_total"` //流量概况
+	Traffic2xxTotal int64                 `json:"traffic_2xx_total"`
+	Traffic4xxTotal int64                 `json:"traffic_4xx_total"` //流量概况
+	Traffic5xxTotal int64                 `json:"traffic_5xx_total"` //流量概况
 
 	AvgResponseTimeOverview         []int64   `json:"avg_response_time_overview"` //平均响应时间概况
 	AvgTrafficPerSubscriberOverview []float64 `json:"avg_traffic_per_subscriber_overview"`
-	TrafficTotal                    string    `json:"traffic_total"`
-	AvgResponseTime                 string    `json:"avg_response_time"` //平均响应时间
-	MaxResponseTime                 string    `json:"max_response_time"` //最大响应时间
-	MinResponseTime                 string    `json:"min_response_time"` //最小响应时间
-	AvgTrafficPerSubscriber         string    `json:"avg_traffic_per_subscriber"`
+	TrafficTotal                    int64     `json:"traffic_total"`
+	AvgResponseTime                 int64     `json:"avg_response_time"` //平均响应时间
+	MaxResponseTime                 int64     `json:"max_response_time"` //最大响应时间
+	MinResponseTime                 int64     `json:"min_response_time"` //最小响应时间
 	Date                            []string  `json:"date"`
+	MaxTrafficPerSubscriber         float64   `json:"max_traffic_per_subscriber"`
+	MinTrafficPerSubscriber         float64   `json:"min_traffic_per_subscriber"`
 }
 
 type ServiceChartRestOverview struct {

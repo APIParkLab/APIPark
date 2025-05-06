@@ -184,7 +184,7 @@ func (f *fluxQuery) CommonTendencyTag(ctx context.Context, queryApi api.QueryAPI
 	tagMap := make(map[string]struct{})
 	defer result.Close()
 	for result.Next() {
-		date := result.Record().Values()["_time"].(time.Time).In(time.Local)
+		date := result.Record().Values()["_stop"].(time.Time).In(time.Local)
 		if _, ok := dateMap[date]; !ok {
 			dateMap[date] = map[string]struct{}{}
 		}
