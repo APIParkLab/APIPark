@@ -62,6 +62,17 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
     getProjectList()
   }, [])
 
+  /**
+   * 重置时间范围
+   */
+  let resetTimeRange = () => {}
+  /**
+   * 绑定时间范围组件
+   * @param instance
+   */
+  const bindRef = (instance: any) => {
+    resetTimeRange = instance.reset
+  }
   const getApiList = (projectIds?: string[]) => {
     return fetchData<{ apis: EntityItem[] }>('simple/service/apis', {
       method: 'POST',
@@ -146,6 +157,7 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
   }
 
   const clearSearch = () => {
+    resetTimeRange()
     setTimeButton('hour')
     setDatePickerValue(null)
     setQueryData(undefined)
@@ -186,11 +198,17 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
     setDrawerOpen(true)
   }
 
+  useEffect(() => {
+    setQueryBtnLoading(true)
+    getApiTableList()
+  }, [queryData])
+
   return (
     <div className="overflow-hidden h-full pr-PAGE_INSIDE_X">
       <ScrollableSection>
         <div className="pl-btnbase pr-btnrbase pb-btnbase content-before">
           <TimeRangeSelector
+            bindRef={bindRef}
             labelSize="small"
             initialTimeButton={timeButton}
             onTimeButtonChange={setTimeButton}
@@ -235,12 +253,8 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
             <div className="w-[346px] inline-block">
               {/* <SearchInputGroup eoSingle={false} eoInputVal={queryData.path} eoClick={() => setQueryData({ ...queryData, path: '' })} /> */}
               <Input
-                value={queryData?.path}
-                onChange={(e) =>
-                  debounce((e) => {
-                    setQueryData((prevData) => ({ ...(prevData || {}), path: e.target.value }))
-                  }, 100)(e)
-                }
+                value={queryData?.path || ''}
+                onChange={(e) => setQueryData((prevData) => ({ ...(prevData || {}), path: e.target.value }))}
                 allowClear
                 placeholder={$t('请输入请求路径进行搜索')}
                 prefix={<SearchOutlined className="cursor-pointer" />}
@@ -248,17 +262,6 @@ export default function MonitorApiPage(props: MonitorApiPageProps) {
             </div>
             <Button className="ml-btnybase" onClick={clearSearch}>
               {$t('重置')}
-            </Button>
-            <Button
-              type="primary"
-              loading={queryBtnLoading}
-              className="ml-btnybase"
-              onClick={() => {
-                setQueryBtnLoading(true)
-                getApiTableList()
-              }}
-            >
-              {$t('查询')}
             </Button>
             <Button className="ml-btnybase" loading={exportLoading} onClick={exportData}>
               {$t('导出')}

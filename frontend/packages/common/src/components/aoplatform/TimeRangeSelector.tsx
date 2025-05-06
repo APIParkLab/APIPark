@@ -112,6 +112,10 @@ const TimeRangeSelector = (props: TimeRangeSelectorProps) => {
     return current && current.valueOf() > dayjs().startOf('day').valueOf()
   }
 
+  useEffect(() => {
+    setTimeButton(initialTimeButton || '')
+  }, [initialTimeButton])
+
   return (
     <div className={`flex flex-nowrap items-center ${customClassNames} mr-btnybase`}>
       {!hideTitle && <label className={`whitespace-nowrap `}>{$t('时间')}：</label>}
