@@ -618,7 +618,7 @@ func (e *executor) TopN(ctx context.Context, start time.Time, end time.Time, lim
 		{
 			Measurement: "request",
 			AggregateFn: "sum()",
-			Fields:      []string{"total", "request", "response", "total_token"},
+			Fields:      []string{"total", "request", "response", "input_token", "output_token"},
 		},
 		{
 			Measurement: "proxy",
@@ -654,8 +654,8 @@ func (e *executor) TokenOverview(ctx context.Context, start time.Time, end time.
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	total := requestValues["total_token"]
-	totalLen := len(total)
+	//total := requestValues["total_token"]
+	//totalLen := len(total)
 	input := requestValues["input_token"]
 	inputLen := len(input)
 	output := requestValues["output_token"]
@@ -664,19 +664,16 @@ func (e *executor) TokenOverview(ctx context.Context, start time.Time, end time.
 	result := make([]*monitor.TokenOverview, 0, len(dates))
 	for i := range dates {
 		r := new(monitor.TokenOverview)
-		if totalLen > i {
-			r.TotalToken = total[i]
-			totalOverview.TotalToken += r.TotalToken
-		}
 		if inputLen > i {
 			r.InputToken = input[i]
-			totalOverview.InputToken += r.InputToken
 		}
 		if outputLen > i {
 			r.OutputToken = output[i]
-			totalOverview.OutputToken += r.OutputToken
 		}
-
+		r.TotalToken = r.InputToken + r.OutputToken
+		totalOverview.InputToken += r.InputToken
+		totalOverview.OutputToken += r.OutputToken
+		totalOverview.TotalToken += r.TotalToken
 		result = append(result, r)
 	}
 	return dates, totalOverview, result, nil

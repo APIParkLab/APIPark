@@ -112,10 +112,11 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 				if avgRequestPerSubscriber > result.MaxRequestPerSubscriber {
 					result.MaxRequestPerSubscriber = avgRequestPerSubscriber
 				}
+				if result.MinRequestPerSubscriber == 0 || result.MinRequestPerSubscriber > avgRequestPerSubscriber {
+					result.MinRequestPerSubscriber = avgRequestPerSubscriber
+				}
 			}
-			if result.MinRequestPerSubscriber == 0 || result.MinRequestPerSubscriber > avgRequestPerSubscriber {
-				result.MinRequestPerSubscriber = avgRequestPerSubscriber
-			}
+
 			result.AvgRequestPerSubscriberOverview = append(result.AvgRequestPerSubscriberOverview, avgRequestPerSubscriber)
 			result.RequestOverview = append(result.RequestOverview, &monitor_dto.StatusCodeOverview{
 				Status2xx: item.Status2xx,
@@ -179,9 +180,9 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 				if avgTotalPerSubscriber > result.MaxTokenPerSubscriber {
 					result.MaxTokenPerSubscriber = avgTotalPerSubscriber
 				}
-			}
-			if result.MinTokenPerSubscriber == 0 || result.MinTokenPerSubscriber > avgTotalPerSubscriber {
-				result.MinTokenPerSubscriber = avgTotalPerSubscriber
+				if result.MinTokenPerSubscriber == 0 || result.MinTokenPerSubscriber > avgTotalPerSubscriber {
+					result.MinTokenPerSubscriber = avgTotalPerSubscriber
+				}
 			}
 
 			result.AvgTokenPerSubscriberOverview = append(result.AvgTokenPerSubscriberOverview, &monitor_dto.TokenFloatOverview{
@@ -221,7 +222,8 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 		if maxTokenPerSecond < p {
 			maxTokenPerSecond = p
 		}
-		if minTokenPerSecond == 0 || minTokenPerSecond > p {
+
+		if p > 0 && (minTokenPerSecond == 0 || minTokenPerSecond > p) {
 			minTokenPerSecond = p
 		}
 	}
@@ -272,11 +274,11 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 				if avgRequestPerSubscriber > result.MaxRequestPerSubscriber {
 					result.MaxRequestPerSubscriber = avgRequestPerSubscriber
 				}
+				if result.MinRequestPerSubscriber == 0 || avgRequestPerSubscriber < result.MinRequestPerSubscriber {
+					result.MinRequestPerSubscriber = avgRequestPerSubscriber
+				}
+			}
 
-			}
-			if result.MinRequestPerSubscriber == 0 || avgRequestPerSubscriber < result.MinRequestPerSubscriber {
-				result.MinRequestPerSubscriber = avgRequestPerSubscriber
-			}
 			result.AvgRequestPerSubscriberOverview = append(result.AvgRequestPerSubscriberOverview, avgRequestPerSubscriber)
 			result.RequestOverview = append(result.RequestOverview, &monitor_dto.StatusCodeOverview{
 				Status2xx: item.Status2xx,
@@ -300,10 +302,18 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 			errChan <- err
 			return
 		}
+		for _, item := range items {
+			if item > result.MaxResponseTime {
+				result.MaxResponseTime = item
+			}
+			if result.MinResponseTime == 0 || item < result.MinResponseTime {
+				result.MinResponseTime = item
+			}
+		}
 		result.AvgResponseTimeOverview = items
 		result.AvgResponseTime = summary.Avg
-		result.MaxResponseTime = summary.Max
-		result.MinResponseTime = summary.Min
+		//result.MaxResponseTime = summary.Max
+		//result.MinResponseTime = summary.Min
 	}()
 
 	go func() {
@@ -330,11 +340,12 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 				if avgTrafficPerSubscriber > result.MaxTrafficPerSubscriber {
 					result.MaxTrafficPerSubscriber = avgTrafficPerSubscriber
 				}
+				if result.MinTrafficPerSubscriber == 0 || result.MinTrafficPerSubscriber > avgTrafficPerSubscriber {
+					result.MinTrafficPerSubscriber = avgTrafficPerSubscriber
+				}
 
 			}
-			if result.MinTrafficPerSubscriber == 0 || result.MinTrafficPerSubscriber > avgTrafficPerSubscriber {
-				result.MinTrafficPerSubscriber = avgTrafficPerSubscriber
-			}
+
 			result.AvgTrafficPerSubscriberOverview = append(result.AvgTrafficPerSubscriberOverview, avgTrafficPerSubscriber)
 		}
 		result.TrafficTotal = summary.StatusTotal
@@ -569,6 +580,10 @@ func (i *imlMonitorStatisticModule) SubscriberStatistics(ctx context.Context, in
 	if err != nil {
 		return nil, err
 	}
+	apps = append(apps, &service.Service{
+		Id:   "apipark-global",
+		Name: "System Consumer",
+	})
 	appIds := utils.SliceToSlice(apps, func(p *service.Service) string {
 		return p.Id
 	})
@@ -777,17 +792,26 @@ func (i *imlMonitorStatisticModule) statisticOnApi(ctx context.Context, clusterI
 	if err != nil {
 		return nil, err
 	}
-	var service []*service.Service
+	var services []*service.Service
 	switch groupBy {
 	case "app":
-		service, err = i.serviceService.AppList(ctx)
+		services, err = i.serviceService.AppList(ctx)
+		if err != nil {
+			return nil, err
+		}
+		services = append(services, &service.Service{
+			Id:   "apipark-global",
+			Name: "System Consumer",
+		})
+
 	case "provider":
-		service, err = i.serviceService.ServiceList(ctx)
+		services, err = i.serviceService.ServiceList(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 	default:
 		return nil, errors.New("invalid group by")
-	}
-	if err != nil {
-		return nil, err
 	}
 
 	wheres, err := i.genCommonWheres(ctx, clusterId)
@@ -806,7 +830,7 @@ func (i *imlMonitorStatisticModule) statisticOnApi(ctx context.Context, clusterI
 	}
 
 	result := make([]*monitor_dto.ServiceStatisticBasicItem, 0, len(statisticMap))
-	for _, item := range service {
+	for _, item := range services {
 
 		statisticItem := &monitor_dto.ServiceStatisticBasicItem{
 			Id:            item.Id,
@@ -872,17 +896,21 @@ func (i *imlMonitorStatisticModule) ApiStatisticsOnSubscriber(ctx context.Contex
 	if err != nil {
 		return nil, err
 	}
-	// 根据订阅ID查询订阅的服务列表
-	subscriptions, err := i.subscribeService.MySubscribeServices(ctx, subscriberId, nil)
-	if err != nil {
-		return nil, err
+	serviceIds := make([]string, 0)
+	if subscriberId != "apipark-global" {
+		// 根据订阅ID查询订阅的服务列表
+		subscriptions, err := i.subscribeService.MySubscribeServices(ctx, subscriberId, nil)
+		if err != nil {
+			return nil, err
+		}
+		serviceIds = utils.SliceToSlice(subscriptions, func(t *subscribe.Subscribe) string {
+			return t.Service
+		})
+		if len(serviceIds) < 1 {
+			return nil, nil
+		}
 	}
-	serviceIds := utils.SliceToSlice(subscriptions, func(t *subscribe.Subscribe) string {
-		return t.Service
-	})
-	if len(serviceIds) < 1 {
-		return nil, nil
-	}
+
 	apiInfos, err := i.apiService.ListInfoForServices(ctx, serviceIds...)
 	if err != nil {
 		return nil, err
