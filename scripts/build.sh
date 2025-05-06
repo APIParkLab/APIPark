@@ -73,7 +73,7 @@ build_frontend() {
     echo_info "Install dependencies..."
     pnpm install --registry https://registry.npmmirror.com --dir ./frontend
     echo_info "Build frontend..."
-    cd ./frontend && pnpm run build
+    cd ./frontend && pnpm run build --verbose
     cd ..
   else
     echo_info "Need not build frontend."
