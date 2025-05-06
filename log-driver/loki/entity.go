@@ -49,29 +49,44 @@ type LogCount struct {
 }
 
 type LogInfo struct {
-	Stream *LogDetail `json:"stream"`
+	Stream *LogDetail    `json:"stream"`
+	Values []interface{} `json:"values"`
 }
 
-type LogDetail struct {
-	Api               string `json:"api"`
-	Application       string `json:"application"`
-	Strategy          string `json:"strategy"`
-	ContentType       string `json:"content_type"`
-	Cluster           string `json:"cluster"`
-	Msec              string `json:"msec"`
-	Node              string `json:"node"`
-	RequestId         string `json:"request_id"`
-	RequestMethod     string `json:"request_method"`
-	RequestScheme     string `json:"request_scheme"`
-	RequestTime       string `json:"request_time"`
-	RequestUri        string `json:"request_uri"`
+type LogBodyDetail struct {
 	RequestBody       string `json:"request_body"`
 	ProxyBody         string `json:"proxy_body"`
 	ResponseBody      string `json:"response_body"`
 	ProxyResponseBody string `json:"proxy_response_body"`
-	Service           string `json:"service"`
-	Provider          string `json:"provider"`
-	Authorization     string `json:"authorization"`
-	SrcIp             string `json:"src_ip"`
-	Status            string `json:"status"`
+}
+
+type LogDetail struct {
+	Api                string      `json:"api"`
+	Application        string      `json:"application"`
+	Strategy           string      `json:"strategy"`
+	ContentType        string      `json:"content_type"`
+	Cluster            string      `json:"cluster"`
+	Msec               string      `json:"msec"`
+	Node               string      `json:"node"`
+	RequestId          string      `json:"request_id"`
+	RequestMethod      string      `json:"request_method"`
+	RequestScheme      string      `json:"request_scheme"`
+	RequestHeader      string      `json:"request_header"`
+	RequestTime        string      `json:"request_time"`
+	RequestUri         string      `json:"request_uri"`
+	RequestBody        string      `json:"request_body"`
+	ProxyBody          string      `json:"proxy_body"`
+	ResponseBody       string      `json:"response_body"`
+	ResponseHeader     string      `json:"response_header"`
+	ProxyResponseBody  string      `json:"proxy_response_body"`
+	Service            string      `json:"service"`
+	Provider           string      `json:"provider"`
+	Authorization      string      `json:"authorization"`
+	SrcIp              string      `json:"src_ip"`
+	Status             string      `json:"status"`
+	AIProvider         string      `json:"ai_provider"`
+	AIModel            string      `json:"ai_model"`
+	AIModelInputToken  interface{} `json:"ai_model_input_token"`
+	AIModelOutputToken interface{} `json:"ai_model_output_token"`
+	AIModelTotalToken  interface{} `json:"ai_model_total_token"`
 }

@@ -138,3 +138,101 @@ type MonitorCluster struct {
 	Name   string `json:"name"`
 	Enable bool   `json:"enable"`
 }
+
+type ChartOverview struct {
+}
+
+type StatusCodeOverview struct {
+	Status2xx int64 `json:"2xx"` //状态码2xx数
+	Status4xx int64 `json:"4xx"`
+	Status5xx int64 `json:"5xx"` //状态码5xx数
+}
+
+type TokenOverview struct {
+	TotalToken  int64 `json:"total_token"` //总token流量
+	OutputToken int64 `json:"output_token"`
+	InputToken  int64 `json:"input_token"` //最小token流量
+}
+
+type TokenFloatOverview struct {
+	TotalToken  float64 `json:"total_token"` //总token流量
+	OutputToken float64 `json:"output_token"`
+	InputToken  float64 `json:"input_token"` //最小token流量
+}
+
+type ChartAIOverview struct {
+	RequestOverview                 []*StatusCodeOverview `json:"request_overview"`
+	AvgRequestPerSubscriberOverview []float64             `json:"avg_request_per_subscriber_overview"` //平均响应时间概况
+	MaxRequestPerSubscriber         float64               `json:"max_request_per_subscriber"`
+	MinRequestPerSubscriber         float64               `json:"min_request_per_subscriber"`
+
+	RequestTotal                  int64                 `json:"request_total"`
+	Request2xxTotal               int64                 `json:"request_2xx_total"`
+	Request4xxTotal               int64                 `json:"request_4xx_total"`
+	Request5xxTotal               int64                 `json:"request_5xx_total"`
+	TokenTotal                    int64                 `json:"token_total"` //总token流量
+	InputTokenTotal               int64                 `json:"input_token_total"`
+	OutputTokenTotal              int64                 `json:"output_token_total"` //最大token流量
+	TokenOverview                 []*TokenOverview      `json:"token_overview"`     //token概况
+	AvgTokenOverview              []float64             `json:"avg_token_overview"`
+	AvgTokenPerSubscriberOverview []*TokenFloatOverview `json:"avg_token_per_subscriber_overview"`
+	AvgToken                      float64               `json:"avg_token"`
+	MaxToken                      float64               `json:"max_token"`
+	MinToken                      float64               `json:"min_token"`
+	Date                          []string              `json:"date"`
+	MaxTokenPerSubscriber         float64               `json:"max_token_per_subscriber"`
+	MinTokenPerSubscriber         float64               `json:"min_token_per_subscriber"`
+}
+
+type ChartRestOverview struct {
+	RequestOverview                 []*StatusCodeOverview `json:"request_overview"`                    //请求概况
+	AvgRequestPerSubscriberOverview []float64             `json:"avg_request_per_subscriber_overview"` //平均响应时间概况
+	MaxRequestPerSubscriber         float64               `json:"max_request_per_subscriber"`
+	MinRequestPerSubscriber         float64               `json:"min_request_per_subscriber"`
+
+	RequestTotal    int64 `json:"request_total"`
+	Request2xxTotal int64 `json:"request_2xx_total"`
+	Request4xxTotal int64 `json:"request_4xx_total"`
+	Request5xxTotal int64 `json:"request_5xx_total"`
+
+	TrafficOverview []*StatusCodeOverview `json:"traffic_overview"` //流量概况
+	Traffic2xxTotal int64                 `json:"traffic_2xx_total"`
+	Traffic4xxTotal int64                 `json:"traffic_4xx_total"` //流量概况
+	Traffic5xxTotal int64                 `json:"traffic_5xx_total"` //流量概况
+
+	AvgResponseTimeOverview         []int64   `json:"avg_response_time_overview"` //平均响应时间概况
+	AvgTrafficPerSubscriberOverview []float64 `json:"avg_traffic_per_subscriber_overview"`
+	TrafficTotal                    int64     `json:"traffic_total"`
+	AvgResponseTime                 int64     `json:"avg_response_time"` //平均响应时间
+	MaxResponseTime                 int64     `json:"max_response_time"` //最大响应时间
+	MinResponseTime                 int64     `json:"min_response_time"` //最小响应时间
+	Date                            []string  `json:"date"`
+	MaxTrafficPerSubscriber         float64   `json:"max_traffic_per_subscriber"`
+	MinTrafficPerSubscriber         float64   `json:"min_traffic_per_subscriber"`
+}
+
+type ServiceChartRestOverview struct {
+	EnableMCP        bool   `json:"enable_mcp"`
+	SubscriberNum    int64  `json:"subscriber_num"`
+	APINum           int64  `json:"api_num"`
+	ServiceKind      string `json:"service_kind"`
+	AvailableMonitor bool   `json:"available_monitor"`
+	*ChartRestOverview
+}
+
+type ServiceChartAIOverview struct {
+	EnableMCP        bool   `json:"enable_mcp"`
+	SubscriberNum    int64  `json:"subscriber_num"`
+	APINum           int64  `json:"api_num"`
+	ServiceKind      string `json:"service_kind"`
+	AvailableMonitor bool   `json:"available_monitor"`
+	*ChartAIOverview
+}
+
+type TopN struct {
+	Id      string `json:"id"`
+	Name    string `json:"name"`
+	Request string `json:"request"`
+	Traffic string `json:"traffic,omitempty"`
+	Token   string `json:"token,omitempty"`
+}

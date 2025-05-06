@@ -34,6 +34,16 @@ type IServiceModule interface {
 
 	//MySimple 获取我的简易项目列表
 	MySimple(ctx context.Context) ([]*service_dto.SimpleServiceItem, error)
+
+	ServiceOverview(ctx context.Context, id string) (*service_dto.Overview, error)
+	ILogModule
+}
+
+type ILogModule interface {
+	AILogs(ctx context.Context, serviceId string, start int64, end int64, page int, size int) ([]*service_dto.AILogItem, int64, error)
+	RestLogs(ctx context.Context, serviceId string, start int64, end int64, page int, size int) ([]*service_dto.RestLogItem, int64, error)
+	RestLogInfo(ctx context.Context, serviceId string, logId string) (*service_dto.RestLogInfo, error)
+	AILogInfo(ctx context.Context, serviceId string, logId string) (*service_dto.AILogInfo, error)
 }
 
 type IServiceDocModule interface {

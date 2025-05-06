@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/APIParkLab/APIPark/common"
 
 	"github.com/mitchellh/mapstructure"
 
@@ -27,6 +30,7 @@ import (
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
 
 	"github.com/APIParkLab/APIPark/resources/access"
+	log_service "github.com/APIParkLab/APIPark/service/log"
 	"github.com/eolinker/eosc/log"
 	"github.com/eolinker/go-common/server"
 
@@ -79,14 +83,217 @@ type imlServiceModule struct {
 	tagService        tag.ITagService                `autowired:""`
 	localModelService ai_local.ILocalModelService    `autowired:""`
 
-	serviceTagService service_tag.ITagService `autowired:""`
-	apiService        api.IAPIService         `autowired:""`
-	apiDocService     api_doc.IAPIDocService  `autowired:""`
-	clusterService    cluster.IClusterService `autowired:""`
-	transaction       store.ITransaction      `autowired:""`
+	serviceTagService service_tag.ITagService     `autowired:""`
+	apiService        api.IAPIService             `autowired:""`
+	apiDocService     api_doc.IAPIDocService      `autowired:""`
+	clusterService    cluster.IClusterService     `autowired:""`
+	subscribeServer   subscribe.ISubscribeService `autowired:""`
 
 	releaseService             release.IReleaseService                           `autowired:""`
 	serviceModelMappingService service_model_mapping.IServiceModelMappingService `autowired:""`
+	logService                 log_service.ILogService                           `autowired:""`
+
+	transaction store.ITransaction `autowired:""`
+}
+
+func formatHeader(header string) string {
+	result, err := url.QueryUnescape(header)
+	if err != nil {
+		return header
+	}
+	result = strings.ReplaceAll(result, "&", "\n")
+	result = strings.ReplaceAll(result, "=", ": ")
+	return result
+}
+
+func (i *imlServiceModule) RestLogInfo(ctx context.Context, serviceId string, logId string) (*service_dto.RestLogInfo, error) {
+	c, err := i.clusterService.Get(ctx, cluster.DefaultClusterID)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s not found", cluster.DefaultClusterID)
+	}
+	info, err := i.logService.LogInfo(ctx, "loki", c.Cluster, logId)
+	if err != nil {
+		return nil, err
+	}
+	if info.Service != serviceId {
+		return nil, errors.New("service not match")
+	}
+
+	logInfo := &service_dto.RestLogInfo{
+		Id:           info.ID,
+		API:          auto.UUID(info.API),
+		Consumer:     auto.UUID(info.Consumer),
+		Status:       info.StatusCode,
+		Ip:           info.RemoteIP,
+		ResponseTime: common.FormatTime(info.ResponseTime),
+		Traffic:      common.FormatByte(info.Traffic),
+		LogTime:      auto.TimeLabel(info.RecordTime),
+		Request: service_dto.OriginRequest{
+			Header: formatHeader(info.RequestHeader),
+			Origin: info.RequestBody,
+			Body:   info.RequestBody,
+		},
+		Response: service_dto.OriginRequest{
+			Header: formatHeader(info.ResponseHeader),
+			Origin: info.ResponseBody,
+			Body:   info.ResponseBody,
+		},
+	}
+
+	if info.Consumer == "apipark-global" {
+		logInfo.IsSystemConsumer = true
+		logInfo.Consumer = auto.Label{
+			Id:   info.Consumer,
+			Name: "System Consumer",
+		}
+	}
+	return logInfo, nil
+}
+
+func (i *imlServiceModule) AILogInfo(ctx context.Context, serviceId string, logId string) (*service_dto.AILogInfo, error) {
+	c, err := i.clusterService.Get(ctx, cluster.DefaultClusterID)
+	if err != nil {
+		return nil, fmt.Errorf("cluster %s not found", cluster.DefaultClusterID)
+	}
+	info, err := i.logService.LogInfo(ctx, "loki", c.Cluster, logId)
+	if err != nil {
+		return nil, err
+	}
+	if info.Service != serviceId {
+		return nil, errors.New("service not match")
+	}
+	response, err := parseAIResponse(info.ResponseBody)
+	if err != nil {
+		response = info.ResponseBody
+	}
+
+	logInfo := &service_dto.AILogInfo{
+		Id:       info.ID,
+		API:      auto.UUID(info.API),
+		Consumer: auto.UUID(info.Consumer),
+		Status:   info.StatusCode,
+		Ip:       info.RemoteIP,
+		Provider: auto.UUID(info.AIProvider),
+		Model:    info.AIModel,
+		LogTime:  auto.TimeLabel(info.RecordTime),
+		Request: service_dto.OriginAIRequest{
+			OriginRequest: service_dto.OriginRequest{
+				Header: formatHeader(info.RequestHeader),
+				Origin: info.RequestBody,
+				Body:   parseAIRequest(info.RequestBody),
+			},
+
+			Token: info.InputToken,
+		},
+		Response: service_dto.OriginAIRequest{
+			OriginRequest: service_dto.OriginRequest{
+				Header: formatHeader(info.ResponseHeader),
+				Origin: info.ResponseBody,
+				Body:   response,
+			},
+
+			Token: info.OutputToken,
+		},
+	}
+	if info.Consumer == "apipark-global" {
+		logInfo.IsSystemConsumer = true
+		logInfo.Consumer = auto.Label{
+			Id:   info.Consumer,
+			Name: "System Consumer",
+		}
+	}
+	return logInfo, nil
+}
+
+func (i *imlServiceModule) RestLogs(ctx context.Context, serviceId string, start int64, end int64, page int, size int) ([]*service_dto.RestLogItem, int64, error) {
+	list, total, err := i.logService.LogRecordsByService(ctx, serviceId, time.Unix(start, 0), time.Unix(end, 0), page, size)
+	if err != nil {
+		return nil, 0, err
+	}
+	return utils.SliceToSlice(list, func(s *log_service.Item) *service_dto.RestLogItem {
+		item := &service_dto.RestLogItem{
+			Id:           s.ID,
+			API:          auto.UUID(s.API),
+			Status:       s.StatusCode,
+			LogTime:      auto.TimeLabel(s.RecordTime),
+			Ip:           s.RemoteIP,
+			Consumer:     auto.UUID(s.Consumer),
+			ResponseTime: common.FormatTime(s.ResponseTime),
+			Traffic:      common.FormatByte(s.Traffic),
+		}
+		if s.Consumer == "apipark-global" {
+			item.Consumer = auto.Label{
+				Id:   s.Consumer,
+				Name: "System Consumer",
+			}
+		}
+		return item
+	}), total, nil
+}
+
+func (i *imlServiceModule) AILogs(ctx context.Context, serviceId string, start int64, end int64, page int, size int) ([]*service_dto.AILogItem, int64, error) {
+	list, total, err := i.logService.LogRecordsByService(ctx, serviceId, time.Unix(start, 0), time.Unix(end, 0), page, size)
+	if err != nil {
+		return nil, 0, err
+	}
+	return utils.SliceToSlice(list, func(s *log_service.Item) *service_dto.AILogItem {
+		item := &service_dto.AILogItem{
+			Id:             s.ID,
+			API:            auto.UUID(s.API),
+			Status:         s.StatusCode,
+			LogTime:        auto.TimeLabel(s.RecordTime),
+			Ip:             s.RemoteIP,
+			Token:          s.TotalToken,
+			TokenPerSecond: s.TotalToken * 1000 / s.ResponseTime,
+			Consumer:       auto.UUID(s.Consumer),
+			Provider:       auto.UUID(s.AIProvider),
+			Model:          s.AIModel,
+		}
+		if s.Consumer == "apipark-global" {
+			item.Consumer = auto.Label{
+				Id:   s.Consumer,
+				Name: "System Consumer",
+			}
+		}
+		return item
+	}), total, nil
+}
+
+func (i *imlServiceModule) ServiceOverview(ctx context.Context, id string) (*service_dto.Overview, error) {
+	info, err := i.serviceService.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	apiCountMap, err := i.apiDocService.APICountByServices(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	subscribeMap, err := i.subscribeServer.CountMapByService(ctx, subscribe.ApplyStatusSubscribe, id)
+	if err != nil {
+		return nil, err
+	}
+	result := &service_dto.Overview{
+		Id:            info.Id,
+		Name:          info.Name,
+		Description:   info.Description,
+		EnableMCP:     info.EnableMCP,
+		ServiceKind:   info.Kind.String(),
+		SubscriberNum: subscribeMap[id],
+		Logo:          info.Logo,
+		Catalogue:     auto.UUID(info.Catalogue),
+		APINum:        apiCountMap[id],
+	}
+	_, err = i.releaseService.GetRunning(ctx, id)
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+	} else {
+		result.IsReleased = true
+	}
+
+	return result, nil
 }
 
 func (i *imlServiceModule) OnInit() {

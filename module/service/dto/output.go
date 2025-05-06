@@ -221,3 +221,80 @@ type ExportApp struct {
 	Description string `json:"description"`
 	Team        string `json:"team"`
 }
+
+type Overview struct {
+	Id               string     `json:"id"`
+	Name             string     `json:"name"`
+	Description      string     `json:"description"`
+	EnableMCP        bool       `json:"enable_mcp"`
+	ServiceKind      string     `json:"service_kind"`
+	SubscriberNum    int64      `json:"subscriber_num"`
+	InvokeNum        int64      `json:"invoke_num"`
+	Logo             string     `json:"logo"`
+	AvailableMonitor bool       `json:"available_monitor"`
+	IsReleased       bool       `json:"is_released"`
+	Catalogue        auto.Label `json:"catalogue" aolabel:"catalogue"`
+	APINum           int64      `json:"api_num"`
+}
+
+type AILogItem struct {
+	Id             string         `json:"id"`
+	API            auto.Label     `json:"api" aolabel:"api"`
+	Status         int64          `json:"status"`
+	LogTime        auto.TimeLabel `json:"log_time"`
+	Ip             string         `json:"ip"`
+	Token          int64          `json:"token"`
+	TokenPerSecond int64          `json:"token_per_second"`
+	Consumer       auto.Label     `json:"consumer" aolabel:"service"`
+	Provider       auto.Label     `json:"provider" aolabel:"ai_provider"`
+	Model          string         `json:"model"`
+}
+type RestLogItem struct {
+	Id           string         `json:"id"`
+	API          auto.Label     `json:"api" aolabel:"api"`
+	Status       int64          `json:"status"`
+	LogTime      auto.TimeLabel `json:"log_time"`
+	Ip           string         `json:"ip"`
+	Consumer     auto.Label     `json:"consumer" aolabel:"service"`
+	ResponseTime string         `json:"response_time"`
+	Traffic      string         `json:"traffic"`
+}
+
+type RestLogInfo struct {
+	Id               string         `json:"id"`
+	API              auto.Label     `json:"api" aolabel:"api"`
+	Consumer         auto.Label     `json:"consumer" aolabel:"service"`
+	IsSystemConsumer bool           `json:"is_system_consumer"`
+	Status           int64          `json:"status"`
+	Ip               string         `json:"ip"`
+	ResponseTime     string         `json:"response_time"`
+	Traffic          string         `json:"traffic"`
+	LogTime          auto.TimeLabel `json:"log_time"`
+	Request          OriginRequest  `json:"request"`
+	Response         OriginRequest  `json:"response"`
+}
+
+type AILogInfo struct {
+	Id               string          `json:"id"`
+	API              auto.Label      `json:"api" aolabel:"api"`
+	Consumer         auto.Label      `json:"consumer" aolabel:"service"`
+	IsSystemConsumer bool            `json:"is_system_consumer"`
+	Status           int64           `json:"status"`
+	Ip               string          `json:"ip"`
+	Provider         auto.Label      `json:"provider" aolabel:"ai_provider"`
+	Model            string          `json:"model"`
+	LogTime          auto.TimeLabel  `json:"log_time"`
+	Request          OriginAIRequest `json:"request"`
+	Response         OriginAIRequest `json:"response"`
+}
+
+type OriginRequest struct {
+	Header string `json:"header"`
+	Origin string `json:"origin"`
+	Body   string `json:"body"`
+}
+
+type OriginAIRequest struct {
+	OriginRequest
+	Token int64 `json:"token"`
+}

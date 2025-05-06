@@ -3,6 +3,8 @@ package service
 import (
 	"reflect"
 
+	monitor_dto "github.com/APIParkLab/APIPark/module/monitor/dto"
+
 	service_dto "github.com/APIParkLab/APIPark/module/service/dto"
 
 	"github.com/gin-gonic/gin"
@@ -32,6 +34,19 @@ type IServiceController interface {
 
 	Swagger(ctx *gin.Context)
 	ExportSwagger(ctx *gin.Context)
+
+	Top10(ctx *gin.Context, serviceId string, start string, end string) ([]*monitor_dto.TopN, []*monitor_dto.TopN, error)
+
+	AIChartOverview(ctx *gin.Context, serviceId string, start string, end string) (*monitor_dto.ServiceChartAIOverview, error)
+	RestChartOverview(ctx *gin.Context, serviceId string, start string, end string) (*monitor_dto.ServiceChartRestOverview, error)
+
+	ServiceOverview(ctx *gin.Context, serviceId string) (*service_dto.Overview, error)
+
+	AILogs(ctx *gin.Context, serviceId string, start string, end string, page string, size string) ([]*service_dto.AILogItem, int64, error)
+
+	RestLogs(ctx *gin.Context, serviceId string, start string, end string, page string, size string) ([]*service_dto.RestLogItem, int64, error)
+	RestLogInfo(ctx *gin.Context, serviceId string, logId string) (*service_dto.RestLogInfo, error)
+	AILogInfo(ctx *gin.Context, serviceId string, logId string) (*service_dto.AILogInfo, error)
 }
 
 type IAppController interface {

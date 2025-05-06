@@ -205,6 +205,7 @@ func (i *imlRouterModule) Search(ctx context.Context, keyword string, serviceId 
 		}
 		return &router_dto.Item{
 			Id:          item.UUID,
+			Name:        item.Name,
 			Methods:     item.Methods,
 			Protocols:   protocols,
 			Path:        item.Path,

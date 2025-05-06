@@ -5,8 +5,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/APIParkLab/APIPark/module/monitor"
+	monitor_dto "github.com/APIParkLab/APIPark/module/monitor/dto"
 
 	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
 
@@ -55,10 +59,6 @@ import (
 	"github.com/google/uuid"
 )
 
-//var (
-//	ollamaConfig = "{\n  \"mirostat\": 0,\n  \"mirostat_eta\": 0.1,\n  \"mirostat_tau\": 5.0,\n  \"num_ctx\": 4096,\n  \"repeat_last_n\":64,\n  \"repeat_penalty\": 1.1,\n  \"temperature\": 0.7,\n  \"seed\": 42,\n  \"num_predict\": 42,\n  \"top_k\": 40,\n  \"top_p\": 0.9,\n  \"min_p\": 0.5\n}\n"
-//)
-
 var (
 	_ IServiceController = (*imlServiceController)(nil)
 
@@ -66,20 +66,210 @@ var (
 )
 
 type imlServiceController struct {
-	module          service.IServiceModule     `autowired:""`
-	docModule       service.IServiceDocModule  `autowired:""`
-	subscribeModule subscribe.ISubscribeModule `autowired:""`
-	aiAPIModule     ai_api.IAPIModule          `autowired:""`
-	routerModule    router.IRouterModule       `autowired:""`
-	apiDocModule    api_doc.IAPIDocModule      `autowired:""`
-	providerModule  ai.IProviderModule         `autowired:""`
-	aiLocalModel    ai_local.ILocalModelModule `autowired:""`
-	appModule       service.IAppModule         `autowired:""`
-	upstreamModule  upstream.IUpstreamModule   `autowired:""`
-	settingModule   system.ISettingModule      `autowired:""`
-	teamModule      team.ITeamModule           `autowired:""`
-	catalogueModule catalogue.ICatalogueModule `autowired:""`
-	transaction     store.ITransaction         `autowired:""`
+	module              service.IServiceModule          `autowired:""`
+	docModule           service.IServiceDocModule       `autowired:""`
+	subscribeModule     subscribe.ISubscribeModule      `autowired:""`
+	aiAPIModule         ai_api.IAPIModule               `autowired:""`
+	routerModule        router.IRouterModule            `autowired:""`
+	apiDocModule        api_doc.IAPIDocModule           `autowired:""`
+	providerModule      ai.IProviderModule              `autowired:""`
+	aiLocalModel        ai_local.ILocalModelModule      `autowired:""`
+	appModule           service.IAppModule              `autowired:""`
+	upstreamModule      upstream.IUpstreamModule        `autowired:""`
+	settingModule       system.ISettingModule           `autowired:""`
+	teamModule          team.ITeamModule                `autowired:""`
+	catalogueModule     catalogue.ICatalogueModule      `autowired:""`
+	monitorModule       monitor.IMonitorStatisticModule `autowired:""`
+	monitorConfigModule monitor.IMonitorConfigModule    `autowired:""`
+	transaction         store.ITransaction              `autowired:""`
+}
+
+func (i *imlServiceController) RestLogInfo(ctx *gin.Context, serviceId string, logId string) (*service_dto.RestLogInfo, error) {
+	return i.module.RestLogInfo(ctx, serviceId, logId)
+}
+
+func (i *imlServiceController) AILogInfo(ctx *gin.Context, serviceId string, logId string) (*service_dto.AILogInfo, error) {
+	return i.module.AILogInfo(ctx, serviceId, logId)
+}
+
+func (i *imlServiceController) AILogs(ctx *gin.Context, serviceId string, start string, end string, page string, size string) ([]*service_dto.AILogItem, int64, error) {
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, 0, err
+	}
+	if serviceId == "" {
+		return nil, 0, fmt.Errorf("service id is empty")
+	}
+	if page == "" {
+		page = "1"
+	}
+	if size == "" {
+		size = "20"
+	}
+	p, err := strconv.Atoi(page)
+	if err != nil {
+		return nil, 0, err
+	}
+	ps, err := strconv.Atoi(size)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return i.module.AILogs(ctx, serviceId, s, e, p, ps)
+}
+
+func (i *imlServiceController) RestLogs(ctx *gin.Context, serviceId string, start string, end string, page string, size string) ([]*service_dto.RestLogItem, int64, error) {
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, 0, err
+	}
+	if serviceId == "" {
+		return nil, 0, fmt.Errorf("service id is empty")
+	}
+	if page == "" {
+		page = "1"
+	}
+	if size == "" {
+		size = "20"
+	}
+	p, err := strconv.Atoi(page)
+	if err != nil {
+		return nil, 0, err
+	}
+	ps, err := strconv.Atoi(size)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return i.module.RestLogs(ctx, serviceId, s, e, p, ps)
+}
+
+func (i *imlServiceController) ServiceOverview(ctx *gin.Context, serviceId string) (*service_dto.Overview, error) {
+	o, err := i.module.ServiceOverview(ctx, serviceId)
+	if err != nil {
+		return nil, err
+	}
+	cfg, err := i.monitorConfigModule.GetMonitorConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(cfg.Config) < 1 {
+		return o, nil
+	}
+	statistics, err := i.monitorModule.ProviderStatistics(ctx, &monitor_dto.StatisticInput{
+		Services: []string{serviceId},
+		CommonInput: &monitor_dto.CommonInput{
+			Start: time.Now().Add(-24 * 30 * time.Hour).Unix(),
+			End:   time.Now().Unix(),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(statistics) < 1 {
+		return o, nil
+	}
+	o.InvokeNum = statistics[0].RequestTotal
+	return o, nil
+}
+
+func (i *imlServiceController) AIChartOverview(ctx *gin.Context, serviceId string, start string, end string) (*monitor_dto.ServiceChartAIOverview, error) {
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, err
+	}
+	if serviceId == "" {
+		return nil, fmt.Errorf("service is required")
+	}
+	so, err := i.module.ServiceOverview(ctx, serviceId)
+	if err != nil {
+		return nil, err
+	}
+	result := &monitor_dto.ServiceChartAIOverview{
+		EnableMCP:     so.EnableMCP,
+		SubscriberNum: so.SubscriberNum,
+		APINum:        so.APINum,
+		ServiceKind:   so.ServiceKind,
+	}
+	cfg, err := i.monitorConfigModule.GetMonitorConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(cfg.Config) < 1 {
+		return result, nil
+	}
+
+	o, err := i.monitorModule.AIChartOverview(ctx, serviceId, s, e)
+	if err != nil {
+		return nil, err
+	}
+
+	result.AvailableMonitor = true
+	result.ChartAIOverview = o
+	return result, nil
+}
+
+func (i *imlServiceController) RestChartOverview(ctx *gin.Context, serviceId string, start string, end string) (*monitor_dto.ServiceChartRestOverview, error) {
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, err
+	}
+	if serviceId == "" {
+		return nil, fmt.Errorf("service is required")
+	}
+	so, err := i.module.ServiceOverview(ctx, serviceId)
+	if err != nil {
+		return nil, err
+	}
+	result := &monitor_dto.ServiceChartRestOverview{
+		EnableMCP:     so.EnableMCP,
+		SubscriberNum: so.SubscriberNum,
+		APINum:        so.APINum,
+		ServiceKind:   so.ServiceKind,
+	}
+	cfg, err := i.monitorConfigModule.GetMonitorConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(cfg.Config) < 1 {
+		return result, nil
+	}
+	o, err := i.monitorModule.RestChartOverview(ctx, serviceId, s, e)
+	if err != nil {
+		return nil, err
+	}
+	result.AvailableMonitor = true
+	result.ChartRestOverview = o
+	return result, nil
+}
+
+func formatTime(start string, end string) (int64, int64, error) {
+	s, err := strconv.ParseInt(start, 10, 64)
+	if err != nil {
+		return 0, 0, fmt.Errorf("parse start time %s error: %w", start, err)
+	}
+	e, err := strconv.ParseInt(end, 10, 64)
+	if err != nil {
+		return 0, 0, fmt.Errorf("parse end time %s error: %w", end, err)
+	}
+	return s, e, nil
+}
+
+func (i *imlServiceController) Top10(ctx *gin.Context, serviceId string, start string, end string) ([]*monitor_dto.TopN, []*monitor_dto.TopN, error) {
+	if serviceId == "" {
+		return nil, nil, fmt.Errorf("serviceId is required")
+	}
+	info, err := i.module.Get(ctx, serviceId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	s, e, err := formatTime(start, end)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return i.monitorModule.Top(ctx, serviceId, s, e, 10, info.ServiceKind)
 }
 
 func (i *imlServiceController) QuickCreateAIService(ctx *gin.Context, input *service_dto.QuickCreateAIService) error {
