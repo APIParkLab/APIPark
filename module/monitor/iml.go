@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"sort"
 	"sync"
 	"time"
@@ -108,6 +109,12 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 			avgRequestPerSubscriber := 0.0
 			if consumerNum != 0 {
 				avgRequestPerSubscriber = float64(item.StatusTotal) / float64(consumerNum)
+				if avgRequestPerSubscriber > result.MaxRequestPerSubscriber {
+					result.MaxRequestPerSubscriber = avgRequestPerSubscriber
+				}
+			}
+			if result.MinRequestPerSubscriber == 0 || result.MinRequestPerSubscriber > avgRequestPerSubscriber {
+				result.MinRequestPerSubscriber = avgRequestPerSubscriber
 			}
 			result.AvgRequestPerSubscriberOverview = append(result.AvgRequestPerSubscriberOverview, avgRequestPerSubscriber)
 			result.RequestOverview = append(result.RequestOverview, &monitor_dto.StatusCodeOverview{
@@ -169,6 +176,12 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 				avgTotalPerSubscriber = float64(item.TotalToken) / float64(consumerNum)
 				avgOutputPerSubscriber = float64(item.OutputToken) / float64(consumerNum)
 				avgInputPerSubscriber = float64(item.InputToken) / float64(consumerNum)
+				if avgTotalPerSubscriber > result.MaxTokenPerSubscriber {
+					result.MaxTokenPerSubscriber = avgTotalPerSubscriber
+				}
+			}
+			if result.MinTokenPerSubscriber == 0 || result.MinTokenPerSubscriber > avgTotalPerSubscriber {
+				result.MinTokenPerSubscriber = avgTotalPerSubscriber
 			}
 
 			result.AvgTokenPerSubscriberOverview = append(result.AvgTokenPerSubscriberOverview, &monitor_dto.TokenFloatOverview{
@@ -178,13 +191,6 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 			})
 
 		}
-		//avgTokenPerSubscriber := 0.0
-		//if totalConsumerCount != 0 {
-		//	avgTokenPerSubscriber = float64(summary.TotalToken) / float64(totalConsumerCount)
-		//}
-		//result.AvgToken = avgTokenPerSubscriber
-		//result.MaxToken = maxToken
-		//result.MinToken = minToken
 		result.TokenTotal = summary.TotalToken
 		result.InputTokenTotal = summary.InputToken
 		result.OutputTokenTotal = summary.OutputToken
@@ -202,12 +208,14 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 	if len(errs) > 0 {
 		return nil, fmt.Errorf("errors occurred: %v", errs)
 	}
-	var maxTokenPerSecond, minTokenPerSecond, avgTokenPerSecond float64 = 0, 0, 0
+	sumResponseTime := 0.0
+	var maxTokenPerSecond, minTokenPerSecond float64 = 0, 0
+
 	for index, token := range totalTokens {
 		var p float64 = 0
 		if len(sumResponseTimes) > index && sumResponseTimes[index] > 0 {
-			// 由于时间单位是ms，因此需要✖️1000
-			p = float64(token) * 1000 / float64(sumResponseTimes[index])
+			p = math.Round(float64(token)*1000*100/float64(sumResponseTimes[index])) / 100
+			sumResponseTime += float64(sumResponseTimes[index])
 		}
 		result.AvgTokenOverview = append(result.AvgTokenOverview, p)
 		if maxTokenPerSecond < p {
@@ -216,10 +224,9 @@ func (i *imlMonitorStatisticModule) AIChartOverview(ctx context.Context, service
 		if minTokenPerSecond == 0 || minTokenPerSecond > p {
 			minTokenPerSecond = p
 		}
-		avgTokenPerSecond += p
 	}
-	if len(sumResponseTimes) > 0 {
-		result.AvgToken = avgTokenPerSecond / float64(len(sumResponseTimes))
+	if sumResponseTime > 0 {
+		result.AvgToken = math.Round(float64(result.TokenTotal)*1000*100/sumResponseTime) / 100
 	}
 	result.MaxToken = maxTokenPerSecond
 	result.MinToken = minTokenPerSecond
@@ -258,12 +265,17 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 		result.AvgRequestPerSubscriberOverview = make([]float64, 0, len(items))
 		result.RequestOverview = make([]*monitor_dto.StatusCodeOverview, 0, len(items))
 		for index, item := range items {
-			t := date[index]
-			log.Infof("date: %v, item: %v", t, item)
 			consumerNum := consumerMap[date[index]]
 			avgRequestPerSubscriber := 0.0
 			if consumerNum != 0 {
 				avgRequestPerSubscriber = float64(summary.StatusTotal) / float64(consumerNum)
+				if avgRequestPerSubscriber > result.MaxRequestPerSubscriber {
+					result.MaxRequestPerSubscriber = avgRequestPerSubscriber
+				}
+
+			}
+			if result.MinRequestPerSubscriber == 0 || avgRequestPerSubscriber < result.MinRequestPerSubscriber {
+				result.MinRequestPerSubscriber = avgRequestPerSubscriber
 			}
 			result.AvgRequestPerSubscriberOverview = append(result.AvgRequestPerSubscriberOverview, avgRequestPerSubscriber)
 			result.RequestOverview = append(result.RequestOverview, &monitor_dto.StatusCodeOverview{
@@ -272,10 +284,7 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 				Status5xx: item.Status5xx,
 			})
 		}
-		//avgRequestPerSubscriber := 0.0
-		//if totalConsumerCount != 0 {
-		//	avgRequestPerSubscriber = float64(summary.StatusTotal) / float64(totalConsumerCount)
-		//}
+
 		result.RequestTotal = summary.StatusTotal
 		result.Request2xxTotal = summary.Status2xx
 		result.Request4xxTotal = summary.Status4xx
@@ -318,6 +327,13 @@ func (i *imlMonitorStatisticModule) RestChartOverview(ctx context.Context, servi
 			avgTrafficPerSubscriber := 0.0
 			if consumerNum != 0 {
 				avgTrafficPerSubscriber = float64(item.StatusTotal) / float64(consumerNum)
+				if avgTrafficPerSubscriber > result.MaxTrafficPerSubscriber {
+					result.MaxTrafficPerSubscriber = avgTrafficPerSubscriber
+				}
+
+			}
+			if result.MinTrafficPerSubscriber == 0 || result.MinTrafficPerSubscriber > avgTrafficPerSubscriber {
+				result.MinTrafficPerSubscriber = avgTrafficPerSubscriber
 			}
 			result.AvgTrafficPerSubscriberOverview = append(result.AvgTrafficPerSubscriberOverview, avgTrafficPerSubscriber)
 		}
@@ -425,10 +441,15 @@ func (i *imlMonitorStatisticModule) Top(ctx context.Context, serviceId string, s
 		appMap := utils.SliceToMap(apps, func(t *service.Service) string {
 			return t.Id
 		})
+		appMap["apipark-global"] = &service.Service{
+			Id:   "apipark-global",
+			Name: "System Consumer",
+		}
 		for _, item := range result {
 			if v, ok := appMap[item.Key]; ok {
 				consumersResult = append(consumersResult, generateTopN(v.Id, v.Name, item, apiKind))
 			}
+
 		}
 	}()
 

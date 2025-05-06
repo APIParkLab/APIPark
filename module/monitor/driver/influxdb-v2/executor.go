@@ -425,29 +425,26 @@ func (e *executor) TrafficOverviewByStatusCode(ctx context.Context, start time.T
 		r := new(monitor.StatusCodeOverview)
 		if s2xxRequestLen > i {
 			r.Status2xx = s2xxRequest[i]
-			totalOverview.Status2xx += r.Status2xx
 		}
 		if s4xxRequestLen > i {
 			r.Status4xx = s4xxRequest[i]
-			totalOverview.Status4xx += r.Status4xx
 		}
 		if s5xxRequestLen > i {
 			r.Status5xx = s5xxRequest[i]
-			totalOverview.Status5xx += r.Status5xx
 		}
 		if s2xxResponseLen > i {
 			r.Status2xx += s2xxResponse[i]
-			totalOverview.Status2xx += r.Status2xx
 		}
 		if s4xxResponseLen > i {
 			r.Status4xx += s4xxResponse[i]
-			totalOverview.Status4xx += r.Status4xx
 		}
 		if s5xxResponseLen > i {
 			r.Status5xx += s5xxResponse[i]
-			totalOverview.Status5xx += r.Status5xx
 		}
 		r.StatusTotal += r.Status2xx + r.Status4xx + r.Status5xx
+		totalOverview.Status2xx += r.Status2xx
+		totalOverview.Status4xx += r.Status4xx
+		totalOverview.Status5xx += r.Status5xx
 		totalOverview.StatusTotal += r.StatusTotal
 
 		result = append(result, r)
@@ -686,9 +683,9 @@ func (e *executor) TokenOverview(ctx context.Context, start time.Time, end time.
 }
 
 func (e *executor) ConsumerOverview(ctx context.Context, start time.Time, end time.Time, wheres []monitor.MonWhereItem) (int64, map[time.Time]int64, error) {
-	newStartTime, every, _, bucket := getTimeIntervalAndBucket(start, end)
+	newStartTime, every, offset, bucket := getTimeIntervalAndBucket(start, end)
 	filters := formatFilter(wheres)
 
-	return e.fluxQuery.CommonTendencyTag(ctx, e.openApi, newStartTime, end, bucket, "request", filters, every, "app")
+	return e.fluxQuery.CommonTendencyTag(ctx, e.openApi, newStartTime, end, bucket, "request", filters, every, offset, "app")
 
 }
