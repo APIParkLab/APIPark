@@ -30,7 +30,7 @@ sync_job:
     - git pull origin main
 
     # 获取 GitLab main 分支的最新提交
-    - git featch http://$DEPLOY_USER:$DEPLOY_TOKEN@gitlab.eolink.com/apipark/APIPark main:gitlab-main
+    - git fetch http://$DEPLOY_USER:$DEPLOY_TOKEN@gitlab.eolink.com/apipark/APIPark main:gitlab-main
     - DIFF=$(git diff "$GITHUB_BRANCH" gitlab-main)
     # 比较 SHA，检查是否有更改
     - if [ -n "$DIFF" ]; then
