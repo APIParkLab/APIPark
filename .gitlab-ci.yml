@@ -10,14 +10,14 @@ variables:
   VIEW_ADDR: http://172.18.166.219:8288
   SAVE_DIR: /opt/${APP}
   NODE_OPTIONS: --max_old_space_size=8192
-  SKIP: true
+  SKIP: "true"
 
 stages:
   - sync
   - notice
   - build
-#  - deploy
-#  - webhook
+  - deploy
+  - webhook
 
 sync_job:
   stage: sync
