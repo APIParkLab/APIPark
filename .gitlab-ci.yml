@@ -1,4 +1,4 @@
-variables:
+xvariables:
   PATH: /opt/go-1.23/go/bin/:/opt/node-1.22/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
   GOROOT: /opt/go-1.23/go
   GOPROXY: https://goproxy.cn
@@ -10,14 +10,56 @@ variables:
   VIEW_ADDR: http://172.18.166.219:8288
   SAVE_DIR: /opt/${APP}
   NODE_OPTIONS: --max_old_space_size=8192
-  APIPARK_OLLAMA_BASE: http://127.0.0.1:11434
 
 stages:
-  - notice
-  - prefix
-  - build
-  - deploy
-  - webhook
+  - sync
+#  - notice
+#  - build
+#  - deploy
+#  - webhook
+
+sync_job:
+  stage: sync
+  script:
+    - echo https://$GITHUB_USER:$GITHUB_TOKEN@$GITHUB_REPO
+    - echo $CI_REPOSITORY_URL
+#    # 检查是否已有仓库缓存，若无则克隆
+#    - if [ ! -d "repo-cache" ]; then
+#    -   git clone --mirror https://$GITHUB_USER:$GITHUB_TOKEN@$GITHUB_REPO repo-cache
+#    - fi
+#    - cd repo-cache
+#    # 获取 GitHub main 分支的最新提交
+#    - git fetch origin
+#    - GITHUB_SHA=$(git rev-parse origin/main)
+#    # 获取 GitLab main 分支的最新提交
+##    - git remote add gitlab http://$DEPLOY_USER:$DEPLOY_TOKEN@$
+#    - git remote add gitlab $CI_REPOSITORY_URL
+#    - git fetch gitlab
+#    - GITLAB_SHA=$(git rev-parse gitlab/main || echo "none")
+#    # 比较 SHA，检查是否有更改
+#    - if [ "$GITHUB_SHA" != "$GITLAB_SHA" ]; then
+#    -   echo "Changes detected, syncing main branch..."
+#    -   git push gitlab refs/remotes/origin/main:refs/heads/main
+#    - else
+#    -   echo "No changes in main branch, skipping sync."
+#    -   exit 0
+#    - fi
+#  only:
+#    - schedules
+  variables:
+    GIT_STRATEGY: none  # 避免 CI 克隆 GitLab 仓库
+  cache:
+    key: repo-cache
+    paths:
+      - repo-cache/
+
+build_job:
+  stage: build
+  script:
+    - echo "Building the project..."
+    - # 添加你的构建命令，例如 npm install, mvn build 等
+  only:
+    - main
 
 feishu-informer: # 飞书回调
   stage: notice
@@ -32,40 +74,31 @@ feishu-informer: # 飞书回调
       -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"项目：${CI_PROJECT_NAME}\\n提交人：${GITLAB_USER_NAME}\\n提交信息：${CI_MERGE_REQUEST_TITLE}\\n合并分支信息：${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} -> ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}\\n差异性地址：${DIFF_URL}\\n请及时review代码\"}}" \
       https://open.feishu.cn/open-apis/bot/v2/hook/1c334752-2874-41a1-8f1b-3060f2d46b6c
 
-prebuild:
-  stage: prefix
-  rules:
-    - if:  $CI_COMMIT_BRANCH == "main"
-  script:
-    - echo "prebuild"
-    - chmod +x ./scripts/prefix.sh
-    - ./scripts/prefix.sh
-
-builder:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-  script:
-    - set -e
-    - |
-      if [ ! -d "../artifacts" ]; then
-        mkdir -p ../artifacts
-      fi
-      if [ -d "../artifacts/dist" ]; then
-        cp -r ../artifacts/dist frontend/dist
-      fi
-    - |
-      if [ -n "$(git diff --name-status HEAD~1 HEAD -- frontend)" ]; then
-        ./scripts/build.sh $BUILD_DIR ${VERSION} all ""
-      else
-        ./scripts/build.sh $BUILD_DIR ${VERSION}
-      fi
-      if [ -d "frontend/dist" ]; then
-        echo "copy frontend/dist to artifacts/dist"
-        rm -fr ../artifacts/dist
-        cp -r frontend/dist ../artifacts/dist
-      fi
-      cp $BUILD_DIR/${APP_PRE}_linux_amd64.tar.gz ${SAVE_DIR}
+#builder:
+#  stage: build
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == "main"
+#  script:
+#    - set -e
+#    - |
+#      if [ ! -d "../artifacts" ]; then
+#        mkdir -p ../artifacts
+#      fi
+#      if [ -d "../artifacts/dist" ]; then
+#        cp -r ../artifacts/dist frontend/dist
+#      fi
+#    - |
+#      if [ -n "$(git diff --name-status HEAD~1 HEAD -- frontend)" ]; then
+#        ./scripts/build.sh $BUILD_DIR ${VERSION} all ""
+#      else
+#        ./scripts/build.sh $BUILD_DIR ${VERSION}
+#      fi
+#      if [ -d "frontend/dist" ]; then
+#        echo "copy frontend/dist to artifacts/dist"
+#        rm -fr ../artifacts/dist
+#        cp -r frontend/dist ../artifacts/dist
+#      fi
+#      cp $BUILD_DIR/${APP_PRE}_linux_amd64.tar.gz ${SAVE_DIR}
 
 deployer:
   stage: deploy
