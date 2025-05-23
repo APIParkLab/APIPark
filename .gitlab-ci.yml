@@ -32,14 +32,14 @@ sync_job:
     # 获取 GitLab main 分支的最新提交
     - git featch http://$DEPLOY_USER:$DEPLOY_TOKEN@gitlab.eolink.com/apipark/APIPark main:gitlab-main
     - DIFF=$(git diff "$GITHUB_BRANCH" gitlab-main)
-#    # 比较 SHA，检查是否有更改
-#    - if [ -n "$DIFF" ]; then
-#        echo "Differences detected, syncing to GitLab..."
-#      # 推送到 GitLab main 分支
-#        git push "$GITLAB_REPO" "$GITHUB_BRANCH:$GITLAB_BRANCH"
-#      else
-#        echo "No differences found between GitHub and GitLab main branches."
-#      fi
+    # 比较 SHA，检查是否有更改
+    - if [ -n "$DIFF" ]; then
+    -   echo "Differences detected, syncing to GitLab..."
+    # 推送到 GitLab main 分支
+    -   git push "$GITLAB_REPO" "$GITHUB_BRANCH:$GITLAB_BRANCH"
+    - else
+    -   echo "No differences found between GitHub and GitLab main branches."
+    - fi
 #  only:
 #    - schedules
   variables:
