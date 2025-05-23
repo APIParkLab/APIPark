@@ -27,23 +27,19 @@ sync_job:
     - fi
     - cd repo-cache
     # 获取 GitHub main 分支的最新提交
-    - git fetch origin
-    - GITHUB_SHA=$(git rev-parse origin/main)
-    - echo http://$DEPLOY_USER:$DEPLOY_TOKEN@gitlab.eolink.com/apipark/APIPark.git
+    - git pull origin main
+
     # 获取 GitLab main 分支的最新提交
-    - git remote remove gitlab
-    - git remote add gitlab http://$DEPLOY_USER:$DEPLOY_TOKEN@gitlab.eolink.com/apipark/APIPark.git
-#    - git remote add gitlab $CI_REPOSITORY_URL
-    - git fetch gitlab
-    - GITLAB_SHA=$(git rev-parse gitlab/main || echo "none")
+    - git featch http://$DEPLOY_USER:$DEPLOY_TOKEN@gitlab.eolink.com/apipark/APIPark main:gitlab-main
+    - DIFF=$(git diff "$GITHUB_BRANCH" gitlab-main)
     # 比较 SHA，检查是否有更改
-    - if [ "$GITHUB_SHA" != "$GITLAB_SHA" ]; then
-    -   echo "Changes detected, syncing main branch..."
-    -   git push gitlab refs/remotes/origin/main:refs/heads/main
-    - else
-    -   echo "No changes in main branch, skipping sync."
-    -   exit 0
-    - fi
+    - if [ -n "$DIFF" ]; then
+        echo "Differences detected, syncing to GitLab..."
+      # 推送到 GitLab main 分支
+        git push "$GITLAB_REPO" "$GITHUB_BRANCH:$GITLAB_BRANCH"
+      else
+        echo "No differences found between GitHub and GitLab main branches."
+      fi
 #  only:
 #    - schedules
   variables:
