@@ -21,29 +21,26 @@ stages:
 sync_job:
   stage: sync
   script:
-    - echo https://$GITHUB_USER:$GITHUB_TOKEN@$GITHUB_REPO
-    - echo $CI_REPOSITORY_URL
-#    # 检查是否已有仓库缓存，若无则克隆
-#    - if [ ! -d "repo-cache" ]; then
-#    -   git clone --mirror https://$GITHUB_USER:$GITHUB_TOKEN@$GITHUB_REPO repo-cache
-#    - fi
-#    - cd repo-cache
-#    # 获取 GitHub main 分支的最新提交
-#    - git fetch origin
-#    - GITHUB_SHA=$(git rev-parse origin/main)
-#    # 获取 GitLab main 分支的最新提交
-##    - git remote add gitlab http://$DEPLOY_USER:$DEPLOY_TOKEN@$
-#    - git remote add gitlab $CI_REPOSITORY_URL
-#    - git fetch gitlab
-#    - GITLAB_SHA=$(git rev-parse gitlab/main || echo "none")
-#    # 比较 SHA，检查是否有更改
-#    - if [ "$GITHUB_SHA" != "$GITLAB_SHA" ]; then
-#    -   echo "Changes detected, syncing main branch..."
-#    -   git push gitlab refs/remotes/origin/main:refs/heads/main
-#    - else
-#    -   echo "No changes in main branch, skipping sync."
-#    -   exit 0
-#    - fi
+    # 检查是否已有仓库缓存，若无则克隆
+    - if [ ! -d "repo-cache" ]; then
+    -   git clone https://$GITHUB_USER:$GITHUB_TOKEN@$GITHUB_REPO repo-cache
+    - fi
+    - cd repo-cache
+    # 获取 GitHub main 分支的最新提交
+    - git fetch origin
+    - GITHUB_SHA=$(git rev-parse origin/main)
+    # 获取 GitLab main 分支的最新提交
+    - git remote add gitlab $CI_REPOSITORY_URL
+    - git fetch gitlab
+    - GITLAB_SHA=$(git rev-parse gitlab/main || echo "none")
+    # 比较 SHA，检查是否有更改
+    - if [ "$GITHUB_SHA" != "$GITLAB_SHA" ]; then
+    -   echo "Changes detected, syncing main branch..."
+    -   git push gitlab refs/remotes/origin/main:refs/heads/main
+    - else
+    -   echo "No changes in main branch, skipping sync."
+    -   exit 0
+    - fi
 #  only:
 #    - schedules
   variables:
