@@ -1,4 +1,4 @@
-variables:
+xvariables:
   PATH: /opt/go-1.23/go/bin/:/opt/node-1.22/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
   GOROOT: /opt/go-1.23/go
   GOPROXY: https://goproxy.cn
@@ -57,7 +57,6 @@ build_job:
   stage: build
   script:
     - echo "Building the project..."
-    - # 添加你的构建命令，例如 npm install, mvn build 等
   only:
     - main
 
