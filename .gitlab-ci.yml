@@ -30,6 +30,7 @@ sync_job:
     - git fetch origin
     - GITHUB_SHA=$(git rev-parse origin/main)
     # 获取 GitLab main 分支的最新提交
+    - git remote remove gitlab
     - git remote add gitlab http://$DEPLOY_USER:$DEPLOY_TOKEN@$gitlab.eolink.com/apipark/APIPark
 #    - git remote add gitlab $CI_REPOSITORY_URL
     - git fetch gitlab
