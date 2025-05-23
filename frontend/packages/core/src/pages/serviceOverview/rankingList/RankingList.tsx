@@ -20,6 +20,10 @@ interface PageListRef {
   [key: string]: any;
 }
 
+/**
+ * 排名列表
+ * @returns 
+ */
 const RankingList = ({ topRankingList, serviceType }: { topRankingList: RankingListData; serviceType: 'aiService' | 'restService' }) => {
   /** 全局状态 */
   const { state } = useGlobalContext()
