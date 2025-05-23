@@ -10,11 +10,12 @@ variables:
   VIEW_ADDR: http://172.18.166.219:8288
   SAVE_DIR: /opt/${APP}
   NODE_OPTIONS: --max_old_space_size=8192
+  SKIP: true
 
 stages:
   - sync
-#  - notice
-#  - build
+  - notice
+  - build
 #  - deploy
 #  - webhook
 
@@ -31,7 +32,6 @@ sync_job:
     - cd repo-cache
     # 获取 GitHub main 分支的最新提交
     - git pull origin main
-
     # 获取 GitLab main 分支的最新提交
     - git fetch ${GITLAB_REPO} main:gitlab-main
     - DIFF=$(git diff main gitlab-main)
@@ -40,6 +40,7 @@ sync_job:
     -   echo "Differences detected, syncing to GitLab..."
     # 推送到 GitLab main 分支
     -   git push "$GITLAB_REPO" "main:main"
+    -   SKIP=false
     - else
     -   echo "No differences found between GitHub and GitLab main branches."
     - fi
@@ -50,79 +51,74 @@ sync_job:
     paths:
       - repo-cache/
 
-#build_job:
-#  stage: build
-#  script:
-#    - echo "Building the project..."
-#  only:
-#    - main
-#
-#feishu-informer: # 飞书回调
-#  stage: notice
-#  variables:
-#    DIFF_URL: "$CI_MERGE_REQUEST_PROJECT_URL/-/merge_requests/$CI_MERGE_REQUEST_IID/diffs"
+feishu-informer: # 飞书回调
+  stage: notice
+  variables:
+    DIFF_URL: "$CI_MERGE_REQUEST_PROJECT_URL/-/merge_requests/$CI_MERGE_REQUEST_IID/diffs"
+  rules:
+    - if: $SKIP == "false"
 #  rules:
 #    - if: $CI_PIPELINE_SOURCE=="merge_request_event" && $CI_COMMIT_BRANCH =~ "main"
-#  script:
-#    - echo "merge request"
-#    - |
-#      curl -X POST -H "Content-Type: application/json" \
-#      -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"项目：${CI_PROJECT_NAME}\\n提交人：${GITLAB_USER_NAME}\\n提交信息：${CI_MERGE_REQUEST_TITLE}\\n合并分支信息：${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} -> ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}\\n差异性地址：${DIFF_URL}\\n请及时review代码\"}}" \
-#      https://open.feishu.cn/open-apis/bot/v2/hook/1c334752-2874-41a1-8f1b-3060f2d46b6c
-#
-##builder:
-##  stage: build
-##  rules:
-##    - if: $CI_COMMIT_BRANCH == "main"
-##  script:
-##    - set -e
-##    - |
-##      if [ ! -d "../artifacts" ]; then
-##        mkdir -p ../artifacts
-##      fi
-##      if [ -d "../artifacts/dist" ]; then
-##        cp -r ../artifacts/dist frontend/dist
-##      fi
-##    - |
-##      if [ -n "$(git diff --name-status HEAD~1 HEAD -- frontend)" ]; then
-##        ./scripts/build.sh $BUILD_DIR ${VERSION} all ""
-##      else
-##        ./scripts/build.sh $BUILD_DIR ${VERSION}
-##      fi
-##      if [ -d "frontend/dist" ]; then
-##        echo "copy frontend/dist to artifacts/dist"
-##        rm -fr ../artifacts/dist
-##        cp -r frontend/dist ../artifacts/dist
-##      fi
-##      cp $BUILD_DIR/${APP_PRE}_linux_amd64.tar.gz ${SAVE_DIR}
-#
-#deployer:
-#  stage: deploy
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == "main"
-#  variables:
-#    APIPARK_GUEST_MODE: allow
-#    APIPARK_GUEST_ID: dklejrfbhjqwdh
-#  script:
-#    - cd ${SAVE_DIR};mkdir -p ${APP_PRE};tar -zxvf ${APP_PRE}_linux_amd64.tar.gz -C ${APP_PRE};cd ${APP_PRE};./install.sh ${SAVE_DIR};./run.sh restart;cd ${SAVE_DIR} && ./clean.sh ${APP_PRE}
-#  when: on_success
-#success:
-#  stage: webhook
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == "main"
-#  script:
-#    - |
-#      curl -X POST -H "Content-Type: application/json" \
-#      -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"最近一次提交：${CI_COMMIT_TITLE}\\n提交人：${GITLAB_USER_NAME}\\n项目：${CI_PROJECT_NAME}\\n环境：${DEPLOY_DESC}\\n更新部署完成.\\n访问地址：${VIEW_ADDR}\\n工作流地址：${CI_PIPELINE_URL}\"}}" \
-#      https://open.feishu.cn/open-apis/bot/v2/hook/c3672932-4dfa-4989-8023-0128bae59338
-#  when: on_success
-#failure:
-#  stage: webhook
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == "main"
-#  script:
-#    - |
-#      curl -X POST -H "Content-Type: application/json" \
-#      -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"最近一次提交：${CI_COMMIT_TITLE}\\n提交人：${GITLAB_USER_NAME}\\n项目：${CI_PROJECT_NAME}\\n环境：${DEPLOY_DESC}\\n更新部署失败，请及时到gitlab上查看\\n工作流地址：${CI_PIPELINE_URL}\"}}" \
-#      https://open.feishu.cn/open-apis/bot/v2/hook/c3672932-4dfa-4989-8023-0128bae59338
-#  when: on_failure
+  script:
+    - echo "merge request"
+    - |
+      curl -X POST -H "Content-Type: application/json" \
+      -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"项目：${CI_PROJECT_NAME}\\n提交人：${GITLAB_USER_NAME}\\n提交信息：${CI_MERGE_REQUEST_TITLE}\\n合并分支信息：${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} -> ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}\\n差异性地址：${DIFF_URL}\\n请及时review代码\"}}" \
+      https://open.feishu.cn/open-apis/bot/v2/hook/1c334752-2874-41a1-8f1b-3060f2d46b6c
+
+builder:
+  stage: build
+  rules:
+    - if: $SKIP == "false"
+  script:
+    - set -e
+    - |
+      if [ ! -d "../artifacts" ]; then
+        mkdir -p ../artifacts
+      fi
+      if [ -d "../artifacts/dist" ]; then
+        cp -r ../artifacts/dist frontend/dist
+      fi
+    - |
+      if [ -n "$(git diff --name-status HEAD~1 HEAD -- frontend)" ]; then
+        ./scripts/build.sh $BUILD_DIR ${VERSION} all ""
+      else
+        ./scripts/build.sh $BUILD_DIR ${VERSION}
+      fi
+      if [ -d "frontend/dist" ]; then
+        echo "copy frontend/dist to artifacts/dist"
+        rm -fr ../artifacts/dist
+        cp -r frontend/dist ../artifacts/dist
+      fi
+      cp $BUILD_DIR/${APP_PRE}_linux_amd64.tar.gz ${SAVE_DIR}
+
+deployer:
+  stage: deploy
+  rules:
+    - if: $SKIP == "false"
+  variables:
+    APIPARK_GUEST_MODE: allow
+    APIPARK_GUEST_ID: dklejrfbhjqwdh
+  script:
+    - cd ${SAVE_DIR};mkdir -p ${APP_PRE};tar -zxvf ${APP_PRE}_linux_amd64.tar.gz -C ${APP_PRE};cd ${APP_PRE};./install.sh ${SAVE_DIR};./run.sh restart;cd ${SAVE_DIR} && ./clean.sh ${APP_PRE}
+  when: on_success
+success:
+  stage: webhook
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  script:
+    - |
+      curl -X POST -H "Content-Type: application/json" \
+      -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"最近一次提交：${CI_COMMIT_TITLE}\\n提交人：${GITLAB_USER_NAME}\\n项目：${CI_PROJECT_NAME}\\n环境：${DEPLOY_DESC}\\n更新部署完成.\\n访问地址：${VIEW_ADDR}\\n工作流地址：${CI_PIPELINE_URL}\"}}" \
+      https://open.feishu.cn/open-apis/bot/v2/hook/c3672932-4dfa-4989-8023-0128bae59338
+  when: on_success
+failure:
+  stage: webhook
+  rules:
+    - if: $SKIP == "false"
+  script:
+    - |
+      curl -X POST -H "Content-Type: application/json" \
+      -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"最近一次提交：${CI_COMMIT_TITLE}\\n提交人：${GITLAB_USER_NAME}\\n项目：${CI_PROJECT_NAME}\\n环境：${DEPLOY_DESC}\\n更新部署失败，请及时到gitlab上查看\\n工作流地址：${CI_PIPELINE_URL}\"}}" \
+      https://open.feishu.cn/open-apis/bot/v2/hook/c3672932-4dfa-4989-8023-0128bae59338
+  when: on_failure
