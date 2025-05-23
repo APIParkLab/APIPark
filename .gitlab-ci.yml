@@ -33,7 +33,7 @@ stages:
 builder:
   stage: build
   rules:
-    - if: $CI_COMMIT_BRANCH == "main-github-pro"
+    - if: $CI_COMMIT_BRANCH == "main-github-pro" || $CI_COMMIT_BRANCH == "main"
   script:
     - set -e
     - |
@@ -59,7 +59,7 @@ builder:
 deployer:
   stage: deploy
   rules:
-    - if: $CI_COMMIT_BRANCH == "main-github-pro"
+    - if: $CI_COMMIT_BRANCH == "main-github-pro" || $CI_COMMIT_BRANCH == "main"
   variables:
     APIPARK_GUEST_MODE: allow
     APIPARK_GUEST_ID: dklejrfbhjqwdh
@@ -69,7 +69,7 @@ deployer:
 success:
   stage: webhook
   rules:
-    - if: $CI_COMMIT_BRANCH == "main-github-pro"
+    - if: $CI_COMMIT_BRANCH == "main-github-pro" || $CI_COMMIT_BRANCH == "main"
   script:
     - |
       curl -X POST -H "Content-Type: application/json" \
@@ -79,7 +79,7 @@ success:
 failure:
   stage: webhook
   rules:
-    - if: $CI_COMMIT_BRANCH == "main-github-pro"
+    - if: $CI_COMMIT_BRANCH == "main-github-pro" || $CI_COMMIT_BRANCH == "main"
   script:
     - |
       curl -X POST -H "Content-Type: application/json" \
