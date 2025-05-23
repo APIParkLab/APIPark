@@ -10,66 +10,30 @@ variables:
   VIEW_ADDR: http://172.18.166.219:8288
   SAVE_DIR: /opt/${APP}
   NODE_OPTIONS: --max_old_space_size=8192
-  SKIP: "true"
 
 stages:
-  - sync
   - notice
   - build
   - deploy
   - webhook
-
-sync_job:
-  stage: sync
-  variables:
-    GITLAB_REPO: http://$DEPLOY_USER:$DEPLOY_TOKEN@gitlab.eolink.com/apipark/APIPark
-    GIT_STRATEGY: none  # 避免 CI 克隆 GitLab 仓库
-  script:
-    # 检查是否已有仓库缓存，若无则克隆
-    - if [ ! -d "repo-cache" ]; then
-    -   git clone https://$GITHUB_USER:$GITHUB_TOKEN@$GITHUB_REPO repo-cache
-    - fi
-    - cd repo-cache
-    # 获取 GitHub main 分支的最新提交
-    - git pull origin main
-    # 获取 GitLab main 分支的最新提交
-    - git fetch ${GITLAB_REPO} main:gitlab-main
-    - DIFF=$(git diff main gitlab-main)
-    # 比较 SHA，检查是否有更改
-    - if [ -n "$DIFF" ]; then
-    -   echo "Differences detected, syncing to GitLab..."
-    # 推送到 GitLab main 分支
-    -   git push "$GITLAB_REPO" "main:main"
-    -   SKIP=false
-    - else
-    -   echo "No differences found between GitHub and GitLab main branches."
-    - fi
-#  only:
-#    - schedules
-  cache:
-    key: repo-cache
-    paths:
-      - repo-cache/
 
 feishu-informer: # 飞书回调
   stage: notice
   variables:
     DIFF_URL: "$CI_MERGE_REQUEST_PROJECT_URL/-/merge_requests/$CI_MERGE_REQUEST_IID/diffs"
   rules:
-    - if: $SKIP == "false"
-#  rules:
-#    - if: $CI_PIPELINE_SOURCE=="merge_request_event" && $CI_COMMIT_BRANCH =~ "main"
+    - if: $CI_PIPELINE_SOURCE=="merge_request_event" && $CI_COMMIT_BRANCH =~ "main"
   script:
     - echo "merge request"
     - |
       curl -X POST -H "Content-Type: application/json" \
       -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"项目：${CI_PROJECT_NAME}\\n提交人：${GITLAB_USER_NAME}\\n提交信息：${CI_MERGE_REQUEST_TITLE}\\n合并分支信息：${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} -> ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}\\n差异性地址：${DIFF_URL}\\n请及时review代码\"}}" \
-      https://open.feishu.cn/open-apis/bot/v2/hook/1c334752-2874-41a1-8f1b-3060f2d46b6c
+      ${FEISHU_WEBHOOK}
 
 builder:
   stage: build
   rules:
-    - if: $SKIP == "false"
+    - if: $CI_COMMIT_BRANCH == "main"
   script:
     - set -e
     - |
@@ -95,7 +59,7 @@ builder:
 deployer:
   stage: deploy
   rules:
-    - if: $SKIP == "false"
+    - if: $CI_COMMIT_BRANCH == "main"
   variables:
     APIPARK_GUEST_MODE: allow
     APIPARK_GUEST_ID: dklejrfbhjqwdh
@@ -110,15 +74,15 @@ success:
     - |
       curl -X POST -H "Content-Type: application/json" \
       -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"最近一次提交：${CI_COMMIT_TITLE}\\n提交人：${GITLAB_USER_NAME}\\n项目：${CI_PROJECT_NAME}\\n环境：${DEPLOY_DESC}\\n更新部署完成.\\n访问地址：${VIEW_ADDR}\\n工作流地址：${CI_PIPELINE_URL}\"}}" \
-      https://open.feishu.cn/open-apis/bot/v2/hook/c3672932-4dfa-4989-8023-0128bae59338
+      ${FEISHU_WEBHOOK}
   when: on_success
 failure:
   stage: webhook
   rules:
-    - if: $SKIP == "false"
+    - if: $CI_COMMIT_BRANCH == "main"
   script:
     - |
       curl -X POST -H "Content-Type: application/json" \
       -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"最近一次提交：${CI_COMMIT_TITLE}\\n提交人：${GITLAB_USER_NAME}\\n项目：${CI_PROJECT_NAME}\\n环境：${DEPLOY_DESC}\\n更新部署失败，请及时到gitlab上查看\\n工作流地址：${CI_PIPELINE_URL}\"}}" \
-      https://open.feishu.cn/open-apis/bot/v2/hook/c3672932-4dfa-4989-8023-0128bae59338
+      ${FEISHU_WEBHOOK}
   when: on_failure
