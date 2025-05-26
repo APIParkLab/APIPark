@@ -47,22 +47,22 @@ if [[ ${Init} == "true" ]];then
   r=$(is_init)
   if [[ $r == "true" ]];then
     echo "Already initialized, skipping initialization."
-    exit 0
+  else
+    wait_for_influxdb
+
+      wait_for_apinto
+      set_cluster
+
+      wait_for_influxdb
+      set_influxdb
+
+      set_loki
+      set_nsq
+      set_openapi_config
+      # 重启apipark
+      kill -9 $(pgrep apipark)
+      nohup ./apipark >> run.log 2>&1 &
   fi
-  wait_for_influxdb
-
-  wait_for_apinto
-  set_cluster
-
-  wait_for_influxdb
-  set_influxdb
-
-  set_loki
-  set_nsq
-  set_openapi_config
-  # 重启apipark
-  kill -9 $(pgrep apipark)
-  nohup ./apipark >> run.log 2>&1 &
 fi
 
 tail -F run.log
