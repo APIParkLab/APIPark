@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	service_overview "github.com/APIParkLab/APIPark/service/service-overview"
+
 	mcp_server "github.com/APIParkLab/APIPark/mcp-server"
 
 	"github.com/APIParkLab/APIPark/module/monitor/driver"
@@ -58,22 +60,72 @@ var (
 )
 
 type imlCatalogueModule struct {
-	catalogueService      catalogue.ICatalogueService      `autowired:""`
-	apiService            api.IAPIService                  `autowired:""`
-	apiDocService         api_doc.IAPIDocService           `autowired:""`
-	serviceService        service.IServiceService          `autowired:""`
-	serviceTagService     service_tag.ITagService          `autowired:""`
-	serviceDocService     service_doc.IDocService          `autowired:""`
-	tagService            tag.ITagService                  `autowired:""`
-	releaseService        release.IReleaseService          `autowired:""`
-	subscribeService      subscribe.ISubscribeService      `autowired:""`
-	subscribeApplyService subscribe.ISubscribeApplyService `autowired:""`
-	transaction           store.ITransaction               `autowired:""`
-	clusterService        cluster.IClusterService          `autowired:""`
-	settingService        setting.ISettingService          `autowired:""`
-	monitorService        monitor.IMonitorService          `autowired:""`
-	root                  *Root
+	catalogueService       catalogue.ICatalogueService       `autowired:""`
+	apiService             api.IAPIService                   `autowired:""`
+	apiDocService          api_doc.IAPIDocService            `autowired:""`
+	serviceService         service.IServiceService           `autowired:""`
+	serviceOverviewService service_overview.IOverviewService `autowired:""`
+	serviceTagService      service_tag.ITagService           `autowired:""`
+	serviceDocService      service_doc.IDocService           `autowired:""`
+	tagService             tag.ITagService                   `autowired:""`
+	releaseService         release.IReleaseService           `autowired:""`
+	subscribeService       subscribe.ISubscribeService       `autowired:""`
+	subscribeApplyService  subscribe.ISubscribeApplyService  `autowired:""`
+	transaction            store.ITransaction                `autowired:""`
+	clusterService         cluster.IClusterService           `autowired:""`
+	settingService         setting.ISettingService           `autowired:""`
+	monitorService         monitor.IMonitorService           `autowired:""`
+	root                   *Root
 }
+
+//func (i *imlCatalogueModule) OnInit() {
+//	register.Handle(func(v server.Server) {
+//		ctx := context.Background()
+//		list, err := i.releaseService.GetRunningList(ctx)
+//		if err != nil {
+//			log.Errorf("onInit: get running list failed:%s", err.Error())
+//			return
+//		}
+//		if len(list) < 1 || list[0].APICount > 0 {
+//			return
+//		}
+//		serviceMap := make(map[string]*release.Release)
+//		serviceIds := make([]string, 0, len(list))
+//		for _, v := range list {
+//			if _, ok := serviceMap[v.Service]; !ok {
+//				serviceMap[v.Service] = v
+//				serviceIds = append(serviceIds, v.Service)
+//			}
+//		}
+//		if len(serviceIds) < 1 {
+//			return
+//		}
+//		commitIds, err := i.releaseService.GetRunningApiDocCommits(ctx, serviceIds...)
+//		if err != nil {
+//			log.Errorf("onInit: get running api doc commits failed:%s", err.Error())
+//			return
+//		}
+//		if len(commitIds) < 1 {
+//			return
+//		}
+//		listCommits, err := i.apiDocService.ListDocCommit(ctx, commitIds...)
+//		if err != nil {
+//			log.Error("onInit: list doc commit failed:", err.Error())
+//			return
+//		}
+//		for _, v := range listCommits {
+//			m, ok := serviceMap[v.Target]
+//			if !ok {
+//				continue
+//			}
+//
+//			i.releaseService.UpdateRelease(ctx, m.UUID, &release.Update{
+//				APICount: &v.Data.APICount,
+//			})
+//		}
+//	})
+//
+//}
 
 func (i *imlCatalogueModule) DefaultCatalogue(ctx context.Context) (*catalogue_dto.Catalogue, error) {
 	catalogues, err := i.catalogueService.List(ctx)
@@ -447,25 +499,24 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 	if err != nil {
 		return nil, err
 	}
-
 	serviceIds := utils.SliceToSlice(items, func(i *service.Service) string {
 		return i.Id
-	}, func(s *service.Service) bool {
-		// 未发布的不给展示
-		_, err = i.releaseService.GetRunning(ctx, s.Id)
-		return err == nil
+	})
+	overviewMap, err := i.serviceOverviewService.Map(ctx, serviceIds...)
+	if err != nil {
+		return nil, err
+	}
+	serviceIds = utils.SliceToSlice(serviceIds, func(s string) string {
+		return s
+	}, func(s string) bool {
+		// 只展示已发布的服务
+		if info, ok := overviewMap[s]; ok && info.IsReleased {
+			return true
+		}
+		return false
 	})
 	if len(serviceIds) < 1 {
 		return nil, nil
-	}
-
-	commits, err := i.releaseService.GetRunningApiDocCommits(ctx, serviceIds...)
-	if err != nil {
-		return nil, err
-	}
-	apiCountMap, err := i.apiDocService.LatestAPICountByCommits(ctx, commits...)
-	if err != nil {
-		return nil, err
 	}
 
 	subscriberCountMap, err := i.subscribeService.CountMapByService(ctx, subscribe.ApplyStatusSubscribe, serviceIds...)
@@ -479,8 +530,9 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 
 	result := make([]*catalogue_dto.ServiceItem, 0, len(items))
 	for _, v := range items {
-		apiNum, ok := apiCountMap[v.Id]
-		if !ok || apiNum < 1 {
+
+		ov, ok := overviewMap[v.Id]
+		if !ok || ov.ReleaseApiCount < 1 {
 			continue
 		}
 
@@ -489,8 +541,8 @@ func (i *imlCatalogueModule) Services(ctx context.Context, keyword string) ([]*c
 			Name:          v.Name,
 			Tags:          auto.List(serviceTagMap[v.Id]),
 			Catalogue:     auto.UUID(v.Catalogue),
-			ApiNum:        apiNum,
 			SubscriberNum: subscriberCountMap[v.Id],
+			ApiNum:        ov.ReleaseApiCount,
 			Description:   v.Description,
 			Logo:          v.Logo,
 			EnableMCP:     v.EnableMCP,

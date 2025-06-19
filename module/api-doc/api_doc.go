@@ -3,6 +3,11 @@ package api_doc
 import (
 	"context"
 	"errors"
+	"fmt"
+
+	"github.com/eolinker/go-common/store"
+
+	service_overview "github.com/APIParkLab/APIPark/service/service-overview"
 
 	api_doc_dto "github.com/APIParkLab/APIPark/module/api-doc/dto"
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
@@ -16,8 +21,10 @@ import (
 var _ IAPIDocModule = (*imlAPIDocModule)(nil)
 
 type imlAPIDocModule struct {
-	apiDocService  api_doc.IAPIDocService  `autowired:""`
-	serviceService service.IServiceService `autowired:""`
+	apiDocService          api_doc.IAPIDocService            `autowired:""`
+	serviceService         service.IServiceService           `autowired:""`
+	serviceOverviewService service_overview.IOverviewService `autowired:""`
+	transaction            store.ITransaction                `autowired:""`
 }
 
 func (i *imlAPIDocModule) UpdateDoc(ctx context.Context, serviceId string, input *api_doc_dto.UpdateDoc) (*api_doc_dto.ApiDocDetail, error) {
@@ -29,11 +36,18 @@ func (i *imlAPIDocModule) UpdateDoc(ctx context.Context, serviceId string, input
 		input.Id = uuid.New().String()
 	}
 	// 每个API加上前缀
-
-	err = i.apiDocService.UpdateDoc(ctx, serviceId, &api_doc.UpdateDoc{
-		ID:      input.Id,
-		Content: input.Content,
-		Prefix:  info.Prefix,
+	err = i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		count, err := i.apiDocService.UpdateDoc(ctx, serviceId, &api_doc.UpdateDoc{
+			ID:      input.Id,
+			Content: input.Content,
+			Prefix:  info.Prefix,
+		})
+		if err != nil {
+			return fmt.Errorf("update api doc error:%v", err)
+		}
+		return i.serviceOverviewService.Update(ctx, serviceId, &service_overview.Update{
+			ApiCount: &count,
+		})
 	})
 	if err != nil {
 		return nil, err

@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	service_overview "github.com/APIParkLab/APIPark/service/service-overview"
+
 	"github.com/APIParkLab/APIPark/common"
 
 	"github.com/mitchellh/mapstructure"
@@ -83,11 +85,12 @@ type imlServiceModule struct {
 	tagService        tag.ITagService                `autowired:""`
 	localModelService ai_local.ILocalModelService    `autowired:""`
 
-	serviceTagService service_tag.ITagService     `autowired:""`
-	apiService        api.IAPIService             `autowired:""`
-	apiDocService     api_doc.IAPIDocService      `autowired:""`
-	clusterService    cluster.IClusterService     `autowired:""`
-	subscribeServer   subscribe.ISubscribeService `autowired:""`
+	serviceOverviewService service_overview.IOverviewService `autowired:""`
+	serviceTagService      service_tag.ITagService           `autowired:""`
+	apiService             api.IAPIService                   `autowired:""`
+	apiDocService          api_doc.IAPIDocService            `autowired:""`
+	clusterService         cluster.IClusterService           `autowired:""`
+	subscribeServer        subscribe.ISubscribeService       `autowired:""`
 
 	releaseService             release.IReleaseService                           `autowired:""`
 	serviceModelMappingService service_model_mapping.IServiceModelMappingService `autowired:""`
@@ -304,8 +307,31 @@ func (i *imlServiceModule) OnInit() {
 			log.Error(err)
 			return
 		}
+
 		for _, s := range services {
 			err = i.updateMCPServer(ctx, s.Id, s.Name, "1.0")
+			if err != nil {
+				log.Error(err)
+				return
+			}
+		}
+		overviews, err := i.serviceOverviewService.List(ctx)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		if len(overviews) > 0 {
+			return
+		}
+		countMap, err := i.apiDocService.APICountByServices(ctx)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		for k, v := range countMap {
+			err = i.serviceOverviewService.Update(ctx, k, &service_overview.Update{
+				ApiCount: &v,
+			})
 			if err != nil {
 				log.Error(err)
 				return
@@ -510,7 +536,14 @@ func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, 
 	serviceIds := utils.SliceToSlice(services, func(p *service.Service) string {
 		return p.Id
 	})
-	apiCountMap, err := i.apiDocService.APICountByServices(ctx, serviceIds...)
+	//apiCountMap, err := i.apiDocService.APICountByServices(ctx, serviceIds...)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//serviceIds := utils.SliceToSlice(services, func(s *service.Service) string {
+	//	return s.Id
+	//})
+	overviewMap, err := i.serviceOverviewService.Map(ctx, serviceIds...)
 	if err != nil {
 		return nil, err
 	}
@@ -520,10 +553,12 @@ func (i *imlServiceModule) SearchMyServices(ctx context.Context, teamId string, 
 		if teamId != "" && model.Team != teamId {
 			continue
 		}
-		apiCount := apiCountMap[model.Id]
 		item := toServiceItem(model)
-		item.ApiNum = apiCount
-		item.CanDelete = apiCount == 0
+		if ov, ok := overviewMap[model.Id]; ok {
+			item.ApiNum = ov.ApiCount
+			item.CanDelete = ov.ApiCount == 0
+		}
+
 		items = append(items, item)
 
 	}
@@ -629,22 +664,21 @@ func (i *imlServiceModule) Search(ctx context.Context, teamID string, keyword st
 	if err != nil {
 		return nil, err
 	}
-
 	serviceIds := utils.SliceToSlice(list, func(s *service.Service) string {
 		return s.Id
 	})
-
-	apiCountMap, err := i.apiDocService.APICountByServices(ctx, serviceIds...)
+	overviewMap, err := i.serviceOverviewService.Map(ctx, serviceIds...)
 	if err != nil {
 		return nil, err
 	}
-
 	items := make([]*service_dto.ServiceItem, 0, len(list))
 	for _, model := range list {
-		apiCount := apiCountMap[model.Id]
 		item := toServiceItem(model)
-		item.ApiNum = apiCount
-		item.CanDelete = apiCount == 0
+		if v, ok := overviewMap[model.Id]; ok {
+			item.ApiNum = v.ApiCount
+			item.CanDelete = v.ApiCount == 0
+		}
+
 		items = append(items, item)
 	}
 	return items, nil

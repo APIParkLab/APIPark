@@ -7,6 +7,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/eolinker/go-common/server"
+
+	"github.com/eolinker/go-common/register"
+
+	service_overview "github.com/APIParkLab/APIPark/service/service-overview"
+
 	mcp_server "github.com/APIParkLab/APIPark/mcp-server"
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
 	"github.com/mark3labs/mcp-go/mcp"
@@ -51,22 +57,70 @@ var (
 )
 
 type imlPublishModule struct {
-	projectDiffModule serviceDiff.IServiceDiffModule `autowired:""`
-	releaseModule     releaseModule.IReleaseModule   `autowired:""`
-	publishService    publish.IPublishService        `autowired:""`
-	apiService        api.IAPIService                `autowired:""`
-	apiDocService     api_doc.IAPIDocService         `autowired:""`
-	upstreamService   upstream.IUpstreamService      `autowired:""`
-	strategyService   strategy.IStrategyService      `autowired:""`
-	releaseService    release.IReleaseService        `autowired:""`
-	clusterService    cluster.IClusterService        `autowired:""`
-	serviceService    service.IServiceService        `autowired:""`
-	transaction       store.ITransaction             `autowired:""`
+	projectDiffModule      serviceDiff.IServiceDiffModule    `autowired:""`
+	releaseModule          releaseModule.IReleaseModule      `autowired:""`
+	publishService         publish.IPublishService           `autowired:""`
+	apiService             api.IAPIService                   `autowired:""`
+	apiDocService          api_doc.IAPIDocService            `autowired:""`
+	upstreamService        upstream.IUpstreamService         `autowired:""`
+	strategyService        strategy.IStrategyService         `autowired:""`
+	releaseService         release.IReleaseService           `autowired:""`
+	clusterService         cluster.IClusterService           `autowired:""`
+	serviceService         service.IServiceService           `autowired:""`
+	serviceOverviewService service_overview.IOverviewService `autowired:""`
+	transaction            store.ITransaction                `autowired:""`
 }
 
-func (m *imlPublishModule) initGateway(ctx context.Context, partitionId string, clientDriver gateway.IClientDriver) error {
+func (i *imlPublishModule) OnInit() {
+	register.Handle(func(v server.Server) {
+		ctx := context.Background()
+		list, err := i.releaseService.GetRunningList(ctx)
+		if err != nil {
+			log.Errorf("onInit: get running list failed:%s", err.Error())
+			return
+		}
+		if len(list) < 1 {
+			return
+		}
+
+		serviceMap := make(map[string]*release.Release)
+		serviceIds := make([]string, 0, len(list))
+		for _, v := range list {
+			if _, ok := serviceMap[v.Service]; !ok {
+				serviceMap[v.Service] = v
+				serviceIds = append(serviceIds, v.Service)
+			}
+		}
+		overviewList, err := i.serviceOverviewService.List(ctx, serviceIds...)
+		if err != nil {
+			log.Errorf("onInit: get running list failed:%s", err.Error())
+			return
+		}
+		for _, v := range overviewList {
+			if v.IsReleased {
+				return
+			}
+		}
+
+		listCommits, err := i.apiDocService.ListLatestDocCommit(ctx, serviceIds...)
+		if err != nil {
+			log.Errorf("onInit: get running api doc commits failed:%s", err.Error())
+			return
+		}
+		isReleased := true
+		for _, v := range listCommits {
+			i.serviceOverviewService.Update(ctx, v.Target, &service_overview.Update{
+				ApiCount:        nil,
+				ReleaseApiCount: &v.Data.APICount,
+				IsReleased:      &isReleased,
+			})
+		}
+	})
+}
+
+func (i *imlPublishModule) initGateway(ctx context.Context, partitionId string, clientDriver gateway.IClientDriver) error {
 	return nil
-	//projects, err := m.serviceService.List(ctx)
+	//projects, err := i.serviceService.List(ctx)
 	//if err != nil {
 	//	return err
 	//}
@@ -74,7 +128,7 @@ func (m *imlPublishModule) initGateway(ctx context.Context, partitionId string, 
 	//	return p.Id
 	//})
 	//for _, projectId := range projectIds {
-	//	releaseInfo, err := m.GetProjectRelease(ctx, projectId, partitionId)
+	//	releaseInfo, err := i.GetProjectRelease(ctx, projectId, partitionId)
 	//	if err != nil {
 	//		return err
 	//	}
@@ -90,8 +144,8 @@ func (m *imlPublishModule) initGateway(ctx context.Context, partitionId string, 
 	//return nil
 }
 
-func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID string, commitId string) (*gateway.ProjectRelease, error) {
-	commits, err := m.releaseService.GetCommits(ctx, commitId)
+func (i *imlPublishModule) getProjectRelease(ctx context.Context, projectID string, commitId string) (*gateway.ProjectRelease, error) {
+	commits, err := i.releaseService.GetCommits(ctx, commitId)
 	if err != nil {
 		return nil, err
 	}
@@ -110,17 +164,17 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 			strategyCommitIds = append(strategyCommitIds, c.Commit)
 		}
 	}
-	serviceInfo, err := m.serviceService.Get(ctx, projectID)
+	serviceInfo, err := i.serviceService.Get(ctx, projectID)
 	if err != nil {
 		return nil, err
 	}
 
-	apiInfos, err := m.apiService.ListInfo(ctx, apiIds...)
+	apiInfos, err := i.apiService.ListInfo(ctx, apiIds...)
 	if err != nil {
 		return nil, err
 	}
 
-	proxyCommits, err := m.apiService.ListProxyCommit(ctx, apiProxyCommitIds...)
+	proxyCommits, err := i.apiService.ListProxyCommit(ctx, apiProxyCommitIds...)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +231,7 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 	r.Apis = apis
 	var upstreamRelease *gateway.UpstreamRelease
 	if len(upstreamCommitIds) > 0 {
-		upstreamCommits, err := m.upstreamService.ListCommit(ctx, upstreamCommitIds...)
+		upstreamCommits, err := i.upstreamService.ListCommit(ctx, upstreamCommitIds...)
 		if err != nil {
 			return nil, err
 		}
@@ -202,7 +256,7 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 		r.Upstream = upstreamRelease
 	}
 	if len(strategyCommitIds) > 0 {
-		strategyCommits, err := m.strategyService.ListStrategyCommit(ctx, strategyCommitIds...)
+		strategyCommits, err := i.strategyService.ListStrategyCommit(ctx, strategyCommitIds...)
 		if err != nil {
 			return nil, err
 		}
@@ -234,9 +288,9 @@ func (m *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 	return r, nil
 }
 
-func (m *imlPublishModule) GetProjectRelease(ctx context.Context, projectID string, partitionId string) (*gateway.ProjectRelease, error) {
+func (i *imlPublishModule) GetProjectRelease(ctx context.Context, projectID string, partitionId string) (*gateway.ProjectRelease, error) {
 
-	releaseInfo, err := m.releaseService.GetRunning(ctx, projectID)
+	releaseInfo, err := i.releaseService.GetRunning(ctx, projectID)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
@@ -244,11 +298,11 @@ func (m *imlPublishModule) GetProjectRelease(ctx context.Context, projectID stri
 		return nil, nil
 	}
 
-	return m.getProjectRelease(ctx, projectID, releaseInfo.UUID)
+	return i.getProjectRelease(ctx, projectID, releaseInfo.UUID)
 }
 
-func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releaseId, version string, clusterIds []string) (map[string]*gateway.ProjectRelease, error) {
-	projectRelease, err := m.getProjectRelease(ctx, projectID, releaseId)
+func (i *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releaseId, version string, clusterIds []string) (map[string]*gateway.ProjectRelease, error) {
+	projectRelease, err := i.getProjectRelease(ctx, projectID, releaseId)
 	if err != nil {
 		return nil, err
 	}
@@ -266,19 +320,19 @@ func (m *imlPublishModule) getReleaseInfo(ctx context.Context, projectID, releas
 	return projectReleaseMap, nil
 }
 
-func (m *imlPublishModule) PublishStatuses(ctx context.Context, serviceId string, id string) ([]*dto.PublishStatus, error) {
-	_, err := m.serviceService.Check(ctx, serviceId, asServer)
+func (i *imlPublishModule) PublishStatuses(ctx context.Context, serviceId string, id string) ([]*dto.PublishStatus, error) {
+	_, err := i.serviceService.Check(ctx, serviceId, asServer)
 	if err != nil {
 		return nil, err
 	}
-	flow, err := m.publishService.Get(ctx, id)
+	flow, err := i.publishService.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	if flow.Service != serviceId {
 		return nil, errors.New("服务不一致")
 	}
-	list, err := m.publishService.GetPublishStatus(ctx, id)
+	list, err := i.publishService.GetPublishStatus(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -302,18 +356,18 @@ func (m *imlPublishModule) PublishStatuses(ctx context.Context, serviceId string
 //
 // ctx context.Context, serviceId string, input *dto.ApplyInput
 // *dto.Publish, error
-func (m *imlPublishModule) Apply(ctx context.Context, serviceId string, input *dto.ApplyInput) (*dto.Publish, error) {
-	_, err := m.serviceService.Check(ctx, serviceId, asServer)
+func (i *imlPublishModule) Apply(ctx context.Context, serviceId string, input *dto.ApplyInput) (*dto.Publish, error) {
+	_, err := i.serviceService.Check(ctx, serviceId, asServer)
 	if err != nil {
 		return nil, err
 	}
-	err = m.checkPublish(ctx, serviceId, input.Release)
+	err = i.checkPublish(ctx, serviceId, input.Release)
 	if err != nil {
 		return nil, err
 	}
 
 	previous := ""
-	running, err := m.releaseService.GetRunning(ctx, serviceId)
+	running, err := i.releaseService.GetRunning(ctx, serviceId)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 
 		return nil, err
@@ -322,42 +376,42 @@ func (m *imlPublishModule) Apply(ctx context.Context, serviceId string, input *d
 		previous = running.UUID
 	}
 
-	releaseToPublish, err := m.releaseService.GetRelease(ctx, input.Release)
+	releaseToPublish, err := i.releaseService.GetRelease(ctx, input.Release)
 	if err != nil {
 		// 目标版本不存在
 		return nil, err
 	}
 
 	newPublishId := uuid.NewString()
-	diff, ok, err := m.projectDiffModule.DiffForLatest(ctx, serviceId, previous)
+	diff, ok, err := i.projectDiffModule.DiffForLatest(ctx, serviceId, previous)
 	if err != nil {
 		return nil, err
 	}
 	if !ok {
 		return nil, errors.New("latest completeness check failed")
 	}
-	err = m.publishService.Create(ctx, newPublishId, serviceId, releaseToPublish.UUID, previous, releaseToPublish.Version, input.Remark, diff)
+	err = i.publishService.Create(ctx, newPublishId, serviceId, releaseToPublish.UUID, previous, releaseToPublish.Version, input.Remark, diff)
 	if err != nil {
 		return nil, err
 	}
-	np, err := m.publishService.Get(ctx, newPublishId)
+	np, err := i.publishService.Get(ctx, newPublishId)
 	if err != nil {
 		return nil, err
 	}
 	return dto.FromModel(np, releaseToPublish.Remark), nil
 }
 
-func (m *imlPublishModule) CheckPublish(ctx context.Context, serviceId string, releaseId string) (*dto.DiffOut, error) {
-	_, err := m.serviceService.Check(ctx, serviceId, asServer)
+func (i *imlPublishModule) CheckPublish(ctx context.Context, serviceId string, releaseId string) (*dto.DiffOut, error) {
+	_, err := i.serviceService.Check(ctx, serviceId, asServer)
 	if err != nil {
 		return nil, err
 	}
-	err = m.checkPublish(ctx, serviceId, releaseId)
+	err = i.checkPublish(ctx, serviceId, releaseId)
 	if err != nil {
 		return nil, err
 	}
 
-	running, err := m.releaseService.GetRunning(ctx, serviceId)
+	running, err := i.releaseService.GetRunning(ctx, serviceId)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
@@ -367,30 +421,30 @@ func (m *imlPublishModule) CheckPublish(ctx context.Context, serviceId string, r
 	}
 	if releaseId == "" {
 		// 发布latest 版本
-		diff, _, err := m.projectDiffModule.DiffForLatest(ctx, serviceId, runningReleaseId)
+		diff, _, err := i.projectDiffModule.DiffForLatest(ctx, serviceId, runningReleaseId)
 		if err != nil {
 			return nil, err
 		}
-		return m.projectDiffModule.Out(ctx, diff)
+		return i.projectDiffModule.Out(ctx, diff)
 	} else {
 		// 发布 releaseId 版本, 返回 与当前版本的差异
-		diff, err := m.projectDiffModule.Diff(ctx, serviceId, runningReleaseId, releaseId)
+		diff, err := i.projectDiffModule.Diff(ctx, serviceId, runningReleaseId, releaseId)
 		if err != nil {
 			return nil, err
 		}
-		return m.projectDiffModule.Out(ctx, diff)
+		return i.projectDiffModule.Out(ctx, diff)
 	}
 
 }
-func (m *imlPublishModule) checkPublish(ctx context.Context, serviceId string, releaseId string) error {
-	flows, err := m.publishService.ListForStatus(ctx, serviceId, publish.StatusApply, publish.StatusAccept)
+func (i *imlPublishModule) checkPublish(ctx context.Context, serviceId string, releaseId string) error {
+	flows, err := i.publishService.ListForStatus(ctx, serviceId, publish.StatusApply, publish.StatusAccept)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 	if len(flows) > 0 {
 		return errors.New("正在发布中")
 	}
-	running, err := m.releaseService.GetRunning(ctx, serviceId)
+	running, err := i.releaseService.GetRunning(ctx, serviceId)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
@@ -403,8 +457,8 @@ func (m *imlPublishModule) checkPublish(ctx context.Context, serviceId string, r
 	}
 	return nil
 }
-func (m *imlPublishModule) Close(ctx context.Context, serviceId, id string) error {
-	err := m.publishService.SetStatus(ctx, serviceId, id, publish.StatusClose)
+func (i *imlPublishModule) Close(ctx context.Context, serviceId, id string) error {
+	err := i.publishService.SetStatus(ctx, serviceId, id, publish.StatusClose)
 	if err != nil {
 		return err
 	}
@@ -412,12 +466,12 @@ func (m *imlPublishModule) Close(ctx context.Context, serviceId, id string) erro
 	return nil
 }
 
-func (m *imlPublishModule) Stop(ctx context.Context, serviceId string, id string) error {
-	_, err := m.serviceService.Check(ctx, serviceId, asServer)
+func (i *imlPublishModule) Stop(ctx context.Context, serviceId string, id string) error {
+	_, err := i.serviceService.Check(ctx, serviceId, asServer)
 	if err != nil {
 		return err
 	}
-	flow, err := m.publishService.Get(ctx, id)
+	flow, err := i.publishService.Get(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -432,44 +486,44 @@ func (m *imlPublishModule) Stop(ctx context.Context, serviceId string, id string
 	if flow.Status == publish.StatusApply {
 		status = publish.StatusClose
 	}
-	return m.publishService.SetStatus(ctx, serviceId, id, status)
+	return i.publishService.SetStatus(ctx, serviceId, id, status)
 }
 
-func (m *imlPublishModule) Refuse(ctx context.Context, serviceId string, id string, commits string) error {
-	_, err := m.serviceService.Check(ctx, serviceId, asServer)
+func (i *imlPublishModule) Refuse(ctx context.Context, serviceId string, id string, commits string) error {
+	_, err := i.serviceService.Check(ctx, serviceId, asServer)
 	if err != nil {
 		return err
 	}
-	return m.publishService.Refuse(ctx, serviceId, id, commits)
+	return i.publishService.Refuse(ctx, serviceId, id, commits)
 }
 
-func (m *imlPublishModule) Accept(ctx context.Context, serviceId string, id string, commits string) error {
-	_, err := m.serviceService.Check(ctx, serviceId, asServer)
+func (i *imlPublishModule) Accept(ctx context.Context, serviceId string, id string, commits string) error {
+	_, err := i.serviceService.Check(ctx, serviceId, asServer)
 	if err != nil {
 		return err
 	}
-	return m.publishService.Accept(ctx, serviceId, id, commits)
+	return i.publishService.Accept(ctx, serviceId, id, commits)
 }
 
-func (m *imlPublishModule) publish(ctx context.Context, id string, clusterId string, projectRelease *gateway.ProjectRelease) error {
+func (i *imlPublishModule) publish(ctx context.Context, id string, clusterId string, projectRelease *gateway.ProjectRelease) error {
 
 	publishStatus := &publish.Status{
 		Publish:  id,
 		Status:   publish.StatusPublishing,
 		UpdateAt: time.Now(),
 	}
-	err := m.publishService.SetPublishStatus(ctx, publishStatus)
+	err := i.publishService.SetPublishStatus(ctx, publishStatus)
 	if err != nil {
 		return fmt.Errorf("set publishing publishStatus error: %v", err)
 	}
 	defer func() {
-		err := m.publishService.SetPublishStatus(ctx, publishStatus)
+		err := i.publishService.SetPublishStatus(ctx, publishStatus)
 		if err != nil {
 			log.Errorf("set publishing publishStatus error: %v", err)
 		}
 	}()
 
-	client, err := m.clusterService.GatewayClient(ctx, clusterId)
+	client, err := i.clusterService.GatewayClient(ctx, clusterId)
 	if err != nil {
 		publishStatus.Status = publish.StatusPublishError
 		publishStatus.Error = err.Error()
@@ -501,12 +555,12 @@ func (m *imlPublishModule) publish(ctx context.Context, id string, clusterId str
 	return nil
 }
 
-func (m *imlPublishModule) Publish(ctx context.Context, serviceId string, id string) error {
-	_, err := m.serviceService.Check(ctx, serviceId, asServer)
+func (i *imlPublishModule) Publish(ctx context.Context, serviceId string, id string) error {
+	_, err := i.serviceService.Check(ctx, serviceId, asServer)
 	if err != nil {
 		return err
 	}
-	flow, err := m.publishService.Get(ctx, id)
+	flow, err := i.publishService.Get(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -516,7 +570,7 @@ func (m *imlPublishModule) Publish(ctx context.Context, serviceId string, id str
 	if flow.Status != publish.StatusAccept && flow.Status != publish.StatusDone {
 		return errors.New("只有通过状态才能发布")
 	}
-	clusters, err := m.clusterService.List(ctx)
+	clusters, err := i.clusterService.List(ctx)
 	if err != nil {
 		return err
 	}
@@ -524,21 +578,21 @@ func (m *imlPublishModule) Publish(ctx context.Context, serviceId string, id str
 		return i.Uuid
 	})
 
-	projectReleaseMap, err := m.getReleaseInfo(ctx, serviceId, flow.Release, flow.Release, clusterIds)
+	projectReleaseMap, err := i.getReleaseInfo(ctx, serviceId, flow.Release, flow.Release, clusterIds)
 	if err != nil {
 		return err
 	}
 	hasError := false
-	return m.transaction.Transaction(ctx, func(ctx context.Context) error {
+	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		for _, c := range clusters {
-			err = m.publish(ctx, flow.Id, c.Uuid, projectReleaseMap[c.Uuid])
+			err = i.publish(ctx, flow.Id, c.Uuid, projectReleaseMap[c.Uuid])
 			if err != nil {
 				hasError = true
 				log.Error(err)
 				continue
 			}
 		}
-		err = m.releaseService.SetRunning(ctx, serviceId, flow.Release)
+		err = i.releaseService.SetRunning(ctx, serviceId, flow.Release)
 		if err != nil {
 			return err
 		}
@@ -547,29 +601,37 @@ func (m *imlPublishModule) Publish(ctx context.Context, serviceId string, id str
 			status = publish.StatusPublishError
 		}
 		if status == publish.StatusDone {
-			info, err := m.serviceService.Get(ctx, serviceId)
+			info, err := i.serviceService.Get(ctx, serviceId)
 			if err != nil {
 				return err
 			}
 			if info.EnableMCP {
-				err = m.updateMCPServer(ctx, serviceId, info.Name, flow.Version)
+				err = i.updateMCPServer(ctx, serviceId, info.Name, flow.Version)
 				if err != nil {
 					return err
 				}
 			}
+			apidocCommit, err := i.apiDocService.LatestDocCommit(ctx, serviceId)
+			if err != nil {
+				return err
+			}
+			isReleased := true
+			i.serviceOverviewService.Update(ctx, serviceId, &service_overview.Update{
+				ReleaseApiCount: &apidocCommit.Data.APICount,
+				IsReleased:      &isReleased,
+			})
 		}
-
-		return m.publishService.SetStatus(ctx, serviceId, id, status)
+		return i.publishService.SetStatus(ctx, serviceId, id, status)
 	})
 
 }
 
-func (m *imlPublishModule) List(ctx context.Context, serviceId string, page, pageSize int) ([]*dto.Publish, int64, error) {
-	_, err := m.serviceService.Check(ctx, serviceId, asServer)
+func (i *imlPublishModule) List(ctx context.Context, serviceId string, page, pageSize int) ([]*dto.Publish, int64, error) {
+	_, err := i.serviceService.Check(ctx, serviceId, asServer)
 	if err != nil {
 		return nil, 0, err
 	}
-	list, total, err := m.publishService.ListProjectPage(ctx, serviceId, page, pageSize)
+	list, total, err := i.publishService.ListProjectPage(ctx, serviceId, page, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -659,31 +721,31 @@ func (i *imlPublishModule) updateMCPServer(ctx context.Context, sid string, name
 	return nil
 }
 
-func (m *imlPublishModule) Detail(ctx context.Context, serviceId string, id string) (*dto.PublishDetail, error) {
-	_, err := m.serviceService.Check(ctx, serviceId, asServer)
+func (i *imlPublishModule) Detail(ctx context.Context, serviceId string, id string) (*dto.PublishDetail, error) {
+	_, err := i.serviceService.Check(ctx, serviceId, asServer)
 	if err != nil {
 		return nil, err
 	}
-	flow, err := m.publishService.Get(ctx, id)
+	flow, err := i.publishService.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	if flow.Service != serviceId {
 		return nil, errors.New("项目不一致")
 	}
-	diff, err := m.publishService.GetDiff(ctx, id)
+	diff, err := i.publishService.GetDiff(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	out, err := m.projectDiffModule.Out(ctx, diff)
+	out, err := i.projectDiffModule.Out(ctx, diff)
 	if err != nil {
 		return nil, err
 	}
-	publishStatuses, err := m.PublishStatuses(ctx, serviceId, id)
+	publishStatuses, err := i.PublishStatuses(ctx, serviceId, id)
 	if err != nil {
 		return nil, err
 	}
-	releaseInfo, err := m.releaseService.GetRelease(ctx, flow.Release)
+	releaseInfo, err := i.releaseService.GetRelease(ctx, flow.Release)
 	if err != nil {
 		return nil, err
 	}

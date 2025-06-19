@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/eolinker/eosc/log"
+
 	"github.com/APIParkLab/APIPark/service/universally/commit"
 	"github.com/APIParkLab/APIPark/stores/api"
 	"github.com/eolinker/go-common/utils"
@@ -59,7 +61,9 @@ func (i *imlAPIDocService) APICountByServices(ctx context.Context, serviceIds ..
 	if len(serviceIds) > 0 {
 		w["service"] = serviceIds
 	}
+	now := time.Now()
 	list, err := i.store.List(ctx, w)
+	log.Infof("search api doc count by services, serviceIds: %v, cost: %v", serviceIds, time.Since(now))
 	if err != nil {
 		return nil, err
 	}
@@ -68,35 +72,35 @@ func (i *imlAPIDocService) APICountByServices(ctx context.Context, serviceIds ..
 	}), nil
 }
 
-func (i *imlAPIDocService) UpdateDoc(ctx context.Context, serviceId string, input *UpdateDoc) error {
+func (i *imlAPIDocService) UpdateDoc(ctx context.Context, serviceId string, input *UpdateDoc) (int64, error) {
 	doc, err := NewDocLoader(input.Content)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if err := doc.Valid(); err != nil {
-		return err
+		return 0, err
 	}
 	if input.Prefix != "" {
 		err = doc.AddPrefixInAll(input.Prefix)
 		if err != nil {
-			return err
+			return 0, err
 		}
 	}
 	data, err := doc.Marshal()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	input.Content = string(data)
-
+	operator := utils.UserId(ctx)
 	info, err := i.store.First(ctx, map[string]interface{}{
 		"service": serviceId,
 	})
-	operator := utils.UserId(ctx)
+
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
+			return 0, err
 		}
-		return i.store.Insert(ctx, &api.Doc{
+		return doc.APICount(), i.store.Insert(ctx, &api.Doc{
 			UUID:     input.ID,
 			Service:  serviceId,
 			Content:  input.Content,
@@ -109,7 +113,7 @@ func (i *imlAPIDocService) UpdateDoc(ctx context.Context, serviceId string, inpu
 	info.Updater = operator
 	info.UpdateAt = time.Now()
 	info.APICount = doc.APICount()
-	return i.store.Save(ctx, info)
+	return doc.APICount(), i.store.Save(ctx, info)
 }
 
 func (i *imlAPIDocService) GetDoc(ctx context.Context, serviceId string) (*Doc, error) {

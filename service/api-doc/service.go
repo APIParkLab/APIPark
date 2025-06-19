@@ -15,7 +15,7 @@ import (
 
 type IAPIDocService interface {
 	// UpdateDoc 更新文档
-	UpdateDoc(ctx context.Context, serviceId string, input *UpdateDoc) error
+	UpdateDoc(ctx context.Context, serviceId string, input *UpdateDoc) (int64, error)
 	// GetDoc 获取文档
 	GetDoc(ctx context.Context, serviceId string) (*Doc, error)
 

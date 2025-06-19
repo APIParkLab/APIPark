@@ -26,6 +26,12 @@ func FromEntity(e *release.Release) *Release {
 	}
 }
 
+type Update struct {
+	Version  *string
+	Remark   *string
+	APICount *int64 // API数量
+}
+
 type APICommit struct {
 	Release string
 	API     string

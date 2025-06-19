@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 
+	service_overview "github.com/APIParkLab/APIPark/service/service-overview"
+
 	ai_provider_local "github.com/APIParkLab/APIPark/ai-provider/local"
 
 	model_runtime "github.com/APIParkLab/APIPark/ai-provider/model-runtime"
@@ -35,12 +37,13 @@ var (
 )
 
 type imlAPIModule struct {
-	serviceService service.IServiceService        `autowired:""`
-	apiDocService  api_doc.IAPIDocService         `autowired:""`
-	aiAPIService   ai_api.IAPIService             `autowired:""`
-	aiModelService ai_model.IProviderModelService `autowired:""`
-	apiService     api.IAPIService                `autowired:""`
-	transaction    store.ITransaction             `autowired:""`
+	serviceService         service.IServiceService           `autowired:""`
+	serviceOverviewService service_overview.IOverviewService `autowired:""`
+	apiDocService          api_doc.IAPIDocService            `autowired:""`
+	aiAPIService           ai_api.IAPIService                `autowired:""`
+	aiModelService         ai_model.IProviderModelService    `autowired:""`
+	apiService             api.IAPIService                   `autowired:""`
+	transaction            store.ITransaction                `autowired:""`
 }
 
 func (i *imlAPIModule) getAPIDoc(ctx context.Context, serviceId string) (*openapi3.T, error) {
@@ -77,9 +80,17 @@ func (i *imlAPIModule) updateAPIDoc(ctx context.Context, serviceId, serviceName,
 	if err != nil {
 		return err
 	}
-	return i.apiDocService.UpdateDoc(ctx, serviceId, &api_doc.UpdateDoc{
-		ID:      uuid.New().String(),
-		Content: string(result),
+	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		count, err := i.apiDocService.UpdateDoc(ctx, serviceId, &api_doc.UpdateDoc{
+			ID:      uuid.New().String(),
+			Content: string(result),
+		})
+		if err != nil {
+			return fmt.Errorf("update api doc error:%v", err)
+		}
+		return i.serviceOverviewService.Update(ctx, serviceId, &service_overview.Update{
+			ApiCount: &count,
+		})
 	})
 }
 
@@ -93,10 +104,19 @@ func (i *imlAPIModule) deleteAPIDoc(ctx context.Context, serviceId string, path 
 	if err != nil {
 		return err
 	}
-	return i.apiDocService.UpdateDoc(ctx, serviceId, &api_doc.UpdateDoc{
-		ID:      uuid.New().String(),
-		Content: string(result),
+	return i.transaction.Transaction(ctx, func(ctx context.Context) error {
+		count, err := i.apiDocService.UpdateDoc(ctx, serviceId, &api_doc.UpdateDoc{
+			ID:      uuid.New().String(),
+			Content: string(result),
+		})
+		if err != nil {
+			return fmt.Errorf("update api doc error:%v", err)
+		}
+		return i.serviceOverviewService.Update(ctx, serviceId, &service_overview.Update{
+			ApiCount: &count,
+		})
 	})
+
 }
 
 func (i *imlAPIModule) Create(ctx context.Context, serviceId string, input *ai_api_dto.CreateAPI) error {
