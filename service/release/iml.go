@@ -28,6 +28,43 @@ type imlReleaseService struct {
 	releaseRuntime release.IReleaseRuntime     `autowired:""`
 }
 
+func (s *imlReleaseService) UpdateRelease(ctx context.Context, id string, update *Update) error {
+	info, err := s.releaseStore.GetByUUID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if update.Version != nil {
+		info.Name = *update.Version
+	}
+	if update.Remark != nil {
+		info.Remark = *update.Remark
+	}
+
+	_, err = s.releaseStore.Update(ctx, info)
+	return err
+}
+
+func (s *imlReleaseService) GetRunningList(ctx context.Context, serviceId ...string) ([]*Release, error) {
+	w := make(map[string]interface{})
+	if len(serviceId) > 0 {
+		w["service"] = serviceId
+	}
+	list, err := s.releaseRuntime.List(ctx, w)
+	if err != nil {
+		return nil, err
+	}
+	if len(list) == 0 {
+		return nil, nil
+	}
+	commitIds := utils.SliceToSlice(list, func(o *release.Runtime) string {
+		return o.Release
+	})
+	commits, err := s.releaseStore.List(ctx, map[string]interface{}{
+		"uuid": commitIds,
+	})
+	return utils.SliceToSlice(commits, FromEntity), err
+}
+
 func (s *imlReleaseService) GetRunningApiDocCommits(ctx context.Context, serviceIds ...string) ([]string, error) {
 	w := make(map[string]interface{})
 	if len(serviceIds) > 0 {

@@ -65,7 +65,6 @@ func (m *imlReleaseModule) latestStrategyCommits(ctx context.Context, serviceId 
 }
 
 func (m *imlReleaseModule) Create(ctx context.Context, serviceId string, input *dto.CreateInput) (string, error) {
-
 	proInfo, err := m.projectService.Check(ctx, serviceId, projectRuleMustServer)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

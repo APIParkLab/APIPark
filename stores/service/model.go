@@ -35,6 +35,22 @@ func (p *Service) TableName() string {
 	return "service"
 }
 
+type Overview struct {
+	Id              int64  `gorm:"type:BIGINT(20);size:20;not null;auto_increment;primary_key;column:id;comment:主键ID;"`
+	Service         string `gorm:"size:255;not null;column:service;comment:服务ID"`
+	ApiCount        int64  `gorm:"type:BIGINT(20);not null;column:api_count;comment:接口数量"`
+	ReleaseApiCount int64  `gorm:"type:BIGINT(20);not null;column:release_api_count;comment:已发布接口数量"`
+	IsReleased      bool   `gorm:"type:tinyint(1);not null;column:is_released;comment:是否已发布"`
+}
+
+func (o *Overview) IdValue() int64 {
+	return o.Id
+}
+
+func (o *Overview) TableName() string {
+	return "service_overview"
+}
+
 type Authorization struct {
 	Id             int64     `gorm:"type:BIGINT(20);size:20;not null;auto_increment;primary_key;column:id;comment:主键ID;"`
 	UUID           string    `gorm:"size:36;not null;column:uuid;uniqueIndex:uuid;comment:UUID;"`

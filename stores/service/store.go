@@ -13,6 +13,12 @@ type IServiceStore interface {
 type imlServiceStore struct {
 	store.SearchStore[Service]
 }
+type IOverviewStore interface {
+	store.IBaseStore[Overview]
+}
+type imlOverviewStore struct {
+	store.Store[Overview]
+}
 
 type IServiceTagStore interface {
 	store.IBaseStore[Tag]
@@ -61,6 +67,9 @@ func init() {
 		return reflect.ValueOf(new(imlServiceDocStore))
 	})
 
+	autowire.Auto[IOverviewStore](func() reflect.Value {
+		return reflect.ValueOf(new(imlOverviewStore))
+	})
 	autowire.Auto[IServiceModelMappingStore](func() reflect.Value {
 		return reflect.ValueOf(new(imlServiceModelMappingStore))
 	})
