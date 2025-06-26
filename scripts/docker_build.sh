@@ -29,9 +29,11 @@ VERSION=$(gen_version)
 
 
 SYS_ARCH=$(arch)
+echo "SYS_ARCH: ${SYS_ARCH}"
+echo "ARCH: ${ARCH}"
 if [[ (${SYS_ARCH} == "aarch64" || ${SYS_ARCH} == "arm64") && $ARCH == "amd64" ]];then
   OPTIONS="--platform=linux/amd64"
-elif [[ ${SYS_ARCH}  == "amd64" && $ARCH == "arm64" ]];then
+elif [[ (${SYS_ARCH}  == "amd64" || ${SYS_ARCH} == "x86_64") && $ARCH == "arm64" ]];then
   OPTIONS="--platform=linux/arm64"
 fi
 
