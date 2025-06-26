@@ -31,6 +31,7 @@ type EditService struct {
 	Name         *string   `json:"name"`
 	Description  *string   `json:"description"`
 	ServiceType  *string   `json:"service_type"`
+	Prefix       *string   `json:"prefix"`
 	Catalogue    *string   `json:"catalogue"`
 	Logo         *string   `json:"logo"`
 	Tags         *[]string `json:"tags"`

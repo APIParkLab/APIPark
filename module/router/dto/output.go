@@ -35,7 +35,7 @@ type Detail struct {
 	SimpleDetail
 	Proxy     *Proxy   `json:"proxy"`
 	Protocols []string `json:"protocols"`
-	Disable   bool     `json:"disabled"`
+	Disable   bool     `json:"disable"`
 	//Doc   map[string]interface{} `json:"doc"`
 }
 

@@ -46,7 +46,7 @@ func (i imlOverviewService) Update(ctx context.Context, serviceId string, update
 			Service: serviceId,
 		}
 		genUpdateFields(info, update)
-		return i.store.Insert(ctx)
+		return i.store.Insert(ctx, info)
 	}
 	genUpdateFields(info, update)
 	_, err = i.store.Update(ctx, info)
