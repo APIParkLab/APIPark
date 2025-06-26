@@ -182,6 +182,7 @@ type Edit struct {
 	AdditionalConfig *map[string]string
 	State            *int
 	ApprovalType     *ApprovalType
+	Prefix           *string
 	EnableMCP        *bool
 }
 

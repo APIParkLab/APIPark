@@ -768,7 +768,7 @@ func (i *imlServiceModule) Create(ctx context.Context, teamID string, input *ser
 		mo.AsServer = *input.AsServer
 	}
 
-	input.Prefix = strings.Trim(strings.Trim(input.Prefix, " "), "/")
+	//input.Prefix = strings.Trim(strings.Trim(input.Prefix, " "), "/")
 	err := i.transaction.Transaction(ctx, func(ctx context.Context) error {
 		if input.Tags != nil {
 			tags, err := i.getTagUuids(ctx, input.Tags)
@@ -873,6 +873,7 @@ func (i *imlServiceModule) Edit(ctx context.Context, id string, input *service_d
 			ServiceType:      serviceType,
 			Catalogue:        input.Catalogue,
 			AdditionalConfig: &info.AdditionalConfig,
+			Prefix:           input.Prefix,
 			ApprovalType:     &approvalType,
 			EnableMCP:        input.EnableMCP,
 		}

@@ -229,5 +229,8 @@ func updateHandler(e *service.Service, i *Edit) {
 	if i.EnableMCP != nil {
 		e.EnableMCP = *i.EnableMCP
 	}
+	//if i.Prefix != nil {
+	//	e.Prefix = *i.Prefix
+	//}
 	e.UpdateAt = time.Now()
 }
