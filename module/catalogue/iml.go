@@ -78,55 +78,6 @@ type imlCatalogueModule struct {
 	root                   *Root
 }
 
-//func (i *imlCatalogueModule) OnInit() {
-//	register.Handle(func(v server.Server) {
-//		ctx := context.Background()
-//		list, err := i.releaseService.GetRunningList(ctx)
-//		if err != nil {
-//			log.Errorf("onInit: get running list failed:%s", err.Error())
-//			return
-//		}
-//		if len(list) < 1 || list[0].APICount > 0 {
-//			return
-//		}
-//		serviceMap := make(map[string]*release.Release)
-//		serviceIds := make([]string, 0, len(list))
-//		for _, v := range list {
-//			if _, ok := serviceMap[v.Service]; !ok {
-//				serviceMap[v.Service] = v
-//				serviceIds = append(serviceIds, v.Service)
-//			}
-//		}
-//		if len(serviceIds) < 1 {
-//			return
-//		}
-//		commitIds, err := i.releaseService.GetRunningApiDocCommits(ctx, serviceIds...)
-//		if err != nil {
-//			log.Errorf("onInit: get running api doc commits failed:%s", err.Error())
-//			return
-//		}
-//		if len(commitIds) < 1 {
-//			return
-//		}
-//		listCommits, err := i.apiDocService.ListDocCommit(ctx, commitIds...)
-//		if err != nil {
-//			log.Error("onInit: list doc commit failed:", err.Error())
-//			return
-//		}
-//		for _, v := range listCommits {
-//			m, ok := serviceMap[v.Target]
-//			if !ok {
-//				continue
-//			}
-//
-//			i.releaseService.UpdateRelease(ctx, m.UUID, &release.Update{
-//				APICount: &v.Data.APICount,
-//			})
-//		}
-//	})
-//
-//}
-
 func (i *imlCatalogueModule) DefaultCatalogue(ctx context.Context) (*catalogue_dto.Catalogue, error) {
 	catalogues, err := i.catalogueService.List(ctx)
 	if err != nil {

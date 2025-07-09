@@ -59,7 +59,7 @@ type Doc struct {
 	Content  string    `gorm:"type:longtext;null;column:content;comment:文档内容"`
 	Updater  string    `gorm:"size:36;not null;column:updater;comment:更新人;index:updater" aovalue:"updater"`
 	UpdateAt time.Time `gorm:"type:timestamp;NOT NULL;DEFAULT:CURRENT_TIMESTAMP;column:update_at;comment:更新时间"`
-	APICount int64     `gorm:"type:int(11);not null;column:api_count;comment:接口数量"`
+	APICount int64     `gorm:"type:int(11);not null;column:api_count;default:0;comment:接口数量"`
 }
 
 func (i *Doc) TableName() string {

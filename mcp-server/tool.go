@@ -2,7 +2,6 @@ package mcp_server
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,36 +15,38 @@ import (
 )
 
 type ITool interface {
-	RegisterMCP(s *server.MCPServer)
+	Tool() server.ServerTool
 }
-
-const (
-	MCPBody   = "Body"
-	MCPHeader = "Header"
-	MCPQuery  = "Query"
-	MCPPath   = "Path"
-)
 
 type Tool struct {
 	name        string
 	url         string
 	method      string
 	contentType string
+	params      map[string]*Param
 	opts        []mcp.ToolOption
 }
 
-func NewTool(name string, uri string, method string, contentType string, opts ...mcp.ToolOption) ITool {
+func (t *Tool) Tool() server.ServerTool {
+	return server.ServerTool{
+		Tool:    mcp.NewTool(t.name, t.opts...),
+		Handler: generateInvokeTool(t.url, t.method, t.contentType, t.params),
+	}
+}
+
+func NewTool(name string, uri string, method string, contentType string, params map[string]*Param, opts ...mcp.ToolOption) ITool {
 	return &Tool{
 		name:        name,
 		url:         uri,
 		method:      method,
 		contentType: contentType,
+		params:      params,
 		opts:        opts,
 	}
 }
 
-func (t *Tool) RegisterMCP(s *server.MCPServer) {
-	s.AddTool(mcp.NewTool(t.name, t.opts...), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func generateInvokeTool(path string, method string, contentType string, params map[string]*Param) func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		invokeAddress := utils.GatewayInvoke(ctx)
 		if invokeAddress == "" {
 			return nil, fmt.Errorf("invoke address is empty")
@@ -58,69 +59,54 @@ func (t *Tool) RegisterMCP(s *server.MCPServer) {
 			u.Scheme = "http"
 		}
 
-		path := t.url
 		queries := url.Values{}
 		headers := make(map[string]string)
-		body := ""
-		for k, v := range request.Params.Arguments {
-			if k == "Body" {
-				switch a := v.(type) {
-				case string:
-					body = a
-				case map[string]interface{}:
-					switch t.contentType {
-					case "application/json":
-						tmp, _ := json.Marshal(a)
-						body = string(tmp)
-					case "application/x-www-form-urlencoded":
-						bodyValue := url.Values{}
-						for kk, vv := range a {
-							bodyValue.Set(kk, fmt.Sprintf("%v", vv))
-						}
-						body = bodyValue.Encode()
+		bodyParam := NewBodyParam(contentType)
+		for k, p := range params {
+			vv, ok := request.GetArguments()[k]
+			if !ok && p.required {
+				return nil, fmt.Errorf("param %s is required", k)
+			}
+			if p.position == PositionHeader || p.position == PositionQuery || p.position == PositionPath {
+				v, ok := vv.(string)
+				if !ok || v == "<nil>" {
+					if p.required {
+						return nil, fmt.Errorf("param %s is required", k)
 					}
-				default:
-					tmp, _ := json.Marshal(a)
-					body = string(tmp)
+					continue
 				}
-				continue
 			}
-			tmp, ok := v.(map[string]interface{})
-			if !ok {
-				continue
-			}
-			switch k {
-			case MCPHeader:
-				for kk, vv := range tmp {
-					headers[kk] = fmt.Sprintf("%v", vv)
-				}
 
-			case MCPQuery:
-				for kk, vv := range tmp {
-					queries.Set(kk, fmt.Sprintf("%v", vv))
+			switch p.position {
+			case PositionPath:
+				path = strings.ReplaceAll(path, "{"+k+"}", fmt.Sprintf("%v", vv))
+			case PositionQuery:
+				queries.Set(k, fmt.Sprintf("%v", vv))
+			case PositionHeader:
+				headers[k] = fmt.Sprintf("%v", vv)
+			case PositionBody:
+				if vv == nil {
+					continue
 				}
-			case MCPPath:
-				for kk, vv := range tmp {
-					p, ok := vv.(string)
-					if !ok {
-						return nil, fmt.Errorf("invalid path %s", v)
-					}
-					path = strings.Replace(path, fmt.Sprintf("{%s}", kk), p, -1)
-				}
+				bodyParam.Set(k, vv)
 			}
+		}
+		bodyData, err := bodyParam.Encode()
+		if err != nil {
+			return nil, err
 		}
 		u.Path = path
 		u.RawQuery = queries.Encode()
 
-		req, err := http.NewRequest(t.method, u.String(), strings.NewReader(body))
+		req, err := http.NewRequest(method, u.String(), strings.NewReader(bodyData))
 		if err != nil {
 			return nil, err
 		}
 		for k, v := range headers {
 			req.Header.Set(k, v)
 		}
-		if t.contentType != "" {
-			req.Header.Set("Content-Type", t.contentType)
+		if contentType != "" {
+			req.Header.Set("Content-Type", contentType)
 		}
 		apikey := utils.Label(ctx, "apikey")
 		if apikey != "" {
@@ -141,7 +127,5 @@ func (t *Tool) RegisterMCP(s *server.MCPServer) {
 		}
 
 		return mcp.NewToolResultText(string(d)), nil
-	})
+	}
 }
-
-var client = http.Client{}

@@ -190,6 +190,7 @@ func (i *imlMcpController) OnComplete() {
 	i.server["ja-JP"] = server.NewSSEServer(i.generateJPMCPServer(), server.WithBasePath(fmt.Sprintf("/api/v1/%s", mcp_server.GlobalBasePath)))
 
 	i.openServer = server.NewSSEServer(enSer, server.WithBasePath(fmt.Sprintf("/openapi/v1/%s", strings.Trim(mcp_server.GlobalBasePath, "/"))))
+
 }
 
 func (i *imlMcpController) GlobalMCPHandle(ctx *gin.Context) {
@@ -261,6 +262,28 @@ func (i *imlMcpController) ServiceHandleSSE(ctx *gin.Context) {
 
 func (i *imlMcpController) ServiceHandleMessage(ctx *gin.Context) {
 	i.handleMessage(ctx, mcp_server.DefaultMCPServer())
+}
+
+func (i *imlMcpController) ServiceHandleStreamHTTP(ctx *gin.Context) {
+	apikey := ctx.Request.URL.Query().Get("apikey")
+	serviceId := ctx.Param("serviceId")
+	if serviceId == "" {
+		ctx.AbortWithStatusJSON(403, gin.H{"code": -1, "msg": "invalid service id", "success": "fail"})
+		return
+	}
+	ok, err := i.authorizationModule.CheckAPIKeyAuthorization(ctx, serviceId, apikey)
+	if err != nil {
+		ctx.AbortWithStatusJSON(403, gin.H{"code": -1, "msg": err.Error(), "success": "fail"})
+		return
+	}
+	if !ok {
+		ctx.AbortWithStatusJSON(403, gin.H{"code": -1, "msg": "invalid apikey", "success": "fail"})
+		return
+	}
+	cfg := i.settingModule.Get(ctx)
+	req := ctx.Request.WithContext(utils.SetGatewayInvoke(ctx.Request.Context(), cfg.InvokeAddress))
+	req = req.WithContext(utils.SetLabel(req.Context(), "apikey", apikey))
+	mcp_server.DefaultMCPServer().ServeHTTP(ctx.Writer, req)
 }
 
 func (i *imlMcpController) handleMessage(ctx *gin.Context, server http.Handler) {

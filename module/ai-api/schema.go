@@ -7,7 +7,7 @@ import (
 
 func genOpenAPI3Template(title string, description string) *openapi3.T {
 	result := new(openapi3.T)
-	result.OpenAPI = "3.1.0"
+	result.OpenAPI = "3.0.1"
 	result.Info = &openapi3.Info{
 		Title:       title,
 		Description: description,
@@ -37,6 +37,8 @@ func genOperation(summary string, description string, variables []*ai_api_dto.Ai
 
 func genRequestBody(variables []*ai_api_dto.AiPromptVariable) *openapi3.RequestBodyRef {
 	requestBody := openapi3.NewRequestBody()
+	requestBody.Description = "Request body"
+	requestBody.Required = true
 	requestBody.Content = openapi3.NewContentWithSchema(genRequestBodySchema(variables), []string{"application/json"})
 	return &openapi3.RequestBodyRef{
 		Value: requestBody,
@@ -55,10 +57,14 @@ func genResponse() *openapi3.ResponseRef {
 
 func genRequestBodySchema(variables []*ai_api_dto.AiPromptVariable) *openapi3.Schema {
 	result := openapi3.NewObjectSchema()
+	required := make([]string, 0, 2)
+	required = append(required, "messages")
 	if len(variables) > 0 {
 		result.WithProperty("variables", genVariableSchema(variables))
-		result.WithRequired([]string{"variables", "messages"})
+		required = append(required, "variables")
 	}
+
+	result.WithRequired(required)
 	streamSchema := openapi3.NewBoolSchema()
 	streamSchema.Title = "stream"
 	streamSchema.Description = "Whether to stream the response"
@@ -129,6 +135,8 @@ func genMessageSchema() *openapi3.Schema {
 		"role":    roleSchema,
 		"content": contentSchema,
 	})
+
+	result.WithRequired([]string{"role", "content"})
 	return result
 }
 
@@ -137,20 +145,21 @@ func genMessagesSchema() *openapi3.Schema {
 	result.Title = "Messages"
 	result.Description = "Chat Messages"
 	result.Items = openapi3.NewSchemaRef("#/components/schemas/Message", messageSchema)
+	result.Required = []string{"content", "role"}
 	return result
 }
 
 func genResponseSchema() *openapi3.Schema {
 	result := openapi3.NewObjectSchema()
 	result.Description = "Response from the server"
-	
+
 	// 创建 choices 数组
 	choicesSchema := openapi3.NewArraySchema()
 	choiceItemSchema := openapi3.NewObjectSchema()
-	
+
 	// choice 中的 message 字段
 	choiceItemSchema.WithPropertyRef("message", messageSchemaRef)
-	
+
 	// finish_reason 字段
 	finishReasonSchema := openapi3.NewStringSchema().WithEnum(
 		"stop",
@@ -160,41 +169,41 @@ func genResponseSchema() *openapi3.Schema {
 		"null",
 	)
 	choiceItemSchema.WithProperty("finish_reason", finishReasonSchema)
-	
+
 	// index 字段
 	choiceItemSchema.WithProperty("index", openapi3.NewIntegerSchema())
-	
+
 	// logprobs 字段，可以为 null
 	choiceItemSchema.WithProperty("logprobs", openapi3.NewSchema().WithNullable())
-	
+
 	choicesSchema.Items = &openapi3.SchemaRef{Value: choiceItemSchema}
 	result.WithProperty("choices", choicesSchema)
-	
+
 	// object 字段
 	result.WithProperty("object", openapi3.NewStringSchema().WithEnum("chat.completion"))
-	
+
 	// usage 字段
 	usageSchema := openapi3.NewObjectSchema()
 	usageSchema.WithProperty("prompt_tokens", openapi3.NewIntegerSchema())
 	usageSchema.WithProperty("completion_tokens", openapi3.NewIntegerSchema())
 	usageSchema.WithProperty("total_tokens", openapi3.NewIntegerSchema())
-	
+
 	// prompt_tokens_details 字段
 	promptTokensDetailsSchema := openapi3.NewObjectSchema()
 	promptTokensDetailsSchema.WithProperty("cached_tokens", openapi3.NewIntegerSchema())
 	usageSchema.WithProperty("prompt_tokens_details", promptTokensDetailsSchema)
-	
+
 	result.WithProperty("usage", usageSchema)
-	
+
 	// 其他字段
 	result.WithProperty("created", openapi3.NewIntegerSchema())
 	result.WithProperty("system_fingerprint", openapi3.NewStringSchema().WithNullable())
 	result.WithProperty("model", openapi3.NewStringSchema())
 	result.WithProperty("id", openapi3.NewStringSchema())
-	
+
 	// 保留原有的错误字段
 	result.WithProperty("code", openapi3.NewIntegerSchema())
 	result.WithProperty("error", openapi3.NewStringSchema())
-	
+
 	return result
 }

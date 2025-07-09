@@ -15,8 +15,6 @@ import (
 
 	mcp_server "github.com/APIParkLab/APIPark/mcp-server"
 	api_doc "github.com/APIParkLab/APIPark/service/api-doc"
-	"github.com/mark3labs/mcp-go/mcp"
-	"github.com/mitchellh/mapstructure"
 
 	strategy_driver "github.com/APIParkLab/APIPark/module/strategy/driver"
 	strategy_dto "github.com/APIParkLab/APIPark/module/strategy/dto"
@@ -657,68 +655,7 @@ func (i *imlPublishModule) updateMCPServer(ctx context.Context, sid string, name
 	if err != nil {
 		return fmt.Errorf("get api doc commit error: %w", err)
 	}
-	mcpInfo, err := mcp_server.ConvertMCPFromOpenAPI3Data([]byte(commitDoc.Data.Content))
-	if err != nil {
-		return fmt.Errorf("convert mcp from openapi3 data error: %w", err)
-	}
-	tools := make([]mcp_server.ITool, 0, len(mcpInfo.Apis))
-	for _, a := range mcpInfo.Apis {
-		toolOptions := make([]mcp.ToolOption, 0, len(a.Params)+2)
-		toolOptions = append(toolOptions, mcp.WithDescription(a.Description))
-		headers := make(map[string]interface{})
-		queries := make(map[string]interface{})
-		path := make(map[string]interface{})
-		for _, v := range a.Params {
-			p := map[string]interface{}{
-				"type":        "string",
-				"required":    v.Required,
-				"description": v.Description,
-			}
-			switch v.In {
-			case "header":
-				headers[v.Name] = p
-			case "query":
-				queries[v.Name] = p
-			case "path":
-				path[v.Name] = p
-			}
-		}
-		if len(headers) > 0 {
-			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPHeader, mcp.Properties(headers), mcp.Description("request headers.")))
-		}
-		if len(queries) > 0 {
-			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPQuery, mcp.Properties(queries), mcp.Description("request queries.")))
-		}
-		if len(path) > 0 {
-			toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPPath, mcp.Properties(path), mcp.Description("request path params.")))
-		}
-		if a.Body != nil {
-			type Schema struct {
-				Type       string                 `mapstructure:"type"`
-				Properties map[string]interface{} `mapstructure:"properties"`
-				Items      interface{}            `mapstructure:"items"`
-			}
-			var tmp Schema
-			err = mapstructure.Decode(a.Body, &tmp)
-			if err != nil {
-				return err
-			}
-			//switch a.ContentType {
-			//case "application/json":
-			switch tmp.Type {
-			case "object":
-				toolOptions = append(toolOptions, mcp.WithObject(mcp_server.MCPBody, mcp.Properties(tmp.Properties), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
-			case "array":
-				toolOptions = append(toolOptions, mcp.WithArray(mcp_server.MCPBody, mcp.Items(tmp.Items), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
-			}
-			//case "application/x-www-form-urlencoded":
-			//	toolOptions = append(toolOptions, mcp.WithString(mcp_server.MCPBody, mcp.Items(tmp.Items), mcp.Description("request body,it is avalible when method is POST、PUT、PATCH.")))
-
-		}
-		tools = append(tools, mcp_server.NewTool(a.Summary, a.Path, a.Method, a.ContentType, toolOptions...))
-	}
-	mcp_server.SetSSEServer(sid, name, version, tools...)
-	return nil
+	return mcp_server.SetServerByOpenapi(sid, name, version, commitDoc.Data.Content)
 }
 
 func (i *imlPublishModule) Detail(ctx context.Context, serviceId string, id string) (*dto.PublishDetail, error) {

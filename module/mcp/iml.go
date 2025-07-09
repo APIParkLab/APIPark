@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/APIParkLab/APIPark/service/subscribe"
 
@@ -48,7 +47,7 @@ type imlMcpModule struct {
 }
 
 func (i *imlMcpModule) Services(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	keyword, _ := req.Params.Arguments["keyword"].(string)
+	keyword, _ := req.GetArguments()["keyword"].(string)
 	list, err := i.serviceService.Search(ctx, keyword, map[string]interface{}{
 		"as_server": true,
 	}, "update_at desc")
@@ -116,34 +115,34 @@ func (i *imlMcpModule) Services(ctx context.Context, req mcp.CallToolRequest) (*
 
 }
 
-func (i *imlMcpModule) Apps(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	keyword := req.Params.Arguments["keyword"].(string)
-	condition := make(map[string]interface{})
-	condition["as_app"] = true
-	list, err := i.serviceService.Search(ctx, keyword, condition, "update_at desc")
-	if err != nil {
-		return nil, fmt.Errorf("search service error: %w", err)
-	}
-	if len(list) == 0 {
-		list, err = i.serviceService.Search(ctx, "", condition, "update_at desc")
-		if err != nil {
-			return nil, fmt.Errorf("search service error: %w", err)
-		}
-	}
-	data, _ := json.Marshal(utils.SliceToSlice(list, func(s *service.Service) *mcp_dto.App {
-		return &mcp_dto.App{
-			Id:          s.Id,
-			Name:        s.Name,
-			Description: s.Name,
-			CreateTime:  s.CreateTime,
-			UpdateTime:  s.UpdateTime,
-		}
-	}))
-	return mcp.NewToolResultText(string(data)), nil
-}
+//func (i *imlMcpModule) Apps(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+//	keyword := req.GetArguments()["keyword"].(string)
+//	condition := make(map[string]interface{})
+//	condition["as_app"] = true
+//	list, err := i.serviceService.Search(ctx, keyword, condition, "update_at desc")
+//	if err != nil {
+//		return nil, fmt.Errorf("search service error: %w", err)
+//	}
+//	if len(list) == 0 {
+//		list, err = i.serviceService.Search(ctx, "", condition, "update_at desc")
+//		if err != nil {
+//			return nil, fmt.Errorf("search service error: %w", err)
+//		}
+//	}
+//	data, _ := json.Marshal(utils.SliceToSlice(list, func(s *service.Service) *mcp_dto.App {
+//		return &mcp_dto.App{
+//			Id:          s.Id,
+//			Name:        s.Name,
+//			Description: s.Name,
+//			CreateTime:  s.CreateTime,
+//			UpdateTime:  s.UpdateTime,
+//		}
+//	}))
+//	return mcp.NewToolResultText(string(data)), nil
+//}
 
 func (i *imlMcpModule) APIs(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	serviceId, _ := req.Params.Arguments["service"].(string)
+	serviceId, _ := req.GetArguments()["service"].(string)
 	serviceIds := make([]string, 0, 1)
 	if serviceId == "" {
 		serviceIds = append(serviceIds, serviceId)
@@ -190,45 +189,45 @@ func (i *imlMcpModule) APIs(ctx context.Context, req mcp.CallToolRequest) (*mcp.
 	return mcp.NewToolResultText(string(data)), nil
 }
 
-func (i *imlMcpModule) SubscriberAuthorizations(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	serviceId, ok := req.Params.Arguments["service"].(string)
-	if !ok {
-		return nil, fmt.Errorf("service id is required")
-	}
-	subscribes, err := i.subscriberService.Subscribers(ctx, serviceId, subscribe.ApplyStatusSubscribe)
-	if err != nil {
-		return nil, fmt.Errorf("get subscriber error: %w,service id is %s", err, serviceId)
-	}
-	appIds := utils.SliceToSlice(subscribes, func(s *subscribe.Subscribe) string {
-		return s.Application
-	})
-	if len(appIds) == 0 {
-		return nil, fmt.Errorf("no subscriber found,service id is %s", serviceId)
-	}
-	list, err := i.appAuthorizationService.ListByApp(ctx, appIds...)
-	if err != nil {
-		return nil, fmt.Errorf("get app authorization error: %w,app ids is %s", err, appIds)
-	}
-	result := utils.SliceToSlice(list, func(a *application_authorization.Authorization) *mcp_dto.AppAuthorization {
-		return &mcp_dto.AppAuthorization{
-			Id:        a.UUID,
-			Name:      a.Name,
-			Position:  a.Position,
-			TokenName: a.TokenName,
-			Config:    a.Config,
-		}
-	}, func(a *application_authorization.Authorization) bool {
-		if a.Type != "apikey" {
-			return false
-		}
-		if a.ExpireTime != 0 && a.ExpireTime < time.Now().Unix() {
-			return false
-		}
-		return true
-	})
-	data, _ := json.Marshal(result)
-	return mcp.NewToolResultText(string(data)), nil
-}
+//func (i *imlMcpModule) SubscriberAuthorizations(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+//	serviceId, ok := req.GetArguments()["service"].(string)
+//	if !ok {
+//		return nil, fmt.Errorf("service id is required")
+//	}
+//	subscribes, err := i.subscriberService.Subscribers(ctx, serviceId, subscribe.ApplyStatusSubscribe)
+//	if err != nil {
+//		return nil, fmt.Errorf("get subscriber error: %w,service id is %s", err, serviceId)
+//	}
+//	appIds := utils.SliceToSlice(subscribes, func(s *subscribe.Subscribe) string {
+//		return s.Application
+//	})
+//	if len(appIds) == 0 {
+//		return nil, fmt.Errorf("no subscriber found,service id is %s", serviceId)
+//	}
+//	list, err := i.appAuthorizationService.ListByApp(ctx, appIds...)
+//	if err != nil {
+//		return nil, fmt.Errorf("get app authorization error: %w,app ids is %s", err, appIds)
+//	}
+//	result := utils.SliceToSlice(list, func(a *application_authorization.Authorization) *mcp_dto.AppAuthorization {
+//		return &mcp_dto.AppAuthorization{
+//			Id:        a.UUID,
+//			Name:      a.Name,
+//			position:  a.position,
+//			TokenName: a.TokenName,
+//			Config:    a.Config,
+//		}
+//	}, func(a *application_authorization.Authorization) bool {
+//		if a.Type != "apikey" {
+//			return false
+//		}
+//		if a.ExpireTime != 0 && a.ExpireTime < time.Now().Unix() {
+//			return false
+//		}
+//		return true
+//	})
+//	data, _ := json.Marshal(result)
+//	return mcp.NewToolResultText(string(data)), nil
+//}
 
 var (
 	client = &http.Client{}
@@ -248,18 +247,18 @@ func (i *imlMcpModule) Invoke(ctx context.Context, req mcp.CallToolRequest) (*mc
 		u.Scheme = "http"
 	}
 
-	path, ok := req.Params.Arguments["path"].(string)
+	path, ok := req.GetArguments()["path"].(string)
 	if !ok {
 		return nil, fmt.Errorf("invalid path")
 	}
 	u.Path = fmt.Sprintf("%s/%s", strings.TrimSuffix(u.Path, "/"), strings.TrimPrefix(path, "/"))
 
-	method, ok := req.Params.Arguments["method"].(string)
+	method, ok := req.GetArguments()["method"].(string)
 	if !ok {
 		method = "GET"
 	}
 	queryParam := url.Values{}
-	query, ok := req.Params.Arguments["query"].(map[string]interface{})
+	query, ok := req.GetArguments()["query"].(map[string]interface{})
 	if ok {
 		for k, v := range query {
 			switch v := v.(type) {
@@ -278,7 +277,7 @@ func (i *imlMcpModule) Invoke(ctx context.Context, req mcp.CallToolRequest) (*mc
 	}
 	u.RawQuery = queryParam.Encode()
 	headerParam := http.Header{}
-	header, ok := req.Params.Arguments["header"].(map[string]interface{})
+	header, ok := req.GetArguments()["header"].(map[string]interface{})
 	if ok {
 		for k, v := range header {
 			switch v := v.(type) {
@@ -294,12 +293,12 @@ func (i *imlMcpModule) Invoke(ctx context.Context, req mcp.CallToolRequest) (*mc
 		}
 	}
 
-	body, ok := req.Params.Arguments["body"].(string)
+	body, ok := req.GetArguments()["body"].(string)
 	if !ok {
 		body = ""
 	}
 
-	contentType, ok := req.Params.Arguments["content-type"].(string)
+	contentType, ok := req.GetArguments()["content-type"].(string)
 	if !ok {
 		contentType = "application/json"
 	}

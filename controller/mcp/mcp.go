@@ -15,6 +15,7 @@ type IMcpController interface {
 	ServiceHandleSSE(ctx *gin.Context)
 	ServiceHandleMessage(ctx *gin.Context)
 	GlobalMCPConfig(ctx *gin.Context) (string, error)
+	ServiceHandleStreamHTTP(ctx *gin.Context)
 }
 
 func init() {
