@@ -15,15 +15,23 @@ func (p *plugin) mcpAPIs() []pm3.Api {
 	globalMessagePath := fmt.Sprintf("/openapi/v1/%s/message", strings.Trim(mcp_server.GlobalBasePath, "/"))
 	serviceMessagePath := fmt.Sprintf("/openapi/v1/%s/:serviceId/message", strings.Trim(mcp_server.ServiceBasePath, "/"))
 	serviceSSEPath := fmt.Sprintf("/openapi/v1/%s/:serviceId/sse", strings.Trim(mcp_server.ServiceBasePath, "/"))
+	serviceStreamablePath := fmt.Sprintf("/openapi/v1/%s/:serviceId/mcp", strings.Trim(mcp_server.ServiceBasePath, "/"))
 	ignore.IgnorePath("openapi", http.MethodPost, globalMessagePath)
-
 	ignore.IgnorePath("openapi", http.MethodGet, serviceSSEPath)
 	ignore.IgnorePath("openapi", http.MethodPost, serviceMessagePath)
+	ignore.IgnorePath("openapi", http.MethodGet, serviceStreamablePath)
+	ignore.IgnorePath("openapi", http.MethodPost, serviceStreamablePath)
+	ignore.IgnorePath("openapi", http.MethodDelete, serviceStreamablePath)
 
 	return []pm3.Api{
 		pm3.CreateApiSimple(http.MethodGet, fmt.Sprintf("/openapi/v1/%s/sse", strings.Trim(mcp_server.GlobalBasePath, "/")), p.mcpController.GlobalHandleSSE),
 		pm3.CreateApiSimple(http.MethodPost, globalMessagePath, p.mcpController.GlobalHandleMessage),
 		pm3.CreateApiSimple(http.MethodGet, serviceSSEPath, p.mcpController.ServiceHandleSSE),
 		pm3.CreateApiSimple(http.MethodPost, serviceMessagePath, p.mcpController.ServiceHandleMessage),
+
+		pm3.CreateApiSimple(http.MethodPost, serviceStreamablePath, p.mcpController.ServiceHandleStreamHTTP),
+		pm3.CreateApiSimple(http.MethodDelete, serviceStreamablePath, p.mcpController.ServiceHandleStreamHTTP),
+		pm3.CreateApiSimple(http.MethodGet, serviceStreamablePath, p.mcpController.ServiceHandleStreamHTTP),
 	}
+
 }

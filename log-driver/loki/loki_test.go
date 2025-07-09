@@ -33,12 +33,12 @@ func TestLoki(t *testing.T) {
 //	headers["Content-Type"] = "application/json"
 //	headers["X-Scope-OrgID"] = "tenant1"
 //	queries := url.Values{}
-//	queries.Set("query", "{cluster=\"apinto\"} | json | request_id = `c9f6b19c-7dfe-496b-9b39-4d049232fe95`")
+//	queries.SetMCPServer("query", "{cluster=\"apinto\"} | json | request_id = `c9f6b19c-7dfe-496b-9b39-4d049232fe95`")
 //	now := time.Now()
 //	start := now.Add(-time.Hour * 24 * 30)
-//	queries.Set("start", strconv.FormatInt(start.UnixNano(), 10))
-//	queries.Set("end", strconv.FormatInt(now.UnixNano(), 10))
-//	queries.Set("limit", "100")
+//	queries.SetMCPServer("start", strconv.FormatInt(start.UnixNano(), 10))
+//	queries.SetMCPServer("end", strconv.FormatInt(now.UnixNano(), 10))
+//	queries.SetMCPServer("limit", "100")
 //	a := time.Now()
 //	result, err := send[LogInfo](http.MethodGet, "http://localhost:3100/loki/api/v1/query_range", headers, queries, "")
 //	if err != nil {
@@ -57,8 +57,8 @@ func TestLoki(t *testing.T) {
 //	headers["Content-Type"] = "application/json"
 //	headers["X-Scope-OrgID"] = "tenant1"
 //	queries := url.Values{}
-//	//queries.Set("query", "sum(count_over_time({cluster=\"apinto\"}[24h])) by (strategy)")
-//	queries.Set("query", "sum(count_over_time({cluster=\"apinto\"}[24h]))")
+//	//queries.SetMCPServer("query", "sum(count_over_time({cluster=\"apinto\"}[24h])) by (strategy)")
+//	queries.SetMCPServer("query", "sum(count_over_time({cluster=\"apinto\"}[24h]))")
 //	result, err := send[LogCount](http.MethodGet, "http://localhost:3100/loki/api/v1/query", headers, queries, "")
 //	if err != nil {
 //		t.Fatalf("failed to send request: %v", err)
@@ -75,12 +75,12 @@ func TestLoki(t *testing.T) {
 //	headers["Content-Type"] = "application/json"
 //	headers["X-Scope-OrgID"] = "tenant1"
 //	queries := url.Values{}
-//	queries.Set("query", "{cluster=\"apinto\"} | json | strategy=\"03899736-5d79-4f26-bd6a-c312a5880780\"")
+//	queries.SetMCPServer("query", "{cluster=\"apinto\"} | json | strategy=\"03899736-5d79-4f26-bd6a-c312a5880780\"")
 //	now := time.Now()
 //	start := now.Add(-time.Hour * 24 * 30)
-//	queries.Set("start", strconv.FormatInt(start.UnixNano(), 10))
-//	queries.Set("end", strconv.FormatInt(now.UnixNano(), 10))
-//	queries.Set("limit", "1")
+//	queries.SetMCPServer("start", strconv.FormatInt(start.UnixNano(), 10))
+//	queries.SetMCPServer("end", strconv.FormatInt(now.UnixNano(), 10))
+//	queries.SetMCPServer("limit", "1")
 //	now = time.Now()
 //	result, err := send[map[string]interface{}](http.MethodGet, "http://localhost:3100/loki/api/v1/query_range", headers, queries, "")
 //	t.LogItem(time.Now().Sub(now))
