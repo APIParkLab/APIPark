@@ -27,6 +27,20 @@ const Login: FC = () => {
   const [feishuAppId, setFeishuAppId] = useState<string>()
   // 获取 url 参数
   const query = new URLSearchParams(useLocation().search)
+  // 是否是飞书登录
+  const [isFeishuLogin, setIsFeishuLogin] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (isFeishuLogin) {
+      const callbackUrl = new URLSearchParams(window.location.search).get('callbackUrl')
+      if (callbackUrl && callbackUrl !== 'null') {
+        navigate(callbackUrl)
+      } else {
+        navigate(state.mainPage)
+      }
+      setIsFeishuLogin(false)
+    }
+  }, [isFeishuLogin])
   /**
    * 飞书登录
    * @param feishuCode 飞书 code
@@ -45,14 +59,10 @@ const Login: FC = () => {
 
       if (code === STATUS_CODE.SUCCESS) {
         dispatch({ type: 'LOGIN' })
-        const callbackUrl = new URLSearchParams(window.location.search).get('callbackUrl')
-        if (callbackUrl && callbackUrl !== 'null') {
-          navigate(callbackUrl)
-        } else {
-          navigate(state.mainPage)
-        }
+        setIsFeishuLogin(true)
       } else {
         dispatch({ type: 'LOGOUT' })
+        setIsFeishuLogin(false)
         message.error(msg)
       }
     } catch (err) {
