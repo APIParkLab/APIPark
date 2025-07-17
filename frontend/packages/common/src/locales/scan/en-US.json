@@ -984,5 +984,7 @@
   "K50693bd8": "Enable Authorization",
   "K682b11cb": "Feishu Authorization Login",
   "K45c99f97": "The APP ID parameter can be found on the App Credentials and Basic Information page in the Feishu Developer Console",
-  "K56e77c4": "The APP Secret parameter can be found on the App Credentials and Basic Information page in the Feishu Developer Console"
+  "K56e77c4": "The APP Secret parameter can be found on the App Credentials and Basic Information page in the Feishu Developer Console",
+  "Kf7b54a1": "API Key not configured",
+  "K2a1422d2": "Configure"
 }
