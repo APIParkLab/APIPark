@@ -187,7 +187,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
         }
       })
       .catch((errorInfo) => {
-        message.error(errorInfo || $t(RESPONSE_TIPS.error))
+        message.error(errorInfo?.toString() || $t(RESPONSE_TIPS.error))
       })
   }
 
@@ -215,7 +215,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
         }
       })
       .catch((errorInfo) => {
-        message.error(errorInfo || $t(RESPONSE_TIPS.error))
+        message.error(errorInfo?.toString() || $t(RESPONSE_TIPS.error))
       })
   }
 
@@ -256,7 +256,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
         }
       })
       .catch((errorInfo) => {
-        message.error(errorInfo || $t(RESPONSE_TIPS.error))
+        message.error(errorInfo?.toString() || $t(RESPONSE_TIPS.error))
       })
   }
   
@@ -297,7 +297,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
         }
       })
       .catch((errorInfo) => {
-        message.error(errorInfo || $t(RESPONSE_TIPS.error))
+        message.error(errorInfo?.toString() || $t(RESPONSE_TIPS.error))
       })
   }
 
@@ -588,7 +588,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
                 <div className="tab-content font-semibold my-[10px]">API Key</div>
                 {apiKeyList.length ? (
                   <>
-                    {type === 'global' || type === 'consumer' ? (
+                    {type === 'global' ? (
                       <>
                         <Select
                           showSearch
