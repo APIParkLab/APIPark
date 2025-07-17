@@ -34,7 +34,7 @@ const Auth = () => {
   }, [state.language])
   const onFinish = () => {
     form.validateFields().then((value) => {
-      return fetchData<BasicResponse<null>>(`/account/third/${value.authType}`, {
+      return fetchData<BasicResponse<null>>(`account/third/${value.authType}`, {
         method: 'POST',
         eoBody: {
           enable: value.enabled,
@@ -71,7 +71,7 @@ const Auth = () => {
           value: string
         }[]
       }>
-    >('/account/third', {
+    >('account/third', {
       method: 'GET',
     }).then((response) => {
       const { code, data, msg } = response
@@ -87,7 +87,7 @@ const Auth = () => {
    * 获取第三方授权配置
    */
   const getThirdPartyAuthSetting = () => {
-    fetchData<BasicResponse<{ info: AuthSetting }>>(`/account/third/${form.getFieldValue('authType')}`, {
+    fetchData<BasicResponse<{ info: AuthSetting }>>(`account/third/${form.getFieldValue('authType')}`, {
       method: 'GET',
       eoTransformKeys: ['client_id', 'client_secret']
     }).then((response) => {

@@ -226,6 +226,10 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
     navigator('/mcpKey')
   }
 
+  const dropAuthPage = () => {
+    navigator(`/consumer/${consumerParams?.teamId}/inside/${consumerParams?.consumerId}/authorization`)
+  }
+
   /**
    * 获取全局 API Key 列表
    */
@@ -492,7 +496,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
             </div>
           </div>
         )}
-        {type === 'service' && !apiKeyList.length ? (
+        {(type === 'service' || type === 'consumer') && !apiKeyList.length ? (
           <>
             <Card
               style={{ borderRadius: '10px' }}
@@ -501,12 +505,23 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
                 body: 'p-[10px]'
               }}
             >
-              <div className="flex flex-col items-center justify-center py-3">
-                <span className="text-[14px] mb-5">{$t('请先订阅该服务')}</span>
-                <Button type="primary" onClick={() => openModal?.('apply')}>
-                  {$t('申请')}
-                </Button>
-              </div>
+              {
+                type === 'service' ? (
+                  <div className="flex flex-col items-center justify-center py-3">
+                    <span className="text-[14px] mb-5">{$t('请先订阅该服务')}</span>
+                    <Button type="primary" onClick={() => openModal?.('apply')}>
+                      {$t('申请')}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-3">
+                    <span className="text-[14px] mb-5">{$t('未配置 API Key')}</span>
+                    <Button type="primary" onClick={() => dropAuthPage()}>
+                      {$t('配置')}
+                    </Button>
+                  </div>
+                )
+              }
             </Card>
           </>
         ) : (
