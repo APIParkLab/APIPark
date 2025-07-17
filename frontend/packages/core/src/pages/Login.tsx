@@ -75,7 +75,7 @@ const Login: FC = () => {
         setAllowGuest(data.channel.filter((x: any) => x.name === 'guest_access').length > 0)
         const feishu = data.channel.find((x: any) => x.name === 'feishu')
         if (feishu) {
-          setFeishuAppId(feishu.config.app_id)
+          setFeishuAppId(feishu.config.client_id)
           setAllowFeishuLogin(true)
         }
         const code = query.get('code')
