@@ -26,6 +26,8 @@ system:
       - system.settings.general.view
       - system.settings.log_configuration.manager
       - system.settings.log_configuration.view
+      - system.settings.login.manager
+      - system.settings.login.view
       - system.settings.mcp.view
       - system.settings.mcp.manager
       - system.settings.role.view
@@ -69,6 +71,8 @@ system:
       - system.settings.general.view
       - system.settings.log_configuration.manager
       - system.settings.log_configuration.view
+      - system.settings.login.manager
+      - system.settings.login.view
       - system.settings.ssl_certificate.manager
       - system.settings.ssl_certificate.view
       - system.settings.strategy.view
