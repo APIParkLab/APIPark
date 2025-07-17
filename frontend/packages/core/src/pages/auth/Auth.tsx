@@ -94,9 +94,9 @@ const Auth = () => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         form.setFieldsValue({
-          clientId: data.info?.config?.clientId || '',
-          clientSecret: data.info?.config?.clientSecret || '',
-          enabled: data.info?.enable || false
+          clientId: data.driver?.config?.clientId || '',
+          clientSecret: data.driver?.config?.clientSecret || '',
+          enabled: data.driver?.enable || false
         })
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
