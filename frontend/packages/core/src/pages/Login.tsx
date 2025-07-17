@@ -34,10 +34,12 @@ const Login: FC = () => {
   const feishuLogin = async (feishuCode: string) => {
     try {
       setLoading(true)
+      const feishuCallbackUrl = localStorage.getItem('feishuCallbackUrl')
       const { code, msg } = await fetchData<BasicResponse<null>>('account/login/feishu', {
         method: 'POST',
         eoBody: {
-          code: feishuCode
+          code: feishuCode,
+          redirect_uri: feishuCallbackUrl
         }
       })
 
@@ -153,6 +155,7 @@ const Login: FC = () => {
   const openFeishuLogin = () => {
     const href = location.href
     const authUrl = `https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=${feishuAppId}&redirect_uri=${href}`
+    localStorage.setItem('feishuCallbackUrl', href)
     window.location.href = authUrl
   }
 
