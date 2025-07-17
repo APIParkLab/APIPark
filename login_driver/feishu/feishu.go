@@ -2,13 +2,15 @@ package feishu
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 
-	"github.com/eolinker/eosc/common/bean"
+	"github.com/eolinker/go-common/autowire"
 
+	"github.com/eolinker/ap-account/service/role"
 	"github.com/eolinker/ap-account/service/user"
 
 	"github.com/eolinker/go-common/utils"
@@ -33,14 +35,27 @@ var _ auth_driver.IDriver = (*Driver)(nil)
 
 func init() {
 	d := &Driver{}
-	bean.Autowired(&d.accountService)
-	bean.Autowired(&d.userService)
+
 	auth_driver.Register(name, d)
 }
 
 type Driver struct {
-	accountService account.IAccountService `autowired:""`
-	userService    user.IUserService       `autowired:""`
+	isInit            bool
+	accountService    account.IAccountService `autowired:""`
+	userService       user.IUserService       `autowired:""`
+	roleService       role.IRoleService       `autowired:""`
+	roleMemberService role.IRoleMemberService `autowired:""`
+}
+
+func (d *Driver) Init() {
+	if d.isInit {
+		return
+	}
+	autowire.Autowired(&d.accountService)
+	autowire.Autowired(&d.userService)
+	autowire.Autowired(&d.roleService)
+	autowire.Autowired(&d.roleMemberService)
+	d.isInit = true
 }
 
 func (d *Driver) FilterConfig(config map[string]string) {
@@ -68,7 +83,21 @@ func (d *Driver) ThirdLogin(ctx context.Context, args map[string]string) (string
 	if !ok {
 		return "", fmt.Errorf("missing client_secret parameter")
 	}
-	tokenResp, err := getUserToken(code, clientId, clientSecret)
+	redirectUri, ok := args["redirect_uri"]
+	if !ok {
+		return "", fmt.Errorf("missing redirect_uri parameter")
+	}
+	u, err := url.Parse(redirectUri)
+	if err != nil {
+		return "", fmt.Errorf("invalid redirect_uri parameter")
+	}
+	query := u.Query()
+	query.Del("code")
+	redirectUri = fmt.Sprintf("%s://%s%s", u.Scheme, u.Host, u.Path)
+	if len(query) > 0 {
+		redirectUri = fmt.Sprintf("%s?%s", redirectUri, query.Encode())
+	}
+	tokenResp, err := getUserToken(code, redirectUri, clientId, clientSecret)
 	if err != nil {
 		return "", err
 	}
@@ -86,33 +115,55 @@ func (d *Driver) ThirdLogin(ctx context.Context, args map[string]string) (string
 			return "", err
 		}
 		uId := uuid.NewString()
+
 		err = d.accountService.Save(ctx, name, uId, userId, utils.Md5(fmt.Sprintf("%s%s", uId, userId)))
 		if err != nil {
 			return "", err
 		}
-		_, err = d.userService.Create(ctx, uId, username, email, mobile, "")
+		_, err = d.userService.Create(ctx, uId, username, email, mobile, name)
 		if err != nil {
 			return "", err
 		}
-		return userId, nil
+		r, err := d.roleService.GetDefaultRole(ctx, role.SystemTarget())
+		if err != nil {
+			return "", err
+		}
+		err = d.roleMemberService.Add(ctx, &role.AddMember{
+			Role:   r.Id,
+			User:   uId,
+			Target: role.SystemTarget(),
+		})
+		if err != nil {
+			return "", err
+		}
+		return uId, nil
 	}
 	_, err = d.userService.Update(ctx, info.Uid, &username, &email, &mobile)
 	if err != nil {
 		return "", err
 	}
 
-	return userId, nil
+	return info.Uid, nil
 }
 
-func getUserToken(code string, clientId string, clientSecret string) (*UserTokenResponse, error) {
+func getUserToken(code string, redirectUri, clientId string, clientSecret string) (*UserTokenResponse, error) {
 	headers := http.Header{}
 	headers.Set("Content-Type", "application/json")
-	body := url.Values{}
-	body.Set("grant_type", "authorization_code")
-	body.Set("code", code)
-	body.Set("client_id", clientId)
-	body.Set("client_secret", clientSecret)
-	resp, err := SendRequest[UserTokenResponse](getTokenUri, http.MethodPost, headers, nil, []byte(body.Encode()))
+	//body := url.Values{}
+	//body.Set("grant_type", "authorization_code")
+	//body.Set("code", code)
+	//body.Set("client_id", clientId)
+	//body.Set("client_secret", clientSecret)
+	//body.Set("redirect_uri", redirectUri)
+	body := map[string]string{
+		"grant_type":    "authorization_code",
+		"code":          code,
+		"client_id":     clientId,
+		"client_secret": clientSecret,
+		"redirect_uri":  redirectUri,
+	}
+	bodyByte, _ := json.Marshal(body)
+	resp, err := SendRequest[UserTokenResponse](getTokenUri, http.MethodPost, headers, nil, bodyByte)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user token: %w", err)
 	}
