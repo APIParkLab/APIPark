@@ -153,8 +153,8 @@ const Login: FC = () => {
 
   // 打开飞书授权页面
   const openFeishuLogin = () => {
-    const href = location.href
-    const authUrl = `https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=${feishuAppId}&redirect_uri=${href}`
+    const href = window.location.origin + window.location.pathname
+    const authUrl = `https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=${feishuAppId}&redirect_uri=${encodeURIComponent(href)}`
     localStorage.setItem('feishuCallbackUrl', href)
     window.location.href = authUrl
   }
