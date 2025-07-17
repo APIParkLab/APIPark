@@ -19,6 +19,7 @@ export type MemberTableListItem = {
     enable:boolean
     departmentId:string
     roles:EntityItem[]
+    form: string
 };
 
 export type AddToDepartmentProps = {
@@ -40,7 +41,7 @@ export type MemberDropdownModalFieldType = {
 
 export type MemberDropdownModalProps = {
     type:'addDep'|'addChild'|'addMember'|'editMember'|'rename'
-    entity?:(MemberTableListItem & {departmentIds:string[]}) | ({id?:string, departmentIds?:string[],name?:string})
+    entity?:(MemberTableListItem & {departmentIds:string[]}) | ({id?:string, departmentIds?:string[],name?:string,form?:string})
     selectedMemberGroupId?:string
 }
 

@@ -618,6 +618,16 @@ export const routerMap: Map<string, RouterMapConfig> = new Map([
                     /* webpackChunkName: "[request]" */ '@market/pages/serviceHub/management/ManagementAppSetting.tsx'
                   )
               )
+            },
+            {
+              path: 'mcp',
+              key: 'consumerMcp',
+              lazy: lazy(
+                () =>
+                  import(
+                    /* webpackChunkName: "[request]" */ '@market/pages/serviceHub/management/mcpContent.tsx'
+                  )
+              )
             }
           ]
         },
@@ -691,6 +701,14 @@ export const routerMap: Map<string, RouterMapConfig> = new Map([
           lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/role/RoleConfig.tsx'))
         }
       ]
+    }
+  ],
+  [
+    'auth',
+    {
+      type: 'module',
+      lazy: lazy(() => import(/* webpackChunkName: "[request]" */ '@core/pages/auth/Auth.tsx')),
+      key: 'auth'
     }
   ],
   [

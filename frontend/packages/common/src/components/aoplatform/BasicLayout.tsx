@@ -137,7 +137,7 @@ function BasicLayout({ project = 'core' }: { project: string }) {
   const items: MenuProps['items'] = useMemo(
     () =>
       [
-        userInfo?.type !== 'guest' && {
+        !['guest', 'third-user'].includes(userInfo?.type as string) && {
           key: '2',
           label: (
             <Button
