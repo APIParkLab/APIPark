@@ -396,7 +396,7 @@ const MemberList = () => {
       width: 600,
       okText: $t('确认'),
       okButtonProps: {
-        disabled: isActionAllowed(type)
+        disabled: isActionAllowed(type) || entity?.form !== 'self-build'
       },
       cancelText: $t('取消'),
       closable: true,

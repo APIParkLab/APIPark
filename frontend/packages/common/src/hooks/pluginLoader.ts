@@ -62,6 +62,16 @@ const mockData = {
     },
     {
       driver: 'apipark.builtIn.component',
+      name: 'auth',
+      router: [
+        {
+          path: 'auth',
+          type: 'normal'
+        }
+      ]
+    },
+    {
+      driver: 'apipark.builtIn.component',
       name: 'cluster',
       router: [
         {

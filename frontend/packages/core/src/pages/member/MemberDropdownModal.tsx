@@ -14,6 +14,7 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
     const {fetchData} = useFetch()
     const [departmentList, setDepartmentList] = useState<DepartmentListItem[]>([])
     const { state } = useGlobalContext()
+    const [disableEditMemberData] = useState<boolean>(entity?.form !== 'self-build')
 
     const save:()=>Promise<boolean | string> =  ()=>{
         let url:string
@@ -182,27 +183,28 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
                     name="name"
                     rules={[{required: true,whitespace:true }]}
                 >
-                    <Input className="w-INPUT_NORMAL" disabled={type ==='editMember'} placeholder={$t(PLACEHOLDER.input)}/>
+                    <Input className="w-INPUT_NORMAL" disabled={disableEditMemberData || type ==='editMember'} placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("邮箱")}
                     name="email"
                     rules={[{required: true,whitespace:true },{type:"email",message: $t(VALIDATE_MESSAGE.email)}]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
+                    <Input className="w-INPUT_NORMAL" disabled={disableEditMemberData} placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("密码")}
                     name="password"
                     rules={[{required: type === 'addMember',whitespace:true }]}
                 >
-                    <Input className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
+                    <Input disabled={disableEditMemberData} className="w-INPUT_NORMAL" placeholder={$t(PLACEHOLDER.input)}/>
                 </Form.Item>
                 <Form.Item<MemberDropdownModalFieldType>
                     label={$t("部门")}
                     name="departmentIds"
                 >
                     <TreeSelect
+                            disabled={disableEditMemberData}
                             className="w-INPUT_NORMAL"
                             fieldNames={{label:'name',value:'id',children:'children'}}
                             showSearch

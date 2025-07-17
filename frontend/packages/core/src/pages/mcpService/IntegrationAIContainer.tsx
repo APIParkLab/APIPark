@@ -50,17 +50,23 @@ type ServiceApiKeyList = {
     expired: number
   }>
 }
+
+type ConsumerParamsType = {
+  consumerId: string
+  teamId: string
+}
 export interface IntegrationAIContainerRef {
   getServiceKeysList: () => void;
 }
 export interface IntegrationAIContainerProps {
-  type: 'global' | 'service'
+  type: 'global' | 'service' | 'consumer'
   handleToolsChange: (value: Tool[]) => void
   customClassName?: string
   service?: ServiceDetailType
   serviceId?: string
   currentTab?: string
   openModal?: (type: 'apply') => void
+  consumerParams?: ConsumerParamsType
 }
 export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, IntegrationAIContainerProps>(
   ({
@@ -69,8 +75,9 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
     customClassName,
     service,
     serviceId,
-  currentTab,
-  openModal
+    currentTab,
+    openModal,
+    consumerParams
 }: IntegrationAIContainerProps, ref) => {
   /** 当前激活的标签 */
   const [activeTab, setActiveTab] = useState(type === 'service' ? 'openApi' : 'mcp')
@@ -185,6 +192,34 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
   }
 
   /**
+   * 获取消费者 MCP 配置
+   * @returns
+   */
+  const getConsumerMcpConfig = () => {
+    fetchData<BasicResponse<null>>('app/mcp/config', {
+      method: 'GET',
+      eoParams: { app: consumerParams?.consumerId, team: consumerParams?.teamId }
+    })
+      .then((response) => {
+        const { code, msg, data } = response
+        if (code === STATUS_CODE.SUCCESS) {
+          setTabContent((prevTabContent) => ({
+            ...prevTabContent,
+            mcp: {
+              ...prevTabContent.mcp,
+              configContent: data.config || ''
+            }
+          }))
+        } else {
+          message.error(msg || $t(RESPONSE_TIPS.error))
+        }
+      })
+      .catch((errorInfo) => {
+        message.error(errorInfo || $t(RESPONSE_TIPS.error))
+      })
+  }
+
+  /**
    * 全局 MCP 跳转
    */
   const addKey = () => {
@@ -229,12 +264,12 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
   }))
 
   /**
-   * 获取服务 API Key 列表
+   * 获取 API Key 列表
    */
-  const getServiceKeysList = () => {
+  const getServiceKeysList = (consumerId?: string) => {
     fetchData<BasicResponse<null>>(`my/app/apikeys`, {
       method: 'GET',
-      eoParams: { service: serviceId }
+      eoParams: consumerId ? { app: consumerId } : { service: serviceId }
     })
       .then((response) => {
         const { code, msg, data } = response
@@ -345,6 +380,10 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
       getGlobalMcpConfig()
       setMcpServerUrl('mcp/global/sse')
       getGlobalKeysList()
+    } else if (type === 'consumer'){
+      getConsumerMcpConfig()
+      setMcpServerUrl(`mcp/service/${consumerParams?.consumerId}/sse`)
+      getServiceKeysList(consumerParams?.consumerId)
     } else {
       service?.basic.enableMcp && setMcpServerUrl(`mcp/service/${serviceId}/sse`)
       getServiceKeysList()
@@ -362,6 +401,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
   useEffect(() => {
     initTabsData()
     type === 'global' && getGlobalMcpConfig()
+    type === 'consumer' && getConsumerMcpConfig()
   }, [state.language])
   /**
    * 切换标签
@@ -408,7 +448,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
       }
       connectMcpServer()
     }
-  }, [mcpServerUrl, ...(type === 'global' ? [state.language] : [])])
+  }, [mcpServerUrl, ...(type === 'global' || type === 'consumer' ? [state.language] : [])])
   /**
    * 获取 MCP tools
    */
@@ -533,7 +573,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
                 <div className="tab-content font-semibold my-[10px]">API Key</div>
                 {apiKeyList.length ? (
                   <>
-                    {type === 'global' ? (
+                    {type === 'global' || type === 'consumer' ? (
                       <>
                         <Select
                           showSearch

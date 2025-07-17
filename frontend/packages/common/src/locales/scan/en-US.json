@@ -972,5 +972,17 @@
   "K6c267c7b": "Avg Requests per Subscriber",
   "K133d4291": "Avg Traffic per Subscriber",
   "K37c5f1d0": "Token",
-  "Kb98264d4": "Avg Token per Subscriber"
+  "Kb98264d4": "Avg Token per Subscriber",
+  "Kb35e6a18": "Auth",
+  "K679bd7e4": "System User Account Login Authorization Settings",
+  "K9e7bb257": "Authorization Type",
+  "Kc499fc1d": "Please select an authorization type",
+  "Kee9f8f26": "APP ID",
+  "K9e4c19bb": "Please enter APP ID",
+  "K90f7c3b4": "APP Secret",
+  "Kdc53d96f": "Please enter APP Secret",
+  "K50693bd8": "Enable Authorization",
+  "K682b11cb": "Feishu Authorization Login",
+  "K45c99f97": "The APP ID parameter can be found on the App Credentials and Basic Information page in the Feishu Developer Console",
+  "K56e77c4": "The APP Secret parameter can be found on the App Credentials and Basic Information page in the Feishu Developer Console"
 }

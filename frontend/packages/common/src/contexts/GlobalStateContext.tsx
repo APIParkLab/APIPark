@@ -207,8 +207,15 @@ const mockData = [
             name: '角色',
             key: 'role',
             path: '/role',
-            icon: 'ic:baseline-verified-user',
+            icon: 'ph:user-circle-gear-fill',
             access: 'system.organization.role.view'
+          },
+          {
+            name: '鉴权',
+            key: 'auth',
+            path: '/auth',
+            icon: 'ic:baseline-verified-user',
+            access: 'system.organization.auth.view'
           }
         ]
       },

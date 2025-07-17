@@ -119,6 +119,11 @@ export const PERMISSION_DEFINITION = [
         anyOf: [{ backend: ['system.organization.role.manager_team_role'] }]
       }
     },
+    'system.organization.auth.view': {
+      granted: {
+        anyOf: [{ backend: ['system.settings.login.manager', 'system.settings.login.view'] }]
+      }
+    },
     'system.api_market.service_classification.view': {
       granted: {
         anyOf: [{ backend: ['system.settings.general.view'] }]
@@ -630,6 +635,15 @@ export const PERMISSION_DEFINITION = [
               'system.workspace.application.view_all',
               'team.consumer.authorization.view'
             ]
+          }
+        ]
+      }
+    },
+    'team.consumer.mcp.view': {
+      granted: {
+        anyOf: [
+          {
+            backend: ['team.consumer.mcp.manager', 'team.consumer.mcp.view']
           }
         ]
       }
