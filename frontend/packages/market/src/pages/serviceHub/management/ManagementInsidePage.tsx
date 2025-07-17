@@ -31,9 +31,9 @@ export default function ManagementInsidePage() {
 
   const TENANT_MANAGEMENT_APP_MENU: MenuProps['items'] = useMemo(
     () => [
-      getItem($t('订阅的服务'), 'service', undefined, undefined, undefined, 'team.application.subscription.view'),
-      getItem($t('MCP 服务'), 'mcp', undefined, undefined, undefined, 'team.consumer.mcp.view'),
       getItem($t('访问授权'), 'authorization', undefined, undefined, undefined, 'team.consumer.authorization.view'),
+      getItem($t('MCP 服务'), 'mcp', undefined, undefined, undefined, 'team.consumer.mcp.view'),
+      getItem($t('订阅的服务'), 'service', undefined, undefined, undefined, 'team.application.subscription.view'),
       getItem($t('消费者管理'), 'setting', undefined, undefined, undefined, 'team.application.application.view')
     ],
     [state.language]
