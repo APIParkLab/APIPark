@@ -86,7 +86,7 @@ require (
 //	github.com/eolinker/eosc => ../../eolinker/eosc
 //)
 
-//replace github.com/eolinker/ap-account => ../../eolinker/ap-account
+replace github.com/eolinker/ap-account => ../../eolinker/ap-account
 
 //
 //replace github.com/eolinker/go-common => ../../eolinker/go-common
