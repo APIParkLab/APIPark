@@ -131,6 +131,16 @@ system:
             value: 'manager'
             dependents:
               - system.settings.ai_api.view
+      - name: login
+        value: 'login'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+              - system.settings.login.view
       - name: ai log
         value: 'ai_log'
         children:

@@ -28,8 +28,8 @@ github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f h1:lO4WD4F/r
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=
 github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
-github.com/eolinker/ap-account v1.0.15 h1:n6DJeL6RHZ8eLlZUcY2U3H4d/GPaA5oelAx3R0E6yL8=
-github.com/eolinker/ap-account v1.0.15/go.mod h1:zm/Ivs6waJ/M/nEszhpPmM6g50y/MKO+5eABFAdeD0g=
+github.com/eolinker/ap-account v1.0.16 h1:v1VvSeQ2AvxAvkYT4n4APqZdWS8d1CbA/1O0LYEyNM4=
+github.com/eolinker/ap-account v1.0.16/go.mod h1:zm/Ivs6waJ/M/nEszhpPmM6g50y/MKO+5eABFAdeD0g=
 github.com/eolinker/eosc v0.18.3 h1:3IK5HkAPnJRfLbQ0FR7kWsZr6Y/OiqqGazvN1q2BL5A=
 github.com/eolinker/eosc v0.18.3/go.mod h1:O9PQQXFCpB6fjHf+oFt/LN6EOAv779ItbMixMKCfTfk=
 github.com/eolinker/go-common v1.1.7 h1:bi7wDmlCYQGjS3k8Bz/o+Mo9aMJAzmPsBLXWurxPfwk=
