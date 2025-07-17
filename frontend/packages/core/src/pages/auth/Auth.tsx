@@ -77,6 +77,10 @@ const Auth = () => {
       const { code, data, msg } = response
       if (code === STATUS_CODE.SUCCESS) {
         setThirdPartyDrivers(data.drivers.map((item: any) => ({ label: item.name, value: item.value })))
+        if (data.drivers.length) {
+          form.setFieldValue('authType', data.drivers[0].value)
+          getThirdPartyAuthSetting()
+        }
       } else {
         message.error(msg || $t(RESPONSE_TIPS.error))
       }
