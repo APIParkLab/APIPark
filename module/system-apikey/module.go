@@ -19,6 +19,7 @@ type IAPIKeyModule interface {
 	SimpleList(ctx context.Context) ([]*system_apikey_dto.SimpleItem, error)
 	MyAPIKeys(ctx context.Context) ([]*system_apikey_dto.SimpleItem, error)
 	MyAPIKeysByService(ctx context.Context, serviceId string) ([]*system_apikey_dto.AuthorizationItem, error)
+	MyAPIKeysByApp(ctx context.Context, appId string) ([]*system_apikey_dto.AuthorizationItem, error)
 }
 
 func init() {

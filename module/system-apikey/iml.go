@@ -41,6 +41,46 @@ type imlAPIKeyModule struct {
 	transaction                     store.ITransaction                              `autowired:""`
 }
 
+func (i *imlAPIKeyModule) MyAPIKeysByApp(ctx context.Context, appId string) ([]*system_apikey_dto.AuthorizationItem, error) {
+	appInfo, err := i.serviceService.Get(ctx, appId)
+	if err != nil {
+		return nil, err
+	}
+	auths, err := i.applicationAuthorizationService.ListByApp(ctx, appId)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[string]*system_apikey_dto.AuthorizationItem)
+	for _, a := range auths {
+		if a.Type != "apikey" {
+			continue
+		}
+
+		m := make(map[string]string)
+		json.Unmarshal([]byte(a.Config), &m)
+		if m["apikey"] == "" {
+			continue
+		}
+		if _, ok := result[appInfo.Id]; !ok {
+			result[appInfo.Id] = &system_apikey_dto.AuthorizationItem{
+				Id:      appInfo.Id,
+				Name:    appInfo.Name,
+				Apikeys: []system_apikey_dto.SimpleItem{},
+			}
+		}
+		result[appInfo.Id].Apikeys = append(result[appInfo.Id].Apikeys, system_apikey_dto.SimpleItem{
+			Id:      a.UUID,
+			Name:    a.Name,
+			Value:   m["apikey"],
+			Expired: a.ExpireTime,
+		})
+
+	}
+	return utils.MapToSlice(result, func(k string, t *system_apikey_dto.AuthorizationItem) *system_apikey_dto.AuthorizationItem {
+		return t
+	}), nil
+}
+
 func (i *imlAPIKeyModule) MyAPIKeysByService(ctx context.Context, serviceId string) ([]*system_apikey_dto.AuthorizationItem, error) {
 	list, err := i.subscribeService.ListBySubscribeStatus(ctx, serviceId, subscribe.ApplyStatusSubscribe)
 	if err != nil {

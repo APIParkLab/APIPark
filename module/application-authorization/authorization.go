@@ -33,7 +33,8 @@ type IAuthorizationModule interface {
 	// Info 获取项目鉴权详情
 	Info(ctx context.Context, appId string, aid string) (*application_authorization_dto.Authorization, error)
 
-	CheckAPIKeyAuthorization(ctx context.Context, serviceId string, apikey string) (bool, error)
+	CheckAPIKeyAuthorizationByService(ctx context.Context, serviceId string, apikey string) (bool, error)
+	CheckAPIKeyAuthorizationByApp(ctx context.Context, appId string, apikey string) (bool, error)
 
 	//ExportAll(ctx context.Context) ([]*application_authorization_dto.ExportAuthorization, error)
 }

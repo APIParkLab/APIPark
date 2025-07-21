@@ -304,6 +304,17 @@ team:
             value: 'manager_subscribed_services'
             dependents:
               - team.consumer.subscription.manager_subscribed_services
+      - name: mcp
+        cname: MCP
+        value: 'mcp'
+        children:
+          - name: view
+            value: 'view'
+            guest_allow: true
+          - name: manager
+            value: 'manager'
+            dependents:
+            - team.consumer.mcp.view
       - name: authorization
         value: 'authorization'
         children:

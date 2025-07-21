@@ -44,7 +44,27 @@ type imlAuthorizationModule struct {
 	transaction          store.ITransaction                              `autowired:""`
 }
 
-func (i *imlAuthorizationModule) CheckAPIKeyAuthorization(ctx context.Context, serviceId string, apikey string) (bool, error) {
+func (i *imlAuthorizationModule) CheckAPIKeyAuthorizationByApp(ctx context.Context, appId string, apikey string) (bool, error) {
+	authorizations, err := i.authorizationService.ListByApp(ctx, appId)
+	if err != nil {
+		return false, err
+	}
+	for _, a := range authorizations {
+		if a.Type != "apikey" {
+			continue
+		}
+		cfg := make(map[string]interface{})
+		if a.Config != "" {
+			json.Unmarshal([]byte(a.Config), &cfg)
+		}
+		if cfg["apikey"] == apikey {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (i *imlAuthorizationModule) CheckAPIKeyAuthorizationByService(ctx context.Context, serviceId string, apikey string) (bool, error) {
 	list, err := i.subscribeService.ListBySubscribeStatus(ctx, serviceId, subscribe.ApplyStatusSubscribe)
 	if err != nil {
 		return false, err
