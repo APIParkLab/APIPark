@@ -16,6 +16,7 @@ var (
 	mcpServer       = NewServer()
 	ServiceBasePath = "mcp/service"
 	GlobalBasePath  = "mcp/global"
+	AppBasePath     = "mcp/app"
 )
 
 func NewServer() *Server {

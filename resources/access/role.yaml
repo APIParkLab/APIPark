@@ -92,6 +92,8 @@ team:
     permits:
       - team.consumer.authorization.manager
       - team.consumer.authorization.view
+      - team.consumer.mcp.manager
+      - team.consumer.mcp.view
       - team.consumer.subscription.manager_subscribed_services
       - team.consumer.subscription.subscribe
       - team.consumer.subscription.view_subscribed_service
@@ -165,6 +167,8 @@ team:
     permits:
       - team.consumer.authorization.manager
       - team.consumer.authorization.view
+      - team.consumer.mcp.manager
+      - team.consumer.mcp.view
       - team.consumer.subscription.manager_subscribed_services
       - team.consumer.subscription.subscribe
       - team.consumer.subscription.view_subscribed_service
@@ -176,9 +180,10 @@ team:
   - name: consumer developer
     value: consumer_developer
     permits:
-      - team.consumer.application.manager
       - team.consumer.authorization.manager
       - team.consumer.authorization.view
+      - team.consumer.mcp.manager
+      - team.consumer.mcp.view
       - team.consumer.subscription.subscribe
       - team.consumer.subscription.view_subscribed_service
       - team.team.consumer.view

@@ -46,18 +46,43 @@ type imlMcpModule struct {
 	releaseService          release.IReleaseService                         `autowired:""`
 }
 
+func (i *imlMcpModule) subscribeServiceIds(ctx context.Context, appId string) ([]string, error) {
+	subscribes, err := i.subscriberService.SubscriptionsByApplication(ctx, appId)
+	if err != nil {
+		return nil, fmt.Errorf("get subscriber error: %w,app id is %s", err, appId)
+	}
+	serviceIds := utils.SliceToSlice(subscribes, func(s *subscribe.Subscribe) string {
+		return s.Service
+	}, func(s *subscribe.Subscribe) bool {
+		return s.ApplyStatus == subscribe.ApplyStatusSubscribe
+	})
+	if len(serviceIds) == 0 {
+		return nil, fmt.Errorf("no subscriber found,app id is %s", appId)
+	}
+	return serviceIds, nil
+}
+
 func (i *imlMcpModule) Services(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+
 	keyword, _ := req.GetArguments()["keyword"].(string)
-	list, err := i.serviceService.Search(ctx, keyword, map[string]interface{}{
+	appId := utils.Label(ctx, "app")
+	condition := map[string]interface{}{
 		"as_server": true,
-	}, "update_at desc")
+	}
+	if appId != "" {
+		serviceIds, err := i.subscribeServiceIds(ctx, appId)
+		if err != nil {
+			return nil, fmt.Errorf("get subscriber service ids error: %w,app id is %s", err, appId)
+		}
+		condition["uuid"] = serviceIds
+	}
+
+	list, err := i.serviceService.Search(ctx, keyword, condition, "update_at desc")
 	if err != nil {
 		return nil, fmt.Errorf("search service error: %w", err)
 	}
 	if len(list) == 0 {
-		list, err = i.serviceService.Search(ctx, "", map[string]interface{}{
-			"as_server": true,
-		}, "update_at desc")
+		list, err = i.serviceService.Search(ctx, "", condition, "update_at desc")
 		if err != nil {
 			return nil, fmt.Errorf("search service error: %w", err)
 		}
@@ -115,119 +140,60 @@ func (i *imlMcpModule) Services(ctx context.Context, req mcp.CallToolRequest) (*
 
 }
 
-//func (i *imlMcpModule) Apps(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-//	keyword := req.GetArguments()["keyword"].(string)
-//	condition := make(map[string]interface{})
-//	condition["as_app"] = true
-//	list, err := i.serviceService.Search(ctx, keyword, condition, "update_at desc")
-//	if err != nil {
-//		return nil, fmt.Errorf("search service error: %w", err)
-//	}
-//	if len(list) == 0 {
-//		list, err = i.serviceService.Search(ctx, "", condition, "update_at desc")
-//		if err != nil {
-//			return nil, fmt.Errorf("search service error: %w", err)
-//		}
-//	}
-//	data, _ := json.Marshal(utils.SliceToSlice(list, func(s *service.Service) *mcp_dto.App {
-//		return &mcp_dto.App{
-//			Id:          s.Id,
-//			Name:        s.Name,
-//			Description: s.Name,
-//			CreateTime:  s.CreateTime,
-//			UpdateTime:  s.UpdateTime,
-//		}
-//	}))
-//	return mcp.NewToolResultText(string(data)), nil
-//}
-
 func (i *imlMcpModule) APIs(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	serviceId, _ := req.GetArguments()["service"].(string)
-	serviceIds := make([]string, 0, 1)
 	if serviceId == "" {
-		serviceIds = append(serviceIds, serviceId)
+		return nil, fmt.Errorf("service id is empty")
 	}
-	serviceList, err := i.serviceService.ServiceList(ctx)
+	s, err := i.serviceService.Get(ctx, serviceId)
 	if err != nil {
-		return nil, fmt.Errorf("get service list error: %w", err)
+		return nil, fmt.Errorf("get service error: %w,service id is %s", err, serviceId)
 	}
-	result := make([]*mcp_dto.ServiceAPI, 0, len(serviceList))
+	appId := utils.Label(ctx, "app")
+	if appId != "" {
+		subscribers, err := i.subscriberService.ListByApplication(ctx, serviceId, appId)
+		if err != nil {
+			return nil, fmt.Errorf("get subscriber error: %w,app id is %s", err, appId)
+		}
+		if len(subscribers) < 1 || subscribers[0].ApplyStatus != subscribe.ApplyStatusSubscribe {
+			return nil, fmt.Errorf("no subscriber found,app id is %s", appId)
+		}
+	}
 
-	for _, s := range serviceList {
-		serviceRelease, err := i.releaseService.GetRunning(ctx, s.Id)
-		if err != nil {
-			if !errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil, fmt.Errorf("get service release error: %w,service id is %s", err, s.Id)
-			}
-			continue
+	serviceRelease, err := i.releaseService.GetRunning(ctx, serviceId)
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("get service release error: %w,service id is %s", err, s.Id)
 		}
-		_, _, apiDocRelease, _, _, err := i.releaseService.GetReleaseInfos(ctx, serviceRelease.UUID)
-		if err != nil {
-			if !errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil, fmt.Errorf("get service release info error: %w,service id is %s", err, s.Id)
-			}
-			continue
+		return nil, fmt.Errorf("no service found,service id is %s", serviceId)
+	}
+	_, _, apiDocRelease, _, _, err := i.releaseService.GetReleaseInfos(ctx, serviceRelease.UUID)
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("get service release info error: %w,service id is %s", err, s.Id)
 		}
-		commit, err := i.apiDocService.GetDocCommit(ctx, apiDocRelease.Commit)
-		if err != nil {
-			if !errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil, fmt.Errorf("get api doc release error: %w,service id is %s", err, s.Id)
-			}
-			continue
+		return nil, fmt.Errorf("no service found,service id is %s", serviceId)
+	}
+	commit, err := i.apiDocService.GetDocCommit(ctx, apiDocRelease.Commit)
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("get api doc release error: %w,service id is %s", err, s.Id)
 		}
-		T, err := openapi3Loader.LoadFromData([]byte(commit.Data.Content))
-		if err != nil {
-			return nil, fmt.Errorf("load openapi3 error: %w,service id is %s", err, s.Id)
-		}
-		result = append(result, &mcp_dto.ServiceAPI{
-			ServiceID:   s.Id,
-			ServiceName: s.Name,
-			APIDoc:      T,
-		})
+		return nil, fmt.Errorf("no service found,service id is %s", serviceId)
+	}
+	T, err := openapi3Loader.LoadFromData([]byte(commit.Data.Content))
+	if err != nil {
+		return nil, fmt.Errorf("load openapi3 error: %w,service id is %s", err, s.Id)
+	}
+
+	result := &mcp_dto.ServiceAPI{
+		ServiceID:   serviceId,
+		ServiceName: s.Name,
+		APIDoc:      T,
 	}
 	data, _ := json.Marshal(result)
 	return mcp.NewToolResultText(string(data)), nil
 }
-
-//func (i *imlMcpModule) SubscriberAuthorizations(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-//	serviceId, ok := req.GetArguments()["service"].(string)
-//	if !ok {
-//		return nil, fmt.Errorf("service id is required")
-//	}
-//	subscribes, err := i.subscriberService.Subscribers(ctx, serviceId, subscribe.ApplyStatusSubscribe)
-//	if err != nil {
-//		return nil, fmt.Errorf("get subscriber error: %w,service id is %s", err, serviceId)
-//	}
-//	appIds := utils.SliceToSlice(subscribes, func(s *subscribe.Subscribe) string {
-//		return s.Application
-//	})
-//	if len(appIds) == 0 {
-//		return nil, fmt.Errorf("no subscriber found,service id is %s", serviceId)
-//	}
-//	list, err := i.appAuthorizationService.ListByApp(ctx, appIds...)
-//	if err != nil {
-//		return nil, fmt.Errorf("get app authorization error: %w,app ids is %s", err, appIds)
-//	}
-//	result := utils.SliceToSlice(list, func(a *application_authorization.Authorization) *mcp_dto.AppAuthorization {
-//		return &mcp_dto.AppAuthorization{
-//			Id:        a.UUID,
-//			Name:      a.Name,
-//			position:  a.position,
-//			TokenName: a.TokenName,
-//			Config:    a.Config,
-//		}
-//	}, func(a *application_authorization.Authorization) bool {
-//		if a.Type != "apikey" {
-//			return false
-//		}
-//		if a.ExpireTime != 0 && a.ExpireTime < time.Now().Unix() {
-//			return false
-//		}
-//		return true
-//	})
-//	data, _ := json.Marshal(result)
-//	return mcp.NewToolResultText(string(data)), nil
-//}
 
 var (
 	client = &http.Client{}
@@ -309,8 +275,14 @@ func (i *imlMcpModule) Invoke(ctx context.Context, req mcp.CallToolRequest) (*mc
 	request.Header = headerParam
 	request.Header.Set("Content-Type", contentType)
 	apikey := utils.Label(ctx, "apikey")
+
 	if apikey != "" {
-		request.Header.Set("Authorization", utils.Md5(apikey))
+		appId := utils.Label(ctx, "app")
+		if appId == "" {
+			request.Header.Set("Authorization", utils.Md5(apikey))
+		} else {
+			request.Header.Set("Authorization", apikey)
+		}
 	}
 
 	resp, err := client.Do(request)

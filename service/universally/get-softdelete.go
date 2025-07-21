@@ -58,11 +58,12 @@ func (s *imlServiceGetSoftDelete[T, E]) List(ctx context.Context, uuids ...strin
 	return utils.SliceToSlice(list, s.toModelHandler), nil
 }
 func (s *imlServiceGetSoftDelete[T, E]) Search(ctx context.Context, keyword string, condition map[string]interface{}, sortRule ...string) ([]*T, error) {
-	if condition == nil {
-		condition = make(map[string]interface{})
+	w := make(map[string]interface{})
+	for k, v := range condition {
+		w[k] = v
 	}
-	condition[SoftDeleteField] = false
-	ps, err := s.store.Search(ctx, keyword, condition, sortRule...)
+	w[SoftDeleteField] = false
+	ps, err := s.store.Search(ctx, keyword, w, sortRule...)
 	if err != nil {
 		return nil, err
 	}
@@ -70,11 +71,12 @@ func (s *imlServiceGetSoftDelete[T, E]) Search(ctx context.Context, keyword stri
 }
 
 func (s *imlServiceGetSoftDelete[T, E]) SearchByPage(ctx context.Context, keyword string, condition map[string]interface{}, page int, pageSize int, sortRule ...string) ([]*T, int64, error) {
-	if condition == nil {
-		condition = make(map[string]interface{})
+	w := make(map[string]interface{})
+	for k, v := range condition {
+		w[k] = v
 	}
-	condition[SoftDeleteField] = false
-	ps, total, err := s.store.SearchByPage(ctx, keyword, condition, page, pageSize, sortRule...)
+	w[SoftDeleteField] = false
+	ps, total, err := s.store.SearchByPage(ctx, keyword, w, page, pageSize, sortRule...)
 	if err != nil {
 		return nil, 0, err
 	}

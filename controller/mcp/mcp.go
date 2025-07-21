@@ -9,12 +9,20 @@ import (
 
 type IMcpController interface {
 	MCPHandle(ctx *gin.Context)
+
 	GlobalMCPHandle(ctx *gin.Context)
 	GlobalHandleSSE(ctx *gin.Context)
 	GlobalHandleMessage(ctx *gin.Context)
+	GlobalMCPConfig(ctx *gin.Context) (string, error)
+
+	AppMCPHandle(ctx *gin.Context)
+	AppHandleSSE(ctx *gin.Context)
+	AppHandleMessage(ctx *gin.Context)
+	AppMCPConfig(ctx *gin.Context, appId string) (string, error)
+
 	ServiceHandleSSE(ctx *gin.Context)
 	ServiceHandleMessage(ctx *gin.Context)
-	GlobalMCPConfig(ctx *gin.Context) (string, error)
+
 	ServiceHandleStreamHTTP(ctx *gin.Context)
 }
 

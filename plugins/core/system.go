@@ -24,7 +24,7 @@ func (p *plugin) systemApikeyApis() []pm3.Api {
 		pm3.CreateApiWidthDoc(http.MethodDelete, "/api/v1/system/apikey", []string{"context", "query:apikey"}, nil, p.systemAPIKeyController.Delete),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/system/apikeys", []string{"context", "query:keyword"}, []string{"apikeys"}, p.systemAPIKeyController.Search),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/my/apikeys", []string{"context"}, []string{"apikeys"}, p.systemAPIKeyController.MyAPIKeys),
-		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/my/app/apikeys", []string{"context", "query:service"}, []string{"apps"}, p.systemAPIKeyController.MyAPIKeysByService),
+		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/my/app/apikeys", []string{"context", "query:service", "query:app"}, []string{"apps"}, p.systemAPIKeyController.MyAPIKeysByService),
 		pm3.CreateApiWidthDoc(http.MethodGet, "/api/v1/simple/system/apikeys", []string{"context"}, []string{"apikeys"}, p.systemAPIKeyController.SimpleList),
 	}
 }

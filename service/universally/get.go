@@ -71,7 +71,11 @@ func (s *imlServiceGet[T, E]) List(ctx context.Context, uuids ...string) ([]*T, 
 	return utils.SliceToSlice(list, s.toModelHandler), nil
 }
 func (s *imlServiceGet[T, E]) Search(ctx context.Context, keyword string, condition map[string]interface{}, sortRule ...string) ([]*T, error) {
-	ps, err := s.store.Search(ctx, keyword, condition, sortRule...)
+	w := make(map[string]interface{})
+	for k, v := range condition {
+		w[k] = v
+	}
+	ps, err := s.store.Search(ctx, keyword, w, sortRule...)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +83,11 @@ func (s *imlServiceGet[T, E]) Search(ctx context.Context, keyword string, condit
 }
 
 func (s *imlServiceGet[T, E]) SearchByPage(ctx context.Context, keyword string, condition map[string]interface{}, page int, pageSize int, sortRule ...string) ([]*T, int64, error) {
-	ps, total, err := s.store.SearchByPage(ctx, keyword, condition, page, pageSize, sortRule...)
+	w := make(map[string]interface{})
+	for k, v := range condition {
+		w[k] = v
+	}
+	ps, total, err := s.store.SearchByPage(ctx, keyword, w, page, pageSize, sortRule...)
 	if err != nil {
 		return nil, 0, err
 	}
