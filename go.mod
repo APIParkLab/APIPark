@@ -5,7 +5,7 @@ go 1.23.4
 toolchain go1.23.6
 
 require (
-	github.com/eolinker/ap-account v1.0.17
+	github.com/eolinker/ap-account v1.0.18
 	github.com/eolinker/eosc v0.18.3
 	github.com/eolinker/go-common v1.1.7
 	github.com/gabriel-vasile/mimetype v1.4.4
