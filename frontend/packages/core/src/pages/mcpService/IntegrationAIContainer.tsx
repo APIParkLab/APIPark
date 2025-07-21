@@ -386,7 +386,7 @@ export const IntegrationAIContainer = forwardRef<IntegrationAIContainerRef, Inte
       getGlobalKeysList()
     } else if (type === 'consumer'){
       getConsumerMcpConfig()
-      setMcpServerUrl(`mcp/service/${consumerParams?.consumerId}/sse`)
+      setMcpServerUrl(`mcp/app/${consumerParams?.consumerId}/sse`)
       getServiceKeysList(consumerParams?.consumerId)
     } else {
       service?.basic.enableMcp && setMcpServerUrl(`mcp/service/${serviceId}/sse`)
