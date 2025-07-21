@@ -8,7 +8,7 @@
   "description": "",
   "scripts": {
     "test": "jest",
-    "build": "set NODE_OPTIONS=--max-old-space-size=8192  && lerna run build --scope=core --stream  --verbose ",
+    "build": "set NODE_OPTIONS=--max-old-space-size=4608  && lerna run build --scope=core --stream  --verbose ",
     "serve": "lerna run preview --parallel",
     "serve:remotes": "lerna run serve --scope=remote --parallel",
     "dev": "lerna run dev --scope=core --stream",
