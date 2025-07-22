@@ -356,7 +356,7 @@ const Login: FC = () => {
                         loading={loading}
                         className="h-[40px]  w-full inline-flex justify-center items-center"
                         type="default"
-                        onClick={openFeishuLogin}
+                        onClick={() => openFeishuLogin(feishuAppId)}
                       >
                         <img className="h-[30px]" src={FeishuLogo} />
                         {$t('飞书授权登录')}
