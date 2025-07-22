@@ -97,7 +97,7 @@ const Login: FC = () => {
           return
         }
         if (isInFeishuClient() && feishu) {
-          openFeishuLogin()
+          openFeishuLogin(feishu.config.client_id)
         }
         setSpinning(false)
       }
@@ -182,9 +182,9 @@ const Login: FC = () => {
   }
 
   // 打开飞书授权页面
-  const openFeishuLogin = () => {
+  const openFeishuLogin = (id?: string) => {
     const href = window.location.origin + window.location.pathname
-    const authUrl = `https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=${feishuAppId}&redirect_uri=${href}`
+    const authUrl = `https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=${id || feishuAppId}&redirect_uri=${href}`
     localStorage.setItem('feishuCallbackUrl', href)
     window.location.href = authUrl
   }
