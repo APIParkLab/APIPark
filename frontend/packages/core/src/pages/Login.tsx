@@ -93,6 +93,11 @@ const Login: FC = () => {
         const code = query.get('code')
         if (code) {
           feishuLogin(code)
+          setSpinning(false)
+          return
+        }
+        if (isInFeishuClient() && feishu) {
+          openFeishuLogin()
         }
         setSpinning(false)
       }
@@ -159,6 +164,21 @@ const Login: FC = () => {
 
   const loginAsGuest = () => {
     fetchLogin({ username: 'guest', password: '12345678' })
+  }
+
+  const isInFeishuClient = () => {
+    // 方法1：检查User-Agent
+    const ua = navigator.userAgent.toLowerCase();
+    const isLark = ua.includes('lark') || ua.includes('feishu');
+    
+    // 方法2：检查全局对象
+    const hasSDK = typeof window.h5sdk !== 'undefined' || typeof window.tt !== 'undefined';
+    
+    // 方法3：检查URL参数
+    const params = new URLSearchParams(window.location.search);
+    const hasFeishuParams = params.has('from') || params.has('required_launch_ability');
+    
+    return isLark || hasSDK || hasFeishuParams;
   }
 
   // 打开飞书授权页面
