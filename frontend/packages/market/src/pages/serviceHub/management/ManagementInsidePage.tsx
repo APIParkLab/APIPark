@@ -20,7 +20,7 @@ export default function ManagementInsidePage() {
   const { message } = App.useApp()
   const { fetchData } = useFetch()
   const { setBreadcrumb } = useBreadcrumb()
-  const [activeMenu, setActiveMenu] = useState<string>('service')
+  const [activeMenu, setActiveMenu] = useState<string>('authorization')
   const { appId, teamId } = useParams<RouterParams>()
   const navigateTo = useNavigate()
   const currentUrl = useLocation().pathname
@@ -56,7 +56,7 @@ export default function ManagementInsidePage() {
   }, [accessData, accessInit, TENANT_MANAGEMENT_APP_MENU])
 
   useEffect(() => {
-    setActiveMenu(currentUrl.split('/').pop() || 'service')
+    setActiveMenu(currentUrl.split('/').pop() || 'authorization')
   }, [currentUrl])
 
   const onMenuClick: MenuProps['onClick'] = (node) => {
