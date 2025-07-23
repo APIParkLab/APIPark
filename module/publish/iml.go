@@ -603,21 +603,22 @@ func (i *imlPublishModule) Publish(ctx context.Context, serviceId string, id str
 			if err != nil {
 				return err
 			}
-			if info.EnableMCP {
-				err = i.updateMCPServer(ctx, serviceId, info.Name, flow.Version)
-				if err != nil {
-					return err
-				}
-			}
-			apidocCommit, err := i.apiDocService.LatestDocCommit(ctx, serviceId)
+
+			apiDocCommit, err := i.apiDocService.LatestDocCommit(ctx, serviceId)
 			if err != nil {
 				return err
 			}
 			isReleased := true
 			i.serviceOverviewService.Update(ctx, serviceId, &service_overview.Update{
-				ReleaseApiCount: &apidocCommit.Data.APICount,
+				ReleaseApiCount: &apiDocCommit.Data.APICount,
 				IsReleased:      &isReleased,
 			})
+			if info.EnableMCP {
+				err = mcp_server.SetServerByOpenapi(serviceId, info.Name, flow.Version, apiDocCommit.Data.Content)
+				if err != nil {
+					return err
+				}
+			}
 		}
 		return i.publishService.SetStatus(ctx, serviceId, id, status)
 	})
