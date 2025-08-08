@@ -156,6 +156,10 @@ curl -sSO  https://download.apipark.com/install/quick-start.sh ;  bash quick-sta
 
 <br>
 
+<br>
+
+
+
 # 🚀 Use Cases
 ## Simplify AI Integration Costs
   - Connect to 100+ major models from all mainstream AI vendors, with standardized API calls requiring no additional adaptation work.
@@ -199,10 +203,19 @@ To achieve this goal, we plan to add new features to APIPark, including:
 # 📕 Documentation
 Visit [APIPark Documentation](https://docs.apipark.com/docs/deploy) for detailed installation guides, API references, and usage instructions.
 
+
+# 🧑‍🤝‍🧑Friendly Links
+<a href="https://xroute.ai/">
+  <img width="1248" height="158" alt="新建 PPTX 演示文稿 (2)_03" src="https://github.com/user-attachments/assets/0ebd694c-410a-4e3f-a793-90f1140d15df" />
+
+</a>
+<br>
+
 <br>
 
 # 🧾 License
 APIPark uses the Apache 2.0 License. For more details, please refer to the LICENSE file.
+
 
 <br>
 
@@ -215,3 +228,7 @@ For enterprise-level features and professional technical support, contact our pr
 <br>
 
 🙏 A big thanks to everyone who helped shape APIPark. We are thrilled to hear the community’s thoughts! Let’s make the world of APIs and AI stronger and more fun together. 🎉
+
+
+
+
