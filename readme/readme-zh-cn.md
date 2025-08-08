@@ -202,6 +202,16 @@ curl -sSO https://download.apipark.com/install/quick-start.sh; bash quick-start.
 
 # 📕文档
 访问 [APIPark文档](https://docs.apipark.com/docs/deploy) 获取详细的安装指南、API 参考和使用说明。
+<br>
+
+
+
+友情链接
+<a href="https://xroute.ai/">
+
+  <img width="1248" height="158" alt="新建 PPTX 演示文稿 (2)_02(1)" src="https://github.com/user-attachments/assets/3e1cd0c1-c4c3-4f0c-8649-810d76f3166b" />
+
+</a>
 
 <br>
 
