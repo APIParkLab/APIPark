@@ -185,6 +185,41 @@ func (i *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 		Id:      projectID,
 		Version: version,
 	}
+	upstreamProxyHeaders := make([]*gateway.ProxyHeader, 0)
+	var upstreamRelease *gateway.UpstreamRelease
+	if len(upstreamCommitIds) > 0 {
+		upstreamCommits, err := i.upstreamService.ListCommit(ctx, upstreamCommitIds...)
+		if err != nil {
+			return nil, err
+		}
+		for _, c := range upstreamCommits {
+			upstreamRelease = &gateway.UpstreamRelease{
+				BasicItem: &gateway.BasicItem{
+					ID:      c.Target,
+					Version: version,
+					MatchLabels: map[string]string{
+						"serviceId": projectID,
+					},
+				},
+				PassHost: c.Data.PassHost,
+				Scheme:   c.Data.Scheme,
+				Balance:  c.Data.Balance,
+				Timeout:  c.Data.Timeout,
+				Nodes: utils.SliceToSlice(c.Data.Nodes, func(n *upstream.NodeConfig) string {
+					return fmt.Sprintf("%s weight=%d", n.Address, n.Weight)
+				}),
+			}
+
+			upstreamProxyHeaders = utils.SliceToSlice(c.Data.ProxyHeaders, func(n *upstream.ProxyHeader) *gateway.ProxyHeader {
+				return &gateway.ProxyHeader{
+					Key:   n.Key,
+					Value: n.Value,
+					Opt:   n.OptType,
+				}
+			})
+		}
+		r.Upstream = upstreamRelease
+	}
 	apis := make([]*gateway.ApiRelease, 0, len(apiInfos))
 	hasUpstream := len(upstreamCommitIds) > 0
 	for _, a := range apiInfos {
@@ -221,38 +256,15 @@ func (i *imlPublishModule) getProjectRelease(ctx context.Context, projectID stri
 					Opt:   h.OptType,
 				}
 			})
+			apiInfo.ProxyHeaders = append(apiInfo.ProxyHeaders, upstreamProxyHeaders...)
+
 			apiInfo.Retry = proxy.Retry
 			apiInfo.Timeout = proxy.Timeout
 		}
 		apis = append(apis, apiInfo)
 	}
 	r.Apis = apis
-	var upstreamRelease *gateway.UpstreamRelease
-	if len(upstreamCommitIds) > 0 {
-		upstreamCommits, err := i.upstreamService.ListCommit(ctx, upstreamCommitIds...)
-		if err != nil {
-			return nil, err
-		}
-		for _, c := range upstreamCommits {
-			upstreamRelease = &gateway.UpstreamRelease{
-				BasicItem: &gateway.BasicItem{
-					ID:      c.Target,
-					Version: version,
-					MatchLabels: map[string]string{
-						"serviceId": projectID,
-					},
-				},
-				PassHost: c.Data.PassHost,
-				Scheme:   c.Data.Scheme,
-				Balance:  c.Data.Balance,
-				Timeout:  c.Data.Timeout,
-				Nodes: utils.SliceToSlice(c.Data.Nodes, func(n *upstream.NodeConfig) string {
-					return fmt.Sprintf("%s weight=%d", n.Address, n.Weight)
-				}),
-			}
-		}
-		r.Upstream = upstreamRelease
-	}
+
 	if len(strategyCommitIds) > 0 {
 		strategyCommits, err := i.strategyService.ListStrategyCommit(ctx, strategyCommitIds...)
 		if err != nil {

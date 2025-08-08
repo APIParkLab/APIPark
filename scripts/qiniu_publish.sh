@@ -22,7 +22,7 @@ echo "login qiniu..."
 qshell account ${AccessKey} ${SecretKey} ${QINIU_NAME}
 
 echo "qshell rput ${QINIU_BUCKET} \"${APP}/images/${Tar}\" ${Tar}"
-qshell rput ${QINIU_BUCKET} "${APP}/images/${Tar}" ${Tar}
+qshell rput --overwrite ${QINIU_BUCKET} "${APP}/images/${Tar}" ${Tar}
 
 rm -f ${Tar}
 docker rmi -f ${ImageName}:${Version}
