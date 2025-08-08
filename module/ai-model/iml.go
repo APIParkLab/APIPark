@@ -128,17 +128,19 @@ func (i *imlProviderModelModule) DeleteProviderModel(ctx *gin.Context, provider 
 		if err := i.providerModelService.Delete(ctx, id); err != nil {
 			return err
 		}
-		err = i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
-			{
-				BasicItem: &gateway.BasicItem{
-					ID:       fmt.Sprintf("%s#%s", provider, modelInfo.Name),
-					Resource: "ai-model",
+		if p.GetModelConfig().AccessConfigurationStatus {
+			err = i.syncGateway(ctx, cluster.DefaultClusterID, []*gateway.DynamicRelease{
+				{
+					BasicItem: &gateway.BasicItem{
+						ID:       fmt.Sprintf("%s$%s", provider, modelInfo.Name),
+						Resource: "ai-model",
+					},
+					Attr: nil,
 				},
-				Attr: nil,
-			},
-		}, false)
-		if err != nil {
-			return err
+			}, false)
+			if err != nil {
+				return err
+			}
 		}
 
 		p.RemoveModel(id)
@@ -200,7 +202,9 @@ func (i *imlProviderModelModule) AddProviderModel(ctx *gin.Context, provider str
 }
 
 func newModel(provider string, model string, config string) *gateway.DynamicRelease {
-
+	if config == "" {
+		config = "{}"
+	}
 	return &gateway.DynamicRelease{
 		BasicItem: &gateway.BasicItem{
 			ID:          fmt.Sprintf("%s$%s", provider, model),
