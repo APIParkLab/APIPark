@@ -154,11 +154,12 @@ const MemberList = () => {
   const [tableHttpReload, setTableHttpReload] = useState(true)
   const [tableListDataSource, setTableListDataSource] = useState<MemberTableListItem[]>([])
   const pageListRef = useRef<ActionType>(null)
-  const { topGroupId, selectedDepartmentIds, refreshGroup } = useOutletContext<{
+  const { topGroupId, selectedDepartmentIds, refreshGroup, refreshTableCount } = useOutletContext<{
     topGroupId: string
     departmentList: DepartmentListItem[]
     selectedDepartmentIds: string[]
     refreshGroup: () => void
+    refreshTableCount: number
   }>()
   const AddMemberRef = useRef<MemberDropdownModalHandle>(null)
   const EditMemberRef = useRef<MemberDropdownModalHandle>(null)
@@ -415,6 +416,13 @@ const MemberList = () => {
     setBreadcrumb([{ title: $t('成员与部门') }])
     getDepartmentList()
   }, [])
+
+  // 监听外部刷新触发器
+  useEffect(() => {
+    if (refreshTableCount > 0) {
+      manualReloadTable()
+    }
+  }, [refreshTableCount])
 
   const getDepartmentList = async () => {
     setDepartmentValueEnum([])
