@@ -95,14 +95,15 @@ const AddToDepartment = forwardRef<AddToDepartmentHandle, AddToDepartmentProps>(
       treeData?.map((x: DataNode) => ({
         ...x,
         name: $t((x as unknown as { name: string }).name),
-        checkable: false,
-        children: x.children?.map(y => ({ ...y, checkable: false }))
+        checkable: false, // 根节点不可选中
+        children: x.children?.map(y => ({ ...y, checkable: true })) // 子节点可以选中
       })),
     [state.language, treeData]
   )
 
-  const onCheck: TreeProps['onCheck'] = (checkedKeys: string[]) => {
-    setSelectedKeys(checkedKeys.checked)
+  const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
+    const selectedIds = Array.isArray(checkedKeys) ? checkedKeys : checkedKeys.checked || []
+    setSelectedKeys(selectedIds)
   }
 
   useEffect(() => {
