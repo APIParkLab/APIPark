@@ -156,6 +156,9 @@ func SetServerByOpenapi(sid, name, version, content string) error {
 		toolOptions = append(toolOptions, mcp.WithDescription(a.Description))
 		params := make(map[string]*Param)
 		for _, v := range a.Params {
+			if v.In == "header" && v.Name == "Authorization" {
+				continue
+			}
 			params[v.Name] = NewParam(Position(v.In), v.Required, v.Description)
 			options := make([]mcp.PropertyOption, 0, 2)
 			if v.Required {

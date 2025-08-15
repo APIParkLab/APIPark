@@ -236,6 +236,10 @@ func (i *imlServiceModule) AILogs(ctx context.Context, serviceId string, start i
 		return nil, 0, err
 	}
 	return utils.SliceToSlice(list, func(s *log_service.Item) *service_dto.AILogItem {
+		var tokenPerSecond int64 = 0
+		if s.ResponseTime > 0 {
+			tokenPerSecond = s.TotalToken * 1000 / s.ResponseTime
+		}
 		item := &service_dto.AILogItem{
 			Id:             s.ID,
 			API:            auto.UUID(s.API),
@@ -243,7 +247,7 @@ func (i *imlServiceModule) AILogs(ctx context.Context, serviceId string, start i
 			LogTime:        auto.TimeLabel(s.RecordTime),
 			Ip:             s.RemoteIP,
 			Token:          s.TotalToken,
-			TokenPerSecond: s.TotalToken * 1000 / s.ResponseTime,
+			TokenPerSecond: tokenPerSecond,
 			Consumer:       auto.UUID(s.Consumer),
 			Provider:       auto.UUID(s.AIProvider),
 			Model:          s.AIModel,
