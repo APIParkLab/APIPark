@@ -225,10 +225,46 @@ For enterprise-level features and professional technical support, contact our pr
 - Website: https://apipark.com
 - Email: contact@apipark.com
 
-<br>
-
 🙏 A big thanks to everyone who helped shape APIPark. We are thrilled to hear the community’s thoughts! Let’s make the world of APIs and AI stronger and more fun together. 🎉
 
 
+<br>
 
+# 🤝 Partner
+- [Cursor](https://www.cursor.com/): Cursor is an AI-powered code editor that integrates artificial intelligence directly into the coding workflow, offering features like intelligent next edit suggestions, deep codebase understanding for relevant answers, and natural language editing to streamline development tasks and boost developer productivity.
 
+- [Dify](https://dify.ai/): Dify is a leading Agentic AI Development Platform that provides a comprehensive suite of tools for building and extending AI applications, offering everything needed for agentic workflows, RAG pipelines, integrations, and observability, while allowing users to amplify their applications with various global Large Language Models (LLMs) and versatile plugins.
+
+- [Trae](https://www.trae.ai/): Trae is an AI-native Integrated Development Environment (IDE) product that aims to embody the concept of “The Real AI Engineer” through intelligent productivity, seamlessly integrating into the development process to enhance quality and efficiency, featuring a chat-based interaction interface and supporting code generation and assistance.
+
+- [Windsurf](https://windsurf.com/): Windsurf is an AI code editor designed to provide a seamless and limitless flow for developers, introducing a new purpose-built IDE that leverages AI to enhance coding with features like "Cascade" for deep codebase understanding, "Windsurf Tab" for intelligent autocompletion, and "Memories" for remembering important aspects of the codebase.
+
+- [Coze](https://www.coze.com/): Coze is a next-generation AI application and chatbot development platform by ByteDance, empowering users to easily create and deploy powerful AI chatbots across various platforms with a no-code bot builder, integrated workflow logic, access to proprietary data, and simplified creation through pre-built plugins, knowledge bases, and workflows.
+
+- [Claude Code](https://www.anthropic.com/claude-code): Claude Code is a command-line AI tool by Anthropic that embeds the Claude Opus 4 model directly into the user’s terminal, providing deep codebase awareness, the ability to edit files and execute commands, and making coordinated changes across multiple files, all while integrating seamlessly with popular IDEs and leveraging existing test suites.
+
+- [Flowith](https://flowith.io/): Flowith is an AI creation workspace designed to revolutionize productivity and deep work by transforming knowledge and streamlining tasks through a multi-thread interface powered by advanced AI agents, offering an intuitive canvas-based user experience unlike traditional chat-based AI tools, and including a 24/7 operational version for complex tasks.
+
+- [OpenManus](https://github.com/FoundationAgents/OpenManus): OpenManus is an open-source framework dedicated to building general AI agents, aiming to provide a platform where users can create and deploy their own agents without an invite code, supporting multi-agent capabilities, and requiring configuration for Large Language Model (LLM) APIs while integrating with browser automation tools.
+
+- [Fellou](https://fellou.ai/): Fellou is an innovative Agentic Browser designed to transcend traditional web browsing by actively performing actions on behalf of the user, automating the entire process of information gathering and insight delivery, and excelling in in-depth research with seamless integrations with popular tools like Notion and LinkedIn.
+
+- [Genspark](https://www.genspark.ai/): Genspark is an ultimate all-in-one AI companion offering a comprehensive suite of tools like AI Slides, AI Sheets, and AI Chat, designed to enhance various aspects of productivity and content creation, with personalized tools and AI Pods for generating content from diverse sources.
+
+- [TEN](https://github.com/TEN-framework/ten-framework): TEN (The Embodied Narrator) is an open-source framework for building real-time, multimodal conversational voice AI agents, including components like TEN Framework, TEN Turn Detection, TEN Agent, TMAN Designer, and TEN Portal, offering features like Real-time Avatar, seamless MCP integration, real-time hardware communication, and vision/screenshare detection.
+
+- [ChatGPT](https://chatgpt.com/): ChatGPT is an AI chatbot developed by OpenAI, built upon large language models like GPT-3.5 and GPT-4, designed to generate human-like conversational dialogue, understand context, answer follow-up questions, and integrate with various platforms for enhanced productivity through advanced language understanding, generation, and multilingual capabilities.
+
+- [LangChain](https://www.langchain.com/): LangChain is a robust platform engineered for the development of reliable agents and Large Language Model (LLM) applications, offering a comprehensive product suite that seamlessly integrates various tools across the entire application development lifecycle, including LangGraph, LangSmith, and the LangGraph Platform, with functionalities for code generation, automation, and AI Search.
+
+- [LEMON AI](https://lemonai.cc/): Lemon AI is the first Full-stack, Open-source, Agentic AI framework, offering a fully local alternative to platforms like Manus & Genspark AI. It features an integrated Code Interpreter VM sandbox for safe execution.
+
+- [LobeChat](https://lobehub.com/): LobeHub offers LobeChat, a personal LLM productivity tool designed to elevate the user experience beyond traditional chatbots by empowering individuals to build personal AI agents and professional teams, supporting a wide array of LLMs, offering a simple chat interface, visual recognition, voice interaction, a rich plugin ecosystem, and knowledge base functionalities.
+
+- [VS Code](https://code.visualstudio.com/): Visual Studio Code (VS Code) is a widely popular, free, and open-source code editor by Microsoft, renowned for its extensibility and customization, supporting vast programming languages, and integrating AI capabilities like intelligent next edit suggestions and an advanced “agent mode” for complex tasks, with broad compatibility with various AI models.
+
+- [XRoute](https://xroute.ai): The Unified Interface For LLMs, provides better prices, better throughput, and no subscription.
+
+- [XPack MCP Marketplace](https://github.com/xpack-ai/XPack-MCP-Marketplace): The world's first open-source MCP monetization platform, transform any OpenAPI into a monetizable MCP server and build your own API marketplace in just 10 minutes. Everything is open-source and ready for commercial use.
+
+- [MemU](https://github.com/NevaMind-AI/memU): MemU is an open-source memory framework for AI companions
