@@ -1,6 +1,6 @@
 provider: azure_openai
 label:
-  en_US: Azure OpenAI Service Model
+  en_US: Azure OpenAI
 icon_small:
   en_US: icon_s_en.svg
 icon_large:
@@ -16,7 +16,7 @@ supported_model_types:
   - llm
 configurate_methods:
   - customizable-model
-model_credential_schema:
+provider_credential_schema:
   credential_form_schemas:
     - variable: api_key
       label:
