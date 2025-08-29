@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	
+
 	auth_driver "github.com/APIParkLab/APIPark/module/application-authorization/auth-driver"
-	
+
 	"github.com/eolinker/go-common/utils"
-	
+
 	application_authorization_dto "github.com/APIParkLab/APIPark/module/application-authorization/dto"
 )
 
@@ -26,12 +26,12 @@ type Config struct {
 	Iss               string            `json:"iss"`
 	Algorithm         string            `json:"algorithm"`
 	Secret            string            `json:"secret"`
-	PublicKey         string            `json:"public_key"`
+	PublicKey         string            `json:"publicKey"`
 	User              string            `json:"user"`
-	UserPath          string            `json:"user_path"`
-	ClaimsToVerify    []string          `json:"claims_to_verify"`
+	UserPath          string            `json:"userPath"`
+	ClaimsToVerify    []string          `json:"claimsToVerify"`
 	Label             map[string]string `json:"label"`
-	SignatureIsBase64 bool              `json:"signature_is_base64"`
+	SignatureIsBase64 bool              `json:"signatureIsBase64"`
 }
 
 func (cfg *Config) ID() string {
@@ -46,7 +46,7 @@ func (cfg *Config) ID() string {
 		for _, claim := range cfg.ClaimsToVerify {
 			builder.WriteString(strings.TrimSpace(claim))
 		}
-	
+
 	case "RS256", "RS384", "RS512", "ES256", "ES384", "ES512":
 		builder.WriteString(strings.TrimSpace(cfg.Iss))
 		builder.WriteString(strings.TrimSpace(cfg.PublicKey))
@@ -81,7 +81,7 @@ func (cfg *Config) Valid() ([]byte, error) {
 	default:
 		return nil, fmt.Errorf("unsupport algorithm")
 	}
-	
+
 	//校验 校验字段
 	for _, claim := range cfg.ClaimsToVerify {
 		switch claim {
@@ -94,7 +94,7 @@ func (cfg *Config) Valid() ([]byte, error) {
 }
 
 func (cfg *Config) Detail() []application_authorization_dto.DetailItem {
-	
+
 	items := []application_authorization_dto.DetailItem{
 		{Key: "Iss", Value: cfg.Iss},
 		{Key: "签名算法", Value: cfg.Algorithm},
@@ -102,7 +102,7 @@ func (cfg *Config) Detail() []application_authorization_dto.DetailItem {
 		{Key: "用户名JsonPath", Value: cfg.UserPath},
 		{Key: "校验字段", Value: strings.Join(cfg.ClaimsToVerify, ",")},
 	}
-	
+
 	switch cfg.Algorithm {
 	case "HS256", "HS384", "HS512":
 		items = append(items, application_authorization_dto.DetailItem{Key: "Secret", Value: cfg.Secret})
@@ -110,10 +110,10 @@ func (cfg *Config) Detail() []application_authorization_dto.DetailItem {
 		if cfg.SignatureIsBase64 {
 			base64 = "true"
 		}
-		items = append(items, application_authorization_dto.DetailItem{Key: "Secret", Value: base64})
+		items = append(items, application_authorization_dto.DetailItem{Key: "SignatureIsBase64", Value: base64})
 	default:
 		items = append(items, application_authorization_dto.DetailItem{Key: "RSA公钥", Value: cfg.PublicKey})
 	}
-	
+
 	return items
 }
