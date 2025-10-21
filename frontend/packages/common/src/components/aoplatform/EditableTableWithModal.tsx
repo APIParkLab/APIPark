@@ -132,7 +132,7 @@ const EditableTableWithModal = <T extends { _id?: string }>({
             }
           ])
     ],
-    [state.language, disabled, configFields]
+    [state.language, disabled, configFields, configurations]
   )
 
   const formItems = useMemo(() => {
