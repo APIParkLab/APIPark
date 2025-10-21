@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	service_overview "github.com/APIParkLab/APIPark/service/service-overview"
-
 	mcp_server "github.com/APIParkLab/APIPark/mcp-server"
+
+	service_overview "github.com/APIParkLab/APIPark/service/service-overview"
 
 	"github.com/APIParkLab/APIPark/module/monitor/driver"
 
@@ -326,15 +326,6 @@ func (i *imlCatalogueModule) Subscribe(ctx context.Context, subscribeInfo *catal
 	})
 }
 
-var mcpDefaultConfig = `{
-  "mcpServers": {
-    "%s": {
-      "url": "%s"
-    }
-  }
-}
-`
-
 func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*catalogue_dto.ServiceDetail, error) {
 	// 获取服务的基本信息
 	s, err := i.serviceService.Get(ctx, sid)
@@ -400,8 +391,15 @@ func (i *imlCatalogueModule) ServiceDetail(ctx context.Context, sid string) (*ca
 	mcpAccessConfig := ""
 	if s.EnableMCP {
 		if sitePrefix != "" {
-			mcpAccessAddress = fmt.Sprintf("%s/openapi/v1/%s/%s/sse?apikey={your_api_key}", strings.TrimSuffix(sitePrefix, "/"), mcp_server.ServiceBasePath, s.Id)
-			mcpAccessConfig = fmt.Sprintf(mcpDefaultConfig, fmt.Sprintf("APIPark/%s", s.Name), mcpAccessAddress)
+			mcpAccessConfig = mcp_server.NewMCPConfig(
+				mcp_server.TransportTypeStreamableHTTP,
+				fmt.Sprintf("%s/openapi/v1/service/mcp", strings.TrimSuffix(sitePrefix, "/")),
+				map[string]string{
+					"Authorization": "Bearer {your_api_key}",
+					"X-Service-Id":  s.Id,
+				},
+				nil,
+			).ToString(fmt.Sprintf("APIPark/%s", s.Name))
 		}
 	}
 	invokeMap, err := i.ProviderStatistics(ctx, time.Now().Add(-24*30*time.Hour), time.Now(), s.Id)

@@ -60,6 +60,7 @@ func (o *openapiCheck) Handler(ginCtx *gin.Context) {
 		}
 		authorization = apikey
 	}
+	authorization = strings.TrimPrefix(authorization, "Bearer ")
 	if authorization == o.apikey {
 		return
 	}
