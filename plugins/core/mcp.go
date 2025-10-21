@@ -17,12 +17,16 @@ func (p *plugin) mcpAPIs() []pm3.Api {
 	globalMessagePath := fmt.Sprintf("/api/v1/%s/message", mcp_server.GlobalBasePath)
 	appSSEPath := fmt.Sprintf("/api/v1/%s/sse", mcp_server.AppBasePath)
 	appMessagePath := fmt.Sprintf("/api/v1/%s/message", mcp_server.AppBasePath)
+	globalMcpPath := fmt.Sprintf("/api/v1/%s/mcp", mcp_server.GlobalBasePath)
+	appMcpPath := fmt.Sprintf("/api/v1/%s/mcp", mcp_server.AppBasePath)
 	ignore.IgnorePath("login", http.MethodGet, serviceSSEPath)
 	ignore.IgnorePath("login", http.MethodPost, serviceMessagePath)
 	ignore.IgnorePath("login", http.MethodGet, globalSSEPath)
 	ignore.IgnorePath("login", http.MethodPost, globalMessagePath)
 	ignore.IgnorePath("login", http.MethodGet, appSSEPath)
 	ignore.IgnorePath("login", http.MethodPost, appMessagePath)
+	ignore.IgnorePath("login", http.MethodGet, globalMcpPath)
+	ignore.IgnorePath("login", http.MethodGet, appMcpPath)
 	return []pm3.Api{
 		pm3.CreateApiSimple(http.MethodGet, serviceSSEPath, p.mcpController.MCPHandle),
 		pm3.CreateApiSimple(http.MethodPost, serviceMessagePath, p.mcpController.MCPHandle),

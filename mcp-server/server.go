@@ -17,6 +17,10 @@ var (
 	ServiceBasePath = "mcp/service"
 	GlobalBasePath  = "mcp/global"
 	AppBasePath     = "mcp/app"
+
+	OpenGlobalMCPPath  = "/openapi/v1/global/mcp"
+	OpenAppMCPPath     = "/openapi/v1/app/mcp"
+	OpenServiceMCPPath = "/openapi/v1/service/mcp"
 )
 
 func NewServer() *Server {
@@ -61,7 +65,7 @@ func (s *Server) Set(id string, ser *server.MCPServer) {
 	}
 	tmp.handlers["api-sse"] = server.NewSSEServer(ser, server.WithStaticBasePath(fmt.Sprintf("/api/v1/%s/%s", ServiceBasePath, id)))
 	tmp.handlers["openapi-sse"] = server.NewSSEServer(ser, server.WithStaticBasePath(fmt.Sprintf("/openapi/v1/%s/%s", ServiceBasePath, id)))
-	tmp.handlers["openapi-stream"] = server.NewStreamableHTTPServer(ser, server.WithEndpointPath(fmt.Sprintf("/openapi/v1/%s/%s/mcp", ServiceBasePath, id)))
+	tmp.handlers["openapi-stream"] = server.NewStreamableHTTPServer(ser, server.WithEndpointPath(OpenServiceMCPPath))
 	s.servers[id] = tmp
 
 }
@@ -91,12 +95,23 @@ func (s *Server) Get(id string) (*Handler, bool) {
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	sid, err := genPath(r.URL.Path)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
+	var sid string
+	if r.URL.Path == OpenServiceMCPPath {
+		sid = r.Header.Get("X-Service-Id")
+		if sid == "" {
+			http.NotFound(w, r)
+			return
+		}
+	} else {
+		id, err := genPath(r.URL.Path)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+			return
+		}
+		sid = id
 	}
+
 	ser, has := s.Get(sid)
 	if has {
 		ser.ServeHTTP(w, r)

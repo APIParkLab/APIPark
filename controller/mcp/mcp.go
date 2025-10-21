@@ -13,11 +13,13 @@ type IMcpController interface {
 	GlobalMCPHandle(ctx *gin.Context)
 	GlobalHandleSSE(ctx *gin.Context)
 	GlobalHandleMessage(ctx *gin.Context)
+	GlobalHandleStreamHTTP(ctx *gin.Context)
 	GlobalMCPConfig(ctx *gin.Context) (string, error)
 
 	AppMCPHandle(ctx *gin.Context)
 	AppHandleSSE(ctx *gin.Context)
 	AppHandleMessage(ctx *gin.Context)
+	AppHandleStreamHTTP(ctx *gin.Context)
 	AppMCPConfig(ctx *gin.Context, appId string) (string, error)
 
 	ServiceHandleSSE(ctx *gin.Context)

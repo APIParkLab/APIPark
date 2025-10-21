@@ -19,17 +19,22 @@ func (p *plugin) mcpAPIs() []pm3.Api {
 
 	serviceSSEPath := fmt.Sprintf("/openapi/v1/%s/:serviceId/sse", strings.Trim(mcp_server.ServiceBasePath, "/"))
 	serviceMessagePath := fmt.Sprintf("/openapi/v1/%s/:serviceId/message", strings.Trim(mcp_server.ServiceBasePath, "/"))
-	serviceStreamablePath := fmt.Sprintf("/openapi/v1/%s/:serviceId/mcp", strings.Trim(mcp_server.ServiceBasePath, "/"))
+	//serviceStreamablePath := fmt.Sprintf("/openapi/v1/%s/:serviceId/mcp", strings.Trim(mcp_server.ServiceBasePath, "/"))
 
 	ignore.IgnorePath("openapi", http.MethodPost, globalMessagePath)
-	ignore.IgnorePath("openapi", http.MethodGet, globalSSEPath)
+	//ignore.IgnorePath("openapi", http.MethodGet, globalSSEPath)
 	ignore.IgnorePath("openapi", http.MethodPost, appMessagePath)
 	ignore.IgnorePath("openapi", http.MethodGet, appSSEPath)
 	ignore.IgnorePath("openapi", http.MethodGet, serviceSSEPath)
 	ignore.IgnorePath("openapi", http.MethodPost, serviceMessagePath)
-	ignore.IgnorePath("openapi", http.MethodGet, serviceStreamablePath)
-	ignore.IgnorePath("openapi", http.MethodPost, serviceStreamablePath)
-	ignore.IgnorePath("openapi", http.MethodDelete, serviceStreamablePath)
+
+	ignore.IgnorePath("openapi", http.MethodGet, mcp_server.OpenAppMCPPath)
+	ignore.IgnorePath("openapi", http.MethodPost, mcp_server.OpenAppMCPPath)
+	ignore.IgnorePath("openapi", http.MethodDelete, mcp_server.OpenAppMCPPath)
+
+	ignore.IgnorePath("openapi", http.MethodGet, mcp_server.OpenServiceMCPPath)
+	ignore.IgnorePath("openapi", http.MethodPost, mcp_server.OpenServiceMCPPath)
+	ignore.IgnorePath("openapi", http.MethodDelete, mcp_server.OpenServiceMCPPath)
 
 	return []pm3.Api{
 		pm3.CreateApiSimple(http.MethodGet, globalSSEPath, p.mcpController.GlobalHandleSSE),
@@ -41,9 +46,17 @@ func (p *plugin) mcpAPIs() []pm3.Api {
 		pm3.CreateApiSimple(http.MethodGet, serviceSSEPath, p.mcpController.ServiceHandleSSE),
 		pm3.CreateApiSimple(http.MethodPost, serviceMessagePath, p.mcpController.ServiceHandleMessage),
 
-		pm3.CreateApiSimple(http.MethodPost, serviceStreamablePath, p.mcpController.ServiceHandleStreamHTTP),
-		pm3.CreateApiSimple(http.MethodDelete, serviceStreamablePath, p.mcpController.ServiceHandleStreamHTTP),
-		pm3.CreateApiSimple(http.MethodGet, serviceStreamablePath, p.mcpController.ServiceHandleStreamHTTP),
+		pm3.CreateApiSimple(http.MethodGet, mcp_server.OpenGlobalMCPPath, p.mcpController.GlobalHandleStreamHTTP),
+		pm3.CreateApiSimple(http.MethodPost, mcp_server.OpenGlobalMCPPath, p.mcpController.GlobalHandleStreamHTTP),
+		pm3.CreateApiSimple(http.MethodDelete, mcp_server.OpenGlobalMCPPath, p.mcpController.GlobalHandleStreamHTTP),
+
+		pm3.CreateApiSimple(http.MethodGet, mcp_server.OpenAppMCPPath, p.mcpController.AppHandleStreamHTTP),
+		pm3.CreateApiSimple(http.MethodPost, mcp_server.OpenAppMCPPath, p.mcpController.AppHandleStreamHTTP),
+		pm3.CreateApiSimple(http.MethodDelete, mcp_server.OpenAppMCPPath, p.mcpController.AppHandleStreamHTTP),
+
+		pm3.CreateApiSimple(http.MethodPost, mcp_server.OpenServiceMCPPath, p.mcpController.ServiceHandleStreamHTTP),
+		pm3.CreateApiSimple(http.MethodDelete, mcp_server.OpenServiceMCPPath, p.mcpController.ServiceHandleStreamHTTP),
+		pm3.CreateApiSimple(http.MethodGet, mcp_server.OpenServiceMCPPath, p.mcpController.ServiceHandleStreamHTTP),
 	}
 
 }

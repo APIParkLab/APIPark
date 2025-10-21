@@ -3,9 +3,10 @@ package commit
 import (
 	"context"
 	"errors"
-	"github.com/eolinker/go-common/utils"
 	"strings"
 	"time"
+
+	"github.com/eolinker/go-common/utils"
 
 	"github.com/eolinker/go-common/store"
 	"github.com/google/uuid"
