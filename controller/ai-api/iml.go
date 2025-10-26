@@ -113,9 +113,13 @@ func (i *imlAPIController) Edit(ctx *gin.Context, serviceId string, apiId string
 			if input.AiModel.Type != "local" {
 				provider = input.AiModel.Provider
 			}
+			modelName := input.AiModel.Name
+			if modelName == "" {
+				modelName = input.AiModel.Id
+			}
 			proxy.Plugins["ai_formatter"] = api.PluginSetting{
 				Config: plugin_model.ConfigType{
-					"model":    input.AiModel.Name,
+					"model":    modelName,
 					"provider": provider,
 					"config":   input.AiModel.Config,
 				},

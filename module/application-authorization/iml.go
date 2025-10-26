@@ -219,19 +219,19 @@ func (i *imlAuthorizationModule) initGateway(ctx context.Context, partitionId st
 	return clientDriver.Application().Online(ctx, applications...)
 }
 
-func (i *imlAuthorizationModule) online(ctx context.Context, s *service.Service) error {
-	clusters, err := i.clusterService.List(ctx)
-	if err != nil {
-		return err
-	}
-	if len(clusters) < 1 {
-		return nil
-	}
+func (i *imlAuthorizationModule) getApplicationRelease(ctx context.Context, s *service.Service) (*gateway.ApplicationRelease, error) {
 	authorizations, err := i.authorizationService.ListByApp(ctx, s.Id)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	app := &gateway.ApplicationRelease{
+	if len(authorizations) < 1 {
+		return &gateway.ApplicationRelease{
+			BasicItem: &gateway.BasicItem{
+				ID: s.Id,
+			},
+		}, nil
+	}
+	return &gateway.ApplicationRelease{
 		BasicItem: &gateway.BasicItem{
 			ID:          s.Id,
 			Description: s.Description,
@@ -256,10 +256,40 @@ func (i *imlAuthorizationModule) online(ctx context.Context, s *service.Service)
 				},
 			}
 		}),
+	}, nil
+}
+func (i *imlAuthorizationModule) doOffline(ctx context.Context, clusterId string, app *gateway.ApplicationRelease) error {
+	client, err := i.clusterService.GatewayClient(ctx, clusterId)
+	if err != nil {
+		return err
 	}
+	defer func() {
+		_ = client.Close(ctx)
+	}()
+	return client.Application().Offline(ctx, app)
+}
 
+func (i *imlAuthorizationModule) online(ctx context.Context, s *service.Service) error {
+	clusters, err := i.clusterService.List(ctx)
+	if err != nil {
+		return err
+	}
+	if len(clusters) < 1 {
+		return nil
+	}
+	release, err := i.getApplicationRelease(ctx, s)
+	if err != nil {
+		return err
+	}
 	for _, c := range clusters {
-		err := i.doOnline(ctx, c.Uuid, app)
+		if len(release.Authorizations) < 1 {
+			err = i.doOffline(ctx, c.Uuid, release)
+			if err != nil {
+				log.Warnf("service authorization offline for cluster[%s] %v", c.Name, err)
+			}
+			continue
+		}
+		err = i.doOnline(ctx, c.Uuid, release)
 		if err != nil {
 			log.Warnf("service authorization online for cluster[%s] %v", c.Name, err)
 		}
@@ -375,7 +405,7 @@ func (i *imlAuthorizationModule) EditAuthorization(ctx context.Context, appId st
 }
 
 func (i *imlAuthorizationModule) DeleteAuthorization(ctx context.Context, pid string, aid string) error {
-	_, err := i.serviceService.Get(ctx, pid)
+	s, err := i.serviceService.Get(ctx, pid)
 	if err != nil {
 		return err
 	}
@@ -385,35 +415,11 @@ func (i *imlAuthorizationModule) DeleteAuthorization(ctx context.Context, pid st
 		if err != nil {
 			return err
 		}
-		clusters, err := i.clusterService.List(ctx)
-		if err != nil {
-			return err
-		}
-		app := &gateway.ApplicationRelease{
-			BasicItem: &gateway.BasicItem{
-				ID: pid,
-			},
-		}
-		for _, c := range clusters {
-			err := i.doOffline(ctx, c.Uuid, app)
-			if err != nil {
-				log.Warnf("service authorization offline for cluster[%s] %v", c.Name, err)
-			}
-		}
-		return nil
+
+		return i.online(ctx, s)
 	})
 }
-func (i *imlAuthorizationModule) doOffline(ctx context.Context, clusterId string, app *gateway.ApplicationRelease) error {
-	client, err := i.clusterService.GatewayClient(ctx, clusterId)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		_ = client.Close(ctx)
-	}()
-	return client.Application().Offline(ctx, app)
 
-}
 func (i *imlAuthorizationModule) Authorizations(ctx context.Context, pid string) ([]*application_authorization_dto.AuthorizationItem, error) {
 	_, err := i.serviceService.Get(ctx, pid)
 	if err != nil {

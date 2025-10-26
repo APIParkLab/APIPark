@@ -520,16 +520,21 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 	modelId := ""
 	modelCfg := ""
 	modelType := "online"
+	if input.Model != nil {
+		modelId = *input.Model
+	}
 	if *input.Provider == ai_provider_local.ProviderLocal {
 		modelType = "local"
-		list, err := i.aiLocalModel.SimpleList(ctx)
-		if err != nil {
-			return nil, err
+		if modelId == "" {
+			list, err := i.aiLocalModel.SimpleList(ctx)
+			if err != nil {
+				return nil, err
+			}
+			if len(list) == 0 {
+				return nil, fmt.Errorf("no local model")
+			}
+			modelId = list[0].Id
 		}
-		if len(list) == 0 {
-			return nil, fmt.Errorf("no local model")
-		}
-		modelId = list[0].Id
 		modelCfg = ai_provider_local.LocalConfig
 	} else {
 		pv, err := i.providerModule.Provider(ctx, *input.Provider)
@@ -540,14 +545,15 @@ func (i *imlServiceController) createAIService(ctx *gin.Context, teamID string, 
 		if !has {
 			return nil, fmt.Errorf("provider not found")
 		}
-		m, has := p.GetModel(pv.DefaultLLM)
+		if modelId == "" {
+			modelId = pv.DefaultLLM
+		}
+		m, has := p.GetModel(modelId)
 		if !has {
 			return nil, fmt.Errorf("model %s not found", pv.DefaultLLM)
 		}
-		//modelId = m.ID()
 		modelId = m.Name()
 		modelCfg = m.DefaultConfig()
-
 	}
 
 	var info *service_dto.Service
