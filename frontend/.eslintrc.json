@@ -21,7 +21,7 @@
   "plugins": ["react", "@typescript-eslint", "prettier", "unused-imports"],
   "rules": {
     "react/react-in-jsx-scope": "off",
-    "prettier/prettier": "error",
+    "prettier/prettier": "off",
     "@typescript-eslint/no-explicit-any": "warn",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "off",

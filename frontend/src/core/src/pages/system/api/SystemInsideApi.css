@@ -1,0 +1,21 @@
+.form-input-group{
+    .ant-input-group-addon{
+        border:none !important;
+        margin-right:-1px;
+        border-radius: 0px !important;
+        padding:0px !important;}
+
+    .ant-input-group-addon .ant-input{
+        border-radius: 0px !important;
+        margin-right:-1px;
+    }
+}
+.api-tabs{
+    .ant-tabs-content-holder{
+         overflow:auto;}
+    .ant-tabs-content-holder .ant-tabs-content{
+        height:100%;}
+    .ant-tabs-content-holder .ant-tabs-content .ant-tabs-tabpane.ant-tabs-tabpane-active{
+        height:100%;
+    }
+ }

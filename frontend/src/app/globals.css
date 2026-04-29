@@ -1,0 +1,11 @@
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
+@config "../../tailwind.config.js";
+@import "@heroui/styles"; 
+
+/* Avoid reset styles forcing media icons to line-break as block elements. */
+img,
+svg {
+  display: inline-block;
+  vertical-align: middle;
+}

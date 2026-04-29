@@ -1,0 +1,37 @@
+@import 'tailwindcss/theme' layer(theme);
+@import 'tailwindcss/utilities' layer(utilities);
+@config "../../../tailwind.config.js";
+@import '@heroui/styles';
+
+/* Avoid reset styles forcing media icons to line-break as block elements. */
+img,
+svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+.ant-tree-node-content-wrapper {
+  overflow: hidden;
+}
+.tree-title-hover {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .tree-title-span {
+    text-overflow: ellipsis;
+  }
+  .tree-title-more {
+    display: none;
+  }
+
+  &:hover .tree-title-more {
+    display: flex;
+    height: 22px;
+    width: 22px;
+  }
+}

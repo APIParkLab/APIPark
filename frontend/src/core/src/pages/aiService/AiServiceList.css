@@ -1,0 +1,14 @@
+.system-tree {
+    .ant-tree .ant-tree-switcher{
+        width:8px !important;
+    } 
+
+    .ant-tree-node-content-wrapper{
+            height:40px;
+            padding:0 10px;
+        }
+    .ant-tree-title{
+        line-height:40px;
+
+    }
+}

@@ -1,39 +1,38 @@
-/** @type {import('tailwindcss').Config} */
 
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   important: true,
-  corePlugins: {
-    preflight: false,
-  },
-  content: [`./packages/**/index.html`, `./packages/**/src/**/*.{js,ts,jsx,tsx}`],
+  content: [
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}"
+  ],
   theme: {
     extend: {
       width: {
         INPUT_NORMAL: '100%',
-        // INPUT_NORMAL: '346px',
         INPUT_LARGE: '508px',
         GROUP: '240px',
         SEARCH: '276px',
-        LOG: '254px',
+        LOG: '254px'
       },
-      minHeight: {
-        TEXTAREA: '68px',
+      minHeight:{
+        TEXTAREA:'68px'
       },
       borderRadius: {
         DEFAULT: 'var(--border-radius)',
-        SEARCH_RADIUS: '50px',
+        SEARCH_RADIUS: '50px'
       },
-      boxShadow: {
+      boxShadow:{
         SCROLL: '0 2px 2px #0000000d',
-        SCROLL_TOP: ' 0 -2px 2px -2px var(--border-color)',
+        SCROLL_TOP:' 0 -2px 2px -2px var(--border-color)'
       },
       colors: {
         DISABLE_BG: 'var(--disabled-background-color)',
         MAIN_TEXT: 'var(--text-color)',
         MAIN_HOVER_TEXT: 'var(--text-hover-color)',
-        SECOND_TEXT: 'var(--disabled-text-color)',
+        SECOND_TEXT:'var(--disabled-text-color)',
         MAIN_BG: 'var(--background-color)',
-        MENU_BG: 'var(--MENU-BG-COLOR)',
+        MENU_BG:'var(--MENU-BG-COLOR)',
         'bar-theme': 'var(--bar-background-color)',
         BORDER: 'var(--border-color)',
         NAVBAR_BTN_BG: 'var(--item-active-background-color)',
@@ -47,32 +46,52 @@ module.exports = {
         guide_publishApi: '#5884ff',
         guide_final: '#915bf9',
         table_text: 'var(--table-text-color)',
-        status_success: '#138913',
-        status_fail: '#ff3b30',
-        status_update: '#03a9f4',
-        status_pending: '#ffa500',
-        status_offline: '#8f8e93',
-        A_HOVER: 'var(--button-primary-hover-background-color)',
+        status_success:'#138913',
+        status_fail:"#ff3b30",
+        status_update:"#03a9f4",
+        status_pending:"#ffa500",
+        status_offline:"#8f8e93",
+        A_HOVER:'var(--button-primary-hover-background-color)'
+      },
+      backgroundImage:{
+        LAYOUT_BG:'linear-gradient(107.97deg, rgba(32,41,117,1) 4.41%,rgba(16,13,27,1) 86.11%)',
+        LAYOUT_BG_DARK:'#fff',
       },
       spacing: {
         mbase: 'var(--FORM_SPAN)',
-        label: '12px', // 选择器和label之间的间距，待删
-        btnbase: 'var(--LAYOUT_MARGIN)', // x方向的间距
-        btnybase: 'var(--LAYOUT_MARGIN)', // y轴方向的间距
-        btnrbase: '20px', // 页面最右侧边距20px
+        label: '12px',
+        btnbase: 'var(--LAYOUT_MARGIN)',
+        btnybase: 'var(--LAYOUT_MARGIN)',
+        btnrbase: '20px',
         formtop: 'var(--FORM_SPAN)',
         icon: '5px',
         blockbase: '40px',
         DEFAULT_BORDER_RADIUS: 'var(--border-radius)',
-        TREE_TITLE: 'var(--small-padding) var(--LAYOUT_PADDING);',
+        TREE_TITLE:'var(--small-padding) var(--LAYOUT_PADDING);',
+        'navbar-height': 'var(--layout-header-height)',
+        TAG_LEFT:'10px',
+        PAGE_INSIDE_X:'40px',
+        PAGE_INSIDE_T:'30px',
+        PAGE_INSIDE_B:'20px',
       },
       borderColor: {
-        'color-base': 'var(--border-color)',
-      },
+        'color-base': 'var(--border-color)'
+      }
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      addUtilities({
+        '.h-calc-100vh-minus-navbar': {
+          height: 'calc(100vh - var(--layout-header-height))',
+        },
+        '.w-calc-100vw-minus-padding-r': {
+          width: 'calc(100% - 40px)',
+        },
+      }, ['responsive', 'hover']);
+    }
+  ],
   corePlugins: {
     preflight: false,
   },
-};
+}

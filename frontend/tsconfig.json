@@ -1,15 +1,77 @@
 {
-  "extends": "./packages/core/tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
     "target": "es5",
-    "jsx": "react",
-    "types": ["jest", "node"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": false
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@common/*": [
+        "src/common/src/*"
+      ],
+      "@core/*": [
+        "src/core/src/*"
+      ],
+      "@dashboard/*": [
+        "src/dashboard/src/*"
+      ],
+      "@market/*": [
+        "src/market/src/*"
+      ],
+      "@openApi/*": [
+        "src/openApi/src/*"
+      ],
+      "@systemRunning/*": [
+        "src/systemRunning/src/*"
+      ],
+      "@apipark/common/*": [
+        "src/common/src/*"
+      ],
+      "@apipark/core/*": [
+        "src/core/src/*"
+      ],
+      "@apipark/dashboard/*": [
+        "src/dashboard/src/*"
+      ],
+      "@apipark/market/*": [
+        "src/market/src/*"
+      ],
+      "@apipark/openApi/*": [
+        "src/openApi/src/*"
+      ],
+      "@apipark/systemRunning/*": [
+        "src/systemRunning/src/*"
+      ]
+    }
   },
-  "include": ["**/*.test.ts", "**/*.test.tsx", "jest.setup.js"],
-  "exclude": ["node_modules"]
-  
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
