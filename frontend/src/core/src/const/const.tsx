@@ -4,24 +4,39 @@ import { AiServiceProvider } from '@core/contexts/AiServiceContext'
 import { SystemProvider } from '@core/contexts/SystemContext'
 import { TeamProvider } from '@core/contexts/TeamContext'
 import AiServiceOutlet from '@core/pages/aiService/AiServiceOutlet'
-import Guide from '@core/pages/guide/Guide'
-import Login from '@core/pages/Login'
 import ServicePolicyLayout from '@core/pages/policy/ServicePolicyLayout'
 import SystemOutlet from '@core/pages/system/SystemOutlet'
 import { TenantManagementProvider } from '@market/contexts/TenantManagementContext'
-import { lazy } from 'react'
+import { lazy, useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
+
+function RedirectToNextLogin() {
+  useEffect(() => {
+    window.location.replace(`/admin/login${window.location.search || ''}`)
+  }, [])
+
+  return null
+}
+
+function RedirectToNextGuide() {
+  useEffect(() => {
+    const query = window.location.search || ''
+    window.location.replace(`/guide/page${query}`)
+  }, [])
+
+  return null
+}
 
 // 内置插件与对应组件/模块
 export const routerMap: Map<string, RouterMapConfig> = new Map([
   ['basicLayout', { type: 'component', component: <ProtectedRoute /> }],
   ['navHidden', { type: 'component', component: <ProtectedRoute /> }],
-  ['login', { type: 'component', component: <Login /> }],
+  ['login', { type: 'component', component: <RedirectToNextLogin /> }],
   [
     'guide',
     {
       type: 'component',
-      component: <Guide />
+      component: <RedirectToNextGuide />
     }
   ],
   [

@@ -8,7 +8,6 @@ import { $t } from '@common/locales'
 import { MenuItem } from '@common/utils/navigation'
 import { checkAccess } from '@common/utils/permission'
 import { ProtectedRoute } from '@core/components/aoplatform/RenderRoutes'
-import Login from '@core/pages/Login'
 import Root from '@core/pages/Root'
 import Playground from '@core/pages/playground'
 import DataMaskingCompare from '@core/pages/policy/dataMasking/DataMaskingCompare'
@@ -277,30 +276,30 @@ const mockData = [
 */
 export const GlobalContext = createContext<
   | {
-      state: GlobalState
-      dispatch: Dispatch<GlobalAction>
-      accessData: Map<string, string[]>
-      pluginAccessDictionary: { [k: string]: string }
-      menuList: MenuItem[]
-      getGlobalAccessData: () => Promise<{ access: string[] }>
-      getTeamAccessData: (teamId: string) => void
-      getPluginAccessDictionary: (pluginData: { [k: string]: string }) => void
-      getMenuList: () => void
-      resetAccess: () => void
-      cleanTeamAccessData: () => void
-      checkPermission: (
-        access: keyof (typeof PERMISSION_DEFINITION)[0] | Array<keyof (typeof PERMISSION_DEFINITION)[0]>
-      ) => boolean
-      teamDataFlushed: boolean
-      accessInit: boolean
-      aiConfigFlushed: boolean
-      setAiConfigFlushed: (flush: boolean) => void
-      routeConfig: RouteConfig[]
-      setRouterConfig: (isRoot: boolean, config: RouteConfig) => void
-      addRouteConfig: (parentRoute: RouteConfig, config: RouteConfig) => void
-      fetchData: ReturnType<typeof useFetch>['fetchData']
-      $t: typeof $t
-    }
+    state: GlobalState
+    dispatch: Dispatch<GlobalAction>
+    accessData: Map<string, string[]>
+    pluginAccessDictionary: { [k: string]: string }
+    menuList: MenuItem[]
+    getGlobalAccessData: () => Promise<{ access: string[] }>
+    getTeamAccessData: (teamId: string) => void
+    getPluginAccessDictionary: (pluginData: { [k: string]: string }) => void
+    getMenuList: () => void
+    resetAccess: () => void
+    cleanTeamAccessData: () => void
+    checkPermission: (
+      access: keyof (typeof PERMISSION_DEFINITION)[0] | Array<keyof (typeof PERMISSION_DEFINITION)[0]>
+    ) => boolean
+    teamDataFlushed: boolean
+    accessInit: boolean
+    aiConfigFlushed: boolean
+    setAiConfigFlushed: (flush: boolean) => void
+    routeConfig: RouteConfig[]
+    setRouterConfig: (isRoot: boolean, config: RouteConfig) => void
+    addRouteConfig: (parentRoute: RouteConfig, config: RouteConfig) => void
+    fetchData: ReturnType<typeof useFetch>['fetchData']
+    $t: typeof $t
+  }
   | undefined
 >(undefined)
 
@@ -357,9 +356,25 @@ const globalReducer = (state: GlobalState, action: GlobalAction): GlobalState =>
   }
 }
 
+function RedirectToNextLogin() {
+  useEffect(() => {
+    window.location.replace(`/admin/login${window.location.search || ''}`)
+  }, [])
+
+  return null
+}
+
+function getStoredLanguage() {
+  if (typeof window === 'undefined') {
+    return 'en-US'
+  }
+
+  return window.sessionStorage.getItem('i18nextLng') || 'en-US'
+}
+
 export const DefaultRouteConfig = [
   { path: '/', pathMatch: 'full', component: <Root />, key: 'root' },
-  { path: '/login', component: <Login />, key: 'login' },
+  { path: '/login', component: <RedirectToNextLogin />, key: 'login' },
   { path: '/dataMaskCompare/:logId/:serviceId?/:teamId?', component: <DataMaskingCompare />, key: 'dataMaskCompare' },
   {
     path: '/',
@@ -391,7 +406,7 @@ export const GlobalProvider: FC<{ children: ReactNode }> = ({ children }) => {
     updateDate: '2024-07-01',
     powered: 'Powered by https://apipark.com',
     mainPage: '/guide/page',
-    language: sessionStorage.getItem('i18nextLng') || 'en-US',
+    language: getStoredLanguage(),
     pluginsLoaded: false
   })
   const [accessData, setAccessData] = useState<Map<string, string[]>>(new Map())
@@ -559,27 +574,27 @@ export const useGlobalContext = () => {
         updateDate: '',
         powered: '',
         mainPage: '',
-        language: sessionStorage.getItem('i18nextLng') || 'en-US',
+        language: getStoredLanguage(),
         pluginsLoaded: false
       },
-      dispatch: () => {},
+      dispatch: () => { },
       accessData: new Map(),
       pluginAccessDictionary: {},
       menuList: [],
       getGlobalAccessData: async () => ({ access: [] }),
-      getTeamAccessData: () => {},
-      getPluginAccessDictionary: () => {},
-      getMenuList: () => {},
-      resetAccess: () => {},
-      cleanTeamAccessData: () => {},
+      getTeamAccessData: () => { },
+      getPluginAccessDictionary: () => { },
+      getMenuList: () => { },
+      resetAccess: () => { },
+      cleanTeamAccessData: () => { },
       checkPermission: () => false,
       teamDataFlushed: false,
       accessInit: false,
       aiConfigFlushed: false,
-      setAiConfigFlushed: () => {},
+      setAiConfigFlushed: () => { },
       routeConfig: [],
-      setRouterConfig: () => {},
-      addRouteConfig: () => {},
+      setRouterConfig: () => { },
+      addRouteConfig: () => { },
       fetchData: async () => ({}),
       $t: (key: string) => key
     }

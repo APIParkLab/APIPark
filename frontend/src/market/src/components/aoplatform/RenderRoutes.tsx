@@ -1,11 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom'
-import Login from '@core/pages/Login.tsx'
 import BasicLayout from '@common/components/aoplatform/BasicLayout'
 import { createElement, ReactElement, ReactNode, Suspense } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { App, Skeleton } from 'antd'
 import { useGlobalContext } from '@common/contexts/GlobalStateContext.tsx'
-import { FC, lazy } from 'react'
+import { FC, lazy, useEffect } from 'react'
 import { TenantManagementProvider } from '@market/contexts/TenantManagementContext.tsx'
 
 type RouteConfig = {
@@ -36,15 +35,23 @@ export type RouterParams = {
   appId: string
 }
 
+function RedirectToNextLogin() {
+  useEffect(() => {
+    window.location.replace(`/admin/login${window.location.search || ''}`)
+  }, [])
+
+  return null
+}
+
 const PUBLIC_ROUTES: RouteConfig[] = [
   {
     path: '/',
-    component: <Login />,
+    component: <RedirectToNextLogin />,
     key: uuidv4()
   },
   {
     path: '/login',
-    component: <Login />,
+    component: <RedirectToNextLogin />,
     key: uuidv4()
   },
   {

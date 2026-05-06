@@ -409,7 +409,8 @@ const AiServiceInsidePublicList:FC = ()=>{
     }, [query]);
 
     useEffect(()=>{
-        setPageType(currLocation.split('/')[0] === 'service' ? 'insidePage' : 'global')
+        const normalizedPath = currLocation.replace(/^\/+/, '')
+        setPageType(normalizedPath.split('/')[0] === 'service' ? 'insidePage' : 'global')
     },[currLocation])
 
     const manualReloadTable = () => {

@@ -181,7 +181,7 @@ export function useFetch() {
         if (response.status === STATUS_CODE.UNANTHORIZED) {
           // 处理401未登录的逻辑，比如跳转到登录页面或弹出登录框
           console.log('Unauthorized access, redirecting to login...')
-          window.location.href = '/login' // 示例：重定向到登录
+          window.location.href = '/admin/login' // 示例：重定向到登录
 
           return // 返回或抛出错误，确保不继续执行后续的响应处理
         }
@@ -189,7 +189,7 @@ export function useFetch() {
         if (response.status === STATUS_CODE.FORBIDDEN) {
           // 处理403无权限，比如跳转到登录页面或弹出登录框
           console.log('Unauthorized access, redirecting to login...')
-          // window.location.href = '/login' // 示例：重定向到登录
+          // window.location.href = '/admin/login' // 示例：重定向到登录
 
           return // 返回或抛出错误，确保不继续执行后续的响应处理
         }
