@@ -5,7 +5,7 @@ import path from 'path'
 import dynamicImportVars from '@rollup/plugin-dynamic-import-vars';
 import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
-import federation from "@originjs/vite-plugin-federation";
+import { federation } from '@module-federation/vite'
 
 export default defineConfig({
   cacheDir: './node_modules/.vite',
@@ -45,14 +45,18 @@ export default defineConfig({
         warnOnError:false
        }),
        federation({
-        name:"container",
-        remotes:{
-          remoteApp: 'http://localhost:5001/assets/remoteEntry.js' // 远程项目的URL
+        name: 'container',
+        remotes: {
+          remoteApp: {
+            type: 'module',
+            name: 'remoteApp',
+            entry: 'http://localhost:5001/assets/remoteEntry.js',
+            entryGlobalName: 'remoteApp',
+            shareScope: 'default'
+          }
         },
-        shared:[
-          "react",
-          "react-dom",
-        ]
+        filename: 'remoteEntry.js',
+        shared: ['react', 'react-dom']
       })
 
     ],
