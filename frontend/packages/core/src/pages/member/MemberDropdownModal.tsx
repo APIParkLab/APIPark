@@ -14,8 +14,7 @@ export const MemberDropdownModal = forwardRef<MemberDropdownModalHandle,MemberDr
     const {fetchData} = useFetch()
     const [departmentList, setDepartmentList] = useState<DepartmentListItem[]>([])
     const { state } = useGlobalContext()
-    const [disableEditMemberData] = useState<boolean>(entity?.form !== 'self-build')
-
+    const [disableEditMemberData] = useState<boolean>(entity?.from === 'feishu')
     const save:()=>Promise<boolean | string> =  ()=>{
         let url:string
         let method:string

@@ -36,6 +36,11 @@ const MemberPage = ()=>{
         const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>('-1')
         const {accessData,state} = useGlobalContext()
         const [refreshMemberCount, setRefreshMemberCount] = useState<number>(0)
+        const [refreshTableCount, setRefreshTableCount] = useState<number>(0)
+        
+        const refreshMemberTable = () => {
+            setRefreshTableCount(prev => prev + 1)
+        }
     const onSearchWordChange = (e:string)=>{
             setSearchWord(e || '')
         }
@@ -90,7 +95,7 @@ const MemberPage = ()=>{
                         case 'addChild':
                             return AddChildRef.current?.save().then((res)=>{if(res === true)getDepartmentList()})
                         case 'addMember':
-                            return AddMemberRef.current?.save().then((res)=>{if(res === true){getDepartmentList();setRefreshMemberCount(pre=>pre+1)}})
+                            return AddMemberRef.current?.save().then((res)=>{if(res === true){getDepartmentList();setRefreshMemberCount(pre=>pre+1);refreshMemberTable()}})
                         case 'rename':
                             return RenameRef.current?.save().then((res)=>{if(res === true)getDepartmentList()})
                         case 'delete':
@@ -262,7 +267,7 @@ const MemberPage = ()=>{
                         </div>
                     </div>
                     <div className="flex-1 p-btnbase pr-PAGE_INSIDE_X overflow-x-hidden">
-                        <Outlet context={{refreshMemberCount, selectedDepartmentIds,refreshGroup:()=>getDepartmentList()}}/>
+                        <Outlet context={{refreshMemberCount, selectedDepartmentIds,refreshGroup:()=>getDepartmentList(), refreshTableCount}}/>
                     </div>
                 </div>
             </InsidePage>);

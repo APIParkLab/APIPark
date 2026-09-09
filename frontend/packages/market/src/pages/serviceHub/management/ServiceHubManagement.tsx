@@ -336,7 +336,7 @@ export default function ServiceHubManagement() {
               setTableSearchWord={setTableSearchWord}
               editApp={(row: ServiceHubAppListItem) => {
                 setAppName(row.name)
-                navigateTo(`/consumer/${row.team.id}/inside/${row.id}/service`)
+                navigateTo(`/consumer/${row.team.id}/inside/${row.id}/authorization`)
               }}
             />
           )}

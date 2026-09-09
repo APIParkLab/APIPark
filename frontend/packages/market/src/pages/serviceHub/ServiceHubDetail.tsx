@@ -74,15 +74,11 @@ const ServiceHubDetail = () => {
 
               // 添加servers部分
               if (!apiDoc.includes('servers:')) {
-                const serverConfig = `info:
-    title: API Space API
-    version: 1.0.0
-openapi: 3.0.1
-servers:
+                const serverConfig = `servers:
   - url: ${apiPrefix}
     description: 默认服务器
 `
-                result = serverConfig + result.substring(result.indexOf('paths:'))
+                result = apiDoc.substring(0, pathsIndex) + serverConfig + apiDoc.substring(pathsIndex, pathsIndex + 6)
               }
 
               // 处理路径
@@ -93,11 +89,19 @@ servers:
                 const trimmedLine = line.trim()
 
                 // 检测是否是路径行
-                if (trimmedLine.match(/^\//)) {
+                if (trimmedLine.match(/^['"]?\/.*['"]?:/)) {
                   // 这是一个路径行
-                  const indentation = line.substring(0, line.indexOf('/'))
-                  const pathWithoutIndent = line.substring(line.indexOf('/'))
-                  lines[i] = indentation + apiPrefix + pathWithoutIndent
+                  const pathMatch = line.match(/^(\s*)['"]?(\/[^'"]*)['"]?:\s*$/)
+                  if (pathMatch) {
+                    const indentation = pathMatch[1]
+                    const actualPath = pathMatch[2]
+                    lines[i] = `${indentation}'${apiPrefix}${actualPath}':`
+                  } else {
+                    const indentation = line.substring(0, line.indexOf('/'))
+                    const pathWithoutIndent = line.substring(line.indexOf('/'))
+                    const cleanPath = pathWithoutIndent.replace(/:\s*$/, '').replace(/['"]/g, '')
+                    lines[i] = `${indentation}'${apiPrefix}${cleanPath}':`
+                  }
                 }
               }
 

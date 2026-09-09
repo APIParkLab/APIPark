@@ -93,6 +93,11 @@ const Login: FC = () => {
         const code = query.get('code')
         if (code) {
           feishuLogin(code)
+          setSpinning(false)
+          return
+        }
+        if (isInFeishuClient() && feishu) {
+          openFeishuLogin(feishu.config.client_id)
         }
         setSpinning(false)
       }
@@ -161,10 +166,25 @@ const Login: FC = () => {
     fetchLogin({ username: 'guest', password: '12345678' })
   }
 
+  const isInFeishuClient = () => {
+    // 方法1：检查User-Agent
+    const ua = navigator.userAgent.toLowerCase();
+    const isLark = ua.includes('lark') || ua.includes('feishu');
+    
+    // 方法2：检查全局对象
+    const hasSDK = typeof window.h5sdk !== 'undefined' || typeof window.tt !== 'undefined';
+    
+    // 方法3：检查URL参数
+    const params = new URLSearchParams(window.location.search);
+    const hasFeishuParams = params.has('from') || params.has('required_launch_ability');
+    
+    return isLark || hasSDK || hasFeishuParams;
+  }
+
   // 打开飞书授权页面
-  const openFeishuLogin = () => {
+  const openFeishuLogin = (id?: string) => {
     const href = window.location.origin + window.location.pathname
-    const authUrl = `https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=${feishuAppId}&redirect_uri=${href}`
+    const authUrl = `https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=${id || feishuAppId}&redirect_uri=${href}`
     localStorage.setItem('feishuCallbackUrl', href)
     window.location.href = authUrl
   }
@@ -336,7 +356,7 @@ const Login: FC = () => {
                         loading={loading}
                         className="h-[40px]  w-full inline-flex justify-center items-center"
                         type="default"
-                        onClick={openFeishuLogin}
+                        onClick={() => openFeishuLogin(feishuAppId)}
                       >
                         <img className="h-[30px]" src={FeishuLogo} />
                         {$t('飞书授权登录')}
