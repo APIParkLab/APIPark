@@ -16,7 +16,10 @@ import (
 
 var _ gateway.IDynamicClient = &DynamicClient{}
 
-func NewDynamicClient(client admin_client.Client, resource string) (*DynamicClient, error) {
+func NewDynamicClient(client admin_client.Client, resource string, profession string) (*DynamicClient, error) {
+	if profession != "" {
+		return &DynamicClient{client: client, profession: profession, driver: resource}, nil
+	}
 	cfg, has := gateway.GetDynamicResourceDriver(resource)
 	if !has {
 		return nil, errors.New("resource not found")

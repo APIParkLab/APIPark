@@ -57,8 +57,8 @@ func (c *ClientDriver) Application() gateway.IApplicationClient {
 	return NewApplicationClient(c.client)
 }
 
-func (c *ClientDriver) Dynamic(resource string) (gateway.IDynamicClient, error) {
-	return NewDynamicClient(c.client, resource)
+func (c *ClientDriver) Dynamic(resource string, profession string) (gateway.IDynamicClient, error) {
+	return NewDynamicClient(c.client, resource,profession string)
 }
 
 func (c *ClientDriver) PluginSetting() gateway.IPluginSetting {
