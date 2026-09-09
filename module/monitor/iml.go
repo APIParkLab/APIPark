@@ -1199,7 +1199,7 @@ func (m *imlMonitorConfig) dynamicClient(ctx context.Context, clusterId string, 
 			log.Warn("close apinto client:", err)
 		}
 	}()
-	dynamic, err := client.Dynamic(resource)
+	dynamic, err := client.Dynamic(resource, "")
 	if err != nil {
 		return err
 	}

@@ -242,7 +242,7 @@ func (i *imlBalanceModule) syncGateway(ctx context.Context, clusterId string, re
 		}
 	}()
 	for _, releaseInfo := range releases {
-		dynamicClient, err := client.Dynamic(releaseInfo.Resource)
+		dynamicClient, err := client.Dynamic(releaseInfo.Resource, "")
 		if err != nil {
 			return err
 		}
@@ -323,7 +323,7 @@ func (i *imlBalanceModule) initGateway(ctx context.Context, clusterId string, cl
 		return err
 	}
 	for _, p := range releases {
-		client, err := clientDriver.Dynamic(p.Resource)
+		client, err := clientDriver.Dynamic(p.Resource, "")
 		if err != nil {
 			return err
 		}

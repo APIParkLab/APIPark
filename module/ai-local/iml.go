@@ -286,7 +286,7 @@ func (i *imlLocalModel) syncGateway(ctx context.Context, clusterId string, relea
 		}
 	}()
 	for _, releaseInfo := range releases {
-		dynamicClient, err := client.Dynamic(releaseInfo.Resource)
+		dynamicClient, err := client.Dynamic(releaseInfo.Resource, "")
 		if err != nil {
 			return err
 		}
@@ -671,7 +671,7 @@ func (i *imlLocalModel) initGateway(ctx context.Context, clusterId string, clien
 	}
 
 	for _, p := range releases {
-		client, err := clientDriver.Dynamic(p.Resource)
+		client, err := clientDriver.Dynamic(p.Resource, "")
 		if err != nil {
 			return err
 		}

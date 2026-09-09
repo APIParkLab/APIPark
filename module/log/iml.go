@@ -122,7 +122,7 @@ func (i *imlLogModule) Save(ctx context.Context, driver string, input *log_dto.S
 			return err
 		}
 		defer client.Close(txCtx)
-		dynamicClient, err := client.Dynamic(driver)
+		dynamicClient, err := client.Dynamic(driver, "")
 		if err != nil {
 			return err
 		}
@@ -217,7 +217,7 @@ func (i *imlLogModule) initGateway(ctx context.Context, clusterId string, client
 			continue
 		}
 		log_driver.SetDriver(driver, d)
-		dynamicClient, err := clientDriver.Dynamic(driver)
+		dynamicClient, err := clientDriver.Dynamic(driver, "")
 		if err != nil {
 			log_print.Errorf("get dynamic client %s error: %s", driver, err)
 			continue
