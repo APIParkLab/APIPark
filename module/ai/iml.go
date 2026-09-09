@@ -748,7 +748,7 @@ func (i *imlProviderModule) initGateway(ctx context.Context, clusterId string, c
 	}
 
 	for _, p := range providers {
-		client, err := clientDriver.Dynamic(p.Resource)
+		client, err := clientDriver.Dynamic(p.Resource, "")
 		if err != nil {
 			return err
 		}
@@ -774,7 +774,7 @@ func (i *imlProviderModule) syncGateway(ctx context.Context, clusterId string, r
 		}
 	}()
 	for _, releaseInfo := range releases {
-		dynamicClient, err := client.Dynamic(releaseInfo.Resource)
+		dynamicClient, err := client.Dynamic(releaseInfo.Resource, "")
 		if err != nil {
 			return err
 		}

@@ -236,7 +236,7 @@ func (i *imlProviderModelModule) syncGateway(ctx context.Context, clusterId stri
 		}
 	}()
 	for _, releaseInfo := range releases {
-		dynamicClient, err := client.Dynamic(releaseInfo.Resource)
+		dynamicClient, err := client.Dynamic(releaseInfo.Resource, "")
 		if err != nil {
 			return err
 		}
