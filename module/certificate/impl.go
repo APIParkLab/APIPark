@@ -6,17 +6,17 @@ import (
 	"errors"
 	"fmt"
 	"time"
-	
+
 	"github.com/eolinker/eosc/log"
 	"gorm.io/gorm"
-	
+
 	"github.com/APIParkLab/APIPark/gateway"
-	
+
 	"github.com/google/uuid"
-	
+
 	"github.com/APIParkLab/APIPark/service/cluster"
 	"github.com/eolinker/go-common/store"
-	
+
 	certificatedto "github.com/APIParkLab/APIPark/module/certificate/dto"
 	"github.com/APIParkLab/APIPark/service/certificate"
 	"github.com/eolinker/ap-account/service/account"
@@ -64,7 +64,7 @@ func (m *imlCertificate) getCertificates(ctx context.Context, clusterId string) 
 }
 
 func (m *imlCertificate) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
-	certificateClient, err := clientDriver.Dynamic("certificate")
+	certificateClient, err := clientDriver.Dynamic("certificate", "")
 	if err != nil {
 		return err
 	}
@@ -76,10 +76,10 @@ func (m *imlCertificate) initGateway(ctx context.Context, clusterId string, clie
 }
 
 func (m *imlCertificate) save(ctx context.Context, id string, clusterId string, create *certificatedto.FileInput) (*certificatedto.Certificate, error) {
-	
+
 	keyData, err := base64.StdEncoding.DecodeString(create.Key)
 	if err != nil {
-		
+
 		return nil, fmt.Errorf("decode key error: %w", err)
 	}
 	certData, err := base64.StdEncoding.DecodeString(create.Cert)
@@ -105,7 +105,7 @@ func (m *imlCertificate) syncGateway(ctx context.Context, clusterId string, rele
 			log.Warn("close apinto client:", err)
 		}
 	}()
-	dynamicClient, err := client.Dynamic("certificate")
+	dynamicClient, err := client.Dynamic("certificate", "")
 	if err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func (m *imlCertificate) syncGateway(ctx context.Context, clusterId string, rele
 }
 
 func (m *imlCertificate) Create(ctx context.Context, create *certificatedto.FileInput) error {
-	
+
 	return m.transaction.Transaction(ctx, func(ctx context.Context) error {
 		id := uuid.New().String()
 		version := time.Now().Format("20060102150405")
@@ -143,7 +143,7 @@ func (m *imlCertificate) Create(ctx context.Context, create *certificatedto.File
 		}
 		return nil
 	})
-	
+
 }
 
 func (m *imlCertificate) Update(ctx context.Context, id string, edit *certificatedto.FileInput) error {
