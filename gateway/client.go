@@ -22,7 +22,7 @@ type IClientDriver interface {
 	Service() IServiceClient
 	Subscribe() ISubscribeClient
 	Strategy() IStrategyClient
-	Dynamic(resource string) (IDynamicClient, error)
+	Dynamic(resource string, profession string) (IDynamicClient, error)
 	Hash() IHashClient
 	PluginSetting() IPluginSetting
 	Commit(ctx context.Context) error
