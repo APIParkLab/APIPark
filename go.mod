@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/eolinker/ap-account v1.0.18
 	github.com/eolinker/eosc v0.18.3
-	github.com/eolinker/go-common v1.1.7
+	github.com/eolinker/go-common v1.1.26
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/getkin/kin-openapi v0.132.0
 	github.com/gin-contrib/gzip v1.0.1
@@ -94,7 +94,6 @@ require (
 //replace (
 //	github.com/eolinker/eosc => ../../eolinker/eosc
 //)
-replace github.com/eolinker/go-common => gitlab.eolink.com/apinto/go-common v1.1.26
 
 //replace github.com/eolinker/ap-account => ../../eolinker/ap-account
 //replace github.com/eolinker/go-common => ../../eolinker/go-common
