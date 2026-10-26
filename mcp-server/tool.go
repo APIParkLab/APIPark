@@ -2,6 +2,7 @@ package mcp_server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,44 +10,47 @@ import (
 	"strings"
 
 	"github.com/eolinker/go-common/utils"
-
-	"github.com/mark3labs/mcp-go/mcp"
-	"github.com/mark3labs/mcp-go/server"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 type ITool interface {
-	Tool() server.ServerTool
+	// Tool 获取Tool
+	Tool() *mcp.Tool
+	Handler() mcp.ToolHandler
 }
 
 type Tool struct {
-	name        string
+	tool        *mcp.Tool
 	url         string
 	method      string
 	contentType string
 	params      map[string]*Param
-	opts        []mcp.ToolOption
 }
 
-func (t *Tool) Tool() server.ServerTool {
-	return server.ServerTool{
-		Tool:    mcp.NewTool(t.name, t.opts...),
-		Handler: generateInvokeTool(t.url, t.method, t.contentType, t.params),
-	}
+func (t *Tool) Tool() *mcp.Tool {
+	return t.tool
 }
 
-func NewTool(name string, uri string, method string, contentType string, params map[string]*Param, opts ...mcp.ToolOption) ITool {
+func (t *Tool) Handler() mcp.ToolHandler {
+	return generateInvokeTool(t.url, t.method, t.contentType, t.params)
+}
+
+func NewTool(name string, description string, inputSchema any, uri string, method string, contentType string, params map[string]*Param) ITool {
 	return &Tool{
-		name:        name,
+		tool: &mcp.Tool{
+			Name:        name,
+			Description: description,
+			InputSchema: inputSchema,
+		},
 		url:         uri,
 		method:      method,
 		contentType: contentType,
 		params:      params,
-		opts:        opts,
 	}
 }
 
-func generateInvokeTool(path string, method string, contentType string, params map[string]*Param) func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func generateInvokeTool(path string, method string, contentType string, params map[string]*Param) mcp.ToolHandler {
+	return func(ctx context.Context, request *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		invokeAddress := utils.GatewayInvoke(ctx)
 		if invokeAddress == "" {
 			return nil, fmt.Errorf("invoke address is empty")
@@ -59,11 +63,18 @@ func generateInvokeTool(path string, method string, contentType string, params m
 			u.Scheme = "http"
 		}
 
+		var args map[string]any
+		if request != nil && request.Params != nil && len(request.Params.Arguments) > 0 {
+			if err := json.Unmarshal(request.Params.Arguments, &args); err != nil {
+				return nil, fmt.Errorf("invalid arguments: %w", err)
+			}
+		}
+
 		queries := url.Values{}
 		headers := make(map[string]string)
 		bodyParam := NewBodyParam(contentType)
 		for k, p := range params {
-			vv, ok := request.GetArguments()[k]
+			vv, ok := args[k]
 			if !ok && p.required {
 				return nil, fmt.Errorf("param %s is required", k)
 			}
@@ -126,6 +137,10 @@ func generateInvokeTool(path string, method string, contentType string, params m
 			return nil, fmt.Errorf("status code %d, %s", resp.StatusCode, string(d))
 		}
 
-		return mcp.NewToolResultText(string(d)), nil
+		return &mcp.CallToolResult{
+			Content: []mcp.Content{
+				&mcp.TextContent{Text: string(d)},
+			},
+		}, nil
 	}
 }

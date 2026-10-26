@@ -146,7 +146,7 @@ func (i *imlMcpController) GlobalMCPConfig(ctx *gin.Context) (string, error) {
 func (i *imlMcpController) OnComplete() {
 	i.sseServers = make(map[string]http.Handler)
 	for language, tools := range mcpToolsByLanguage {
-		s := server.NewMCPServer("APIPark MCP Server", "1.0.0", server.WithLogging())
+		s := server.NewMCPServer("APIPark MCP Server", "1.0.0gemini-3.7-flash", server.WithLogging())
 		s.AddTool(tools[ToolServiceList], i.mcpModule.Services)
 		s.AddTool(tools[ToolOpenAPIDocument], i.mcpModule.APIs)
 		s.AddTool(tools[ToolInvokeAPI], i.mcpModule.Invoke)
@@ -210,10 +210,14 @@ func (i *imlMcpController) GlobalHandleStreamHTTP(ctx *gin.Context) {
 }
 
 func (i *imlMcpController) MCPHandle(ctx *gin.Context) {
-	cfg := i.settingModule.Get(ctx)
+	//cfg := i.settingModule.Get(ctx)
 
-	req := ctx.Request.WithContext(utils.SetGatewayInvoke(ctx.Request.Context(), cfg.InvokeAddress))
-	mcp_server.ServeHTTP(ctx.Writer, req)
+	//req := ctx.Request.WithContext(utils.SetGatewayInvoke(ctx.Request.Context(), cfg.InvokeAddress))
+	if strings.HasSuffix(ctx.Request.URL.Path, "/message") {
+		i.handleMessage(ctx, mcp_server.DefaultMCPServer())
+	} else if strings.HasSuffix(ctx.Request.URL.Path, "/sse") {
+		i.handleSSE(ctx, mcp_server.DefaultMCPServer(), SessionInfo{})
+	}
 }
 
 func (i *imlMcpController) ServiceHandleSSE(ctx *gin.Context) {
@@ -267,6 +271,9 @@ func (i *imlMcpController) ServiceHandleStreamHTTP(ctx *gin.Context) {
 
 func (i *imlMcpController) handleMessage(ctx *gin.Context, server http.Handler) {
 	sessionId := ctx.Request.URL.Query().Get("sessionId")
+	if sessionId == "" {
+		sessionId = ctx.Request.URL.Query().Get("sessionid")
+	}
 	params, ok := i.sessionKeys.Load(sessionId)
 	if !ok {
 		ctx.String(403, "sessionId not found")

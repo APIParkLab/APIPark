@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/eolinker/go-common/env"
+
 	"github.com/eolinker/go-common/utils"
 
 	"github.com/eolinker/go-common/store"
@@ -60,7 +62,9 @@ func NewCommitStore[H any](name string) *Store[H] {
 }
 
 func (h *Store[H]) OnComplete() {
-
+	if !env.AutoMigrate {
+		return
+	}
 	onceMigrate(h.name, func() {
 		db := h.db.DB(context.Background())
 
