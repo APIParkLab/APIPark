@@ -3,6 +3,11 @@ package mcp
 import (
 	"net/http"
 	"regexp"
+	"strings"
+)
+
+var (
+	extractSessionId = regexp.MustCompile(`sessionid=([^&?\s]+)`)
 )
 
 type ResponseWriter struct {
@@ -22,12 +27,16 @@ func (r *ResponseWriter) Header() http.Header {
 }
 
 func (r *ResponseWriter) Write(bytes []byte) (int, error) {
-	re := regexp.MustCompile(`sessionId=([^&?\s]+)`)
-	match := re.FindStringSubmatch(string(bytes))
+
+	data := string(bytes)
+	match := extractSessionId.FindStringSubmatch(data)
 	if len(match) > 1 {
 		r.sessionId <- match[1]
 	}
-	return r.Writer.Write(bytes)
+
+	//data := extractServicePath.ReplaceAllString(string(bytes), `/mcp/service/message/$1$2`)
+	data = strings.Replace(data, "/sse", "/message", -1)
+	return r.Writer.Write([]byte(data))
 }
 
 func (r *ResponseWriter) WriteHeader(statusCode int) {

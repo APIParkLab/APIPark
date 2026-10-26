@@ -64,6 +64,7 @@ func (m *imlCertificate) getCertificates(ctx context.Context, clusterId string) 
 }
 
 func (m *imlCertificate) initGateway(ctx context.Context, clusterId string, clientDriver gateway.IClientDriver) error {
+	// test
 	certificateClient, err := clientDriver.Dynamic("certificate", "")
 	if err != nil {
 		return err

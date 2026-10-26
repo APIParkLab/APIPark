@@ -6,10 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/mark3labs/mcp-go/mcp"
-	"github.com/mitchellh/mapstructure"
-
-	"github.com/mark3labs/mcp-go/server"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 var (
@@ -35,39 +32,45 @@ type Server struct {
 }
 
 type Handler struct {
-	*server.MCPServer
-	handlers map[string]http.Handler
+	server            *mcp.Server
+	sseHandler        *mcp.SSEHandler
+	streamableHandler *mcp.StreamableHTTPHandler
+}
+
+func (h *Handler) Server() *mcp.Server {
+	return h.server
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
-	if strings.HasSuffix(r.URL.Path, "/mcp") {
-		h.handlers["openapi-stream"].ServeHTTP(w, r)
+	path := strings.TrimSuffix(r.URL.Path, "/")
+	if strings.HasSuffix(path, "/mcp") {
+		h.streamableHandler.ServeHTTP(w, r)
 		return
 	}
-	if strings.HasPrefix(r.URL.Path, "/api") {
-		h.handlers["api-sse"].ServeHTTP(w, r)
-		return
-	} else if strings.HasPrefix(r.URL.Path, "/openapi") {
-		h.handlers["openapi-sse"].ServeHTTP(w, r)
+	if strings.Contains(path, "/sse") || strings.Contains(path, "/message") {
+		h.sseHandler.ServeHTTP(w, r)
 		return
 	}
 	http.NotFound(w, r)
-	return
 }
 
-func (s *Server) Set(id string, ser *server.MCPServer) {
+func (s *Server) Set(id string, ser *mcp.Server) {
 	s.locker.Lock()
 	defer s.locker.Unlock()
 	tmp := &Handler{
-		MCPServer: ser,
-		handlers:  make(map[string]http.Handler),
+		server: ser,
+		sseHandler: mcp.NewSSEHandler(func(req *http.Request) *mcp.Server {
+			return ser
+		}, nil),
+		streamableHandler: mcp.NewStreamableHTTPHandler(func(req *http.Request) *mcp.Server {
+			return ser
+		}, &mcp.StreamableHTTPOptions{
+			// The 2026-07-28 (SEP-2575) generation of the MCP spec is only served
+			// by the streamable HTTP transport in stateless mode.
+			Stateless: true,
+		}),
 	}
-	tmp.handlers["api-sse"] = server.NewSSEServer(ser, server.WithStaticBasePath(fmt.Sprintf("/api/v1/%s/%s", ServiceBasePath, id)))
-	tmp.handlers["openapi-sse"] = server.NewSSEServer(ser, server.WithStaticBasePath(fmt.Sprintf("/openapi/v1/%s/%s", ServiceBasePath, id)))
-	tmp.handlers["openapi-stream"] = server.NewStreamableHTTPServer(ser, server.WithEndpointPath(OpenServiceMCPPath))
 	s.servers[id] = tmp
-
 }
 
 func (s *Server) Del(id string) {
@@ -83,15 +86,7 @@ func (s *Server) Get(id string) (*Handler, bool) {
 	if !has {
 		return nil, false
 	}
-	m := &Handler{
-		MCPServer: ser.MCPServer,
-		handlers:  make(map[string]http.Handler),
-	}
-	for k, v := range ser.handlers {
-		m.handlers[k] = v
-	}
-
-	return m, true
+	return ser, true
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -118,7 +113,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.NotFound(w, r)
-	return
 }
 
 func genPath(path string) (sid string, err error) {
@@ -133,19 +127,16 @@ func genPath(path string) (sid string, err error) {
 }
 
 func SetServer(sid string, name string, version string, tools ...ITool) {
-	ser, has := mcpServer.Get(sid)
-	if !has {
-		mcpServer.Set(sid, server.NewMCPServer(name, version, server.WithToolCapabilities(true)))
-		ser, has = mcpServer.Get(sid)
-		if !has {
-			return
+	ser := mcp.NewServer(&mcp.Implementation{
+		Name:    name,
+		Version: version,
+	}, nil)
+	for _, tool := range tools {
+		if tool != nil && tool.Tool() != nil {
+			ser.AddTool(tool.Tool(), tool.Handler())
 		}
 	}
-	ts := make([]server.ServerTool, 0, len(tools))
-	for _, tool := range tools {
-		ts = append(ts, tool.Tool())
-	}
-	ser.SetTools(ts...)
+	mcpServer.Set(sid, ser)
 }
 
 func DelServer(sid string) {
@@ -167,66 +158,76 @@ func SetServerByOpenapi(sid, name, version, content string) error {
 	}
 	tools := make([]ITool, 0, len(mcpInfo.Apis))
 	for _, a := range mcpInfo.Apis {
-		toolOptions := make([]mcp.ToolOption, 0, len(a.Params)+2)
-		toolOptions = append(toolOptions, mcp.WithDescription(a.Description))
+		if a == nil {
+			continue
+		}
+		toolName := strings.TrimSpace(a.Summary)
+		if toolName == "" {
+			toolName = fmt.Sprintf("%s %s", a.Method, a.Path)
+		}
+		toolDesc := strings.TrimSpace(a.Description)
+		if toolDesc == "" {
+			toolDesc = toolName
+		}
+
 		params := make(map[string]*Param)
+		properties := make(map[string]interface{})
+		required := make([]string, 0)
+
 		for _, v := range a.Params {
+			if v == nil {
+				continue
+			}
 			if v.In == "header" && v.Name == "Authorization" {
 				continue
 			}
 			params[v.Name] = NewParam(Position(v.In), v.Required, v.Description)
-			options := make([]mcp.PropertyOption, 0, 2)
-			if v.Required {
-				options = append(options, mcp.Required())
+			prop := map[string]interface{}{
+				"type": "string",
 			}
-			options = append(options, mcp.Description(v.Description))
-			toolOptions = append(toolOptions, mcp.WithString(v.Name, options...))
-		}
-		if a.Body != nil {
-			type Schema struct {
-				Type       string                 `mapstructure:"type"`
-				Properties map[string]interface{} `mapstructure:"properties"`
-				Items      interface{}            `mapstructure:"items"`
-				Required   interface{}            `mapstructure:"required"`
+			if v.Description != "" {
+				prop["description"] = v.Description
 			}
-			var tmp Schema
-			err = mapstructure.Decode(a.Body, &tmp)
-			if err != nil {
-				return err
-			}
-			required := map[string]struct{}{}
-			switch t := tmp.Required.(type) {
-			case []interface{}:
-				for _, v := range t {
-					i, ok := v.(string)
-					if !ok {
-						continue
-					}
-					required[i] = struct{}{}
+			if v.Schema != nil && v.Schema.Value != nil {
+				if v.Schema.Value.Type != nil && len(*v.Schema.Value.Type) > 0 {
+					prop["type"] = (*v.Schema.Value.Type)[0]
+				}
+				if len(v.Schema.Value.Enum) > 0 {
+					prop["enum"] = v.Schema.Value.Enum
 				}
 			}
-			for k, v := range tmp.Properties {
+			properties[v.Name] = prop
+			if v.Required {
+				required = append(required, v.Name)
+			}
+		}
+
+		if a.Body != nil {
+			// 展平 allOf/oneOf/anyOf，得到扁平的属性集合，
+			// 否则组合 schema 的字段会被整体丢弃，Tool 入参将为空。
+			body := flattenBodySchema(a.Body)
+			reqMap := map[string]struct{}{}
+			if names, ok := body["required"].([]string); ok {
+				for _, name := range names {
+					reqMap[name] = struct{}{}
+				}
+			}
+			bodyProperties, _ := body["properties"].(map[string]interface{})
+			for k, v := range bodyProperties {
 				description := ""
 				typ := "string"
 				isRequired := false
-				if _, ok := required[k]; ok {
+				if _, ok := reqMap[k]; ok {
 					isRequired = true
 				}
 				var props map[string]interface{}
 				var items interface{}
-				switch t := v.(type) {
-				case map[string]interface{}:
-					if m, ok := t["type"]; ok {
-						n, ok := m.(string)
-						if ok {
-							typ = n
-						}
+				if t, ok := v.(map[string]interface{}); ok {
+					if m, ok := t["type"].(string); ok {
+						typ = m
 					}
-					if m, ok := t["description"]; ok {
-						n, ok := m.(string)
-						if ok {
-							description = n
-						}
+					if m, ok := t["description"].(string); ok {
+						description = m
 					}
 					switch typ {
 					case "array":
@@ -234,42 +235,41 @@ func SetServerByOpenapi(sid, name, version, content string) error {
 							items = m
 						}
 					case "object":
-						if m, ok := t["properties"]; ok {
-							n, ok := m.(map[string]interface{})
-							if ok {
-								props = n
-							}
+						if m, ok := t["properties"].(map[string]interface{}); ok {
+							props = m
 						}
 					}
 				}
 
 				params[k] = NewParam(PositionBody, isRequired, description)
-				options := make([]mcp.PropertyOption, 0, 3)
-				options = append(options, mcp.Description(description))
+				propMap := map[string]interface{}{
+					"type": typ,
+				}
+				if description != "" {
+					propMap["description"] = description
+				}
 				if props != nil {
-					options = append(options, mcp.Properties(props))
+					propMap["properties"] = props
 				}
 				if items != nil {
-					options = append(options, mcp.Items(items))
+					propMap["items"] = items
 				}
-				switch typ {
-				case "string":
-					toolOptions = append(toolOptions, mcp.WithString(k, options...))
-				case "integer", "number", "float":
-					toolOptions = append(toolOptions, mcp.WithNumber(k, options...))
-				case "boolean":
-					toolOptions = append(toolOptions, mcp.WithBoolean(k, options...))
-				case "array":
-					toolOptions = append(toolOptions, mcp.WithArray(k, options...))
-				case "object":
-					toolOptions = append(toolOptions, mcp.WithObject(k, options...))
-				default:
-					return fmt.Errorf("unsupported type: %s", typ)
+				properties[k] = propMap
+				if isRequired {
+					required = append(required, k)
 				}
 			}
 		}
 
-		tools = append(tools, NewTool(a.Summary, a.Path, a.Method, a.ContentType, params, toolOptions...))
+		schema := map[string]interface{}{
+			"type":       "object",
+			"properties": properties,
+		}
+		if len(required) > 0 {
+			schema["required"] = required
+		}
+
+		tools = append(tools, NewTool(toolName, toolDesc, schema, a.Path, a.Method, a.ContentType, params))
 	}
 	SetServer(sid, name, version, tools...)
 	return nil

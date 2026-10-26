@@ -148,5 +148,137 @@ func recurseSchemaRef(ref *openapi3.SchemaRef) (map[string]interface{}, error) {
 		m["items"] = v
 	}
 
+	// allOf/oneOf/anyOf 的分支同样需要展开，否则 json.Marshal 只会保留
+	// {"$ref": "..."}，无法拿到真实 schema。
+	for _, c := range []struct {
+		key  string
+		refs openapi3.SchemaRefs
+	}{
+		{"allOf", ref.Value.AllOf},
+		{"oneOf", ref.Value.OneOf},
+		{"anyOf", ref.Value.AnyOf},
+	} {
+		if len(c.refs) == 0 {
+			continue
+		}
+		branches := make([]interface{}, 0, len(c.refs))
+		for _, sub := range c.refs {
+			v, err := recurseSchemaRef(sub)
+			if err != nil {
+				return nil, err
+			}
+			branches = append(branches, v)
+		}
+		m[c.key] = branches
+	}
+
 	return m, nil
+}
+
+// schemaRequired 读取 schema 的 required 字段，兼容 json 反序列化产生的
+// []interface{} 与本包展平后写回的 []string。
+func schemaRequired(schema map[string]interface{}) []string {
+	switch names := schema["required"].(type) {
+	case []string:
+		return names
+	case []interface{}:
+		res := make([]string, 0, len(names))
+		for _, name := range names {
+			if s, ok := name.(string); ok {
+				res = append(res, s)
+			}
+		}
+		return res
+	}
+	return nil
+}
+
+// flattenBodySchema 将请求体 schema 中的组合关键字展平，使其能转换为 MCP Tool 的扁平入参：
+//   - allOf：所有分支都必须满足，合并各分支的 properties 与 required；
+//   - oneOf / anyOf：只需满足其中一个分支，合并各分支的 properties，但不继承 required。
+//
+// 分支内的 $ref 已由 recurseSchemaRef 展开。
+func flattenBodySchema(schema map[string]interface{}) map[string]interface{} {
+	if schema == nil {
+		return nil
+	}
+	out := make(map[string]interface{}, len(schema))
+	for k, v := range schema {
+		if k == "allOf" || k == "oneOf" || k == "anyOf" {
+			continue
+		}
+		out[k] = v
+	}
+
+	properties := make(map[string]interface{})
+	required := make([]string, 0)
+	requiredSet := make(map[string]struct{})
+	addRequired := func(names []string) {
+		for _, name := range names {
+			if _, has := requiredSet[name]; has {
+				continue
+			}
+			requiredSet[name] = struct{}{}
+			required = append(required, name)
+		}
+	}
+	if props, ok := out["properties"].(map[string]interface{}); ok {
+		for k, v := range props {
+			if m, ok := v.(map[string]interface{}); ok {
+				properties[k] = flattenBodySchema(m)
+				continue
+			}
+			properties[k] = v
+		}
+	}
+	addRequired(schemaRequired(out))
+
+	branches := func(key string) []map[string]interface{} {
+		items, ok := schema[key].([]interface{})
+		if !ok {
+			return nil
+		}
+		res := make([]map[string]interface{}, 0, len(items))
+		for _, item := range items {
+			if m, ok := item.(map[string]interface{}); ok {
+				res = append(res, m)
+			}
+		}
+		return res
+	}
+	merge := func(branch map[string]interface{}, inheritRequired bool) {
+		branch = flattenBodySchema(branch)
+		if props, ok := branch["properties"].(map[string]interface{}); ok {
+			for k, v := range props {
+				if _, has := properties[k]; !has {
+					properties[k] = v
+				}
+			}
+		}
+		if inheritRequired {
+			addRequired(schemaRequired(branch))
+		}
+	}
+	for _, branch := range branches("allOf") {
+		merge(branch, true)
+	}
+	for _, branch := range branches("oneOf") {
+		merge(branch, false)
+	}
+	for _, branch := range branches("anyOf") {
+		merge(branch, false)
+	}
+
+	if len(properties) > 0 {
+		out["properties"] = properties
+		if _, has := out["type"]; !has {
+			out["type"] = "object"
+		}
+	}
+	if len(required) > 0 {
+		out["required"] = required
+	} else {
+		delete(out, "required")
+	}
+	return out
 }

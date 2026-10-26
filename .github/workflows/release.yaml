@@ -48,7 +48,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.21.1'
+          go-version: '1.26.3'
       - name: Go tidy
         run: |
           go mod tidy
