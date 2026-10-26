@@ -94,16 +94,5 @@
     "typescript": "^5.2.2",
     "vite": "^5.0.0",
     "vite-jest": "^0.1.4"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@scarf/scarf",
-      "@tree-sitter-grammars/tree-sitter-yaml",
-      "core-js-pure",
-      "esbuild",
-      "nx",
-      "tree-sitter",
-      "tree-sitter-json"
-    ]
   }
 }
