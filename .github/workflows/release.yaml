@@ -17,10 +17,10 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v3.0.0
         with:
-          node-version: '24.22.1'
+          node-version: '18.20.0'
       - name: Pnpm install and build
         run: |
-          npm install -g pnpm
+          npm install -g pnpm@9
           pnpm install --registry https://registry.npmmirror.com --dir ./frontend
           echo "Build frontend..."
           cd ./frontend && pnpm run build
