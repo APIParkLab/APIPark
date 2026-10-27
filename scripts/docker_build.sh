@@ -45,6 +45,6 @@ imageName=${User}/${APP}:${VERSION}-${ARCH}
 docker rmi -f ${imageName}
 
 echo "docker build ${OPTIONS} -t ${imageName} --build-arg VERSION=${VERSION} --build-arg APP=${APP}  -f ./scripts/Dockerfile ./scripts/"
-docker build ${OPTIONS} -t ${imageName} --build-arg VERSION=${VERSION} --build-arg APP=${APP}  -f ./scripts/Dockerfile ./scripts/
+docker build ${OPTIONS} --provenance=false -t ${imageName} --build-arg VERSION=${VERSION} --build-arg APP=${APP}  -f ./scripts/Dockerfile ./scripts/
 
 
