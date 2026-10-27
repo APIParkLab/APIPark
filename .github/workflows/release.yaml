@@ -33,6 +33,8 @@ jobs:
     needs: [frontend-builder]
     name: release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: SetOutput #处理Tag字符串并存进outputs
         id: vars
