@@ -9,7 +9,7 @@
   <body id="eo-body">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
+    <script type="module">
       document.addEventListener('DOMContentLoaded', () => {
         const eoBody = document.getElementById('eo-body');
         const favicon = document.getElementById('favicon');
@@ -22,8 +22,8 @@
           return script;
         };
 
-        const iconparkApintoSrc = window.location.hostname === 'localhost' ? '/iconpark_apinto.js' : '/frontend/iconpark_apinto.js';
-        const iconparkEolinkSrc = window.location.hostname === 'localhost' ? '/iconpark_eolink.js' : '/frontend/iconpark_eolink.js';
+        const iconparkApintoSrc = import.meta.env.DEV ? '/iconpark_apinto.js' : '/frontend/iconpark_apinto.js';
+        const iconparkEolinkSrc = import.meta.env.DEV ? '/iconpark_eolink.js' : '/frontend/iconpark_eolink.js';
         const faviconSrc = window.location.hostname === 'localhost' ? '/favicon.ico' : '/frontend/favicon.ico';
 
         favicon.href = faviconSrc;
